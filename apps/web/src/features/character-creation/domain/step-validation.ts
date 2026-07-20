@@ -2,6 +2,10 @@ import {
   validateAttributeDistribution,
 } from './attribute-rules'
 
+import {
+  validateSkillDistribution,
+} from './skill-rules'
+
 import type {
   CharacterDraft,
 } from '../types/character-draft.types'
@@ -59,6 +63,21 @@ export function validateAttributesStep(
   }
 }
 
+export function validateSkillsStep(
+  draft: CharacterDraft,
+): StepValidationResult {
+  const result =
+    validateSkillDistribution(
+      draft.skills,
+      draft.skillDistributionMethod,
+    )
+
+  return {
+    valid: result.valid,
+    errors: result.errors,
+  }
+}
+
 export function validateStep(
   stepId: CreationStepId,
   draft: CharacterDraft,
@@ -69,6 +88,9 @@ export function validateStep(
 
     case 'attributes':
       return validateAttributesStep(draft)
+
+    case 'skills':
+      return validateSkillsStep(draft)
 
     default:
       return valid()

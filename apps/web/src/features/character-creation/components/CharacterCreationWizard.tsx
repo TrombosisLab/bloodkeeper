@@ -7,6 +7,10 @@ import {
   buildStepValidationMap,
 } from '../domain/step-validation'
 
+import {
+  removeInvalidSpecialties,
+} from '../domain/skill-specialty-rules'
+
 import type {
   CharacterDraft,
 } from '../types/character-draft.types'
@@ -19,6 +23,7 @@ import { AttributesStep } from './AttributesStep'
 import { CreationProgress } from './CreationProgress'
 import { CreationStepPlaceholder } from './CreationStepPlaceholder'
 import { IdentityStep } from './IdentityStep'
+import { SkillsStep } from './SkillsStep'
 
 interface CharacterCreationWizardProps {
   onBackToSheet: () => void
@@ -233,6 +238,50 @@ export function CharacterCreationWizard({
                   (current) => ({
                     ...current,
                     attributes,
+                  }),
+                )
+              }
+            />
+          ) : currentStepId ===
+            'skills' ? (
+            <SkillsStep
+              value={draft.skills}
+              method={
+                draft.skillDistributionMethod
+              }
+              specialties={
+                draft.skillSpecialties
+              }
+              onChange={(skills) =>
+                updateDraft(
+                  (current) => ({
+                    ...current,
+                    skills,
+                    skillSpecialties:
+                      removeInvalidSpecialties(
+                        current.skillSpecialties,
+                        skills,
+                      ),
+                  }),
+                )
+              }
+              onMethodChange={(
+                skillDistributionMethod,
+              ) =>
+                updateDraft(
+                  (current) => ({
+                    ...current,
+                    skillDistributionMethod,
+                  }),
+                )
+              }
+              onSpecialtiesChange={(
+                skillSpecialties,
+              ) =>
+                updateDraft(
+                  (current) => ({
+                    ...current,
+                    skillSpecialties,
                   }),
                 )
               }
