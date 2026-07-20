@@ -993,3 +993,227 @@ select {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==================================================
+   002-E — ESTADO VAMPIRICO
+   ================================================== */
+
+.sr-only {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+
+  clip: rect(0, 0, 0, 0);
+
+  white-space: nowrap;
+
+  border: 0;
+}
+
+.state-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.07),
+      transparent 280px
+    );
+}
+
+.state-grid {
+  display: grid;
+
+  grid-template-columns:
+    2fr 1fr 1fr;
+
+  gap: 1px;
+
+  border: 1px solid #392d2f;
+
+  background: #392d2f;
+}
+
+.state-card {
+  min-width: 0;
+
+  padding: 22px;
+
+  background: #121010;
+}
+
+.state-card__heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  margin-bottom: 22px;
+}
+
+.state-card__heading span,
+.state-card__heading strong {
+  display: block;
+}
+
+.state-card__heading span {
+  margin-bottom: 5px;
+
+  color: #a76d75;
+
+  font-size: 0.7rem;
+  font-weight: 800;
+
+  letter-spacing: 0.15em;
+
+  text-transform: uppercase;
+}
+
+.state-card__heading strong {
+  color: #e1d8d2;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.8rem;
+  font-weight: 400;
+}
+
+.state-card__heading small {
+  color: #675e5b;
+
+  font-size: 0.65rem;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+.humanity-track {
+  display: grid;
+
+  grid-template-columns:
+    repeat(10, minmax(20px, 1fr));
+
+  gap: 7px;
+}
+
+.humanity-box {
+  aspect-ratio: 1;
+
+  border: 1px solid #554447;
+
+  background: #0d0b0b;
+}
+
+.humanity-box--filled {
+  border-color: #9b7479;
+
+  background:
+    linear-gradient(
+      135deg,
+      #795159,
+      #4c3035
+    );
+
+  box-shadow:
+    inset 0 0 0 3px #171112;
+}
+
+.hunger-track {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  min-height: 42px;
+}
+
+.hunger-drop {
+  width: 24px;
+  height: 32px;
+
+  display: block;
+
+  border: 1px solid #6f444b;
+
+  border-radius:
+    55% 55% 58% 58% /
+    38% 38% 70% 70%;
+
+  transform: rotate(45deg);
+
+  background: #0d0b0b;
+}
+
+.hunger-drop--filled {
+  border-color: #a34d59;
+
+  background:
+    linear-gradient(
+      135deg,
+      #8d2837,
+      #4e1720
+    );
+
+  box-shadow:
+    inset 0 0 0 3px #171112;
+}
+
+.blood-potency-display {
+  min-height: 42px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.blood-potency-display span {
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid #704149;
+
+  transform: rotate(45deg);
+
+  color: transparent;
+}
+
+.blood-potency-display strong {
+  color: #bd747d;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.6rem;
+
+  font-weight: 400;
+}
+
+@media (max-width: 900px) {
+  .state-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .humanity-track {
+    grid-template-columns:
+      repeat(5, minmax(28px, 1fr));
+  }
+}

@@ -3,6 +3,7 @@ import { demoCharacter } from '../data/demo-character'
 import { CharacterAttributes } from './CharacterAttributes'
 import { CharacterIdentity } from './CharacterIdentity'
 import { CharacterSkills } from './CharacterSkills'
+import { CharacterState } from './CharacterState'
 
 export function CharacterSheet() {
   return (
@@ -28,6 +29,8 @@ export function CharacterSheet() {
       <CharacterAttributes />
 
       <CharacterSkills />
+
+      <CharacterState />
     </article>
   )
 }
