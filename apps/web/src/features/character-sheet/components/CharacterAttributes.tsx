@@ -1,5 +1,6 @@
 import { demoAttributes } from '../data/demo-attributes'
 import { AttributeRow } from './AttributeRow'
+import { CharacterTrackers } from './CharacterTrackers'
 
 export function CharacterAttributes() {
   return (
@@ -48,21 +49,7 @@ export function CharacterAttributes() {
         ))}
       </div>
 
-      <div className="derived-preview">
-        <div>
-          <span>Salud</span>
-          <strong>
-            Se incorporará debajo de Atributos
-          </strong>
-        </div>
-
-        <div>
-          <span>Fuerza de Voluntad</span>
-          <strong>
-            Se incorporará debajo de Atributos
-          </strong>
-        </div>
-      </div>
+      <CharacterTrackers />
     </section>
   )
 }

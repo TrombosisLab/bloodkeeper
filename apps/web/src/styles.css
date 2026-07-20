@@ -738,3 +738,163 @@ select {
     height: 13px;
   }
 }
+
+/* ==================================================
+   002-C — SALUD Y FUERZA DE VOLUNTAD
+   ================================================== */
+
+.character-trackers {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 1px;
+
+  margin-top: 22px;
+
+  border: 1px solid #392d2f;
+
+  background: #392d2f;
+}
+
+.damage-tracker {
+  min-width: 0;
+
+  padding: 20px;
+
+  background: #121010;
+}
+
+.damage-tracker__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  margin-bottom: 18px;
+}
+
+.damage-tracker__label,
+.damage-tracker__capacity {
+  display: block;
+}
+
+.damage-tracker__label {
+  margin-bottom: 4px;
+
+  color: #a76d75;
+
+  font-size: 0.7rem;
+  font-weight: 800;
+
+  letter-spacing: 0.16em;
+
+  text-transform: uppercase;
+}
+
+.damage-tracker__capacity {
+  color: #e1d8d2;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.7rem;
+  font-weight: 400;
+}
+
+.damage-tracker__maximum {
+  color: #675e5b;
+
+  font-size: 0.68rem;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+.damage-tracker__boxes {
+  display: grid;
+
+  grid-template-columns:
+    repeat(10, minmax(20px, 1fr));
+
+  gap: 8px;
+}
+
+.damage-box {
+  position: relative;
+
+  aspect-ratio: 1;
+
+  display: block;
+
+  border: 1px solid #4d3b3e;
+
+  background: #0e0c0c;
+}
+
+.damage-box--available {
+  border-color: #816168;
+}
+
+.damage-box--unavailable {
+  opacity: 0.22;
+}
+
+.damage-box--superficial::after {
+  content: "";
+
+  position: absolute;
+
+  left: 16%;
+  right: 16%;
+
+  top: 50%;
+
+  height: 1px;
+
+  background: #d0a2a8;
+
+  transform: rotate(-45deg);
+}
+
+.damage-box--aggravated::before,
+.damage-box--aggravated::after {
+  content: "";
+
+  position: absolute;
+
+  left: 14%;
+  right: 14%;
+
+  top: 50%;
+
+  height: 1px;
+
+  background: #d5848e;
+}
+
+.damage-box--aggravated::before {
+  transform: rotate(45deg);
+}
+
+.damage-box--aggravated::after {
+  transform: rotate(-45deg);
+}
+
+@media (max-width: 900px) {
+  .character-trackers {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .damage-tracker__boxes {
+    grid-template-columns:
+      repeat(5, minmax(24px, 1fr));
+  }
+}
