@@ -1862,3 +1862,175 @@ select {
     border-bottom: 0;
   }
 }
+
+/* ==================================================
+   002-J — ESPECIALIDADES Y SECCIONES SECUNDARIAS
+   ================================================== */
+
+.skill-row__identity {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.skill-row__specialties {
+  max-width: 190px;
+  overflow: hidden;
+  color: #806f6c;
+  font-size: 0.61rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.secondary-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.045),
+      transparent 320px
+    );
+}
+
+.secondary-grid {
+  display: grid;
+  grid-template-columns:
+    0.9fr 1fr 1.35fr;
+  gap: 1px;
+  border: 1px solid #392d2f;
+  background: #392d2f;
+}
+
+.secondary-panel {
+  min-width: 0;
+  background: #121010;
+}
+
+.secondary-panel > header {
+  min-height: 82px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #392d2f;
+  background: rgb(93 30 39 / 0.045);
+}
+
+.secondary-panel > header span {
+  display: block;
+  margin-bottom: 7px;
+  color: #776c68;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.secondary-panel > header h3 {
+  margin: 0;
+  color: #d8cec8;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 1.28rem;
+  font-weight: 400;
+}
+
+.inventory-list,
+.history-list {
+  padding: 7px 20px;
+}
+
+.inventory-item,
+.history-entry {
+  border-bottom: 1px solid #292324;
+}
+
+.inventory-item:last-child,
+.history-entry:last-child {
+  border-bottom: 0;
+}
+
+.inventory-item {
+  min-height: 55px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.inventory-item strong,
+.history-entry strong {
+  color: #d0c6c0;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.inventory-item span {
+  margin-top: 3px;
+  color: #716764;
+  font-size: 0.65rem;
+}
+
+.notes-list {
+  margin: 0;
+  padding: 8px 20px;
+  list-style: none;
+}
+
+.notes-list li {
+  position: relative;
+  padding:
+    14px
+    0
+    14px
+    17px;
+  border-bottom: 1px solid #292324;
+  color: #bfb5af;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.notes-list li:last-child {
+  border-bottom: 0;
+}
+
+.notes-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20px;
+  width: 6px;
+  height: 6px;
+  border: 1px solid #805159;
+  transform: rotate(45deg);
+}
+
+.history-entry {
+  padding: 13px 0;
+}
+
+.history-entry p {
+  margin: 5px 0 0;
+  color: #776d69;
+  font-size: 0.69rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .secondary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .skill-row__specialties {
+    max-width: 240px;
+  }
+}

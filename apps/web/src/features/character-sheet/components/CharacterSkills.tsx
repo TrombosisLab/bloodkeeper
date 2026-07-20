@@ -37,6 +37,7 @@ export function CharacterSkills() {
                   key={skill.key}
                   label={skill.label}
                   value={skill.value}
+                  specialties={skill.specialties}
                 />
               ))}
             </div>

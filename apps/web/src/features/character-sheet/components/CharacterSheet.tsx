@@ -8,6 +8,7 @@ import { CharacterDisciplines } from './CharacterDisciplines'
 import { CharacterAdvantages } from './CharacterAdvantages'
 import { CharacterNarrative } from './CharacterNarrative'
 import { CharacterBloodExperience } from './CharacterBloodExperience'
+import { CharacterSecondary } from './CharacterSecondary'
 
 export function CharacterSheet() {
   return (
@@ -43,6 +44,8 @@ export function CharacterSheet() {
       <CharacterNarrative />
 
       <CharacterBloodExperience />
+
+      <CharacterSecondary />
     </article>
   )
 }
