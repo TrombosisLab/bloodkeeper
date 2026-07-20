@@ -1545,3 +1545,188 @@ select {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==================================================
+   002-H — CONVICCIONES Y PIEDRAS DE TOQUE
+   ================================================== */
+
+.narrative-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.05),
+      transparent 320px
+    );
+}
+
+.narrative-grid {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr 1.25fr;
+
+  gap: 1px;
+
+  border: 1px solid #392d2f;
+
+  background: #392d2f;
+}
+
+.narrative-panel {
+  min-width: 0;
+
+  background: #121010;
+}
+
+.narrative-panel header {
+  min-height: 82px;
+
+  padding: 18px 20px;
+
+  border-bottom: 1px solid #392d2f;
+
+  background:
+    rgb(93 30 39 / 0.05);
+}
+
+.narrative-panel header span {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #776c68;
+
+  font-size: 0.62rem;
+  font-weight: 700;
+
+  letter-spacing: 0.13em;
+
+  text-transform: uppercase;
+}
+
+.narrative-panel header h3 {
+  margin: 0;
+
+  color: #d8cec8;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.28rem;
+  font-weight: 400;
+}
+
+.narrative-list {
+  margin: 0;
+  padding: 8px 20px;
+
+  list-style: none;
+}
+
+.narrative-list li {
+  position: relative;
+
+  padding:
+    14px
+    0
+    14px
+    18px;
+
+  border-bottom: 1px solid #292324;
+
+  color: #cfc5bf;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.9rem;
+
+  line-height: 1.45;
+}
+
+.narrative-list li:last-child {
+  border-bottom: 0;
+}
+
+.narrative-list li::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 20px;
+
+  width: 7px;
+  height: 7px;
+
+  border: 1px solid #8b535b;
+
+  transform: rotate(45deg);
+}
+
+.touchstone-list {
+  padding: 8px 20px;
+}
+
+.touchstone {
+  min-height: 62px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  border-bottom: 1px solid #292324;
+}
+
+.touchstone:last-child {
+  border-bottom: 0;
+}
+
+.touchstone strong {
+  color: #d4cac4;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+.touchstone span {
+  margin-top: 4px;
+
+  color: #746a67;
+
+  font-size: 0.68rem;
+}
+
+.narrative-panel--notes p {
+  margin: 0;
+
+  padding: 20px;
+
+  color: #bfb5af;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.92rem;
+
+  line-height: 1.65;
+}
+
+@media (max-width: 900px) {
+  .narrative-grid {
+    grid-template-columns: 1fr;
+  }
+}
