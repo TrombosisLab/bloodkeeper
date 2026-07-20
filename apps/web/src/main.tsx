@@ -1,19 +1,53 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
 
 import { AppHeader } from './components/layout/AppHeader'
+import { CharacterCreationWizard } from './features/character-creation/components/CharacterCreationWizard'
 import { CharacterSheet } from './features/character-sheet/components/CharacterSheet'
 
 import './styles.css'
 
+type AppView =
+  | 'sheet'
+  | 'creation'
+
 function App() {
+  const [view, setView] =
+    useState<AppView>('sheet')
+
   return (
     <div className="application">
       <AppHeader />
 
-      <main className="application-content">
-        <CharacterSheet />
-      </main>
+      {view === 'sheet' ? (
+        <main className="application-content">
+          <div className="sheet-toolbar">
+            <div>
+              <span className="sheet-toolbar__eyebrow">
+                Personajes
+              </span>
+
+              <strong>
+                Adrián Varela
+              </strong>
+            </div>
+
+            <button
+              type="button"
+              className="sheet-toolbar__action"
+              onClick={() => setView('creation')}
+            >
+              Crear personaje
+            </button>
+          </div>
+
+          <CharacterSheet />
+        </main>
+      ) : (
+        <CharacterCreationWizard
+          onBackToSheet={() => setView('sheet')}
+        />
+      )}
     </div>
   )
 }
