@@ -1384,3 +1384,164 @@ select {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==================================================
+   002-G — VENTAJAS, TRASFONDOS Y DEFECTOS
+   ================================================== */
+
+.advantages-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.055),
+      transparent 300px
+    );
+}
+
+.advantages-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 1px;
+
+  border: 1px solid #392d2f;
+
+  background: #392d2f;
+}
+
+.trait-group {
+  min-width: 0;
+
+  background: #121010;
+}
+
+.trait-group__header {
+  min-height: 86px;
+
+  padding: 18px 20px;
+
+  border-bottom: 1px solid #392d2f;
+
+  background:
+    rgb(93 30 39 / 0.055);
+}
+
+.trait-group__header span {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #776c68;
+
+  font-size: 0.62rem;
+  font-weight: 700;
+
+  letter-spacing: 0.13em;
+
+  text-transform: uppercase;
+}
+
+.trait-group__header h3 {
+  margin: 0;
+
+  color: #d8cec8;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.35rem;
+  font-weight: 400;
+}
+
+.trait-group__content {
+  padding: 7px 20px;
+}
+
+.rated-trait {
+  min-height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  border-bottom: 1px solid #292324;
+}
+
+.rated-trait:last-child {
+  border-bottom: 0;
+}
+
+.rated-trait__identity {
+  min-width: 0;
+}
+
+.rated-trait__identity span,
+.rated-trait__identity small {
+  display: block;
+}
+
+.rated-trait__identity span {
+  color: #d2c8c2;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.92rem;
+}
+
+.rated-trait__identity small {
+  margin-top: 4px;
+
+  color: #706663;
+
+  font-size: 0.66rem;
+}
+
+.rated-trait--negative
+.rated-trait__identity span {
+  color: #bd858b;
+}
+
+.advantages-section .dot-rating {
+  gap: 5px;
+}
+
+.advantages-section .dot-rating__dot {
+  width: 12px;
+  height: 12px;
+}
+
+.rated-trait--negative
+.dot-rating__dot--filled {
+  border-color: #9d5962;
+
+  background: #74333d;
+}
+
+.trait-group__empty {
+  color: #665d5a;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+@media (max-width: 900px) {
+  .advantages-grid {
+    grid-template-columns: 1fr;
+  }
+}
