@@ -2489,3 +2489,143 @@ select {
     text-align: center;
   }
 }
+
+/* ==================================================
+   MILESTONE-003 / 003-B — IDENTIDAD
+   ================================================== */
+
+.identity-step {
+  flex: 1;
+
+  padding:
+    clamp(30px, 5vw, 64px);
+}
+
+.creation-step-heading {
+  margin-bottom: 34px;
+}
+
+.creation-step-heading > span {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #9e656d;
+
+  font-size: 0.67rem;
+  font-weight: 800;
+
+  letter-spacing: 0.15em;
+
+  text-transform: uppercase;
+}
+
+.creation-step-heading h2 {
+  margin: 0;
+
+  color: #dfd4ce;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(2rem, 4vw, 3.4rem);
+
+  font-weight: 400;
+}
+
+.creation-step-heading p {
+  max-width: 650px;
+
+  margin:
+    14px
+    0
+    0;
+
+  color: #8d817d;
+
+  line-height: 1.6;
+}
+
+.creation-form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 20px;
+}
+
+.creation-field {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.creation-field--wide {
+  grid-column: span 2;
+}
+
+.creation-field > span {
+  color: #846f72;
+
+  font-size: 0.65rem;
+  font-weight: 800;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.creation-field input,
+.creation-field select,
+.creation-field textarea {
+  width: 100%;
+
+  border: 1px solid #443639;
+  border-radius: 2px;
+
+  padding: 12px 13px;
+
+  color: #ddd3cd;
+  background: #0d0b0b;
+
+  outline: none;
+}
+
+.creation-field textarea {
+  resize: vertical;
+}
+
+.creation-field input::placeholder,
+.creation-field textarea::placeholder {
+  color: #554c49;
+}
+
+.creation-field input:focus,
+.creation-field select:focus,
+.creation-field textarea:focus {
+  border-color: #83505a;
+
+  box-shadow:
+    0 0 0 2px rgb(131 80 90 / 0.1);
+}
+
+.creation-field select {
+  color-scheme: dark;
+}
+
+@media (max-width: 720px) {
+  .creation-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .creation-field--wide {
+    grid-column: auto;
+  }
+}

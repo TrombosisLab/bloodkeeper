@@ -1,6 +1,11 @@
 import { useState } from 'react'
 
 import { creationSteps } from '../data/creation-steps'
+import { initialCharacterDraft } from '../data/initial-character-draft'
+
+import type {
+  CharacterDraft,
+} from '../types/character-draft.types'
 
 import type {
   CreationStepId,
@@ -8,6 +13,7 @@ import type {
 
 import { CreationProgress } from './CreationProgress'
 import { CreationStepPlaceholder } from './CreationStepPlaceholder'
+import { IdentityStep } from './IdentityStep'
 
 interface CharacterCreationWizardProps {
   onBackToSheet: () => void
@@ -18,6 +24,11 @@ export function CharacterCreationWizard({
 }: CharacterCreationWizardProps) {
   const [currentStepId, setCurrentStepId] =
     useState<CreationStepId>('identity')
+
+  const [draft, setDraft] =
+    useState<CharacterDraft>(
+      initialCharacterDraft,
+    )
 
   const currentIndex = creationSteps.findIndex(
     (step) => step.id === currentStepId,
@@ -49,6 +60,16 @@ export function CharacterCreationWizard({
 
     setCurrentStepId(
       creationSteps[currentIndex + 1].id,
+    )
+  }
+
+  function updateDraft(
+    updater: (
+      current: CharacterDraft,
+    ) => CharacterDraft,
+  ) {
+    setDraft((current) =>
+      updater(current),
     )
   }
 
@@ -97,9 +118,21 @@ export function CharacterCreationWizard({
         </aside>
 
         <section className="creation-workspace">
-          <CreationStepPlaceholder
-            step={currentStep}
-          />
+          {currentStepId === 'identity' ? (
+            <IdentityStep
+              value={draft.identity}
+              onChange={(identity) =>
+                updateDraft((current) => ({
+                  ...current,
+                  identity,
+                }))
+              }
+            />
+          ) : (
+            <CreationStepPlaceholder
+              step={currentStep}
+            />
+          )}
 
           <footer className="creation-actions">
             <button
