@@ -1,4 +1,5 @@
 services:
+
   web:
     build:
       context: ./apps/web
@@ -7,5 +8,19 @@ services:
 
     ports:
       - "5173:5173"
+
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./apps/api
+
+    container_name: v5r-api
+
+    environment:
+      PORT: 3000
+
+    ports:
+      - "3000:3000"
 
     restart: unless-stopped
