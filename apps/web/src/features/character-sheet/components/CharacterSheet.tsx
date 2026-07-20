@@ -4,6 +4,7 @@ import { CharacterAttributes } from './CharacterAttributes'
 import { CharacterIdentity } from './CharacterIdentity'
 import { CharacterSkills } from './CharacterSkills'
 import { CharacterState } from './CharacterState'
+import { CharacterDisciplines } from './CharacterDisciplines'
 
 export function CharacterSheet() {
   return (
@@ -31,6 +32,8 @@ export function CharacterSheet() {
       <CharacterSkills />
 
       <CharacterState />
+
+      <CharacterDisciplines />
     </article>
   )
 }

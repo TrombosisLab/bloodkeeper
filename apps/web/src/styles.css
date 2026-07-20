@@ -1217,3 +1217,170 @@ select {
       repeat(5, minmax(28px, 1fr));
   }
 }
+
+/* ==================================================
+   002-F — DISCIPLINAS
+   ================================================== */
+
+.disciplines-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.065),
+      transparent 300px
+    );
+}
+
+.disciplines-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 1px;
+
+  border: 1px solid #392d2f;
+
+  background: #392d2f;
+}
+
+.discipline-card {
+  min-width: 0;
+
+  background: #121010;
+}
+
+.discipline-card__header {
+  min-height: 105px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  padding: 20px;
+
+  border-bottom: 1px solid #392d2f;
+}
+
+.discipline-card__kicker {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #786c69;
+
+  font-size: 0.62rem;
+  font-weight: 700;
+
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
+}
+
+.discipline-card h3 {
+  margin: 0;
+
+  color: #ddd3cd;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.discipline-card__powers {
+  padding: 18px 20px 20px;
+}
+
+.discipline-card__powers-label {
+  display: block;
+
+  margin-bottom: 12px;
+
+  color: #a76d75;
+
+  font-size: 0.65rem;
+  font-weight: 800;
+
+  letter-spacing: 0.13em;
+
+  text-transform: uppercase;
+}
+
+.discipline-card__powers ul {
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.discipline-card__powers li {
+  min-height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  border-bottom: 1px solid #292324;
+}
+
+.discipline-card__powers li:last-child {
+  border-bottom: 0;
+}
+
+.discipline-card__powers li span {
+  color: #cfc5bf;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.9rem;
+}
+
+.discipline-card__powers li small {
+  flex: 0 0 auto;
+
+  color: #716764;
+
+  font-size: 0.64rem;
+
+  letter-spacing: 0.06em;
+
+  text-transform: uppercase;
+}
+
+.discipline-card__empty {
+  margin: 0;
+
+  color: #665d5a;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.disciplines-section .dot-rating__dot {
+  width: 13px;
+  height: 13px;
+}
+
+@media (max-width: 900px) {
+  .disciplines-grid {
+    grid-template-columns: 1fr;
+  }
+}
