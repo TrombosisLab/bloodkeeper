@@ -2915,3 +2915,58 @@ select {
       repeat(2, minmax(0, 1fr));
   }
 }
+
+/* ==================================================
+   MILESTONE-003 / 003-D — VALIDACION DE NAVEGACION
+   ================================================== */
+
+.creation-progress__step--locked {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.creation-progress__step--locked:hover {
+  color: inherit;
+  background: transparent;
+}
+
+.creation-step-errors {
+  margin:
+    0
+    clamp(30px, 5vw, 64px)
+    20px;
+
+  padding: 16px 18px;
+
+  border: 1px solid #693d45;
+
+  background:
+    rgb(111 48 59 / 0.1);
+}
+
+.creation-step-errors strong {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #c58a92;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-weight: 400;
+}
+
+.creation-step-errors ul {
+  margin: 0;
+
+  padding-left: 18px;
+
+  color: #a8787e;
+
+  font-size: 0.78rem;
+
+  line-height: 1.6;
+}
