@@ -1,4 +1,6 @@
 import { demoCharacter } from '../data/demo-character'
+
+import { CharacterAttributes } from './CharacterAttributes'
 import { CharacterIdentity } from './CharacterIdentity'
 
 export function CharacterSheet() {
@@ -22,10 +24,7 @@ export function CharacterSheet() {
         character={demoCharacter}
       />
 
-      <section className="next-section-placeholder">
-        <span>Siguiente bloque</span>
-        <strong>Atributos</strong>
-      </section>
+      <CharacterAttributes />
     </article>
   )
 }
