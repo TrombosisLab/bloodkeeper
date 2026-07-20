@@ -47,6 +47,18 @@ export function validateIdentityStep(
     )
   }
 
+  if (!draft.identity.clan.trim()) {
+    errors.push(
+      'El clan es obligatorio.',
+    )
+  }
+
+  if (draft.identity.generation === null) {
+    errors.push(
+      'La generación es obligatoria.',
+    )
+  }
+
   return {
     valid: errors.length === 0,
     errors,
