@@ -1,3 +1,7 @@
+import type {
+  CharacterGeneration,
+} from '../types/character-generation.types'
+
 export const clanOptions = [
   '',
   'Brujah',
@@ -20,10 +24,13 @@ export const predatorTypeOptions = [
   'Sandman',
 ]
 
-export const generationOptions = [
-  '',
-  '10ª',
-  '11ª',
-  '12ª',
-  '13ª',
-]
+export const generationOptions:
+  CharacterGeneration[] = [
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+  ]

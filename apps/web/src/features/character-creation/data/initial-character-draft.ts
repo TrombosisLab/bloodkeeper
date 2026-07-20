@@ -12,7 +12,7 @@ export const initialCharacterDraft: CharacterDraft = {
     clan: '',
     sire: '',
     desire: '',
-    generation: '',
+    generation: null,
   },
 
   attributes: {
@@ -27,6 +27,11 @@ export const initialCharacterDraft: CharacterDraft = {
     intelligence: 1,
     wits: 1,
     resolve: 1,
+  },
+
+  blood: {
+    bloodPotency: 1,
+    hunger: 1,
   },
 
   skills: {

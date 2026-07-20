@@ -3518,3 +3518,275 @@ select {
 
   font-size: 0.75rem;
 }
+
+/* ==================================================
+   MILESTONE-003 / 003-F — SANGRE
+   ================================================== */
+
+.blood-step {
+  flex: 1;
+  padding:
+    clamp(30px, 5vw, 64px);
+}
+
+.blood-step__grid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.blood-panel,
+.derived-traits {
+  border: 1px solid #3b2d30;
+  background:
+    rgb(255 255 255 / 0.015);
+}
+
+.blood-panel {
+  padding: 20px;
+}
+
+.blood-panel__heading span,
+.derived-traits__heading span {
+  color: #94545e;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.blood-panel__heading h3,
+.derived-traits__heading h3 {
+  margin: 5px 0 18px;
+  color: #d0c2bd;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-weight: 400;
+}
+
+.generation-selector {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.generation-option {
+  min-height: 45px;
+  border: 1px solid #443438;
+  color: #827672;
+  background: #121010;
+  cursor: pointer;
+}
+
+.generation-option--active {
+  border-color: #a45b66;
+  color: #d2929b;
+  background:
+    rgb(117 39 51 / 0.18);
+}
+
+.blood-rating-control {
+  min-height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+}
+
+.blood-rating-control > button {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #5c4045;
+  border-radius: 50%;
+  color: #c6b7b2;
+  background: #171213;
+  cursor: pointer;
+}
+
+.blood-rating-control > button:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.blood-rating-control__value {
+  min-width: 100px;
+  text-align: center;
+}
+
+.blood-rating-control__value strong {
+  display: block;
+  color: #bd6d78;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 2.5rem;
+  font-weight: 400;
+}
+
+.blood-rating-control__value span {
+  display: block;
+  margin-top: 5px;
+  color: #756a66;
+  font-size: 0.62rem;
+}
+
+.hunger-editor {
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.hunger-editor__dots {
+  display: flex;
+  gap: 9px;
+  margin-bottom: 14px;
+}
+
+.hunger-editor__dot {
+  width: 19px;
+  height: 19px;
+  padding: 0;
+  border: 1px solid #704a50;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.hunger-editor__dot--filled {
+  border-color: #b2636e;
+  background: #8e3f4a;
+  box-shadow:
+    inset 0 0 0 3px #171112;
+}
+
+.hunger-editor strong {
+  color: #cdbeba;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-weight: 400;
+}
+
+.hunger-editor > span {
+  margin-top: 4px;
+  color: #6f6561;
+  font-size: 0.62rem;
+}
+
+.derived-traits {
+  margin-top: 16px;
+  padding: 20px;
+}
+
+.derived-traits__grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.derived-trait-card {
+  padding: 20px;
+  border: 1px solid #33292b;
+  background: #121010;
+}
+
+.derived-trait-card > span,
+.derived-trait-card > strong,
+.derived-trait-card > small {
+  display: block;
+}
+
+.derived-trait-card > span {
+  color: #827571;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.derived-trait-card > strong {
+  margin: 8px 0;
+  color: #c97983;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+.derived-trait-card > small {
+  color: #716662;
+  font-size: 0.68rem;
+}
+
+.blood-validation {
+  margin-top: 16px;
+  padding: 14px 18px;
+  border: 1px solid #54363c;
+  color: #bd7b84;
+  background:
+    rgb(105 38 49 / 0.08);
+}
+
+.blood-validation--valid {
+  border-color: #385642;
+  color: #87a78e;
+  background:
+    rgb(61 101 73 / 0.08);
+}
+
+.blood-validation p,
+.blood-validation ul {
+  margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .blood-step__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .derived-traits__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.blood-generation-summary {
+  min-height: 110px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.blood-generation-summary strong {
+  color: #bd6d78;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 2.5rem;
+  font-weight: 400;
+}
+
+.blood-generation-summary span {
+  margin-top: 5px;
+
+  color: #756a66;
+
+  font-size: 0.62rem;
+}

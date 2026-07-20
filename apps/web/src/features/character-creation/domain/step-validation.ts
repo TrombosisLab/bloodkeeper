@@ -6,6 +6,10 @@ import {
   validateSkillDistribution,
 } from './skill-rules'
 
+import {
+  validateBloodDraft,
+} from './blood-rules'
+
 import type {
   CharacterDraft,
 } from '../types/character-draft.types'
@@ -78,6 +82,21 @@ export function validateSkillsStep(
   }
 }
 
+export function validateBloodStep(
+  draft: CharacterDraft,
+): StepValidationResult {
+  const result =
+    validateBloodDraft(
+      draft.blood,
+      draft.identity.generation,
+    )
+
+  return {
+    valid: result.valid,
+    errors: result.errors,
+  }
+}
+
 export function validateStep(
   stepId: CreationStepId,
   draft: CharacterDraft,
@@ -91,6 +110,9 @@ export function validateStep(
 
     case 'skills':
       return validateSkillsStep(draft)
+
+    case 'blood':
+      return validateBloodStep(draft)
 
     default:
       return valid()

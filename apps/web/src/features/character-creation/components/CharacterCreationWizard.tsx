@@ -11,6 +11,10 @@ import {
   removeInvalidSpecialties,
 } from '../domain/skill-specialty-rules'
 
+import {
+  normalizeBloodForGeneration,
+} from '../domain/blood-rules'
+
 import type {
   CharacterDraft,
 } from '../types/character-draft.types'
@@ -24,6 +28,7 @@ import { CreationProgress } from './CreationProgress'
 import { CreationStepPlaceholder } from './CreationStepPlaceholder'
 import { IdentityStep } from './IdentityStep'
 import { SkillsStep } from './SkillsStep'
+import { BloodStep } from './BloodStep'
 
 interface CharacterCreationWizardProps {
   onBackToSheet: () => void
@@ -224,7 +229,17 @@ export function CharacterCreationWizard({
                 updateDraft(
                   (current) => ({
                     ...current,
+
                     identity,
+
+                    blood:
+                      identity.generation ===
+                      null
+                        ? current.blood
+                        : normalizeBloodForGeneration(
+                            current.blood,
+                            identity.generation,
+                          ),
                   }),
                 )
               }
@@ -282,6 +297,26 @@ export function CharacterCreationWizard({
                   (current) => ({
                     ...current,
                     skillSpecialties,
+                  }),
+                )
+              }
+            />
+          ) : currentStepId ===
+            'blood' ? (
+            <BloodStep
+              value={draft.blood}
+              attributes={
+                draft.attributes
+              }
+              generation={
+                draft.identity.generation ??
+                13
+              }
+              onChange={(blood) =>
+                updateDraft(
+                  (current) => ({
+                    ...current,
+                    blood,
                   }),
                 )
               }

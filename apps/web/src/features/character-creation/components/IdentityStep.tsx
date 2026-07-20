@@ -9,18 +9,26 @@ import {
 } from '../data/identity-options'
 
 import type {
-  CharacterIdentity,
-} from '../../character-sheet/types/character-sheet.types'
+  CharacterGeneration,
+} from '../types/character-generation.types'
+
+import type {
+  CharacterIdentityDraft,
+} from '../types/character-identity-draft.types'
 
 interface IdentityStepProps {
-  value: CharacterIdentity
+  value: CharacterIdentityDraft
+
   onChange: (
-    value: CharacterIdentity,
+    value: CharacterIdentityDraft,
   ) => void
 }
 
-type IdentityFieldName =
-  keyof CharacterIdentity
+type TextIdentityFieldName =
+  Exclude<
+    keyof CharacterIdentityDraft,
+    'generation'
+  >
 
 export function IdentityStep({
   value,
@@ -34,11 +42,32 @@ export function IdentityStep({
     >,
   ) {
     const field =
-      event.target.name as IdentityFieldName
+      event.target
+        .name as TextIdentityFieldName
 
     onChange({
       ...value,
       [field]: event.target.value,
+    })
+  }
+
+  function updateGeneration(
+    event: ChangeEvent<
+      HTMLSelectElement
+    >,
+  ) {
+    const rawValue =
+      event.target.value
+
+    onChange({
+      ...value,
+
+      generation:
+        rawValue === ''
+          ? null
+          : Number(
+              rawValue,
+            ) as CharacterGeneration,
     })
   }
 
@@ -88,14 +117,19 @@ export function IdentityStep({
             value={value.clan}
             onChange={updateField}
           >
-            {clanOptions.map((option) => (
-              <option
-                key={option || 'empty'}
-                value={option}
-              >
-                {option || 'Selecciona clan'}
-              </option>
-            ))}
+            {clanOptions.map(
+              (option) => (
+                <option
+                  key={
+                    option || 'empty'
+                  }
+                  value={option}
+                >
+                  {option ||
+                    'Selecciona clan'}
+                </option>
+              ),
+            )}
           </select>
         </label>
 
@@ -110,7 +144,9 @@ export function IdentityStep({
             {predatorTypeOptions.map(
               (option) => (
                 <option
-                  key={option || 'empty'}
+                  key={
+                    option || 'empty'
+                  }
                   value={option}
                 >
                   {option ||
@@ -126,17 +162,24 @@ export function IdentityStep({
 
           <select
             name="generation"
-            value={value.generation}
-            onChange={updateField}
+            value={
+              value.generation ?? ''
+            }
+            onChange={
+              updateGeneration
+            }
           >
+            <option value="">
+              Selecciona generación
+            </option>
+
             {generationOptions.map(
-              (option) => (
+              (generation) => (
                 <option
-                  key={option || 'empty'}
-                  value={option}
+                  key={generation}
+                  value={generation}
                 >
-                  {option ||
-                    'Selecciona generación'}
+                  {generation}ª
                 </option>
               ),
             )}
