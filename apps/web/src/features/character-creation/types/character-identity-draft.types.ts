@@ -3,14 +3,22 @@ import type {
 } from '../../character-sheet/types/character-sheet.types'
 
 import type {
+  ClanKey,
+} from './clan.types'
+
+import type {
   CharacterGeneration,
 } from './character-generation.types'
 
 export type CharacterIdentityDraft =
   Omit<
     CharacterIdentity,
-    'generation'
+    'clan' | 'generation'
   > & {
+    clan:
+      | ClanKey
+      | null
+
     generation:
       | CharacterGeneration
       | null

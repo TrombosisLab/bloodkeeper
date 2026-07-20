@@ -10,6 +10,10 @@ import {
   validateBloodDraft,
 } from './blood-rules'
 
+import {
+  validateDisciplines,
+} from './discipline-rules'
+
 import type {
   CharacterDraft,
 } from '../types/character-draft.types'
@@ -47,7 +51,7 @@ export function validateIdentityStep(
     )
   }
 
-  if (!draft.identity.clan.trim()) {
+  if (draft.identity.clan === null) {
     errors.push(
       'El clan es obligatorio.',
     )
@@ -109,6 +113,21 @@ export function validateBloodStep(
   }
 }
 
+export function validateDisciplinesStep(
+  draft: CharacterDraft,
+): StepValidationResult {
+  const result =
+    validateDisciplines(
+      draft.disciplines,
+      draft.identity.clan,
+    )
+
+  return {
+    valid: result.valid,
+    errors: result.errors,
+  }
+}
+
 export function validateStep(
   stepId: CreationStepId,
   draft: CharacterDraft,
@@ -125,6 +144,9 @@ export function validateStep(
 
     case 'blood':
       return validateBloodStep(draft)
+
+    case 'disciplines':
+      return validateDisciplinesStep(draft)
 
     default:
       return valid()

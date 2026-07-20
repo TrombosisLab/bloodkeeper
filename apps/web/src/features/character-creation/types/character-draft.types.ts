@@ -16,10 +16,15 @@ import type {
   SkillDistributionMethod,
 } from './character-skills-draft.types'
 
+import type {
+  CharacterDisciplinesDraft,
+} from './discipline.types'
+
 export interface CharacterDraft {
   identity: CharacterIdentityDraft
   attributes: CharacterAttributesDraft
   blood: CharacterBloodDraft
+  disciplines: CharacterDisciplinesDraft
   skills: CharacterSkillsDraft
   skillSpecialties: CharacterSkillSpecialtiesDraft
   skillDistributionMethod: SkillDistributionMethod

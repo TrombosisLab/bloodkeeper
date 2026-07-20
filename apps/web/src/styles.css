@@ -3790,3 +3790,411 @@ select {
 
   font-size: 0.62rem;
 }
+
+/* ==================================================
+   MILESTONE-003 / 003-G — DISCIPLINAS
+   ================================================== */
+
+.disciplines-step {
+  flex: 1;
+
+  padding:
+    clamp(30px, 5vw, 64px);
+}
+
+.disciplines-step__clan {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto
+    auto;
+
+  align-items: center;
+
+  gap: 24px;
+
+  margin-bottom: 22px;
+
+  padding: 17px 19px;
+
+  border: 1px solid #3b2e30;
+
+  background:
+    rgb(255 255 255 / 0.015);
+}
+
+.disciplines-step__clan span,
+.disciplines-step__clan strong {
+  display: block;
+}
+
+.disciplines-step__clan span {
+  margin-bottom: 4px;
+
+  color: #756a67;
+
+  font-size: 0.6rem;
+  font-weight: 700;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.disciplines-step__clan strong {
+  color: #cdbfba;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.05rem;
+
+  font-weight: 400;
+}
+
+.disciplines-step__rule {
+  padding-left: 24px;
+
+  border-left:
+    1px solid #3c3032;
+}
+
+.disciplines-step__rule strong {
+  color: #bd707a;
+
+  font-size: 1.35rem;
+}
+
+.discipline-editor-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+.discipline-editor-card {
+  min-width: 0;
+
+  padding: 20px;
+
+  border: 1px solid #392e30;
+
+  background: #121010;
+
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.discipline-editor-card--selected {
+  border-color: #654148;
+
+  background:
+    rgb(94 35 45 / 0.08);
+}
+
+.discipline-editor-card__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  padding-bottom: 16px;
+
+  border-bottom:
+    1px solid #302729;
+}
+
+.discipline-editor-card__heading span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #725e61;
+
+  font-size: 0.56rem;
+  font-weight: 800;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.discipline-editor-card__heading h3 {
+  margin: 0;
+
+  color: #d2c5bf;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.2rem;
+
+  font-weight: 400;
+}
+
+.discipline-editor-card__heading > strong {
+  color: #bd6874;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 2rem;
+
+  font-weight: 400;
+}
+
+.discipline-editor-card__control {
+  min-height: 90px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 18px;
+}
+
+.discipline-editor-card__control button {
+  width: 34px;
+  height: 34px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid #563b40;
+  border-radius: 50%;
+
+  color: #c8bbb5;
+  background: #171213;
+
+  cursor: pointer;
+}
+
+.discipline-editor-card__control button:disabled {
+  opacity: 0.2;
+
+  cursor: not-allowed;
+}
+
+.discipline-editor-card__dots {
+  display: flex;
+
+  gap: 9px;
+}
+
+.discipline-editor-dot {
+  width: 17px;
+  height: 17px;
+
+  display: block;
+
+  border: 1px solid #795159;
+  border-radius: 50%;
+
+  background: transparent;
+}
+
+.discipline-editor-dot--filled {
+  border-color: #ba6672;
+
+  background: #994651;
+
+  box-shadow:
+    inset 0 0 0 3px #171112;
+}
+
+.discipline-editor-card__hint {
+  margin: 0;
+
+  color: #716662;
+
+  font-size: 0.68rem;
+
+  text-align: center;
+}
+
+.discipline-validation {
+  margin-top: 20px;
+
+  padding: 18px;
+
+  border: 1px solid #51343a;
+
+  background:
+    rgb(104 39 49 / 0.08);
+}
+
+.discipline-validation--valid {
+  border-color: #385643;
+
+  background:
+    rgb(62 103 75 / 0.08);
+}
+
+.discipline-validation__summary {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 1px;
+
+  margin-bottom: 14px;
+
+  background: #33292b;
+}
+
+.discipline-validation__summary > div {
+  padding: 12px;
+
+  background: #121010;
+}
+
+.discipline-validation__summary span,
+.discipline-validation__summary strong {
+  display: block;
+}
+
+.discipline-validation__summary span {
+  margin-bottom: 4px;
+
+  color: #756a67;
+
+  font-size: 0.58rem;
+
+  text-transform: uppercase;
+}
+
+.discipline-validation__summary strong {
+  color: #d0c3bd;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.2rem;
+
+  font-weight: 400;
+}
+
+.discipline-validation__ok {
+  margin: 0;
+
+  color: #86a68d;
+
+  font-size: 0.78rem;
+}
+
+.discipline-validation__errors {
+  margin: 0;
+
+  padding-left: 19px;
+
+  color: #b98289;
+
+  font-size: 0.78rem;
+
+  line-height: 1.6;
+}
+
+.discipline-special-case {
+  max-width: 720px;
+
+  padding: 28px;
+
+  border: 1px solid #5b4146;
+
+  background:
+    rgb(102 41 51 / 0.08);
+}
+
+.discipline-special-case > span {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #a15e68;
+
+  font-size: 0.61rem;
+  font-weight: 800;
+
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
+}
+
+.discipline-special-case h3 {
+  margin:
+    0
+    0
+    12px;
+
+  color: #d1c3bd;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.6rem;
+
+  font-weight: 400;
+}
+
+.discipline-special-case p {
+  margin: 0;
+
+  color: #8a7d79;
+
+  line-height: 1.65;
+}
+
+@media (max-width: 950px) {
+  .discipline-editor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .disciplines-step__clan {
+    grid-template-columns:
+      1fr
+      auto;
+  }
+
+  .disciplines-step__clan
+    > .creation-button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .disciplines-step__clan {
+    grid-template-columns: 1fr;
+  }
+
+  .disciplines-step__rule {
+    padding:
+      14px
+      0
+      0;
+
+    border-left: 0;
+
+    border-top:
+      1px solid #3c3032;
+  }
+
+  .discipline-validation__summary {
+    grid-template-columns: 1fr;
+  }
+}

@@ -3,10 +3,17 @@ import type {
 } from 'react'
 
 import {
-  clanOptions,
+  clanDefinitions,
+} from '../data/clan-definitions'
+
+import {
   generationOptions,
   predatorTypeOptions,
 } from '../data/identity-options'
+
+import type {
+  ClanKey,
+} from '../types/clan.types'
 
 import type {
   CharacterGeneration,
@@ -27,7 +34,7 @@ interface IdentityStepProps {
 type TextIdentityFieldName =
   Exclude<
     keyof CharacterIdentityDraft,
-    'generation'
+    'clan' | 'generation'
   >
 
 export function IdentityStep({
@@ -48,6 +55,24 @@ export function IdentityStep({
     onChange({
       ...value,
       [field]: event.target.value,
+    })
+  }
+
+  function updateClan(
+    event: ChangeEvent<
+      HTMLSelectElement
+    >,
+  ) {
+    const rawValue =
+      event.target.value
+
+    onChange({
+      ...value,
+
+      clan:
+        rawValue === ''
+          ? null
+          : rawValue as ClanKey,
     })
   }
 
@@ -114,19 +139,22 @@ export function IdentityStep({
 
           <select
             name="clan"
-            value={value.clan}
-            onChange={updateField}
+            value={
+              value.clan ?? ''
+            }
+            onChange={updateClan}
           >
-            {clanOptions.map(
-              (option) => (
+            <option value="">
+              Selecciona clan
+            </option>
+
+            {clanDefinitions.map(
+              (clan) => (
                 <option
-                  key={
-                    option || 'empty'
-                  }
-                  value={option}
+                  key={clan.key}
+                  value={clan.key}
                 >
-                  {option ||
-                    'Selecciona clan'}
+                  {clan.name}
                 </option>
               ),
             )}

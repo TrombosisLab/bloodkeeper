@@ -15,6 +15,10 @@ import {
   normalizeBloodForGeneration,
 } from '../domain/blood-rules'
 
+import {
+  normalizeDisciplinesForClan,
+} from '../domain/discipline-rules'
+
 import type {
   CharacterDraft,
 } from '../types/character-draft.types'
@@ -29,6 +33,7 @@ import { CreationStepPlaceholder } from './CreationStepPlaceholder'
 import { IdentityStep } from './IdentityStep'
 import { SkillsStep } from './SkillsStep'
 import { BloodStep } from './BloodStep'
+import { DisciplinesStep } from './DisciplinesStep'
 
 interface CharacterCreationWizardProps {
   onBackToSheet: () => void
@@ -240,6 +245,15 @@ export function CharacterCreationWizard({
                             current.blood,
                             identity.generation,
                           ),
+
+                    disciplines:
+                      identity.clan ===
+                      null
+                        ? []
+                        : normalizeDisciplinesForClan(
+                            current.disciplines,
+                            identity.clan,
+                          ),
                   }),
                 )
               }
@@ -317,6 +331,28 @@ export function CharacterCreationWizard({
                   (current) => ({
                     ...current,
                     blood,
+                  }),
+                )
+              }
+            />
+          ) : currentStepId ===
+            'disciplines' &&
+            draft.identity.clan !==
+              null ? (
+            <DisciplinesStep
+              clanKey={
+                draft.identity.clan
+              }
+              value={
+                draft.disciplines
+              }
+              onChange={(
+                disciplines,
+              ) =>
+                updateDraft(
+                  (current) => ({
+                    ...current,
+                    disciplines,
                   }),
                 )
               }

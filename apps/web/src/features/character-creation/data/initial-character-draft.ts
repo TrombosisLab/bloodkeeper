@@ -9,7 +9,7 @@ export const initialCharacterDraft: CharacterDraft = {
     predatorType: '',
     chronicle: '',
     ambition: '',
-    clan: '',
+    clan: null,
     sire: '',
     desire: '',
     generation: null,
@@ -33,6 +33,8 @@ export const initialCharacterDraft: CharacterDraft = {
     bloodPotency: 1,
     hunger: 1,
   },
+
+  disciplines: [],
 
   skills: {
     athletics: 0,

@@ -2,17 +2,6 @@ import type {
   CharacterGeneration,
 } from '../types/character-generation.types'
 
-export const clanOptions = [
-  '',
-  'Brujah',
-  'Gangrel',
-  'Malkavian',
-  'Nosferatu',
-  'Toreador',
-  'Tremere',
-  'Ventrue',
-]
-
 export const predatorTypeOptions = [
   '',
   'Sanguijuela',
