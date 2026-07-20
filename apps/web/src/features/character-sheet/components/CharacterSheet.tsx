@@ -7,6 +7,7 @@ import { CharacterState } from './CharacterState'
 import { CharacterDisciplines } from './CharacterDisciplines'
 import { CharacterAdvantages } from './CharacterAdvantages'
 import { CharacterNarrative } from './CharacterNarrative'
+import { CharacterBloodExperience } from './CharacterBloodExperience'
 
 export function CharacterSheet() {
   return (
@@ -40,6 +41,8 @@ export function CharacterSheet() {
       <CharacterAdvantages />
 
       <CharacterNarrative />
+
+      <CharacterBloodExperience />
     </article>
   )
 }

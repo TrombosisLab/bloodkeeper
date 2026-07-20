@@ -1730,3 +1730,135 @@ select {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==================================================
+   002-I — RESONANCIA Y EXPERIENCIA
+   ================================================== */
+
+.blood-experience-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.05),
+      transparent 260px
+    );
+}
+
+.blood-experience-grid {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr 1.4fr;
+
+  gap: 1px;
+
+  border: 1px solid #392d2f;
+
+  background: #392d2f;
+}
+
+.blood-info-card,
+.experience-card {
+  min-width: 0;
+
+  background: #121010;
+}
+
+.blood-info-card {
+  padding: 22px;
+}
+
+.blood-info-card__label {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: #806f6c;
+
+  font-size: 0.66rem;
+  font-weight: 700;
+
+  letter-spacing: 0.13em;
+
+  text-transform: uppercase;
+}
+
+.blood-info-card strong {
+  color: #d8cec8;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.45rem;
+  font-weight: 400;
+}
+
+.experience-card {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+}
+
+.experience-card > div {
+  padding: 20px;
+
+  border-right: 1px solid #292324;
+}
+
+.experience-card > div:last-child {
+  border-right: 0;
+}
+
+.experience-card span,
+.experience-card strong {
+  display: block;
+}
+
+.experience-card span {
+  margin-bottom: 9px;
+
+  color: #7a6f6b;
+
+  font-size: 0.62rem;
+  font-weight: 700;
+
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+.experience-card strong {
+  color: #d9cfc9;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+@media (max-width: 900px) {
+  .blood-experience-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .experience-card {
+    grid-template-columns: 1fr;
+  }
+
+  .experience-card > div {
+    border-right: 0;
+    border-bottom: 1px solid #292324;
+  }
+
+  .experience-card > div:last-child {
+    border-bottom: 0;
+  }
+}
