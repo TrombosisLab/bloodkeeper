@@ -14,6 +14,7 @@ import type {
 import { CreationProgress } from './CreationProgress'
 import { CreationStepPlaceholder } from './CreationStepPlaceholder'
 import { IdentityStep } from './IdentityStep'
+import { AttributesStep } from './AttributesStep'
 
 interface CharacterCreationWizardProps {
   onBackToSheet: () => void
@@ -125,6 +126,16 @@ export function CharacterCreationWizard({
                 updateDraft((current) => ({
                   ...current,
                   identity,
+                }))
+              }
+            />
+          ) : currentStepId === 'attributes' ? (
+            <AttributesStep
+              value={draft.attributes}
+              onChange={(attributes) =>
+                updateDraft((current) => ({
+                  ...current,
+                  attributes,
                 }))
               }
             />
