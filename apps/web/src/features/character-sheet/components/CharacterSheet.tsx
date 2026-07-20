@@ -2,6 +2,7 @@ import { demoCharacter } from '../data/demo-character'
 
 import { CharacterAttributes } from './CharacterAttributes'
 import { CharacterIdentity } from './CharacterIdentity'
+import { CharacterSkills } from './CharacterSkills'
 
 export function CharacterSheet() {
   return (
@@ -25,6 +26,8 @@ export function CharacterSheet() {
       />
 
       <CharacterAttributes />
+
+      <CharacterSkills />
     </article>
   )
 }

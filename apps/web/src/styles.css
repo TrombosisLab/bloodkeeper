@@ -898,3 +898,98 @@ select {
       repeat(5, minmax(24px, 1fr));
   }
 }
+
+/* ==================================================
+   002-D — HABILIDADES
+   ================================================== */
+
+.skills-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.06),
+      transparent 320px
+    );
+}
+
+.skills-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  border-top: 1px solid #392d2f;
+  border-left: 1px solid #392d2f;
+}
+
+.skill-category {
+  border-right: 1px solid #392d2f;
+  border-bottom: 1px solid #392d2f;
+}
+
+.skill-category h3 {
+  margin: 0;
+
+  padding: 15px 20px;
+
+  border-bottom: 1px solid #392d2f;
+
+  color: #b8777f;
+
+  font-size: 0.72rem;
+  font-weight: 800;
+
+  letter-spacing: 0.18em;
+
+  text-transform: uppercase;
+
+  background: rgb(93 30 39 / 0.08);
+}
+
+.skill-category__rows {
+  padding: 6px 20px;
+}
+
+.skill-row {
+  min-height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  border-bottom: 1px solid #292324;
+}
+
+.skill-row:last-child {
+  border-bottom: 0;
+}
+
+.skill-row__label {
+  color: #d4cbc6;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.94rem;
+}
+
+.skills-section .dot-rating {
+  gap: 6px;
+}
+
+.skills-section .dot-rating__dot {
+  width: 13px;
+  height: 13px;
+}
+
+@media (max-width: 1000px) {
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+}
