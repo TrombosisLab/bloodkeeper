@@ -16,6 +16,92 @@ import type {
 export const disciplinePowerDefinitions:
   DisciplinePowerDefinition[] = [
     /*
+     * PROTEAN
+     * Fuente: Vampiro V5 — Libro Básico ES
+     */
+
+    {
+      key: 'protean-eyes-of-the-beast',
+      disciplineKey: 'protean',
+      name: 'Ojos de la Bestia',
+      level: 1,
+      summary:
+        'Permite ver con claridad sobrenatural en la oscuridad y manifiesta rasgos depredadores en los ojos.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 270,
+    },
+    {
+      key: 'protean-weight-of-the-feather',
+      disciplineKey: 'protean',
+      name: 'Peso de la Pluma',
+      level: 1,
+      summary:
+        'Reduce sobrenaturalmente el peso efectivo del vampiro para evitar o mitigar determinados peligros físicos.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 270,
+    },
+    {
+      key: 'protean-feral-weapons',
+      disciplineKey: 'protean',
+      name: 'Armas Salvajes',
+      level: 2,
+      summary:
+        'Transforma partes del cuerpo en armas naturales sobrenaturales apropiadas para el combate.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 270,
+    },
+    {
+      key: 'protean-earth-meld',
+      disciplineKey: 'protean',
+      name: 'Fusión con la Tierra',
+      level: 3,
+      summary:
+        'Permite fundirse sobrenaturalmente con la tierra y permanecer oculto en ella.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 271,
+    },
+    {
+      key: 'protean-shapechange',
+      disciplineKey: 'protean',
+      name: 'Metamorfosis',
+      level: 3,
+      summary:
+        'Permite adoptar una forma animal asociada a la naturaleza depredadora del vampiro.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 271,
+    },
+    {
+      key: 'protean-horrid-form',
+      disciplineKey: 'protean',
+      name: 'Forma Horrenda',
+      level: 4,
+      summary:
+        'Transforma el cuerpo en una forma monstruosa especialmente poderosa y aterradora.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 272,
+    },
+    {
+      key: 'protean-heart-of-darkness',
+      disciplineKey: 'protean',
+      name: 'Corazón de la Oscuridad',
+      level: 5,
+      summary:
+        'Permite alterar sobrenaturalmente la ubicación del corazón para dificultar su destrucción.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 272,
+    },
+    {
+      key: 'protean-mist-form',
+      disciplineKey: 'protean',
+      name: 'Forma de Niebla',
+      level: 5,
+      summary:
+        'Permite transformar el cuerpo en una nube de niebla sobrenatural.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 272,
+    },
+
+    /*
      * FORTALEZA
      * Fuente: Vampiro V5 — Libro Básico ES
      */
@@ -598,31 +684,9 @@ export const disciplinePowerDefinitions:
       sourceKey: 'development',
     },
 
-    {
-      key: 'protean-dev-1-a',
-      disciplineKey: 'protean',
-      name: 'Poder de Protean A',
-      level: 1,
-      sourceKey: 'development',
-    },
-    {
-      key: 'protean-dev-1-b',
-      disciplineKey: 'protean',
-      name: 'Poder de Protean B',
-      level: 1,
-      sourceKey: 'development',
-    },
-
     /*
      * Poderes técnicos de nivel 2.
      * Permiten comprobar que una Disciplina a 2
      * puede seleccionar dos poderes.
      */
-    {
-      key: 'protean-dev-2-a',
-      disciplineKey: 'protean',
-      name: 'Poder de Protean nivel 2',
-      level: 2,
-      sourceKey: 'development',
-    },
   ]
