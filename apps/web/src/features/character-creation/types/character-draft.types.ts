@@ -20,11 +20,16 @@ import type {
   CharacterDisciplinesDraft,
 } from './discipline.types'
 
+import type {
+  CharacterBloodSorceryRitualsDraft,
+} from './blood-sorcery-ritual.types'
+
 export interface CharacterDraft {
   identity: CharacterIdentityDraft
   attributes: CharacterAttributesDraft
   blood: CharacterBloodDraft
   disciplines: CharacterDisciplinesDraft
+  bloodSorceryRituals: CharacterBloodSorceryRitualsDraft
   skills: CharacterSkillsDraft
   skillSpecialties: CharacterSkillSpecialtiesDraft
   skillDistributionMethod: SkillDistributionMethod

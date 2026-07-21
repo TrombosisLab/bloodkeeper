@@ -4390,3 +4390,133 @@ select {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==================================================
+   003-G / 6B.12 — RITUAL INICIAL DE HECHICERÍA
+   ================================================== */
+
+.blood-sorcery-ritual-selector {
+  margin-top: 28px;
+  padding: 24px;
+  border: 1px solid #493337;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(105 35 47 / 0.08),
+      rgb(18 16 16 / 0.35)
+    );
+}
+
+.blood-sorcery-ritual-selector__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #392d2f;
+}
+
+.blood-sorcery-ritual-selector__heading span {
+  display: block;
+  margin-bottom: 5px;
+  color: #8d656b;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.blood-sorcery-ritual-selector__heading h3 {
+  margin: 0;
+  color: #ddd0ca;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+}
+
+.blood-sorcery-ritual-selector__heading > strong {
+  color: #bd707a;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.blood-sorcery-ritual-selector__intro {
+  margin: 18px 0;
+  color: #918481;
+  line-height: 1.6;
+}
+
+.blood-sorcery-ritual-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.blood-sorcery-ritual-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #382d2f;
+  background: #121010;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease,
+    transform 120ms ease;
+}
+
+.blood-sorcery-ritual-card:hover {
+  border-color: #604047;
+  transform: translateY(-1px);
+}
+
+.blood-sorcery-ritual-card--selected {
+  border-color: #8d4d58;
+  background:
+    rgb(110 38 50 / 0.14);
+}
+
+.blood-sorcery-ritual-card__level {
+  display: block;
+  margin-bottom: 8px;
+  color: #9b6870;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.blood-sorcery-ritual-card > strong {
+  display: block;
+  color: #d6c8c2;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.blood-sorcery-ritual-card p {
+  margin: 10px 0;
+  color: #8c817d;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.blood-sorcery-ritual-card small {
+  color: #665d5a;
+  font-size: 0.62rem;
+}
+
+@media (max-width: 800px) {
+  .blood-sorcery-ritual-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -36,6 +36,10 @@ export const initialCharacterDraft: CharacterDraft = {
 
   disciplines: [],
 
+  bloodSorceryRituals: {
+    ritualKeys: [],
+  },
+
   skills: {
     athletics: 0,
     brawl: 0,

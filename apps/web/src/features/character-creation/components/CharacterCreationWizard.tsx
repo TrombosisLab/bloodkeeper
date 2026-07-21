@@ -8,6 +8,10 @@ import {
 } from '../domain/step-validation'
 
 import {
+  applyCharacterDraftUpdate,
+} from '../domain/blood-sorcery-ritual-draft-rules'
+
+import {
   removeInvalidSpecialties,
 } from '../domain/skill-specialty-rules'
 
@@ -80,8 +84,12 @@ export function CharacterCreationWizard({
       current: CharacterDraft,
     ) => CharacterDraft,
   ) {
-    setDraft((current) =>
-      updater(current),
+    setDraft(
+      (current) =>
+        applyCharacterDraftUpdate(
+          current,
+          updater,
+        ),
     )
   }
 
@@ -353,6 +361,19 @@ export function CharacterCreationWizard({
                   (current) => ({
                     ...current,
                     disciplines,
+                  }),
+                )
+              }
+              rituals={
+                draft.bloodSorceryRituals
+              }
+              onRitualsChange={(
+                bloodSorceryRituals,
+              ) =>
+                updateDraft(
+                  (current) => ({
+                    ...current,
+                    bloodSorceryRituals,
                   }),
                 )
               }

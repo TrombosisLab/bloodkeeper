@@ -1,4 +1,16 @@
 import {
+  BLOOD_SORCERY_RITUAL_DEFINITIONS,
+} from '../data/blood-sorcery-ritual-definitions'
+
+import {
+  validateInitialBloodSorceryRituals,
+} from './blood-sorcery-ritual-rules'
+
+import {
+  getDisciplineValue,
+} from './discipline-rules'
+
+import {
   disciplinePowerDefinitions,
 } from '../data/discipline-power-definitions'
 
@@ -121,7 +133,7 @@ export function validateBloodStep(
   }
 }
 
-export function validateDisciplinesStep(
+export function validateDisciplinesStepBase(
   draft: CharacterDraft,
 ): StepValidationResult {
   const result =
@@ -135,6 +147,38 @@ export function validateDisciplinesStep(
     errors: result.errors,
   }
 }
+
+
+export function validateDisciplinesStep(
+  draft: CharacterDraft,
+): StepValidationResult {
+  const base =
+    validateDisciplinesStepBase(
+      draft,
+    )
+
+  const ritualValidation =
+    validateInitialBloodSorceryRituals(
+      BLOOD_SORCERY_RITUAL_DEFINITIONS,
+      draft.bloodSorceryRituals.ritualKeys,
+      getDisciplineValue(
+        draft.disciplines,
+        'bloodSorcery',
+      ),
+    )
+
+  return {
+    valid:
+      base.valid &&
+      ritualValidation.valid,
+
+    errors: [
+      ...base.errors,
+      ...ritualValidation.errors,
+    ],
+  }
+}
+
 
 export function validateStep(
   stepId: CreationStepId,

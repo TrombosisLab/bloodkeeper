@@ -22,8 +22,13 @@ import type {
   DisciplineKey,
 } from '../types/discipline.types'
 
+import type {
+  CharacterBloodSorceryRitualsDraft,
+} from '../types/blood-sorcery-ritual.types'
+
 import { DisciplineEditorCard } from './DisciplineEditorCard'
 import { DisciplinePowerSelector } from './DisciplinePowerSelector'
+import { BloodSorceryRitualSelector } from './BloodSorceryRitualSelector'
 
 interface DisciplinesStepProps {
   clanKey: ClanKey
@@ -34,6 +39,14 @@ interface DisciplinesStepProps {
   onChange: (
     value:
       CharacterDisciplinesDraft,
+  ) => void
+
+  rituals:
+    CharacterBloodSorceryRitualsDraft
+
+  onRitualsChange: (
+    value:
+      CharacterBloodSorceryRitualsDraft,
   ) => void
 }
 
@@ -52,6 +65,8 @@ export function DisciplinesStep({
   clanKey,
   value,
   onChange,
+  rituals,
+  onRitualsChange,
 }: DisciplinesStepProps) {
   const clan =
     getClanDefinition(
@@ -241,6 +256,18 @@ export function DisciplinesStep({
           ),
         )}
       </div>
+
+      {getDisciplineValue(
+        value,
+        'bloodSorcery',
+      ) >= 1 && (
+        <BloodSorceryRitualSelector
+          value={rituals}
+          onChange={
+            onRitualsChange
+          }
+        />
+      )}
 
       <div
         className={
