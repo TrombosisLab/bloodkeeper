@@ -181,7 +181,7 @@ test(
       updateSelectedPower(
         disciplines,
         'potence',
-        'potence-dev-1-a',
+        'potence-lethal-body',
         true,
       )
 
@@ -220,7 +220,7 @@ test(
       updateSelectedPower(
         disciplines,
         'potence',
-        'potence-dev-1-a',
+        'potence-lethal-body',
         true,
       )
 
@@ -257,14 +257,14 @@ test(
         value: 2,
         powerKeys: [
           'celerity-cats-grace',
-          'potence-dev-1-a',
+          'potence-lethal-body',
         ],
       },
       {
         key: 'potence',
         value: 1,
         powerKeys: [
-          'potence-dev-1-a',
+          'potence-lethal-body',
         ],
       },
     ]

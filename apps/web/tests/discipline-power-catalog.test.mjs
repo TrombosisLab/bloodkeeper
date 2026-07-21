@@ -106,13 +106,45 @@ test(
 )
 
 test(
-  'el catálogo temporal está identificado como desarrollo',
+  'los poderes temporales restantes están identificados como desarrollo',
   () => {
+    const temporaryPowers =
+      disciplinePowerDefinitions.filter(
+        (power) =>
+          power.disciplineKey !==
+            'celerity' &&
+          power.disciplineKey !==
+            'potence',
+      )
+
     assert.equal(
-      disciplinePowerDefinitions.every(
+      temporaryPowers.every(
         (power) =>
           power.sourceKey ===
           'development',
+      ),
+      true,
+    )
+  },
+)
+
+test(
+  'Celeridad y Potencia ya no usan contenido de desarrollo',
+  () => {
+    const realPowers =
+      disciplinePowerDefinitions.filter(
+        (power) =>
+          power.disciplineKey ===
+            'celerity' ||
+          power.disciplineKey ===
+            'potence',
+      )
+
+    assert.equal(
+      realPowers.every(
+        (power) =>
+          power.sourceKey ===
+          'core-v5-es',
       ),
       true,
     )
