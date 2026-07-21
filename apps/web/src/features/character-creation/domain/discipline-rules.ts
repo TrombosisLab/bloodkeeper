@@ -17,13 +17,36 @@ export interface DisciplineValidationResult {
   errors: string[]
 }
 
+export const caitiffAvailableDisciplines: DisciplineKey[] = [
+  'animalism',
+  'auspex',
+  'bloodSorcery',
+  'celerity',
+  'dominate',
+  'fortitude',
+  'obfuscate',
+  'oblivion',
+  'potence',
+  'presence',
+  'protean',
+]
+
 export function getAvailableDisciplinesForClan(
   clanKey: ClanKey,
 ): DisciplineKey[] {
-  return [
-    ...getClanDefinition(
+  const clan =
+    getClanDefinition(
       clanKey,
-    ).inClanDisciplines,
+    )
+
+  if (clan.kind === 'caitiff') {
+    return [
+      ...caitiffAvailableDisciplines,
+    ]
+  }
+
+  return [
+    ...clan.inClanDisciplines,
   ]
 }
 
@@ -63,6 +86,19 @@ export function updateDiscipline(
       key,
     )
   ) {
+    return disciplines
+  }
+
+  if (
+    clan.kind === 'caitiff' &&
+    !caitiffAvailableDisciplines.includes(
+      key,
+    )
+  ) {
+    return disciplines
+  }
+
+  if (clan.kind === 'thinBlood') {
     return disciplines
   }
 
@@ -109,6 +145,15 @@ export function normalizeDisciplinesForClan(
       clanKey,
     )
 
+  if (clan.kind === 'caitiff') {
+    return disciplines.filter(
+      (discipline) =>
+        caitiffAvailableDisciplines.includes(
+          discipline.key,
+        ),
+    )
+  }
+
   if (clan.kind !== 'clan') {
     return []
   }
@@ -145,10 +190,75 @@ export function validateDisciplines(
     )
 
   if (clan.kind === 'caitiff') {
+    for (
+      const discipline of disciplines
+    ) {
+      if (
+        !caitiffAvailableDisciplines.includes(
+          discipline.key,
+        )
+      ) {
+        errors.push(
+          'Caitiff solo puede seleccionar Disciplinas vampíricas válidas durante la creación.',
+        )
+        break
+      }
+
+      if (
+        !Number.isInteger(
+          discipline.value,
+        ) ||
+        discipline.value < 1 ||
+        discipline.value > 2
+      ) {
+        errors.push(
+          'Las puntuaciones iniciales de Disciplina Caitiff deben estar entre 1 y 2.',
+        )
+        break
+      }
+    }
+
+    const uniqueKeys =
+      new Set(
+        disciplines.map(
+          (discipline) =>
+            discipline.key,
+        ),
+      )
+
+    const values =
+      disciplines.map(
+        (discipline) =>
+          discipline.value,
+      )
+
+    const rating2 =
+      values.filter(
+        (value) =>
+          value === 2,
+      ).length
+
+    const rating1 =
+      values.filter(
+        (value) =>
+          value === 1,
+      ).length
+
+    if (
+      disciplines.length !== 2 ||
+      uniqueKeys.size !== 2 ||
+      rating2 !== 1 ||
+      rating1 !== 1
+    ) {
+      errors.push(
+        'Caitiff debe seleccionar dos Disciplinas distintas con distribución 2 + 1.',
+      )
+    }
+
     return {
-      valid: false,
+      valid: errors.length === 0,
       errors: [
-        'La creación de Disciplinas para Caitiff requiere sus reglas especiales.',
+        ...new Set(errors),
       ],
     }
   }
@@ -222,6 +332,48 @@ export function validateDisciplines(
       ...new Set(errors),
     ],
   }
+}
+
+export function randomizeCaitiffDisciplines(
+  random: () => number =
+    Math.random,
+): CharacterDisciplinesDraft {
+  const shuffled = [
+    ...caitiffAvailableDisciplines,
+  ]
+
+  for (
+    let index =
+      shuffled.length - 1;
+    index > 0;
+    index -= 1
+  ) {
+    const target =
+      Math.floor(
+        random() * (index + 1),
+      )
+
+    ;[
+      shuffled[index],
+      shuffled[target],
+    ] = [
+      shuffled[target],
+      shuffled[index],
+    ]
+  }
+
+  return [
+    {
+      key: shuffled[0],
+      value: 2,
+      powerKeys: [],
+    },
+    {
+      key: shuffled[1],
+      value: 1,
+      powerKeys: [],
+    },
+  ]
 }
 
 export function randomizeClanDisciplines(

@@ -7,7 +7,9 @@ import {
 } from '../data/discipline-definitions'
 
 import {
+  getAvailableDisciplinesForClan,
   getDisciplineValue,
+  randomizeCaitiffDisciplines,
   randomizeClanDisciplines,
   updateDiscipline,
   validateDisciplines,
@@ -108,44 +110,21 @@ export function DisciplinesStep({
     )
   }
 
+  const availableDisciplines =
+    getAvailableDisciplinesForClan(
+      clanKey,
+    )
+
+  const isCaitiff =
+    clan.kind === 'caitiff'
+
   function randomize() {
     onChange(
-      randomizeClanDisciplines(
-        clanKey,
-      ),
-    )
-  }
-
-  if (clan.kind === 'caitiff') {
-    return (
-      <div className="disciplines-step">
-        <div className="creation-step-heading">
-          <span>Fase 5</span>
-
-          <h2>Disciplinas</h2>
-
-          <p>
-            Las Disciplinas de un Caitiff no
-            siguen la selección normal de
-            Disciplinas de clan.
-          </p>
-        </div>
-
-        <section className="discipline-special-case">
-          <span>
-            Caso especial
-          </span>
-
-          <h3>Caitiff</h3>
-
-          <p>
-            Este flujo tendrá su propia regla
-            de selección de Disciplinas.
-            No aplicaremos una regla de clan
-            normal de forma incorrecta.
-          </p>
-        </section>
-      </div>
+      isCaitiff
+        ? randomizeCaitiffDisciplines()
+        : randomizeClanDisciplines(
+            clanKey,
+          ),
     )
   }
 
@@ -190,15 +169,18 @@ export function DisciplinesStep({
         <h2>Disciplinas</h2>
 
         <p>
-          Distribuye tus puntos iniciales entre
-          las Disciplinas propias de tu clan.
+          {isCaitiff
+            ? 'Elige libremente dos Disciplinas vampíricas y distribuye 2 + 1 puntos.'
+            : 'Distribuye tus puntos iniciales entre las Disciplinas propias de tu clan.'}
         </p>
       </div>
 
       <div className="disciplines-step__clan">
         <div>
           <span>
-            Clan seleccionado
+            {isCaitiff
+              ? 'Tipo seleccionado'
+              : 'Clan seleccionado'}
           </span>
 
           <strong>
@@ -212,7 +194,7 @@ export function DisciplinesStep({
           </span>
 
           <strong>
-            2 + 1
+            {'2 + 1'}
           </strong>
         </div>
 
@@ -226,7 +208,7 @@ export function DisciplinesStep({
       </div>
 
       <div className="discipline-editor-grid">
-        {clan.inClanDisciplines.map(
+        {availableDisciplines.map(
           (disciplineKey) => (
             <DisciplineEditorCard
               key={disciplineKey}
@@ -253,7 +235,7 @@ export function DisciplinesStep({
       </div>
 
       <div className="discipline-power-selectors">
-        {clan.inClanDisciplines.map(
+        {availableDisciplines.map(
           (disciplineKey) => (
             <DisciplinePowerSelector
               key={disciplineKey}
@@ -300,7 +282,7 @@ export function DisciplinesStep({
         }
       >
         <div className="discipline-validation__summary">
-          {clan.inClanDisciplines.map(
+          {availableDisciplines.map(
             (disciplineKey) => (
               <div
                 key={
