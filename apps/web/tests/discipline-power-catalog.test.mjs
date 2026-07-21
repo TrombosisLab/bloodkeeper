@@ -122,7 +122,9 @@ test(
           power.disciplineKey !==
             'fortitude' &&
           power.disciplineKey !==
-            'protean',
+            'protean' &&
+          power.disciplineKey !==
+            'auspex',
       )
 
     assert.equal(
@@ -153,7 +155,9 @@ test(
           power.disciplineKey ===
             'fortitude' ||
           power.disciplineKey ===
-            'protean',
+            'protean' ||
+          power.disciplineKey ===
+            'auspex',
       )
 
     assert.equal(

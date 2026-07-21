@@ -16,6 +16,109 @@ import type {
 export const disciplinePowerDefinitions:
   DisciplinePowerDefinition[] = [
     /*
+     * AUSPEX
+     * Fuente: Vampiro V5 — Libro Básico ES
+     * Págs. 249–252.
+     */
+
+    {
+      key: 'auspex-heightened-senses',
+      disciplineKey: 'auspex',
+      name: 'Sentidos Agudizados',
+      level: 1,
+      summary:
+        'Amplifica sobrenaturalmente uno o varios sentidos del vampiro.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 249,
+    },
+    {
+      key: 'auspex-sense-the-unseen',
+      disciplineKey: 'auspex',
+      name: 'Sentir lo Invisible',
+      level: 1,
+      summary:
+        'Permite percibir fenómenos sobrenaturales que normalmente permanecerían ocultos.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 249,
+    },
+    {
+      key: 'auspex-premonition',
+      disciplineKey: 'auspex',
+      name: 'Premonición',
+      level: 2,
+      summary:
+        'Proporciona destellos intuitivos de información sobre peligros o acontecimientos relevantes.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 250,
+    },
+    {
+      key: 'auspex-share-the-senses',
+      disciplineKey: 'auspex',
+      name: 'Compartir los Sentidos',
+      level: 3,
+      summary:
+        'Permite experimentar a distancia las percepciones sensoriales de otro ser.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 250,
+    },
+    {
+      key: 'auspex-scry-the-soul',
+      disciplineKey: 'auspex',
+      name: 'Escudriñar el Alma',
+      level: 3,
+      summary:
+        'Permite observar aspectos sobrenaturales y emocionales profundos de un individuo.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 250,
+    },
+    {
+      key: 'auspex-spirits-touch',
+      disciplineKey: 'auspex',
+      name: 'Toque del Espíritu',
+      level: 4,
+      summary:
+        'Permite obtener impresiones psíquicas asociadas a objetos o lugares mediante el contacto.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 251,
+    },
+    {
+      key: 'auspex-clairvoyance',
+      disciplineKey: 'auspex',
+      name: 'Clarividencia',
+      level: 5,
+      summary:
+        'Extiende la percepción sobrenatural para obtener información de un área situada más allá de los sentidos normales.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 251,
+    },
+    {
+      key: 'auspex-possession',
+      disciplineKey: 'auspex',
+      name: 'Posesión',
+      level: 5,
+      summary:
+        'Permite proyectar la mente del vampiro sobre un mortal y controlar su cuerpo.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 251,
+      requirements: {
+        amalgam: {
+          disciplineKey: 'dominate',
+          minimumLevel: 3,
+        },
+      },
+    },
+    {
+      key: 'auspex-telepathy',
+      disciplineKey: 'auspex',
+      name: 'Telepatía',
+      level: 5,
+      summary:
+        'Permite leer pensamientos y establecer comunicación mental sobrenatural.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 252,
+    },
+
+    /*
      * PROTEAN
      * Fuente: Vampiro V5 — Libro Básico ES
      */
@@ -607,21 +710,6 @@ export const disciplinePowerDefinitions:
         'Permite reaccionar a acontecimientos con una velocidad que parece anticiparse a los demás.',
       sourceKey: 'core-v5-es',
       sourcePage: 254,
-    },
-
-    {
-      key: 'auspex-dev-1-a',
-      disciplineKey: 'auspex',
-      name: 'Poder de Auspex A',
-      level: 1,
-      sourceKey: 'development',
-    },
-    {
-      key: 'auspex-dev-1-b',
-      disciplineKey: 'auspex',
-      name: 'Poder de Auspex B',
-      level: 1,
-      sourceKey: 'development',
     },
 
     {
