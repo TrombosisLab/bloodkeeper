@@ -16,6 +16,102 @@ import type {
 export const disciplinePowerDefinitions:
   DisciplinePowerDefinition[] = [
     /*
+     * FORTALEZA
+     * Fuente: Vampiro V5 — Libro Básico ES
+     */
+
+    {
+      key: 'fortitude-resilience',
+      disciplineKey: 'fortitude',
+      name: 'Resiliencia',
+      level: 1,
+      summary:
+        'Refuerza sobrenaturalmente la capacidad del vampiro para soportar daño físico.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 258,
+    },
+    {
+      key: 'fortitude-unswayable-mind',
+      disciplineKey: 'fortitude',
+      name: 'Mente Inquebrantable',
+      level: 1,
+      summary:
+        'Refuerza la resistencia mental frente a coerción e influencia sobrenatural.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 258,
+    },
+    {
+      key: 'fortitude-toughness',
+      disciplineKey: 'fortitude',
+      name: 'Dureza',
+      level: 2,
+      summary:
+        'Permite resistir mejor las heridas mediante una resistencia sobrenatural.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 258,
+    },
+    {
+      key: 'fortitude-defy-bane',
+      disciplineKey: 'fortitude',
+      name: 'Desafiar la Perdición',
+      level: 3,
+      summary:
+        'Permite resistir temporalmente fuentes de daño especialmente peligrosas para los vampiros.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 259,
+    },
+    {
+      key: 'fortitude-fortify-inner-facade',
+      disciplineKey: 'fortitude',
+      name: 'Fortificar la Fachada Interior',
+      level: 3,
+      summary:
+        'Protege la mente frente a intentos sobrenaturales de leer pensamientos o descubrir secretos.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 259,
+    },
+    {
+      key: 'fortitude-draught-of-endurance',
+      disciplineKey: 'fortitude',
+      name: 'Sorbo de Resistencia',
+      level: 4,
+      summary:
+        'Permite transmitir temporalmente parte de Fortaleza mediante la Sangre.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 259,
+    },
+    {
+      key: 'fortitude-flesh-of-marble',
+      disciplineKey: 'fortitude',
+      name: 'Carne de Mármol',
+      level: 5,
+      summary:
+        'Endurece sobrenaturalmente el cuerpo hasta hacerlo extremadamente difícil de dañar.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 259,
+    },
+    {
+      key: 'fortitude-prowess-from-pain',
+      disciplineKey: 'fortitude',
+      name: 'Proeza del Dolor',
+      level: 5,
+      summary:
+        'Convierte las heridas sufridas en una fuente de capacidad física sobrenatural.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 260,
+    },
+    {
+      key: 'fortitude-skin-of-the-sarcophagus',
+      disciplineKey: 'fortitude',
+      name: 'Piel de Sarcófago',
+      level: 5,
+      summary:
+        'Representa una manifestación extrema de resistencia sobrenatural.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 260,
+    },
+
+    /*
      * ANIMALISMO
      * Fuente: Vampiro V5 — Libro Básico ES
      * Págs. 245–248.
@@ -473,21 +569,6 @@ export const disciplinePowerDefinitions:
     },
 
     {
-      key: 'fortitude-dev-1-a',
-      disciplineKey: 'fortitude',
-      name: 'Poder de Fortaleza A',
-      level: 1,
-      sourceKey: 'development',
-    },
-    {
-      key: 'fortitude-dev-1-b',
-      disciplineKey: 'fortitude',
-      name: 'Poder de Fortaleza B',
-      level: 1,
-      sourceKey: 'development',
-    },
-
-    {
       key: 'obfuscate-dev-1-a',
       disciplineKey: 'obfuscate',
       name: 'Poder de Ofuscación A',
@@ -537,13 +618,6 @@ export const disciplinePowerDefinitions:
      * Permiten comprobar que una Disciplina a 2
      * puede seleccionar dos poderes.
      */
-    {
-      key: 'fortitude-dev-2-a',
-      disciplineKey: 'fortitude',
-      name: 'Poder de Fortaleza nivel 2',
-      level: 2,
-      sourceKey: 'development',
-    },
     {
       key: 'protean-dev-2-a',
       disciplineKey: 'protean',
