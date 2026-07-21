@@ -16,6 +16,96 @@ import type {
 export const disciplinePowerDefinitions:
   DisciplinePowerDefinition[] = [
     /*
+     * HECHICERÍA DE SANGRE
+     * Fuente: Vampiro V5 — Libro Básico ES
+     * Págs. 272–275.
+     *
+     * Los Rituales NO se modelan aquí.
+     * Tendrán catálogo y reglas independientes.
+     */
+
+    {
+      key: 'blood-sorcery-taste-for-blood',
+      disciplineKey: 'bloodSorcery',
+      name: 'Sabor de la Sangre',
+      level: 1,
+      summary:
+        'Permite analizar sobrenaturalmente una muestra de sangre y obtener información sobre su naturaleza.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 272,
+    },
+    {
+      key: 'blood-sorcery-corrosive-vitae',
+      disciplineKey: 'bloodSorcery',
+      name: 'Vitae Corrosiva',
+      level: 1,
+      summary:
+        'Permite transformar la propia Vitae en una sustancia capaz de corroer materiales inertes.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 273,
+    },
+    {
+      key: 'blood-sorcery-extinguish-vitae',
+      disciplineKey: 'bloodSorcery',
+      name: 'Extinguir Vitae',
+      level: 2,
+      summary:
+        'Debilita sobrenaturalmente la Sangre de otro vampiro y aumenta su Ansia.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 273,
+    },
+    {
+      key: 'blood-sorcery-blood-of-potency',
+      disciplineKey: 'bloodSorcery',
+      name: 'Sangre de Potencia',
+      level: 3,
+      summary:
+        'Concentra temporalmente la Sangre del vampiro para incrementar su Potencia de Sangre.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 273,
+    },
+    {
+      key: 'blood-sorcery-scorpions-touch',
+      disciplineKey: 'bloodSorcery',
+      name: 'Toque de Escorpión',
+      level: 3,
+      summary:
+        'Transforma parte de la Vitae en un veneno sobrenatural capaz de afectar a mortales y vampiros.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 273,
+    },
+    {
+      key: 'blood-sorcery-theft-of-vitae',
+      disciplineKey: 'bloodSorcery',
+      name: 'Robo de Vitae',
+      level: 4,
+      summary:
+        'Permite extraer sangre sobrenaturalmente de una víctima y atraerla hacia el vampiro.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 274,
+    },
+    {
+      key: 'blood-sorcery-cauldron-of-blood',
+      disciplineKey: 'bloodSorcery',
+      name: 'Caldero de Sangre',
+      level: 5,
+      summary:
+        'Hace hervir sobrenaturalmente la sangre de una víctima dentro de su propio cuerpo.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 274,
+    },
+    {
+      key: 'blood-sorcery-baals-caress',
+      disciplineKey: 'bloodSorcery',
+      name: 'Caricia de Baal',
+      level: 5,
+      summary:
+        'Transforma la Vitae en un veneno sobrenatural extremadamente destructivo.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 275,
+    },
+
+    /*
      * DOMINACIÓN
      * Fuente: Vampiro V5 — Libro Básico ES
      */
@@ -806,21 +896,6 @@ export const disciplinePowerDefinitions:
         'Permite reaccionar a acontecimientos con una velocidad que parece anticiparse a los demás.',
       sourceKey: 'core-v5-es',
       sourcePage: 254,
-    },
-
-    {
-      key: 'blood-sorcery-dev-1-a',
-      disciplineKey: 'bloodSorcery',
-      name: 'Poder de Hechicería de Sangre A',
-      level: 1,
-      sourceKey: 'development',
-    },
-    {
-      key: 'blood-sorcery-dev-1-b',
-      disciplineKey: 'bloodSorcery',
-      name: 'Poder de Hechicería de Sangre B',
-      level: 1,
-      sourceKey: 'development',
     },
 
     {

@@ -126,7 +126,9 @@ test(
           power.disciplineKey !==
             'auspex' &&
           power.disciplineKey !==
-            'dominate',
+            'dominate' &&
+          power.disciplineKey !==
+            'bloodSorcery',
       )
 
     assert.equal(
@@ -161,7 +163,9 @@ test(
           power.disciplineKey ===
             'auspex' ||
           power.disciplineKey ===
-            'dominate',
+            'dominate' ||
+          power.disciplineKey ===
+            'bloodSorcery',
       )
 
     assert.equal(
