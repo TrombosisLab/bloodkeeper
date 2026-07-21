@@ -23,6 +23,7 @@ import type {
 } from '../types/discipline.types'
 
 import { DisciplineEditorCard } from './DisciplineEditorCard'
+import { DisciplinePowerSelector } from './DisciplinePowerSelector'
 
 interface DisciplinesStepProps {
   clanKey: ClanKey
@@ -216,6 +217,26 @@ export function DisciplinesStep({
               onChange={
                 changeDiscipline
               }
+            />
+          ),
+        )}
+      </div>
+
+      <div className="discipline-power-selectors">
+        {clan.inClanDisciplines.map(
+          (disciplineKey) => (
+            <DisciplinePowerSelector
+              key={disciplineKey}
+              disciplineKey={
+                disciplineKey
+              }
+              disciplineName={
+                getDisciplineName(
+                  disciplineKey,
+                )
+              }
+              disciplines={value}
+              onChange={onChange}
             />
           ),
         )}

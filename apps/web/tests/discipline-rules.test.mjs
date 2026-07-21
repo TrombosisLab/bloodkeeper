@@ -34,10 +34,12 @@ test(
           {
             key: 'celerity',
             value: 2,
+            powerKeys: [],
           },
           {
             key: 'potence',
             value: 1,
+            powerKeys: [],
           },
         ],
         'brujah',
@@ -59,6 +61,7 @@ test(
           {
             key: 'celerity',
             value: 1,
+            powerKeys: [],
           },
         ],
         'brujah',
@@ -98,10 +101,12 @@ test(
           {
             key: 'celerity',
             value: 2,
+            powerKeys: [],
           },
           {
             key: 'presence',
             value: 1,
+            powerKeys: [],
           },
         ],
         'gangrel',

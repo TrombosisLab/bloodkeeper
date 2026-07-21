@@ -90,6 +90,11 @@ export function updateDiscipline(
     {
       key,
       value: safeValue,
+      powerKeys:
+        disciplines.find(
+          (discipline) =>
+            discipline.key === key,
+        )?.powerKeys ?? [],
     },
   ]
 }
@@ -264,10 +269,12 @@ export function randomizeClanDisciplines(
     {
       key: shuffled[0],
       value: 2,
+      powerKeys: [],
     },
     {
       key: shuffled[1],
       value: 1,
+      powerKeys: [],
     },
   ]
 }

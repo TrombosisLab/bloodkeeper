@@ -4198,3 +4198,195 @@ select {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==================================================
+   MILESTONE-003 / 003-G PARTE 5C — PODERES
+   ================================================== */
+
+.discipline-power-selectors {
+  display: grid;
+
+  gap: 14px;
+
+  margin-top: 18px;
+}
+
+.discipline-power-selector {
+  padding: 18px;
+
+  border: 1px solid #392e30;
+
+  background:
+    rgb(255 255 255 / 0.012);
+}
+
+.discipline-power-selector__header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding-bottom: 12px;
+
+  border-bottom:
+    1px solid #302729;
+}
+
+.discipline-power-selector__header span {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #725e61;
+
+  font-size: 0.56rem;
+  font-weight: 800;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.discipline-power-selector__header h4 {
+  margin: 0;
+
+  color: #d2c5bf;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.15rem;
+
+  font-weight: 400;
+}
+
+.discipline-power-selector__header > strong {
+  color: #bd6874;
+
+  font-size: 1rem;
+}
+
+.discipline-power-selector__help {
+  margin:
+    12px
+    0;
+
+  color: #756a67;
+
+  font-size: 0.72rem;
+
+  line-height: 1.5;
+}
+
+.discipline-power-selector__options {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+
+  gap: 8px;
+}
+
+.discipline-power-option {
+  min-height: 94px;
+
+  padding: 12px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  border: 1px solid #3a3031;
+
+  color: #9c8e89;
+
+  background: #121010;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.discipline-power-option:hover:not(:disabled) {
+  border-color: #67434a;
+}
+
+.discipline-power-option--selected {
+  border-color: #8b4c57;
+
+  background:
+    rgb(112 45 56 / 0.14);
+}
+
+.discipline-power-option:disabled {
+  opacity: 0.35;
+
+  cursor: not-allowed;
+}
+
+.discipline-power-option__level {
+  margin-bottom: 7px;
+
+  color: #8e555e;
+
+  font-size: 0.56rem;
+  font-weight: 800;
+
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+.discipline-power-option strong {
+  color: #c9bbb6;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.88rem;
+
+  font-weight: 400;
+}
+
+.discipline-power-option__state {
+  margin-top: auto;
+
+  padding-top: 10px;
+
+  color: #756966;
+
+  font-size: 0.62rem;
+}
+
+.discipline-power-option--selected
+  .discipline-power-option__state {
+  color: #bd737d;
+}
+
+.discipline-power-selector__validation {
+  margin-top: 10px;
+
+  color: #b98289;
+
+  font-size: 0.7rem;
+}
+
+.discipline-power-selector__validation--valid {
+  color: #86a68d;
+}
+
+@media (max-width: 850px) {
+  .discipline-power-selector__options {
+    grid-template-columns: 1fr;
+  }
+}

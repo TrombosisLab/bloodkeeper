@@ -1,3 +1,7 @@
+import type {
+  DisciplinePowerKey,
+} from './discipline-power.types'
+
 export type DisciplineKey =
   | 'animalism'
   | 'auspex'
@@ -20,6 +24,7 @@ export interface DisciplineDefinition {
 export interface CharacterDisciplineDraft {
   key: DisciplineKey
   value: number
+  powerKeys: DisciplinePowerKey[]
 }
 
 export type CharacterDisciplinesDraft =

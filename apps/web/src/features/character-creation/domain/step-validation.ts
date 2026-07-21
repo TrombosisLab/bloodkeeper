@@ -1,4 +1,12 @@
 import {
+  disciplinePowerDefinitions,
+} from '../data/discipline-power-definitions'
+
+import {
+  validateSelectedPowers,
+} from './discipline-power-rules'
+
+import {
   validateAttributeDistribution,
 } from './attribute-rules'
 
@@ -145,8 +153,52 @@ export function validateStep(
     case 'blood':
       return validateBloodStep(draft)
 
-    case 'disciplines':
-      return validateDisciplinesStep(draft)
+    case 'disciplines': {
+      const base =
+        validateDisciplinesStep(
+          draft,
+        )
+
+      if (!base.valid) {
+        return base
+      }
+
+      const powerErrors: string[] = []
+
+      for (
+        const discipline of
+        draft.disciplines
+      ) {
+        if (
+          discipline.value <= 0
+        ) {
+          continue
+        }
+
+        const result =
+          validateSelectedPowers(
+            disciplinePowerDefinitions,
+            draft.disciplines,
+            discipline.key,
+            discipline.powerKeys,
+          )
+
+        powerErrors.push(
+          ...result.errors,
+        )
+      }
+
+      return {
+        valid:
+          powerErrors.length === 0,
+
+        errors: [
+          ...new Set(
+            powerErrors,
+          ),
+        ],
+      }
+    }
 
     default:
       return valid()
