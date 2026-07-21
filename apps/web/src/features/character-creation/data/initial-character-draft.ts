@@ -40,6 +40,10 @@ export const initialCharacterDraft: CharacterDraft = {
     ritualKeys: [],
   },
 
+  oblivionCeremonies: {
+    ceremonyKeys: [],
+  },
+
   skills: {
     athletics: 0,
     brawl: 0,

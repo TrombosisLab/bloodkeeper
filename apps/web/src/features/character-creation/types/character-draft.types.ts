@@ -24,12 +24,17 @@ import type {
   CharacterBloodSorceryRitualsDraft,
 } from './blood-sorcery-ritual.types'
 
+import type {
+  CharacterOblivionCeremoniesDraft,
+} from './oblivion-ceremony.types'
+
 export interface CharacterDraft {
   identity: CharacterIdentityDraft
   attributes: CharacterAttributesDraft
   blood: CharacterBloodDraft
   disciplines: CharacterDisciplinesDraft
   bloodSorceryRituals: CharacterBloodSorceryRitualsDraft
+  oblivionCeremonies: CharacterOblivionCeremoniesDraft
   skills: CharacterSkillsDraft
   skillSpecialties: CharacterSkillSpecialtiesDraft
   skillDistributionMethod: SkillDistributionMethod

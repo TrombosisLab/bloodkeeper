@@ -20,6 +20,14 @@ export const contentSources:
       category: 'core',
     },
 
+    {
+      key: 'players-guide-v5-es',
+      name: 'Vampiro: La Mascarada V5 — Guía del Jugador',
+      shortName: 'V5 Guía del Jugador',
+      edition: 'V5',
+      category: 'supplement',
+    },
+
     /*
      * Las fuentes reales se añadirán
      * explícitamente conforme se incorpore

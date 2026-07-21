@@ -1,51 +1,60 @@
 import {
   BLOOD_SORCERY_RITUAL_DEFINITIONS,
-} from '../data/blood-sorcery-ritual-definitions'
+} from '../data/blood-sorcery-ritual-definitions.ts'
+
+import {
+  oblivionCeremonyDefinitions,
+} from '../data/oblivion-ceremony-definitions.ts'
+
+import {
+  getLearnableInitialOblivionCeremonies,
+  validateInitialOblivionCeremonySelection,
+} from './oblivion-ceremony-rules.ts'
 
 import {
   validateInitialBloodSorceryRituals,
-} from './blood-sorcery-ritual-rules'
+} from './blood-sorcery-ritual-rules.ts'
 
 import {
   getDisciplineValue,
-} from './discipline-rules'
+} from './discipline-rules.ts'
 
 import {
   disciplinePowerDefinitions,
-} from '../data/discipline-power-definitions'
+} from '../data/discipline-power-definitions.ts'
 
 import {
   validateSelectedPowers,
-} from './discipline-power-rules'
+} from './discipline-power-rules.ts'
 
 import {
   validateAttributeDistribution,
-} from './attribute-rules'
+} from './attribute-rules.ts'
 
 import {
   validateSkillDistribution,
-} from './skill-rules'
+} from './skill-rules.ts'
 
 import {
   validateBloodDraft,
-} from './blood-rules'
+} from './blood-rules.ts'
 
 import {
   validateDisciplines,
-} from './discipline-rules'
+} from './discipline-rules.ts'
 
 import type {
   CharacterDraft,
-} from '../types/character-draft.types'
+} from '../types/character-draft.types.ts'
 
 import type {
   CreationStepId,
-} from '../types/creation-step.types'
+} from '../types/creation-step.types.ts'
 
 import type {
   StepValidationMap,
   StepValidationResult,
-} from '../types/step-validation.types'
+} from '../types/step-validation.types.ts'
 
 function valid(): StepValidationResult {
   return {
@@ -167,14 +176,60 @@ export function validateDisciplinesStep(
       ),
     )
 
+  const oblivion =
+    draft.disciplines.find(
+      (discipline) =>
+        discipline.key ===
+        'oblivion',
+    )
+
+  const oblivionLevel =
+    oblivion?.value ?? 0
+
+  const oblivionPowerKeys =
+    oblivion?.powerKeys ?? []
+
+  const learnableCeremonies =
+    getLearnableInitialOblivionCeremonies(
+      oblivionCeremonyDefinitions,
+      oblivionLevel,
+      oblivionPowerKeys,
+    )
+
+  const ceremonyValidation =
+    validateInitialOblivionCeremonySelection(
+      oblivionCeremonyDefinitions,
+      draft.oblivionCeremonies.ceremonyKeys,
+      oblivionLevel,
+      oblivionPowerKeys,
+    )
+
+  const ceremonyErrors = [
+    ...ceremonyValidation.errors,
+  ]
+
+  if (
+    learnableCeremonies.length > 0 &&
+    draft.oblivionCeremonies
+      .ceremonyKeys.length !== 1
+  ) {
+    ceremonyErrors.push(
+      'Debes seleccionar exactamente una Ceremonia inicial de Olvido.',
+    )
+  }
+
   return {
     valid:
       base.valid &&
-      ritualValidation.valid,
+      ritualValidation.valid &&
+      ceremonyErrors.length === 0,
 
     errors: [
       ...base.errors,
       ...ritualValidation.errors,
+      ...new Set(
+        ceremonyErrors,
+      ),
     ],
   }
 }

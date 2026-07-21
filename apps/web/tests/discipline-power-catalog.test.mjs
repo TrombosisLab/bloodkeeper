@@ -130,7 +130,9 @@ test(
           power.disciplineKey !==
             'bloodSorcery' &&
           power.disciplineKey !==
-            'obfuscate',
+            'obfuscate' &&
+          power.disciplineKey !==
+            'oblivion',
       )
 
     assert.equal(

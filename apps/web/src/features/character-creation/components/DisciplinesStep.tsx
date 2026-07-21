@@ -26,9 +26,14 @@ import type {
   CharacterBloodSorceryRitualsDraft,
 } from '../types/blood-sorcery-ritual.types'
 
+import type {
+  CharacterOblivionCeremoniesDraft,
+} from '../types/oblivion-ceremony.types'
+
 import { DisciplineEditorCard } from './DisciplineEditorCard'
 import { DisciplinePowerSelector } from './DisciplinePowerSelector'
 import { BloodSorceryRitualSelector } from './BloodSorceryRitualSelector'
+import { OblivionCeremonySelector } from './OblivionCeremonySelector'
 
 interface DisciplinesStepProps {
   clanKey: ClanKey
@@ -47,6 +52,14 @@ interface DisciplinesStepProps {
   onRitualsChange: (
     value:
       CharacterBloodSorceryRitualsDraft,
+  ) => void
+
+  ceremonies:
+    CharacterOblivionCeremoniesDraft
+
+  onCeremoniesChange: (
+    value:
+      CharacterOblivionCeremoniesDraft,
   ) => void
 }
 
@@ -67,6 +80,8 @@ export function DisciplinesStep({
   onChange,
   rituals,
   onRitualsChange,
+  ceremonies,
+  onCeremoniesChange,
 }: DisciplinesStepProps) {
   const clan =
     getClanDefinition(
@@ -268,6 +283,14 @@ export function DisciplinesStep({
           }
         />
       )}
+
+      <OblivionCeremonySelector
+        disciplines={value}
+        value={ceremonies}
+        onChange={
+          onCeremoniesChange
+        }
+      />
 
       <div
         className={

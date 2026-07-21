@@ -12,6 +12,10 @@ import {
 } from '../domain/blood-sorcery-ritual-draft-rules'
 
 import {
+  normalizeCharacterDraftOblivionCeremonies,
+} from '../domain/oblivion-ceremony-draft-rules'
+
+import {
   removeInvalidSpecialties,
 } from '../domain/skill-specialty-rules'
 
@@ -358,10 +362,11 @@ export function CharacterCreationWizard({
                 disciplines,
               ) =>
                 updateDraft(
-                  (current) => ({
-                    ...current,
-                    disciplines,
-                  }),
+                  (current) =>
+                    normalizeCharacterDraftOblivionCeremonies({
+                      ...current,
+                      disciplines,
+                    }),
                 )
               }
               rituals={
@@ -374,6 +379,19 @@ export function CharacterCreationWizard({
                   (current) => ({
                     ...current,
                     bloodSorceryRituals,
+                  }),
+                )
+              }
+              ceremonies={
+                draft.oblivionCeremonies
+              }
+              onCeremoniesChange={(
+                oblivionCeremonies,
+              ) =>
+                updateDraft(
+                  (current) => ({
+                    ...current,
+                    oblivionCeremonies,
                   }),
                 )
               }
