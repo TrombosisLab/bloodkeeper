@@ -16,6 +16,109 @@ import type {
 export const disciplinePowerDefinitions:
   DisciplinePowerDefinition[] = [
     /*
+     * ANIMALISMO
+     * Fuente: Vampiro V5 — Libro Básico ES
+     * Págs. 245–248.
+     */
+
+    {
+      key: 'animalism-sense-the-beast',
+      disciplineKey: 'animalism',
+      name: 'Sentir a la Bestia',
+      level: 1,
+      summary:
+        'Permite percibir la naturaleza bestial, hostilidad y determinados impulsos sobrenaturales de otros seres.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 245,
+    },
+    {
+      key: 'animalism-bond-famulus',
+      disciplineKey: 'animalism',
+      name: 'Vínculo con Famulus',
+      level: 1,
+      summary:
+        'Crea un vínculo especial con un animal convertido en famulus y facilita otros usos de Animalismo.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 245,
+    },
+    {
+      key: 'animalism-feral-whispers',
+      disciplineKey: 'animalism',
+      name: 'Susurros Salvajes',
+      level: 2,
+      summary:
+        'Permite comunicarse con animales y, según las circunstancias, convocarlos o solicitar su ayuda.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 246,
+    },
+    {
+      key: 'animalism-unliving-hive',
+      disciplineKey: 'animalism',
+      name: 'Colmena No-Muerta',
+      level: 3,
+      summary:
+        'Extiende la influencia de Animalismo a enjambres de insectos y permite tratarlos como una criatura vinculada.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 247,
+      requirements: {
+        amalgam: {
+          disciplineKey: 'obfuscate',
+          minimumLevel: 2,
+        },
+      },
+    },
+    {
+      key: 'animalism-quell-the-beast',
+      disciplineKey: 'animalism',
+      name: 'Reprimir a la Bestia',
+      level: 3,
+      summary:
+        'Permite someter temporalmente los impulsos bestiales de un objetivo mediante la fuerza sobrenatural del vampiro.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 247,
+    },
+    {
+      key: 'animalism-animal-succulence',
+      disciplineKey: 'animalism',
+      name: 'Suculencia Animal',
+      level: 3,
+      summary:
+        'Permite obtener mayor sustento de la sangre animal y beneficios especiales relacionados con el famulus.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 247,
+    },
+    {
+      key: 'animalism-subsume-the-spirit',
+      disciplineKey: 'animalism',
+      name: 'Comunión de Espíritus',
+      level: 4,
+      summary:
+        'Permite transferir la mente del vampiro al cuerpo de un animal y controlarlo directamente.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 248,
+    },
+    {
+      key: 'animalism-animal-dominion',
+      disciplineKey: 'animalism',
+      name: 'Control Animal',
+      level: 5,
+      summary:
+        'Permite dominar grupos numerosos de animales como extensiones de la voluntad del vampiro.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 248,
+    },
+    {
+      key: 'animalism-drawing-out-the-beast',
+      disciplineKey: 'animalism',
+      name: 'Extraer a la Bestia',
+      level: 5,
+      summary:
+        'Permite proyectar la propia Bestia sobre otra persona y desplazar hacia ella sus impulsos más peligrosos.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 248,
+    },
+
+    /*
      * PRESENCIA
      * Fuente: Vampiro V5 — Libro Básico ES
      * Págs. 267–269.
@@ -325,21 +428,6 @@ export const disciplinePowerDefinitions:
     },
 
     {
-      key: 'animalism-dev-1-a',
-      disciplineKey: 'animalism',
-      name: 'Poder de Animalismo A',
-      level: 1,
-      sourceKey: 'development',
-    },
-    {
-      key: 'animalism-dev-1-b',
-      disciplineKey: 'animalism',
-      name: 'Poder de Animalismo B',
-      level: 1,
-      sourceKey: 'development',
-    },
-
-    {
       key: 'auspex-dev-1-a',
       disciplineKey: 'auspex',
       name: 'Poder de Auspex A',
@@ -449,13 +537,6 @@ export const disciplinePowerDefinitions:
      * Permiten comprobar que una Disciplina a 2
      * puede seleccionar dos poderes.
      */
-    {
-      key: 'animalism-dev-2-a',
-      disciplineKey: 'animalism',
-      name: 'Poder de Animalismo nivel 2',
-      level: 2,
-      sourceKey: 'development',
-    },
     {
       key: 'fortitude-dev-2-a',
       disciplineKey: 'fortitude',
