@@ -114,7 +114,9 @@ test(
           power.disciplineKey !==
             'celerity' &&
           power.disciplineKey !==
-            'potence',
+            'potence' &&
+          power.disciplineKey !==
+            'presence',
       )
 
     assert.equal(
@@ -137,7 +139,9 @@ test(
           power.disciplineKey ===
             'celerity' ||
           power.disciplineKey ===
-            'potence',
+            'potence' ||
+          power.disciplineKey ===
+            'presence',
       )
 
     assert.equal(

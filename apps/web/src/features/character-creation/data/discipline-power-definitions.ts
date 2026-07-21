@@ -16,6 +16,109 @@ import type {
 export const disciplinePowerDefinitions:
   DisciplinePowerDefinition[] = [
     /*
+     * PRESENCIA
+     * Fuente: Vampiro V5 — Libro Básico ES
+     * Págs. 267–269.
+     */
+
+    {
+      key: 'presence-daunt',
+      disciplineKey: 'presence',
+      name: 'Atemorizar',
+      level: 1,
+      summary:
+        'Proyecta una presencia amenazante que dificulta enfrentarse o actuar contra el vampiro.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 267,
+    },
+    {
+      key: 'presence-awe',
+      disciplineKey: 'presence',
+      name: 'Fascinación',
+      level: 1,
+      summary:
+        'Hace al vampiro sobrenaturalmente atractivo y aumenta su capacidad de influir socialmente.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 267,
+    },
+    {
+      key: 'presence-lingering-kiss',
+      disciplineKey: 'presence',
+      name: 'Beso Persistente',
+      level: 2,
+      summary:
+        'Hace que el Beso resulte especialmente adictivo para los mortales que lo experimentan.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 268,
+    },
+    {
+      key: 'presence-entrancement',
+      disciplineKey: 'presence',
+      name: 'Encantamiento',
+      level: 3,
+      summary:
+        'Concentra el magnetismo sobrenatural sobre una persona concreta y genera una fuerte fascinación.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 268,
+    },
+    {
+      key: 'presence-dread-gaze',
+      disciplineKey: 'presence',
+      name: 'Mirada Aterradora',
+      level: 3,
+      summary:
+        'Revela brevemente la naturaleza depredadora del vampiro para infundir un miedo extremo.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 268,
+    },
+    {
+      key: 'presence-summon',
+      disciplineKey: 'presence',
+      name: 'Invocación',
+      level: 4,
+      summary:
+        'Permite llamar sobrenaturalmente a una persona con la que existe una conexión adecuada.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 269,
+    },
+    {
+      key: 'presence-irresistible-voice',
+      disciplineKey: 'presence',
+      name: 'Voz Irresistible',
+      level: 4,
+      summary:
+        'Permite canalizar Dominación mediante la voz sin depender del contacto visual habitual.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 269,
+      requirements: {
+        amalgam: {
+          disciplineKey: 'dominate',
+          minimumLevel: 1,
+        },
+      },
+    },
+    {
+      key: 'presence-star-magnetism',
+      disciplineKey: 'presence',
+      name: 'Magnetismo de Estrella',
+      level: 5,
+      summary:
+        'Permite extender determinados efectos de Presencia a transmisiones en directo y comunicaciones.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 269,
+    },
+    {
+      key: 'presence-majesty',
+      disciplineKey: 'presence',
+      name: 'Majestad',
+      level: 5,
+      summary:
+        'Amplifica la presencia sobrenatural del vampiro hasta un nivel abrumador para quienes lo contemplan.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 269,
+    },
+
+    /*
      * POTENCIA
      * Fuente: Vampiro V5 — Libro Básico ES
      * Págs. 263–266.
@@ -327,21 +430,6 @@ export const disciplinePowerDefinitions:
     },
 
     {
-      key: 'presence-dev-1-a',
-      disciplineKey: 'presence',
-      name: 'Poder de Presencia A',
-      level: 1,
-      sourceKey: 'development',
-    },
-    {
-      key: 'presence-dev-1-b',
-      disciplineKey: 'presence',
-      name: 'Poder de Presencia B',
-      level: 1,
-      sourceKey: 'development',
-    },
-
-    {
       key: 'protean-dev-1-a',
       disciplineKey: 'protean',
       name: 'Poder de Protean A',
@@ -361,13 +449,6 @@ export const disciplinePowerDefinitions:
      * Permiten comprobar que una Disciplina a 2
      * puede seleccionar dos poderes.
      */
-    {
-      key: 'presence-dev-2-a',
-      disciplineKey: 'presence',
-      name: 'Poder de Presencia nivel 2',
-      level: 2,
-      sourceKey: 'development',
-    },
     {
       key: 'animalism-dev-2-a',
       disciplineKey: 'animalism',
