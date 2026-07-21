@@ -1,0 +1,1526 @@
+/* ==================================================
+   002-B — ATRIBUTOS
+   ================================================== */
+
+.attributes-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.08),
+      transparent 280px
+    );
+}
+
+.section-title {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  margin-bottom: 32px;
+}
+
+.section-title h2 {
+  margin: 0;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(2rem, 4vw, 3.25rem);
+
+  font-weight: 400;
+
+  letter-spacing: -0.035em;
+}
+
+.section-number {
+  color: #4f4142;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 2.4rem;
+}
+
+.attributes-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  border-top: 1px solid #392d2f;
+  border-left: 1px solid #392d2f;
+}
+
+.attribute-category {
+  border-right: 1px solid #392d2f;
+  border-bottom: 1px solid #392d2f;
+}
+
+.attribute-category h3 {
+  margin: 0;
+
+  padding: 15px 20px;
+
+  border-bottom: 1px solid #392d2f;
+
+  color: #b8777f;
+
+  font-size: 0.72rem;
+  font-weight: 800;
+
+  letter-spacing: 0.18em;
+
+  text-transform: uppercase;
+
+  background:
+    rgb(93 30 39 / 0.08);
+}
+
+.attribute-category__rows {
+  padding: 8px 20px;
+}
+
+.attribute-row {
+  min-height: 62px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  border-bottom: 1px solid #292324;
+}
+
+.attribute-row:last-child {
+  border-bottom: 0;
+}
+
+.attribute-row__label {
+  color: #d9d0ca;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.05rem;
+}
+
+.dot-rating {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  flex: 0 0 auto;
+}
+
+.dot-rating__dot {
+  width: 15px;
+  height: 15px;
+
+  display: block;
+
+  border: 1px solid #74565a;
+  border-radius: 50%;
+
+  background: transparent;
+}
+
+.dot-rating__dot--filled {
+  border-color: #b46d76;
+
+  background: #9d4d58;
+
+  box-shadow:
+    inset 0 0 0 3px #171112;
+}
+
+.derived-preview {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 1px;
+
+  margin-top: 22px;
+
+  background: #392d2f;
+
+  border: 1px solid #392d2f;
+}
+
+.derived-preview > div {
+  padding: 18px 20px;
+
+  background: #121010;
+}
+
+.derived-preview span,
+.derived-preview strong {
+  display: block;
+}
+
+.derived-preview span {
+  margin-bottom: 7px;
+
+  color: #817572;
+
+  font-size: 0.68rem;
+  font-weight: 700;
+
+  letter-spacing: 0.13em;
+
+  text-transform: uppercase;
+}
+
+.derived-preview strong {
+  color: #655d59;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.92rem;
+  font-weight: 400;
+}
+
+@media (max-width: 900px) {
+  .attributes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .derived-preview {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .attribute-row {
+    min-height: 58px;
+  }
+
+  .attribute-category__rows {
+    padding:
+      6px
+      16px;
+  }
+
+  .dot-rating {
+    gap: 5px;
+  }
+
+  .dot-rating__dot {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+/* ==================================================
+   002-C — SALUD Y FUERZA DE VOLUNTAD
+   ================================================== */
+
+.character-trackers {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 1px;
+
+  margin-top: 22px;
+
+  border: 1px solid #392d2f;
+
+  background: #392d2f;
+}
+
+.damage-tracker {
+  min-width: 0;
+
+  padding: 20px;
+
+  background: #121010;
+}
+
+.damage-tracker__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  margin-bottom: 18px;
+}
+
+.damage-tracker__label,
+.damage-tracker__capacity {
+  display: block;
+}
+
+.damage-tracker__label {
+  margin-bottom: 4px;
+
+  color: #a76d75;
+
+  font-size: 0.7rem;
+  font-weight: 800;
+
+  letter-spacing: 0.16em;
+
+  text-transform: uppercase;
+}
+
+.damage-tracker__capacity {
+  color: #e1d8d2;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.7rem;
+  font-weight: 400;
+}
+
+.damage-tracker__maximum {
+  color: #675e5b;
+
+  font-size: 0.68rem;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+.damage-tracker__boxes {
+  display: grid;
+
+  grid-template-columns:
+    repeat(10, minmax(20px, 1fr));
+
+  gap: 8px;
+}
+
+.damage-box {
+  position: relative;
+
+  aspect-ratio: 1;
+
+  display: block;
+
+  border: 1px solid #4d3b3e;
+
+  background: #0e0c0c;
+}
+
+.damage-box--available {
+  border-color: #816168;
+}
+
+.damage-box--unavailable {
+  opacity: 0.22;
+}
+
+.damage-box--superficial::after {
+  content: "";
+
+  position: absolute;
+
+  left: 16%;
+  right: 16%;
+
+  top: 50%;
+
+  height: 1px;
+
+  background: #d0a2a8;
+
+  transform: rotate(-45deg);
+}
+
+.damage-box--aggravated::before,
+.damage-box--aggravated::after {
+  content: "";
+
+  position: absolute;
+
+  left: 14%;
+  right: 14%;
+
+  top: 50%;
+
+  height: 1px;
+
+  background: #d5848e;
+}
+
+.damage-box--aggravated::before {
+  transform: rotate(45deg);
+}
+
+.damage-box--aggravated::after {
+  transform: rotate(-45deg);
+}
+
+@media (max-width: 900px) {
+  .character-trackers {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .damage-tracker__boxes {
+    grid-template-columns:
+      repeat(5, minmax(24px, 1fr));
+  }
+}
+
+/* ==================================================
+   002-D — HABILIDADES
+   ================================================== */
+
+.skills-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.06),
+      transparent 320px
+    );
+}
+
+.skills-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  border-top: 1px solid #392d2f;
+  border-left: 1px solid #392d2f;
+}
+
+.skill-category {
+  border-right: 1px solid #392d2f;
+  border-bottom: 1px solid #392d2f;
+}
+
+.skill-category h3 {
+  margin: 0;
+
+  padding: 15px 20px;
+
+  border-bottom: 1px solid #392d2f;
+
+  color: #b8777f;
+
+  font-size: 0.72rem;
+  font-weight: 800;
+
+  letter-spacing: 0.18em;
+
+  text-transform: uppercase;
+
+  background: rgb(93 30 39 / 0.08);
+}
+
+.skill-category__rows {
+  padding: 6px 20px;
+}
+
+.skill-row {
+  min-height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  border-bottom: 1px solid #292324;
+}
+
+.skill-row:last-child {
+  border-bottom: 0;
+}
+
+.skill-row__label {
+  color: #d4cbc6;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.94rem;
+}
+
+.skills-section .dot-rating {
+  gap: 6px;
+}
+
+.skills-section .dot-rating__dot {
+  width: 13px;
+  height: 13px;
+}
+
+@media (max-width: 1000px) {
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==================================================
+   002-E — ESTADO VAMPIRICO
+   ================================================== */
+
+.sr-only {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+
+  clip: rect(0, 0, 0, 0);
+
+  white-space: nowrap;
+
+  border: 0;
+}
+
+.state-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.07),
+      transparent 280px
+    );
+}
+
+.state-grid {
+  display: grid;
+
+  grid-template-columns:
+    2fr 1fr 1fr;
+
+  gap: 1px;
+
+  border: 1px solid #392d2f;
+
+  background: #392d2f;
+}
+
+.state-card {
+  min-width: 0;
+
+  padding: 22px;
+
+  background: #121010;
+}
+
+.state-card__heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  margin-bottom: 22px;
+}
+
+.state-card__heading span,
+.state-card__heading strong {
+  display: block;
+}
+
+.state-card__heading span {
+  margin-bottom: 5px;
+
+  color: #a76d75;
+
+  font-size: 0.7rem;
+  font-weight: 800;
+
+  letter-spacing: 0.15em;
+
+  text-transform: uppercase;
+}
+
+.state-card__heading strong {
+  color: #e1d8d2;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.8rem;
+  font-weight: 400;
+}
+
+.state-card__heading small {
+  color: #675e5b;
+
+  font-size: 0.65rem;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+.humanity-track {
+  display: grid;
+
+  grid-template-columns:
+    repeat(10, minmax(20px, 1fr));
+
+  gap: 7px;
+}
+
+.humanity-box {
+  aspect-ratio: 1;
+
+  border: 1px solid #554447;
+
+  background: #0d0b0b;
+}
+
+.humanity-box--filled {
+  border-color: #9b7479;
+
+  background:
+    linear-gradient(
+      135deg,
+      #795159,
+      #4c3035
+    );
+
+  box-shadow:
+    inset 0 0 0 3px #171112;
+}
+
+.hunger-track {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  min-height: 42px;
+}
+
+.hunger-drop {
+  width: 24px;
+  height: 32px;
+
+  display: block;
+
+  border: 1px solid #6f444b;
+
+  border-radius:
+    55% 55% 58% 58% /
+    38% 38% 70% 70%;
+
+  transform: rotate(45deg);
+
+  background: #0d0b0b;
+}
+
+.hunger-drop--filled {
+  border-color: #a34d59;
+
+  background:
+    linear-gradient(
+      135deg,
+      #8d2837,
+      #4e1720
+    );
+
+  box-shadow:
+    inset 0 0 0 3px #171112;
+}
+
+.blood-potency-display {
+  min-height: 42px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.blood-potency-display span {
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid #704149;
+
+  transform: rotate(45deg);
+
+  color: transparent;
+}
+
+.blood-potency-display strong {
+  color: #bd747d;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.6rem;
+
+  font-weight: 400;
+}
+
+@media (max-width: 900px) {
+  .state-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .humanity-track {
+    grid-template-columns:
+      repeat(5, minmax(28px, 1fr));
+  }
+}
+
+/* ==================================================
+   002-F — DISCIPLINAS
+   ================================================== */
+
+.disciplines-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.065),
+      transparent 300px
+    );
+}
+
+.disciplines-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 1px;
+
+  border: 1px solid #392d2f;
+
+  background: #392d2f;
+}
+
+.discipline-card {
+  min-width: 0;
+
+  background: #121010;
+}
+
+.discipline-card__header {
+  min-height: 105px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  padding: 20px;
+
+  border-bottom: 1px solid #392d2f;
+}
+
+.discipline-card__kicker {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #786c69;
+
+  font-size: 0.62rem;
+  font-weight: 700;
+
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
+}
+
+.discipline-card h3 {
+  margin: 0;
+
+  color: #ddd3cd;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.discipline-card__powers {
+  padding: 18px 20px 20px;
+}
+
+.discipline-card__powers-label {
+  display: block;
+
+  margin-bottom: 12px;
+
+  color: #a76d75;
+
+  font-size: 0.65rem;
+  font-weight: 800;
+
+  letter-spacing: 0.13em;
+
+  text-transform: uppercase;
+}
+
+.discipline-card__powers ul {
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.discipline-card__powers li {
+  min-height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  border-bottom: 1px solid #292324;
+}
+
+.discipline-card__powers li:last-child {
+  border-bottom: 0;
+}
+
+.discipline-card__powers li span {
+  color: #cfc5bf;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.9rem;
+}
+
+.discipline-card__powers li small {
+  flex: 0 0 auto;
+
+  color: #716764;
+
+  font-size: 0.64rem;
+
+  letter-spacing: 0.06em;
+
+  text-transform: uppercase;
+}
+
+.discipline-card__empty {
+  margin: 0;
+
+  color: #665d5a;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.disciplines-section .dot-rating__dot {
+  width: 13px;
+  height: 13px;
+}
+
+@media (max-width: 900px) {
+  .disciplines-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==================================================
+   002-G — VENTAJAS, TRASFONDOS Y DEFECTOS
+   ================================================== */
+
+.advantages-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.055),
+      transparent 300px
+    );
+}
+
+.advantages-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 1px;
+
+  border: 1px solid #392d2f;
+
+  background: #392d2f;
+}
+
+.trait-group {
+  min-width: 0;
+
+  background: #121010;
+}
+
+.trait-group__header {
+  min-height: 86px;
+
+  padding: 18px 20px;
+
+  border-bottom: 1px solid #392d2f;
+
+  background:
+    rgb(93 30 39 / 0.055);
+}
+
+.trait-group__header span {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #776c68;
+
+  font-size: 0.62rem;
+  font-weight: 700;
+
+  letter-spacing: 0.13em;
+
+  text-transform: uppercase;
+}
+
+.trait-group__header h3 {
+  margin: 0;
+
+  color: #d8cec8;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.35rem;
+  font-weight: 400;
+}
+
+.trait-group__content {
+  padding: 7px 20px;
+}
+
+.rated-trait {
+  min-height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  border-bottom: 1px solid #292324;
+}
+
+.rated-trait:last-child {
+  border-bottom: 0;
+}
+
+.rated-trait__identity {
+  min-width: 0;
+}
+
+.rated-trait__identity span,
+.rated-trait__identity small {
+  display: block;
+}
+
+.rated-trait__identity span {
+  color: #d2c8c2;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.92rem;
+}
+
+.rated-trait__identity small {
+  margin-top: 4px;
+
+  color: #706663;
+
+  font-size: 0.66rem;
+}
+
+.rated-trait--negative
+.rated-trait__identity span {
+  color: #bd858b;
+}
+
+.advantages-section .dot-rating {
+  gap: 5px;
+}
+
+.advantages-section .dot-rating__dot {
+  width: 12px;
+  height: 12px;
+}
+
+.rated-trait--negative
+.dot-rating__dot--filled {
+  border-color: #9d5962;
+
+  background: #74333d;
+}
+
+.trait-group__empty {
+  color: #665d5a;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+@media (max-width: 900px) {
+  .advantages-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==================================================
+   002-H — CONVICCIONES Y PIEDRAS DE TOQUE
+   ================================================== */
+
+.narrative-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.05),
+      transparent 320px
+    );
+}
+
+.narrative-grid {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr 1.25fr;
+
+  gap: 1px;
+
+  border: 1px solid #392d2f;
+
+  background: #392d2f;
+}
+
+.narrative-panel {
+  min-width: 0;
+
+  background: #121010;
+}
+
+.narrative-panel header {
+  min-height: 82px;
+
+  padding: 18px 20px;
+
+  border-bottom: 1px solid #392d2f;
+
+  background:
+    rgb(93 30 39 / 0.05);
+}
+
+.narrative-panel header span {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #776c68;
+
+  font-size: 0.62rem;
+  font-weight: 700;
+
+  letter-spacing: 0.13em;
+
+  text-transform: uppercase;
+}
+
+.narrative-panel header h3 {
+  margin: 0;
+
+  color: #d8cec8;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.28rem;
+  font-weight: 400;
+}
+
+.narrative-list {
+  margin: 0;
+  padding: 8px 20px;
+
+  list-style: none;
+}
+
+.narrative-list li {
+  position: relative;
+
+  padding:
+    14px
+    0
+    14px
+    18px;
+
+  border-bottom: 1px solid #292324;
+
+  color: #cfc5bf;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.9rem;
+
+  line-height: 1.45;
+}
+
+.narrative-list li:last-child {
+  border-bottom: 0;
+}
+
+.narrative-list li::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 20px;
+
+  width: 7px;
+  height: 7px;
+
+  border: 1px solid #8b535b;
+
+  transform: rotate(45deg);
+}
+
+.touchstone-list {
+  padding: 8px 20px;
+}
+
+.touchstone {
+  min-height: 62px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  border-bottom: 1px solid #292324;
+}
+
+.touchstone:last-child {
+  border-bottom: 0;
+}
+
+.touchstone strong {
+  color: #d4cac4;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+.touchstone span {
+  margin-top: 4px;
+
+  color: #746a67;
+
+  font-size: 0.68rem;
+}
+
+.narrative-panel--notes p {
+  margin: 0;
+
+  padding: 20px;
+
+  color: #bfb5af;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.92rem;
+
+  line-height: 1.65;
+}
+
+@media (max-width: 900px) {
+  .narrative-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==================================================
+   002-I — RESONANCIA Y EXPERIENCIA
+   ================================================== */
+
+.blood-experience-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.05),
+      transparent 260px
+    );
+}
+
+.blood-experience-grid {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr 1.4fr;
+
+  gap: 1px;
+
+  border: 1px solid #392d2f;
+
+  background: #392d2f;
+}
+
+.blood-info-card,
+.experience-card {
+  min-width: 0;
+
+  background: #121010;
+}
+
+.blood-info-card {
+  padding: 22px;
+}
+
+.blood-info-card__label {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: #806f6c;
+
+  font-size: 0.66rem;
+  font-weight: 700;
+
+  letter-spacing: 0.13em;
+
+  text-transform: uppercase;
+}
+
+.blood-info-card strong {
+  color: #d8cec8;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.45rem;
+  font-weight: 400;
+}
+
+.experience-card {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+}
+
+.experience-card > div {
+  padding: 20px;
+
+  border-right: 1px solid #292324;
+}
+
+.experience-card > div:last-child {
+  border-right: 0;
+}
+
+.experience-card span,
+.experience-card strong {
+  display: block;
+}
+
+.experience-card span {
+  margin-bottom: 9px;
+
+  color: #7a6f6b;
+
+  font-size: 0.62rem;
+  font-weight: 700;
+
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+.experience-card strong {
+  color: #d9cfc9;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+@media (max-width: 900px) {
+  .blood-experience-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .experience-card {
+    grid-template-columns: 1fr;
+  }
+
+  .experience-card > div {
+    border-right: 0;
+    border-bottom: 1px solid #292324;
+  }
+
+  .experience-card > div:last-child {
+    border-bottom: 0;
+  }
+}
+
+/* ==================================================
+   002-J — ESPECIALIDADES Y SECCIONES SECUNDARIAS
+   ================================================== */
+
+.skill-row__identity {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.skill-row__specialties {
+  max-width: 190px;
+  overflow: hidden;
+  color: #806f6c;
+  font-size: 0.61rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.secondary-section {
+  border-top: 1px solid #4c292e;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgb(82 22 30 / 0.045),
+      transparent 320px
+    );
+}
+
+.secondary-grid {
+  display: grid;
+  grid-template-columns:
+    0.9fr 1fr 1.35fr;
+  gap: 1px;
+  border: 1px solid #392d2f;
+  background: #392d2f;
+}
+
+.secondary-panel {
+  min-width: 0;
+  background: #121010;
+}
+
+.secondary-panel > header {
+  min-height: 82px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #392d2f;
+  background: rgb(93 30 39 / 0.045);
+}
+
+.secondary-panel > header span {
+  display: block;
+  margin-bottom: 7px;
+  color: #776c68;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.secondary-panel > header h3 {
+  margin: 0;
+  color: #d8cec8;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 1.28rem;
+  font-weight: 400;
+}
+
+.inventory-list,
+.history-list {
+  padding: 7px 20px;
+}
+
+.inventory-item,
+.history-entry {
+  border-bottom: 1px solid #292324;
+}
+
+.inventory-item:last-child,
+.history-entry:last-child {
+  border-bottom: 0;
+}
+
+.inventory-item {
+  min-height: 55px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.inventory-item strong,
+.history-entry strong {
+  color: #d0c6c0;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.inventory-item span {
+  margin-top: 3px;
+  color: #716764;
+  font-size: 0.65rem;
+}
+
+.notes-list {
+  margin: 0;
+  padding: 8px 20px;
+  list-style: none;
+}
+
+.notes-list li {
+  position: relative;
+  padding:
+    14px
+    0
+    14px
+    17px;
+  border-bottom: 1px solid #292324;
+  color: #bfb5af;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.notes-list li:last-child {
+  border-bottom: 0;
+}
+
+.notes-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20px;
+  width: 6px;
+  height: 6px;
+  border: 1px solid #805159;
+  transform: rotate(45deg);
+}
+
+.history-entry {
+  padding: 13px 0;
+}
+
+.history-entry p {
+  margin: 5px 0 0;
+  color: #776d69;
+  font-size: 0.69rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .secondary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .skill-row__specialties {
+    max-width: 240px;
+  }
+}
+
