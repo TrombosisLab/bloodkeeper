@@ -15,6 +15,109 @@ import type {
 
 export const disciplinePowerDefinitions:
   DisciplinePowerDefinition[] = [
+    /*
+     * CELERIDAD
+     * Fuente: Vampiro V5 — Libro Básico ES
+     * Págs. 252–254.
+     */
+
+    {
+      key: 'celerity-cats-grace',
+      disciplineKey: 'celerity',
+      name: 'Gracia Felina',
+      level: 1,
+      summary:
+        'Permite un equilibrio sobrenatural incluso en apoyos extremadamente difíciles.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 252,
+    },
+    {
+      key: 'celerity-rapid-reflexes',
+      disciplineKey: 'celerity',
+      name: 'Reflejos Rápidos',
+      level: 1,
+      summary:
+        'Mejora las reacciones defensivas y permite realizar ciertas acciones menores con gran rapidez.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 252,
+    },
+    {
+      key: 'celerity-fleetness',
+      disciplineKey: 'celerity',
+      name: 'Presteza',
+      level: 2,
+      summary:
+        'Potencia de forma sobrenatural las acciones basadas en Destreza.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 253,
+    },
+    {
+      key: 'celerity-blink',
+      disciplineKey: 'celerity',
+      name: 'Pestañeo',
+      level: 3,
+      summary:
+        'Permite cubrir una distancia considerable en un instante aparente.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 253,
+    },
+    {
+      key: 'celerity-traversal',
+      disciplineKey: 'celerity',
+      name: 'Recorrido',
+      level: 3,
+      summary:
+        'Permite desplazarse a gran velocidad por superficies difíciles, verticales o incluso sobre líquidos.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 253,
+    },
+    {
+      key: 'celerity-unerring-aim',
+      disciplineKey: 'celerity',
+      name: 'Puntería Certera',
+      level: 4,
+      summary:
+        'Permite realizar un ataque a distancia con una precisión sobrenatural.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 254,
+      requirements: {
+        amalgam: {
+          disciplineKey: 'auspex',
+          minimumLevel: 2,
+        },
+      },
+    },
+    {
+      key: 'celerity-draught-of-elegance',
+      disciplineKey: 'celerity',
+      name: 'Sorbo de Elegancia',
+      level: 4,
+      summary:
+        'Permite transmitir temporalmente parte de la Celeridad mediante la Sangre.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 254,
+    },
+    {
+      key: 'celerity-lightning-strike',
+      disciplineKey: 'celerity',
+      name: 'Golpe Relámpago',
+      level: 5,
+      summary:
+        'Permite ejecutar un ataque cuerpo a cuerpo a una velocidad extraordinaria.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 254,
+    },
+    {
+      key: 'celerity-split-second',
+      disciplineKey: 'celerity',
+      name: 'Segundo Quebrado',
+      level: 5,
+      summary:
+        'Permite reaccionar a acontecimientos con una velocidad que parece anticiparse a los demás.',
+      sourceKey: 'core-v5-es',
+      sourcePage: 254,
+    },
+
     {
       key: 'animalism-dev-1-a',
       disciplineKey: 'animalism',
@@ -56,21 +159,6 @@ export const disciplinePowerDefinitions:
       key: 'blood-sorcery-dev-1-b',
       disciplineKey: 'bloodSorcery',
       name: 'Poder de Hechicería de Sangre B',
-      level: 1,
-      sourceKey: 'development',
-    },
-
-    {
-      key: 'celerity-dev-1-a',
-      disciplineKey: 'celerity',
-      name: 'Poder de Celeridad A',
-      level: 1,
-      sourceKey: 'development',
-    },
-    {
-      key: 'celerity-dev-1-b',
-      disciplineKey: 'celerity',
-      name: 'Poder de Celeridad B',
       level: 1,
       sourceKey: 'development',
     },
@@ -185,14 +273,6 @@ export const disciplinePowerDefinitions:
      * Permiten comprobar que una Disciplina a 2
      * puede seleccionar dos poderes.
      */
-
-    {
-      key: 'celerity-dev-2-a',
-      disciplineKey: 'celerity',
-      name: 'Poder de Celeridad nivel 2',
-      level: 2,
-      sourceKey: 'development',
-    },
     {
       key: 'potence-dev-2-a',
       disciplineKey: 'potence',

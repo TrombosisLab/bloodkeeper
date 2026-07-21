@@ -12,6 +12,14 @@ export const contentSources:
       category: 'development',
     },
 
+    {
+      key: 'core-v5-es',
+      name: 'Vampiro: La Mascarada V5 — Libro Básico',
+      shortName: 'V5 Básico',
+      edition: 'V5',
+      category: 'core',
+    },
+
     /*
      * Las fuentes reales se añadirán
      * explícitamente conforme se incorpore

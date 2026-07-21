@@ -87,7 +87,7 @@ test(
       updateSelectedPower(
         disciplines,
         'celerity',
-        'celerity-dev-1-a',
+        'celerity-cats-grace',
         true,
       )
 
@@ -124,7 +124,7 @@ test(
       updateSelectedPower(
         disciplines,
         'celerity',
-        'celerity-dev-1-a',
+        'celerity-cats-grace',
         true,
       )
 
@@ -132,7 +132,7 @@ test(
       updateSelectedPower(
         disciplines,
         'celerity',
-        'celerity-dev-1-b',
+        'celerity-rapid-reflexes',
         true,
       )
 
@@ -165,7 +165,7 @@ test(
       updateSelectedPower(
         disciplines,
         'celerity',
-        'celerity-dev-1-a',
+        'celerity-cats-grace',
         true,
       )
 
@@ -173,7 +173,7 @@ test(
       updateSelectedPower(
         disciplines,
         'celerity',
-        'celerity-dev-1-b',
+        'celerity-rapid-reflexes',
         true,
       )
 
@@ -204,7 +204,7 @@ test(
       updateSelectedPower(
         disciplines,
         'celerity',
-        'celerity-dev-1-a',
+        'celerity-cats-grace',
         true,
       )
 
@@ -212,7 +212,7 @@ test(
       updateSelectedPower(
         disciplines,
         'celerity',
-        'celerity-dev-1-b',
+        'celerity-rapid-reflexes',
         true,
       )
 
@@ -235,7 +235,7 @@ test(
       updateSelectedPower(
         disciplines,
         'celerity',
-        'celerity-dev-1-b',
+        'celerity-rapid-reflexes',
         false,
       )
 
@@ -256,7 +256,7 @@ test(
         key: 'celerity',
         value: 2,
         powerKeys: [
-          'celerity-dev-1-a',
+          'celerity-cats-grace',
           'potence-dev-1-a',
         ],
       },
@@ -292,8 +292,8 @@ test(
         key: 'celerity',
         value: 1,
         powerKeys: [
-          'celerity-dev-1-a',
-          'celerity-dev-1-b',
+          'celerity-cats-grace',
+          'celerity-rapid-reflexes',
         ],
       },
       {
@@ -316,7 +316,7 @@ test(
           'celerity',
       ).powerKeys,
       [
-        'celerity-dev-1-a',
+        'celerity-cats-grace',
       ],
     )
   },
