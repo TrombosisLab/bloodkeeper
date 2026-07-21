@@ -20,12 +20,14 @@ export const disciplinePowerDefinitions:
       disciplineKey: 'animalism',
       name: 'Poder de Animalismo A',
       level: 1,
+      sourceKey: 'development',
     },
     {
       key: 'animalism-dev-1-b',
       disciplineKey: 'animalism',
       name: 'Poder de Animalismo B',
       level: 1,
+      sourceKey: 'development',
     },
 
     {
@@ -33,12 +35,14 @@ export const disciplinePowerDefinitions:
       disciplineKey: 'auspex',
       name: 'Poder de Auspex A',
       level: 1,
+      sourceKey: 'development',
     },
     {
       key: 'auspex-dev-1-b',
       disciplineKey: 'auspex',
       name: 'Poder de Auspex B',
       level: 1,
+      sourceKey: 'development',
     },
 
     {
@@ -46,12 +50,14 @@ export const disciplinePowerDefinitions:
       disciplineKey: 'bloodSorcery',
       name: 'Poder de Hechicería de Sangre A',
       level: 1,
+      sourceKey: 'development',
     },
     {
       key: 'blood-sorcery-dev-1-b',
       disciplineKey: 'bloodSorcery',
       name: 'Poder de Hechicería de Sangre B',
       level: 1,
+      sourceKey: 'development',
     },
 
     {
@@ -59,12 +65,14 @@ export const disciplinePowerDefinitions:
       disciplineKey: 'celerity',
       name: 'Poder de Celeridad A',
       level: 1,
+      sourceKey: 'development',
     },
     {
       key: 'celerity-dev-1-b',
       disciplineKey: 'celerity',
       name: 'Poder de Celeridad B',
       level: 1,
+      sourceKey: 'development',
     },
 
     {
@@ -72,12 +80,14 @@ export const disciplinePowerDefinitions:
       disciplineKey: 'dominate',
       name: 'Poder de Dominación A',
       level: 1,
+      sourceKey: 'development',
     },
     {
       key: 'dominate-dev-1-b',
       disciplineKey: 'dominate',
       name: 'Poder de Dominación B',
       level: 1,
+      sourceKey: 'development',
     },
 
     {
@@ -85,12 +95,14 @@ export const disciplinePowerDefinitions:
       disciplineKey: 'fortitude',
       name: 'Poder de Fortaleza A',
       level: 1,
+      sourceKey: 'development',
     },
     {
       key: 'fortitude-dev-1-b',
       disciplineKey: 'fortitude',
       name: 'Poder de Fortaleza B',
       level: 1,
+      sourceKey: 'development',
     },
 
     {
@@ -98,12 +110,14 @@ export const disciplinePowerDefinitions:
       disciplineKey: 'obfuscate',
       name: 'Poder de Ofuscación A',
       level: 1,
+      sourceKey: 'development',
     },
     {
       key: 'obfuscate-dev-1-b',
       disciplineKey: 'obfuscate',
       name: 'Poder de Ofuscación B',
       level: 1,
+      sourceKey: 'development',
     },
 
     {
@@ -111,12 +125,14 @@ export const disciplinePowerDefinitions:
       disciplineKey: 'oblivion',
       name: 'Poder de Olvido A',
       level: 1,
+      sourceKey: 'development',
     },
     {
       key: 'oblivion-dev-1-b',
       disciplineKey: 'oblivion',
       name: 'Poder de Olvido B',
       level: 1,
+      sourceKey: 'development',
     },
 
     {
@@ -124,12 +140,14 @@ export const disciplinePowerDefinitions:
       disciplineKey: 'potence',
       name: 'Poder de Potencia A',
       level: 1,
+      sourceKey: 'development',
     },
     {
       key: 'potence-dev-1-b',
       disciplineKey: 'potence',
       name: 'Poder de Potencia B',
       level: 1,
+      sourceKey: 'development',
     },
 
     {
@@ -137,12 +155,14 @@ export const disciplinePowerDefinitions:
       disciplineKey: 'presence',
       name: 'Poder de Presencia A',
       level: 1,
+      sourceKey: 'development',
     },
     {
       key: 'presence-dev-1-b',
       disciplineKey: 'presence',
       name: 'Poder de Presencia B',
       level: 1,
+      sourceKey: 'development',
     },
 
     {
@@ -150,12 +170,14 @@ export const disciplinePowerDefinitions:
       disciplineKey: 'protean',
       name: 'Poder de Protean A',
       level: 1,
+      sourceKey: 'development',
     },
     {
       key: 'protean-dev-1-b',
       disciplineKey: 'protean',
       name: 'Poder de Protean B',
       level: 1,
+      sourceKey: 'development',
     },
 
     /*
@@ -169,35 +191,41 @@ export const disciplinePowerDefinitions:
       disciplineKey: 'celerity',
       name: 'Poder de Celeridad nivel 2',
       level: 2,
+      sourceKey: 'development',
     },
     {
       key: 'potence-dev-2-a',
       disciplineKey: 'potence',
       name: 'Poder de Potencia nivel 2',
       level: 2,
+      sourceKey: 'development',
     },
     {
       key: 'presence-dev-2-a',
       disciplineKey: 'presence',
       name: 'Poder de Presencia nivel 2',
       level: 2,
+      sourceKey: 'development',
     },
     {
       key: 'animalism-dev-2-a',
       disciplineKey: 'animalism',
       name: 'Poder de Animalismo nivel 2',
       level: 2,
+      sourceKey: 'development',
     },
     {
       key: 'fortitude-dev-2-a',
       disciplineKey: 'fortitude',
       name: 'Poder de Fortaleza nivel 2',
       level: 2,
+      sourceKey: 'development',
     },
     {
       key: 'protean-dev-2-a',
       disciplineKey: 'protean',
       name: 'Poder de Protean nivel 2',
       level: 2,
+      sourceKey: 'development',
     },
   ]
