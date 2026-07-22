@@ -119,6 +119,87 @@ export function validateCharacterAdvantageDefinitions(
         )
       }
     }
+
+    if (
+      definition.minimumParentRating !== undefined &&
+      (
+        !Number.isInteger(
+          definition.minimumParentRating,
+        ) ||
+        definition.minimumParentRating < 1 ||
+        definition.minimumParentRating > 6
+      )
+    ) {
+      errors.push(
+        `La definición ${definition.key || '(sin clave)'} contiene un mínimo de padre no válido.`,
+      )
+    }
+
+    if (
+      definition.minimumParentRating !== undefined &&
+      !definition.requiresParentSelection
+    ) {
+      errors.push(
+        `La definición ${definition.key || '(sin clave)'} declara un mínimo de padre sin requerir selección padre.`,
+      )
+    }
+
+    if (
+      definition.parentRatingConstraints &&
+      !definition.requiresParentSelection
+    ) {
+      errors.push(
+        `La definición ${definition.key || '(sin clave)'} declara restricciones por puntuación del padre sin requerir selección padre.`,
+      )
+    }
+
+    const constrainedParentRatings =
+      definition.parentRatingConstraints?.map(
+        (constraint) =>
+          constraint.parentRating,
+      ) ?? []
+
+    if (
+      new Set(
+        constrainedParentRatings,
+      ).size !==
+      constrainedParentRatings.length
+    ) {
+      errors.push(
+        `La definición ${definition.key || '(sin clave)'} contiene restricciones duplicadas para la misma puntuación del padre.`,
+      )
+    }
+
+    for (
+      const constraint of
+        definition.parentRatingConstraints ?? []
+    ) {
+      if (
+        !Number.isInteger(
+          constraint.parentRating,
+        ) ||
+        constraint.parentRating < 1 ||
+        constraint.parentRating > 6
+      ) {
+        errors.push(
+          `La definición ${definition.key || '(sin clave)'} contiene una puntuación de padre no válida.`,
+        )
+      }
+
+      if (
+        constraint.allowedRatings.length === 0 ||
+        constraint.allowedRatings.some(
+          (rating) =>
+            !definition.allowedRatings.includes(
+              rating,
+            ),
+        )
+      ) {
+        errors.push(
+          `La definición ${definition.key || '(sin clave)'} contiene una restricción de puntuaciones incompatible con allowedRatings.`,
+        )
+      }
+    }
   }
 
   return {
@@ -309,6 +390,34 @@ export function validateCharacterAdvantageSelectionsAgainstDefinitions(
         errors.push(
           `La selección ${selection.selectionId} está vinculada a un tipo de padre no permitido.`,
         )
+      } else {
+        if (
+          definition.minimumParentRating !== undefined &&
+          parent.rating <
+            definition.minimumParentRating
+        ) {
+          errors.push(
+            `La selección ${selection.selectionId} requiere que su selección padre tenga al menos puntuación ${definition.minimumParentRating}.`,
+          )
+        }
+
+        const parentConstraint =
+          definition.parentRatingConstraints?.find(
+            (constraint) =>
+              constraint.parentRating ===
+              parent.rating,
+          )
+
+        if (
+          parentConstraint &&
+          !parentConstraint.allowedRatings.includes(
+            selection.rating,
+          )
+        ) {
+          errors.push(
+            `La puntuación ${selection.rating} no está permitida para ${definition.name} con un padre de puntuación ${parent.rating}.`,
+          )
+        }
       }
     }
 

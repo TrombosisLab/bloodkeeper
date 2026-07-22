@@ -532,3 +532,354 @@ test(
     )
   },
 )
+
+test(
+  'una definición puede exigir puntuación mínima en su padre',
+  () => {
+    const localDefinitions = [
+      {
+        key: 'haven',
+        name: 'Refugio',
+        category: 'background',
+        allowedRatings: [
+          1,
+          2,
+          3,
+        ],
+        source: 'core',
+        allowMultiple: true,
+        requiresInstanceDetails: true,
+        instanceDetailsKind: 'haven',
+      },
+      {
+        key: 'haven-lab',
+        name: 'Laboratorio',
+        category: 'merit',
+        allowedRatings: [
+          1,
+          2,
+          3,
+          4,
+          5,
+        ],
+        source: 'core',
+        allowMultiple: true,
+        requiresInstanceDetails: false,
+        requiresParentSelection: true,
+        allowedParentDefinitionKeys: [
+          'haven',
+        ],
+        minimumParentRating: 2,
+      },
+    ]
+
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId: 'haven-small',
+              definitionKey: 'haven',
+              category: 'background',
+              rating: 1,
+              origin: 'creation',
+              details: {
+                kind: 'haven',
+              },
+            },
+            {
+              selectionId: 'lab',
+              definitionKey: 'haven-lab',
+              category: 'merit',
+              rating: 1,
+              origin: 'creation',
+              parentSelectionId:
+                'haven-small',
+            },
+          ],
+        },
+        localDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+
+    assert.equal(
+      result.errors.some(
+        (error) =>
+          error.includes(
+            'al menos puntuación 2',
+          ),
+      ),
+      true,
+    )
+  },
+)
+
+test(
+  'una definición con mínimo de padre acepta un padre suficiente',
+  () => {
+    const localDefinitions = [
+      {
+        key: 'haven',
+        name: 'Refugio',
+        category: 'background',
+        allowedRatings: [
+          1,
+          2,
+          3,
+        ],
+        source: 'core',
+        allowMultiple: true,
+        requiresInstanceDetails: true,
+        instanceDetailsKind: 'haven',
+      },
+      {
+        key: 'haven-lab',
+        name: 'Laboratorio',
+        category: 'merit',
+        allowedRatings: [
+          1,
+          2,
+          3,
+          4,
+          5,
+        ],
+        source: 'core',
+        allowMultiple: true,
+        requiresInstanceDetails: false,
+        requiresParentSelection: true,
+        allowedParentDefinitionKeys: [
+          'haven',
+        ],
+        minimumParentRating: 2,
+      },
+    ]
+
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId: 'haven-medium',
+              definitionKey: 'haven',
+              category: 'background',
+              rating: 2,
+              origin: 'creation',
+              details: {
+                kind: 'haven',
+              },
+            },
+            {
+              selectionId: 'lab',
+              definitionKey: 'haven-lab',
+              category: 'merit',
+              rating: 1,
+              origin: 'creation',
+              parentSelectionId:
+                'haven-medium',
+            },
+          ],
+        },
+        localDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+  },
+)
+
+test(
+  'una definición puede limitar sus puntuaciones según el rating del padre',
+  () => {
+    const localDefinitions = [
+      {
+        key: 'haven',
+        name: 'Refugio',
+        category: 'background',
+        allowedRatings: [
+          1,
+          2,
+          3,
+        ],
+        source: 'core',
+        allowMultiple: true,
+        requiresInstanceDetails: true,
+        instanceDetailsKind: 'haven',
+      },
+      {
+        key: 'haven-library',
+        name: 'Biblioteca',
+        category: 'merit',
+        allowedRatings: [
+          1,
+          2,
+          3,
+          4,
+          5,
+        ],
+        source: 'core',
+        allowMultiple: true,
+        requiresInstanceDetails: false,
+        requiresParentSelection: true,
+        allowedParentDefinitionKeys: [
+          'haven',
+        ],
+        parentRatingConstraints: [
+          {
+            parentRating: 1,
+            allowedRatings: [
+              1,
+            ],
+          },
+        ],
+      },
+    ]
+
+    const invalid =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId: 'haven-small',
+              definitionKey: 'haven',
+              category: 'background',
+              rating: 1,
+              origin: 'creation',
+              details: {
+                kind: 'haven',
+              },
+            },
+            {
+              selectionId: 'library',
+              definitionKey: 'haven-library',
+              category: 'merit',
+              rating: 2,
+              origin: 'creation',
+              parentSelectionId:
+                'haven-small',
+            },
+          ],
+        },
+        localDefinitions,
+      )
+
+    assert.equal(
+      invalid.valid,
+      false,
+    )
+
+    const valid =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId: 'haven-small',
+              definitionKey: 'haven',
+              category: 'background',
+              rating: 1,
+              origin: 'creation',
+              details: {
+                kind: 'haven',
+              },
+            },
+            {
+              selectionId: 'library',
+              definitionKey: 'haven-library',
+              category: 'merit',
+              rating: 1,
+              origin: 'creation',
+              parentSelectionId:
+                'haven-small',
+            },
+          ],
+        },
+        localDefinitions,
+      )
+
+    assert.equal(
+      valid.valid,
+      true,
+    )
+  },
+)
+
+test(
+  'el catálogo rechaza minimumParentRating sin padre obligatorio',
+  () => {
+    const result =
+      validateCharacterAdvantageDefinitions([
+        {
+          key: 'broken',
+          name: 'Broken',
+          category: 'merit',
+          allowedRatings: [1],
+          source: 'core',
+          allowMultiple: false,
+          requiresInstanceDetails: false,
+          minimumParentRating: 2,
+        },
+      ])
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+  },
+)
+
+test(
+  'el catálogo rechaza restricciones del padre con ratings ajenos a allowedRatings',
+  () => {
+    const result =
+      validateCharacterAdvantageDefinitions([
+        {
+          key: 'haven',
+          name: 'Refugio',
+          category: 'background',
+          allowedRatings: [
+            1,
+            2,
+            3,
+          ],
+          source: 'core',
+          allowMultiple: true,
+          requiresInstanceDetails: true,
+          instanceDetailsKind: 'haven',
+        },
+        {
+          key: 'broken-child',
+          name: 'Broken child',
+          category: 'merit',
+          allowedRatings: [
+            1,
+            2,
+          ],
+          source: 'core',
+          allowMultiple: false,
+          requiresInstanceDetails: false,
+          requiresParentSelection: true,
+          allowedParentDefinitionKeys: [
+            'haven',
+          ],
+          parentRatingConstraints: [
+            {
+              parentRating: 1,
+              allowedRatings: [
+                3,
+              ],
+            },
+          ],
+        },
+      ])
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+  },
+)

@@ -86,6 +86,26 @@ export interface CharacterAdvantageDefinition {
    */
   allowedParentDefinitionKeys?: string[]
 
+  /*
+   * Puntuación mínima que debe tener la selección padre.
+   *
+   * Ejemplo:
+   * algunos Méritos de Refugio requieren Refugio 2+.
+   */
+  minimumParentRating?: number
+
+  /*
+   * Permite restringir las puntuaciones de esta definición
+   * en función de la puntuación concreta de su padre.
+   *
+   * Ejemplo inicial:
+   * Biblioteca está limitada cuando el Refugio es pequeño.
+   */
+  parentRatingConstraints?: readonly {
+    parentRating: number
+    allowedRatings: readonly number[]
+  }[]
+
   requirements?: CharacterAdvantageRequirements
 
   incompatibleDefinitionKeys?: string[]
