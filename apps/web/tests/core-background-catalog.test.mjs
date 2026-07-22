@@ -13,7 +13,7 @@ import {
 } from '../src/features/character-creation/domain/advantage-definition-rules.ts'
 
 test(
-  '003-H.3B.1 contiene exactamente Aliados, Contactos y Criados',
+  'el catálogo Core parcial contiene los seis Trasfondos implementados',
   () => {
     assert.deepEqual(
       characterAdvantageDefinitions.map(
@@ -24,6 +24,9 @@ test(
         'allies',
         'contacts',
         'retainers',
+        'status',
+        'fame',
+        'influence',
       ],
     )
   },
@@ -209,6 +212,9 @@ test(
         'allies',
         'contacts',
         'retainers',
+        'status',
+        'fame',
+        'influence',
       ],
     )
 
@@ -436,6 +442,419 @@ test(
     assert.equal(
       result.valid,
       false,
+    )
+  },
+)
+
+test(
+  'Estatus usa puntuaciones 1 a 5 y ámbito por instancia',
+  () => {
+    const definition =
+      getCharacterAdvantageDefinition(
+        'status',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.allowedRatings,
+      [
+        1,
+        2,
+        3,
+        4,
+        5,
+      ],
+    )
+
+    assert.equal(
+      definition.category,
+      'background',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.allowMultiple,
+      true,
+    )
+
+    assert.equal(
+      definition.requiresInstanceDetails,
+      true,
+    )
+
+    assert.equal(
+      definition.instanceDetailsKind,
+      'status',
+    )
+  },
+)
+
+test(
+  'Fama usa puntuaciones 1 a 5 y ámbito por instancia',
+  () => {
+    const definition =
+      getCharacterAdvantageDefinition(
+        'fame',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.allowedRatings,
+      [
+        1,
+        2,
+        3,
+        4,
+        5,
+      ],
+    )
+
+    assert.equal(
+      definition.category,
+      'background',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.allowMultiple,
+      true,
+    )
+
+    assert.equal(
+      definition.requiresInstanceDetails,
+      true,
+    )
+
+    assert.equal(
+      definition.instanceDetailsKind,
+      'fame',
+    )
+  },
+)
+
+test(
+  'Influencia usa puntuaciones 1 a 5 y ámbito por instancia',
+  () => {
+    const definition =
+      getCharacterAdvantageDefinition(
+        'influence',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.allowedRatings,
+      [
+        1,
+        2,
+        3,
+        4,
+        5,
+      ],
+    )
+
+    assert.equal(
+      definition.category,
+      'background',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.allowMultiple,
+      true,
+    )
+
+    assert.equal(
+      definition.requiresInstanceDetails,
+      true,
+    )
+
+    assert.equal(
+      definition.instanceDetailsKind,
+      'influence',
+    )
+  },
+)
+
+test(
+  'Estatus valida una instancia con ámbito vampírico',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'status-camarilla',
+              definitionKey:
+                'status',
+              category:
+                'background',
+              rating: 3,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'status',
+                sphere:
+                  'Camarilla',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+  },
+)
+
+test(
+  'Fama valida una instancia con ámbito concreto',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'fame-music',
+              definitionKey:
+                'fame',
+              category:
+                'background',
+              rating: 4,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'fame',
+                sphere:
+                  'Escena musical',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+  },
+)
+
+test(
+  'Influencia valida una instancia con ámbito mortal',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'influence-politics',
+              definitionKey:
+                'influence',
+              category:
+                'background',
+              rating: 5,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'influence',
+                sphere:
+                  'Política municipal',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+  },
+)
+
+test(
+  'Estatus rechaza puntuación 6',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'invalid-status',
+              definitionKey:
+                'status',
+              category:
+                'background',
+              rating: 6,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'status',
+                sphere:
+                  'Camarilla',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+  },
+)
+
+test(
+  'Fama rechaza puntuación 6',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'invalid-fame',
+              definitionKey:
+                'fame',
+              category:
+                'background',
+              rating: 6,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'fame',
+                sphere:
+                  'Medios',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+  },
+)
+
+test(
+  'Influencia rechaza puntuación 6',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'invalid-influence',
+              definitionKey:
+                'influence',
+              category:
+                'background',
+              rating: 6,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'influence',
+                sphere:
+                  'Política',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+  },
+)
+
+test(
+  'Estatus puede mantener instancias independientes por ámbito',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'status-one',
+              definitionKey:
+                'status',
+              category:
+                'background',
+              rating: 2,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'status',
+                sphere:
+                  'Camarilla',
+              },
+            },
+            {
+              selectionId:
+                'status-two',
+              definitionKey:
+                'status',
+              category:
+                'background',
+              rating: 1,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'status',
+                sphere:
+                  'Otro ámbito',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
     )
   },
 )

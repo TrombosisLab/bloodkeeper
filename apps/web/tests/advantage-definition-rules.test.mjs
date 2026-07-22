@@ -56,6 +56,9 @@ test(
         'allies',
         'contacts',
         'retainers',
+        'status',
+        'fame',
+        'influence',
       ],
     )
 
@@ -70,7 +73,7 @@ test(
       getCharacterAdvantageDefinitionsByCategory(
         'background',
       ).length,
-      3,
+      6,
     )
   },
 )
