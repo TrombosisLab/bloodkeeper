@@ -54,6 +54,38 @@ export interface CharacterAdvantageDefinition {
    */
   requiresInstanceDetails: boolean
 
+  /*
+   * Si existe, indica qué configuración tipada debe usar
+   * cada instancia de esta definición.
+   */
+  instanceDetailsKind?:
+    | 'allies'
+    | 'contact'
+    | 'retainer'
+    | 'status'
+    | 'fame'
+    | 'influence'
+    | 'mask'
+    | 'mawla'
+    | 'herd'
+    | 'resources'
+    | 'haven'
+    | 'loresheet'
+
+  /*
+   * Una definición asociada necesita estar vinculada a
+   * otra selección mediante parentSelectionId.
+   *
+   * Se usará inicialmente para elementos vinculados
+   * a una instancia de Refugio.
+   */
+  requiresParentSelection?: boolean
+
+  /*
+   * Limita qué definiciones pueden actuar como padre.
+   */
+  allowedParentDefinitionKeys?: string[]
+
   requirements?: CharacterAdvantageRequirements
 
   incompatibleDefinitionKeys?: string[]

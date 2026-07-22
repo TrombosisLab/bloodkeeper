@@ -31,6 +31,7 @@ const definitions = [
     source: 'core',
     allowMultiple: true,
     requiresInstanceDetails: true,
+    instanceDetailsKind: 'contact',
   },
   {
     key: 'example-flaw',
@@ -328,6 +329,10 @@ test(
               category: 'background',
               rating: 2,
               origin: 'creation',
+              details: {
+                kind: 'contact',
+                identity: 'Uno',
+              },
             },
             {
               selectionId:
@@ -337,6 +342,10 @@ test(
               category: 'background',
               rating: 3,
               origin: 'creation',
+              details: {
+                kind: 'contact',
+                identity: 'Dos',
+              },
             },
           ],
         },
