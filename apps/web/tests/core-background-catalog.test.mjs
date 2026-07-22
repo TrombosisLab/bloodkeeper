@@ -27,6 +27,10 @@ test(
         'status',
         'fame',
         'influence',
+        'mask',
+        'mawla',
+        'herd',
+        'resources',
       ],
     )
   },
@@ -215,6 +219,10 @@ test(
         'status',
         'fame',
         'influence',
+        'mask',
+        'mawla',
+        'herd',
+        'resources',
       ],
     )
 
@@ -856,5 +864,454 @@ test(
       result.valid,
       true,
     )
+  },
+)
+
+test(
+  'Máscara usa puntuaciones 1 a 2 y una identidad por instancia',
+  () => {
+    const definition =
+      getCharacterAdvantageDefinition(
+        'mask',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.allowedRatings,
+      [
+        1,
+        2,
+      ],
+    )
+
+    assert.equal(
+      definition.allowMultiple,
+      true,
+    )
+
+    assert.equal(
+      definition.requiresInstanceDetails,
+      true,
+    )
+
+    assert.equal(
+      definition.instanceDetailsKind,
+      'mask',
+    )
+  },
+)
+
+test(
+  'Mawla usa puntuaciones 1 a 5 y datos por instancia',
+  () => {
+    const definition =
+      getCharacterAdvantageDefinition(
+        'mawla',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.allowedRatings,
+      [
+        1,
+        2,
+        3,
+        4,
+        5,
+      ],
+    )
+
+    assert.equal(
+      definition.allowMultiple,
+      true,
+    )
+
+    assert.equal(
+      definition.instanceDetailsKind,
+      'mawla',
+    )
+  },
+)
+
+test(
+  'Rebaño usa puntuaciones 1 a 5 y datos por instancia',
+  () => {
+    const definition =
+      getCharacterAdvantageDefinition(
+        'herd',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.allowedRatings,
+      [
+        1,
+        2,
+        3,
+        4,
+        5,
+      ],
+    )
+
+    assert.equal(
+      definition.allowMultiple,
+      true,
+    )
+
+    assert.equal(
+      definition.instanceDetailsKind,
+      'herd',
+    )
+  },
+)
+
+test(
+  'Recursos usa puntuaciones 1 a 5 y datos por instancia',
+  () => {
+    const definition =
+      getCharacterAdvantageDefinition(
+        'resources',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.allowedRatings,
+      [
+        1,
+        2,
+        3,
+        4,
+        5,
+      ],
+    )
+
+    assert.equal(
+      definition.allowMultiple,
+      true,
+    )
+
+    assert.equal(
+      definition.instanceDetailsKind,
+      'resources',
+    )
+  },
+)
+
+test(
+  'Máscara valida una identidad falsa concreta',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'mask-one',
+              definitionKey:
+                'mask',
+              category:
+                'background',
+              rating: 2,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'mask',
+                identity:
+                  'Identidad alternativa',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+  },
+)
+
+test(
+  'Máscara admite múltiples identidades independientes',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'mask-one',
+              definitionKey:
+                'mask',
+              category:
+                'background',
+              rating: 1,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'mask',
+                identity:
+                  'Identidad uno',
+              },
+            },
+            {
+              selectionId:
+                'mask-two',
+              definitionKey:
+                'mask',
+              category:
+                'background',
+              rating: 2,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'mask',
+                identity:
+                  'Identidad dos',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+  },
+)
+
+test(
+  'Mawla valida una instancia concreta',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'mawla-one',
+              definitionKey:
+                'mawla',
+              category:
+                'background',
+              rating: 4,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'mawla',
+                identity:
+                  'Mawla de ejemplo',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+  },
+)
+
+test(
+  'Rebaño valida un grupo concreto',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'herd-one',
+              definitionKey:
+                'herd',
+              category:
+                'background',
+              rating: 3,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'herd',
+                identity:
+                  'Grupo de ejemplo',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+  },
+)
+
+test(
+  'Recursos valida una fuente patrimonial concreta',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'resources-one',
+              definitionKey:
+                'resources',
+              category:
+                'background',
+              rating: 5,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'resources',
+                source:
+                  'Patrimonio de ejemplo',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+  },
+)
+
+test(
+  'Máscara rechaza puntuación 3',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'invalid-mask',
+              definitionKey:
+                'mask',
+              category:
+                'background',
+              rating: 3,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'mask',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+  },
+)
+
+test(
+  'Mawla rechaza puntuación 6',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'invalid-mawla',
+              definitionKey:
+                'mawla',
+              category:
+                'background',
+              rating: 6,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'mawla',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+  },
+)
+
+test(
+  'Rebaño y Recursos rechazan puntuaciones superiores a 5',
+  () => {
+    for (
+      const [
+        definitionKey,
+        details,
+      ] of [
+        [
+          'herd',
+          {
+            kind: 'herd',
+          },
+        ],
+        [
+          'resources',
+          {
+            kind: 'resources',
+          },
+        ],
+      ]
+    ) {
+      const result =
+        validateCharacterAdvantageSelectionsAgainstDefinitions(
+          {
+            selections: [
+              {
+                selectionId:
+                  `invalid-${definitionKey}`,
+                definitionKey,
+                category:
+                  'background',
+                rating: 6,
+                origin:
+                  'creation',
+                details,
+              },
+            ],
+          },
+          characterAdvantageDefinitions,
+        )
+
+      assert.equal(
+        result.valid,
+        false,
+      )
+    }
   },
 )

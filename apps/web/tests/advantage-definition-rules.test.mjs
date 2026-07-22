@@ -59,6 +59,10 @@ test(
         'status',
         'fame',
         'influence',
+        'mask',
+        'mawla',
+        'herd',
+        'resources',
       ],
     )
 
@@ -73,7 +77,7 @@ test(
       getCharacterAdvantageDefinitionsByCategory(
         'background',
       ).length,
-      6,
+      10,
     )
   },
 )
