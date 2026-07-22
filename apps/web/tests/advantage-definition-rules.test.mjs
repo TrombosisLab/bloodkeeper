@@ -45,11 +45,18 @@ const definitions = [
 ]
 
 test(
-  'el catálogo real comienza vacío deliberadamente en 003-H.2',
+  'el catálogo real expone las primeras definiciones Core de Trasfondos',
   () => {
     assert.deepEqual(
-      characterAdvantageDefinitions,
-      [],
+      characterAdvantageDefinitions.map(
+        (definition) =>
+          definition.key,
+      ),
+      [
+        'allies',
+        'contacts',
+        'retainers',
+      ],
     )
 
     assert.equal(
@@ -59,11 +66,11 @@ test(
       null,
     )
 
-    assert.deepEqual(
+    assert.equal(
       getCharacterAdvantageDefinitionsByCategory(
         'background',
-      ),
-      [],
+      ).length,
+      3,
     )
   },
 )
