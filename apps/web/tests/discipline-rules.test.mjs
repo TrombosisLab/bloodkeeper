@@ -157,14 +157,14 @@ test(
 )
 
 test(
-  'Sangre Débil se mantiene como regla especial pendiente',
+  'Sangre Débil usa una regla especial sin distribución inicial 2 + 1',
   () => {
     assert.equal(
       validateDisciplines(
         [],
         'thinBlood',
       ).valid,
-      false,
+      true,
     )
   },
 )

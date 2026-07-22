@@ -28,6 +28,10 @@ import type {
   CharacterOblivionCeremoniesDraft,
 } from './oblivion-ceremony.types'
 
+import type {
+  CharacterThinBloodAlchemyDraft,
+} from './thin-blood-alchemy.types'
+
 export interface CharacterDraft {
   identity: CharacterIdentityDraft
   attributes: CharacterAttributesDraft
@@ -35,6 +39,7 @@ export interface CharacterDraft {
   disciplines: CharacterDisciplinesDraft
   bloodSorceryRituals: CharacterBloodSorceryRitualsDraft
   oblivionCeremonies: CharacterOblivionCeremoniesDraft
+  thinBloodAlchemy: CharacterThinBloodAlchemyDraft
   skills: CharacterSkillsDraft
   skillSpecialties: CharacterSkillSpecialtiesDraft
   skillDistributionMethod: SkillDistributionMethod
