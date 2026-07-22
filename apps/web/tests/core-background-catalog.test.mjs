@@ -31,6 +31,7 @@ test(
         'mawla',
         'herd',
         'resources',
+        'haven',
       ],
     )
   },
@@ -223,6 +224,7 @@ test(
         'mawla',
         'herd',
         'resources',
+        'haven',
       ],
     )
 
@@ -1313,5 +1315,227 @@ test(
         false,
       )
     }
+  },
+)
+
+test(
+  'Refugio base usa exclusivamente puntuaciones 1 a 3',
+  () => {
+    const definition =
+      getCharacterAdvantageDefinition(
+        'haven',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.allowedRatings,
+      [
+        1,
+        2,
+        3,
+      ],
+    )
+
+    assert.equal(
+      definition.category,
+      'background',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.sourcePage,
+      192,
+    )
+  },
+)
+
+test(
+  'Refugio admite múltiples instancias independientes',
+  () => {
+    const definition =
+      getCharacterAdvantageDefinition(
+        'haven',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.allowMultiple,
+      true,
+    )
+
+    assert.equal(
+      definition.requiresInstanceDetails,
+      true,
+    )
+
+    assert.equal(
+      definition.instanceDetailsKind,
+      'haven',
+    )
+  },
+)
+
+test(
+  'una instancia de Refugio 1 es válida',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'haven-small',
+              definitionKey:
+                'haven',
+              category:
+                'background',
+              rating: 1,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'haven',
+                identity:
+                  'Refugio pequeño',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+  },
+)
+
+test(
+  'una instancia de Refugio 3 es válida',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'haven-large',
+              definitionKey:
+                'haven',
+              category:
+                'background',
+              rating: 3,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'haven',
+                identity:
+                  'Refugio principal',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+  },
+)
+
+test(
+  'Refugio base rechaza puntuación 4',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'haven-invalid',
+              definitionKey:
+                'haven',
+              category:
+                'background',
+              rating: 4,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'haven',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+  },
+)
+
+test(
+  'dos Refugios pueden conservar identidades independientes',
+  () => {
+    const result =
+      validateCharacterAdvantageSelectionsAgainstDefinitions(
+        {
+          selections: [
+            {
+              selectionId:
+                'haven-one',
+              definitionKey:
+                'haven',
+              category:
+                'background',
+              rating: 1,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'haven',
+                identity:
+                  'Refugio uno',
+              },
+            },
+            {
+              selectionId:
+                'haven-two',
+              definitionKey:
+                'haven',
+              category:
+                'background',
+              rating: 2,
+              origin:
+                'creation',
+              details: {
+                kind:
+                  'haven',
+                identity:
+                  'Refugio dos',
+              },
+            },
+          ],
+        },
+        characterAdvantageDefinitions,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
   },
 )

@@ -168,6 +168,21 @@ export const characterAdvantageDefinitions:
       requiresInstanceDetails: true,
       instanceDetailsKind: 'resources',
     },
+    {
+      key: 'haven',
+      name: 'Refugio',
+      category: 'background',
+      allowedRatings: [
+        1,
+        2,
+        3,
+      ],
+      source: 'core',
+      sourcePage: 192,
+      allowMultiple: true,
+      requiresInstanceDetails: true,
+      instanceDetailsKind: 'haven',
+    },
   ]
 
 export function getCharacterAdvantageDefinition(

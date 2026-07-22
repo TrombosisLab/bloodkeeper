@@ -63,6 +63,7 @@ test(
         'mawla',
         'herd',
         'resources',
+        'haven',
       ],
     )
 
@@ -77,7 +78,7 @@ test(
       getCharacterAdvantageDefinitionsByCategory(
         'background',
       ).length,
-      10,
+      11,
     )
   },
 )
