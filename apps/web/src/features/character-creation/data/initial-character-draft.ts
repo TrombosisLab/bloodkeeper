@@ -44,6 +44,12 @@ export const initialCharacterDraft: CharacterDraft = {
     ceremonyKeys: [],
   },
 
+  thinBloodAlchemy: {
+    rating: 0,
+    method: null,
+    formulaKeys: [],
+  },
+
   skills: {
     athletics: 0,
     brawl: 0,
