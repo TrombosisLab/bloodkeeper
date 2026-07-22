@@ -32,6 +32,11 @@ import type {
   CharacterThinBloodAlchemyDraft,
 } from './thin-blood-alchemy.types'
 
+
+import type {
+  CharacterAdvantagesDraft,
+} from './character-advantages-draft.types'
+
 export interface CharacterDraft {
   identity: CharacterIdentityDraft
   attributes: CharacterAttributesDraft
@@ -40,6 +45,7 @@ export interface CharacterDraft {
   bloodSorceryRituals: CharacterBloodSorceryRitualsDraft
   oblivionCeremonies: CharacterOblivionCeremoniesDraft
   thinBloodAlchemy: CharacterThinBloodAlchemyDraft
+  advantages: CharacterAdvantagesDraft
   skills: CharacterSkillsDraft
   skillSpecialties: CharacterSkillSpecialtiesDraft
   skillDistributionMethod: SkillDistributionMethod

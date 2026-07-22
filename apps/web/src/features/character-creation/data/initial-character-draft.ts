@@ -50,6 +50,10 @@ export const initialCharacterDraft: CharacterDraft = {
     formulaKeys: [],
   },
 
+  advantages: {
+    selections: [],
+  },
+
   skills: {
     athletics: 0,
     brawl: 0,
