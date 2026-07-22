@@ -16,10 +16,16 @@ test(
   'el catálogo Core parcial contiene los seis Trasfondos implementados',
   () => {
     assert.deepEqual(
-      characterAdvantageDefinitions.map(
-        (definition) =>
-          definition.key,
-      ),
+      characterAdvantageDefinitions
+        .filter(
+          (definition) =>
+            definition.category ===
+            'background',
+        )
+        .map(
+          (definition) =>
+            definition.key,
+        ),
       [
         'allies',
         'contacts',
@@ -78,7 +84,11 @@ test(
   () => {
     for (
       const definition of
-        characterAdvantageDefinitions
+        characterAdvantageDefinitions.filter(
+          (definition) =>
+            definition.category ===
+            'background',
+        )
     ) {
       assert.equal(
         definition.category,
@@ -228,18 +238,40 @@ test(
       ],
     )
 
-    assert.deepEqual(
+    assert.equal(
       getCharacterAdvantageDefinitionsByCategory(
         'merit',
+      ).every(
+        (definition) =>
+          definition.category ===
+          'merit',
       ),
-      [],
+      true,
     )
 
-    assert.deepEqual(
+    assert.equal(
       getCharacterAdvantageDefinitionsByCategory(
         'flaw',
+      ).every(
+        (definition) =>
+          definition.category ===
+          'flaw',
       ),
-      [],
+      true,
+    )
+
+    assert.equal(
+      getCharacterAdvantageDefinitionsByCategory(
+        'merit',
+      ).length > 0,
+      true,
+    )
+
+    assert.equal(
+      getCharacterAdvantageDefinitionsByCategory(
+        'flaw',
+      ).length > 0,
+      true,
     )
   },
 )

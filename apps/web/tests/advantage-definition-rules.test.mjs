@@ -48,10 +48,16 @@ test(
   'el catálogo real expone las primeras definiciones Core de Trasfondos',
   () => {
     assert.deepEqual(
-      characterAdvantageDefinitions.map(
-        (definition) =>
-          definition.key,
-      ),
+      characterAdvantageDefinitions
+        .filter(
+          (definition) =>
+            definition.category ===
+            'background',
+        )
+        .map(
+          (definition) =>
+            definition.key,
+        ),
       [
         'allies',
         'contacts',
