@@ -264,11 +264,18 @@ export function validateDisciplines(
   }
 
   if (clan.kind === 'thinBlood') {
+    if (disciplines.length > 0) {
+      return {
+        valid: false,
+        errors: [
+          'Sangre Débil no recibe la distribución inicial normal de Disciplinas 2 + 1.',
+        ],
+      }
+    }
+
     return {
-      valid: false,
-      errors: [
-        'La creación de Sangre Débil requiere sus reglas especiales.',
-      ],
+      valid: true,
+      errors: [],
     }
   }
 
