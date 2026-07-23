@@ -656,18 +656,8 @@ export const characterAdvantageDefinitions:
      * Méritos y Defectos Míticos Core II.
      */
     {
-      key: 'cross-repulsion',
-      name: 'Repulsión de Cruces',
-      category: 'flaw',
-      allowedRatings: [2],
-      source: 'core',
-      sourcePage: 182,
-      allowMultiple: false,
-      requiresInstanceDetails: false,
-    },
-    {
-      key: 'no-reflection',
-      name: 'Sin Reflejo',
+      key: 'stigmata',
+      name: 'Estigmas',
       category: 'flaw',
       allowedRatings: [1],
       source: 'core',
