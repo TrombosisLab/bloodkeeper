@@ -87,7 +87,20 @@ export interface HavenAdvantageDetails {
 
 export interface LoresheetAdvantageDetails {
   kind: 'loresheet'
+
+  /*
+   * Ficha de Conocimientos a la que pertenece
+   * la ventaja adquirida.
+   */
   loresheetKey: string
+
+  /*
+   * Ventaja concreta adquirida dentro de la ficha.
+   *
+   * Su nivel determina el coste/puntuación
+   * de esta selección.
+   */
+  benefitKey: string
 }
 
 export type CharacterAdvantageInstanceDetails =
