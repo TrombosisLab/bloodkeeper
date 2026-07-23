@@ -615,6 +615,42 @@ export const characterAdvantageDefinitions:
       requiresInstanceDetails: true,
       instanceDetailsKind: 'preyExclusion',
     },
+    /*
+     * 003-H.3B.6A.6A:
+     * Defectos Míticos Core I.
+     */
+    {
+      key: 'stake-bait',
+      name: 'Carne de Estaca',
+      category: 'flaw',
+      allowedRatings: [2],
+      source: 'core',
+      sourcePage: 182,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
+    {
+      key: 'folkloric-bane',
+      name: 'Daño Folclórico',
+      category: 'flaw',
+      allowedRatings: [1],
+      source: 'core',
+      sourcePage: 182,
+      allowMultiple: true,
+      requiresInstanceDetails: true,
+      instanceDetailsKind: 'folkloricBane',
+    },
+    {
+      key: 'folkloric-block',
+      name: 'Tabú Folclórico',
+      category: 'flaw',
+      allowedRatings: [1],
+      source: 'core',
+      sourcePage: 182,
+      allowMultiple: true,
+      requiresInstanceDetails: true,
+      instanceDetailsKind: 'folkloricBlock',
+    },
   ]
 
 export function getCharacterAdvantageDefinition(

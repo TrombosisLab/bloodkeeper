@@ -294,6 +294,32 @@ function validateInstanceDetails(
   }
 
   if (
+    selection.details?.kind === 'folkloricBane'
+  ) {
+    const source =
+      selection.details.source.trim()
+
+    if (!source) {
+      errors.push(
+        `La selección ${selection.selectionId} debe especificar una fuente de daño folclórico.`,
+      )
+    }
+  }
+
+  if (
+    selection.details?.kind === 'folkloricBlock'
+  ) {
+    const taboo =
+      selection.details.taboo.trim()
+
+    if (!taboo) {
+      errors.push(
+        `La selección ${selection.selectionId} debe especificar un tabú folclórico.`,
+      )
+    }
+  }
+
+  if (
     selection.details?.kind === 'preyExclusion'
   ) {
     const excludedPrey =

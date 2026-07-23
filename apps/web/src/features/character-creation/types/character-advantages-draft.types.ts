@@ -103,6 +103,26 @@ export interface SubstanceUseAdvantageDetails {
   poolCategory?: string
 }
 
+export interface FolkloricBaneAdvantageDetails {
+  kind: 'folkloricBane'
+
+  /*
+   * Fuente folclórica concreta que causa el daño.
+   * Ejemplos del manual no constituyen una lista cerrada.
+   */
+  source: string
+}
+
+export interface FolkloricBlockAdvantageDetails {
+  kind: 'folkloricBlock'
+
+  /*
+   * Tabú folclórico concreto de esta instancia.
+   * Cada tabú se contabiliza independientemente.
+   */
+  taboo: string
+}
+
 export interface PreyExclusionAdvantageDetails {
   kind: 'preyExclusion'
 
@@ -144,6 +164,8 @@ export type CharacterAdvantageInstanceDetails =
   | HavenAdvantageDetails
   | SubstanceUseAdvantageDetails
   | PreyExclusionAdvantageDetails
+  | FolkloricBaneAdvantageDetails
+  | FolkloricBlockAdvantageDetails
   | LoresheetAdvantageDetails
 
 export interface CharacterAdvantageSelectionDraft {

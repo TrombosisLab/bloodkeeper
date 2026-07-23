@@ -100,6 +100,8 @@ export interface CharacterAdvantageDefinition {
     | 'haven'
     | 'substanceUse'
     | 'preyExclusion'
+    | 'folkloricBane'
+    | 'folkloricBlock'
     | 'loresheet'
 
   /*
