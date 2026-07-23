@@ -291,6 +291,39 @@ export const characterCoreLoresheetDefinitions:
       ],
     },
     {
+      key: 'week-of-nightmares',
+      name: 'La Semana de las Pesadillas',
+      source: 'core',
+      sourcePage: 395,
+      benefits: [
+        {
+          key: 'week-of-nightmares-oral-history',
+          name: 'Historia Oral',
+          level: 1,
+        },
+        {
+          key: 'week-of-nightmares-ravnos-remnants',
+          name: 'Remanentes Ravnos',
+          level: 2,
+        },
+        {
+          key: 'week-of-nightmares-i-was-there',
+          name: 'Estuve Allí',
+          level: 3,
+        },
+        {
+          key: 'week-of-nightmares-red-star',
+          name: 'La Estrella Roja',
+          level: 4,
+        },
+        {
+          key: 'week-of-nightmares-blood-of-zapathasura',
+          name: 'Sangre de Zapathasura',
+          level: 5,
+        },
+      ],
+    },
+    {
       key: 'golconda',
       name: 'Golconda',
       source: 'core',

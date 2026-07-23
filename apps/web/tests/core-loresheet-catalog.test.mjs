@@ -47,6 +47,7 @@ test(
         'sect-war-veteran',
         'the-trinity',
         'jeanette-therese-voerman',
+        'week-of-nightmares',
         'golconda',
       ],
     )
@@ -950,6 +951,93 @@ test(
     const definition =
       getCharacterCoreLoresheetDefinition(
         'jeanette-therese-voerman',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.requirements,
+      undefined,
+    )
+  },
+)
+
+test(
+  'La Semana de las Pesadillas está registrada como Ficha Core de la página 395',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'week-of-nightmares',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'La Semana de las Pesadillas',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.sourcePage,
+      395,
+    )
+  },
+)
+
+test(
+  'La Semana de las Pesadillas contiene exactamente sus cinco niveles Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'week-of-nightmares',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.benefits.map(
+        (benefit) => ({
+          name: benefit.name,
+          level: benefit.level,
+        }),
+      ),
+      [
+        {
+          name: 'Historia Oral',
+          level: 1,
+        },
+        {
+          name: 'Remanentes Ravnos',
+          level: 2,
+        },
+        {
+          name: 'Estuve Allí',
+          level: 3,
+        },
+        {
+          name: 'La Estrella Roja',
+          level: 4,
+        },
+        {
+          name: 'Sangre de Zapathasura',
+          level: 5,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  'La Semana de las Pesadillas no impone una restricción Ravnos inferida',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'week-of-nightmares',
       )
 
     assert.ok(definition)
