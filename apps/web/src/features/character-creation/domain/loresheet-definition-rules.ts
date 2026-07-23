@@ -44,6 +44,62 @@ export function validateCharacterLoresheetDefinitions(
       )
     }
 
+    const requirements =
+      definition.requirements
+
+    if (requirements) {
+      const characterKinds =
+        requirements.characterKinds ?? []
+
+      const clanKeys =
+        requirements.clanKeys ?? []
+
+      const excludedClanKeys =
+        requirements.excludedClanKeys ?? []
+
+      if (
+        new Set(characterKinds).size !==
+        characterKinds.length
+      ) {
+        errors.push(
+          `La Ficha de Conocimientos ${definition.key} contiene tipos de personaje duplicados en sus requisitos.`,
+        )
+      }
+
+      if (
+        new Set(clanKeys).size !==
+        clanKeys.length
+      ) {
+        errors.push(
+          `La Ficha de Conocimientos ${definition.key} contiene clanes permitidos duplicados.`,
+        )
+      }
+
+      if (
+        new Set(excludedClanKeys).size !==
+        excludedClanKeys.length
+      ) {
+        errors.push(
+          `La Ficha de Conocimientos ${definition.key} contiene clanes excluidos duplicados.`,
+        )
+      }
+
+      const excludedClanSet =
+        new Set(excludedClanKeys)
+
+      for (const clanKey of clanKeys) {
+        if (
+          excludedClanSet.has(
+            clanKey,
+          )
+        ) {
+          errors.push(
+            `La Ficha de Conocimientos ${definition.key} no puede permitir y excluir simultáneamente el clan ${clanKey}.`,
+          )
+        }
+      }
+    }
+
     const benefitKeys = new Set<string>()
     const levels = new Set<CharacterLoresheetLevel>()
 
