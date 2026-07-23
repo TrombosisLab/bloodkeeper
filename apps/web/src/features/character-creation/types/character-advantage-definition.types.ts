@@ -13,11 +13,24 @@ export type CharacterAdvantageCharacterKind =
   | 'caitiff'
   | 'thinBlood'
 
+export type CharacterAdvantageAgeCategory =
+  | 'neonate'
+  | 'ancilla'
+  | 'elder'
+
 export interface CharacterAdvantageRequirements {
   characterKinds?: CharacterAdvantageCharacterKind[]
   clanKeys?: string[]
   excludedClanKeys?: string[]
   requiredDefinitionKeys?: string[]
+
+  /*
+   * Categoría etaria mínima exigida por la definición.
+   *
+   * No se deduce de Generación: edad y generación son
+   * conceptos distintos en el dominio.
+   */
+  minimumAgeCategory?: CharacterAdvantageAgeCategory
 }
 
 export interface CharacterAdvantageDefinition {
