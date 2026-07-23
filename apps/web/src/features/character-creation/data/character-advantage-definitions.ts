@@ -352,6 +352,71 @@ export const characterAdvantageDefinitions:
       requiresParentSelection: false,
       allowedParentDefinitionKeys: ['haven'],
     },
+    /*
+     * 003-H.3B.6A.1:
+     * Méritos y Defectos Core — Lingüística y Aspecto.
+     * Libro Básico, pág. 179.
+     */
+    {
+      key: 'linguistics',
+      name: 'Lingüística',
+      category: 'merit',
+      allowedRatings: [1, 2, 3, 4, 5],
+      source: 'core',
+      sourcePage: 179,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
+    {
+      key: 'illiterate',
+      name: 'Analfabeto',
+      category: 'flaw',
+      allowedRatings: [2],
+      source: 'core',
+      sourcePage: 179,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
+    {
+      key: 'ugly',
+      name: 'Feo',
+      category: 'flaw',
+      allowedRatings: [1],
+      source: 'core',
+      sourcePage: 179,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
+    {
+      key: 'repulsive',
+      name: 'Repulsivo',
+      category: 'flaw',
+      allowedRatings: [2],
+      source: 'core',
+      sourcePage: 179,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
+    {
+      key: 'beautiful',
+      name: 'Bello',
+      category: 'merit',
+      allowedRatings: [2],
+      source: 'core',
+      sourcePage: 179,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
+    {
+      key: 'stunning',
+      name: 'Despampanante',
+      category: 'merit',
+      allowedRatings: [4],
+      source: 'core',
+      sourcePage: 179,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
   ]
 
 export function getCharacterAdvantageDefinition(
