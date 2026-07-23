@@ -15,7 +15,41 @@ import type {
  * - contenido de otras fuentes
  */
 export const characterCoreLoresheetDefinitions:
-  readonly CharacterLoresheetDefinition[] = []
+  readonly CharacterLoresheetDefinition[] = [
+    {
+      key: 'golconda',
+      name: 'Golconda',
+      source: 'core',
+      sourcePage: 389,
+      benefits: [
+        {
+          key: 'golconda-seeds',
+          name: 'Semillas de Golconda',
+          level: 1,
+        },
+        {
+          key: 'one-true-way',
+          name: 'El Único Camino Verdadero',
+          level: 2,
+        },
+        {
+          key: 'saulot-disciple',
+          name: 'Discípulo de Saulot',
+          level: 3,
+        },
+        {
+          key: 'satisfy-the-hunger',
+          name: 'Satisfacer el Ansia',
+          level: 4,
+        },
+        {
+          key: 'greet-the-sun',
+          name: 'Recibir al Sol',
+          level: 5,
+        },
+      ],
+    },
+  ]
 
 export function getCharacterCoreLoresheetDefinition(
   key: string,
