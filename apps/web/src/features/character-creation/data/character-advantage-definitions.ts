@@ -651,6 +651,40 @@ export const characterAdvantageDefinitions:
       requiresInstanceDetails: true,
       instanceDetailsKind: 'folkloricBlock',
     },
+    /*
+     * 003-H.3B.6A.6B:
+     * Méritos y Defectos Míticos Core II.
+     */
+    {
+      key: 'cross-repulsion',
+      name: 'Repulsión de Cruces',
+      category: 'flaw',
+      allowedRatings: [2],
+      source: 'core',
+      sourcePage: 182,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
+    {
+      key: 'no-reflection',
+      name: 'Sin Reflejo',
+      category: 'flaw',
+      allowedRatings: [1],
+      source: 'core',
+      sourcePage: 182,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
+    {
+      key: 'eat-food',
+      name: 'Comer Comida',
+      category: 'merit',
+      allowedRatings: [2],
+      source: 'core',
+      sourcePage: 182,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
   ]
 
 export function getCharacterAdvantageDefinition(
