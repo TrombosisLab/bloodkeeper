@@ -238,6 +238,33 @@ function validateInstanceDetails(
   }
 
   if (
+    selection.details?.kind === 'substanceUse'
+  ) {
+    const substance =
+      selection.details.substance.trim()
+
+    if (!substance) {
+      errors.push(
+        `La selección ${selection.selectionId} debe especificar una sustancia.`,
+      )
+    }
+
+    if (
+      selection.definitionKey ===
+        'functional-addict'
+    ) {
+      const poolCategory =
+        selection.details.poolCategory?.trim()
+
+      if (!poolCategory) {
+        errors.push(
+          `La selección ${selection.selectionId} de Adicto Funcional debe especificar una categoría de reserva.`,
+        )
+      }
+    }
+  }
+
+  if (
     selection.details?.kind === 'allies'
   ) {
     const {

@@ -85,6 +85,24 @@ export interface HavenAdvantageDetails {
   identity?: string
 }
 
+export interface SubstanceUseAdvantageDetails {
+  kind: 'substanceUse'
+
+  /*
+   * Sustancia concreta asociada al Mérito o Defecto.
+   */
+  substance: string
+
+  /*
+   * Adicto Funcional requiere además concretar
+   * la categoría de reserva beneficiada.
+   *
+   * Se mantiene como texto tipado de dominio abierto
+   * hasta que la UI defina su catálogo cerrado.
+   */
+  poolCategory?: string
+}
+
 export interface LoresheetAdvantageDetails {
   kind: 'loresheet'
 
@@ -115,6 +133,7 @@ export type CharacterAdvantageInstanceDetails =
   | HerdAdvantageDetails
   | ResourcesAdvantageDetails
   | HavenAdvantageDetails
+  | SubstanceUseAdvantageDetails
   | LoresheetAdvantageDetails
 
 export interface CharacterAdvantageSelectionDraft {

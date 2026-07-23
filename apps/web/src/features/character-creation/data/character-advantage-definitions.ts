@@ -417,6 +417,43 @@ export const characterAdvantageDefinitions:
       allowMultiple: false,
       requiresInstanceDetails: false,
     },
+    /*
+     * 003-H.3B.6A.2:
+     * Méritos y Defectos Core — Consumo de Sustancias.
+     */
+    {
+      key: 'hopeless-addiction',
+      name: 'Caso Perdido de Adicción',
+      category: 'flaw',
+      allowedRatings: [2],
+      source: 'core',
+      sourcePage: 179,
+      allowMultiple: false,
+      requiresInstanceDetails: true,
+      instanceDetailsKind: 'substanceUse',
+    },
+    {
+      key: 'addiction',
+      name: 'Adicción',
+      category: 'flaw',
+      allowedRatings: [1],
+      source: 'core',
+      sourcePage: 179,
+      allowMultiple: false,
+      requiresInstanceDetails: true,
+      instanceDetailsKind: 'substanceUse',
+    },
+    {
+      key: 'functional-addict',
+      name: 'Adicto Funcional',
+      category: 'merit',
+      allowedRatings: [1],
+      source: 'core',
+      sourcePage: 179,
+      allowMultiple: false,
+      requiresInstanceDetails: true,
+      instanceDetailsKind: 'substanceUse',
+    },
   ]
 
 export function getCharacterAdvantageDefinition(

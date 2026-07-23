@@ -70,6 +70,7 @@ export interface CharacterAdvantageDefinition {
     | 'herd'
     | 'resources'
     | 'haven'
+    | 'substanceUse'
     | 'loresheet'
 
   /*
