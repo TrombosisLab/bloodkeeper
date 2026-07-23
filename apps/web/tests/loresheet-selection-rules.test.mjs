@@ -256,19 +256,31 @@ test(
 )
 
 test(
-  'la misma clave de ventaja en fichas distintas se trata como selección independiente',
+  'la misma clave de ventaja puede existir en definiciones de Fichas distintas',
   () => {
     const secondLoresheet = {
       ...loresheet,
       key: 'second-loresheet',
     }
 
-    const result =
+    const firstResult =
       validateCharacterLoresheetSelections(
         [
           createSelection({
             selectionId: 'first',
+            loresheetKey:
+              'test-loresheet',
           }),
+        ],
+        [
+          loresheet,
+          secondLoresheet,
+        ],
+      )
+
+    const secondResult =
+      validateCharacterLoresheetSelections(
+        [
           createSelection({
             selectionId: 'second',
             loresheetKey:
@@ -281,7 +293,206 @@ test(
         ],
       )
 
-    assert.equal(result.valid, true)
+    assert.equal(
+      firstResult.valid,
+      true,
+    )
+
+    assert.equal(
+      secondResult.valid,
+      true,
+    )
+
+    assert.deepEqual(
+      firstResult.errors,
+      [],
+    )
+
+    assert.deepEqual(
+      secondResult.errors,
+      [],
+    )
+  },
+)
+
+test(
+  'permite adquirir varias Ventajas independientes de la misma Ficha de Conocimientos',
+  () => {
+    const result =
+      validateCharacterLoresheetSelections(
+        [
+          createSelection({
+            selectionId:
+              'level-one',
+            benefitKey:
+              'benefit-1',
+            rating: 1,
+          }),
+          createSelection({
+            selectionId:
+              'level-three',
+            benefitKey:
+              'benefit-3',
+            rating: 3,
+          }),
+          createSelection({
+            selectionId:
+              'level-five',
+            benefitKey:
+              'benefit-5',
+            rating: 5,
+          }),
+        ],
+        [
+          loresheet,
+        ],
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+
+    assert.deepEqual(
+      result.errors,
+      [],
+    )
+  },
+)
+
+test(
+  'una Ventaja de nivel alto no exige seleccionar los niveles inferiores',
+  () => {
+    const result =
+      validateCharacterLoresheetSelections(
+        [
+          createSelection({
+            selectionId:
+              'only-level-five',
+            benefitKey:
+              'benefit-5',
+            rating: 5,
+          }),
+        ],
+        [
+          loresheet,
+        ],
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+
+    assert.deepEqual(
+      result.errors,
+      [],
+    )
+  },
+)
+
+test(
+  'rechaza adquirir Ventajas de dos Fichas de Conocimientos distintas',
+  () => {
+    const secondLoresheet = {
+      ...loresheet,
+      key:
+        'second-loresheet',
+      benefits:
+        loresheet.benefits.map(
+          (benefit) => ({
+            ...benefit,
+            key:
+              `second-${benefit.key}`,
+          }),
+        ),
+    }
+
+    const result =
+      validateCharacterLoresheetSelections(
+        [
+          createSelection({
+            selectionId:
+              'first-sheet-benefit',
+            loresheetKey:
+              'test-loresheet',
+            benefitKey:
+              'benefit-1',
+            rating: 1,
+          }),
+          createSelection({
+            selectionId:
+              'second-sheet-benefit',
+            loresheetKey:
+              'second-loresheet',
+            benefitKey:
+              'second-benefit-2',
+            rating: 2,
+          }),
+        ],
+        [
+          loresheet,
+          secondLoresheet,
+        ],
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+
+    assert.ok(
+      result.errors.some(
+        (error) =>
+          error.includes(
+            'una única Ficha de Conocimientos',
+          ),
+      ),
+    )
+  },
+)
+
+test(
+  'la restricción de una sola ficha ignora Ventajas que no son Loresheet',
+  () => {
+    const result =
+      validateCharacterLoresheetSelections(
+        [
+          createSelection({
+            selectionId:
+              'loresheet-benefit',
+            benefitKey:
+              'benefit-2',
+            rating: 2,
+          }),
+          {
+            selectionId:
+              'resources-one',
+            definitionKey:
+              'resources',
+            category:
+              'background',
+            rating: 3,
+            origin:
+              'creation',
+            details: {
+              kind:
+                'resources',
+              source:
+                'Trabajo e inversiones',
+            },
+          },
+        ],
+        [
+          loresheet,
+        ],
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+
     assert.deepEqual(
       result.errors,
       [],

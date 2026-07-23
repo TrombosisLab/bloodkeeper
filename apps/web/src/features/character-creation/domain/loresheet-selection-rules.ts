@@ -32,6 +32,19 @@ export function validateCharacterLoresheetSelections(
   const selectedBenefits =
     new Set<string>()
 
+  /*
+   * Regla general de creación V5:
+   * un personaje escoge una única Ficha de Conocimientos.
+   *
+   * Puede adquirir varias Ventajas independientes
+   * dentro de esa misma ficha.
+   *
+   * Línea de Sangre no se modela aquí:
+   * es un Trasfondo distinto y tendrá su propia regla.
+   */
+  const selectedLoresheetKeys =
+    new Set<string>()
+
   for (const selection of selections) {
     if (
       selection.details?.kind !==
@@ -44,6 +57,10 @@ export function validateCharacterLoresheetSelections(
       loresheetKey,
       benefitKey,
     } = selection.details
+
+    selectedLoresheetKeys.add(
+      loresheetKey,
+    )
 
     const definition =
       definitionsByKey.get(
@@ -97,6 +114,14 @@ export function validateCharacterLoresheetSelections(
 
     selectedBenefits.add(
       uniqueBenefitKey,
+    )
+  }
+
+  if (
+    selectedLoresheetKeys.size > 1
+  ) {
+    errors.push(
+      'Un personaje sólo puede seleccionar Ventajas de una única Ficha de Conocimientos.',
     )
   }
 
