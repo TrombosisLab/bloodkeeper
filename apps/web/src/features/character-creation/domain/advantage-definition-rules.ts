@@ -79,6 +79,62 @@ export function validateCharacterAdvantageDefinitions(
       )
     }
 
+
+    const originRatingConstraints =
+      definition.originRatingConstraints ?? []
+
+    const constrainedOrigins =
+      originRatingConstraints.map(
+        (constraint) => constraint.origin,
+      )
+
+    if (
+      new Set(constrainedOrigins).size !==
+      constrainedOrigins.length
+    ) {
+      errors.push(
+        `La definición ${definition.key || '(sin clave)'} contiene restricciones de puntuación duplicadas para el mismo origen.`,
+      )
+    }
+
+    for (
+      const constraint of
+      originRatingConstraints
+    ) {
+      if (
+        constraint.allowedRatings.length === 0
+      ) {
+        errors.push(
+          `La definición ${definition.key || '(sin clave)'} contiene una restricción de origen sin puntuaciones permitidas.`,
+        )
+
+        continue
+      }
+
+      if (
+        constraint.allowedRatings.some(
+          (rating) =>
+            !Number.isInteger(rating) ||
+            rating < 1,
+        )
+      ) {
+        errors.push(
+          `La definición ${definition.key || '(sin clave)'} contiene una puntuación de origen no válida.`,
+        )
+      }
+
+      if (
+        new Set(
+          constraint.allowedRatings,
+        ).size !==
+        constraint.allowedRatings.length
+      ) {
+        errors.push(
+          `La definición ${definition.key || '(sin clave)'} contiene puntuaciones de origen duplicadas.`,
+        )
+      }
+    }
+
     if (
       definition.requiresInstanceDetails &&
       !definition.instanceDetailsKind
@@ -364,13 +420,26 @@ export function validateCharacterAdvantageSelectionsAgainstDefinitions(
       )
     }
 
+    const originConstraint =
+      definition.originRatingConstraints
+        ?.find(
+          (constraint) =>
+            constraint.origin ===
+            selection.origin,
+        )
+
+    const allowedRatings =
+      originConstraint
+        ?.allowedRatings ??
+      definition.allowedRatings
+
     if (
-      !definition.allowedRatings.includes(
+      !allowedRatings.includes(
         selection.rating,
       )
     ) {
       errors.push(
-        `La puntuación ${selection.rating} no está permitida para ${definition.name}.`,
+        `La puntuación ${selection.rating} no está permitida para ${definition.name} con origen ${selection.origin}.`,
       )
     }
 

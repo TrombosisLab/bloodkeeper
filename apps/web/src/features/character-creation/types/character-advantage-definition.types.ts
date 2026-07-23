@@ -1,5 +1,6 @@
 import type {
   CharacterAdvantageCategory,
+  CharacterAdvantageSelectionOrigin,
 } from './character-advantages-draft.types'
 
 export type CharacterAdvantageSource =
@@ -46,6 +47,20 @@ export interface CharacterAdvantageDefinition {
 
   source: CharacterAdvantageSource
   sourcePage?: number
+
+  /*
+   * Excepciones de puntuación ligadas al origen de
+   * la selección.
+   *
+   * allowedRatings sigue representando la adquisición
+   * ordinaria. Estas reglas permiten que un origen
+   * concreto conceda una puntuación distinta sin
+   * convertirla en comprable libremente.
+   */
+  originRatingConstraints?: readonly {
+    origin: CharacterAdvantageSelectionOrigin
+    allowedRatings: readonly number[]
+  }[]
 
   /*
    * Permite varias instancias de la misma definición.
