@@ -485,6 +485,40 @@ export const characterAdvantageDefinitions:
         minimumAgeCategory: 'ancilla',
       },
     },
+    /*
+     * 003-H.3B.6A.4A:
+     * Defectos Core — Vínculo.
+     */
+    {
+      key: 'bondslave',
+      name: 'Esclavo Vinculado',
+      category: 'flaw',
+      allowedRatings: [2],
+      source: 'core',
+      sourcePage: 180,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
+    {
+      key: 'bond-junkie',
+      name: 'Yonqui del Vínculo',
+      category: 'flaw',
+      allowedRatings: [1],
+      source: 'core',
+      sourcePage: 180,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
+    {
+      key: 'long-bond',
+      name: 'Vínculo Largo',
+      category: 'flaw',
+      allowedRatings: [1],
+      source: 'core',
+      sourcePage: 181,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
   ]
 
 export function getCharacterAdvantageDefinition(
