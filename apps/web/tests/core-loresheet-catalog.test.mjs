@@ -46,6 +46,7 @@ test(
         'theo-bell',
         'sect-war-veteran',
         'the-trinity',
+        'jeanette-therese-voerman',
         'golconda',
       ],
     )
@@ -862,6 +863,93 @@ test(
     const definition =
       getCharacterCoreLoresheetDefinition(
         'the-trinity',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.requirements,
+      undefined,
+    )
+  },
+)
+
+test(
+  'Jeanette / Therese Voerman está registrada como Ficha Core de la página 394',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'jeanette-therese-voerman',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'Jeanette / Therese Voerman',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.sourcePage,
+      394,
+    )
+  },
+)
+
+test(
+  'Jeanette / Therese Voerman contiene exactamente sus cinco niveles Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'jeanette-therese-voerman',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.benefits.map(
+        (benefit) => ({
+          name: benefit.name,
+          level: benefit.level,
+        }),
+      ),
+      [
+        {
+          name: 'Miembro del Asylum',
+          level: 1,
+        },
+        {
+          name: 'Mono de feria',
+          level: 2,
+        },
+        {
+          name: 'El Preferido de Jeanette',
+          level: 3,
+        },
+        {
+          name: 'El Preferido de Therese',
+          level: 4,
+        },
+        {
+          name: 'Director de Asylum',
+          level: 5,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  'Jeanette / Therese Voerman no impone una restricción Malkavian inferida',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'jeanette-therese-voerman',
       )
 
     assert.ok(definition)

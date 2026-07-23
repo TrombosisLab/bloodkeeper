@@ -258,6 +258,39 @@ export const characterCoreLoresheetDefinitions:
       ],
     },
     {
+      key: 'jeanette-therese-voerman',
+      name: 'Jeanette / Therese Voerman',
+      source: 'core',
+      sourcePage: 394,
+      benefits: [
+        {
+          key: 'voerman-asylum-member',
+          name: 'Miembro del Asylum',
+          level: 1,
+        },
+        {
+          key: 'voerman-performing-monkey',
+          name: 'Mono de feria',
+          level: 2,
+        },
+        {
+          key: 'voerman-jeanettes-favorite',
+          name: 'El Preferido de Jeanette',
+          level: 3,
+        },
+        {
+          key: 'voerman-thereses-favorite',
+          name: 'El Preferido de Therese',
+          level: 4,
+        },
+        {
+          key: 'voerman-asylum-director',
+          name: 'Director de Asylum',
+          level: 5,
+        },
+      ],
+    },
+    {
       key: 'golconda',
       name: 'Golconda',
       source: 'core',
