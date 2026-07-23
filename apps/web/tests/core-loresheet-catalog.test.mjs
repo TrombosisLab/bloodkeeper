@@ -39,6 +39,7 @@ test(
           definition.key,
       ),
       [
+        'carna',
         'golconda',
       ],
     )
@@ -162,6 +163,102 @@ test(
         'missing',
       ),
       null,
+    )
+  },
+)
+
+test(
+  'Carna está registrada como Ficha de Conocimientos Core de la página 385',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'carna',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'Carna',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.sourcePage,
+      385,
+    )
+  },
+)
+
+test(
+  'Carna contiene exactamente sus cinco niveles Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'carna',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.benefits.map(
+        (benefit) => ({
+          name:
+            benefit.name,
+          level:
+            benefit.level,
+        }),
+      ),
+      [
+        {
+          name:
+            'Abrazar la Visión',
+          level: 1,
+        },
+        {
+          name:
+            'El Rastro Rebelde',
+          level: 2,
+        },
+        {
+          name:
+            'Rituales Poco Ortodoxos',
+          level: 3,
+        },
+        {
+          name:
+            'Vínculo Reimaginado',
+          level: 4,
+        },
+        {
+          name:
+            'Libro de la Guerra de las Tumbas',
+          level: 5,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  'Carna y Golconda conservan claves de beneficios globalmente independientes',
+  () => {
+    const keys =
+      characterCoreLoresheetDefinitions.flatMap(
+        (definition) =>
+          definition.benefits.map(
+            (benefit) =>
+              benefit.key,
+          ),
+      )
+
+    assert.equal(
+      new Set(keys).size,
+      keys.length,
     )
   },
 )

@@ -17,6 +17,39 @@ import type {
 export const characterCoreLoresheetDefinitions:
   readonly CharacterLoresheetDefinition[] = [
     {
+      key: 'carna',
+      name: 'Carna',
+      source: 'core',
+      sourcePage: 385,
+      benefits: [
+        {
+          key: 'carna-embrace-the-vision',
+          name: 'Abrazar la Visión',
+          level: 1,
+        },
+        {
+          key: 'carna-rebel-trail',
+          name: 'El Rastro Rebelde',
+          level: 2,
+        },
+        {
+          key: 'carna-unorthodox-rituals',
+          name: 'Rituales Poco Ortodoxos',
+          level: 3,
+        },
+        {
+          key: 'carna-bond-reimagined',
+          name: 'Vínculo Reimaginado',
+          level: 4,
+        },
+        {
+          key: 'carna-book-of-the-grave-war',
+          name: 'Libro de la Guerra de las Tumbas',
+          level: 5,
+        },
+      ],
+    },
+    {
       key: 'golconda',
       name: 'Golconda',
       source: 'core',
