@@ -83,6 +83,44 @@ export const characterCoreLoresheetDefinitions:
       ],
     },
     {
+      key: 'descendant-of-helena',
+      name: 'Descendiente de Helena',
+      source: 'core',
+      sourcePage: 391,
+      requirements: {
+        clanKeys: [
+          'toreador',
+        ],
+      },
+      benefits: [
+        {
+          key: 'helena-skin-deep',
+          name: 'A Flor de Piel',
+          level: 1,
+        },
+        {
+          key: 'helena-true-talent',
+          name: 'Talento Real',
+          level: 2,
+        },
+        {
+          key: 'helena-embrace-the-stereotype',
+          name: 'Abraza el Estereotipo',
+          level: 3,
+        },
+        {
+          key: 'helena-divine-purity',
+          name: 'Pureza Divina',
+          level: 4,
+        },
+        {
+          key: 'helena-succubus-club-franchise',
+          name: 'Franquicia del Succubus Club',
+          level: 5,
+        },
+      ],
+    },
+    {
       key: 'descendant-of-hardestadt',
       name: 'Descendiente de Hardestadt',
       source: 'core',

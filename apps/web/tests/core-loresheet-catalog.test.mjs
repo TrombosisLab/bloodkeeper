@@ -41,6 +41,7 @@ test(
       [
         'cainite-heresy',
         'carna',
+        'descendant-of-helena',
         'descendant-of-hardestadt',
         'golconda',
       ],
@@ -461,6 +462,149 @@ test(
       definition.requirements
         ?.excludedClanKeys,
       undefined,
+    )
+  },
+)
+
+test(
+  'Descendiente de Helena está registrada como Ficha Core de la página 391',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'descendant-of-helena',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'Descendiente de Helena',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.sourcePage,
+      391,
+    )
+
+    assert.deepEqual(
+      definition.requirements,
+      {
+        clanKeys: [
+          'toreador',
+        ],
+      },
+    )
+  },
+)
+
+test(
+  'Descendiente de Helena contiene exactamente sus cinco niveles Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'descendant-of-helena',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.benefits.map(
+        (benefit) => ({
+          name:
+            benefit.name,
+          level:
+            benefit.level,
+        }),
+      ),
+      [
+        {
+          name:
+            'A Flor de Piel',
+          level: 1,
+        },
+        {
+          name:
+            'Talento Real',
+          level: 2,
+        },
+        {
+          name:
+            'Abraza el Estereotipo',
+          level: 3,
+        },
+        {
+          name:
+            'Pureza Divina',
+          level: 4,
+        },
+        {
+          name:
+            'Franquicia del Succubus Club',
+          level: 5,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  'Descendiente de Helena conserva la restricción exclusiva de clan Toreador',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'descendant-of-helena',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.requirements?.clanKeys,
+      [
+        'toreador',
+      ],
+    )
+
+    assert.equal(
+      definition.requirements
+        ?.excludedClanKeys,
+      undefined,
+    )
+  },
+)
+
+test(
+  'las restricciones de linaje Hardestadt y Helena permanecen independientes',
+  () => {
+    const hardestadt =
+      getCharacterCoreLoresheetDefinition(
+        'descendant-of-hardestadt',
+      )
+
+    const helena =
+      getCharacterCoreLoresheetDefinition(
+        'descendant-of-helena',
+      )
+
+    assert.ok(hardestadt)
+    assert.ok(helena)
+
+    assert.deepEqual(
+      hardestadt.requirements?.clanKeys,
+      [
+        'ventrue',
+      ],
+    )
+
+    assert.deepEqual(
+      helena.requirements?.clanKeys,
+      [
+        'toreador',
+      ],
     )
   },
 )
