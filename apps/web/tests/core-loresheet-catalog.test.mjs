@@ -41,6 +41,7 @@ test(
       [
         'bahari',
         'circulatory-system',
+        'convention-of-thorns',
         'cainite-heresy',
         'carna',
         'descendant-of-helena',
@@ -1290,6 +1291,93 @@ test(
     const definition =
       getCharacterCoreLoresheetDefinition(
         'circulatory-system',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.requirements,
+      undefined,
+    )
+  },
+)
+
+test(
+  'Convención de Thorns está registrada como Ficha Core de la página 387',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'convention-of-thorns',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'Convención de Thorns',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.sourcePage,
+      387,
+    )
+  },
+)
+
+test(
+  'Convención de Thorns contiene exactamente sus cinco niveles Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'convention-of-thorns',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.benefits.map(
+        (benefit) => ({
+          name: benefit.name,
+          level: benefit.level,
+        }),
+      ),
+      [
+        {
+          name: 'Historiador de Thorns',
+          level: 1,
+        },
+        {
+          name: 'Maestro de Tradiciones',
+          level: 2,
+        },
+        {
+          name: 'Secretos de la Convención',
+          level: 3,
+        },
+        {
+          name: 'Candidato a Justicar',
+          level: 4,
+        },
+        {
+          name: 'Nuevas Tradiciones',
+          level: 5,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  'Convención de Thorns no impone una restricción global de clan o afiliación política',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'convention-of-thorns',
       )
 
     assert.ok(definition)

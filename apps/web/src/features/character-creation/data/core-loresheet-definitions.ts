@@ -83,6 +83,39 @@ export const characterCoreLoresheetDefinitions:
       ],
     },
     {
+      key: 'convention-of-thorns',
+      name: 'Convención de Thorns',
+      source: 'core',
+      sourcePage: 387,
+      benefits: [
+        {
+          key: 'convention-of-thorns-historian',
+          name: 'Historiador de Thorns',
+          level: 1,
+        },
+        {
+          key: 'convention-of-thorns-master-of-traditions',
+          name: 'Maestro de Tradiciones',
+          level: 2,
+        },
+        {
+          key: 'convention-of-thorns-secrets',
+          name: 'Secretos de la Convención',
+          level: 3,
+        },
+        {
+          key: 'convention-of-thorns-justicar-candidate',
+          name: 'Candidato a Justicar',
+          level: 4,
+        },
+        {
+          key: 'convention-of-thorns-new-traditions',
+          name: 'Nuevas Tradiciones',
+          level: 5,
+        },
+      ],
+    },
+    {
       key: 'cainite-heresy',
       name: 'Herejía Cainita',
       source: 'core',
