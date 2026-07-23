@@ -50,6 +50,39 @@ export const characterCoreLoresheetDefinitions:
       ],
     },
     {
+      key: 'circulatory-system',
+      name: 'El Sistema Circulatorio',
+      source: 'core',
+      sourcePage: 386,
+      benefits: [
+        {
+          key: 'circulatory-system-access-the-system',
+          name: 'Acceder al Sistema',
+          level: 1,
+        },
+        {
+          key: 'circulatory-system-little-black-book',
+          name: 'Pequeño Libro Negro',
+          level: 2,
+        },
+        {
+          key: 'circulatory-system-remote-farm',
+          name: 'Granja Remota',
+          level: 3,
+        },
+        {
+          key: 'circulatory-system-safe-passage',
+          name: 'Tránsito Seguro',
+          level: 4,
+        },
+        {
+          key: 'circulatory-system-blood-sommelier',
+          name: 'Sumiller de Sangre',
+          level: 5,
+        },
+      ],
+    },
+    {
       key: 'cainite-heresy',
       name: 'Herejía Cainita',
       source: 'core',

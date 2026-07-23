@@ -40,6 +40,7 @@ test(
       ),
       [
         'bahari',
+        'circulatory-system',
         'cainite-heresy',
         'carna',
         'descendant-of-helena',
@@ -1202,6 +1203,93 @@ test(
     const definition =
       getCharacterCoreLoresheetDefinition(
         'bahari',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.requirements,
+      undefined,
+    )
+  },
+)
+
+test(
+  'El Sistema Circulatorio está registrado como Ficha Core de la página 386',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'circulatory-system',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'El Sistema Circulatorio',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.sourcePage,
+      386,
+    )
+  },
+)
+
+test(
+  'El Sistema Circulatorio contiene exactamente sus cinco niveles Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'circulatory-system',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.benefits.map(
+        (benefit) => ({
+          name: benefit.name,
+          level: benefit.level,
+        }),
+      ),
+      [
+        {
+          name: 'Acceder al Sistema',
+          level: 1,
+        },
+        {
+          name: 'Pequeño Libro Negro',
+          level: 2,
+        },
+        {
+          name: 'Granja Remota',
+          level: 3,
+        },
+        {
+          name: 'Tránsito Seguro',
+          level: 4,
+        },
+        {
+          name: 'Sumiller de Sangre',
+          level: 5,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  'El Sistema Circulatorio no impone una restricción global de clan',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'circulatory-system',
       )
 
     assert.ok(definition)
