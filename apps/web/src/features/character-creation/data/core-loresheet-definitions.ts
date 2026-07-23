@@ -192,6 +192,39 @@ export const characterCoreLoresheetDefinitions:
       ],
     },
     {
+      key: 'sect-war-veteran',
+      name: 'Veterano de la Guerra de Sectas',
+      source: 'core',
+      sourcePage: 392,
+      benefits: [
+        {
+          key: 'sect-war-veteran-survivor',
+          name: 'Superviviente',
+          level: 1,
+        },
+        {
+          key: 'sect-war-veteran-active-participant',
+          name: 'Participante Activo',
+          level: 2,
+        },
+        {
+          key: 'sect-war-veteran-trophy',
+          name: 'Trofeo',
+          level: 3,
+        },
+        {
+          key: 'sect-war-veteran-no-vampires-land',
+          name: 'Tierra de Ningún Vampiro',
+          level: 4,
+        },
+        {
+          key: 'sect-war-veteran-sect-agitator',
+          name: 'Agitador de Secta',
+          level: 5,
+        },
+      ],
+    },
+    {
       key: 'golconda',
       name: 'Golconda',
       source: 'core',

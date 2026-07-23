@@ -44,6 +44,7 @@ test(
         'descendant-of-helena',
         'descendant-of-hardestadt',
         'theo-bell',
+        'sect-war-veteran',
         'golconda',
       ],
     )
@@ -686,6 +687,93 @@ test(
     const definition =
       getCharacterCoreLoresheetDefinition(
         'theo-bell',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.requirements,
+      undefined,
+    )
+  },
+)
+
+test(
+  'Veterano de la Guerra de Sectas está registrada como Ficha Core de la página 392',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'sect-war-veteran',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'Veterano de la Guerra de Sectas',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.sourcePage,
+      392,
+    )
+  },
+)
+
+test(
+  'Veterano de la Guerra de Sectas contiene exactamente sus cinco niveles Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'sect-war-veteran',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.benefits.map(
+        (benefit) => ({
+          name: benefit.name,
+          level: benefit.level,
+        }),
+      ),
+      [
+        {
+          name: 'Superviviente',
+          level: 1,
+        },
+        {
+          name: 'Participante Activo',
+          level: 2,
+        },
+        {
+          name: 'Trofeo',
+          level: 3,
+        },
+        {
+          name: 'Tierra de Ningún Vampiro',
+          level: 4,
+        },
+        {
+          name: 'Agitador de Secta',
+          level: 5,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  'Veterano de la Guerra de Sectas no impone una restricción global de clan o tipo de personaje',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'sect-war-veteran',
       )
 
     assert.ok(definition)
