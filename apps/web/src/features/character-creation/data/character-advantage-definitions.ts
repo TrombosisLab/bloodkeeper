@@ -519,6 +519,40 @@ export const characterAdvantageDefinitions:
       allowMultiple: false,
       requiresInstanceDetails: false,
     },
+    /*
+     * 003-H.3B.6A.4B:
+     * Méritos Core — Vínculo.
+     */
+    {
+      key: 'bond-resistance',
+      name: 'Resistencia al Vínculo',
+      category: 'merit',
+      allowedRatings: [1, 2, 3],
+      source: 'core',
+      sourcePage: 181,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
+    {
+      key: 'short-bond',
+      name: 'Vínculo Breve',
+      category: 'merit',
+      allowedRatings: [2],
+      source: 'core',
+      sourcePage: 181,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
+    {
+      key: 'unbondable',
+      name: 'Invinculable',
+      category: 'merit',
+      allowedRatings: [5],
+      source: 'core',
+      sourcePage: 181,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
   ]
 
 export function getCharacterAdvantageDefinition(
