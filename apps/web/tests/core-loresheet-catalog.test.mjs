@@ -39,6 +39,7 @@ test(
           definition.key,
       ),
       [
+        'bahari',
         'cainite-heresy',
         'carna',
         'descendant-of-helena',
@@ -1126,6 +1127,81 @@ test(
     const definition =
       getCharacterCoreLoresheetDefinition(
         'rudi',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.requirements,
+      undefined,
+    )
+  },
+)
+
+test(
+  'Los Bahari está registrada como Ficha Core de la página 382',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'bahari',
+      )
+
+    assert.ok(definition)
+    assert.equal(definition.name, 'Los Bahari')
+    assert.equal(definition.source, 'core')
+    assert.equal(definition.sourcePage, 382)
+  },
+)
+
+test(
+  'Los Bahari contiene exactamente sus cinco niveles Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'bahari',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.benefits.map(
+        (benefit) => ({
+          name: benefit.name,
+          level: benefit.level,
+        }),
+      ),
+      [
+        {
+          name: 'Reputación Peligrosa',
+          level: 1,
+        },
+        {
+          name: 'Escarificación Ritual',
+          level: 2,
+        },
+        {
+          name: 'Sacrificar a los Niños',
+          level: 3,
+        },
+        {
+          name: 'La Sangre del Útero',
+          level: 4,
+        },
+        {
+          name: 'Primera Maldita',
+          level: 5,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  'Los Bahari no impone una restricción global de clan',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'bahari',
       )
 
     assert.ok(definition)

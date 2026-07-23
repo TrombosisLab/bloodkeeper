@@ -17,6 +17,39 @@ import type {
 export const characterCoreLoresheetDefinitions:
   readonly CharacterLoresheetDefinition[] = [
     {
+      key: 'bahari',
+      name: 'Los Bahari',
+      source: 'core',
+      sourcePage: 382,
+      benefits: [
+        {
+          key: 'bahari-dangerous-reputation',
+          name: 'Reputación Peligrosa',
+          level: 1,
+        },
+        {
+          key: 'bahari-ritual-scarification',
+          name: 'Escarificación Ritual',
+          level: 2,
+        },
+        {
+          key: 'bahari-sacrifice-the-children',
+          name: 'Sacrificar a los Niños',
+          level: 3,
+        },
+        {
+          key: 'bahari-blood-of-the-womb',
+          name: 'La Sangre del Útero',
+          level: 4,
+        },
+        {
+          key: 'bahari-first-cursed',
+          name: 'Primera Maldita',
+          level: 5,
+        },
+      ],
+    },
+    {
       key: 'cainite-heresy',
       name: 'Herejía Cainita',
       source: 'core',
