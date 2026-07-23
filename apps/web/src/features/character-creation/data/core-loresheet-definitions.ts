@@ -83,6 +83,44 @@ export const characterCoreLoresheetDefinitions:
       ],
     },
     {
+      key: 'descendant-of-hardestadt',
+      name: 'Descendiente de Hardestadt',
+      source: 'core',
+      sourcePage: 390,
+      requirements: {
+        clanKeys: [
+          'ventrue',
+        ],
+      },
+      benefits: [
+        {
+          key: 'hardestadt-voice',
+          name: 'Voz de Hardestadt',
+          level: 1,
+        },
+        {
+          key: 'hardestadt-supreme-leader',
+          name: 'Líder Supremo',
+          level: 2,
+        },
+        {
+          key: 'hardestadt-ventrue-pillar',
+          name: 'Pilar Ventrue',
+          level: 3,
+        },
+        {
+          key: 'hardestadt-line-to-the-founders',
+          name: 'Línea con los Fundadores',
+          level: 4,
+        },
+        {
+          key: 'hardestadt-heir',
+          name: 'Heredero de Hardestadt',
+          level: 5,
+        },
+      ],
+    },
+    {
       key: 'golconda',
       name: 'Golconda',
       source: 'core',

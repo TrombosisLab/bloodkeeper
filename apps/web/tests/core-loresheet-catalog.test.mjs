@@ -41,6 +41,7 @@ test(
       [
         'cainite-heresy',
         'carna',
+        'descendant-of-hardestadt',
         'golconda',
       ],
     )
@@ -349,6 +350,117 @@ test(
     assert.equal(
       new Set(keys).size,
       keys.length,
+    )
+  },
+)
+
+test(
+  'Descendiente de Hardestadt está registrada como Ficha Core de la página 390',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'descendant-of-hardestadt',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'Descendiente de Hardestadt',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.sourcePage,
+      390,
+    )
+
+    assert.deepEqual(
+      definition.requirements,
+      {
+        clanKeys: [
+          'ventrue',
+        ],
+      },
+    )
+  },
+)
+
+test(
+  'Descendiente de Hardestadt contiene exactamente sus cinco niveles Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'descendant-of-hardestadt',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.benefits.map(
+        (benefit) => ({
+          name:
+            benefit.name,
+          level:
+            benefit.level,
+        }),
+      ),
+      [
+        {
+          name:
+            'Voz de Hardestadt',
+          level: 1,
+        },
+        {
+          name:
+            'Líder Supremo',
+          level: 2,
+        },
+        {
+          name:
+            'Pilar Ventrue',
+          level: 3,
+        },
+        {
+          name:
+            'Línea con los Fundadores',
+          level: 4,
+        },
+        {
+          name:
+            'Heredero de Hardestadt',
+          level: 5,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  'Descendiente de Hardestadt conserva la restricción exclusiva de clan Ventrue',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'descendant-of-hardestadt',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.requirements?.clanKeys,
+      [
+        'ventrue',
+      ],
+    )
+
+    assert.equal(
+      definition.requirements
+        ?.excludedClanKeys,
+      undefined,
     )
   },
 )
