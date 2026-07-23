@@ -99,6 +99,7 @@ export interface CharacterAdvantageDefinition {
     | 'resources'
     | 'haven'
     | 'substanceUse'
+    | 'preyExclusion'
     | 'loresheet'
 
   /*

@@ -590,6 +590,31 @@ export const characterAdvantageDefinitions:
       allowMultiple: false,
       requiresInstanceDetails: false,
     },
+    /*
+     * 003-H.3B.6A.5B.2:
+     * Defecto Core — Exclusión de Presa.
+     *
+     * La adquisición ordinaria cuesta 1 punto.
+     * Determinados Tipos de Depredador pueden conceder
+     * una variante de 2 puntos.
+     */
+    {
+      key: 'prey-exclusion',
+      name: 'Exclusión de Presa',
+      category: 'flaw',
+      allowedRatings: [1],
+      originRatingConstraints: [
+        {
+          origin: 'predatorType',
+          allowedRatings: [1, 2],
+        },
+      ],
+      source: 'core',
+      sourcePage: 181,
+      allowMultiple: true,
+      requiresInstanceDetails: true,
+      instanceDetailsKind: 'preyExclusion',
+    },
   ]
 
 export function getCharacterAdvantageDefinition(

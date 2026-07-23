@@ -103,6 +103,15 @@ export interface SubstanceUseAdvantageDetails {
   poolCategory?: string
 }
 
+export interface PreyExclusionAdvantageDetails {
+  kind: 'preyExclusion'
+
+  /*
+   * Tipo concreto de presa que el personaje rehúsa.
+   */
+  excludedPrey: string
+}
+
 export interface LoresheetAdvantageDetails {
   kind: 'loresheet'
 
@@ -134,6 +143,7 @@ export type CharacterAdvantageInstanceDetails =
   | ResourcesAdvantageDetails
   | HavenAdvantageDetails
   | SubstanceUseAdvantageDetails
+  | PreyExclusionAdvantageDetails
   | LoresheetAdvantageDetails
 
 export interface CharacterAdvantageSelectionDraft {

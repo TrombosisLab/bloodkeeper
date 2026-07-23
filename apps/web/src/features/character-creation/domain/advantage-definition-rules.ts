@@ -294,6 +294,19 @@ function validateInstanceDetails(
   }
 
   if (
+    selection.details?.kind === 'preyExclusion'
+  ) {
+    const excludedPrey =
+      selection.details.excludedPrey.trim()
+
+    if (!excludedPrey) {
+      errors.push(
+        `La selección ${selection.selectionId} debe especificar una presa excluida.`,
+      )
+    }
+  }
+
+  if (
     selection.details?.kind === 'substanceUse'
   ) {
     const substance =
