@@ -225,6 +225,39 @@ export const characterCoreLoresheetDefinitions:
       ],
     },
     {
+      key: 'the-trinity',
+      name: 'La Trinidad',
+      source: 'core',
+      sourcePage: 393,
+      benefits: [
+        {
+          key: 'the-trinity-constantinople-knowledge',
+          name: 'Conocimiento Constantinopla',
+          level: 1,
+        },
+        {
+          key: 'the-trinity-antonius-architecture',
+          name: 'Arquitectura de Antonius',
+          level: 2,
+        },
+        {
+          key: 'the-trinity-the-dream',
+          name: 'El Sueño',
+          level: 3,
+        },
+        {
+          key: 'the-trinity-the-dracon',
+          name: 'El Dracon',
+          level: 4,
+        },
+        {
+          key: 'the-trinity-new-trinity',
+          name: 'La Nueva Trinidad',
+          level: 5,
+        },
+      ],
+    },
+    {
       key: 'golconda',
       name: 'Golconda',
       source: 'core',

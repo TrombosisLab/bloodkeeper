@@ -45,6 +45,7 @@ test(
         'descendant-of-hardestadt',
         'theo-bell',
         'sect-war-veteran',
+        'the-trinity',
         'golconda',
       ],
     )
@@ -774,6 +775,93 @@ test(
     const definition =
       getCharacterCoreLoresheetDefinition(
         'sect-war-veteran',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.requirements,
+      undefined,
+    )
+  },
+)
+
+test(
+  'La Trinidad está registrada como Ficha Core de la página 393',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'the-trinity',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'La Trinidad',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.sourcePage,
+      393,
+    )
+  },
+)
+
+test(
+  'La Trinidad contiene exactamente sus cinco niveles Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'the-trinity',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.benefits.map(
+        (benefit) => ({
+          name: benefit.name,
+          level: benefit.level,
+        }),
+      ),
+      [
+        {
+          name: 'Conocimiento Constantinopla',
+          level: 1,
+        },
+        {
+          name: 'Arquitectura de Antonius',
+          level: 2,
+        },
+        {
+          name: 'El Sueño',
+          level: 3,
+        },
+        {
+          name: 'El Dracon',
+          level: 4,
+        },
+        {
+          name: 'La Nueva Trinidad',
+          level: 5,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  'La Trinidad no impone una restricción global de clan no indicada por la ficha Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'the-trinity',
       )
 
     assert.ok(definition)
