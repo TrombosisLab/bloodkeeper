@@ -159,6 +159,39 @@ export const characterCoreLoresheetDefinitions:
       ],
     },
     {
+      key: 'theo-bell',
+      name: 'Theo Bell',
+      source: 'core',
+      sourcePage: 383,
+      benefits: [
+        {
+          key: 'theo-bell-rebels-to-the-cause',
+          name: 'Rebeldes a la Causa',
+          level: 1,
+        },
+        {
+          key: 'theo-bell-true-anarch',
+          name: 'Verdadero Anarquista',
+          level: 2,
+        },
+        {
+          key: 'theo-bell-contact-information',
+          name: 'Información de Contacto',
+          level: 3,
+        },
+        {
+          key: 'theo-bell-bells-circle',
+          name: 'Círculo de Bell',
+          level: 4,
+        },
+        {
+          key: 'theo-bell-sect-neutrality',
+          name: 'Neutralidad de Secta',
+          level: 5,
+        },
+      ],
+    },
+    {
       key: 'golconda',
       name: 'Golconda',
       source: 'core',

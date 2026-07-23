@@ -43,6 +43,7 @@ test(
         'carna',
         'descendant-of-helena',
         'descendant-of-hardestadt',
+        'theo-bell',
         'golconda',
       ],
     )
@@ -605,6 +606,93 @@ test(
       [
         'toreador',
       ],
+    )
+  },
+)
+
+test(
+  'Theo Bell está registrada como Ficha Core de la página 383',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'theo-bell',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'Theo Bell',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.sourcePage,
+      383,
+    )
+  },
+)
+
+test(
+  'Theo Bell contiene exactamente sus cinco niveles Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'theo-bell',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.benefits.map(
+        (benefit) => ({
+          name: benefit.name,
+          level: benefit.level,
+        }),
+      ),
+      [
+        {
+          name: 'Rebeldes a la Causa',
+          level: 1,
+        },
+        {
+          name: 'Verdadero Anarquista',
+          level: 2,
+        },
+        {
+          name: 'Información de Contacto',
+          level: 3,
+        },
+        {
+          name: 'Círculo de Bell',
+          level: 4,
+        },
+        {
+          name: 'Neutralidad de Secta',
+          level: 5,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  'Theo Bell no impone una restricción de clan no indicada por la ficha Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'theo-bell',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.requirements,
+      undefined,
     )
   },
 )
