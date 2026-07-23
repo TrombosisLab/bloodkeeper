@@ -553,6 +553,43 @@ export const characterAdvantageDefinitions:
       allowMultiple: false,
       requiresInstanceDetails: false,
     },
+    /*
+     * 003-H.3B.6A.5A:
+     * Defectos Core de Alimentación de puntuación fija.
+     */
+    {
+      key: 'vegan',
+      name: 'Vegano',
+      category: 'flaw',
+      allowedRatings: [2],
+      source: 'core',
+      sourcePage: 181,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+      requirements: {
+        excludedClanKeys: ['ventrue'],
+      },
+    },
+    {
+      key: 'organovore',
+      name: 'Organóvoro',
+      category: 'flaw',
+      allowedRatings: [2],
+      source: 'core',
+      sourcePage: 181,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
+    {
+      key: 'methuselah-thirst',
+      name: 'Sed de Matusalén',
+      category: 'flaw',
+      allowedRatings: [1],
+      source: 'core',
+      sourcePage: 181,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+    },
   ]
 
 export function getCharacterAdvantageDefinition(
