@@ -52,6 +52,7 @@ test(
         'jeanette-therese-voerman',
         'week-of-nightmares',
         'rudi',
+        'first-inquisition',
         'golconda',
       ],
     )
@@ -1378,6 +1379,93 @@ test(
     const definition =
       getCharacterCoreLoresheetDefinition(
         'convention-of-thorns',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.requirements,
+      undefined,
+    )
+  },
+)
+
+test(
+  'La Primera Inquisición está registrada como Ficha Core de la página 388',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'first-inquisition',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'La Primera Inquisición',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.sourcePage,
+      388,
+    )
+  },
+)
+
+test(
+  'La Primera Inquisición contiene exactamente sus cinco niveles Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'first-inquisition',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.benefits.map(
+        (benefit) => ({
+          name: benefit.name,
+          level: benefit.level,
+        }),
+      ),
+      [
+        {
+          name: 'Errores del Pasado',
+          level: 1,
+        },
+        {
+          name: 'Nombres de los Culpables',
+          level: 2,
+        },
+        {
+          name: 'La Secta de Santiago',
+          level: 3,
+        },
+        {
+          name: 'El Segundo Acto',
+          level: 4,
+        },
+        {
+          name: 'Punto Negro',
+          level: 5,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  'La Primera Inquisición no impone requisitos globales no indicados por la ficha',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'first-inquisition',
       )
 
     assert.ok(definition)

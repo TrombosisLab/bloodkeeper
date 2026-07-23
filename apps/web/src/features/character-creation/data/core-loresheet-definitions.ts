@@ -456,6 +456,39 @@ export const characterCoreLoresheetDefinitions:
       ],
     },
     {
+      key: 'first-inquisition',
+      name: 'La Primera Inquisición',
+      source: 'core',
+      sourcePage: 388,
+      benefits: [
+        {
+          key: 'first-inquisition-mistakes-of-the-past',
+          name: 'Errores del Pasado',
+          level: 1,
+        },
+        {
+          key: 'first-inquisition-names-of-the-guilty',
+          name: 'Nombres de los Culpables',
+          level: 2,
+        },
+        {
+          key: 'first-inquisition-sect-of-santiago',
+          name: 'La Secta de Santiago',
+          level: 3,
+        },
+        {
+          key: 'first-inquisition-second-act',
+          name: 'El Segundo Acto',
+          level: 4,
+        },
+        {
+          key: 'first-inquisition-black-site',
+          name: 'Punto Negro',
+          level: 5,
+        },
+      ],
+    },
+    {
       key: 'golconda',
       name: 'Golconda',
       source: 'core',
