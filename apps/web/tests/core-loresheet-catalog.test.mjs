@@ -39,6 +39,7 @@ test(
           definition.key,
       ),
       [
+        'cainite-heresy',
         'carna',
         'golconda',
       ],
@@ -246,6 +247,95 @@ test(
 
 test(
   'Carna y Golconda conservan claves de beneficios globalmente independientes',
+  () => {
+    const keys =
+      characterCoreLoresheetDefinitions.flatMap(
+        (definition) =>
+          definition.benefits.map(
+            (benefit) =>
+              benefit.key,
+          ),
+      )
+
+    assert.equal(
+      new Set(keys).size,
+      keys.length,
+    )
+  },
+)
+
+test(
+  'Herejía Cainita está registrada como Ficha de Conocimientos Core de la página 384',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'cainite-heresy',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'Herejía Cainita',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.sourcePage,
+      384,
+    )
+  },
+)
+
+test(
+  'Herejía Cainita contiene exactamente sus cinco niveles Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'cainite-heresy',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.benefits.map(
+        (benefit) => ({
+          name: benefit.name,
+          level: benefit.level,
+        }),
+      ),
+      [
+        {
+          name: 'El que Tenga Entendimiento',
+          level: 1,
+        },
+        {
+          name: 'Mano de la Herejía',
+          level: 2,
+        },
+        {
+          name: 'Contra-Inquisición',
+          level: 3,
+        },
+        {
+          name: 'Celebrante Rojo',
+          level: 4,
+        },
+        {
+          name: 'El Mencionado en la Profecía',
+          level: 5,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  'las Fichas Core implementadas conservan claves de beneficios globalmente únicas',
   () => {
     const keys =
       characterCoreLoresheetDefinitions.flatMap(

@@ -17,6 +17,39 @@ import type {
 export const characterCoreLoresheetDefinitions:
   readonly CharacterLoresheetDefinition[] = [
     {
+      key: 'cainite-heresy',
+      name: 'Herejía Cainita',
+      source: 'core',
+      sourcePage: 384,
+      benefits: [
+        {
+          key: 'cainite-heresy-understanding',
+          name: 'El que Tenga Entendimiento',
+          level: 1,
+        },
+        {
+          key: 'cainite-heresy-hand',
+          name: 'Mano de la Herejía',
+          level: 2,
+        },
+        {
+          key: 'cainite-heresy-counter-inquisition',
+          name: 'Contra-Inquisición',
+          level: 3,
+        },
+        {
+          key: 'cainite-heresy-red-celebrant',
+          name: 'Celebrante Rojo',
+          level: 4,
+        },
+        {
+          key: 'cainite-heresy-mentioned-in-prophecy',
+          name: 'El Mencionado en la Profecía',
+          level: 5,
+        },
+      ],
+    },
+    {
       key: 'carna',
       name: 'Carna',
       source: 'core',
