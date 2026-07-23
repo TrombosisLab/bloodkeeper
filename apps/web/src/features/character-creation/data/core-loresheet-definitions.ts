@@ -324,6 +324,39 @@ export const characterCoreLoresheetDefinitions:
       ],
     },
     {
+      key: 'rudi',
+      name: 'Rudi',
+      source: 'core',
+      sourcePage: 396,
+      benefits: [
+        {
+          key: 'rudi-new-rights',
+          name: 'Nuevos Derechos',
+          level: 1,
+        },
+        {
+          key: 'rudi-them-and-theirs',
+          name: 'Ellos y lo Suyo',
+          level: 2,
+        },
+        {
+          key: 'rudi-gangrel-advocate',
+          name: 'Abogado Gangrel',
+          level: 3,
+        },
+        {
+          key: 'rudi-bear-pack',
+          name: 'La Manada del Oso',
+          level: 4,
+        },
+        {
+          key: 'rudi-army',
+          name: 'Ejército de Rudi',
+          level: 5,
+        },
+      ],
+    },
+    {
       key: 'golconda',
       name: 'Golconda',
       source: 'core',

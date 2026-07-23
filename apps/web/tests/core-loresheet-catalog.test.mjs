@@ -48,6 +48,7 @@ test(
         'the-trinity',
         'jeanette-therese-voerman',
         'week-of-nightmares',
+        'rudi',
         'golconda',
       ],
     )
@@ -1038,6 +1039,93 @@ test(
     const definition =
       getCharacterCoreLoresheetDefinition(
         'week-of-nightmares',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.requirements,
+      undefined,
+    )
+  },
+)
+
+test(
+  'Rudi está registrada como Ficha Core de la página 396',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'rudi',
+      )
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'Rudi',
+    )
+
+    assert.equal(
+      definition.source,
+      'core',
+    )
+
+    assert.equal(
+      definition.sourcePage,
+      396,
+    )
+  },
+)
+
+test(
+  'Rudi contiene exactamente sus cinco niveles Core',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'rudi',
+      )
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.benefits.map(
+        (benefit) => ({
+          name: benefit.name,
+          level: benefit.level,
+        }),
+      ),
+      [
+        {
+          name: 'Nuevos Derechos',
+          level: 1,
+        },
+        {
+          name: 'Ellos y lo Suyo',
+          level: 2,
+        },
+        {
+          name: 'Abogado Gangrel',
+          level: 3,
+        },
+        {
+          name: 'La Manada del Oso',
+          level: 4,
+        },
+        {
+          name: 'Ejército de Rudi',
+          level: 5,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  'Rudi no impone una restricción Gangrel inferida',
+  () => {
+    const definition =
+      getCharacterCoreLoresheetDefinition(
+        'rudi',
       )
 
     assert.ok(definition)
