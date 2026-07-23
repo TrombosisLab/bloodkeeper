@@ -454,6 +454,37 @@ export const characterAdvantageDefinitions:
       requiresInstanceDetails: true,
       instanceDetailsKind: 'substanceUse',
     },
+    /*
+     * 003-H.3B.6A.3B:
+     * Defectos Core — Arcaico.
+     * Sólo disponibles para Ancillae o mayores.
+     */
+    {
+      key: 'archaic',
+      name: 'Arcaico',
+      category: 'flaw',
+      allowedRatings: [2],
+      source: 'core',
+      sourcePage: 180,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+      requirements: {
+        minimumAgeCategory: 'ancilla',
+      },
+    },
+    {
+      key: 'living-in-the-past',
+      name: 'Vivir en el Pasado',
+      category: 'flaw',
+      allowedRatings: [1],
+      source: 'core',
+      sourcePage: 180,
+      allowMultiple: false,
+      requiresInstanceDetails: false,
+      requirements: {
+        minimumAgeCategory: 'ancilla',
+      },
+    },
   ]
 
 export function getCharacterAdvantageDefinition(
