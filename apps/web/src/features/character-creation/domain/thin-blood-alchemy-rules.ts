@@ -11,6 +11,20 @@ import type {
   ClanKey,
 } from '../types/clan.types.ts'
 
+import type {
+  CharacterThinBloodTraitsDraft,
+} from '../types/thin-blood-trait.types.ts'
+
+export function hasThinBloodAlchemistMerit(
+  traits: CharacterThinBloodTraitsDraft,
+): boolean {
+  return traits.selections.some(
+    (selection) =>
+      selection.definitionKey ===
+      'thin-blood-alchemist',
+  )
+}
+
 export const thinBloodAlchemyMethods:
   ThinBloodAlchemyMethod[] = [
     'athanorCorporis',
@@ -82,6 +96,26 @@ export function normalizeThinBloodAlchemyForClan(
 }
 
 
+export function normalizeThinBloodAlchemyForCharacter(
+  alchemy: CharacterThinBloodAlchemyDraft,
+  clanKey: ClanKey | null,
+  traits: CharacterThinBloodTraitsDraft,
+): CharacterThinBloodAlchemyDraft {
+  if (
+    clanKey !== 'thinBlood' ||
+    !hasThinBloodAlchemistMerit(
+      traits,
+    )
+  ) {
+    return createEmptyThinBloodAlchemy()
+  }
+
+  return normalizeThinBloodAlchemyForClan(
+    alchemy,
+    clanKey,
+  )
+}
+
 export interface ThinBloodAlchemyValidationResult {
   valid: boolean
   errors: string[]
@@ -152,6 +186,44 @@ export function normalizeThinBloodAlchemyFormulaKeys(
   }
 
   return normalized
+}
+
+export function validateThinBloodAlchemyForCharacter(
+  value: CharacterThinBloodAlchemyDraft,
+  clanKey: ClanKey | null,
+  traits: CharacterThinBloodTraitsDraft,
+): ThinBloodAlchemyValidationResult {
+  if (
+    clanKey !== 'thinBlood' ||
+    !hasThinBloodAlchemistMerit(
+      traits,
+    )
+  ) {
+    const isEmpty =
+      value.rating === 0 &&
+      value.method === null &&
+      value.formulaKeys.length === 0
+
+    if (isEmpty) {
+      return {
+        valid: true,
+        errors: [],
+      }
+    }
+
+    return {
+      valid: false,
+      errors: [
+        clanKey === 'thinBlood'
+          ? 'Alquimia de Sangre Débil requiere el Mérito Alquimista de Sangre Débil.'
+          : 'Sólo un personaje Sangre Débil puede conservar Alquimia de Sangre Débil.',
+      ],
+    }
+  }
+
+  return validateThinBloodAlchemyDraft(
+    value,
+  )
 }
 
 export function validateThinBloodAlchemyDraft(
