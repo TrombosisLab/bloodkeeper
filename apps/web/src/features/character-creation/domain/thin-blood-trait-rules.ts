@@ -33,6 +33,19 @@ export interface ThinBloodTraitValidationResult {
  * Severidad y prerrequisitos especiales se incorporarán
  * en checkpoints posteriores.
  */
+/*
+ * La Severidad de la Prohibición adoptada mediante el Defecto
+ * Maldición de Clan de Sangre Débil es siempre 1.
+ *
+ * Es una regla derivada de dominio:
+ * - no se almacena en el draft;
+ * - no es configurable;
+ * - no admite ratings arbitrarios.
+ */
+export function getThinBloodClanCurseSeverity(): 1 {
+  return 1
+}
+
 export function validateThinBloodClanCurseDetails(
   draft: CharacterThinBloodTraitsDraft,
 ): ThinBloodTraitValidationResult {
