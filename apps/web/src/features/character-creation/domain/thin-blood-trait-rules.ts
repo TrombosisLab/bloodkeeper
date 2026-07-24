@@ -64,6 +64,68 @@ export function hasUnknownThinBloodTraitSelections(
   )
 }
 
+export function getThinBloodTraitIncompatibilities(
+  draft: CharacterThinBloodTraitsDraft,
+): Array<{
+  definitionKey: string
+  incompatibleWithKey: string
+}> {
+  const selectedKeys = new Set(
+    draft.selections.map(
+      (selection) =>
+        selection.definitionKey,
+    ),
+  )
+
+  const conflicts: Array<{
+    definitionKey: string
+    incompatibleWithKey: string
+  }> = []
+
+  const recordedPairs = new Set<string>()
+
+  for (
+    const definition
+    of getSelectedDefinitions(draft)
+  ) {
+    for (
+      const incompatibleWithKey
+      of definition.incompatibleWithKeys ?? []
+    ) {
+      if (
+        !selectedKeys.has(
+          incompatibleWithKey,
+        )
+      ) {
+        continue
+      }
+
+      const pairKey = [
+        definition.key,
+        incompatibleWithKey,
+      ]
+        .sort()
+        .join('::')
+
+      if (
+        recordedPairs.has(pairKey)
+      ) {
+        continue
+      }
+
+      recordedPairs.add(pairKey)
+
+      conflicts.push({
+        definitionKey:
+          definition.key,
+        incompatibleWithKey,
+      })
+    }
+  }
+
+  return conflicts
+}
+
 /*
  * Valida la selección completa exigida durante la creación
  * de un personaje Sangre Débil.
@@ -97,6 +159,19 @@ export function validateThinBloodTraitSelection(
   ) {
     errors.push(
       'No se puede seleccionar dos veces el mismo rasgo de Sangre Débil.',
+    )
+  }
+
+  const incompatibilities =
+    getThinBloodTraitIncompatibilities(
+      draft,
+    )
+
+  if (
+    incompatibilities.length > 0
+  ) {
+    errors.push(
+      'La selección contiene Méritos y Defectos de Sangre Débil incompatibles.',
     )
   }
 

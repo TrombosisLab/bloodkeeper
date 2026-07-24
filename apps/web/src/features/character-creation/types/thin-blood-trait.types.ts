@@ -20,6 +20,14 @@ export interface ThinBloodTraitDefinition {
   category: ThinBloodTraitCategory
   source: ThinBloodTraitSource
   sourcePage?: number
+
+  /*
+   * Relaciones normativas explícitas entre rasgos.
+   *
+   * No añadir incompatibilidades por inferencia:
+   * sólo deben declararse cuando una fuente las indique.
+   */
+  incompatibleWithKeys?: readonly string[]
 }
 
 /*

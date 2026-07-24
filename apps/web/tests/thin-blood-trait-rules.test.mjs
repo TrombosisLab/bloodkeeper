@@ -45,7 +45,7 @@ test(
           'day-drinker',
           'lively',
           'baby-teeth',
-          'dead-flesh',
+          'vitae-dependency',
         ),
       )
 

@@ -23,6 +23,9 @@ export const thinBloodTraitDefinitions:
       name: 'Carne Muerta',
       category: 'flaw',
       source: 'core',
+      incompatibleWithKeys: [
+        'lively',
+      ],
     },
     {
       key: 'vitae-dependency',
@@ -41,6 +44,9 @@ export const thinBloodTraitDefinitions:
       name: 'Fragilidad Mortal',
       category: 'flaw',
       source: 'core',
+      incompatibleWithKeys: [
+        'vampiric-resilience',
+      ],
     },
     {
       key: 'clan-curse',
@@ -59,6 +65,9 @@ export const thinBloodTraitDefinitions:
       name: 'Rechazado por los Anarquistas',
       category: 'flaw',
       source: 'core',
+      incompatibleWithKeys: [
+        'anarch-comrades',
+      ],
     },
     {
       key: 'bestial-temper',
@@ -86,6 +95,9 @@ export const thinBloodTraitDefinitions:
       name: 'Camaradas Anarquistas',
       category: 'merit',
       source: 'core',
+      incompatibleWithKeys: [
+        'anarch-rejected',
+      ],
     },
     {
       key: 'camarilla-contact',
@@ -104,6 +116,9 @@ export const thinBloodTraitDefinitions:
       name: 'Resiliencia Vampírica',
       category: 'merit',
       source: 'core',
+      incompatibleWithKeys: [
+        'mortal-frailty',
+      ],
     },
     {
       key: 'bonding-blood',
@@ -116,6 +131,9 @@ export const thinBloodTraitDefinitions:
       name: 'Vívido',
       category: 'merit',
       source: 'core',
+      incompatibleWithKeys: [
+        'dead-flesh',
+      ],
     },
   ]
 
