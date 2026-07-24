@@ -186,7 +186,7 @@ export function validateDisciplinesStep(
     )
 
   const oblivion =
-    draft.disciplines.find(
+    permanentDisciplines.find(
       (discipline) =>
         discipline.key ===
         'oblivion',

@@ -7,6 +7,10 @@ import {
 } from './discipline-rules.ts'
 
 import {
+  resolvePermanentDisciplines,
+} from './permanent-discipline-rules.ts'
+
+import {
   normalizeKnownOblivionCeremonies,
 } from './oblivion-ceremony-rules.ts'
 
@@ -21,8 +25,13 @@ import type {
 export function getSelectedOblivionPowerKeys(
   draft: CharacterDraft,
 ): string[] {
+  const permanentDisciplines =
+    resolvePermanentDisciplines(
+      draft,
+    )
+
   return (
-    draft.disciplines.find(
+    permanentDisciplines.find(
       (discipline) =>
         discipline.key ===
         'oblivion',
@@ -33,9 +42,14 @@ export function getSelectedOblivionPowerKeys(
 export function normalizeOblivionCeremoniesForDraft(
   draft: CharacterDraft,
 ): CharacterOblivionCeremoniesDraft {
+  const permanentDisciplines =
+    resolvePermanentDisciplines(
+      draft,
+    )
+
   const oblivionLevel =
     getDisciplineValue(
-      draft.disciplines,
+      permanentDisciplines,
       'oblivion',
     )
 
