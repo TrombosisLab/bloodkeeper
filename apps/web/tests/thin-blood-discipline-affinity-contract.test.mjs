@@ -21,13 +21,55 @@ const expectedClanDisciplineKeys = [
   'protean',
 ]
 
-function affinity(disciplineKey) {
+const validLevelOnePowerByDiscipline = {
+  animalism:
+    'animalism-sense-the-beast',
+
+  auspex:
+    'auspex-heightened-senses',
+
+  bloodSorcery:
+    'blood-sorcery-taste-for-blood',
+
+  celerity:
+    'celerity-cats-grace',
+
+  dominate:
+    'dominate-cloud-memory',
+
+  fortitude:
+    'fortitude-resilience',
+
+  obfuscate:
+    'obfuscate-cloak-of-shadows',
+
+  oblivion:
+    'oblivion-ashes-to-ashes',
+
+  potence:
+    'potence-lethal-body',
+
+  presence:
+    'presence-daunt',
+
+  protean:
+    'protean-eyes-of-the-beast',
+}
+
+function affinity(
+  disciplineKey,
+  powerKey =
+    validLevelOnePowerByDiscipline[
+      disciplineKey
+    ],
+) {
   return {
     definitionKey:
       'discipline-affinity',
 
     disciplineAffinityDetails: {
       disciplineKey,
+      powerKey,
     },
   }
 }

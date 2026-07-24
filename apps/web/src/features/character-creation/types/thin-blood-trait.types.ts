@@ -45,6 +45,10 @@ import type {
   DisciplineKey,
 } from './discipline.types'
 
+import type {
+  DisciplinePowerKey,
+} from './discipline-power.types'
+
 export interface ClanCurseThinBloodTraitDetails {
   clanKey: ClanKey
 }
@@ -59,6 +63,14 @@ export interface DisciplineAffinityThinBloodTraitDetails {
    * manualmente un segundo catálogo de Disciplinas.
    */
   disciplineKey: DisciplineKey
+
+  /*
+   * El jugador debe conservar la elección real del poder
+   * adquirido con el punto inicial de Disciplina Afín.
+   *
+   * El rating NO se almacena: siempre se deriva como 1.
+   */
+  powerKey: DisciplinePowerKey
 }
 
 export interface ThinBloodTraitSelectionDraft {

@@ -7,14 +7,23 @@ import {
   getClanDefinition,
 } from '../data/clan-definitions.ts'
 
+import {
+  disciplinePowerDefinitions,
+} from '../data/discipline-power-definitions.ts'
+
 import type {
   CharacterThinBloodTraitsDraft,
   ThinBloodTraitCategory,
 } from '../types/thin-blood-trait.types.ts'
 
 import type {
+  CharacterDisciplineDraft,
   DisciplineKey,
 } from '../types/discipline.types.ts'
+
+import {
+  validateSelectedPowers,
+} from './discipline-power-rules.ts'
 
 export const THIN_BLOOD_TRAIT_MIN_PER_CATEGORY = 1
 export const THIN_BLOOD_TRAIT_MAX_PER_CATEGORY = 3
@@ -206,15 +215,56 @@ export function getThinBloodDisciplineAffinityKeys():
 }
 
 /*
- * Valida únicamente el contrato estructural de Disciplina Afín.
+ * Devuelve la representación efectiva del punto concedido
+ * por Disciplina Afín.
  *
- * - Disciplina Afín debe indicar una Disciplina.
- * - La Disciplina debe pertenecer al conjunto de Disciplinas
- *   de clan derivado de los 13 clanes.
- * - Alquimia de Sangre Débil queda fuera de ese conjunto.
+ * Esta estructura NO pertenece a draft.disciplines.
+ * Sólo adapta el efecto del Mérito al contrato canónico
+ * que ya consume el core de poderes de Disciplina.
+ *
+ * El rating es siempre 1 y nunca se almacena como dato editable.
+ */
+export function getThinBloodDisciplineAffinityEffect(
+  draft: CharacterThinBloodTraitsDraft,
+): CharacterDisciplineDraft | null {
+  const selection =
+    draft.selections.find(
+      (candidate) =>
+        candidate.definitionKey ===
+        'discipline-affinity',
+    )
+
+  const details =
+    selection?.disciplineAffinityDetails
+
+  if (
+    !details?.disciplineKey ||
+    !details.powerKey
+  ) {
+    return null
+  }
+
+  return {
+    key: details.disciplineKey,
+    value: 1,
+    powerKeys: [
+      details.powerKey,
+    ],
+  }
+}
+
+/*
+ * Valida el contrato estructural y el efecto inicial
+ * de Disciplina Afín.
+ *
+ * - Debe indicar una Disciplina válida de clan.
+ * - Debe indicar exactamente un poder elegido.
+ * - El poder debe existir y pertenecer a esa Disciplina.
+ * - El poder debe ser legal con el rating efectivo 1.
+ * - Alquimia de Sangre Débil queda fuera del conjunto.
  * - Ningún otro rasgo puede portar disciplineAffinityDetails.
  *
- * Este checkpoint NO concede todavía el punto inicial.
+ * El rating 1 es derivado y draft.disciplines permanece intacto.
  */
 export function validateThinBloodDisciplineAffinityDetails(
   draft: CharacterThinBloodTraitsDraft,
@@ -243,10 +293,12 @@ export function validateThinBloodDisciplineAffinityDetails(
       continue
     }
 
-    const disciplineKey =
+    const details =
       selection
         .disciplineAffinityDetails
-        ?.disciplineKey
+
+    const disciplineKey =
+      details?.disciplineKey
 
     if (!disciplineKey) {
       errors.push(
@@ -263,6 +315,47 @@ export function validateThinBloodDisciplineAffinityDetails(
     ) {
       errors.push(
         'Disciplina Afín sólo puede seleccionar una Disciplina presente como Disciplina de clan entre los 13 clanes.',
+      )
+
+      continue
+    }
+
+    const powerKey =
+      details?.powerKey
+
+    if (!powerKey) {
+      errors.push(
+        'Disciplina Afín requiere seleccionar un poder inicial de la Disciplina elegida.',
+      )
+
+      continue
+    }
+
+    const effect:
+      CharacterDisciplineDraft = {
+        key: disciplineKey,
+        value: 1,
+        powerKeys: [
+          powerKey,
+        ],
+      }
+
+    const powerValidation =
+      validateSelectedPowers(
+        disciplinePowerDefinitions,
+        [
+          effect,
+        ],
+        disciplineKey,
+        effect.powerKeys,
+      )
+
+    if (!powerValidation.valid) {
+      errors.push(
+        ...powerValidation.errors.map(
+          (error) =>
+            `Disciplina Afín: ${error}`,
+        ),
       )
     }
   }
