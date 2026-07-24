@@ -37,8 +37,25 @@ export interface ThinBloodTraitDefinition {
  * no deben recibir una puntuación ficticia para encajar
  * en el presupuesto normal de Ventajas 7/2.
  */
+import type {
+  ClanKey,
+} from './clan.types'
+
+export interface ClanCurseThinBloodTraitDetails {
+  clanKey: ClanKey
+}
+
 export interface ThinBloodTraitSelectionDraft {
   definitionKey: string
+
+  /*
+   * Datos específicos opcionales de un rasgo.
+   *
+   * En este checkpoint sólo se modela Maldición de Clan.
+   * El resto de rasgos conserva exactamente el contrato
+   * mínimo anterior: { definitionKey }.
+   */
+  clanCurseDetails?: ClanCurseThinBloodTraitDetails
 }
 
 export interface CharacterThinBloodTraitsDraft {
