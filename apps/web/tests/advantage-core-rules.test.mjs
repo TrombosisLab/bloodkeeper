@@ -255,7 +255,7 @@ test(
             selectionId: 'same',
             definitionKey: 'background-a',
             category: 'background',
-            rating: 6,
+            rating: 7,
             origin: 'creation',
           },
         ],
@@ -280,7 +280,7 @@ test(
       result.errors.some(
         (error) =>
           error.includes(
-            'entero entre 1 y 5',
+            'entero entre 1 y 6',
           ),
       ),
       true,

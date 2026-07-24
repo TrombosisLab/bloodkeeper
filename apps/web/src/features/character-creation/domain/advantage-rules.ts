@@ -100,10 +100,10 @@ export function validateCharacterAdvantagesStructure(
         selection.rating,
       ) ||
       selection.rating < 1 ||
-      selection.rating > 5
+      selection.rating > 6
     ) {
       errors.push(
-        'La puntuación de una Ventaja, Trasfondo o Defecto debe ser un entero entre 1 y 5.',
+        'La puntuación de una Ventaja, Trasfondo o Defecto debe ser un entero entre 1 y 6.',
       )
     }
   }
