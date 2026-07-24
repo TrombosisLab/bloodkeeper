@@ -97,6 +97,82 @@ export function validateThinBloodClanCurseDetails(
   }
 }
 
+/*
+ * Valida únicamente los prerrequisitos especiales asociados
+ * a determinadas Prohibiciones elegidas mediante Maldición de Clan.
+ *
+ * La fuente de verdad son las selecciones canónicas del propio
+ * subsistema Sangre Débil. No se almacenan flags derivados.
+ *
+ * Reglas:
+ * - Brujah requiere Temperamento Bestial.
+ * - Gangrel requiere Temperamento Bestial.
+ * - Tremere requiere Sangre Vinculante.
+ * - El resto de clanes no recibe requisitos adicionales aquí.
+ */
+export function validateThinBloodClanCursePrerequisites(
+  draft: CharacterThinBloodTraitsDraft,
+): ThinBloodTraitValidationResult {
+  const errors: string[] = []
+
+  const selectedKeys = new Set(
+    draft.selections.map(
+      (selection) =>
+        selection.definitionKey,
+    ),
+  )
+
+  for (const selection of draft.selections) {
+    if (
+      selection.definitionKey !==
+        'clan-curse'
+    ) {
+      continue
+    }
+
+    const clanKey =
+      selection.clanCurseDetails?.clanKey
+
+    if (!clanKey) {
+      /*
+       * La ausencia o invalidez estructural del clan
+       * pertenece a validateThinBloodClanCurseDetails().
+       */
+      continue
+    }
+
+    if (
+      (
+        clanKey === 'brujah' ||
+        clanKey === 'gangrel'
+      ) &&
+      !selectedKeys.has(
+        'bestial-temper',
+      )
+    ) {
+      errors.push(
+        'La Maldición de Clan Brujah o Gangrel requiere Temperamento Bestial.',
+      )
+    }
+
+    if (
+      clanKey === 'tremere' &&
+      !selectedKeys.has(
+        'bonding-blood',
+      )
+    ) {
+      errors.push(
+        'La Maldición de Clan Tremere requiere Sangre Vinculante.',
+      )
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  }
+}
+
 function getSelectedDefinitions(
   draft: CharacterThinBloodTraitsDraft,
 ) {
@@ -231,6 +307,15 @@ export function validateThinBloodTraitSelection(
 
   errors.push(
     ...clanCurseValidation.errors,
+  )
+
+  const clanCursePrerequisiteValidation =
+    validateThinBloodClanCursePrerequisites(
+      draft,
+    )
+
+  errors.push(
+    ...clanCursePrerequisiteValidation.errors,
   )
 
   if (
