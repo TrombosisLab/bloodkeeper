@@ -2,6 +2,10 @@ import {
   getThinBloodTraitDefinition,
 } from '../data/thin-blood-trait-definitions.ts'
 
+import {
+  getClanDefinition,
+} from '../data/clan-definitions.ts'
+
 import type {
   CharacterThinBloodTraitsDraft,
   ThinBloodTraitCategory,
@@ -13,6 +17,71 @@ export const THIN_BLOOD_TRAIT_MAX_PER_CATEGORY = 3
 export interface ThinBloodTraitValidationResult {
   valid: boolean
   errors: string[]
+}
+
+/*
+ * Validación estructural del Defecto Maldición de Clan.
+ *
+ * Este checkpoint sólo comprueba que:
+ * - Maldición de Clan indique un clan;
+ * - la referencia corresponda a un ClanKey existente;
+ * - el destino sea uno de los clanes reales (kind === 'clan').
+ *
+ * Caitiff y Sangre Débil son tipos de personaje especiales
+ * y no constituyen una Prohibición de Clan seleccionable.
+ *
+ * Severidad y prerrequisitos especiales se incorporarán
+ * en checkpoints posteriores.
+ */
+export function validateThinBloodClanCurseDetails(
+  draft: CharacterThinBloodTraitsDraft,
+): ThinBloodTraitValidationResult {
+  const errors: string[] = []
+
+  for (const selection of draft.selections) {
+    if (selection.definitionKey !== 'clan-curse') {
+      if (selection.clanCurseDetails !== undefined) {
+        errors.push(
+          'Sólo Maldición de Clan puede contener datos de Prohibición de Clan.',
+        )
+      }
+
+      continue
+    }
+
+    const clanKey =
+      selection.clanCurseDetails?.clanKey
+
+    if (!clanKey) {
+      errors.push(
+        'Maldición de Clan requiere seleccionar una Prohibición de Clan.',
+      )
+      continue
+    }
+
+    let clanDefinition
+
+    try {
+      clanDefinition =
+        getClanDefinition(clanKey)
+    } catch {
+      errors.push(
+        'Maldición de Clan referencia un clan desconocido.',
+      )
+      continue
+    }
+
+    if (clanDefinition.kind !== 'clan') {
+      errors.push(
+        'Maldición de Clan sólo puede adoptar la Prohibición de uno de los clanes.',
+      )
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  }
 }
 
 function getSelectedDefinitions(
@@ -141,6 +210,15 @@ export function validateThinBloodTraitSelection(
   draft: CharacterThinBloodTraitsDraft,
 ): ThinBloodTraitValidationResult {
   const errors: string[] = []
+
+  const clanCurseValidation =
+    validateThinBloodClanCurseDetails(
+      draft,
+    )
+
+  errors.push(
+    ...clanCurseValidation.errors,
+  )
 
   if (
     hasUnknownThinBloodTraitSelections(
