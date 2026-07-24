@@ -50,6 +50,10 @@ export const initialCharacterDraft: CharacterDraft = {
     formulaKeys: [],
   },
 
+  thinBloodTraits: {
+    selections: [],
+  },
+
   advantages: {
     selections: [],
   },
