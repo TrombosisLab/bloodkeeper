@@ -41,8 +41,24 @@ import type {
   ClanKey,
 } from './clan.types'
 
+import type {
+  DisciplineKey,
+} from './discipline.types'
+
 export interface ClanCurseThinBloodTraitDetails {
   clanKey: ClanKey
+}
+
+export interface DisciplineAffinityThinBloodTraitDetails {
+  /*
+   * La validez normativa no depende únicamente de DisciplineKey:
+   * el dominio debe comprobar que sea una Disciplina presente
+   * entre las Disciplinas de clan de los 13 clanes.
+   *
+   * Esto excluye Alquimia de Sangre Débil sin duplicar
+   * manualmente un segundo catálogo de Disciplinas.
+   */
+  disciplineKey: DisciplineKey
 }
 
 export interface ThinBloodTraitSelectionDraft {
@@ -56,6 +72,16 @@ export interface ThinBloodTraitSelectionDraft {
    * mínimo anterior: { definitionKey }.
    */
   clanCurseDetails?: ClanCurseThinBloodTraitDetails
+
+  /*
+   * Configuración propia del Mérito Disciplina Afín.
+   *
+   * El punto concedido por el Mérito NO se almacena aquí
+   * ni se introduce todavía en draft.disciplines.
+   * Este contrato sólo registra la Disciplina elegida.
+   */
+  disciplineAffinityDetails?:
+    DisciplineAffinityThinBloodTraitDetails
 }
 
 export interface CharacterThinBloodTraitsDraft {

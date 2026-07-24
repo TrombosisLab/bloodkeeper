@@ -3,6 +3,7 @@ import {
 } from '../data/thin-blood-trait-definitions.ts'
 
 import {
+  clanDefinitions,
   getClanDefinition,
 } from '../data/clan-definitions.ts'
 
@@ -10,6 +11,10 @@ import type {
   CharacterThinBloodTraitsDraft,
   ThinBloodTraitCategory,
 } from '../types/thin-blood-trait.types.ts'
+
+import type {
+  DisciplineKey,
+} from '../types/discipline.types.ts'
 
 export const THIN_BLOOD_TRAIT_MIN_PER_CATEGORY = 1
 export const THIN_BLOOD_TRAIT_MAX_PER_CATEGORY = 3
@@ -173,6 +178,101 @@ export function validateThinBloodClanCursePrerequisites(
   }
 }
 
+/*
+ * Devuelve el conjunto canónico de Disciplinas que aparecen
+ * como Disciplinas de clan entre los 13 clanes reales.
+ *
+ * La lista se deriva de clanDefinitions para evitar mantener
+ * otro catálogo paralelo susceptible de divergencias.
+ *
+ * Caitiff y Sangre Débil no aportan Disciplinas porque
+ * únicamente se consideran entradas kind === 'clan'.
+ */
+export function getThinBloodDisciplineAffinityKeys():
+  DisciplineKey[] {
+  return [
+    ...new Set(
+      clanDefinitions
+        .filter(
+          (clan) =>
+            clan.kind === 'clan',
+        )
+        .flatMap(
+          (clan) =>
+            clan.inClanDisciplines,
+        ),
+    ),
+  ]
+}
+
+/*
+ * Valida únicamente el contrato estructural de Disciplina Afín.
+ *
+ * - Disciplina Afín debe indicar una Disciplina.
+ * - La Disciplina debe pertenecer al conjunto de Disciplinas
+ *   de clan derivado de los 13 clanes.
+ * - Alquimia de Sangre Débil queda fuera de ese conjunto.
+ * - Ningún otro rasgo puede portar disciplineAffinityDetails.
+ *
+ * Este checkpoint NO concede todavía el punto inicial.
+ */
+export function validateThinBloodDisciplineAffinityDetails(
+  draft: CharacterThinBloodTraitsDraft,
+): ThinBloodTraitValidationResult {
+  const errors: string[] = []
+
+  const allowedKeys =
+    new Set(
+      getThinBloodDisciplineAffinityKeys(),
+    )
+
+  for (const selection of draft.selections) {
+    if (
+      selection.definitionKey !==
+        'discipline-affinity'
+    ) {
+      if (
+        selection.disciplineAffinityDetails !==
+        undefined
+      ) {
+        errors.push(
+          'Sólo Disciplina Afín puede contener datos de Disciplina Afín.',
+        )
+      }
+
+      continue
+    }
+
+    const disciplineKey =
+      selection
+        .disciplineAffinityDetails
+        ?.disciplineKey
+
+    if (!disciplineKey) {
+      errors.push(
+        'Disciplina Afín requiere seleccionar una Disciplina de clan.',
+      )
+
+      continue
+    }
+
+    if (
+      !allowedKeys.has(
+        disciplineKey,
+      )
+    ) {
+      errors.push(
+        'Disciplina Afín sólo puede seleccionar una Disciplina presente como Disciplina de clan entre los 13 clanes.',
+      )
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  }
+}
+
 function getSelectedDefinitions(
   draft: CharacterThinBloodTraitsDraft,
 ) {
@@ -316,6 +416,15 @@ export function validateThinBloodTraitSelection(
 
   errors.push(
     ...clanCursePrerequisiteValidation.errors,
+  )
+
+  const disciplineAffinityValidation =
+    validateThinBloodDisciplineAffinityDetails(
+      draft,
+    )
+
+  errors.push(
+    ...disciplineAffinityValidation.errors,
   )
 
   if (
