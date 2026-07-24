@@ -20,6 +20,10 @@ import {
 } from './discipline-rules.ts'
 
 import {
+  resolvePermanentDisciplines,
+} from './permanent-discipline-rules.ts'
+
+import {
   disciplinePowerDefinitions,
 } from '../data/discipline-power-definitions.ts'
 
@@ -166,12 +170,17 @@ export function validateDisciplinesStep(
       draft,
     )
 
+  const permanentDisciplines =
+    resolvePermanentDisciplines(
+      draft,
+    )
+
   const ritualValidation =
     validateInitialBloodSorceryRituals(
       BLOOD_SORCERY_RITUAL_DEFINITIONS,
       draft.bloodSorceryRituals.ritualKeys,
       getDisciplineValue(
-        draft.disciplines,
+        permanentDisciplines,
         'bloodSorcery',
       ),
     )

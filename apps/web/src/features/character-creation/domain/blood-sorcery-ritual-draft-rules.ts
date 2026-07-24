@@ -7,6 +7,10 @@ import {
 } from './discipline-rules.ts'
 
 import {
+  resolvePermanentDisciplines,
+} from './permanent-discipline-rules.ts'
+
+import {
   normalizeKnownRituals,
 } from './blood-sorcery-ritual-rules.ts'
 
@@ -25,9 +29,14 @@ import type {
 export function normalizeBloodSorceryRitualsForDraft(
   draft: CharacterDraft,
 ): CharacterBloodSorceryRitualsDraft {
+  const permanentDisciplines =
+    resolvePermanentDisciplines(
+      draft,
+    )
+
   const bloodSorceryLevel =
     getDisciplineValue(
-      draft.disciplines,
+      permanentDisciplines,
       'bloodSorcery',
     )
 
