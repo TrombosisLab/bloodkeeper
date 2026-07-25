@@ -44,6 +44,10 @@ import {
 } from './blood-rules.ts'
 
 import {
+  validateInitialCharacterAdvantagesBudget,
+} from './advantage-rules.ts'
+
+import {
   validateDisciplines,
 } from './discipline-rules.ts'
 
@@ -260,6 +264,18 @@ export function validateStep(
 
     case 'blood':
       return validateBloodStep(draft)
+
+    case 'advantages': {
+      const result =
+        validateInitialCharacterAdvantagesBudget(
+          draft.advantages,
+        )
+
+      return {
+        valid: result.valid,
+        errors: result.errors,
+      }
+    }
 
     case 'disciplines': {
       const base =
