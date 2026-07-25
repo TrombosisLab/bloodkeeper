@@ -135,6 +135,241 @@ export function validateCharacterAdvantageDefinitions(
       }
     }
 
+    const legacyRequirements =
+      definition.requirements
+
+    if (legacyRequirements) {
+      const characterKinds =
+        legacyRequirements.characterKinds ?? []
+      const clanKeys =
+        legacyRequirements.clanKeys ?? []
+      const excludedClanKeys =
+        legacyRequirements.excludedClanKeys ?? []
+      const requiredDefinitionKeys =
+        legacyRequirements.requiredDefinitionKeys ?? []
+
+      if (
+        new Set(characterKinds).size !==
+        characterKinds.length
+      ) {
+        errors.push(
+          `La definición ${definition.key || '(sin clave)'} contiene tipos de personaje requeridos duplicados.`,
+        )
+      }
+
+      if (
+        new Set(clanKeys).size !==
+        clanKeys.length
+      ) {
+        errors.push(
+          `La definición ${definition.key || '(sin clave)'} contiene clanes requeridos duplicados.`,
+        )
+      }
+
+      if (
+        new Set(excludedClanKeys).size !==
+        excludedClanKeys.length
+      ) {
+        errors.push(
+          `La definición ${definition.key || '(sin clave)'} contiene clanes excluidos duplicados.`,
+        )
+      }
+
+      if (
+        new Set(requiredDefinitionKeys).size !==
+        requiredDefinitionKeys.length
+      ) {
+        errors.push(
+          `La definición ${definition.key || '(sin clave)'} contiene definiciones requeridas duplicadas.`,
+        )
+      }
+
+      for (
+        const requiredKey of
+        requiredDefinitionKeys
+      ) {
+        if (!knownKeys.has(requiredKey)) {
+          errors.push(
+            `La definición ${definition.key || '(sin clave)'} requiere una definición inexistente: ${requiredKey}.`,
+          )
+        }
+
+        if (requiredKey === definition.key) {
+          errors.push(
+            `La definición ${definition.key || '(sin clave)'} no puede requerirse a sí misma.`,
+          )
+        }
+      }
+
+      for (const clanKey of clanKeys) {
+        if (
+          excludedClanKeys.includes(
+            clanKey,
+          )
+        ) {
+          errors.push(
+            `La definición ${definition.key || '(sin clave)'} incluye y excluye simultáneamente el clan ${clanKey}.`,
+          )
+        }
+      }
+    }
+
+    const requirementRules =
+      definition.requirementRules ?? []
+
+    const serializedRequirementRules =
+      requirementRules.map(
+        (requirement) =>
+          JSON.stringify(requirement),
+      )
+
+    if (
+      new Set(
+        serializedRequirementRules,
+      ).size !==
+      serializedRequirementRules.length
+    ) {
+      errors.push(
+        `La definición ${definition.key || '(sin clave)'} contiene reglas de requisito duplicadas.`,
+      )
+    }
+
+    for (
+      const requirement of
+      requirementRules
+    ) {
+      switch (requirement.type) {
+        case 'advantage':
+          if (
+            !requirement.definitionKey.trim()
+          ) {
+            errors.push(
+              `La definición ${definition.key || '(sin clave)'} contiene un requisito de Ventaja sin clave.`,
+            )
+          } else {
+            if (
+              !knownKeys.has(
+                requirement.definitionKey,
+              )
+            ) {
+              errors.push(
+                `La definición ${definition.key || '(sin clave)'} requiere una definición inexistente: ${requirement.definitionKey}.`,
+              )
+            }
+
+            if (
+              requirement.definitionKey ===
+              definition.key
+            ) {
+              errors.push(
+                `La definición ${definition.key || '(sin clave)'} no puede requerirse a sí misma.`,
+              )
+            }
+          }
+
+          if (
+            requirement.minRating !== undefined &&
+            (
+              !Number.isInteger(
+                requirement.minRating,
+              ) ||
+              requirement.minRating < 1 ||
+              requirement.minRating > 6
+            )
+          ) {
+            errors.push(
+              `La definición ${definition.key || '(sin clave)'} contiene un rating mínimo de requisito no válido.`,
+            )
+          }
+
+          break
+
+        case 'clan':
+          if (
+            requirement.allowedClanKeys.length === 0
+          ) {
+            errors.push(
+              `La definición ${definition.key || '(sin clave)'} contiene un requisito de clan vacío.`,
+            )
+          }
+
+          if (
+            new Set(
+              requirement.allowedClanKeys,
+            ).size !==
+            requirement.allowedClanKeys.length
+          ) {
+            errors.push(
+              `La definición ${definition.key || '(sin clave)'} contiene clanes permitidos duplicados en una regla moderna.`,
+            )
+          }
+
+          break
+
+        case 'predatorType':
+          if (
+            requirement.allowedPredatorTypeKeys.length === 0
+          ) {
+            errors.push(
+              `La definición ${definition.key || '(sin clave)'} contiene un requisito de tipo de depredador vacío.`,
+            )
+          }
+
+          if (
+            new Set(
+              requirement.allowedPredatorTypeKeys,
+            ).size !==
+            requirement.allowedPredatorTypeKeys.length
+          ) {
+            errors.push(
+              `La definición ${definition.key || '(sin clave)'} contiene tipos de depredador duplicados.`,
+            )
+          }
+
+          break
+
+        case 'humanity':
+          if (
+            !Number.isInteger(
+              requirement.min,
+            ) ||
+            requirement.min < 0 ||
+            requirement.min > 10
+          ) {
+            errors.push(
+              `La definición ${definition.key || '(sin clave)'} contiene un requisito de Humanidad no válido.`,
+            )
+          }
+
+          break
+
+        case 'generation':
+          if (
+            !Number.isInteger(
+              requirement.max,
+            ) ||
+            requirement.max < 1 ||
+            requirement.max > 16
+          ) {
+            errors.push(
+              `La definición ${definition.key || '(sin clave)'} contiene un requisito de Generación no válido.`,
+            )
+          }
+
+          break
+
+        case 'thinBlood':
+          break
+
+        default: {
+          const exhaustiveCheck: never =
+            requirement
+
+          void exhaustiveCheck
+        }
+      }
+    }
+
     if (
       definition.requiresInstanceDetails &&
       !definition.instanceDetailsKind

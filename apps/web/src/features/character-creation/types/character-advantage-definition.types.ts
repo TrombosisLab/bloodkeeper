@@ -2,6 +2,9 @@ import type {
   CharacterAdvantageCategory,
   CharacterAdvantageSelectionOrigin,
 } from './character-advantages-draft.types'
+import type {
+  CharacterAdvantageRequirement,
+} from './character-advantage-requirements.types'
 
 export type CharacterAdvantageSource =
   | 'core'
@@ -138,6 +141,17 @@ export interface CharacterAdvantageDefinition {
     allowedRatings: readonly number[]
   }[]
 
+  /*
+   * Requisitos modernos evaluados por advantage-requirement-engine.
+   *
+   * Conviven temporalmente con requirements para permitir una
+   * migración gradual del catálogo sin romper definiciones existentes.
+   */
+  requirementRules?: readonly CharacterAdvantageRequirement[]
+
+  /*
+   * Contrato histórico conservado durante la migración.
+   */
   requirements?: CharacterAdvantageRequirements
 
   incompatibleDefinitionKeys?: string[]
