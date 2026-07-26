@@ -400,8 +400,14 @@ export function CharacterCreationWizard({
           ) : currentStepId ===
             'advantages' ? (
             <AdvantagesStep
+              clanKey={
+                draft.identity.clan
+              }
               value={
                 draft.advantages
+              }
+              thinBloodTraits={
+                draft.thinBloodTraits
               }
               onChange={(
                 advantages,
@@ -410,6 +416,16 @@ export function CharacterCreationWizard({
                   (current) => ({
                     ...current,
                     advantages,
+                  }),
+                )
+              }
+              onThinBloodTraitsChange={(
+                thinBloodTraits,
+              ) =>
+                updateDraft(
+                  (current) => ({
+                    ...current,
+                    thinBloodTraits,
                   }),
                 )
               }

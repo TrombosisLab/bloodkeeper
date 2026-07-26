@@ -6,6 +6,18 @@ import {
   getCharacterAdvantagesBudget,
 } from '../domain/advantage-rules'
 
+import {
+  getThinBloodTraitDefinitionsByCategory,
+} from '../data/thin-blood-trait-definitions'
+
+import {
+  useThinBloodTraits,
+} from '../hooks/useThinBloodTraits'
+
+import {
+  ThinBloodSection,
+} from './thin-blood/ThinBloodSection'
+
 import type {
   CharacterAdvantageDefinition,
 } from '../types/character-advantage-definition.types'
@@ -16,11 +28,21 @@ import type {
   CharacterAdvantagesDraft,
 } from '../types/character-advantages-draft.types'
 
+import type { ClanKey } from '../types/clan.types'
+import type { CharacterThinBloodTraitsDraft } from '../types/thin-blood-trait.types'
 interface AdvantagesStepProps {
+  clanKey: ClanKey | null
+
   value: CharacterAdvantagesDraft
 
   onChange: (
     value: CharacterAdvantagesDraft,
+  ) => void
+
+  thinBloodTraits: CharacterThinBloodTraitsDraft
+
+  onThinBloodTraitsChange: (
+    value: CharacterThinBloodTraitsDraft,
   ) => void
 }
 
@@ -74,8 +96,11 @@ function getDefinitionSelections(
 }
 
 export function AdvantagesStep({
+  clanKey,
   value,
   onChange,
+  thinBloodTraits,
+  onThinBloodTraitsChange,
 }: AdvantagesStepProps) {
   const budget =
     getCharacterAdvantagesBudget(value)
@@ -85,6 +110,40 @@ export function AdvantagesStep({
 
   const flawDelta =
     2 - budget.flawPoints
+
+  const thinBloodMerits =
+    getThinBloodTraitDefinitionsByCategory(
+      'merit',
+    )
+
+  const thinBloodFlaws =
+    getThinBloodTraitDefinitionsByCategory(
+      'flaw',
+    )
+
+  const isThinBlood =
+    clanKey === 'thinBlood'
+
+  const thinBlood =
+    useThinBloodTraits({
+      value: thinBloodTraits,
+      onChange:
+        onThinBloodTraitsChange,
+      meritKeys:
+        thinBloodMerits.map(
+          (definition) =>
+            definition.key,
+        ),
+      flawKeys:
+        thinBloodFlaws.map(
+          (definition) =>
+            definition.key,
+        ),
+      characterKind:
+        isThinBlood
+          ? 'thinBlood'
+          : 'clan',
+    })
 
   function getBudgetMessage(
     delta: number,
@@ -243,6 +302,15 @@ export function AdvantagesStep({
           </strong>
         </div>
       </section>
+
+
+      {isThinBlood && (
+        <ThinBloodSection
+          thinBlood={thinBlood}
+          merits={thinBloodMerits}
+          flaws={thinBloodFlaws}
+        />
+      )}
 
       {categories.map(
         (category) => {
