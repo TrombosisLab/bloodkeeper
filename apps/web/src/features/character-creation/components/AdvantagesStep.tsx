@@ -7,6 +7,10 @@ import {
 } from '../domain/advantage-rules'
 
 import {
+  createInitialAdvantageInstanceDetails,
+} from '../domain/advantage-instance-details-rules'
+
+import {
   getThinBloodTraitDefinitionsByCategory,
 } from '../data/thin-blood-trait-definitions'
 
@@ -184,10 +188,6 @@ export function AdvantagesStep({
     definition: CharacterAdvantageDefinition,
     rating: number,
   ) {
-    if (!isSimpleDefinition(definition)) {
-      return
-    }
-
     const existing =
       getDefinitionSelections(
         value,
@@ -218,6 +218,11 @@ export function AdvantagesStep({
 
         origin:
           'creation',
+
+        details:
+          createInitialAdvantageInstanceDetails(
+            definition,
+          ),
       }
 
     onChange({
@@ -428,7 +433,6 @@ export function AdvantagesStep({
                                 }
                                 type="button"
                                 disabled={
-                                  !simple ||
                                   (
                                     !definition.allowMultiple &&
                                     alreadySelected
