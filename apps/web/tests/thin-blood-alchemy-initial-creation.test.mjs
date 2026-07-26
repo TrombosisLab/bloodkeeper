@@ -336,3 +336,129 @@ test(
     )
   },
 )
+
+
+test(
+  'Sangre Débil permite generación 14',
+  () => {
+    const draft = {
+      ...initialCharacterDraft,
+
+      identity: {
+        ...initialCharacterDraft.identity,
+        name: 'Test',
+        concept: 'Test',
+        clan: 'thinBlood',
+        generation: 14,
+      },
+    }
+
+    const result =
+      validateStep(
+        'identity',
+        draft,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+      result.errors.join('\n'),
+    )
+  },
+)
+
+test(
+  'Sangre Débil permite generación 15',
+  () => {
+    const draft = {
+      ...initialCharacterDraft,
+
+      identity: {
+        ...initialCharacterDraft.identity,
+        name: 'Test',
+        concept: 'Test',
+        clan: 'thinBlood',
+        generation: 15,
+      },
+    }
+
+    const result =
+      validateStep(
+        'identity',
+        draft,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+      result.errors.join('\n'),
+    )
+  },
+)
+
+test(
+  'Sangre Débil permite generación 16',
+  () => {
+    const draft = {
+      ...initialCharacterDraft,
+
+      identity: {
+        ...initialCharacterDraft.identity,
+        name: 'Test',
+        concept: 'Test',
+        clan: 'thinBlood',
+        generation: 16,
+      },
+    }
+
+    const result =
+      validateStep(
+        'identity',
+        draft,
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+      result.errors.join('\n'),
+    )
+  },
+)
+
+test(
+  'Sangre Débil rechaza generación distinta de 14, 15 o 16',
+  () => {
+    const draft = {
+      ...initialCharacterDraft,
+
+      identity: {
+        ...initialCharacterDraft.identity,
+        name: 'Test',
+        concept: 'Test',
+        clan: 'thinBlood',
+        generation: 13,
+      },
+    }
+
+    const result =
+      validateStep(
+        'identity',
+        draft,
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+
+    assert.equal(
+      result.errors.some(
+        (error) =>
+          error.includes(
+            '14, 15 o 16',
+          ),
+      ),
+      true,
+    )
+  },
+)

@@ -110,6 +110,18 @@ export function validateIdentityStep(
     )
   }
 
+  if (
+    draft.identity.clan === 'thinBlood' &&
+    draft.identity.generation !== null &&
+    ![14, 15, 16].includes(
+      draft.identity.generation,
+    )
+  ) {
+    errors.push(
+      'Los Sangre Débil solo pueden tener generación 14, 15 o 16.',
+    )
+  }
+
   return {
     valid: errors.length === 0,
     errors,
