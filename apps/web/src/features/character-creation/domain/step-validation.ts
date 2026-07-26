@@ -47,6 +47,16 @@ import {
   validateInitialCharacterAdvantagesBudget,
 } from './advantage-rules.ts'
 
+
+import {
+  validateInitialThinBloodAlchemySelection,
+} from './thin-blood-alchemy-rules.ts'
+
+
+import {
+  validateThinBloodTraitsForCharacterKind,
+} from './thin-blood-trait-rules.ts'
+
 import {
   validateDisciplines,
 } from './discipline-rules.ts'
@@ -266,14 +276,47 @@ export function validateStep(
       return validateBloodStep(draft)
 
     case 'advantages': {
-      const result =
+      const advantageValidation =
         validateInitialCharacterAdvantagesBudget(
           draft.advantages,
         )
 
+      const characterKind =
+        draft.identity.clan ===
+          'thinBlood'
+          ? 'thinBlood'
+          : 'clan'
+
+      const thinBloodValidation =
+        validateThinBloodTraitsForCharacterKind(
+          draft.thinBloodTraits,
+          characterKind,
+        )
+
+      const alchemyValidation =
+        validateInitialThinBloodAlchemySelection(
+          draft.thinBloodAlchemy,
+          draft.identity.clan,
+          draft.thinBloodTraits,
+        )
+
+      const errors = [
+        ...advantageValidation.errors,
+        ...thinBloodValidation.errors,
+        ...alchemyValidation.errors,
+      ]
+
       return {
-        valid: result.valid,
-        errors: result.errors,
+        valid:
+          advantageValidation.valid &&
+          thinBloodValidation.valid &&
+          alchemyValidation.valid,
+
+        errors: [
+          ...new Set(
+            errors,
+          ),
+        ],
       }
     }
 

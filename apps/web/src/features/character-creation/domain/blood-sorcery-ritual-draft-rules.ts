@@ -18,6 +18,10 @@ import {
   normalizeCharacterDraftOblivionCeremonies,
 } from './oblivion-ceremony-draft-rules.ts'
 
+import {
+  normalizeCharacterDraft,
+} from './character-draft-normalization.ts'
+
 import type {
   CharacterDraft,
 } from '../types/character-draft.types'
@@ -88,9 +92,7 @@ export function applyCharacterDraftUpdate(
   const updated =
     updater(current)
 
-  return normalizeCharacterDraftOblivionCeremonies(
-    normalizeCharacterDraftRituals(
-      updated,
-    ),
+  return normalizeCharacterDraft(
+    updated,
   )
 }

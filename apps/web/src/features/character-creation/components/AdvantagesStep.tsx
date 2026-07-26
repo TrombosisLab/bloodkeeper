@@ -30,6 +30,11 @@ import type {
 
 import type { ClanKey } from '../types/clan.types'
 import type { CharacterThinBloodTraitsDraft } from '../types/thin-blood-trait.types'
+
+import type {
+  CharacterThinBloodAlchemyDraft,
+} from '../types/thin-blood-alchemy.types'
+
 interface AdvantagesStepProps {
   clanKey: ClanKey | null
 
@@ -43,6 +48,12 @@ interface AdvantagesStepProps {
 
   onThinBloodTraitsChange: (
     value: CharacterThinBloodTraitsDraft,
+  ) => void
+
+  thinBloodAlchemy: CharacterThinBloodAlchemyDraft
+
+  onThinBloodAlchemyChange: (
+    value: CharacterThinBloodAlchemyDraft,
   ) => void
 }
 
@@ -101,6 +112,8 @@ export function AdvantagesStep({
   onChange,
   thinBloodTraits,
   onThinBloodTraitsChange,
+  thinBloodAlchemy,
+  onThinBloodAlchemyChange,
 }: AdvantagesStepProps) {
   const budget =
     getCharacterAdvantagesBudget(value)
@@ -309,6 +322,10 @@ export function AdvantagesStep({
           thinBlood={thinBlood}
           merits={thinBloodMerits}
           flaws={thinBloodFlaws}
+          alchemy={thinBloodAlchemy}
+          onAlchemyChange={
+            onThinBloodAlchemyChange
+          }
         />
       )}
 

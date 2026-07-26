@@ -19,13 +19,6 @@ import {
   removeInvalidSpecialties,
 } from '../domain/skill-specialty-rules'
 
-import {
-  normalizeBloodForGeneration,
-} from '../domain/blood-rules'
-
-import {
-  normalizeDisciplinesForClan,
-} from '../domain/discipline-rules'
 
 import type {
   CharacterDraft,
@@ -249,24 +242,6 @@ export function CharacterCreationWizard({
                     ...current,
 
                     identity,
-
-                    blood:
-                      identity.generation ===
-                      null
-                        ? current.blood
-                        : normalizeBloodForGeneration(
-                            current.blood,
-                            identity.generation,
-                          ),
-
-                    disciplines:
-                      identity.clan ===
-                      null
-                        ? []
-                        : normalizeDisciplinesForClan(
-                            current.disciplines,
-                            identity.clan,
-                          ),
                   }),
                 )
               }
@@ -409,6 +384,9 @@ export function CharacterCreationWizard({
               thinBloodTraits={
                 draft.thinBloodTraits
               }
+              thinBloodAlchemy={
+                draft.thinBloodAlchemy
+              }
               onChange={(
                 advantages,
               ) =>
@@ -426,6 +404,16 @@ export function CharacterCreationWizard({
                   (current) => ({
                     ...current,
                     thinBloodTraits,
+                  }),
+                )
+              }
+              onThinBloodAlchemyChange={(
+                thinBloodAlchemy,
+              ) =>
+                updateDraft(
+                  (current) => ({
+                    ...current,
+                    thinBloodAlchemy,
                   }),
                 )
               }

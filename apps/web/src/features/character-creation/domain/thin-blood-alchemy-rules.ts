@@ -226,6 +226,57 @@ export function validateThinBloodAlchemyForCharacter(
   )
 }
 
+/*
+ * Validación específica de creación inicial.
+ *
+ * El dominio general de Alquimia permite aprender fórmulas
+ * adicionales durante la crónica. La creación inicial concede
+ * exactamente una fórmula gratuita por cada punto de Alquimia.
+ */
+export function validateInitialThinBloodAlchemySelection(
+  value: CharacterThinBloodAlchemyDraft,
+  clanKey: ClanKey | null,
+  traits: CharacterThinBloodTraitsDraft,
+): ThinBloodAlchemyValidationResult {
+  const base =
+    validateThinBloodAlchemyForCharacter(
+      value,
+      clanKey,
+      traits,
+    )
+
+  if (!base.valid) {
+    return base
+  }
+
+  if (
+    clanKey !== 'thinBlood' ||
+    !hasThinBloodAlchemistMerit(
+      traits,
+    )
+  ) {
+    return base
+  }
+
+  if (
+    value.formulaKeys.length !==
+    value.rating
+  ) {
+    return {
+      valid: false,
+
+      errors: [
+        value.rating === 1
+          ? 'Durante la creación inicial debes seleccionar exactamente 1 fórmula gratuita de Alquimia de Sangre Débil.'
+          : `Durante la creación inicial debes seleccionar exactamente ${value.rating} fórmulas gratuitas de Alquimia de Sangre Débil.`,
+      ],
+    }
+  }
+
+  return base
+}
+
+
 export function validateThinBloodAlchemyDraft(
   value: CharacterThinBloodAlchemyDraft,
 ): ThinBloodAlchemyValidationResult {

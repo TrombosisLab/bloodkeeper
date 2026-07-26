@@ -176,6 +176,11 @@ test(
     const draft = {
       ...initialCharacterDraft,
 
+      identity: {
+        ...initialCharacterDraft.identity,
+        clan: 'tremere',
+      },
+
       disciplines: [
         {
           key: 'bloodSorcery',
