@@ -47,6 +47,10 @@ import {
   validateInitialCharacterAdvantagesBudget,
 } from './advantage-rules.ts'
 
+import {
+  characterAdvantageDefinitions,
+} from '../data/character-advantage-definitions.ts'
+
 
 import {
   validateInitialThinBloodAlchemySelection,
