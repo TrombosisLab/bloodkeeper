@@ -30,6 +30,10 @@ import {
   AdvantageInstanceDetailsEditor,
 } from './advantages/AdvantageInstanceDetailsEditor'
 
+import {
+  AdvantageRatingControl,
+} from './advantages/AdvantageRatingControl'
+
 import type {
   CharacterAdvantageDefinition,
 } from '../types/character-advantage-definition.types'
@@ -115,6 +119,19 @@ function getDefinitionSelections(
       selection.definitionKey ===
       definitionKey &&
       selection.origin === 'creation',
+  )
+}
+
+
+function getChildAdvantageDefinitions(
+  parentDefinitionKey: string,
+) {
+  return characterAdvantageDefinitions.filter(
+    (definition) =>
+      definition.requiresParentSelection === true &&
+      definition.allowedParentDefinitionKeys?.includes(
+        parentDefinitionKey,
+      ),
   )
 }
 
@@ -212,6 +229,7 @@ export function AdvantagesStep({
   function addSelection(
     definition: CharacterAdvantageDefinition,
     rating: number,
+    parentSelectionId?: string,
   ) {
     const existing =
       getDefinitionSelections(
@@ -245,6 +263,7 @@ export function AdvantagesStep({
           'creation',
 
         parentSelectionId:
+          parentSelectionId ??
           resolveParentSelectionId(
             definition,
           ),
@@ -272,6 +291,26 @@ export function AdvantagesStep({
           (selection) =>
             selection.selectionId !==
             selectionId,
+        ),
+    })
+  }
+
+
+  function updateSelectionRating(
+    selectionId: string,
+    rating: number,
+  ) {
+    onChange({
+      selections:
+        value.selections.map(
+          (selection) =>
+            selection.selectionId ===
+            selectionId
+              ? {
+                  ...selection,
+                  rating,
+                }
+              : selection,
         ),
     })
   }
@@ -371,6 +410,7 @@ export function AdvantagesStep({
               (definition) =>
                 definition.category ===
                   category &&
+                definition.requiresParentSelection !== true &&
                 canShowAdvantageDefinition(
                   definition,
                   value,
@@ -539,50 +579,7 @@ export function AdvantagesStep({
                             </p>
                           )}
 
-                        {selections.length >
-                          0 && (
-                          <div className="advantage-selection-list">
-                            {selections.map(
-                              (
-                                selection,
-                              ) => (
-                                <div
-                                  key={
-                                    selection.selectionId
-                                  }
-                                  className="advantage-selection-chip"
-                                >
-                                  <span>
-                                    {
-                                      selection.rating
-                                    }{' '}
-                                    pt
-                                    {
-                                      selection.rating ===
-                                      1
-                                        ? ''
-                                        : 's'
-                                    }
-                                  </span>
 
-                                  <button
-                                    type="button"
-                                    aria-label={
-                                      `Eliminar ${definition.name}`
-                                    }
-                                    onClick={() =>
-                                      removeSelection(
-                                        selection.selectionId,
-                                      )
-                                    }
-                                  >
-                                    ×
-                                  </button>
-                                </div>
-                              ),
-                            )}
-                          </div>
-                        )}
                       </article>
                     )
                   },
@@ -592,6 +589,126 @@ export function AdvantagesStep({
           )
         },
       )}
+      {value.selections
+        .filter(
+          (selection) =>
+            selection.definitionKey === 'haven',
+        )
+        .length > 0 && (
+          <section
+            className="advantages-category"
+          >
+            <header className="advantages-category__heading">
+              <div>
+                <span>
+                  Catálogo CORE
+                </span>
+
+                <h3>
+                  Méritos de Refugio
+                </h3>
+              </div>
+            </header>
+
+            <div className="advantages-catalog-grid">
+              {value.selections
+                .filter(
+                  (selection) =>
+                    selection.definitionKey === 'haven',
+                )
+                .flatMap(
+                  (haven) =>
+                    getChildAdvantageDefinitions(
+                      'haven',
+                    ).map(
+                      (definition) => (
+                        <article
+                          key={
+                            definition.key +
+                            haven.selectionId
+                          }
+                          className={
+                            getDefinitionSelections(
+                              value,
+                              definition.key,
+                            ).some(
+                              (selection) =>
+                                selection.parentSelectionId ===
+                                haven.selectionId,
+                            )
+                              ? 'advantage-catalog-card advantage-catalog-card--selected'
+                              : 'advantage-catalog-card'
+                          }
+                        >
+                          <h4>
+                            {definition.name}
+                          </h4>
+
+                          <div className="advantage-catalog-card__ratings">
+                            {(() => {
+                              const selected =
+                                getDefinitionSelections(
+                                  value,
+                                  definition.key,
+                                ).find(
+                                  (selection) =>
+                                    selection.parentSelectionId ===
+                                    haven.selectionId,
+                                )
+
+                              if (!selected) {
+                                return (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      addSelection(
+                                        definition,
+                                        1,
+                                        haven.selectionId,
+                                      )
+                                    }
+                                  >
+                                    Configurar
+                                  </button>
+                                )
+                              }
+
+                              return (
+                                <AdvantageRatingControl
+                                  value={
+                                    selected.rating
+                                  }
+                                  min={1}
+                                  max={
+                                    definition.allowedRatings[
+                                      definition.allowedRatings.length - 1
+                                    ]
+                                  }
+                                  onChange={(
+                                    rating,
+                                  ) =>
+                                    updateSelectionRating(
+                                      selected.selectionId,
+                                      rating,
+                                    )
+                                  }
+                                  onRemove={() =>
+                                    removeSelection(
+                                      selected.selectionId,
+                                    )
+                                  }
+                                />
+                              )
+                            })()}
+                          </div>
+                        </article>
+                      ),
+                    ),
+                )}
+            </div>
+          </section>
+        )}
+
     </div>
   )
 }

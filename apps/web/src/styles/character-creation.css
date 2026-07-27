@@ -2729,6 +2729,48 @@
   cursor: pointer;
 }
 
+
+.advantage-rating-control {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.advantage-rating-control button {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.advantage-rating-control button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.advantage-rating-control__dots {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.advantage-rating-control__dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  display: inline-block;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  background: transparent;
+}
+
+.advantage-rating-control__dot--active {
+  background: currentColor;
+}
+
 .advantage-catalog-card__ratings button:disabled {
   cursor: not-allowed;
   opacity: 0.28;

@@ -211,6 +211,44 @@ export function AdvantageInstanceDetailsEditor({
   }
 
 
+  if (
+    details.kind === 'haven'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Refugio
+        </h5>
+
+        <label>
+          Identidad
+
+          <input
+            value={
+              details.identity ?? ''
+            }
+            onChange={
+              (event) =>
+                onChange({
+                  ...selection,
+                  details: {
+                    kind: 'haven',
+                    identity:
+                      event.target.value,
+                  },
+                })
+            }
+          />
+        </label>
+
+        <small>
+          Nivel de Refugio: {selection.rating}
+        </small>
+      </div>
+    )
+  }
+
+
   return (
     <p className="advantage-catalog-card__pending">
       Editor específico pendiente.
