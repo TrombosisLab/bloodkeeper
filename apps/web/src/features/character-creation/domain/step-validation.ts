@@ -52,6 +52,10 @@ import {
   validateInitialThinBloodAlchemySelection,
 } from './thin-blood-alchemy-rules.ts'
 
+import {
+  validateAdvantageParentRelations,
+} from './advantage-parent-rules.ts'
+
 
 import {
   validateThinBloodTraitsForCharacterKind,
@@ -312,17 +316,25 @@ export function validateStep(
           draft.thinBloodTraits,
         )
 
+      const parentValidation =
+        validateAdvantageParentRelations(
+          draft.advantages,
+          characterAdvantageDefinitions,
+        )
+
       const errors = [
         ...advantageValidation.errors,
         ...thinBloodValidation.errors,
         ...alchemyValidation.errors,
+        ...parentValidation.errors,
       ]
 
       return {
         valid:
           advantageValidation.valid &&
           thinBloodValidation.valid &&
-          alchemyValidation.valid,
+          alchemyValidation.valid &&
+          parentValidation.valid,
 
         errors: [
           ...new Set(
