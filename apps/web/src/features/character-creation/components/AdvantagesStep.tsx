@@ -184,6 +184,23 @@ export function AdvantagesStep({
       : `Has excedido el presupuesto en ${excess} ${plural}.`
   }
 
+  function resolveParentSelectionId(
+    definition: CharacterAdvantageDefinition,
+  ): string | undefined {
+    if (
+      definition.requiresParentSelection !== true
+    ) {
+      return undefined
+    }
+
+    return value.selections.find(
+      (selection) =>
+        definition.allowedParentDefinitionKeys?.includes(
+          selection.definitionKey,
+        ),
+    )?.selectionId
+  }
+
   function addSelection(
     definition: CharacterAdvantageDefinition,
     rating: number,
@@ -218,6 +235,11 @@ export function AdvantagesStep({
 
         origin:
           'creation',
+
+        parentSelectionId:
+          resolveParentSelectionId(
+            definition,
+          ),
 
         details:
           createInitialAdvantageInstanceDetails(
