@@ -26,6 +26,10 @@ import {
   ThinBloodSection,
 } from './thin-blood/ThinBloodSection'
 
+import {
+  AdvantageInstanceDetailsEditor,
+} from './advantages/AdvantageInstanceDetailsEditor'
+
 import type {
   CharacterAdvantageDefinition,
 } from '../types/character-advantage-definition.types'
@@ -455,38 +459,77 @@ export function AdvantagesStep({
                         </header>
 
                         <div className="advantage-catalog-card__ratings">
-                          {definition.allowedRatings.map(
-                            (rating) => (
-                              <button
-                                key={
-                                  rating
-                                }
-                                type="button"
-                                disabled={
-                                  (
-                                    !definition.allowMultiple &&
-                                    alreadySelected
-                                  )
-                                }
-                                onClick={() =>
-                                  addSelection(
-                                    definition,
-                                    rating,
-                                  )
-                                }
-                              >
-                                {rating}
-                              </button>
-                            ),
+                          {definition.instanceDetailsKind ===
+                            'allies' ? (
+                            <button
+                              type="button"
+                              disabled={
+                                alreadySelected
+                              }
+                              onClick={() =>
+                                addSelection(
+                                  definition,
+                                  0,
+                                )
+                              }
+                            >
+                              Configurar
+                            </button>
+                          ) : (
+                            definition.allowedRatings.map(
+                              (rating) => (
+                                <button
+                                  key={
+                                    rating
+                                  }
+                                  type="button"
+                                  disabled={
+                                    (
+                                      !definition.allowMultiple &&
+                                      alreadySelected
+                                    )
+                                  }
+                                  onClick={() =>
+                                    addSelection(
+                                      definition,
+                                      rating,
+                                    )
+                                  }
+                                >
+                                  {rating}
+                                </button>
+                              ),
+                            )
                           )}
                         </div>
 
-                        {!simple && (
-                          <p className="advantage-catalog-card__pending">
-                            Configuración específica
-                            pendiente de interfaz.
-                          </p>
-                        )}
+                        {!simple &&
+                          selections.map(
+                            (selection) => (
+                              <AdvantageInstanceDetailsEditor
+                                key={
+                                  selection.selectionId
+                                }
+                                selection={
+                                  selection
+                                }
+                                onChange={(
+                                  updated,
+                                ) =>
+                                  onChange({
+                                    selections:
+                                      value.selections.map(
+                                        (current) =>
+                                          current.selectionId ===
+                                          updated.selectionId
+                                            ? updated
+                                            : current,
+                                      ),
+                                  })
+                                }
+                              />
+                            ),
+                          )}
 
                         {simple &&
                           !definition.allowMultiple &&
