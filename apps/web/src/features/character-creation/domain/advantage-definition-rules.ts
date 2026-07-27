@@ -60,7 +60,10 @@ export function validateCharacterAdvantageDefinitions(
         (rating) =>
           !Number.isInteger(rating) ||
           rating < 1 ||
-          rating > 6,
+          (
+            rating > 6 &&
+            definition.instanceDetailsKind !== 'allies'
+          ),
       )
     ) {
       errors.push(
@@ -634,11 +637,6 @@ function validateInstanceDetails(
       )
     }
 
-    if (total > 6) {
-      errors.push(
-        `La puntuación total de Aliados no puede superar 6.`,
-      )
-    }
   }
 }
 

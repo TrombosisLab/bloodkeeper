@@ -127,7 +127,7 @@ test(
 )
 
 test(
-  'rating 7 es inválido ya en la capa estructural',
+  'rating 7 es estructuralmente representable y depende de la definición',
   () => {
     const result =
       validateSelection({
@@ -153,22 +153,22 @@ test(
 
     assert.equal(
       result.structural.valid,
-      false,
+      true,
     )
 
-    assert.equal(
-      result.structural.errors.some(
-        (error) =>
-          error.includes(
-            'entero entre 1 y 6',
-          ),
-      ),
-      true,
+    assert.deepEqual(
+      result.structural.errors,
+      [],
     )
 
     assert.equal(
       result.againstDefinitions.valid,
-      false,
+      true,
+    )
+
+    assert.deepEqual(
+      result.againstDefinitions.errors,
+      [],
     )
   },
 )

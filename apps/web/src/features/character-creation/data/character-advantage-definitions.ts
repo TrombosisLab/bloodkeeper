@@ -25,6 +25,7 @@ export const characterAdvantageDefinitions:
         4,
         5,
         6,
+        7,
       ],
       source: 'core',
       allowMultiple: true,
@@ -221,7 +222,6 @@ export const characterAdvantageDefinitions:
       requiresInstanceDetails: false,
       requiresParentSelection: true,
       allowedParentDefinitionKeys: ['haven'],
-      minimumParentRating: 2,
     },
     {
       key: 'haven-laboratory',
@@ -233,7 +233,6 @@ export const characterAdvantageDefinitions:
       requiresInstanceDetails: false,
       requiresParentSelection: true,
       allowedParentDefinitionKeys: ['haven'],
-      minimumParentRating: 2,
     },
     {
       key: 'haven-location',
@@ -289,7 +288,6 @@ export const characterAdvantageDefinitions:
       requiresInstanceDetails: false,
       requiresParentSelection: true,
       allowedParentDefinitionKeys: ['haven'],
-      minimumParentRating: 2,
     },
     {
       key: 'haven-security-system',

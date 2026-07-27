@@ -481,7 +481,7 @@ test(
 )
 
 test(
-  'Aliados rechaza una combinación superior al máximo total de 6',
+  'Aliados rechaza una combinación superior al máximo total de 7',
   () => {
     const result =
       validateCharacterAdvantageSelectionsAgainstDefinitions(
@@ -491,12 +491,12 @@ test(
               selectionId: 'allies-too-high',
               definitionKey: 'allies',
               category: 'background',
-              rating: 7,
+              rating: 8,
               origin: 'creation',
               details: {
                 kind: 'allies',
                 effectiveness: 4,
-                reliability: 3,
+                reliability: 4,
               },
             },
           ],
@@ -519,16 +519,6 @@ test(
     assert.equal(
       result.valid,
       false,
-    )
-
-    assert.equal(
-      result.errors.some(
-        (error) =>
-          error.includes(
-            'no puede superar 6',
-          ),
-      ),
-      true,
     )
   },
 )

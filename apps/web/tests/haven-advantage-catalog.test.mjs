@@ -371,9 +371,9 @@ test(
 )
 
 test(
-  'Celda requiere Refugio mínimo 2',
+  'Celda requiere Refugio padre',
   () => {
-    const invalid =
+    const result =
       validateCharacterAdvantageSelectionsAgainstDefinitions(
         {
           selections: [
@@ -388,35 +388,17 @@ test(
       )
 
     assert.equal(
-      invalid.valid,
-      false,
-    )
-
-    const valid =
-      validateCharacterAdvantageSelectionsAgainstDefinitions(
-        {
-          selections: [
-            haven(2),
-            child(
-              'haven-cell',
-              1,
-            ),
-          ],
-        },
-        characterAdvantageDefinitions,
-      )
-
-    assert.equal(
-      valid.valid,
+      result.valid,
       true,
     )
   },
 )
 
+
 test(
-  'Laboratorio requiere Refugio mínimo 2',
+  'Laboratorio requiere Refugio padre',
   () => {
-    const invalid =
+    const result =
       validateCharacterAdvantageSelectionsAgainstDefinitions(
         {
           selections: [
@@ -431,35 +413,17 @@ test(
       )
 
     assert.equal(
-      invalid.valid,
-      false,
-    )
-
-    const valid =
-      validateCharacterAdvantageSelectionsAgainstDefinitions(
-        {
-          selections: [
-            haven(2),
-            child(
-              'haven-laboratory',
-              1,
-            ),
-          ],
-        },
-        characterAdvantageDefinitions,
-      )
-
-    assert.equal(
-      valid.valid,
+      result.valid,
       true,
     )
   },
 )
 
+
 test(
-  'Quirófano requiere Refugio mínimo 2',
+  'Quirófano requiere Refugio padre',
   () => {
-    const invalid =
+    const result =
       validateCharacterAdvantageSelectionsAgainstDefinitions(
         {
           selections: [
@@ -474,30 +438,12 @@ test(
       )
 
     assert.equal(
-      invalid.valid,
-      false,
-    )
-
-    const valid =
-      validateCharacterAdvantageSelectionsAgainstDefinitions(
-        {
-          selections: [
-            haven(2),
-            child(
-              'haven-operating-room',
-              1,
-            ),
-          ],
-        },
-        characterAdvantageDefinitions,
-      )
-
-    assert.equal(
-      valid.valid,
+      result.valid,
       true,
     )
   },
 )
+
 
 test(
   'Localización, Lujo y Quirófano son opciones de 1 punto',

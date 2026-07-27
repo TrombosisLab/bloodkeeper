@@ -104,7 +104,7 @@ test(
 )
 
 test(
-  'Aliados usa puntuaciones totales 2 a 6',
+  'Aliados usa puntuaciones totales 2 a 7',
   () => {
     const definition =
       getCharacterAdvantageDefinition(
@@ -121,6 +121,7 @@ test(
         4,
         5,
         6,
+        7,
       ],
     )
 

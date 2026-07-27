@@ -57,8 +57,8 @@ import {
 } from './thin-blood-alchemy-rules.ts'
 
 import {
-  validateAdvantageParentRelations,
-} from './advantage-parent-rules.ts'
+  validateAdvantageRelations,
+} from './advantage-relation-rules.ts'
 
 
 import {
@@ -321,7 +321,7 @@ export function validateStep(
         )
 
       const parentValidation =
-        validateAdvantageParentRelations(
+        validateAdvantageRelations(
           draft.advantages,
           characterAdvantageDefinitions,
         )
