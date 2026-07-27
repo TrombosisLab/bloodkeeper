@@ -143,6 +143,74 @@ export function AdvantageInstanceDetailsEditor({
   }
 
 
+  if (
+    details.kind === 'contact'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Contacto
+        </h5>
+
+        <label>
+          Identidad
+
+          <input
+            value={
+              details.identity ?? ''
+            }
+            onChange={
+              (event) =>
+                onChange({
+                  ...selection,
+                  details: {
+                    kind: 'contact',
+                    identity:
+                      event.target.value,
+                  },
+                })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  if (
+    details.kind === 'retainer'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Criado
+        </h5>
+
+        <label>
+          Identidad
+
+          <input
+            value={
+              details.identity ?? ''
+            }
+            onChange={
+              (event) =>
+                onChange({
+                  ...selection,
+                  details: {
+                    kind: 'retainer',
+                    identity:
+                      event.target.value,
+                  },
+                })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
   return (
     <p className="advantage-catalog-card__pending">
       Editor específico pendiente.
