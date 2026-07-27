@@ -7,6 +7,10 @@ import {
 } from '../domain/advantage-rules'
 
 import {
+  canShowAdvantageDefinition,
+} from '../domain/advantage-visibility-rules'
+
+import {
   createInitialAdvantageInstanceDetails,
 } from '../domain/advantage-instance-details-rules'
 
@@ -362,7 +366,11 @@ export function AdvantagesStep({
             characterAdvantageDefinitions.filter(
               (definition) =>
                 definition.category ===
-                category,
+                  category &&
+                canShowAdvantageDefinition(
+                  definition,
+                  value,
+                ),
             )
 
           return (
