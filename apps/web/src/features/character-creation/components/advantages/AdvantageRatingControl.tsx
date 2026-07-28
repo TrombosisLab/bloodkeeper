@@ -5,6 +5,8 @@ interface AdvantageRatingControlProps {
 
   max: number
 
+  fixedRating?: boolean
+
   onChange: (
     value: number,
   ) => void
@@ -17,6 +19,7 @@ export function AdvantageRatingControl({
   value,
   min,
   max,
+  fixedRating,
   onChange,
   onRemove,
 }: AdvantageRatingControlProps) {
@@ -72,7 +75,10 @@ export function AdvantageRatingControl({
       <button
         type="button"
         aria-label="Aumentar nivel"
-        disabled={value >= max}
+        disabled={
+          !fixedRating &&
+          value >= max
+        }
         onClick={() =>
           onChange(
             Math.min(

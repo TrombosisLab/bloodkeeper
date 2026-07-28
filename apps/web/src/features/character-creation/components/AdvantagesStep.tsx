@@ -885,7 +885,14 @@ export function AdvantagesStep({
                               if (!selected) {
                                 return (
                                   <AdvantageRatingControl
-                                    value={0}
+                                    value={
+                                      definition.allowedRatings.length === 1
+                                        ? definition.allowedRatings[0]
+                                        : 0
+                                    }
+                                    fixedRating={
+                                      definition.allowedRatings.length === 1
+                                    }
                                     min={0}
                                     max={
                                       definition.allowedRatings[
@@ -897,7 +904,9 @@ export function AdvantagesStep({
                                     ) =>
                                       addSelection(
                                         definition,
-                                        rating,
+                                        definition.allowedRatings.length === 1
+                                          ? definition.allowedRatings[0]
+                                          : rating,
                                       )
                                     }
                                   />
