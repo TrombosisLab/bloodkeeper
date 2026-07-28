@@ -516,6 +516,96 @@ export function AdvantagesStep({
                               Configurar
                             </button>
                           ) : definition.instanceDetailsKind ===
+                            'contact' ? (
+                            (() => {
+                              const selected =
+                                selections[0]
+
+                              if (!selected) {
+                                return (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      addSelection(
+                                        definition,
+                                        1,
+                                      )
+                                    }
+                                  >
+                                    Configurar
+                                  </button>
+                                )
+                              }
+
+                              return (
+                                <AdvantageRatingControl
+                                  value={
+                                    selected.rating
+                                  }
+                                  min={1}
+                                  max={5}
+                                  onChange={(
+                                    rating,
+                                  ) =>
+                                    updateSelectionRating(
+                                      selected.selectionId,
+                                      rating,
+                                    )
+                                  }
+                                  onRemove={() =>
+                                    removeSelection(
+                                      selected.selectionId,
+                                    )
+                                  }
+                                />
+                              )
+                            })()
+                          ) : definition.instanceDetailsKind ===
+                            'retainer' ? (
+                            (() => {
+                              const selected =
+                                selections[0]
+
+                              if (!selected) {
+                                return (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      addSelection(
+                                        definition,
+                                        1,
+                                      )
+                                    }
+                                  >
+                                    Configurar
+                                  </button>
+                                )
+                              }
+
+                              return (
+                                <AdvantageRatingControl
+                                  value={
+                                    selected.rating
+                                  }
+                                  min={1}
+                                  max={3}
+                                  onChange={(
+                                    rating,
+                                  ) =>
+                                    updateSelectionRating(
+                                      selected.selectionId,
+                                      rating,
+                                    )
+                                  }
+                                  onRemove={() =>
+                                    removeSelection(
+                                      selected.selectionId,
+                                    )
+                                  }
+                                />
+                              )
+                            })()
+                          ) : definition.instanceDetailsKind ===
                             'haven' ? (
                             (() => {
                               const selected =
