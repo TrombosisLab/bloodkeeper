@@ -142,6 +142,7 @@ test(
   },
 )
 
+
 test(
   'Contactos usa puntuaciones 1 a 3',
   () => {
@@ -922,7 +923,7 @@ test(
 
     assert.equal(
       definition.allowMultiple,
-      true,
+      false,
     )
 
     assert.equal(
@@ -1058,6 +1059,8 @@ test(
                   'mask',
                 identity:
                   'Identidad alternativa',
+                benefits:
+                  [],
               },
             },
           ],
@@ -1073,54 +1076,18 @@ test(
 )
 
 test(
-  'Máscara admite múltiples identidades independientes',
+  'Máscara no admite múltiples identidades independientes',
   () => {
-    const result =
-      validateCharacterAdvantageSelectionsAgainstDefinitions(
-        {
-          selections: [
-            {
-              selectionId:
-                'mask-one',
-              definitionKey:
-                'mask',
-              category:
-                'background',
-              rating: 1,
-              origin:
-                'creation',
-              details: {
-                kind:
-                  'mask',
-                identity:
-                  'Identidad uno',
-              },
-            },
-            {
-              selectionId:
-                'mask-two',
-              definitionKey:
-                'mask',
-              category:
-                'background',
-              rating: 2,
-              origin:
-                'creation',
-              details: {
-                kind:
-                  'mask',
-                identity:
-                  'Identidad dos',
-              },
-            },
-          ],
-        },
-        characterAdvantageDefinitions,
+    const definition =
+      getCharacterAdvantageDefinition(
+        'mask',
       )
 
+    assert.ok(definition)
+
     assert.equal(
-      result.valid,
-      true,
+      definition.allowMultiple,
+      false,
     )
   },
 )

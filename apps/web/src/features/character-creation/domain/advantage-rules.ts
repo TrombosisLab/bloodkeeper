@@ -6,6 +6,20 @@ import type {
 export const INITIAL_ADVANTAGE_POINTS = 7
 export const INITIAL_FLAW_POINTS = 2
 
+function getMaskBenefitsCost(
+  selection: CharacterAdvantageSelectionDraft,
+): number {
+  if (
+    selection.details?.kind !== 'mask'
+  ) {
+    return 0
+  }
+
+  return (
+    selection.details.benefits?.length ?? 0
+  )
+}
+
 export interface CharacterAdvantagesBudget {
   advantagePoints: number
   flawPoints: number
@@ -48,7 +62,11 @@ export function getCharacterAdvantagesBudget(
       selection.category === 'merit' ||
       selection.category === 'background'
     ) {
-      advantagePoints += selection.rating
+      advantagePoints +=
+        selection.rating +
+        getMaskBenefitsCost(
+          selection,
+        )
     }
 
     if (selection.category === 'flaw') {

@@ -61,6 +61,7 @@ export function createInitialAdvantageInstanceDetails(
     case 'mask':
       return {
         kind: 'mask',
+        benefits: [],
       }
 
     case 'mawla':

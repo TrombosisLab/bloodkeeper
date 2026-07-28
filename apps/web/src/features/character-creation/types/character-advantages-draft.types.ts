@@ -60,9 +60,14 @@ export interface InfluenceAdvantageDetails {
   sphere?: string
 }
 
+export type MaskBenefitKey =
+  | 'erased'
+  | 'tailor'
+
 export interface MaskAdvantageDetails {
   kind: 'mask'
   identity?: string
+  benefits: MaskBenefitKey[]
 }
 
 export interface MawlaAdvantageDetails {

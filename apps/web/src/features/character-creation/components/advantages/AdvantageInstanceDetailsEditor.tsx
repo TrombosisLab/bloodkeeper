@@ -1,5 +1,6 @@
 import type {
   CharacterAdvantageSelectionDraft,
+  MaskAdvantageDetails,
 } from '../../types/character-advantages-draft.types'
 
 
@@ -206,6 +207,118 @@ export function AdvantageInstanceDetailsEditor({
             }
           />
         </label>
+      </div>
+    )
+  }
+
+
+  if (
+    details.kind === 'mask'
+  ) {
+    const maskDetails =
+      details as import('../../types/character-advantages-draft.types').MaskAdvantageDetails
+
+    function updateMask(
+      changes: Partial<
+        import('../../types/character-advantages-draft.types').MaskAdvantageDetails
+      >,
+    ) {
+      onChange({
+        ...selection,
+        details: {
+          ...maskDetails,
+          ...changes,
+          kind: 'mask',
+        },
+      })
+    }
+
+    function toggleBenefit(
+      benefit:
+        | 'erased'
+        | 'tailor',
+    ) {
+      const benefits =
+        maskDetails.benefits ?? []
+
+      updateMask({
+        benefits:
+          benefits.includes(benefit)
+            ? benefits.filter(
+                (item) =>
+                  item !== benefit,
+              )
+            : [
+                ...benefits,
+                benefit,
+              ],
+      })
+    }
+
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Máscara
+        </h5>
+
+        <label>
+          Identidad
+
+          <input
+            value={
+              maskDetails.identity ?? ''
+            }
+            onChange={
+              (event) =>
+                updateMask({
+                  identity:
+                    event.target.value,
+                })
+            }
+          />
+        </label>
+
+        {selection.rating >= 2 && (
+          <div>
+            <h6>
+              Beneficios de Máscara
+            </h6>
+
+            <label>
+              <input
+                type="checkbox"
+                checked={
+                  maskDetails.benefits.includes(
+                    'erased',
+                  )
+                }
+                onChange={() =>
+                  toggleBenefit(
+                    'erased',
+                  )
+                }
+              />
+              Borrado
+            </label>
+
+            <label>
+              <input
+                type="checkbox"
+                checked={
+                  maskDetails.benefits.includes(
+                    'tailor',
+                  )
+                }
+                onChange={() =>
+                  toggleBenefit(
+                    'tailor',
+                  )
+                }
+              />
+              Curtidor
+            </label>
+          </div>
+        )}
       </div>
     )
   }

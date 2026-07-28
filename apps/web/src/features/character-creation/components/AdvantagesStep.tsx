@@ -606,6 +606,192 @@ export function AdvantagesStep({
                               )
                             })()
                           ) : definition.instanceDetailsKind ===
+                            'herd' ? (
+                            (() => {
+                              return (
+                                <div className="advantage-instance-rating-list">
+                                  {selections.map(
+                                    (selection) => (
+                                      <AdvantageRatingControl
+                                        key={
+                                          selection.selectionId
+                                        }
+                                        value={
+                                          selection.rating
+                                        }
+                                        min={1}
+                                        max={5}
+                                        onChange={(
+                                          rating,
+                                        ) =>
+                                          updateSelectionRating(
+                                            selection.selectionId,
+                                            rating,
+                                          )
+                                        }
+                                        onRemove={() =>
+                                          removeSelection(
+                                            selection.selectionId,
+                                          )
+                                        }
+                                      />
+                                    ),
+                                  )}
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      addSelection(
+                                        definition,
+                                        1,
+                                      )
+                                    }
+                                  >
+                                    Añadir Rebaño
+                                  </button>
+                                </div>
+                              )
+                            })()
+                          ) : definition.instanceDetailsKind ===
+                            'resources' ? (
+                            (() => {
+                              return (
+                                <div className="advantage-instance-rating-list">
+                                  {selections.map(
+                                    (selection) => (
+                                      <AdvantageRatingControl
+                                        key={
+                                          selection.selectionId
+                                        }
+                                        value={
+                                          selection.rating
+                                        }
+                                        min={1}
+                                        max={5}
+                                        onChange={(
+                                          rating,
+                                        ) =>
+                                          updateSelectionRating(
+                                            selection.selectionId,
+                                            rating,
+                                          )
+                                        }
+                                        onRemove={() =>
+                                          removeSelection(
+                                            selection.selectionId,
+                                          )
+                                        }
+                                      />
+                                    ),
+                                  )}
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      addSelection(
+                                        definition,
+                                        1,
+                                      )
+                                    }
+                                  >
+                                    Añadir Recursos
+                                  </button>
+                                </div>
+                              )
+                            })()
+                          ) : definition.instanceDetailsKind ===
+                            'status' ? (
+                            (() => {
+                              return (
+                                <div className="advantage-instance-rating-list">
+                                  {selections.map(
+                                    (selection) => (
+                                      <AdvantageRatingControl
+                                        key={
+                                          selection.selectionId
+                                        }
+                                        value={
+                                          selection.rating
+                                        }
+                                        min={1}
+                                        max={5}
+                                        onChange={(
+                                          rating,
+                                        ) =>
+                                          updateSelectionRating(
+                                            selection.selectionId,
+                                            rating,
+                                          )
+                                        }
+                                        onRemove={() =>
+                                          removeSelection(
+                                            selection.selectionId,
+                                          )
+                                        }
+                                      />
+                                    ),
+                                  )}
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      addSelection(
+                                        definition,
+                                        1,
+                                      )
+                                    }
+                                  >
+                                    Añadir Estatus
+                                  </button>
+                                </div>
+                              )
+                            })()
+                          ) : definition.instanceDetailsKind ===
+                            'mask' ? (
+                            (() => {
+                              const selected =
+                                selections[0]
+
+                              if (!selected) {
+                                return (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      addSelection(
+                                        definition,
+                                        1,
+                                      )
+                                    }
+                                  >
+                                    Configurar
+                                  </button>
+                                )
+                              }
+
+                              return (
+                                <AdvantageRatingControl
+                                  value={
+                                    selected.rating
+                                  }
+                                  min={1}
+                                  max={2}
+                                  onChange={(
+                                    rating,
+                                  ) =>
+                                    updateSelectionRating(
+                                      selected.selectionId,
+                                      rating,
+                                    )
+                                  }
+                                  onRemove={() =>
+                                    removeSelection(
+                                      selected.selectionId,
+                                    )
+                                  }
+                                />
+                              )
+                            })()
+                          ) : definition.instanceDetailsKind ===
                             'haven' ? (
                             (() => {
                               const selected =

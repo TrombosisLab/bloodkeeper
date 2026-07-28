@@ -70,6 +70,10 @@ export interface CharacterMaskInstanceData
   extends CharacterAdvantageNarrativeFields {
   kind: 'mask'
   identityName?: string
+  benefits: (
+    | 'erased'
+    | 'tailor'
+  )[]
 }
 
 export interface CharacterMawlaInstanceData

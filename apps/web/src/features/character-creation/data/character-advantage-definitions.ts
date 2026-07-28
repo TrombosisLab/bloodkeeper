@@ -117,7 +117,7 @@ export const characterAdvantageDefinitions:
         2,
       ],
       source: 'core',
-      allowMultiple: true,
+      allowMultiple: false,
       requiresInstanceDetails: true,
       instanceDetailsKind: 'mask',
     },
