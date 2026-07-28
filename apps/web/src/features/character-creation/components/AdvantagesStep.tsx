@@ -460,7 +460,11 @@ export function AdvantagesStep({
                 </strong>
               </header>
 
-              <div className="advantages-catalog-grid">
+              <div
+              className={
+                "advantages-catalog-grid advantages-catalog-grid--merit"
+              }
+            >
                 {definitions.map(
                   (definition) => {
                     const selections =
@@ -484,8 +488,8 @@ export function AdvantagesStep({
                         }
                         className={
                           alreadySelected
-                            ? 'advantage-catalog-card advantage-catalog-card--selected'
-                            : 'advantage-catalog-card'
+                            ? 'advantage-sheet-entry advantage-sheet-entry--selected'
+                            : 'advantage-sheet-entry'
                         }
                       >
                         <header>
@@ -874,30 +878,61 @@ export function AdvantagesStep({
                               )
                             })()
                           ) : (
-                            definition.allowedRatings.map(
-                              (rating) => (
-                                <button
-                                  key={
-                                    rating
+                            (() => {
+                              const selected =
+                                selections[0]
+
+                              if (!selected) {
+                                return (
+                                  <AdvantageRatingControl
+                                    value={0}
+                                    min={0}
+                                    max={
+                                      definition.allowedRatings[
+                                        definition.allowedRatings.length - 1
+                                      ]
+                                    }
+                                    onChange={(
+                                      rating,
+                                    ) =>
+                                      addSelection(
+                                        definition,
+                                        rating,
+                                      )
+                                    }
+                                  />
+                                )
+                              }
+
+                              return (
+                                <AdvantageRatingControl
+                                  value={
+                                    selected.rating
                                   }
-                                  type="button"
-                                  disabled={
-                                    (
-                                      !definition.allowMultiple &&
-                                      alreadySelected
-                                    )
+                                  min={
+                                    definition.allowedRatings[0]
                                   }
-                                  onClick={() =>
-                                    addSelection(
-                                      definition,
+                                  max={
+                                    definition.allowedRatings[
+                                      definition.allowedRatings.length - 1
+                                    ]
+                                  }
+                                  onChange={(
+                                    rating,
+                                  ) =>
+                                    updateSelectionRating(
+                                      selected.selectionId,
                                       rating,
                                     )
                                   }
-                                >
-                                  {rating}
-                                </button>
-                              ),
-                            )
+                                  onRemove={() =>
+                                    removeSelection(
+                                      selected.selectionId,
+                                    )
+                                  }
+                                />
+                              )
+                            })()
                           )}
                         </div>
 
@@ -968,7 +1003,11 @@ export function AdvantagesStep({
               </div>
             </header>
 
-            <div className="advantages-catalog-grid">
+            <div
+              className={
+                "advantages-catalog-grid advantages-catalog-grid--merit"
+              }
+            >
               {value.selections
                 .filter(
                   (selection) =>
@@ -1089,7 +1128,11 @@ export function AdvantagesStep({
                 </div>
               </header>
 
-              <div className="advantages-catalog-grid">
+              <div
+              className={
+                "advantages-catalog-grid advantages-catalog-grid--flaw"
+              }
+            >
                 {value.selections
                   .filter(
                     (selection) =>
