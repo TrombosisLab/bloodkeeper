@@ -199,13 +199,13 @@ test(
 )
 
 test(
-  'Embrujado es escalable',
+  'Embrujado usa un único punto',
   () => {
     assert.deepEqual(
       getCharacterAdvantageDefinition(
         'haven-haunted',
       )?.allowedRatings,
-      [1, 2, 3, 4, 5],
+      [1],
     )
   },
 )

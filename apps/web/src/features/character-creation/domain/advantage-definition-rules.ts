@@ -722,7 +722,7 @@ export function validateCharacterAdvantageSelectionsAgainstDefinitions(
     )
 
     if (
-      definition.requiresParentSelection &&
+      definition.requiresParentSelection === true &&
       !selection.parentSelectionId
     ) {
       errors.push(

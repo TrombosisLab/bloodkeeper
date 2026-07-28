@@ -2742,9 +2742,14 @@
   border-radius: 50%;
   border: 1px solid var(--color-border);
   background: transparent;
+  color: var(--color-text);
   cursor: pointer;
   padding: 0;
   line-height: 1;
+}
+
+.advantage-rating-control button:hover:not(:disabled) {
+  border-color: var(--color-text);
 }
 
 .advantage-rating-control button:disabled {

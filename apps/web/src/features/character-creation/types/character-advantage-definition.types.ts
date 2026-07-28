@@ -116,6 +116,12 @@ export interface CharacterAdvantageDefinition {
    */
   requiresParentSelection?: boolean
 
+  /**
+   * Permite vincular opcionalmente esta ventaja
+   * a una selección padre compatible.
+   */
+  allowsOptionalParentSelection?: boolean
+
   /*
    * Limita qué definiciones pueden actuar como padre.
    */

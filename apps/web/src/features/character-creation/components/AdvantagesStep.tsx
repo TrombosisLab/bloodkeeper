@@ -128,10 +128,25 @@ function getChildAdvantageDefinitions(
 ) {
   return characterAdvantageDefinitions.filter(
     (definition) =>
-      definition.requiresParentSelection === true &&
+      (
+        definition.requiresParentSelection === true ||
+        definition.allowsOptionalParentSelection === true
+      ) &&
       definition.allowedParentDefinitionKeys?.includes(
         parentDefinitionKey,
       ),
+  )
+}
+
+function getChildAdvantageDefinitionsByCategory(
+  parentDefinitionKey: string,
+  category: 'merit' | 'flaw',
+) {
+  return getChildAdvantageDefinitions(
+    parentDefinitionKey,
+  ).filter(
+    (definition) =>
+      definition.category === category,
   )
 }
 
@@ -410,7 +425,10 @@ export function AdvantagesStep({
               (definition) =>
                 definition.category ===
                   category &&
-                definition.requiresParentSelection !== true &&
+                (
+                  definition.requiresParentSelection !== true ||
+                  definition.allowsOptionalParentSelection === true
+                ) &&
                 canShowAdvantageDefinition(
                   definition,
                   value,
@@ -501,20 +519,39 @@ export function AdvantagesStep({
                         <div className="advantage-catalog-card__ratings">
                           {definition.instanceDetailsKind ===
                             'allies' ? (
-                            <button
-                              type="button"
-                              disabled={
-                                alreadySelected
-                              }
-                              onClick={() =>
-                                addSelection(
-                                  definition,
-                                  0,
+                            (() => {
+                              const selected =
+                                selections[0]
+
+                              if (!selected) {
+                                return (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      addSelection(
+                                        definition,
+                                        0,
+                                      )
+                                    }
+                                  >
+                                    Configurar
+                                  </button>
                                 )
                               }
-                            >
-                              Configurar
-                            </button>
+
+                              return (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    removeSelection(
+                                      selected.selectionId,
+                                    )
+                                  }
+                                >
+                                  Quitar
+                                </button>
+                              )
+                            })()
                           ) : definition.instanceDetailsKind ===
                             'contact' ? (
                             (() => {
@@ -939,8 +976,9 @@ export function AdvantagesStep({
                 )
                 .flatMap(
                   (haven) =>
-                    getChildAdvantageDefinitions(
+                    getChildAdvantageDefinitionsByCategory(
                       'haven',
+                        'merit',
                     ).map(
                       (definition) => (
                         <article
@@ -1029,6 +1067,108 @@ export function AdvantagesStep({
             </div>
           </section>
         )}
+
+        {value.selections
+          .filter(
+            (selection) =>
+              selection.definitionKey === 'haven',
+          )
+          .length > 0 && (
+            <section
+              className="advantages-category"
+            >
+              <header className="advantages-category__heading">
+                <div>
+                  <span>
+                    Catálogo CORE
+                  </span>
+
+                  <h3>
+                    Defectos de Refugio
+                  </h3>
+                </div>
+              </header>
+
+              <div className="advantages-catalog-grid">
+                {value.selections
+                  .filter(
+                    (selection) =>
+                      selection.definitionKey === 'haven',
+                  )
+                  .flatMap(
+                    (haven) =>
+                      getChildAdvantageDefinitionsByCategory(
+                        'haven',
+                        'flaw',
+                      ).map(
+                        (definition) => (
+                          <article
+                            key={
+                              definition.key +
+                              haven.selectionId
+                            }
+                            className="advantage-catalog-card"
+                          >
+                            <h4>
+                              {definition.name}
+                            </h4>
+
+                                                          <div className="advantages-catalog-card__ratings">
+                                {(() => {
+                                  const selected =
+                                    getDefinitionSelections(
+                                      value,
+                                      definition.key,
+                                    ).find(
+                                      (selection) =>
+                                        selection.parentSelectionId ===
+                                        haven.selectionId,
+                                    )
+
+                                  if (!selected) {
+                                    return (
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          addSelection(
+                                            definition,
+                                            definition.allowedRatings[0],
+                                            haven.selectionId,
+                                          )
+                                        }
+                                      >
+                                        Configurar
+                                      </button>
+                                    )
+                                  }
+
+                                  return (
+                                    <AdvantageRatingControl
+                                      value={selected.rating}
+                                      min={1}
+                                      max={definition.allowedRatings[definition.allowedRatings.length - 1]}
+                                      onChange={(rating) =>
+                                        updateSelectionRating(
+                                          selected.selectionId,
+                                          rating,
+                                        )
+                                      }
+                                      onRemove={() =>
+                                        removeSelection(
+                                          selected.selectionId,
+                                        )
+                                      }
+                                    />
+                                  )
+                                })()}
+                              </div>
+                          </article>
+                        ),
+                      ),
+                  )}
+              </div>
+            </section>
+          )}
 
     </div>
   )

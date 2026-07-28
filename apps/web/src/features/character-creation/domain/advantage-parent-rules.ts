@@ -35,7 +35,8 @@ export function validateAdvantageParentRelations(
 
 
     if (
-      definition.requiresParentSelection !== true
+      definition.requiresParentSelection !== true &&
+      definition.allowsOptionalParentSelection !== true
     ) {
       continue
     }
@@ -44,9 +45,13 @@ export function validateAdvantageParentRelations(
     if (
       !selection.parentSelectionId
     ) {
-      errors.push(
-        `${definition.name} necesita una selección padre.`,
-      )
+      if (
+        definition.requiresParentSelection === true
+      ) {
+        errors.push(
+          `${definition.name} necesita una selección padre.`,
+        )
+      }
 
       continue
     }
