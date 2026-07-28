@@ -2982,3 +2982,161 @@
 .thin-blood-validation--invalid {
   font-weight: 500;
 }
+
+
+/*
+ * Ventajas estilo ficha V5
+ * Méritos y Defectos básicos
+ */
+
+.advantage-sheet-entry {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+
+  min-height: 3rem;
+  padding: 0.45rem 0.75rem;
+
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 0.45rem;
+
+  background: rgba(255,255,255,0.025);
+}
+
+
+.advantage-sheet-entry--selected {
+  background: rgba(255,255,255,0.06);
+}
+
+
+.advantage-sheet-entry > header {
+  display: flex;
+  align-items: center;
+}
+
+
+.advantage-sheet-entry h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+
+.advantage-sheet-entry > header span {
+  display: none;
+}
+
+
+.advantage-sheet-entry > header small {
+  display: none;
+}
+
+
+.advantage-sheet-entry .advantage-catalog-card__ratings {
+  justify-content: flex-end;
+}
+
+/* Limpieza visual ficha V5 para méritos y defectos */
+
+.advantage-sheet-entry {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  min-height: 3rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 0.5rem;
+}
+
+
+.advantage-sheet-entry header {
+  display: contents;
+}
+
+
+.advantage-sheet-entry header > div {
+  display: flex;
+  align-items: center;
+}
+
+
+.advantage-sheet-entry header span {
+  display: none;
+}
+
+
+.advantage-sheet-entry header small {
+  display: none;
+}
+
+
+.advantage-sheet-entry h4 {
+  margin: 0;
+}
+
+
+.advantage-sheet-entry .advantage-catalog-card__ratings {
+  grid-column: 2;
+}
+
+/* Advantage rating: mismo estilo visual que habilidades */
+
+.advantage-rating-control {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+
+.advantage-rating-control button {
+  width: 26px;
+  height: 26px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid #523b3f;
+  border-radius: 50%;
+
+  color: #c8bbb5;
+  background: #171214;
+
+  cursor: pointer;
+}
+
+
+.advantage-rating-control button:disabled {
+  opacity: 0.22;
+  cursor: not-allowed;
+}
+
+
+.advantage-rating-control__dots {
+  display: flex;
+  gap: 4px;
+}
+
+
+.advantage-rating-control__dot {
+  width: 10px;
+  height: 10px;
+
+  display: block;
+
+  border: 1px solid #72545a;
+  border-radius: 50%;
+
+  background: transparent;
+}
+
+
+.advantage-rating-control__dot--active {
+  border-color: #b46d76;
+  background: #9d4d58;
+
+  box-shadow:
+    inset 0 0 0 2px #171112;
+}
+

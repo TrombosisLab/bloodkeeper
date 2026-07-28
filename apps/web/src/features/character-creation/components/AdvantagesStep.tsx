@@ -1034,8 +1034,8 @@ export function AdvantagesStep({
                                 selection.parentSelectionId ===
                                 haven.selectionId,
                             )
-                              ? 'advantage-catalog-card advantage-catalog-card--selected'
-                              : 'advantage-catalog-card'
+                              ? 'advantage-sheet-entry advantage-sheet-entry--selected'
+                              : 'advantage-sheet-entry'
                           }
                         >
                           <h4>
@@ -1150,13 +1150,13 @@ export function AdvantagesStep({
                               definition.key +
                               haven.selectionId
                             }
-                            className="advantage-catalog-card"
+                            className="advantage-sheet-entry"
                           >
                             <h4>
                               {definition.name}
                             </h4>
 
-                                                          <div className="advantages-catalog-card__ratings">
+                                                          <div className="advantage-catalog-card__ratings">
                                 {(() => {
                                   const selected =
                                     getDefinitionSelections(

@@ -27,29 +27,34 @@ export function AdvantageRatingControl({
         type="button"
         aria-label="Reducir nivel"
         disabled={
-          value <= min
+          value <= min && !onRemove
         }
-        onClick={() =>
+        onClick={() => {
+          if (
+            value <= min &&
+            onRemove
+          ) {
+            onRemove()
+            return
+          }
+
           onChange(
             Math.max(
               min,
               value - 1,
             ),
           )
-        }
+        }}
       >
         −
       </button>
-
 
       <div
         className="advantage-rating-control__dots"
         aria-label={`Nivel ${value}`}
       >
         {Array.from(
-          {
-            length: max,
-          },
+          { length: max },
           (_, index) => (
             <span
               key={index}
@@ -58,18 +63,16 @@ export function AdvantageRatingControl({
                   ? 'advantage-rating-control__dot advantage-rating-control__dot--active'
                   : 'advantage-rating-control__dot'
               }
+              aria-hidden="true"
             />
           ),
         )}
       </div>
 
-
       <button
         type="button"
         aria-label="Aumentar nivel"
-        disabled={
-          value >= max
-        }
+        disabled={value >= max}
         onClick={() =>
           onChange(
             Math.min(
@@ -81,20 +84,6 @@ export function AdvantageRatingControl({
       >
         +
       </button>
-
-
-      {onRemove && (
-        <button
-          type="button"
-          aria-label="Eliminar selección"
-          className="advantage-rating-control__remove"
-          onClick={
-            onRemove
-          }
-        >
-          ×
-        </button>
-      )}
 
     </div>
   )
