@@ -36,6 +36,7 @@ import { SkillsStep } from './SkillsStep'
 import { BloodStep } from './BloodStep'
 import { DisciplinesStep } from './DisciplinesStep'
 import { AdvantagesStep } from './AdvantagesStep'
+import { HumanityStep } from './HumanityStep'
 
 interface CharacterCreationWizardProps {
   onBackToSheet: () => void
@@ -417,6 +418,23 @@ export function CharacterCreationWizard({
                   (current) => ({
                     ...current,
                     thinBloodAlchemy,
+                  }),
+                )
+              }
+            />
+          ) : currentStepId ===
+            'humanity' ? (
+            <HumanityStep
+              value={
+                draft.humanity
+              }
+              onChange={(
+                humanity,
+              ) =>
+                updateDraft(
+                  (current) => ({
+                    ...current,
+                    humanity,
                   }),
                 )
               }
