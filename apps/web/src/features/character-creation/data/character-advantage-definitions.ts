@@ -474,7 +474,7 @@ export const characterAdvantageDefinitions:
         requiresInstanceDetails: true,
         instanceDetailsKind: 'childOfTheScene',
       },
-
+    
     /*
      * 003-H.3B.6A.2:
      * Méritos y Defectos Core — Consumo de Sustancias.
@@ -517,36 +517,61 @@ export const characterAdvantageDefinitions:
      * Defectos Core — Arcaico.
      * Sólo disponibles para Ancillae o mayores.
      */
-    {
-      key: 'archaic',
-      name: 'Arcaico',
-      category: 'flaw',
-      allowedRatings: [2],
-      source: 'core',
-      sourcePage: 180,
-      allowMultiple: false,
-      requiresInstanceDetails: false,
-      requirements: {
-        minimumAgeCategory: 'ancilla',
+      {
+        key: 'archaic',
+        name: 'Arcaico',
+        category: 'flaw',
+        allowedRatings: [2],
+        source: 'core',
+        sourcePage: 180,
+        allowMultiple: false,
+        requiresInstanceDetails: false,
+        requirements: {
+          minimumAgeCategory: 'ancilla',
+        },
       },
-    },
-    {
-      key: 'living-in-the-past',
-      name: 'Vivir en el Pasado',
-      category: 'flaw',
-      allowedRatings: [1],
-      source: 'core',
-      sourcePage: 180,
-      allowMultiple: false,
-      requiresInstanceDetails: false,
-      requirements: {
-        minimumAgeCategory: 'ancilla',
+      {
+        key: 'living-in-the-past',
+        name: 'Vivir en el Pasado',
+        category: 'flaw',
+        allowedRatings: [1],
+        source: 'core',
+        sourcePage: 180,
+        allowMultiple: false,
+        requiresInstanceDetails: false,
+        requirements: {
+          minimumAgeCategory: 'ancilla',
+        },
       },
-    },
-    /*
-     * 003-H.3B.6A.4A:
-     * Defectos Core — Vínculo.
-     */
+
+      /*
+       * 003-H.3B.6A.X:
+       * Mérito In Memoriam — Custodio de la Historia.
+       *
+       * Disponible únicamente para Ancillae o mayores.
+       */
+      {
+        key: 'custodian-of-history',
+        name: 'Custodio de la Historia',
+        category: 'merit',
+        allowedRatings: [1],
+        source: 'other',
+        allowMultiple: false,
+        requiresInstanceDetails: false,
+
+        requirementRules: [
+          {
+            type: 'generation',
+            max: 11,
+          },
+        ],
+
+      },
+
+      /*
+       * 003-H.3B.6A.4A:
+       * Defectos Core — Vínculo.
+       */
     {
       key: 'bondslave',
       name: 'Esclavo Vinculado',

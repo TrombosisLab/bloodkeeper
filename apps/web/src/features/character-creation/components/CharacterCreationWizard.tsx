@@ -378,6 +378,9 @@ export function CharacterCreationWizard({
               clanKey={
                 draft.identity.clan
               }
+              generation={
+                draft.identity.generation
+              }
               value={
                 draft.advantages
               }

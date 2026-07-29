@@ -51,8 +51,15 @@ import type {
   CharacterThinBloodAlchemyDraft,
 } from '../types/thin-blood-alchemy.types'
 
+    
+import type {
+  CharacterGeneration,
+} from '../types/character-generation.types'
+
 interface AdvantagesStepProps {
   clanKey: ClanKey | null
+
+  generation: CharacterGeneration | null
 
   value: CharacterAdvantagesDraft
 
@@ -152,6 +159,7 @@ function getChildAdvantageDefinitionsByCategory(
 
 export function AdvantagesStep({
   clanKey,
+  generation,
   value,
   onChange,
   thinBloodTraits,
@@ -432,6 +440,10 @@ export function AdvantagesStep({
                 canShowAdvantageDefinition(
                   definition,
                   value,
+                  {
+                    clanKey,
+                    generation,
+                  },
                 ),
             )
 
