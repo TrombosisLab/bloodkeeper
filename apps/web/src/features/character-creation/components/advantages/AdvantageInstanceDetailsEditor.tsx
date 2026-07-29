@@ -518,6 +518,167 @@ export function AdvantageInstanceDetailsEditor({
   }
 
 
+
+  if (
+    details.kind === 'fame'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Fama
+        </h5>
+
+        <label>
+          Ámbito conocido
+
+          <input
+            value={
+              details.sphere ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'fame',
+                  sphere: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  if (
+    details.kind === 'substanceUse'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Consumo
+        </h5>
+
+        <label>
+          Sustancia
+
+          <input
+            value={
+              details.substance ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'substanceUse',
+                  substance: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  if (
+    details.kind === 'preyExclusion'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Exclusión de Presa
+        </h5>
+
+        <label>
+          Presa excluida
+
+          <input
+            value={
+              details.excludedPrey ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'preyExclusion',
+                  excludedPrey: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  if (
+    details.kind === 'folkloricBane'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Plaga Folclórica
+        </h5>
+
+        <label>
+          Fuente
+
+          <input
+            value={
+              details.source ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'folkloricBane',
+                  source: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  if (
+    details.kind === 'folkloricBlock'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Bloqueo Folclórico
+        </h5>
+
+        <label>
+          Tabú
+
+          <input
+            value={
+              details.taboo ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'folkloricBlock',
+                  taboo: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
   return (
     <p className="advantage-catalog-card__pending">
       Editor específico pendiente.

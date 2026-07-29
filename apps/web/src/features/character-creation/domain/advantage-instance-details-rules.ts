@@ -124,6 +124,32 @@ export function createInitialAdvantageInstanceDetails(
         kind: 'childOfTheScene',
       }
 
+
+
+    case 'substanceUse':
+      return {
+        kind: 'substanceUse',
+        substance: '',
+      }
+
+    case 'preyExclusion':
+      return {
+        kind: 'preyExclusion',
+        excludedPrey: '',
+      }
+
+    case 'folkloricBane':
+      return {
+        kind: 'folkloricBane',
+        source: '',
+      }
+
+    case 'folkloricBlock':
+      return {
+        kind: 'folkloricBlock',
+        taboo: '',
+      }
+
     default:
       return undefined
   }
