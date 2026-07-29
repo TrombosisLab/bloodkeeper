@@ -7,6 +7,18 @@ interface AdvantageRatingControlProps {
 
   fixedRating?: boolean
 
+  /*
+   * Valores legales de puntuación.
+   *
+   * Cuando existe, el control no interpreta la puntuación
+   * como un rango continuo, sino como una lista de valores
+   * permitidos.
+   *
+   * Ejemplo:
+   * [2, 4] permite pasar de 2 a 4 sin pasar por 3.
+   */
+  allowedRatings?: readonly number[]
+
   onChange: (
     value: number,
   ) => void
@@ -20,6 +32,7 @@ export function AdvantageRatingControl({
   min,
   max,
   fixedRating,
+  allowedRatings,
   onChange,
   onRemove,
 }: AdvantageRatingControlProps) {
@@ -42,10 +55,17 @@ export function AdvantageRatingControl({
           }
 
           onChange(
-            Math.max(
-              min,
-              value - 1,
-            ),
+            allowedRatings
+              ? allowedRatings[
+                  Math.max(
+                    0,
+                    allowedRatings.indexOf(value) - 1,
+                  )
+                ]
+              : Math.max(
+                  min,
+                  value - 1,
+                ),
           )
         }}
       >
@@ -76,15 +96,24 @@ export function AdvantageRatingControl({
         type="button"
         aria-label="Aumentar nivel"
         disabled={
-          !fixedRating &&
-          value >= max
+          allowedRatings
+            ? value >= allowedRatings[allowedRatings.length - 1]
+            : !fixedRating &&
+              value >= max
         }
         onClick={() =>
           onChange(
-            Math.min(
-              max,
-              value + 1,
-            ),
+            allowedRatings
+              ? allowedRatings[
+                  Math.min(
+                    allowedRatings.length - 1,
+                    allowedRatings.indexOf(value) + 1,
+                  )
+                ]
+              : Math.min(
+                  max,
+                  value + 1,
+                ),
           )
         }
       >

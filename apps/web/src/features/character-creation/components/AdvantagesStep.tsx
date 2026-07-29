@@ -893,6 +893,9 @@ export function AdvantagesStep({
                                     fixedRating={
                                       definition.allowedRatings.length === 1
                                     }
+                                    allowedRatings={
+                                      definition.allowedRatings
+                                    }
                                     min={0}
                                     max={
                                       definition.allowedRatings[
@@ -925,6 +928,9 @@ export function AdvantagesStep({
                                     definition.allowedRatings[
                                       definition.allowedRatings.length - 1
                                     ]
+                                  }
+                                  allowedRatings={
+                                    definition.allowedRatings
                                   }
                                   onChange={(
                                     rating,
@@ -1091,6 +1097,9 @@ export function AdvantagesStep({
                                       definition.allowedRatings.length - 1
                                     ]
                                   }
+                                  allowedRatings={
+                                    definition.allowedRatings
+                                  }
                                   onChange={(
                                     rating,
                                   ) =>
@@ -1199,6 +1208,9 @@ export function AdvantagesStep({
                                       value={selected.rating}
                                       min={1}
                                       max={definition.allowedRatings[definition.allowedRatings.length - 1]}
+                                      allowedRatings={
+                                        definition.allowedRatings
+                                      }
                                       onChange={(rating) =>
                                         updateSelectionRating(
                                           selected.selectionId,
