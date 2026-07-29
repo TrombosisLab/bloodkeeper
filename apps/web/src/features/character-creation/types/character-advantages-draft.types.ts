@@ -155,6 +155,56 @@ export interface LoresheetAdvantageDetails {
   benefitKey: string
 }
 
+
+/*
+ * Lingüística.
+ *
+ * Guarda los idiomas concretos asociados al personaje.
+ * Se mantiene como lista abierta de texto para no acoplar
+ * todavía el sistema a un catálogo cerrado de idiomas.
+ */
+export interface LinguisticsAdvantageDetails {
+  kind: 'linguistics'
+
+  languages: string[]
+}
+
+/*
+ * Semblante de Matusalén.
+ *
+ * Permite registrar la identidad o persona en la que se basa
+ * el parecido del personaje.
+ */
+export interface MethuselahVisageAdvantageDetails {
+  kind: 'methuselahVisage'
+
+  resembles?: string
+}
+
+/*
+ * Cara Famosa.
+ *
+ * Guarda la identidad por la que el personaje es reconocido
+ * públicamente o dentro de determinados círculos.
+ */
+export interface FamousFaceAdvantageDetails {
+  kind: 'famousFace'
+
+  identity?: string
+}
+
+/*
+ * Niño de la Escena.
+ *
+ * Guarda la subcultura o escena social con la que el personaje
+ * está relacionado.
+ */
+export interface ChildOfTheSceneAdvantageDetails {
+  kind: 'childOfTheScene'
+
+  subculture?: string
+}
+
 export type CharacterAdvantageInstanceDetails =
   | AlliesAdvantageDetails
   | ContactAdvantageDetails
@@ -172,6 +222,10 @@ export type CharacterAdvantageInstanceDetails =
   | FolkloricBaneAdvantageDetails
   | FolkloricBlockAdvantageDetails
   | LoresheetAdvantageDetails
+  | LinguisticsAdvantageDetails
+  | MethuselahVisageAdvantageDetails
+  | FamousFaceAdvantageDetails
+  | ChildOfTheSceneAdvantageDetails
 
 export interface CharacterAdvantageSelectionDraft {
   /*

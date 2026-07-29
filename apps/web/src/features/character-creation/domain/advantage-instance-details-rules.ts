@@ -7,6 +7,14 @@ import type {
 } from '../types/character-advantages-draft.types'
 
 
+/*
+ * Crea la configuración inicial de una ventaja que necesita
+ * datos adicionales propios de la instancia.
+ *
+ * Cada nuevo instanceDetailsKind debe definir aquí su estado
+ * inicial para garantizar que la selección nace con una
+ * estructura válida antes de abrir el editor correspondiente.
+ */
 export function createInitialAdvantageInstanceDetails(
   definition: CharacterAdvantageDefinition,
 ):
@@ -77,6 +85,43 @@ export function createInitialAdvantageInstanceDetails(
     case 'resources':
       return {
         kind: 'resources',
+      }
+
+    /*
+     * Lingüística necesita conservar la lista
+     * de idiomas escogidos por el personaje.
+     */
+    case 'linguistics':
+      return {
+        kind: 'linguistics',
+        languages: [],
+      }
+
+    /*
+     * Semblante de Matusalén guarda la identidad
+     * de la persona o figura a la que se parece.
+     */
+    case 'methuselahVisage':
+      return {
+        kind: 'methuselahVisage',
+      }
+
+    /*
+     * Cara Famosa guarda la identidad asociada
+     * al reconocimiento público del personaje.
+     */
+    case 'famousFace':
+      return {
+        kind: 'famousFace',
+      }
+
+    /*
+     * Niño de la Escena guarda la subcultura
+     * o escena social asociada.
+     */
+    case 'childOfTheScene':
+      return {
+        kind: 'childOfTheScene',
       }
 
     default:

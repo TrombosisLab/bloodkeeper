@@ -2,21 +2,41 @@ import type {
   CharacterAdvantageCategory,
   CharacterAdvantageSelectionOrigin,
 } from './character-advantages-draft.types'
+
 import type {
   CharacterAdvantageRequirement,
 } from './character-advantage-requirements.types'
 
+/*
+ * Fuente normativa de la ventaja.
+ *
+ * Permite identificar el origen del contenido para poder
+ * ampliar el catálogo con suplementos u otras fuentes
+ * sin mezclar reglas de procedencia distinta.
+ */
 export type CharacterAdvantageSource =
   | 'core'
   | 'playersGuide'
   | 'bloodSigils'
   | 'other'
 
+/*
+ * Tipo de personaje al que puede aplicarse una ventaja.
+ *
+ * Permite restringir ventajas concretas según la naturaleza
+ * del personaje.
+ */
 export type CharacterAdvantageCharacterKind =
   | 'standard'
   | 'caitiff'
   | 'thinBlood'
 
+/*
+ * Categoría narrativa de edad vampírica.
+ *
+ * No representa generación.
+ * Edad y generación son conceptos separados dentro del dominio.
+ */
 export type CharacterAdvantageAgeCategory =
   | 'neonate'
   | 'ancilla'
@@ -37,9 +57,35 @@ export interface CharacterAdvantageRequirements {
   minimumAgeCategory?: CharacterAdvantageAgeCategory
 }
 
+/*
+ * Definición estática de una ventaja disponible en el catálogo.
+ *
+ * Representa la opción que puede escoger un personaje.
+ * No representa una elección concreta realizada por un jugador.
+ *
+ * Las elecciones reales se almacenan mediante
+ * CharacterAdvantageSelectionDraft.
+ */
 export interface CharacterAdvantageDefinition {
+  /*
+   * Identificador estable interno.
+   *
+   * No debe depender del texto mostrado al usuario,
+   * ya que puede cambiar la traducción o presentación.
+   */
   key: string
+
+  /*
+   * Nombre visible de la ventaja.
+   */
   name: string
+
+  /*
+   * Categoría de la ventaja:
+   * - mérito
+   * - defecto
+   * - trasfondo
+   */
   category: CharacterAdvantageCategory
 
   /*
@@ -76,7 +122,7 @@ export interface CharacterAdvantageDefinition {
    * Indica que la selección necesitará configuración propia
    * por instancia en una fase posterior.
    *
-   * Ejemplos futuros:
+   * Ejemplos:
    * - identidad/nombre del contacto
    * - descripción de un aliado
    * - datos concretos de un refugio
@@ -88,6 +134,9 @@ export interface CharacterAdvantageDefinition {
   /*
    * Si existe, indica qué configuración tipada debe usar
    * cada instancia de esta definición.
+   *
+   * Este listado crece de forma explícita cuando una nueva
+   * familia de ventajas necesita datos propios.
    */
   instanceDetailsKind?:
     | 'allies'
@@ -106,6 +155,10 @@ export interface CharacterAdvantageDefinition {
     | 'folkloricBane'
     | 'folkloricBlock'
     | 'loresheet'
+    | 'linguistics'
+    | 'methuselahVisage'
+    | 'famousFace'
+    | 'childOfTheScene'
 
   /*
    * Una definición asociada necesita estar vinculada a
@@ -150,8 +203,10 @@ export interface CharacterAdvantageDefinition {
   /*
    * Requisitos modernos evaluados por advantage-requirement-engine.
    *
-   * Conviven temporalmente con requirements para permitir una
-   * migración gradual del catálogo sin romper definiciones existentes.
+   * Permite reglas como:
+   * - generación máxima
+   * - humanidad mínima
+   * - clan requerido
    */
   requirementRules?: readonly CharacterAdvantageRequirement[]
 
@@ -160,5 +215,11 @@ export interface CharacterAdvantageDefinition {
    */
   requirements?: CharacterAdvantageRequirements
 
+  /*
+   * Lista de ventajas incompatibles con esta definición.
+   *
+   * Permite impedir combinaciones contradictorias
+   * dentro del mismo personaje.
+   */
   incompatibleDefinitionKeys?: string[]
 }

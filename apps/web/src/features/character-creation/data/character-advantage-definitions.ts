@@ -363,7 +363,8 @@ export const characterAdvantageDefinitions:
       source: 'core',
       sourcePage: 179,
       allowMultiple: false,
-      requiresInstanceDetails: false,
+      requiresInstanceDetails: true,
+      instanceDetailsKind: 'linguistics',
     },
     {
       key: 'illiterate',
@@ -423,7 +424,8 @@ export const characterAdvantageDefinitions:
         allowedRatings: [1, 2],
         source: 'core',
         allowMultiple: false,
-        requiresInstanceDetails: false,
+        requiresInstanceDetails: true,
+        instanceDetailsKind: 'methuselahVisage',
       },
       {
         key: 'famous-face',
@@ -432,7 +434,8 @@ export const characterAdvantageDefinitions:
         allowedRatings: [1],
         source: 'core',
         allowMultiple: false,
-        requiresInstanceDetails: false,
+        requiresInstanceDetails: true,
+        instanceDetailsKind: 'famousFace',
       },
       {
         key: 'innocent-face',
@@ -468,7 +471,8 @@ export const characterAdvantageDefinitions:
         allowedRatings: [1],
         source: 'core',
         allowMultiple: false,
-        requiresInstanceDetails: false,
+        requiresInstanceDetails: true,
+        instanceDetailsKind: 'childOfTheScene',
       },
 
     /*

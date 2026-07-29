@@ -13,6 +13,16 @@ interface AdvantageInstanceDetailsEditorProps {
 }
 
 
+/*
+ * Editor de configuración específica de una ventaja.
+ *
+ * Cada instanceDetailsKind con información propia implementa
+ * aquí su edición visual.
+ *
+ * La puntuación de la ventaja permanece separada de estos datos:
+ * este componente solo modifica la configuración adicional
+ * de la instancia seleccionada.
+ */
 export function AdvantageInstanceDetailsEditor({
   selection,
   onChange,
@@ -357,6 +367,164 @@ export function AdvantageInstanceDetailsEditor({
         <small>
           Nivel de Refugio: {selection.rating}
         </small>
+      </div>
+    )
+  }
+
+
+
+  /*
+   * Lingüística.
+   *
+   * Guarda los idiomas concretos asociados al personaje.
+   */
+  if (
+    details.kind === 'linguistics'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Lingüística
+        </h5>
+
+        <label>
+          Idiomas
+
+          <input
+            value={
+              details.languages.join(', ')
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'linguistics',
+                  languages:
+                    event.target.value
+                      .split(',')
+                      .map(
+                        (value) => value.trim(),
+                      )
+                      .filter(Boolean),
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  /*
+   * Semblante de Matusalén.
+   *
+   * Guarda la identidad de la figura
+   * a la que se parece el personaje.
+   */
+  if (
+    details.kind === 'methuselahVisage'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Semblante de Matusalén
+        </h5>
+
+        <label>
+          Se parece a
+
+          <input
+            value={
+              details.resembles ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'methuselahVisage',
+                  resembles: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  /*
+   * Cara Famosa.
+   *
+   * Guarda la identidad por la que el personaje
+   * es reconocido.
+   */
+  if (
+    details.kind === 'famousFace'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Cara Famosa
+        </h5>
+
+        <label>
+          Identidad conocida
+
+          <input
+            value={
+              details.identity ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'famousFace',
+                  identity: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  /*
+   * Niño de la Escena.
+   *
+   * Guarda la subcultura o escena social
+   * asociada al personaje.
+   */
+  if (
+    details.kind === 'childOfTheScene'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Niño de la Escena
+        </h5>
+
+        <label>
+          Subcultura
+
+          <input
+            value={
+              details.subculture ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'childOfTheScene',
+                  subculture: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
       </div>
     )
   }
