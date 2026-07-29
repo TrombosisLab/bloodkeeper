@@ -4,6 +4,11 @@ import type {
 } from '../../types/character-advantages-draft.types'
 
 
+import {
+  AdvantageRatingControl,
+} from './AdvantageRatingControl'
+
+
 interface AdvantageInstanceDetailsEditorProps {
   selection: CharacterAdvantageSelectionDraft
 
@@ -74,27 +79,19 @@ export function AdvantageInstanceDetailsEditor({
             Efectividad
           </span>
 
-          <div>
-            {[1,2,3,4].map(
-              (value) => (
-                <button
-                  key={value}
-                  type="button"
-                  aria-pressed={
-                    details.effectiveness === value
-                  }
-                  onClick={() =>
-                    update(
-                      value,
-                      details.reliability,
-                    )
-                  }
-                >
-                  {value}
-                </button>
-              ),
-            )}
-          </div>
+          <AdvantageRatingControl
+            value={
+              details.effectiveness
+            }
+            min={0}
+            max={4}
+            onChange={(value) =>
+              update(
+                value,
+                details.reliability,
+              )
+            }
+          />
         </div>
 
 
@@ -103,33 +100,24 @@ export function AdvantageInstanceDetailsEditor({
             Fiabilidad
           </span>
 
-          <div>
-            {[1,2,3].map(
-              (value) => (
-                <button
-                  key={value}
-                  type="button"
-                  aria-pressed={
-                    details.reliability === value
-                  }
-                  onClick={() =>
-                    update(
-                      details.effectiveness,
-                      value,
-                    )
-                  }
-                >
-                  {value}
-                </button>
-              ),
-            )}
-          </div>
+          <AdvantageRatingControl
+            value={
+              details.reliability
+            }
+            min={0}
+            max={3}
+            onChange={(value) =>
+              update(
+                details.effectiveness,
+                value,
+              )
+            }
+          />
         </div>
-
-
+        
         <label>
           Identidad
-
+                
           <input
             value={
               details.identity ?? ''
