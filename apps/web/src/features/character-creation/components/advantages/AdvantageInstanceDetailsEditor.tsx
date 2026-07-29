@@ -679,6 +679,167 @@ export function AdvantageInstanceDetailsEditor({
   }
 
 
+
+  if (
+    details.kind === 'status'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Estatus
+        </h5>
+
+        <label>
+          Esfera
+
+          <input
+            value={
+              details.sphere ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'status',
+                  sphere: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  if (
+    details.kind === 'influence'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Influencia
+        </h5>
+
+        <label>
+          Ámbito
+
+          <input
+            value={
+              details.sphere ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'influence',
+                  sphere: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  if (
+    details.kind === 'mawla'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Mawla
+        </h5>
+
+        <label>
+          Identidad
+
+          <input
+            value={
+              details.identity ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'mawla',
+                  identity: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  if (
+    details.kind === 'herd'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Rebaño
+        </h5>
+
+        <label>
+          Descripción
+
+          <input
+            value={
+              details.identity ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'herd',
+                  identity: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  if (
+    details.kind === 'resources'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Recursos
+        </h5>
+
+        <label>
+          Fuente
+
+          <input
+            value={
+              details.source ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'resources',
+                  source: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
   return (
     <p className="advantage-catalog-card__pending">
       Editor específico pendiente.
