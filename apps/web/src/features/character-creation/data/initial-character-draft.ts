@@ -58,6 +58,12 @@ export const initialCharacterDraft: CharacterDraft = {
     selections: [],
   },
 
+  humanity: {
+    value: 7,
+    convictions: [],
+    touchstones: [],
+  },
+
   skills: {
     athletics: 0,
     brawl: 0,

@@ -57,6 +57,10 @@ import {
 } from './thin-blood-alchemy-rules.ts'
 
 import {
+  validateInitialHumanity,
+} from './humanity-rules.ts'
+
+import {
   validateAdvantageRelations,
 } from './advantage-relation-rules.ts'
 
@@ -345,6 +349,18 @@ export function validateStep(
             errors,
           ),
         ],
+      }
+    }
+
+    case 'humanity': {
+      const result =
+        validateInitialHumanity(
+          draft.humanity,
+        )
+
+      return {
+        valid: result.valid,
+        errors: result.errors,
       }
     }
 
