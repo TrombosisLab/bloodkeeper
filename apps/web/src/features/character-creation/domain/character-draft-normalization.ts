@@ -15,8 +15,16 @@ import {
 } from './discipline-rules.ts'
 
 import {
+  normalizePredatorTypeForCharacter,
+} from './predator-type-rules.ts'
+
+import {
   normalizeThinBloodAlchemyForCharacter,
 } from './thin-blood-alchemy-rules.ts'
+
+import {
+  normalizeCharacterDraftPredatorType,
+} from './predator-type-draft-rules.ts'
 
 import {
   normalizeCharacterDraftOblivionCeremonies,
@@ -76,6 +84,26 @@ export function normalizeCharacterDraft(
           ),
   }
 
+
+  normalized = {
+    ...normalized,
+
+    identity: {
+      ...normalized.identity,
+
+      predatorType:
+        normalizePredatorTypeForCharacter(
+          normalized.identity.predatorType,
+          normalized.identity.clan,
+        ),
+    },
+  }
+
+
+  normalized =
+    normalizeCharacterDraftPredatorType(
+      normalized,
+    )
 
   /*
    * Los datos exclusivos de Sangre Débil sólo pueden

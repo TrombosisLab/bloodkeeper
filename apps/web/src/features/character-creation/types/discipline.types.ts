@@ -21,10 +21,16 @@ export interface DisciplineDefinition {
   name: string
 }
 
+export type CharacterDisciplineOrigin =
+  | 'creation'
+  | 'predatorType'
+  | 'thinBlood'
+
 export interface CharacterDisciplineDraft {
   key: DisciplineKey
   value: number
   powerKeys: DisciplinePowerKey[]
+  origin?: CharacterDisciplineOrigin
 }
 
 export type CharacterDisciplinesDraft =

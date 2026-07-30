@@ -37,6 +37,7 @@ import { BloodStep } from './BloodStep'
 import { DisciplinesStep } from './DisciplinesStep'
 import { AdvantagesStep } from './AdvantagesStep'
 import { HumanityStep } from './HumanityStep'
+import { ReviewStep } from './ReviewStep'
 
 interface CharacterCreationWizardProps {
   onBackToSheet: () => void
@@ -438,6 +439,11 @@ export function CharacterCreationWizard({
                   }),
                 )
               }
+            />
+          ) : currentStepId ===
+            'review' ? (
+            <ReviewStep
+              draft={draft}
             />
           ) : (
             <CreationStepPlaceholder

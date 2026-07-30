@@ -44,10 +44,15 @@ export interface SkillDefinition {
     | 'mental'
 }
 
+export type SkillSpecialtyOrigin =
+  | 'creation'
+  | 'predatorType'
+
 export interface SkillSpecialty {
   id: string
   skillKey: SkillKey
   name: string
+  origin?: SkillSpecialtyOrigin
 }
 
 export type CharacterSkillSpecialtiesDraft =
