@@ -11,6 +11,9 @@ export interface PredatorTypeRestriction {
   requiredClans?: string[];
   requiredMerits?: string[];
   forbiddenMerits?: string[];
+  minimumHumanity?: number;
+  maximumHumanity?: number;
+  requiresStorytellerApproval?: boolean;
 }
 
 export interface PendingReference {
@@ -33,9 +36,40 @@ export interface PredatorTypeDisciplineGrant {
   dots: number
 }
 
+export type PredatorTypeAdvantageCategory =
+  | 'merit'
+  | 'flaw'
+
+export interface PredatorTypeAdvantageGrant {
+  type: 'advantage'
+  definitionKey: string
+  category: PredatorTypeAdvantageCategory
+  rating: number
+}
+
+export interface PredatorTypeHumanityGrant {
+  type: 'humanity'
+  modifier: number
+}
+
+export interface PredatorTypePointDistributionOption {
+  definitionKey: string
+  category: PredatorTypeAdvantageCategory
+  maximumRating?: number
+}
+
+export interface PredatorTypePointDistributionGrant {
+  type: 'pointDistribution'
+  points: number
+  options: PredatorTypePointDistributionOption[]
+}
+
 export type PredatorTypeChoiceGrant =
   | PredatorTypeSpecialtyGrant
   | PredatorTypeDisciplineGrant
+  | PredatorTypeAdvantageGrant
+  | PredatorTypeHumanityGrant
+  | PredatorTypePointDistributionGrant
 
 export interface PredatorTypeChoiceOption {
   when?: PredatorTypeChoiceCondition
@@ -51,7 +85,7 @@ export interface PredatorTypeChoice {
 
 export interface PredatorTypeGrant {
   definitionKey: string;
-  category: 'merit' | 'flaw';
+  category: PredatorTypeAdvantageCategory;
   rating: number;
 }
 
@@ -63,11 +97,16 @@ export interface PredatorTypeDefinition {
 
   fixedGrants?: {
     advantages?: PredatorTypeGrant[];
+    humanityModifier?: number;
+    pointDistributions?: PredatorTypePointDistributionGrant[];
   };
 
   choices?: PredatorTypeChoice[];
 
   pendingReferences?: PendingReference[];
+
+  storyEffects?: string[];
+  notes?: string[];
 
   tags?: string[];
 }
