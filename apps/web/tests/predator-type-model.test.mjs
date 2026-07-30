@@ -1326,7 +1326,7 @@ test(
             rating: 1,
           },
           {
-            definitionKey: 'stake-bait',
+            definitionKey: 'stigmata',
             rating: 1,
           },
         ],
@@ -1561,7 +1561,7 @@ test(
             rating: 1,
           },
           {
-            definitionKey: 'stake-bait',
+            definitionKey: 'stigmata',
             rating: 1,
           },
         ],
@@ -1616,7 +1616,7 @@ test(
       result.errors.some(
         error =>
           error.includes(
-            'Se esperaban 3 puntos',
+            'Deben gastarse exactamente 3 puntos',
           ),
       ),
       true,
@@ -1698,7 +1698,7 @@ test(
       duplicate.errors.some(
         error =>
           error.includes(
-            'duplicada',
+            'aparece más de una vez',
           ),
       ),
       true,
@@ -1878,7 +1878,7 @@ test(
             rating: 1,
           },
           {
-            definitionKey: 'stake-bait',
+            definitionKey: 'stigmata',
             rating: 1,
           },
         ],

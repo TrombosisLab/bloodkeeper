@@ -206,6 +206,7 @@ export const predatorTypeDefinitions: PredatorTypeDefinition[] = [
         advantages: [
             {
                 definitionKey: 'resources',
+                category: 'background',
                 rating: 1,
             },
         ],

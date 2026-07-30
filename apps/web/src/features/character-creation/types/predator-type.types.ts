@@ -41,6 +41,7 @@ export interface PredatorTypeDisciplineGrant {
 }
 
 export type PredatorTypeAdvantageCategory =
+  | 'background'
   | 'merit'
   | 'flaw'
 
