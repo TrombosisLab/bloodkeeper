@@ -825,3 +825,124 @@ test(
   },
 )
 
+
+
+test(
+  '003-K.1B resuelve restricciones de Humanidad',
+  async () => {
+    const {
+      humanityAllowed,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    assert.equal(
+      humanityAllowed('bagger', 7),
+      true,
+    )
+
+    assert.equal(
+      humanityAllowed(
+        'unknown-predator-type',
+        7,
+      ),
+      false,
+    )
+  },
+)
+
+test(
+  '003-K.1B Bolsero no modifica Humanidad',
+  async () => {
+    const {
+      resolvePredatorTypeHumanityModifier,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    assert.equal(
+      resolvePredatorTypeHumanityModifier(
+        'bagger',
+        {
+          clan: 'brujah',
+        },
+      ),
+      0,
+    )
+  },
+)
+
+test(
+  '003-K.1B Bolsero no declara distribuciones de puntos',
+  async () => {
+    const {
+      resolvePredatorTypePointDistributions,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    assert.deepEqual(
+      resolvePredatorTypePointDistributions(
+        'bagger',
+        {
+          clan: 'brujah',
+        },
+      ),
+      [],
+    )
+  },
+)
+
+test(
+  '003-K.1B conserva los efectos actuales de Bolsero',
+  async () => {
+    const {
+      applyPredatorTypeEffects,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const result =
+      applyPredatorTypeEffects({
+        predatorTypeKey: 'bagger',
+        clanKey: 'brujah',
+
+        choiceSelections: {
+          'bagger-specialty': 0,
+        },
+
+        advantages: {
+          selections: [],
+        },
+
+        disciplines: [],
+
+        skillSpecialties: [],
+      })
+
+    assert.deepEqual(
+      result.advantages.selections.map(
+        selection => [
+          selection.definitionKey,
+          selection.rating,
+        ],
+      ),
+      [
+        [
+          'iron-stomach',
+          3,
+        ],
+      ],
+    )
+
+    assert.equal(
+      result.disciplines[0].key,
+      'obfuscate',
+    )
+
+    assert.equal(
+      result.skillSpecialties[0].name,
+      'Forzar Cerraduras',
+    )
+  },
+)

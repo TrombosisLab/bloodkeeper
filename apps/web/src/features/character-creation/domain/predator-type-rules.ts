@@ -3,6 +3,7 @@ import { predatorTypeDefinitions } from '../data/predator-type-definitions.ts';
 import type {
   PredatorTypeChoice,
   PredatorTypeChoiceGrant,
+  PredatorTypePointDistributionGrant,
 } from '../types/predator-type.types.ts'
 
 
@@ -109,6 +110,132 @@ export function predatorPendingReferences(
     return (definition.pendingReferences ?? [])
         .map(x=>x.definitionKey);
 
+}
+
+export function humanityAllowed(
+  predatorTypeKey: string,
+  humanity: number,
+): boolean {
+  const definition =
+    getPredatorType(predatorTypeKey)
+
+  if (!definition) {
+    return false
+  }
+
+  const minimum =
+    definition.restrictions
+      ?.minimumHumanity
+
+  const maximum =
+    definition.restrictions
+      ?.maximumHumanity
+
+  if (
+    minimum !== undefined &&
+    humanity < minimum
+  ) {
+    return false
+  }
+
+  if (
+    maximum !== undefined &&
+    humanity > maximum
+  ) {
+    return false
+  }
+
+  return true
+}
+
+export function predatorTypeRequiresStorytellerApproval(
+  predatorTypeKey: string,
+): boolean {
+  return (
+    getPredatorType(predatorTypeKey)
+      ?.restrictions
+      ?.requiresStorytellerApproval === true
+  )
+}
+
+export function resolvePredatorTypeHumanityModifier(
+  predatorTypeKey: string,
+  context: Record<string, unknown> = {},
+  selections: PredatorTypeChoiceSelections = {},
+): number {
+  const definition =
+    getPredatorType(predatorTypeKey)
+
+  if (!definition) {
+    return 0
+  }
+
+  const choiceModifier =
+    resolveSelectedPredatorChoices(
+      predatorTypeKey,
+      context,
+      selections,
+    )
+      .filter(
+        (
+          grant,
+        ): grant is Extract<
+          PredatorTypeChoiceGrant,
+          {
+            type: 'humanity'
+          }
+        > =>
+          grant.type === 'humanity',
+      )
+      .reduce(
+        (
+          total,
+          grant,
+        ) =>
+          total + grant.modifier,
+        0,
+      )
+
+  return (
+    definition.fixedGrants
+      ?.humanityModifier ?? 0
+  ) + choiceModifier
+}
+
+export function resolvePredatorTypePointDistributions(
+  predatorTypeKey: string,
+  context: Record<string, unknown> = {},
+  selections: PredatorTypeChoiceSelections = {},
+): PredatorTypePointDistributionGrant[] {
+  const definition =
+    getPredatorType(predatorTypeKey)
+
+  if (!definition) {
+    return []
+  }
+
+  const fixed =
+    definition.fixedGrants
+      ?.pointDistributions ?? []
+
+  const selected =
+    resolveSelectedPredatorChoices(
+      predatorTypeKey,
+      context,
+      selections,
+    )
+      .filter(
+        (
+          grant,
+        ): grant is PredatorTypePointDistributionGrant =>
+          grant.type ===
+          'pointDistribution',
+      )
+
+  return [
+    ...fixed,
+    ...selected,
+  ]
 }
 
 export function normalizePredatorTypeForCharacter(
@@ -271,7 +398,9 @@ function createPredatorTypeSelectionId(
 
 export function applyPredatorTypeAdvantages(
   predatorTypeKey: string,
+  clanKey: string | null,
   advantages: CharacterAdvantagesDraft,
+  choiceSelections: PredatorTypeChoiceSelections = {},
 ): CharacterAdvantagesDraft {
   const cleaned =
     removePredatorTypeAdvantages(
@@ -292,12 +421,39 @@ export function applyPredatorTypeAdvantages(
       ),
     )
 
+  const fixedGrants =
+    definition.fixedGrants
+      ?.advantages ?? []
+
+  const selectedGrants =
+    clanKey === null
+      ? []
+      : resolveSelectedPredatorChoices(
+          predatorTypeKey,
+          {
+            clan: clanKey,
+          },
+          choiceSelections,
+        )
+          .filter(
+            (
+              grant,
+            ): grant is Extract<
+              PredatorTypeChoiceGrant,
+              {
+                type: 'advantage'
+              }
+            > =>
+              grant.type ===
+              'advantage',
+          )
+
   const selections:
     CharacterAdvantageSelectionDraft[] =
-      (
-        definition.fixedGrants
-          ?.advantages ?? []
-      )
+      [
+        ...fixedGrants,
+        ...selectedGrants,
+      ]
         .filter(
           grant =>
             !pendingReferences.has(
@@ -305,12 +461,18 @@ export function applyPredatorTypeAdvantages(
             ),
         )
         .map(
-          grant => ({
+          (
+            grant,
+            index,
+          ) => ({
             selectionId:
               createPredatorTypeSelectionId(
                 predatorTypeKey,
                 'advantage',
-                grant.definitionKey,
+                [
+                  grant.definitionKey,
+                  index,
+                ].join(':'),
               ),
 
             definitionKey:
@@ -509,7 +671,9 @@ export function applyPredatorTypeEffects(
     advantages:
       applyPredatorTypeAdvantages(
         validPredatorTypeKey,
+        input.clanKey,
         input.advantages,
+        choiceSelections,
       ),
 
     disciplines:
