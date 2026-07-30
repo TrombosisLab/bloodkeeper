@@ -175,6 +175,70 @@ export function AdvantageInstanceDetailsEditor({
     )
   }
 
+  
+  if (
+    details.kind === 'enemy'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Enemigo
+        </h5>
+
+        <label>
+          Identidad
+
+          <input
+            value={
+              details.identity ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'enemy',
+                  identity: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  if (
+    details.kind === 'stalker'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Stalker
+        </h5>
+
+        <label>
+          Identidad
+
+          <input
+            value={
+              details.identity ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'stalker',
+                  identity: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
 
   if (
     details.kind === 'retainer'
@@ -317,6 +381,38 @@ export function AdvantageInstanceDetailsEditor({
             </label>
           </div>
         )}
+      </div>
+    )
+  }
+
+
+    if (
+    details.kind === 'darkSecret'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Secreto Oscuro
+        </h5>
+
+        <label>
+          Secreto
+
+          <input
+            value={
+              details.secret ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'darkSecret',
+                  secret: event.target.value,
+                },
+              })
+            }
+          />
+        </label>
       </div>
     )
   }

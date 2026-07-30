@@ -69,6 +69,7 @@ test(
         'mawla',
         'herd',
         'resources',
+        'dark-secret',
         'haven',
       ],
     )
@@ -84,7 +85,7 @@ test(
       getCharacterAdvantageDefinitionsByCategory(
         'background',
       ).length,
-      11,
+      12,
     )
   },
 )

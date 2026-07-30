@@ -100,4 +100,176 @@ export const predatorTypeDefinitions: PredatorTypeDefinition[] = [
     ],
 },
 
+
+{
+    key: 'osiris',
+
+    name: 'Osiris',
+
+    fixedGrants: {
+        pointDistributions: [
+            {
+                type: 'pointDistribution',
+                points: 3,
+                options: [
+                    {
+                        definitionKey: 'fame',
+                        category: 'background',
+                    },
+                    {
+                        definitionKey: 'herd',
+                        category: 'background',
+                    },
+                ],
+            },
+            {
+                type: 'pointDistribution',
+                points: 2,
+                options: [
+                    {
+                        definitionKey: 'enemy',
+                        category: 'flaw',
+                    },
+                    {
+                        family: 'mythic-flaw',
+                        category: 'flaw',
+                    },
+                ],
+            },
+        ],
+    },
+
+    choices: [
+        {
+            id: 'osiris-specialty',
+            minimumSelections: 1,
+            maximumSelections: 1,
+
+            options: [
+                {
+                    grant: {
+                        type: 'specialty',
+                        skillKey: 'occult',
+                        name: 'Tradición específica',
+                    },
+                },
+                {
+                    grant: {
+                        type: 'specialty',
+                        skillKey: 'performance',
+                        name: 'Campo de entretenimiento específico',
+                    },
+                },
+            ],
+        },
+        {
+            id: 'osiris-discipline',
+            minimumSelections: 1,
+            maximumSelections: 1,
+
+            options: [
+                {
+                    when: {
+                        clan: 'tremere',
+                    },
+                    grant: {
+                        type: 'discipline',
+                        disciplineKey: 'bloodSorcery',
+                        dots: 1,
+                    },
+                },
+                {
+                    grant: {
+                        type: 'discipline',
+                        disciplineKey: 'presence',
+                        dots: 1,
+                    },
+                },
+            ],
+        },
+    ],
+
+    tags: [
+        'cult',
+        'fame',
+        'followers',
+    ],
+},
+
+
+{
+    key: 'sandman',
+
+    name: 'Sandman',
+
+    fixedGrants: {
+        advantages: [
+            {
+                definitionKey: 'resources',
+                rating: 1,
+            },
+        ],
+    },
+
+    choices: [
+        {
+            id: 'sandman-specialty',
+
+            minimumSelections: 1,
+            maximumSelections: 1,
+
+            options: [
+                {
+                    grant: {
+                        type: 'specialty',
+                        skillKey: 'medicine',
+                        name: 'Anestesia',
+                    },
+                },
+                {
+                    grant: {
+                        type: 'specialty',
+                        skillKey: 'stealth',
+                        name: 'Entradas silenciosas',
+                    },
+                },
+            ],
+        },
+
+        {
+            id: 'sandman-discipline',
+
+            minimumSelections: 1,
+            maximumSelections: 1,
+
+            options: [
+                {
+                    when: {
+                        clan: 'tremere',
+                    },
+
+                    grant: {
+                        type: 'discipline',
+                        disciplineKey: 'bloodSorcery',
+                        dots: 1,
+                    },
+                },
+
+                {
+                    grant: {
+                        type: 'discipline',
+                        disciplineKey: 'obfuscate',
+                        dots: 1,
+                    },
+                },
+            ],
+        },
+    ],
+
+    tags: [
+        'sleep',
+        'intrusion',
+    ],
+},
+
 ];

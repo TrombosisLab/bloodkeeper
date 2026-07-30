@@ -70,6 +70,15 @@ export interface MaskAdvantageDetails {
   benefits: MaskBenefitKey[]
 }
 
+export interface DarkSecretAdvantageDetails {
+  kind: 'darkSecret'
+
+  /*
+   * Información narrativa del secreto asociado.
+   */
+  secret?: string
+}
+
 export interface MawlaAdvantageDetails {
   kind: 'mawla'
   identity?: string
@@ -205,6 +214,25 @@ export interface ChildOfTheSceneAdvantageDetails {
   subculture?: string
 }
 
+export interface EnemyAdvantageDetails {
+  kind: 'enemy'
+
+  /*
+   * Persona o entidad enemiga asociada al personaje.
+   */
+  identity?: string
+}
+
+
+export interface StalkerAdvantageDetails {
+  kind: 'stalker'
+
+  /*
+   * Persona que persigue o acosa al personaje.
+   */
+  identity?: string
+}
+
 export type CharacterAdvantageInstanceDetails =
   | AlliesAdvantageDetails
   | ContactAdvantageDetails
@@ -226,6 +254,9 @@ export type CharacterAdvantageInstanceDetails =
   | MethuselahVisageAdvantageDetails
   | FamousFaceAdvantageDetails
   | ChildOfTheSceneAdvantageDetails
+  | EnemyAdvantageDetails
+  | StalkerAdvantageDetails
+  | DarkSecretAdvantageDetails
 
 export interface CharacterAdvantageSelectionDraft {
   /*

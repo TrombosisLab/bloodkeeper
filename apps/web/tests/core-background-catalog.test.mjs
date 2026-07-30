@@ -37,6 +37,7 @@ test(
         'mawla',
         'herd',
         'resources',
+        'dark-secret',
         'haven',
       ],
     )
@@ -236,6 +237,7 @@ test(
         'mawla',
         'herd',
         'resources',
+        'dark-secret',
         'haven',
       ],
     )

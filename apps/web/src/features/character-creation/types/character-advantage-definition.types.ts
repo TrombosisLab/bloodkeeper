@@ -26,6 +26,15 @@ export type CharacterAdvantageSource =
  * Permite restringir ventajas concretas según la naturaleza
  * del personaje.
  */
+/*
+ * Familias funcionales de ventajas.
+ *
+ * Permiten agrupar definiciones relacionadas por reglas
+ * sin crear ventajas artificiales ni duplicar catálogos.
+ */
+export type CharacterAdvantageFamily =
+  | 'mythic-flaw'
+
 export type CharacterAdvantageCharacterKind =
   | 'standard'
   | 'caitiff'
@@ -159,6 +168,9 @@ export interface CharacterAdvantageDefinition {
     | 'methuselahVisage'
     | 'famousFace'
     | 'childOfTheScene'
+    | 'enemy'
+    | 'stalker'
+    | 'darkSecret'
 
   /*
    * Una definición asociada necesita estar vinculada a
@@ -214,6 +226,15 @@ export interface CharacterAdvantageDefinition {
    * Contrato histórico conservado durante la migración.
    */
   requirements?: CharacterAdvantageRequirements
+
+  /*
+   * Familias funcionales a las que pertenece esta definición.
+   *
+   * Se usan para reglas que afectan a grupos normativos,
+   * como los Defectos Míticos, sin depender de enumeraciones
+   * manuales en cada módulo consumidor.
+   */
+  families?: readonly CharacterAdvantageFamily[]
 
   /*
    * Lista de ventajas incompatibles con esta definición.

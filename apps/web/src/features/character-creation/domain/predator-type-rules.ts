@@ -1,11 +1,21 @@
 import { predatorTypeDefinitions } from '../data/predator-type-definitions.ts';
 
+import {
+  characterAdvantageDefinitions,
+} from '../data/character-advantage-definitions.ts'
+
 import type {
   PredatorTypeChoice,
   PredatorTypeChoiceGrant,
+  PredatorTypePointDistributionAllocation,
   PredatorTypePointDistributionGrant,
+  PredatorTypePointDistributionOption,
 } from '../types/predator-type.types.ts'
 
+
+import type {
+  CharacterAdvantageDefinition,
+} from '../types/character-advantage-definition.types.ts'
 
 import type {
   CharacterAdvantagesDraft,
@@ -200,6 +210,402 @@ export function resolvePredatorTypeHumanityModifier(
     definition.fixedGrants
       ?.humanityModifier ?? 0
   ) + choiceModifier
+}
+
+/*
+ * Resuelve una opción de reparto a definiciones reales
+ * del catálogo de Ventajas.
+ *
+ * El motor acepta dos formas equivalentes:
+ *
+ * - definitionKey: una definición concreta;
+ * - family: todas las definiciones de una familia funcional.
+ *
+ * La categoría declarada en el Tipo de Depredador debe
+ * coincidir con la categoría real de la definición.
+ */
+export function resolvePredatorTypePointDistributionOptionDefinitions(
+  option: PredatorTypePointDistributionOption,
+): CharacterAdvantageDefinition[] {
+  return characterAdvantageDefinitions.filter(
+    definition => {
+      if (
+        definition.category !==
+        option.category
+      ) {
+        return false
+      }
+
+      if (
+        'definitionKey' in option &&
+        option.definitionKey !== undefined
+      ) {
+        return (
+          definition.key ===
+          option.definitionKey
+        )
+      }
+
+      if (
+        'family' in option &&
+        option.family !== undefined
+      ) {
+        return (
+          definition.families
+            ?.includes(option.family) ===
+          true
+        )
+      }
+
+      return false
+    },
+  )
+}
+
+/*
+ * Resuelve todas las opciones de una distribución y elimina
+ * posibles duplicados cuando una definición aparece tanto
+ * de forma explícita como mediante una familia.
+ */
+export function resolvePredatorTypePointDistributionDefinitions(
+  distribution: PredatorTypePointDistributionGrant,
+): CharacterAdvantageDefinition[] {
+  const definitionsByKey =
+    new Map<
+      string,
+      CharacterAdvantageDefinition
+    >()
+
+  for (
+    const option of
+    distribution.options
+  ) {
+    for (
+      const definition of
+      resolvePredatorTypePointDistributionOptionDefinitions(
+        option,
+      )
+    ) {
+      definitionsByKey.set(
+        definition.key,
+        definition,
+      )
+    }
+  }
+
+  return [
+    ...definitionsByKey.values(),
+  ]
+}
+
+export interface PredatorTypePointDistributionValidationResult {
+  valid: boolean
+  errors: string[]
+}
+
+/*
+ * Valida la configuración estructural de una bolsa de reparto.
+ *
+ * Esta validación se aplica a las definiciones del catálogo,
+ * antes de comprobar cómo ha repartido los puntos el jugador.
+ */
+export function validatePredatorTypePointDistributionGrant(
+  distribution: PredatorTypePointDistributionGrant,
+): PredatorTypePointDistributionValidationResult {
+  const errors: string[] = []
+
+  if (
+    !Number.isInteger(distribution.points) ||
+    distribution.points <= 0
+  ) {
+    errors.push(
+      'La distribución debe conceder un número entero positivo de puntos.',
+    )
+  }
+
+  if (distribution.options.length === 0) {
+    errors.push(
+      'La distribución debe contener al menos una opción.',
+    )
+  }
+
+  distribution.options.forEach(
+    (
+      option,
+      index,
+    ) => {
+      const optionLabel =
+        `Opción ${index + 1}`
+
+      if (
+        option.maximumRating !== undefined &&
+        (
+          !Number.isInteger(
+            option.maximumRating,
+          ) ||
+          option.maximumRating <= 0
+        )
+      ) {
+        errors.push(
+          `${optionLabel}: maximumRating debe ser un entero positivo.`,
+        )
+      }
+
+      const definitions =
+        resolvePredatorTypePointDistributionOptionDefinitions(
+          option,
+        )
+
+      if (definitions.length === 0) {
+        if (
+          'definitionKey' in option &&
+          option.definitionKey !== undefined
+        ) {
+          errors.push(
+            `${optionLabel}: no existe una definición compatible para "${option.definitionKey}".`,
+          )
+        } else if (
+          'family' in option &&
+          option.family !== undefined
+        ) {
+          errors.push(
+            `${optionLabel}: la familia "${option.family}" no contiene definiciones compatibles.`,
+          )
+        } else {
+          errors.push(
+            `${optionLabel}: no define definitionKey ni family.`,
+          )
+        }
+
+        return
+      }
+
+      if (
+        option.maximumRating !== undefined
+      ) {
+        const hasLegalRating =
+          definitions.some(
+            definition =>
+              definition.allowedRatings.some(
+                rating =>
+                  rating <=
+                  option.maximumRating!,
+              ),
+          )
+
+        if (!hasLegalRating) {
+          errors.push(
+            `${optionLabel}: maximumRating no permite ninguna puntuación legal.`,
+          )
+        }
+      }
+    },
+  )
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  }
+}
+
+/*
+ * Valida todas las bolsas de reparto resueltas para un
+ * Tipo de Depredador concreto.
+ */
+/*
+ * Valida la asignación realizada por el jugador dentro de
+ * una bolsa de reparto.
+ *
+ * Reglas:
+ * - todas las definiciones deben pertenecer a las opciones;
+ * - las puntuaciones deben ser enteros positivos;
+ * - deben respetarse allowedRatings y maximumRating;
+ * - no se permiten definiciones duplicadas;
+ * - deben gastarse exactamente todos los puntos.
+ */
+export function validatePredatorTypePointDistributionAllocation(
+  distribution: PredatorTypePointDistributionGrant,
+  allocations: readonly PredatorTypePointDistributionAllocation[],
+): PredatorTypePointDistributionValidationResult {
+  const structuralValidation =
+    validatePredatorTypePointDistributionGrant(
+      distribution,
+    )
+
+  if (!structuralValidation.valid) {
+    return structuralValidation
+  }
+
+  const errors: string[] = []
+  const seenDefinitionKeys =
+    new Set<string>()
+
+  for (const allocation of allocations) {
+    if (
+      seenDefinitionKeys.has(
+        allocation.definitionKey,
+      )
+    ) {
+      errors.push(
+        `La definición "${allocation.definitionKey}" aparece más de una vez.`,
+      )
+
+      continue
+    }
+
+    seenDefinitionKeys.add(
+      allocation.definitionKey,
+    )
+
+    if (
+      !Number.isInteger(allocation.rating) ||
+      allocation.rating <= 0
+    ) {
+      errors.push(
+        `"${allocation.definitionKey}" debe tener una puntuación entera positiva.`,
+      )
+
+      continue
+    }
+
+    const matchingOptions =
+      distribution.options.filter(
+        option =>
+          resolvePredatorTypePointDistributionOptionDefinitions(
+            option,
+          ).some(
+            definition =>
+              definition.key ===
+              allocation.definitionKey,
+          ),
+      )
+
+    if (matchingOptions.length === 0) {
+      errors.push(
+        `"${allocation.definitionKey}" no pertenece a esta distribución.`,
+      )
+
+      continue
+    }
+
+    const definition =
+      characterAdvantageDefinitions.find(
+        candidate =>
+          candidate.key ===
+          allocation.definitionKey,
+      )
+
+    if (!definition) {
+      errors.push(
+        `No existe la definición "${allocation.definitionKey}".`,
+      )
+
+      continue
+    }
+
+    if (
+      !definition.allowedRatings.includes(
+        allocation.rating,
+      )
+    ) {
+      errors.push(
+        `"${allocation.definitionKey}" no admite puntuación ${allocation.rating}.`,
+      )
+    }
+
+    const maximumRatings =
+      matchingOptions
+        .map(option => option.maximumRating)
+        .filter(
+          (
+            maximumRating,
+          ): maximumRating is number =>
+            maximumRating !== undefined,
+        )
+
+    if (
+      maximumRatings.length > 0 &&
+      allocation.rating >
+        Math.max(...maximumRatings)
+    ) {
+      errors.push(
+        `"${allocation.definitionKey}" supera maximumRating.`,
+      )
+    }
+  }
+
+  const spentPoints =
+    allocations.reduce(
+      (
+        total,
+        allocation,
+      ) =>
+        total +
+        (
+          Number.isInteger(
+            allocation.rating,
+          ) &&
+          allocation.rating > 0
+            ? allocation.rating
+            : 0
+        ),
+      0,
+    )
+
+  if (
+    spentPoints !==
+    distribution.points
+  ) {
+    errors.push(
+      `Deben gastarse exactamente ${distribution.points} puntos; se han gastado ${spentPoints}.`,
+    )
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  }
+}
+
+export function validatePredatorTypePointDistributions(
+  predatorTypeKey: string,
+  context: Record<string, unknown> = {},
+  selections: PredatorTypeChoiceSelections = {},
+): PredatorTypePointDistributionValidationResult {
+  const definition =
+    getPredatorType(predatorTypeKey)
+
+  if (!definition) {
+    return {
+      valid: false,
+      errors: [
+        `No existe el Tipo de Depredador "${predatorTypeKey}".`,
+      ],
+    }
+  }
+
+  const errors =
+    resolvePredatorTypePointDistributions(
+      predatorTypeKey,
+      context,
+      selections,
+    ).flatMap(
+      (
+        distribution,
+        index,
+      ) =>
+        validatePredatorTypePointDistributionGrant(
+          distribution,
+        ).errors.map(
+          error =>
+            `Distribución ${index + 1}: ${error}`,
+        ),
+    )
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  }
 }
 
 export function resolvePredatorTypePointDistributions(

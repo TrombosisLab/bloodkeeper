@@ -3,6 +3,10 @@ import type {
 } from './discipline.types.ts'
 
 import type {
+  CharacterAdvantageFamily,
+} from './character-advantage-definition.types.ts'
+
+import type {
   SkillKey,
 } from './character-skills-draft.types.ts'
 
@@ -52,17 +56,45 @@ export interface PredatorTypeHumanityGrant {
   modifier: number
 }
 
-export interface PredatorTypePointDistributionOption {
-  definitionKey: string
+interface PredatorTypePointDistributionOptionBase {
   category: PredatorTypeAdvantageCategory
   maximumRating?: number
 }
+
+/*
+ * Una opción de reparto puede señalar:
+ *
+ * - una definición concreta;
+ * - una familia funcional completa.
+ *
+ * Son alternativas excluyentes para evitar configuraciones
+ * ambiguas dentro de una misma opción.
+ */
+export type PredatorTypePointDistributionOption =
+  | (
+      PredatorTypePointDistributionOptionBase & {
+        definitionKey: string
+        family?: never
+      }
+    )
+  | (
+      PredatorTypePointDistributionOptionBase & {
+        definitionKey?: never
+        family: CharacterAdvantageFamily
+      }
+    )
 
 export interface PredatorTypePointDistributionGrant {
   type: 'pointDistribution'
   points: number
   options: PredatorTypePointDistributionOption[]
 }
+
+export interface PredatorTypePointDistributionAllocation {
+  definitionKey: string
+  rating: number
+}
+
 
 export type PredatorTypeChoiceGrant =
   | PredatorTypeSpecialtyGrant

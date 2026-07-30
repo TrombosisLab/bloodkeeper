@@ -77,6 +77,11 @@ export function createInitialAdvantageInstanceDetails(
         kind: 'mawla',
       }
 
+    case 'darkSecret':
+      return {
+        kind: 'darkSecret',
+      }
+      
     case 'herd':
       return {
         kind: 'herd',
@@ -87,6 +92,16 @@ export function createInitialAdvantageInstanceDetails(
         kind: 'resources',
       }
 
+    case 'enemy':
+      return {
+        kind: 'enemy',
+      }
+
+    case 'stalker':
+      return {
+        kind: 'stalker',
+      }
+      
     /*
      * Lingüística necesita conservar la lista
      * de idiomas escogidos por el personaje.

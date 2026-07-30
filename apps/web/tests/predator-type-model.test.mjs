@@ -946,3 +946,999 @@ test(
     )
   },
 )
+
+test(
+  '003-H.PREDATOR.ENGINE resuelve opciones de reparto por definición y familia',
+  async () => {
+    const {
+      resolvePredatorTypePointDistributionOptionDefinitions,
+      resolvePredatorTypePointDistributionDefinitions,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const explicitDefinitions =
+      resolvePredatorTypePointDistributionOptionDefinitions({
+        definitionKey: 'enemy',
+        category: 'flaw',
+      })
+
+    assert.deepEqual(
+      explicitDefinitions.map(
+        definition => definition.key,
+      ),
+      [
+        'enemy',
+      ],
+    )
+
+    const familyDefinitions =
+      resolvePredatorTypePointDistributionOptionDefinitions({
+        family: 'mythic-flaw',
+        category: 'flaw',
+      })
+
+    const familyKeys =
+      familyDefinitions
+        .map(definition => definition.key)
+        .sort()
+
+    assert.deepEqual(
+      familyKeys,
+      [
+        'folkloric-bane',
+        'folkloric-block',
+        'stake-bait',
+        'stigmata',
+      ].sort(),
+    )
+
+    const resolvedDistribution =
+      resolvePredatorTypePointDistributionDefinitions({
+        type: 'pointDistribution',
+        points: 2,
+        options: [
+          {
+            definitionKey: 'enemy',
+            category: 'flaw',
+          },
+          {
+            family: 'mythic-flaw',
+            category: 'flaw',
+          },
+        ],
+      })
+
+    assert.deepEqual(
+      resolvedDistribution
+        .map(definition => definition.key)
+        .sort(),
+      [
+        'enemy',
+        'folkloric-bane',
+        'folkloric-block',
+        'stake-bait',
+        'stigmata',
+      ].sort(),
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.ENGINE ignora definiciones cuya categoría no coincide',
+  async () => {
+    const {
+      resolvePredatorTypePointDistributionOptionDefinitions,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    assert.deepEqual(
+      resolvePredatorTypePointDistributionOptionDefinitions({
+        definitionKey: 'enemy',
+        category: 'merit',
+      }),
+      [],
+    )
+
+    assert.deepEqual(
+      resolvePredatorTypePointDistributionOptionDefinitions({
+        family: 'mythic-flaw',
+        category: 'merit',
+      }),
+      [],
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.ENGINE valida la configuración estructural de los repartos',
+  async () => {
+    const {
+      validatePredatorTypePointDistributionGrant,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    assert.deepEqual(
+      validatePredatorTypePointDistributionGrant({
+        type: 'pointDistribution',
+        points: 3,
+        options: [
+          {
+            definitionKey: 'fame',
+            category: 'background',
+          },
+          {
+            definitionKey: 'herd',
+            category: 'background',
+          },
+        ],
+      }),
+      {
+        valid: true,
+        errors: [],
+      },
+    )
+
+    assert.deepEqual(
+      validatePredatorTypePointDistributionGrant({
+        type: 'pointDistribution',
+        points: 2,
+        options: [
+          {
+            definitionKey: 'enemy',
+            category: 'flaw',
+          },
+          {
+            family: 'mythic-flaw',
+            category: 'flaw',
+          },
+        ],
+      }),
+      {
+        valid: true,
+        errors: [],
+      },
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.ENGINE rechaza repartos sin puntos u opciones válidas',
+  async () => {
+    const {
+      validatePredatorTypePointDistributionGrant,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const invalidPoints =
+      validatePredatorTypePointDistributionGrant({
+        type: 'pointDistribution',
+        points: 0,
+        options: [],
+      })
+
+    assert.equal(
+      invalidPoints.valid,
+      false,
+    )
+
+    assert.equal(
+      invalidPoints.errors.length,
+      2,
+    )
+
+    const unknownDefinition =
+      validatePredatorTypePointDistributionGrant({
+        type: 'pointDistribution',
+        points: 2,
+        options: [
+          {
+            definitionKey:
+              'unknown-advantage',
+            category:
+              'flaw',
+          },
+        ],
+      })
+
+    assert.equal(
+      unknownDefinition.valid,
+      false,
+    )
+
+    assert.match(
+      unknownDefinition.errors[0],
+      /unknown-advantage/,
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.ENGINE valida maximumRating en opciones explícitas y familias',
+  async () => {
+    const {
+      validatePredatorTypePointDistributionGrant,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const invalidMaximum =
+      validatePredatorTypePointDistributionGrant({
+        type: 'pointDistribution',
+        points: 2,
+        options: [
+          {
+            definitionKey: 'enemy',
+            category: 'flaw',
+            maximumRating: 0,
+          },
+        ],
+      })
+
+    assert.equal(
+      invalidMaximum.valid,
+      false,
+    )
+
+    assert.match(
+      invalidMaximum.errors[0],
+      /maximumRating/,
+    )
+
+    const validFamilyMaximum =
+      validatePredatorTypePointDistributionGrant({
+        type: 'pointDistribution',
+        points: 2,
+        options: [
+          {
+            family: 'mythic-flaw',
+            category: 'flaw',
+            maximumRating: 2,
+          },
+        ],
+      })
+
+    assert.equal(
+      validFamilyMaximum.valid,
+      true,
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.ENGINE valida las distribuciones resueltas de un depredador',
+  async () => {
+    const {
+      validatePredatorTypePointDistributions,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    assert.deepEqual(
+      validatePredatorTypePointDistributions(
+        'bagger',
+        {
+          clan: 'tremere',
+        },
+      ),
+      {
+        valid: true,
+        errors: [],
+      },
+    )
+
+    const unknown =
+      validatePredatorTypePointDistributions(
+        'unknown-predator-type',
+      )
+
+    assert.equal(
+      unknown.valid,
+      false,
+    )
+
+    assert.match(
+      unknown.errors[0],
+      /unknown-predator-type/,
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.ENGINE valida las asignaciones de una bolsa de reparto',
+  async () => {
+    const {
+      validatePredatorTypePointDistributionAllocation,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const distribution = {
+      type: 'pointDistribution',
+      points: 3,
+      options: [
+        {
+          definitionKey: 'fame',
+          category: 'background',
+        },
+        {
+          definitionKey: 'herd',
+          category: 'background',
+        },
+      ],
+    }
+
+    assert.deepEqual(
+      validatePredatorTypePointDistributionAllocation(
+        distribution,
+        [
+          {
+            definitionKey: 'fame',
+            rating: 1,
+          },
+          {
+            definitionKey: 'herd',
+            rating: 2,
+          },
+        ],
+      ),
+      {
+        valid: true,
+        errors: [],
+      },
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.ENGINE acepta repartos entre enemigo y defectos míticos',
+  async () => {
+    const {
+      validatePredatorTypePointDistributionAllocation,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const distribution = {
+      type: 'pointDistribution',
+      points: 2,
+      options: [
+        {
+          definitionKey: 'enemy',
+          category: 'flaw',
+        },
+        {
+          family: 'mythic-flaw',
+          category: 'flaw',
+        },
+      ],
+    }
+
+    assert.equal(
+      validatePredatorTypePointDistributionAllocation(
+        distribution,
+        [
+          {
+            definitionKey: 'enemy',
+            rating: 1,
+          },
+          {
+            definitionKey: 'stake-bait',
+            rating: 1,
+          },
+        ],
+      ).valid,
+      true,
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.ENGINE exige gastar exactamente todos los puntos',
+  async () => {
+    const {
+      validatePredatorTypePointDistributionAllocation,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const result =
+      validatePredatorTypePointDistributionAllocation(
+        {
+          type: 'pointDistribution',
+          points: 3,
+          options: [
+            {
+              definitionKey: 'fame',
+              category: 'background',
+            },
+            {
+              definitionKey: 'herd',
+              category: 'background',
+            },
+          ],
+        },
+        [
+          {
+            definitionKey: 'fame',
+            rating: 1,
+          },
+        ],
+      )
+
+    assert.equal(result.valid, false)
+
+    assert.equal(
+      result.errors.some(
+        error =>
+          error.includes(
+            'exactamente 3 puntos',
+          ),
+      ),
+      true,
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.ENGINE rechaza definiciones ajenas, duplicadas y puntuaciones ilegales',
+  async () => {
+    const {
+      validatePredatorTypePointDistributionAllocation,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const distribution = {
+      type: 'pointDistribution',
+      points: 3,
+      options: [
+        {
+          definitionKey: 'fame',
+          category: 'background',
+          maximumRating: 2,
+        },
+        {
+          definitionKey: 'herd',
+          category: 'background',
+        },
+      ],
+    }
+
+    const foreign =
+      validatePredatorTypePointDistributionAllocation(
+        distribution,
+        [
+          {
+            definitionKey: 'contacts',
+            rating: 3,
+          },
+        ],
+      )
+
+    assert.equal(foreign.valid, false)
+
+    assert.equal(
+      foreign.errors.some(
+        error =>
+          error.includes(
+            'no pertenece',
+          ),
+      ),
+      true,
+    )
+
+    const duplicated =
+      validatePredatorTypePointDistributionAllocation(
+        distribution,
+        [
+          {
+            definitionKey: 'fame',
+            rating: 1,
+          },
+          {
+            definitionKey: 'fame',
+            rating: 2,
+          },
+        ],
+      )
+
+    assert.equal(duplicated.valid, false)
+
+    assert.equal(
+      duplicated.errors.some(
+        error =>
+          error.includes(
+            'más de una vez',
+          ),
+      ),
+      true,
+    )
+
+    const aboveMaximum =
+      validatePredatorTypePointDistributionAllocation(
+        distribution,
+        [
+          {
+            definitionKey: 'fame',
+            rating: 3,
+          },
+        ],
+      )
+
+    assert.equal(aboveMaximum.valid, false)
+
+    assert.equal(
+      aboveMaximum.errors.some(
+        error =>
+          error.includes(
+            'maximumRating',
+          ),
+      ),
+      true,
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.ENGINE valida una asignación completa de puntos',
+  async () => {
+    const {
+      validatePredatorTypePointDistributionAllocation,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const result =
+      validatePredatorTypePointDistributionAllocation(
+        {
+          type: 'pointDistribution',
+          points: 3,
+          options: [
+            {
+              definitionKey: 'fame',
+              category: 'background',
+            },
+            {
+              definitionKey: 'herd',
+              category: 'background',
+            },
+          ],
+        },
+        [
+          {
+            definitionKey: 'fame',
+            rating: 1,
+          },
+          {
+            definitionKey: 'herd',
+            rating: 2,
+          },
+        ],
+      )
+
+    assert.deepEqual(
+      result,
+      {
+        valid: true,
+        errors: [],
+      },
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.ENGINE valida asignaciones mediante familia funcional',
+  async () => {
+    const {
+      validatePredatorTypePointDistributionAllocation,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const result =
+      validatePredatorTypePointDistributionAllocation(
+        {
+          type: 'pointDistribution',
+          points: 2,
+          options: [
+            {
+              definitionKey: 'enemy',
+              category: 'flaw',
+            },
+            {
+              family: 'mythic-flaw',
+              category: 'flaw',
+            },
+          ],
+        },
+        [
+          {
+            definitionKey: 'enemy',
+            rating: 1,
+          },
+          {
+            definitionKey: 'stake-bait',
+            rating: 1,
+          },
+        ],
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.ENGINE rechaza puntos incompletos',
+  async () => {
+    const {
+      validatePredatorTypePointDistributionAllocation,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const result =
+      validatePredatorTypePointDistributionAllocation(
+        {
+          type: 'pointDistribution',
+          points: 3,
+          options: [
+            {
+              definitionKey: 'fame',
+              category: 'background',
+            },
+            {
+              definitionKey: 'herd',
+              category: 'background',
+            },
+          ],
+        },
+        [
+          {
+            definitionKey: 'fame',
+            rating: 1,
+          },
+        ],
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+
+    assert.equal(
+      result.errors.some(
+        error =>
+          error.includes(
+            'Se esperaban 3 puntos',
+          ),
+      ),
+      true,
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.ENGINE rechaza definiciones ajenas y duplicadas',
+  async () => {
+    const {
+      validatePredatorTypePointDistributionAllocation,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const distribution = {
+      type: 'pointDistribution',
+      points: 2,
+      options: [
+        {
+          definitionKey: 'enemy',
+          category: 'flaw',
+        },
+        {
+          family: 'mythic-flaw',
+          category: 'flaw',
+        },
+      ],
+    }
+
+    const foreign =
+      validatePredatorTypePointDistributionAllocation(
+        distribution,
+        [
+          {
+            definitionKey: 'contacts',
+            rating: 2,
+          },
+        ],
+      )
+
+    assert.equal(
+      foreign.valid,
+      false,
+    )
+
+    assert.equal(
+      foreign.errors.some(
+        error =>
+          error.includes(
+            'no pertenece',
+          ),
+      ),
+      true,
+    )
+
+    const duplicate =
+      validatePredatorTypePointDistributionAllocation(
+        distribution,
+        [
+          {
+            definitionKey: 'enemy',
+            rating: 1,
+          },
+          {
+            definitionKey: 'enemy',
+            rating: 1,
+          },
+        ],
+      )
+
+    assert.equal(
+      duplicate.valid,
+      false,
+    )
+
+    assert.equal(
+      duplicate.errors.some(
+        error =>
+          error.includes(
+            'duplicada',
+          ),
+      ),
+      true,
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.ENGINE rechaza puntuaciones no admitidas',
+  async () => {
+    const {
+      validatePredatorTypePointDistributionAllocation,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const result =
+      validatePredatorTypePointDistributionAllocation(
+        {
+          type: 'pointDistribution',
+          points: 9,
+          options: [
+            {
+              definitionKey: 'enemy',
+              category: 'flaw',
+            },
+          ],
+        },
+        [
+          {
+            definitionKey: 'enemy',
+            rating: 9,
+          },
+        ],
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+
+    assert.equal(
+      result.errors.some(
+        error =>
+          error.includes(
+            'no admite puntuación 9',
+          ),
+      ),
+      true,
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.OSIRIS define todos sus efectos oficiales',
+  async () => {
+    const {
+      getPredatorType,
+      resolvePredatorChoices,
+      resolvePredatorTypePointDistributions,
+      validatePredatorTypePointDistributions,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition = getPredatorType('osiris')
+
+    assert.ok(definition)
+    assert.equal(definition.name, 'Osiris')
+
+    const tremere =
+      resolvePredatorChoices(
+        'osiris',
+        { clan: 'tremere' },
+      )
+
+    assert.equal(
+      tremere.some(
+        grant =>
+          grant.type === 'discipline' &&
+          grant.disciplineKey === 'bloodSorcery',
+      ),
+      true,
+    )
+
+    const brujah =
+      resolvePredatorChoices(
+        'osiris',
+        { clan: 'brujah' },
+      )
+
+    assert.equal(
+      brujah.some(
+        grant =>
+          grant.type === 'discipline' &&
+          grant.disciplineKey === 'presence',
+      ),
+      true,
+    )
+
+    const distributions =
+      resolvePredatorTypePointDistributions(
+        'osiris',
+      )
+
+    assert.equal(distributions.length, 2)
+    assert.equal(distributions[0].points, 3)
+    assert.equal(distributions[1].points, 2)
+
+    assert.deepEqual(
+      validatePredatorTypePointDistributions(
+        'osiris',
+      ),
+      {
+        valid: true,
+        errors: [],
+      },
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.OSIRIS permite repartir Fama y Rebaño',
+  async () => {
+    const {
+      resolvePredatorTypePointDistributions,
+      validatePredatorTypePointDistributionAllocation,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const [socialDistribution] =
+      resolvePredatorTypePointDistributions(
+        'osiris',
+      )
+
+    assert.equal(
+      validatePredatorTypePointDistributionAllocation(
+        socialDistribution,
+        [
+          {
+            definitionKey: 'fame',
+            rating: 1,
+          },
+          {
+            definitionKey: 'herd',
+            rating: 2,
+          },
+        ],
+      ).valid,
+      true,
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.OSIRIS permite repartir Enemigo y Defectos Míticos',
+  async () => {
+    const {
+      resolvePredatorTypePointDistributions,
+      validatePredatorTypePointDistributionAllocation,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const [, flawDistribution] =
+      resolvePredatorTypePointDistributions(
+        'osiris',
+      )
+
+    assert.equal(
+      validatePredatorTypePointDistributionAllocation(
+        flawDistribution,
+        [
+          {
+            definitionKey: 'enemy',
+            rating: 1,
+          },
+          {
+            definitionKey: 'stake-bait',
+            rating: 1,
+          },
+        ],
+      ).valid,
+      true,
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.SANDMAN reglas oficiales',
+  async () => {
+
+    const {
+      getPredatorType,
+      resolvePredatorChoices,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition=getPredatorType('sandman')
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'Sandman',
+    )
+
+    const tremere=
+      resolvePredatorChoices(
+        'sandman',
+        { clan:'tremere' },
+      )
+
+    assert.equal(
+      tremere.some(
+        x =>
+          x.type==='discipline' &&
+          x.disciplineKey==='bloodSorcery'
+      ),
+      true,
+    )
+
+    const ventrue=
+      resolvePredatorChoices(
+        'sandman',
+        { clan:'ventrue' },
+      )
+
+    assert.equal(
+      ventrue.some(
+        x =>
+          x.type==='discipline' &&
+          x.disciplineKey==='obfuscate'
+      ),
+      true,
+    )
+
+  },
+)
+
+
