@@ -2,16 +2,7 @@ import type {
   CharacterGeneration,
 } from '../types/character-generation.types'
 
-export const predatorTypeOptions = [
-  '',
-  'Sanguijuela',
-  'Cleaver',
-  'Consensualista',
-  'Extorsionista',
-  'Granjero',
-  'Osiris',
-  'Sandman',
-]
+
 
 export const generationOptions:
   CharacterGeneration[] = [

@@ -8,8 +8,11 @@ import {
 
 import {
   generationOptions,
-  predatorTypeOptions,
 } from '../data/identity-options'
+
+import {
+  getPredatorTypeOptions,
+} from '../domain/predator-type-rules'
 
 import type {
   ClanKey,
@@ -41,6 +44,9 @@ export function IdentityStep({
   value,
   onChange,
 }: IdentityStepProps) {
+  const predatorTypeOptions =
+    getPredatorTypeOptions()
+
   function updateField(
     event: ChangeEvent<
       HTMLInputElement |
@@ -169,16 +175,17 @@ export function IdentityStep({
             value={value.predatorType}
             onChange={updateField}
           >
+            <option value="">
+              Selecciona tipo
+            </option>
+
             {predatorTypeOptions.map(
               (option) => (
                 <option
-                  key={
-                    option || 'empty'
-                  }
-                  value={option}
+                  key={option.value}
+                  value={option.value}
                 >
-                  {option ||
-                    'Selecciona tipo'}
+                  {option.label}
                 </option>
               ),
             )}

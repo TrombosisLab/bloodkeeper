@@ -33,6 +33,21 @@ import type {
 } from '../types/character-skills-draft.types.ts'
 
 
+export interface PredatorTypeOption {
+  value: string
+  label: string
+}
+
+export function getPredatorTypeOptions():
+  readonly PredatorTypeOption[] {
+  return predatorTypeDefinitions.map(
+    (definition) => ({
+      value: definition.key,
+      label: definition.name,
+    }),
+  )
+}
+
 export function getPredatorType(key: string) {
     return predatorTypeDefinitions.find(x => x.key === key);
 }
