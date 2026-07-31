@@ -17,6 +17,8 @@ export interface PredatorTypeRestriction {
   forbiddenMerits?: string[];
   minimumHumanity?: number;
   maximumHumanity?: number;
+  minimumBloodPotency?: number;
+  maximumBloodPotency?: number;
   requiresStorytellerApproval?: boolean;
 }
 
@@ -54,6 +56,11 @@ export interface PredatorTypeAdvantageGrant {
 
 export interface PredatorTypeHumanityGrant {
   type: 'humanity'
+  modifier: number
+}
+
+export interface PredatorTypeBloodPotencyGrant {
+  type: 'bloodPotency'
   modifier: number
 }
 
@@ -102,6 +109,7 @@ export type PredatorTypeChoiceGrant =
   | PredatorTypeDisciplineGrant
   | PredatorTypeAdvantageGrant
   | PredatorTypeHumanityGrant
+  | PredatorTypeBloodPotencyGrant
   | PredatorTypePointDistributionGrant
 
 export interface PredatorTypeChoiceOption {
@@ -131,6 +139,7 @@ export interface PredatorTypeDefinition {
   fixedGrants?: {
     advantages?: PredatorTypeGrant[];
     humanityModifier?: number;
+    bloodPotencyModifier?: number;
     pointDistributions?: PredatorTypePointDistributionGrant[];
   };
 

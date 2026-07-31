@@ -171,6 +171,13 @@ export interface CharacterAdvantageDefinition {
     | 'enemy'
     | 'stalker'
     | 'darkSecret'
+    | 'infamy'
+    | 'despised'
+    | 'hatred'
+    | 'exiled'
+    | 'suspect'
+    | 'shunned'
+    | 'mortalPretender'
 
   /*
    * Una definición asociada necesita estar vinculada a

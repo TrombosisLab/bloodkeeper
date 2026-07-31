@@ -101,7 +101,41 @@ export function createInitialAdvantageInstanceDetails(
       return {
         kind: 'stalker',
       }
+    case 'infamy':
+      return {
+        kind: 'infamy',
+      }
+
+    case 'despised':
+      return {
+        kind: 'despised',
+      }
+
+    case 'hatred':
+      return {
+        kind: 'hatred',
+      }
+
+    case 'exiled':
+      return {
+        kind: 'exiled',
+      }
       
+    case 'suspect':
+      return {
+        kind: 'suspect',
+      }
+
+    case 'shunned':
+      return {
+        kind: 'shunned',
+      }
+
+    case 'mortalPretender':
+      return {
+        kind: 'mortalPretender',
+      }
+            
     /*
      * Lingüística necesita conservar la lista
      * de idiomas escogidos por el personaje.

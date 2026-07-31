@@ -240,6 +240,158 @@ export function AdvantageInstanceDetailsEditor({
   }
 
 
+  /*
+   * Infamia.
+   *
+   * Guarda la causa o naturaleza de la mala reputación.
+   */
+  if (
+    details.kind === 'infamy'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Infamia
+        </h5>
+
+        <label>
+          Descripción
+
+          <input
+            value={
+              details.description ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'infamy',
+                  description:
+                    event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  /*
+   * Despreciado.
+   *
+   * Guarda el motivo por el que el personaje es rechazado.
+   */
+  if (
+    details.kind === 'despised'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Despreciado
+        </h5>
+
+        <label>
+          Descripción
+
+          <input
+            value={
+              details.description ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'despised',
+                  description:
+                    event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
+  /*
+   * Odio.
+   *
+   * Guarda la persona, grupo o causa odiada.
+   */
+  if (
+    details.kind === 'hatred'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Odio
+        </h5>
+
+        <label>
+          Descripción
+
+          <input
+            value={
+              details.description ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'hatred',
+                  description:
+                    event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+  
+
+  /*
+   * Expulsado.
+   *
+   * Guarda la causa o la organización de la expulsión.
+   */
+  if (
+    details.kind === 'exiled'
+  ) {
+    return (
+      <div className="advantage-instance-editor">
+        <h5>
+          Configuración de Expulsado
+        </h5>
+
+        <label>
+          Descripción
+
+          <input
+            value={
+              details.description ?? ''
+            }
+            onChange={(event) =>
+              onChange({
+                ...selection,
+                details: {
+                  kind: 'exiled',
+                  description:
+                    event.target.value,
+                },
+              })
+            }
+          />
+        </label>
+      </div>
+    )
+  }
+
+
   if (
     details.kind === 'retainer'
   ) {

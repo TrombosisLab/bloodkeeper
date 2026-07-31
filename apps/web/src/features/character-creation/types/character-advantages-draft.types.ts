@@ -233,6 +233,56 @@ export interface StalkerAdvantageDetails {
   identity?: string
 }
 
+
+export interface InfamyAdvantageDetails {
+  kind: 'infamy'
+
+  description?: string
+}
+
+
+export interface DespisedAdvantageDetails {
+  kind: 'despised'
+
+  description?: string
+}
+
+
+export interface HatredAdvantageDetails {
+  kind: 'hatred'
+
+  description?: string
+}
+
+
+export interface ExiledAdvantageDetails {
+  kind: 'exiled'
+
+  description?: string
+}
+
+
+export interface SuspectAdvantageDetails {
+  kind: 'suspect'
+
+  description?: string
+}
+
+
+export interface ShunnedAdvantageDetails {
+  kind: 'shunned'
+
+  description?: string
+}
+
+
+export interface MortalPretenderAdvantageDetails {
+  kind: 'mortalPretender'
+
+  description?: string
+}
+
+
 export type CharacterAdvantageInstanceDetails =
   | AlliesAdvantageDetails
   | ContactAdvantageDetails
@@ -257,6 +307,13 @@ export type CharacterAdvantageInstanceDetails =
   | EnemyAdvantageDetails
   | StalkerAdvantageDetails
   | DarkSecretAdvantageDetails
+  | InfamyAdvantageDetails
+  | DespisedAdvantageDetails
+  | HatredAdvantageDetails
+  | ExiledAdvantageDetails
+  | SuspectAdvantageDetails
+  | ShunnedAdvantageDetails
+  | MortalPretenderAdvantageDetails
 
 export interface CharacterAdvantageSelectionDraft {
   /*

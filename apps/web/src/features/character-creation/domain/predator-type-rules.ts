@@ -158,6 +158,42 @@ export function humanityAllowed(
   return true
 }
 
+export function bloodPotencyAllowed(
+  predatorTypeKey: string,
+  bloodPotency: number,
+): boolean {
+  const definition =
+    getPredatorType(predatorTypeKey)
+
+  if (!definition) {
+    return false
+  }
+
+  const minimum =
+    definition.restrictions
+      ?.minimumBloodPotency
+
+  const maximum =
+    definition.restrictions
+      ?.maximumBloodPotency
+
+  if (
+    minimum !== undefined &&
+    bloodPotency < minimum
+  ) {
+    return false
+  }
+
+  if (
+    maximum !== undefined &&
+    bloodPotency > maximum
+  ) {
+    return false
+  }
+
+  return true
+}
+
 export function predatorTypeRequiresStorytellerApproval(
   predatorTypeKey: string,
 ): boolean {
@@ -209,6 +245,51 @@ export function resolvePredatorTypeHumanityModifier(
   return (
     definition.fixedGrants
       ?.humanityModifier ?? 0
+  ) + choiceModifier
+}
+
+export function resolvePredatorTypeBloodPotencyModifier(
+  predatorTypeKey: string,
+  context: Record<string, unknown> = {},
+  selections: PredatorTypeChoiceSelections = {},
+): number {
+
+  const definition =
+    getPredatorType(predatorTypeKey)
+
+  if (!definition) {
+    return 0
+  }
+
+  const choiceModifier =
+    resolveSelectedPredatorChoices(
+      predatorTypeKey,
+      context,
+      selections,
+    )
+      .filter(
+        (
+          grant,
+        ): grant is Extract<
+          PredatorTypeChoiceGrant,
+          {
+            type: 'bloodPotency'
+          }
+        > =>
+          grant.type === 'bloodPotency',
+      )
+      .reduce(
+        (
+          total,
+          grant,
+        ) =>
+          total + grant.modifier,
+        0,
+      )
+
+  return (
+    definition.fixedGrants
+      ?.bloodPotencyModifier ?? 0
   ) + choiceModifier
 }
 

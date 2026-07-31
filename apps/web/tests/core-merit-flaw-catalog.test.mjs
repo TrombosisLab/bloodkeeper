@@ -43,6 +43,48 @@ const EXPECTED = [
     category: 'merit',
     ratings: [4],
   },
+    {
+      key: 'infamy',
+      name: 'Infamia',
+      category: 'flaw',
+      ratings: [1, 2, 3, 4, 5],
+    },
+    {
+      key: 'despised',
+      name: 'Despreciado',
+      category: 'flaw',
+      ratings: [1],
+    },
+    {
+      key: 'hatred',
+      name: 'Odio',
+      category: 'flaw',
+      ratings: [2],
+    },
+    {
+      key: 'exiled',
+      name: 'Expulsado',
+      category: 'flaw',
+      ratings: [1, 2, 3],
+    },
+    {
+      key: 'suspect',
+      name: 'Sospechoso',
+      category: 'flaw',
+      ratings: [1],
+    },
+    {
+      key: 'shunned',
+      name: 'Rechazado',
+      category: 'flaw',
+      ratings: [2],
+    },
+    {
+      key: 'mortal-pretender',
+      name: 'Pretendiente Mortal',
+      category: 'flaw',
+      ratings: [1],
+    },
 ]
 
 test(

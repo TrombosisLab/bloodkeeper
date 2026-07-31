@@ -873,6 +873,29 @@ test(
 )
 
 test(
+  '003-K.2 Bolsero no modifica Potencia de Sangre',
+  async () => {
+
+    const {
+      resolvePredatorTypeBloodPotencyModifier,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    assert.equal(
+      resolvePredatorTypeBloodPotencyModifier(
+        'bagger',
+        {
+          clan: 'brujah',
+        },
+      ),
+      0,
+    )
+
+  },
+)
+
+test(
   '003-K.1B Bolsero no declara distribuciones de puntos',
   async () => {
     const {
@@ -1941,4 +1964,1206 @@ test(
   },
 )
 
+
+
+
+test(
+  '003-H.PREDATOR.SCENE-QUEEN define todos sus efectos',
+  async () => {
+    const {
+      getPredatorType,
+      resolveSelectedPredatorChoices,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition =
+      getPredatorType('scene-queen')
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'Reina del Ambiente',
+    )
+
+    assert.deepEqual(
+      definition.fixedGrants.advantages.map(
+        grant => [
+          grant.definitionKey,
+          grant.category,
+          grant.rating,
+        ],
+      ),
+      [
+        [
+          'fame',
+          'background',
+          1,
+        ],
+        [
+          'contacts',
+          'background',
+          1,
+        ],
+      ],
+    )
+
+    const grants =
+      resolveSelectedPredatorChoices(
+        'scene-queen',
+        {
+          clan: 'brujah',
+        },
+        {
+          'scene-queen-specialty': 1,
+          'scene-queen-discipline': 1,
+          'scene-queen-flaw': 0,
+        },
+      )
+
+    assert.equal(
+      grants.some(
+        grant =>
+          grant.type === 'specialty' &&
+          grant.skillKey === 'leadership',
+      ),
+      true,
+    )
+
+    assert.equal(
+      grants.some(
+        grant =>
+          grant.type === 'discipline' &&
+          grant.disciplineKey === 'potence',
+      ),
+      true,
+    )
+
+    assert.equal(
+      grants.some(
+        grant =>
+          grant.type === 'advantage' &&
+          grant.definitionKey === 'despised' &&
+          grant.category === 'flaw' &&
+          grant.rating === 1,
+      ),
+      true,
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.SCENE-QUEEN aplica la elección Despreciado',
+  async () => {
+    const {
+      applyPredatorTypeEffects,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const result =
+      applyPredatorTypeEffects({
+        predatorTypeKey:
+          'scene-queen',
+
+        clanKey:
+          'brujah',
+
+        choiceSelections: {
+          'scene-queen-specialty': 0,
+          'scene-queen-discipline': 0,
+          'scene-queen-flaw': 0,
+        },
+
+        advantages: {
+          selections: [],
+        },
+
+        disciplines: [],
+
+        skillSpecialties: [],
+      })
+
+    assert.deepEqual(
+      result.advantages.selections.map(
+        selection => [
+          selection.definitionKey,
+          selection.category,
+          selection.rating,
+          selection.origin,
+        ],
+      ),
+      [
+        [
+          'fame',
+          'background',
+          1,
+          'predatorType',
+        ],
+        [
+          'contacts',
+          'background',
+          1,
+          'predatorType',
+        ],
+        [
+          'despised',
+          'flaw',
+          1,
+          'predatorType',
+        ],
+      ],
+    )
+
+    assert.deepEqual(
+      result.disciplines.map(
+        discipline => [
+          discipline.key,
+          discipline.value,
+          discipline.origin,
+        ],
+      ),
+      [
+        [
+          'dominate',
+          1,
+          'predatorType',
+        ],
+      ],
+    )
+
+    assert.deepEqual(
+      result.skillSpecialties.map(
+        specialty => [
+          specialty.skillKey,
+          specialty.name,
+          specialty.origin,
+        ],
+      ),
+      [
+        [
+          'etiquette',
+          'Ambiente específico',
+          'predatorType',
+        ],
+      ],
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.SCENE-QUEEN aplica la elección Exclusión de Presa',
+  async () => {
+    const {
+      applyPredatorTypeAdvantages,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const result =
+      applyPredatorTypeAdvantages(
+        'scene-queen',
+        'brujah',
+        {
+          selections: [],
+        },
+        {
+          'scene-queen-flaw': 1,
+        },
+      )
+
+    assert.equal(
+      result.selections.some(
+        selection =>
+          selection.definitionKey ===
+            'prey-exclusion' &&
+          selection.category ===
+            'flaw' &&
+          selection.rating ===
+            1 &&
+          selection.origin ===
+            'predatorType',
+      ),
+      true,
+    )
+
+    assert.equal(
+      result.selections.some(
+        selection =>
+          selection.definitionKey ===
+          'despised',
+      ),
+      false,
+    )
+  },
+)
+
+
+test(
+  '003-H.PREDATOR.SIREN define todos sus efectos',
+  async () => {
+    const {
+      getPredatorType,
+      resolveSelectedPredatorChoices,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition =
+      getPredatorType('siren')
+
+    assert.ok(definition)
+
+    assert.equal(
+      definition.name,
+      'Sirena',
+    )
+
+    assert.deepEqual(
+      definition.fixedGrants.advantages.map(
+        grant => [
+          grant.definitionKey,
+          grant.category,
+          grant.rating,
+        ],
+      ),
+      [
+        [
+          'beautiful',
+          'merit',
+          2,
+        ],
+        [
+          'enemy',
+          'flaw',
+          1,
+        ],
+      ],
+    )
+
+    const grants =
+      resolveSelectedPredatorChoices(
+        'siren',
+        {
+          clan: 'toreador',
+        },
+        {
+          'siren-specialty': 1,
+          'siren-discipline': 1,
+        },
+      )
+
+    assert.equal(
+      grants.some(
+        grant =>
+          grant.type === 'specialty' &&
+          grant.skillKey === 'subterfuge' &&
+          grant.name === 'Seducción',
+      ),
+      true,
+    )
+
+    assert.equal(
+      grants.some(
+        grant =>
+          grant.type === 'discipline' &&
+          grant.disciplineKey === 'presence' &&
+          grant.dots === 1,
+      ),
+      true,
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.SIREN aplica Bello, Enemigo, Fortaleza y Persuasión',
+  async () => {
+    const {
+      applyPredatorTypeEffects,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const result =
+      applyPredatorTypeEffects({
+        predatorTypeKey:
+          'siren',
+
+        clanKey:
+          'toreador',
+
+        choiceSelections: {
+          'siren-specialty': 0,
+          'siren-discipline': 0,
+        },
+
+        advantages: {
+          selections: [],
+        },
+
+        disciplines: [],
+
+        skillSpecialties: [],
+      })
+
+    assert.deepEqual(
+      result.advantages.selections.map(
+        selection => [
+          selection.definitionKey,
+          selection.category,
+          selection.rating,
+          selection.origin,
+        ],
+      ),
+      [
+        [
+          'beautiful',
+          'merit',
+          2,
+          'predatorType',
+        ],
+        [
+          'enemy',
+          'flaw',
+          1,
+          'predatorType',
+        ],
+      ],
+    )
+
+    assert.deepEqual(
+      result.disciplines.map(
+        discipline => [
+          discipline.key,
+          discipline.value,
+          discipline.origin,
+        ],
+      ),
+      [
+        [
+          'fortitude',
+          1,
+          'predatorType',
+        ],
+      ],
+    )
+
+    assert.deepEqual(
+      result.skillSpecialties.map(
+        specialty => [
+          specialty.skillKey,
+          specialty.name,
+          specialty.origin,
+        ],
+      ),
+      [
+        [
+          'persuasion',
+          'Seducción',
+          'predatorType',
+        ],
+      ],
+    )
+  },
+)
+
+test(
+  '003-H.PREDATOR.SIREN permite Presencia y Subterfugio',
+  async () => {
+    const {
+      applyPredatorTypeEffects,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const result =
+      applyPredatorTypeEffects({
+        predatorTypeKey:
+          'siren',
+
+        clanKey:
+          'toreador',
+
+        choiceSelections: {
+          'siren-specialty': 1,
+          'siren-discipline': 1,
+        },
+
+        advantages: {
+          selections: [],
+        },
+
+        disciplines: [],
+
+        skillSpecialties: [],
+      })
+
+    assert.equal(
+      result.disciplines.some(
+        discipline =>
+          discipline.key === 'presence' &&
+          discipline.value === 1 &&
+          discipline.origin === 'predatorType',
+      ),
+      true,
+    )
+
+    assert.equal(
+      result.skillSpecialties.some(
+        specialty =>
+          specialty.skillKey === 'subterfuge' &&
+          specialty.name === 'Seducción' &&
+          specialty.origin === 'predatorType',
+      ),
+      true,
+    )
+  },
+)
+
+
+test(
+  '003-K.3 Blood Leech declara sus modificadores',
+  async () => {
+    const {
+      resolvePredatorTypeHumanityModifier,
+      resolvePredatorTypeBloodPotencyModifier,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    assert.equal(
+      resolvePredatorTypeHumanityModifier(
+        'blood-leech',
+      ),
+      -1,
+    )
+
+    assert.equal(
+      resolvePredatorTypeBloodPotencyModifier(
+        'blood-leech',
+      ),
+      1,
+    )
+  },
+)
+
+test(
+  '003-K.3 Blood Leech concede Exclusión de Presa a dos puntos',
+  async () => {
+    const {
+      getPredatorType,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition =
+      getPredatorType('blood-leech')
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.fixedGrants
+        ?.advantages,
+      [
+        {
+          definitionKey:
+            'prey-exclusion',
+          category: 'flaw',
+          rating: 2,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  '003-K.3 Blood Leech permite Pelea o Sigilo como especialidad',
+  async () => {
+    const {
+      getPredatorType,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition =
+      getPredatorType('blood-leech')
+
+    const choice =
+      definition?.choices?.find(
+        item =>
+          item.id ===
+          'blood-leech-specialty',
+      )
+
+    assert.ok(choice)
+
+    assert.equal(
+      choice.minimumSelections,
+      1,
+    )
+
+    assert.equal(
+      choice.maximumSelections,
+      1,
+    )
+
+    assert.deepEqual(
+      choice.options.map(
+        option => option.grant,
+      ),
+      [
+        {
+          type: 'specialty',
+          skillKey: 'brawl',
+          name: 'Vástagos',
+        },
+        {
+          type: 'specialty',
+          skillKey: 'stealth',
+          name: 'Contra Vástagos',
+        },
+      ],
+    )
+  },
+)
+
+test(
+  '003-K.3 Blood Leech permite Celeridad o Protean',
+  async () => {
+    const {
+      getPredatorType,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition =
+      getPredatorType('blood-leech')
+
+    const choice =
+      definition?.choices?.find(
+        item =>
+          item.id ===
+          'blood-leech-discipline',
+      )
+
+    assert.ok(choice)
+
+    assert.deepEqual(
+      choice.options.map(
+        option => option.grant,
+      ),
+      [
+        {
+          type: 'discipline',
+          disciplineKey: 'celerity',
+          dots: 1,
+        },
+        {
+          type: 'discipline',
+          disciplineKey: 'protean',
+          dots: 1,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  '003-K.3 Blood Leech permite Secreto Oscuro o Rechazado',
+  async () => {
+    const {
+      getPredatorType,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition =
+      getPredatorType('blood-leech')
+
+    const choice =
+      definition?.choices?.find(
+        item =>
+          item.id ===
+          'blood-leech-social-flaw',
+      )
+
+    assert.ok(choice)
+
+    assert.equal(
+      choice.minimumSelections,
+      1,
+    )
+
+    assert.equal(
+      choice.maximumSelections,
+      1,
+    )
+
+    assert.deepEqual(
+      choice.options.map(
+        option => option.grant,
+      ),
+      [
+        {
+          type: 'advantage',
+          definitionKey: 'dark-secret',
+          category: 'background',
+          rating: 2,
+        },
+        {
+          type: 'advantage',
+          definitionKey: 'shunned',
+          category: 'flaw',
+          rating: 2,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  '003-K.3 Blood Leech conserva sus referencias narrativas',
+  async () => {
+    const {
+      predatorPendingReferences,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    assert.deepEqual(
+      predatorPendingReferences(
+        'blood-leech',
+      ),
+      [
+        'dark-secret',
+        'shunned',
+        'prey-exclusion',
+      ],
+    )
+  },
+)
+
+
+test(
+  '003-K restringe Tipos de Depredador por Potencia de Sangre',
+  async () => {
+    const {
+      bloodPotencyAllowed,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    assert.equal(
+      bloodPotencyAllowed(
+        'bagger',
+        1,
+      ),
+      true,
+    )
+
+    assert.equal(
+      bloodPotencyAllowed(
+        'bagger',
+        5,
+      ),
+      true,
+    )
+
+    assert.equal(
+      bloodPotencyAllowed(
+        'unknown-predator-type',
+        1,
+      ),
+      false,
+    )
+  },
+)
+
+
+test(
+  '003-K.4 el catálogo Core contiene los diez Tipos de Depredador',
+  async () => {
+    const {
+      predatorTypeDefinitions,
+    } = await import(
+      '../src/features/character-creation/data/predator-type-definitions.ts'
+    )
+
+    const expectedKeys = [
+      'bagger',
+      'cleaver',
+      'consensualist',
+      'alleycat',
+      'farmer',
+      'osiris',
+      'scene-queen',
+      'sandman',
+      'blood-leech',
+      'siren',
+    ]
+
+    for (const key of expectedKeys) {
+      assert.equal(
+        predatorTypeDefinitions.some(
+          definition =>
+            definition.key === key,
+        ),
+        true,
+        `Falta el Tipo de Depredador ${key}`,
+      )
+    }
+
+    assert.equal(
+      new Set(
+        predatorTypeDefinitions.map(
+          definition => definition.key,
+        ),
+      ).size,
+      predatorTypeDefinitions.length,
+    )
+  },
+)
+
+test(
+  '003-K.4 Cleaver concede Secreto Oscuro y Rebaño',
+  async () => {
+    const {
+      getPredatorType,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition =
+      getPredatorType('cleaver')
+
+    assert.ok(definition)
+
+    assert.deepEqual(
+      definition.fixedGrants?.advantages,
+      [
+        {
+          definitionKey: 'dark-secret',
+          category: 'background',
+          rating: 2,
+        },
+        {
+          definitionKey: 'herd',
+          category: 'background',
+          rating: 1,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  '003-K.4 Cleaver permite sus especialidades y disciplinas oficiales',
+  async () => {
+    const {
+      getPredatorType,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition =
+      getPredatorType('cleaver')
+
+    const specialty =
+      definition?.choices?.find(
+        choice =>
+          choice.id ===
+          'cleaver-specialty',
+      )
+
+    const discipline =
+      definition?.choices?.find(
+        choice =>
+          choice.id ===
+          'cleaver-discipline',
+      )
+
+    assert.deepEqual(
+      specialty?.options.map(
+        option => option.grant,
+      ),
+      [
+        {
+          type: 'specialty',
+          skillKey: 'persuasion',
+          name: 'Luz de Gas',
+        },
+        {
+          type: 'specialty',
+          skillKey: 'subterfuge',
+          name: 'Encubrimiento',
+        },
+      ],
+    )
+
+    assert.deepEqual(
+      discipline?.options.map(
+        option => option.grant,
+      ),
+      [
+        {
+          type: 'discipline',
+          disciplineKey: 'dominate',
+          dots: 1,
+        },
+        {
+          type: 'discipline',
+          disciplineKey: 'animalism',
+          dots: 1,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  '003-K.4 Consensualista concede Humanidad y sus defectos',
+  async () => {
+    const {
+      getPredatorType,
+      resolvePredatorTypeHumanityModifier,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition =
+      getPredatorType('consensualist')
+
+    assert.ok(definition)
+
+    assert.equal(
+      resolvePredatorTypeHumanityModifier(
+        'consensualist',
+      ),
+      1,
+    )
+
+    assert.deepEqual(
+      definition.fixedGrants?.advantages,
+      [
+        {
+          definitionKey: 'dark-secret',
+          category: 'background',
+          rating: 1,
+        },
+        {
+          definitionKey: 'prey-exclusion',
+          category: 'flaw',
+          rating: 1,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  '003-K.4 Consensualista permite sus especialidades y disciplinas oficiales',
+  async () => {
+    const {
+      getPredatorType,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition =
+      getPredatorType('consensualist')
+
+    const specialty =
+      definition?.choices?.find(
+        choice =>
+          choice.id ===
+          'consensualist-specialty',
+      )
+
+    const discipline =
+      definition?.choices?.find(
+        choice =>
+          choice.id ===
+          'consensualist-discipline',
+      )
+
+    assert.deepEqual(
+      specialty?.options.map(
+        option => option.grant,
+      ),
+      [
+        {
+          type: 'specialty',
+          skillKey: 'medicine',
+          name: 'Flebotomía',
+        },
+        {
+          type: 'specialty',
+          skillKey: 'persuasion',
+          name: 'Víctimas',
+        },
+      ],
+    )
+
+    assert.deepEqual(
+      discipline?.options.map(
+        option => option.grant,
+      ),
+      [
+        {
+          type: 'discipline',
+          disciplineKey: 'auspex',
+          dots: 1,
+        },
+        {
+          type: 'discipline',
+          disciplineKey: 'fortitude',
+          dots: 1,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  '003-K.4 Gato Callejero pierde Humanidad y gana Contactos',
+  async () => {
+    const {
+      getPredatorType,
+      resolvePredatorTypeHumanityModifier,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition =
+      getPredatorType('alleycat')
+
+    assert.ok(definition)
+
+    assert.equal(
+      resolvePredatorTypeHumanityModifier(
+        'alleycat',
+      ),
+      -1,
+    )
+
+    assert.deepEqual(
+      definition.fixedGrants?.advantages,
+      [
+        {
+          definitionKey: 'contacts',
+          category: 'background',
+          rating: 3,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  '003-K.4 Gato Callejero permite sus especialidades y disciplinas oficiales',
+  async () => {
+    const {
+      getPredatorType,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition =
+      getPredatorType('alleycat')
+
+    const specialty =
+      definition?.choices?.find(
+        choice =>
+          choice.id ===
+          'alleycat-specialty',
+      )
+
+    const discipline =
+      definition?.choices?.find(
+        choice =>
+          choice.id ===
+          'alleycat-discipline',
+      )
+
+    assert.deepEqual(
+      specialty?.options.map(
+        option => option.grant,
+      ),
+      [
+        {
+          type: 'specialty',
+          skillKey: 'intimidation',
+          name: 'Atracos',
+        },
+        {
+          type: 'specialty',
+          skillKey: 'brawl',
+          name: 'Realizar Presas',
+        },
+      ],
+    )
+
+    assert.deepEqual(
+      discipline?.options.map(
+        option => option.grant,
+      ),
+      [
+        {
+          type: 'discipline',
+          disciplineKey: 'celerity',
+          dots: 1,
+        },
+        {
+          type: 'discipline',
+          disciplineKey: 'potence',
+          dots: 1,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  '003-K.4 Granjero aplica sus restricciones oficiales',
+  async () => {
+    const {
+      bloodPotencyAllowed,
+      clanAllowed,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    assert.equal(
+      clanAllowed(
+        'farmer',
+        'ventrue',
+      ),
+      false,
+    )
+
+    assert.equal(
+      clanAllowed(
+        'farmer',
+        'brujah',
+      ),
+      true,
+    )
+
+    assert.equal(
+      bloodPotencyAllowed(
+        'farmer',
+        2,
+      ),
+      true,
+    )
+
+    assert.equal(
+      bloodPotencyAllowed(
+        'farmer',
+        3,
+      ),
+      false,
+    )
+  },
+)
+
+test(
+  '003-K.4 Granjero concede Humanidad y Vegano',
+  async () => {
+    const {
+      getPredatorType,
+      resolvePredatorTypeHumanityModifier,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition =
+      getPredatorType('farmer')
+
+    assert.ok(definition)
+
+    assert.equal(
+      resolvePredatorTypeHumanityModifier(
+        'farmer',
+      ),
+      1,
+    )
+
+    assert.deepEqual(
+      definition.fixedGrants?.advantages,
+      [
+        {
+          definitionKey: 'vegan',
+          category: 'flaw',
+          rating: 2,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  '003-K.4 Granjero permite sus especialidades y disciplinas oficiales',
+  async () => {
+    const {
+      getPredatorType,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const definition =
+      getPredatorType('farmer')
+
+    const specialty =
+      definition?.choices?.find(
+        choice =>
+          choice.id ===
+          'farmer-specialty',
+      )
+
+    const discipline =
+      definition?.choices?.find(
+        choice =>
+          choice.id ===
+          'farmer-discipline',
+      )
+
+    assert.deepEqual(
+      specialty?.options.map(
+        option => option.grant,
+      ),
+      [
+        {
+          type: 'specialty',
+          skillKey: 'animalKen',
+          name: 'Animal específico',
+        },
+        {
+          type: 'specialty',
+          skillKey: 'survival',
+          name: 'Caza',
+        },
+      ],
+    )
+
+    assert.deepEqual(
+      discipline?.options.map(
+        option => option.grant,
+      ),
+      [
+        {
+          type: 'discipline',
+          disciplineKey: 'animalism',
+          dots: 1,
+        },
+        {
+          type: 'discipline',
+          disciplineKey: 'protean',
+          dots: 1,
+        },
+      ],
+    )
+  },
+)
 
