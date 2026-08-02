@@ -125,6 +125,28 @@
   flex: 0 0 auto;
 }
 
+.dot-rating--editable {
+  padding: 3px 5px;
+
+  border: 1px solid #4f393d;
+  border-radius: 999px;
+
+  background: rgb(157 77 88 / 0.08);
+}
+
+.dot-rating--locked {
+  opacity: 0.45;
+}
+
+.dot-rating--error {
+  padding: 3px 5px;
+
+  border: 1px solid #b05b65;
+  border-radius: 999px;
+
+  background: rgb(176 91 101 / 0.14);
+}
+
 .dot-rating__dot {
   width: 15px;
   height: 15px;
@@ -1523,4 +1545,3 @@
     max-width: 240px;
   }
 }
-

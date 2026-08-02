@@ -2,6 +2,8 @@ import type {
   SkillKey,
 } from '../types/character-skills-draft.types'
 
+import { DotRating } from '../../../components/ui/DotRating'
+
 interface SkillEditorRowProps {
   skillKey: SkillKey
   label: string
@@ -39,25 +41,12 @@ export function SkillEditorRow({
           −
         </button>
 
-        <div
-          className="skill-editor-row__dots"
-          aria-label={`${label}: ${value}`}
-        >
-          {Array.from(
-            { length: 4 },
-            (_, index) => (
-              <span
-                key={index}
-                className={
-                  index < value
-                    ? 'skill-editor-dot skill-editor-dot--filled'
-                    : 'skill-editor-dot'
-                }
-                aria-hidden="true"
-              />
-            ),
-          )}
-        </div>
+        <DotRating
+          label={label}
+          value={value}
+          max={4}
+          state="editable"
+        />
 
         <button
           type="button"

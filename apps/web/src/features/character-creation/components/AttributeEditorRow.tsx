@@ -2,6 +2,8 @@ import type {
   AttributeKey,
 } from '../types/character-attributes-draft.types'
 
+import { DotRating } from '../../../components/ui/DotRating'
+
 interface AttributeEditorRowProps {
   attributeKey: AttributeKey
   label: string
@@ -39,25 +41,12 @@ export function AttributeEditorRow({
           −
         </button>
 
-        <div
-          className="attribute-editor-row__dots"
-          aria-label={`${label}: ${value}`}
-        >
-          {Array.from(
-            { length: 4 },
-            (_, index) => (
-              <span
-                key={index}
-                className={
-                  index < value
-                    ? 'attribute-editor-dot attribute-editor-dot--filled'
-                    : 'attribute-editor-dot'
-                }
-                aria-hidden="true"
-              />
-            ),
-          )}
-        </div>
+        <DotRating
+          label={label}
+          value={value}
+          max={4}
+          state="editable"
+        />
 
         <button
           type="button"
