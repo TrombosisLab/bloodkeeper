@@ -10,6 +10,7 @@ import {
   Post,
   Req,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common'
 
 import {
@@ -40,6 +41,10 @@ import {
 import type {
   CharacterDraftResponseDto,
 } from './character-draft.dto'
+
+import {
+  InvalidCharacterAttributeSkillStateError,
+} from '../domain/character-attribute-skill.rules'
 
 export interface AuthenticatedCharacterRequest {
   user?: {
@@ -80,6 +85,16 @@ function throwCharacterDraftHttpError(
   ) {
     throw new ConflictException({
       code: 'CHARACTER_DRAFT_WRITE_CONFLICT',
+    })
+  }
+
+  if (
+    error instanceof
+      InvalidCharacterAttributeSkillStateError
+  ) {
+    throw new UnprocessableEntityException({
+      code: 'CHARACTER_DRAFT_RULE_VIOLATION',
+      violations: error.violations,
     })
   }
 

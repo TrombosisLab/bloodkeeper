@@ -25,12 +25,58 @@ function createEmptySkills() {
   )
 }
 
+function createBalancedSkills() {
+  const ratings = [
+    ...Array(7).fill(1),
+    ...Array(5).fill(2),
+    ...Array(3).fill(3),
+  ]
+
+  return Object.fromEntries(
+    CHARACTER_SKILL_KEYS.map(
+      (skillKey, index) => [
+        skillKey,
+        ratings[index] ?? 0,
+      ],
+    ),
+  )
+}
+
+function createValidAttributes() {
+  return {
+    strength: 4,
+    dexterity: 3,
+    stamina: 3,
+    charisma: 3,
+    manipulation: 2,
+    composure: 2,
+    intelligence: 2,
+    wits: 2,
+    resolve: 1,
+  }
+}
+
+function createInitialAttributes() {
+  return Object.fromEntries(
+    Object.keys(createValidAttributes()).map(
+      (attributeKey) => [attributeKey, 1],
+    ),
+  )
+}
+
 function createRepository() {
   const calls = []
   const record = {
     characterId:
       '39c1801e-68fe-4c92-8795-723cac284bdf',
     revision: 1,
+    attributes: createValidAttributes(),
+    skills: createBalancedSkills(),
+    skillSpecialties: [],
+    creation: {
+      currentStep: 'blood',
+      skillDistributionMethod: 'balanced',
+    },
   }
 
   return {
@@ -69,17 +115,7 @@ test(
         '3bbc46f8-a45f-4589-9872-129e6652082c',
       chronicleId: null,
       identity: { name: 'Alicia' },
-      attributes: {
-        strength: 1,
-        dexterity: 1,
-        stamina: 1,
-        charisma: 1,
-        manipulation: 1,
-        composure: 1,
-        intelligence: 1,
-        wits: 1,
-        resolve: 1,
-      },
+      attributes: createInitialAttributes(),
       blood: {
         bloodPotency: 1,
         hunger: 1,
@@ -120,6 +156,60 @@ test(
       repository.calls,
       [['create', command]],
     )
+
+    assert.throws(
+      () =>
+        useCase.execute({
+          ...command,
+          attributes: {
+            ...command.attributes,
+            resolve: 5,
+          },
+        }),
+      {
+        name:
+          'InvalidCharacterAttributeSkillStateError',
+      },
+    )
+
+    assert.deepEqual(
+      repository.calls,
+      [['create', command]],
+    )
+  },
+)
+
+test(
+  '005-A valida el estado combinado antes de actualizar',
+  async () => {
+    const repository = createRepository()
+    const useCase =
+      new UpdateCharacterDraftUseCase(
+        repository,
+      )
+    const ownerId =
+      '3bbc46f8-a45f-4589-9872-129e6652082c'
+    const command = {
+      characterId: repository.record.characterId,
+      expectedRevision: 1,
+      skills: { athletics: 0 },
+    }
+
+    await assert.rejects(
+      useCase.execute(ownerId, command),
+      {
+        name:
+          'InvalidCharacterAttributeSkillStateError',
+      },
+    )
+
+    assert.deepEqual(repository.calls, [
+      [
+        'findById',
+        ownerId,
+        repository.record.characterId,
+      ],
+    ])
   },
 )
 

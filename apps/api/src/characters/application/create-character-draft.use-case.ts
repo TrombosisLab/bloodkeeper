@@ -7,6 +7,10 @@ import type {
   PersistedCharacterDraft,
 } from '../domain/persisted-character.types'
 
+import {
+  assertValidCharacterAttributeSkillState,
+} from '../domain/character-attribute-skill.rules'
+
 export class CreateCharacterDraftUseCase {
   private readonly repository:
     CharacterDraftRepository
@@ -20,6 +24,14 @@ export class CreateCharacterDraftUseCase {
   execute(
     data: CreateCharacterDraftData,
   ): Promise<PersistedCharacterDraft> {
+    assertValidCharacterAttributeSkillState(
+      data.attributes,
+      data.skills,
+      data.creation.skillDistributionMethod,
+      data.creation.currentStep,
+      data.skillSpecialties,
+    )
+
     return this.repository.create(data)
   }
 }

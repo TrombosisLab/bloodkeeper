@@ -1,4 +1,5 @@
 import {
+  CHARACTER_ATTRIBUTE_KEYS,
   CHARACTER_DISCIPLINE_KEYS,
   CHARACTER_SKILL_KEYS,
 } from '../domain/persisted-character.types'
@@ -623,12 +624,6 @@ function validateCreation(
   }
 }
 
-const attributes = [
-  'strength', 'dexterity', 'stamina',
-  'charisma', 'manipulation', 'composure',
-  'intelligence', 'wits', 'resolve',
-] as const
-
 function validateCreateBody(input: unknown): void {
   const value = record(input, 'body')
   const keys = [
@@ -646,7 +641,7 @@ function validateCreateBody(input: unknown): void {
     uuid(chronicleId, 'body.chronicleId')
   }
   validateIdentity(value.identity, 'body.identity')
-  validateIntegerRecord(value.attributes, attributes, 'body.attributes', true)
+  validateIntegerRecord(value.attributes, CHARACTER_ATTRIBUTE_KEYS, 'body.attributes', true)
   validateIntegerRecord(value.blood, ['bloodPotency', 'hunger'], 'body.blood', true)
   validateIntegerRecord(value.skills, CHARACTER_SKILL_KEYS, 'body.skills', true)
   validateSpecialties(value.skillSpecialties, 'body.skillSpecialties')
@@ -709,7 +704,7 @@ export function parseUpdateCharacterDraftRequest(
     }
   }
   if (Object.hasOwn(value, 'identity')) validateIdentity(value.identity, 'body.identity')
-  if (Object.hasOwn(value, 'attributes')) validateIntegerRecord(value.attributes, attributes, 'body.attributes', false)
+  if (Object.hasOwn(value, 'attributes')) validateIntegerRecord(value.attributes, CHARACTER_ATTRIBUTE_KEYS, 'body.attributes', false)
   if (Object.hasOwn(value, 'blood')) validateIntegerRecord(value.blood, ['bloodPotency', 'hunger'], 'body.blood', false)
   if (Object.hasOwn(value, 'skills')) validateIntegerRecord(value.skills, CHARACTER_SKILL_KEYS, 'body.skills', false)
   if (Object.hasOwn(value, 'skillSpecialties')) validateSpecialties(value.skillSpecialties, 'body.skillSpecialties')

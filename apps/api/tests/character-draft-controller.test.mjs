@@ -11,6 +11,10 @@ import {
 } from '../dist/characters/application/character-draft.repository.js'
 
 import {
+  InvalidCharacterAttributeSkillStateError,
+} from '../dist/characters/domain/character-attribute-skill.rules.js'
+
+import {
   CharacterDraftController,
 } from '../dist/characters/presentation/character-draft.controller.js'
 
@@ -232,6 +236,30 @@ test(
         { expectedRevision: 1 },
       ),
       hasStatus(409),
+    )
+  },
+)
+
+test(
+  '005-A expone infracciones de reglas como respuesta 422',
+  async () => {
+    const { instance } = controller({
+      updateDraft: {
+        async execute() {
+          throw new InvalidCharacterAttributeSkillStateError(
+            ['SKILL_DISTRIBUTION_INVALID'],
+          )
+        },
+      },
+    })
+
+    await assert.rejects(
+      instance.update(
+        authenticatedRequest(),
+        characterId,
+        { expectedRevision: 1 },
+      ),
+      hasStatus(422),
     )
   },
 )

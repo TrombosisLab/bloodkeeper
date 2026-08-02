@@ -36,17 +36,23 @@ export interface PersistedCharacterCreationState {
   updatedAt: Date
 }
 
-export interface PersistedCharacterAttributes {
-  strength: number
-  dexterity: number
-  stamina: number
-  charisma: number
-  manipulation: number
-  composure: number
-  intelligence: number
-  wits: number
-  resolve: number
-}
+export const CHARACTER_ATTRIBUTE_KEYS = [
+  'strength',
+  'dexterity',
+  'stamina',
+  'charisma',
+  'manipulation',
+  'composure',
+  'intelligence',
+  'wits',
+  'resolve',
+] as const
+
+export type CharacterAttributeKey =
+  typeof CHARACTER_ATTRIBUTE_KEYS[number]
+
+export type PersistedCharacterAttributes =
+  Record<CharacterAttributeKey, number>
 
 export interface PersistedCharacterBlood {
   bloodPotency: number
