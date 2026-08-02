@@ -11,6 +11,10 @@ import {
   assertValidCharacterAttributeSkillState,
 } from '../domain/character-attribute-skill.rules'
 
+import {
+  assertValidCharacterHumanityState,
+} from '../domain/character-humanity-state.rules'
+
 export class CreateCharacterDraftUseCase {
   private readonly repository:
     CharacterDraftRepository
@@ -30,6 +34,11 @@ export class CreateCharacterDraftUseCase {
       data.creation.skillDistributionMethod,
       data.creation.currentStep,
       data.skillSpecialties,
+    )
+
+    assertValidCharacterHumanityState(
+      data.humanity.value,
+      data.humanity.stains,
     )
 
     return this.repository.create(data)

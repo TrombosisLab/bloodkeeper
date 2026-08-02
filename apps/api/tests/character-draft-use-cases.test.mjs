@@ -81,6 +81,10 @@ function createRepository() {
         aggravated: 0,
       },
     },
+    humanity: {
+      value: 7,
+      stains: 0,
+    },
     skills: createBalancedSkills(),
     skillSpecialties: [],
     creation: {
@@ -150,6 +154,7 @@ test(
       },
       humanity: {
         value: 7,
+        stains: 0,
         convictions: [],
         touchstones: [],
       },
@@ -186,6 +191,38 @@ test(
       repository.calls,
       [['create', command]],
     )
+  },
+)
+
+test(
+  '006-D valida Humanidad y Manchas como estados separados',
+  async () => {
+    const repository = createRepository()
+    const useCase =
+      new UpdateCharacterDraftUseCase(
+        repository,
+      )
+    const ownerId =
+      '3bbc46f8-a45f-4589-9872-129e6652082c'
+
+    await assert.rejects(
+      useCase.execute(ownerId, {
+        characterId: repository.record.characterId,
+        expectedRevision: 1,
+        humanityStains: 4,
+      }),
+      {
+        name:
+          'InvalidCharacterHumanityStateError',
+      },
+    )
+
+    await useCase.execute(ownerId, {
+      characterId: repository.record.characterId,
+      expectedRevision: 1,
+      humanityValue: 6,
+      humanityStains: 4,
+    })
   },
 )
 

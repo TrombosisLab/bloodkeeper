@@ -900,6 +900,7 @@ function toPersistedDraft(
     },
     humanity: {
       value: row.humanity.value,
+      stains: row.humanity.stains,
       convictions: row.convictions.map(
         (conviction) => ({
           convictionId: conviction.convictionId,
@@ -1059,6 +1060,7 @@ export class PrismaCharacterDraftRepository
               humanity: {
                 create: {
                   value: data.humanity.value,
+                  stains: data.humanity.stains,
                 },
               },
               touchstones: {
@@ -1479,6 +1481,18 @@ export class PrismaCharacterDraftRepository
                 characterId: data.characterId,
               },
               data: { value: data.humanityValue },
+            })
+        }
+
+        if (data.humanityStains !== undefined) {
+          await transaction.characterHumanityState
+            .update({
+              where: {
+                characterId: data.characterId,
+              },
+              data: {
+                stains: data.humanityStains,
+              },
             })
         }
 

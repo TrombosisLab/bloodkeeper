@@ -357,6 +357,7 @@ model CharacterAdvantageDetails {
 model CharacterHumanityState {
   characterId String @id @db.Uuid
   value       Int    @default(7)
+  stains      Int    @default(0)
 
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 

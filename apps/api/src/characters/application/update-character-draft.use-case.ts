@@ -19,6 +19,10 @@ import {
   assertValidCharacterDamageState,
 } from '../domain/character-damage.rules'
 
+import {
+  assertValidCharacterHumanityState,
+} from '../domain/character-humanity-state.rules'
+
 export class UpdateCharacterDraftUseCase {
   private readonly repository:
     CharacterDraftRepository
@@ -47,9 +51,14 @@ export class UpdateCharacterDraftUseCase {
       data.attributes?.composure !== undefined ||
       data.attributes?.resolve !== undefined
 
+    const changesHumanityState =
+      data.humanityValue !== undefined ||
+      data.humanityStains !== undefined
+
     if (
       changesAttributeSkillState ||
-      changesDamageState
+      changesDamageState ||
+      changesHumanityState
     ) {
       const current =
         await this.repository.findById(
@@ -93,6 +102,15 @@ export class UpdateCharacterDraftUseCase {
         assertValidCharacterDamageState(
           attributes,
           data.damage ?? current.damage,
+        )
+      }
+
+      if (changesHumanityState) {
+        assertValidCharacterHumanityState(
+          data.humanityValue ??
+            current.humanity.value,
+          data.humanityStains ??
+            current.humanity.stains,
         )
       }
     }

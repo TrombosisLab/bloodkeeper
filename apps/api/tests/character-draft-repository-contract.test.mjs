@@ -112,6 +112,10 @@ test(
     )
     assert.match(
       repository,
+      /humanityStains[\s\S]*characterHumanityState[\s\S]*stains:/,
+    )
+    assert.match(
+      repository,
       /characterDiscipline[\s\S]*\.deleteMany/,
     )
     assert.match(

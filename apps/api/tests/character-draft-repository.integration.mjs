@@ -138,6 +138,7 @@ test(
         },
         humanity: {
           value: 7,
+          stains: 0,
           touchstones: [
             {
               touchstoneId: 'touchstone-004-c-4',
@@ -181,6 +182,7 @@ test(
         'Escenas del crimen',
       )
       assert.equal(created.humanity.value, 7)
+      assert.equal(created.humanity.stains, 0)
       assert.deepEqual(created.disciplines, [
         {
           disciplineKey: 'auspex',
@@ -348,6 +350,7 @@ test(
           ],
         },
         humanityValue: 6,
+        humanityStains: 2,
         humanityNarrative: {
           touchstones: [
             {
@@ -398,6 +401,7 @@ test(
         [{ name: 'Forense', origin: null }],
       )
       assert.equal(updated.humanity.value, 6)
+      assert.equal(updated.humanity.stains, 2)
       assert.deepEqual(updated.disciplines, [
         {
           disciplineKey: 'obfuscate',

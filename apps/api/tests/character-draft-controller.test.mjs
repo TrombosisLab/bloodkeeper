@@ -19,6 +19,10 @@ import {
 } from '../dist/characters/domain/character-damage.rules.js'
 
 import {
+  InvalidCharacterHumanityStateError,
+} from '../dist/characters/domain/character-humanity-state.rules.js'
+
+import {
   CharacterDraftController,
 } from '../dist/characters/presentation/character-draft.controller.js'
 
@@ -277,6 +281,32 @@ test(
           throw new InvalidCharacterDamageStateError(
             [
               'HEALTH_DAMAGE_EXCEEDS_CAPACITY',
+            ],
+          )
+        },
+      },
+    })
+
+    await assert.rejects(
+      instance.update(
+        authenticatedRequest(),
+        characterId,
+        { expectedRevision: 1 },
+      ),
+      hasStatus(422),
+    )
+  },
+)
+
+test(
+  '006-D expone Manchas imposibles como respuesta 422',
+  async () => {
+    const { instance } = controller({
+      updateDraft: {
+        async execute() {
+          throw new InvalidCharacterHumanityStateError(
+            [
+              'HUMANITY_STAINS_EXCEED_AVAILABLE_BOXES',
             ],
           )
         },

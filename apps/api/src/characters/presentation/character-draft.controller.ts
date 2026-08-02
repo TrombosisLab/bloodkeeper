@@ -50,6 +50,10 @@ import {
   InvalidCharacterDamageStateError,
 } from '../domain/character-damage.rules'
 
+import {
+  InvalidCharacterHumanityStateError,
+} from '../domain/character-humanity-state.rules'
+
 export interface AuthenticatedCharacterRequest {
   user?: {
     id?: unknown
@@ -96,7 +100,9 @@ function throwCharacterDraftHttpError(
     error instanceof
       InvalidCharacterAttributeSkillStateError ||
     error instanceof
-      InvalidCharacterDamageStateError
+      InvalidCharacterDamageStateError ||
+    error instanceof
+      InvalidCharacterHumanityStateError
   ) {
     throw new UnprocessableEntityException({
       code: 'CHARACTER_DRAFT_RULE_VIOLATION',

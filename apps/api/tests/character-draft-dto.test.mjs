@@ -55,6 +55,7 @@ function createBody() {
     advantages: { selections: [] },
     humanity: {
       value: 7,
+      stains: 0,
       convictions: [],
       touchstones: [],
     },
@@ -78,6 +79,24 @@ test(
     assert.equal(command.ownerId, ownerId)
     assert.equal(command.identity.name, 'Alicia')
     assert.notEqual(command, body)
+  },
+)
+
+test(
+  '006-D transporta Manchas separadas de Humanidad',
+  () => {
+    const command =
+      parseUpdateCharacterDraftRequest(
+        characterId,
+        {
+          expectedRevision: 1,
+          humanityValue: 6,
+          humanityStains: 2,
+        },
+      )
+
+    assert.equal(command.humanityValue, 6)
+    assert.equal(command.humanityStains, 2)
   },
 )
 

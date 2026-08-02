@@ -573,8 +573,9 @@ function validateHumanity(
   path: string,
 ): void {
   const value = record(input, path)
-  onlyKeys(value, ['value', 'convictions', 'touchstones'], path)
+  onlyKeys(value, ['value', 'stains', 'convictions', 'touchstones'], path)
   integer(required(value, 'value', path), `${path}.value`)
+  integer(required(value, 'stains', path), `${path}.stains`)
 
   arrayValue(required(value, 'convictions', path), `${path}.convictions`)
     .forEach((item, index) => {
@@ -724,7 +725,7 @@ export function parseUpdateCharacterDraftRequest(
     'attributes', 'blood', 'damage', 'skills', 'skillSpecialties',
     'disciplines', 'bloodSorceryRituals',
     'oblivionCeremonies', 'thinBloodAlchemy',
-    'thinBloodTraits', 'advantages', 'humanityValue',
+    'thinBloodTraits', 'advantages', 'humanityValue', 'humanityStains',
     'humanityNarrative', 'creation',
   ] as const
   onlyKeys(value, keys, 'body')
@@ -748,12 +749,14 @@ export function parseUpdateCharacterDraftRequest(
   if (Object.hasOwn(value, 'thinBloodTraits')) validateThinBloodTraits(value.thinBloodTraits, 'body.thinBloodTraits')
   if (Object.hasOwn(value, 'advantages')) validateAdvantages(value.advantages, 'body.advantages')
   if (Object.hasOwn(value, 'humanityValue')) integer(value.humanityValue, 'body.humanityValue')
+  if (Object.hasOwn(value, 'humanityStains')) integer(value.humanityStains, 'body.humanityStains')
   if (Object.hasOwn(value, 'humanityNarrative')) {
     const narrative = record(value.humanityNarrative, 'body.humanityNarrative')
     onlyKeys(narrative, ['convictions', 'touchstones'], 'body.humanityNarrative')
     validateHumanity(
       {
         value: 0,
+        stains: 0,
         convictions: required(narrative, 'convictions', 'body.humanityNarrative'),
         touchstones: required(narrative, 'touchstones', 'body.humanityNarrative'),
       },

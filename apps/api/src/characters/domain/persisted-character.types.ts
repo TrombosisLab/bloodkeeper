@@ -289,6 +289,7 @@ export interface PersistedCharacterTouchstone {
 
 export interface PersistedCharacterHumanity {
   value: number
+  stains: number
   convictions: PersistedCharacterConviction[]
   touchstones: PersistedCharacterTouchstone[]
 }
@@ -370,6 +371,7 @@ export interface UpdateCharacterDraftData {
     PersistedCharacterThinBloodTrait[]
   advantages?: PersistedCharacterAdvantages
   humanityValue?: number
+  humanityStains?: number
   humanityNarrative?: {
     convictions: PersistedCharacterConviction[]
     touchstones: PersistedCharacterTouchstone[]
