@@ -3,6 +3,14 @@ import type {
 } from './content-source.types'
 
 import type {
+  AttributeKey,
+} from './character-attributes-draft.types'
+
+import type {
+  SkillKey,
+} from './character-skills-draft.types'
+
+import type {
   DisciplineKey,
 } from './discipline.types'
 
@@ -19,6 +27,30 @@ export interface DisciplinePowerRequirements {
 
   amalgam?:
     DisciplineAmalgamRequirement
+}
+
+export type DisciplinePowerDicePoolTermDefinition =
+  | {
+      kind: 'attribute'
+      key: AttributeKey
+    }
+  | {
+      kind: 'skill'
+      key: SkillKey
+    }
+  | {
+      kind: 'discipline'
+      key: DisciplineKey
+    }
+
+export interface DisciplinePowerDiceCheckDefinition {
+  /*
+   * Referencias estructuradas que el módulo
+   * de dados podrá consumir. Aquí no se suma
+   * la reserva ni se ejecuta ninguna tirada.
+   */
+  pool:
+    DisciplinePowerDicePoolTermDefinition[]
 }
 
 export interface DisciplinePowerDefinition {
@@ -57,4 +89,7 @@ export interface DisciplinePowerDefinition {
 
   requirements?:
     DisciplinePowerRequirements
+
+  diceCheck?:
+    DisciplinePowerDiceCheckDefinition
 }

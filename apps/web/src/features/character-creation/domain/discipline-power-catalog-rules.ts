@@ -10,6 +10,8 @@ export type DisciplinePowerCatalogViolation =
   | 'POWER_NAME_EMPTY'
   | 'POWER_LEVEL_INVALID'
   | 'POWER_ACTIVE_STATE_INVALID'
+  | 'POWER_DICE_POOL_EMPTY'
+  | 'POWER_DICE_POOL_TERM_DUPLICATED'
 
 export interface DisciplinePowerCatalogValidationResult {
   valid: boolean
@@ -69,6 +71,36 @@ export function validateDisciplinePowerCatalog(
       violations.push(
         'POWER_ACTIVE_STATE_INVALID',
       )
+    }
+
+    if (definition.diceCheck) {
+      if (
+        definition.diceCheck.pool.length === 0
+      ) {
+        violations.push(
+          'POWER_DICE_POOL_EMPTY',
+        )
+      }
+
+      const poolTerms = new Set<string>()
+
+      for (
+        const term of
+        definition.diceCheck.pool
+      ) {
+        const termReference =
+          `${term.kind}:${term.key}`
+
+        if (
+          poolTerms.has(termReference)
+        ) {
+          violations.push(
+            'POWER_DICE_POOL_TERM_DUPLICATED',
+          )
+        }
+
+        poolTerms.add(termReference)
+      }
     }
   }
 
