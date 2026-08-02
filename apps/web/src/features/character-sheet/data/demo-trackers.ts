@@ -5,26 +5,17 @@ import type {
 export const demoHealth: DamageTrackerData = {
   label: 'Salud',
   capacity: 5,
-  maxCapacity: 10,
-  damage: [
-    'superficial',
-    'superficial',
-    'empty',
-    'empty',
-    'empty',
-  ],
+  track: {
+    superficial: 2,
+    aggravated: 0,
+  },
 }
 
 export const demoWillpower: DamageTrackerData = {
   label: 'Fuerza de Voluntad',
   capacity: 6,
-  maxCapacity: 10,
-  damage: [
-    'aggravated',
-    'superficial',
-    'empty',
-    'empty',
-    'empty',
-    'empty',
-  ],
+  track: {
+    superficial: 1,
+    aggravated: 1,
+  },
 }

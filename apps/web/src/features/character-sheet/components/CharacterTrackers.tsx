@@ -11,15 +11,13 @@ export function CharacterTrackers() {
       <DamageTracker
         label={demoHealth.label}
         capacity={demoHealth.capacity}
-        maxCapacity={demoHealth.maxCapacity}
-        damage={demoHealth.damage}
+        track={demoHealth.track}
       />
 
       <DamageTracker
         label={demoWillpower.label}
         capacity={demoWillpower.capacity}
-        maxCapacity={demoWillpower.maxCapacity}
-        damage={demoWillpower.damage}
+        track={demoWillpower.track}
       />
     </div>
   )

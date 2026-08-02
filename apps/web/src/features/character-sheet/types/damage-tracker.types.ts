@@ -1,4 +1,5 @@
 import type {
+  CharacterDamageTrack,
   DamageState,
 } from '../domain/damage-track-rules'
 
@@ -9,6 +10,5 @@ export type {
 export interface DamageTrackerData {
   label: string
   capacity: number
-  maxCapacity: number
-  damage: DamageState[]
+  track: CharacterDamageTrack
 }

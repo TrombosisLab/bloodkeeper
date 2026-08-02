@@ -1,12 +1,16 @@
 import type {
+  CharacterDamageTrack,
   DamageState,
-} from '../../features/character-sheet/types/damage-tracker.types'
+} from '../../features/character-sheet/domain/damage-track-rules'
+import {
+  MAX_DAMAGE_TRACK_CAPACITY,
+  toDamageStates,
+} from '../../features/character-sheet/domain/damage-track-rules'
 
 interface DamageTrackerProps {
   label: string
   capacity: number
-  maxCapacity?: number
-  damage: DamageState[]
+  track: CharacterDamageTrack
 }
 
 function getDamageLabel(
@@ -24,16 +28,36 @@ function getDamageLabel(
   }
 }
 
+function getDamageSymbol(
+  state: DamageState,
+): string {
+  switch (state) {
+    case 'superficial':
+      return '/'
+
+    case 'aggravated':
+      return '×'
+
+    default:
+      return ''
+  }
+}
+
 export function DamageTracker({
   label,
   capacity,
-  maxCapacity = 10,
-  damage,
+  track,
 }: DamageTrackerProps) {
-  const safeCapacity = Math.max(
-    0,
-    Math.min(capacity, maxCapacity),
+  const damage = toDamageStates(
+    capacity,
+    track,
   )
+
+  const summary = [
+    `${track.superficial} daño superficial`,
+    `${track.aggravated} daño agravado`,
+    `${capacity - track.superficial - track.aggravated} sin daño`,
+  ].join(', ')
 
   return (
     <div className="damage-tracker">
@@ -44,34 +68,41 @@ export function DamageTracker({
           </span>
 
           <strong className="damage-tracker__capacity">
-            {safeCapacity}
+            {capacity}
           </strong>
         </div>
 
         <span className="damage-tracker__maximum">
-          Máximo {maxCapacity}
+          Máximo {MAX_DAMAGE_TRACK_CAPACITY}
         </span>
       </div>
 
       <div
         className="damage-tracker__boxes"
-        role="img"
-        aria-label={`${label}: ${safeCapacity} casillas`}
+        role="list"
+        aria-label={`${label}: ${summary}`}
       >
         {Array.from(
-          { length: maxCapacity },
+          {
+            length:
+              MAX_DAMAGE_TRACK_CAPACITY,
+          },
           (_, index) => {
-            const available =
-              index < safeCapacity
+            const available = index < capacity
 
             const state: DamageState =
               available
                 ? (damage[index] ?? 'empty')
                 : 'empty'
 
+            const stateLabel = available
+              ? getDamageLabel(state)
+              : 'Capacidad no disponible'
+
             return (
               <span
                 key={index}
+                role="listitem"
                 className={[
                   'damage-box',
 
@@ -91,13 +122,18 @@ export function DamageTracker({
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                title={
-                  available
-                    ? getDamageLabel(state)
-                    : 'Capacidad no disponible'
-                }
-                aria-hidden="true"
-              />
+                title={stateLabel}
+                aria-label={`Casilla ${index + 1}: ${stateLabel}`}
+              >
+                <span
+                  className="damage-box__symbol"
+                  aria-hidden="true"
+                >
+                  {available
+                    ? getDamageSymbol(state)
+                    : ''}
+                </span>
+              </span>
             )
           },
         )}

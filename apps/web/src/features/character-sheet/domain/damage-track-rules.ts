@@ -8,6 +8,8 @@ export interface CharacterDamageTrack {
   aggravated: number
 }
 
+export const MAX_DAMAGE_TRACK_CAPACITY = 10
+
 export type CharacterDamageTrackViolation =
   | 'CAPACITY_OUT_OF_RANGE'
   | 'DAMAGE_COUNT_INVALID'
@@ -46,7 +48,7 @@ export function validateCharacterDamageTrack(
   if (
     !Number.isInteger(capacity) ||
     capacity < 0 ||
-    capacity > 10
+    capacity > MAX_DAMAGE_TRACK_CAPACITY
   ) {
     violations.push('CAPACITY_OUT_OF_RANGE')
   }
