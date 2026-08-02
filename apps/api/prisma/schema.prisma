@@ -6,3 +6,80 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model MilestoneValidation {
+  id    Int    @id
+  value String
+
+  @@map("milestone_validation")
+}
+
+enum CharacterStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum CharacterCreationStep {
+  IDENTITY
+  ATTRIBUTES
+  SKILLS
+  BLOOD
+  DISCIPLINES
+  ADVANTAGES
+  HUMANITY
+  REVIEW
+}
+
+enum SkillDistributionMethod {
+  GENERALIST
+  BALANCED
+  SPECIALIST
+}
+
+model Character {
+  id          String          @id @default(uuid()) @db.Uuid
+  ownerId     String          @db.Uuid
+  chronicleId String?         @db.Uuid
+  status      CharacterStatus @default(DRAFT)
+  revision    Int             @default(1)
+  createdAt   DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime        @updatedAt @db.Timestamptz(3)
+
+  identity      CharacterIdentity?
+  creationState CharacterCreationState?
+
+  @@index([ownerId])
+  @@index([chronicleId])
+  @@index([status])
+  @@map("characters")
+}
+
+model CharacterIdentity {
+  id              String  @id @default(uuid()) @db.Uuid
+  characterId     String  @unique @db.Uuid
+  name            String  @default("")
+  concept         String?
+  predatorTypeKey String?
+  ambition        String?
+  clanKey         String?
+  sire            String?
+  desire          String?
+  generation      Int?
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("character_identities")
+}
+
+model CharacterCreationState {
+  characterId            String                  @id @db.Uuid
+  schemaVersion          Int                     @default(1)
+  currentStep            CharacterCreationStep   @default(IDENTITY)
+  skillDistributionMethod SkillDistributionMethod @default(BALANCED)
+  updatedAt              DateTime                @updatedAt @db.Timestamptz(3)
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("character_creation_states")
+}
