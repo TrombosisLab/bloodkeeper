@@ -71,6 +71,17 @@ test(
             origin: 'creation',
           },
         ],
+        disciplines: [
+          {
+            disciplineKey: 'auspex',
+            rating: 2,
+            powerKeys: [
+              'heightened-senses',
+              'premonition',
+            ],
+            origin: 'creation',
+          },
+        ],
         humanity: {
           value: 7,
           touchstones: [
@@ -106,6 +117,17 @@ test(
         'Escenas del crimen',
       )
       assert.equal(created.humanity.value, 7)
+      assert.deepEqual(created.disciplines, [
+        {
+          disciplineKey: 'auspex',
+          rating: 2,
+          powerKeys: [
+            'heightened-senses',
+            'premonition',
+          ],
+          origin: 'creation',
+        },
+      ])
       assert.equal(
         created.humanity.convictions[0]
           ?.touchstoneId,
@@ -144,6 +166,14 @@ test(
             skillKey: 'investigation',
             name: 'Forense',
             origin: null,
+          },
+        ],
+        disciplines: [
+          {
+            disciplineKey: 'obfuscate',
+            rating: 1,
+            powerKeys: ['cloak-of-shadows'],
+            origin: 'predatorType',
           },
         ],
         humanityValue: 6,
@@ -187,6 +217,14 @@ test(
         [{ name: 'Forense', origin: null }],
       )
       assert.equal(updated.humanity.value, 6)
+      assert.deepEqual(updated.disciplines, [
+        {
+          disciplineKey: 'obfuscate',
+          rating: 1,
+          powerKeys: ['cloak-of-shadows'],
+          origin: 'predatorType',
+        },
+      ])
       assert.equal(
         updated.humanity.touchstones[0]?.name,
         'Marcos',

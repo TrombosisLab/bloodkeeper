@@ -42,6 +42,12 @@ enum SkillSpecialtyOrigin {
   PREDATOR_TYPE
 }
 
+enum DisciplineOrigin {
+  CREATION
+  PREDATOR_TYPE
+  THIN_BLOOD
+}
+
 model Character {
   id          String          @id @default(uuid()) @db.Uuid
   ownerId     String          @db.Uuid
@@ -56,6 +62,7 @@ model Character {
   attributes    CharacterAttributes?
   blood         CharacterBloodState?
   skills        CharacterSkill[]
+  disciplines   CharacterDiscipline[]
   humanity      CharacterHumanityState?
   convictions   CharacterConviction[]
   touchstones   CharacterTouchstone[]
@@ -145,6 +152,30 @@ model CharacterSkillSpecialty {
 
   @@index([characterId, skillKey])
   @@map("character_skill_specialties")
+}
+
+model CharacterDiscipline {
+  characterId  String            @db.Uuid
+  disciplineKey String
+  rating        Int               @default(0)
+  origin        DisciplineOrigin?
+
+  character Character                  @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  powers    CharacterDisciplinePower[]
+
+  @@id([characterId, disciplineKey])
+  @@map("character_disciplines")
+}
+
+model CharacterDisciplinePower {
+  characterId  String @db.Uuid
+  disciplineKey String
+  powerKey      String
+
+  discipline CharacterDiscipline @relation(fields: [characterId, disciplineKey], references: [characterId, disciplineKey], onDelete: Cascade)
+
+  @@id([characterId, disciplineKey, powerKey])
+  @@map("character_discipline_powers")
 }
 
 model CharacterHumanityState {

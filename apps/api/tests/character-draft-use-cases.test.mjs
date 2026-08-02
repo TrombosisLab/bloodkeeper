@@ -86,6 +86,7 @@ test(
       },
       skills: createEmptySkills(),
       skillSpecialties: [],
+      disciplines: [],
       humanity: {
         value: 7,
         convictions: [],

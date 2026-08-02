@@ -100,6 +100,36 @@ export interface PersistedCharacterSkillSpecialty {
   origin: SkillSpecialtyOrigin | null
 }
 
+export const CHARACTER_DISCIPLINE_KEYS = [
+  'animalism',
+  'auspex',
+  'bloodSorcery',
+  'celerity',
+  'dominate',
+  'fortitude',
+  'obfuscate',
+  'oblivion',
+  'potence',
+  'presence',
+  'protean',
+  'thinBloodAlchemy',
+] as const
+
+export type CharacterDisciplineKey =
+  typeof CHARACTER_DISCIPLINE_KEYS[number]
+
+export type CharacterDisciplineOrigin =
+  | 'creation'
+  | 'predatorType'
+  | 'thinBlood'
+
+export interface PersistedCharacterDiscipline {
+  disciplineKey: CharacterDisciplineKey
+  rating: number
+  powerKeys: string[]
+  origin: CharacterDisciplineOrigin | null
+}
+
 export interface PersistedCharacterConviction {
   convictionId: string
   text: string
@@ -133,6 +163,7 @@ export interface PersistedCharacterDraft {
   skills: PersistedCharacterSkills
   skillSpecialties:
     PersistedCharacterSkillSpecialty[]
+  disciplines: PersistedCharacterDiscipline[]
   humanity: PersistedCharacterHumanity
 }
 
@@ -145,6 +176,7 @@ export interface CreateCharacterDraftData {
   skills: PersistedCharacterSkills
   skillSpecialties:
     PersistedCharacterSkillSpecialty[]
+  disciplines: PersistedCharacterDiscipline[]
   humanity: PersistedCharacterHumanity
   creation: {
     currentStep: CharacterCreationStep
@@ -162,6 +194,7 @@ export interface UpdateCharacterDraftData {
   skills?: Partial<PersistedCharacterSkills>
   skillSpecialties?:
     PersistedCharacterSkillSpecialty[]
+  disciplines?: PersistedCharacterDiscipline[]
   humanityValue?: number
   humanityNarrative?: {
     convictions: PersistedCharacterConviction[]

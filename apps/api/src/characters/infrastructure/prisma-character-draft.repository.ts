@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common'
 import {
   CharacterCreationStep as PrismaCharacterCreationStep,
   CharacterStatus as PrismaCharacterStatus,
+  DisciplineOrigin as PrismaDisciplineOrigin,
   Prisma,
   SkillDistributionMethod as PrismaSkillDistributionMethod,
   SkillSpecialtyOrigin as PrismaSkillSpecialtyOrigin,
@@ -18,6 +19,8 @@ import type {
 
 import type {
   CharacterCreationStep,
+  CharacterDisciplineKey,
+  CharacterDisciplineOrigin,
   CharacterLifecycleStatus,
   CharacterSkillKey,
   CreateCharacterDraftData,
@@ -30,6 +33,7 @@ import type {
 } from '../domain/persisted-character.types'
 
 import {
+  CHARACTER_DISCIPLINE_KEYS,
   CHARACTER_SKILL_KEYS,
 } from '../domain/persisted-character.types'
 
@@ -107,6 +111,25 @@ const specialtyOriginFromPrisma: Record<
   PREDATOR_TYPE: 'predatorType',
 }
 
+const disciplineOriginToPrisma: Record<
+  CharacterDisciplineOrigin,
+  PrismaDisciplineOrigin
+> = {
+  creation: PrismaDisciplineOrigin.CREATION,
+  predatorType:
+    PrismaDisciplineOrigin.PREDATOR_TYPE,
+  thinBlood: PrismaDisciplineOrigin.THIN_BLOOD,
+}
+
+const disciplineOriginFromPrisma: Record<
+  PrismaDisciplineOrigin,
+  CharacterDisciplineOrigin
+> = {
+  CREATION: 'creation',
+  PREDATOR_TYPE: 'predatorType',
+  THIN_BLOOD: 'thinBlood',
+}
+
 const characterRelations = {
   identity: true,
   creationState: true,
@@ -119,6 +142,14 @@ const characterRelations = {
       },
     },
     orderBy: { skillKey: 'asc' },
+  },
+  disciplines: {
+    include: {
+      powers: {
+        orderBy: { powerKey: 'asc' },
+      },
+    },
+    orderBy: { disciplineKey: 'asc' },
   },
   humanity: true,
   convictions: {
@@ -158,6 +189,16 @@ function isCharacterSkillKey(
   value: string,
 ): value is CharacterSkillKey {
   return characterSkillKeySet.has(value)
+}
+
+const characterDisciplineKeySet = new Set<string>(
+  CHARACTER_DISCIPLINE_KEYS,
+)
+
+function isCharacterDisciplineKey(
+  value: string,
+): value is CharacterDisciplineKey {
+  return characterDisciplineKeySet.has(value)
 }
 
 function toPersistedDraft(
@@ -265,6 +306,33 @@ function toPersistedDraft(
         )
       },
     ),
+    disciplines: row.disciplines.map(
+      (discipline) => {
+        if (
+          !isCharacterDisciplineKey(
+            discipline.disciplineKey,
+          )
+        ) {
+          throw new Error(
+            `Character ${row.id} has unknown discipline ${discipline.disciplineKey}`,
+          )
+        }
+
+        return {
+          disciplineKey: discipline.disciplineKey,
+          rating: discipline.rating,
+          powerKeys: discipline.powers.map(
+            (power) => power.powerKey,
+          ),
+          origin:
+            discipline.origin === null
+              ? null
+              : disciplineOriginFromPrisma[
+                  discipline.origin
+                ],
+        }
+      },
+    ),
     humanity: {
       value: row.humanity.value,
       convictions: row.convictions.map(
@@ -353,6 +421,25 @@ export class PrismaCharacterDraftRepository
                     },
                   }),
                 ),
+              },
+              disciplines: {
+                create: data.disciplines.map(
+                  (discipline) => ({
+                    disciplineKey:
+                      discipline.disciplineKey,
+                    rating: discipline.rating,
+                    origin:
+                      discipline.origin === null
+                        ? null
+                        : disciplineOriginToPrisma[
+                            discipline.origin
+                          ],
+                    powers: {
+                      create: discipline.powerKeys.map(
+                        (powerKey) => ({ powerKey }),
+                      ),
+                    },
+                  })),
               },
               humanity: {
                 create: {
@@ -549,6 +636,44 @@ export class PrismaCharacterDraftRepository
                 ),
               })
           }
+        }
+
+        if (data.disciplines !== undefined) {
+          await transaction.characterDiscipline
+            .deleteMany({
+              where: {
+                characterId: data.characterId,
+              },
+            })
+
+          await Promise.all(
+            data.disciplines.map(
+              (discipline) =>
+                transaction.characterDiscipline
+                  .create({
+                    data: {
+                      characterId: data.characterId,
+                      disciplineKey:
+                        discipline.disciplineKey,
+                      rating: discipline.rating,
+                      origin:
+                        discipline.origin === null
+                          ? null
+                          : disciplineOriginToPrisma[
+                              discipline.origin
+                            ],
+                      powers: {
+                        create:
+                          discipline.powerKeys.map(
+                            (powerKey) => ({
+                              powerKey,
+                            }),
+                          ),
+                      },
+                    },
+                  }),
+            ),
+          )
         }
 
         if (data.humanityValue !== undefined) {
