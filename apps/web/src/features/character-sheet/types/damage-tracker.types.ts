@@ -1,7 +1,10 @@
-export type DamageState =
-  | 'empty'
-  | 'superficial'
-  | 'aggravated'
+import type {
+  DamageState,
+} from '../domain/damage-track-rules'
+
+export type {
+  DamageState,
+} from '../domain/damage-track-rules'
 
 export interface DamageTrackerData {
   label: string
