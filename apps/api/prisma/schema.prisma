@@ -48,6 +48,12 @@ enum DisciplineOrigin {
   THIN_BLOOD
 }
 
+enum ThinBloodAlchemyMethod {
+  ATHANOR_CORPORIS
+  CALCINATIO
+  FIXATIO
+}
+
 model Character {
   id          String          @id @default(uuid()) @db.Uuid
   ownerId     String          @db.Uuid
@@ -65,6 +71,9 @@ model Character {
   disciplines   CharacterDiscipline[]
   bloodSorceryRituals CharacterBloodSorceryRitual[]
   oblivionCeremonies  CharacterOblivionCeremony[]
+  thinBloodAlchemy    CharacterThinBloodAlchemyState?
+  thinBloodFormulas   CharacterThinBloodAlchemyFormula[]
+  thinBloodTraits     CharacterThinBloodTrait[]
   humanity      CharacterHumanityState?
   convictions   CharacterConviction[]
   touchstones   CharacterTouchstone[]
@@ -198,6 +207,39 @@ model CharacterOblivionCeremony {
 
   @@id([characterId, ceremonyKey])
   @@map("character_oblivion_ceremonies")
+}
+
+model CharacterThinBloodAlchemyState {
+  characterId String                  @id @db.Uuid
+  rating      Int                     @default(0)
+  method      ThinBloodAlchemyMethod?
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("character_thin_blood_alchemy_states")
+}
+
+model CharacterThinBloodAlchemyFormula {
+  characterId String @db.Uuid
+  formulaKey  String
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@id([characterId, formulaKey])
+  @@map("character_thin_blood_alchemy_formulas")
+}
+
+model CharacterThinBloodTrait {
+  characterId                        String  @db.Uuid
+  definitionKey                      String
+  clanCurseClanKey                   String?
+  disciplineAffinityDisciplineKey    String?
+  disciplineAffinityPowerKey         String?
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@id([characterId, definitionKey])
+  @@map("character_thin_blood_traits")
 }
 
 model CharacterHumanityState {

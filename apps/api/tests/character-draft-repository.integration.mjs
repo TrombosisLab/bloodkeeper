@@ -88,6 +88,28 @@ test(
         oblivionCeremonies: {
           ceremonyKeys: ['the-binding-fetter'],
         },
+        thinBloodAlchemy: {
+          rating: 1,
+          method: 'fixatio',
+          formulaKeys: ['far-reach'],
+        },
+        thinBloodTraits: [
+          {
+            definitionKey: 'clan-curse',
+            clanCurseDetails: {
+              clanKey: 'brujah',
+            },
+            disciplineAffinityDetails: null,
+          },
+          {
+            definitionKey: 'discipline-affinity',
+            clanCurseDetails: null,
+            disciplineAffinityDetails: {
+              disciplineKey: 'auspex',
+              powerKey: 'heightened-senses',
+            },
+          },
+        ],
         humanity: {
           value: 7,
           touchstones: [
@@ -141,6 +163,21 @@ test(
       assert.deepEqual(
         created.oblivionCeremonies.ceremonyKeys,
         ['the-binding-fetter'],
+      )
+      assert.deepEqual(created.thinBloodAlchemy, {
+        rating: 1,
+        method: 'fixatio',
+        formulaKeys: ['far-reach'],
+      })
+      assert.equal(
+        created.thinBloodTraits[0]
+          ?.clanCurseDetails?.clanKey,
+        'brujah',
+      )
+      assert.equal(
+        created.thinBloodTraits[1]
+          ?.disciplineAffinityDetails?.disciplineKey,
+        'auspex',
       )
       assert.equal(
         created.humanity.convictions[0]
@@ -196,6 +233,18 @@ test(
         oblivionCeremonies: {
           ceremonyKeys: ['summon-spirit'],
         },
+        thinBloodAlchemy: {
+          rating: 2,
+          method: 'calcinatio',
+          formulaKeys: ['haze'],
+        },
+        thinBloodTraits: [
+          {
+            definitionKey: 'day-drinker',
+            clanCurseDetails: null,
+            disciplineAffinityDetails: null,
+          },
+        ],
         humanityValue: 6,
         humanityNarrative: {
           touchstones: [
@@ -252,6 +301,17 @@ test(
       assert.deepEqual(
         updated.oblivionCeremonies.ceremonyKeys,
         ['summon-spirit'],
+      )
+      assert.deepEqual(updated.thinBloodAlchemy, {
+        rating: 2,
+        method: 'calcinatio',
+        formulaKeys: ['haze'],
+      })
+      assert.deepEqual(
+        updated.thinBloodTraits.map(
+          (trait) => trait.definitionKey,
+        ),
+        ['day-drinker'],
       )
       assert.equal(
         updated.humanity.touchstones[0]?.name,

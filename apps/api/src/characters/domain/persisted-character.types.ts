@@ -138,6 +138,28 @@ export interface PersistedCharacterOblivionCeremonies {
   ceremonyKeys: string[]
 }
 
+export type ThinBloodAlchemyMethod =
+  | 'athanorCorporis'
+  | 'calcinatio'
+  | 'fixatio'
+
+export interface PersistedCharacterThinBloodAlchemy {
+  rating: number
+  method: ThinBloodAlchemyMethod | null
+  formulaKeys: string[]
+}
+
+export interface PersistedCharacterThinBloodTrait {
+  definitionKey: string
+  clanCurseDetails: {
+    clanKey: string
+  } | null
+  disciplineAffinityDetails: {
+    disciplineKey: CharacterDisciplineKey
+    powerKey: string
+  } | null
+}
+
 export interface PersistedCharacterConviction {
   convictionId: string
   text: string
@@ -176,6 +198,10 @@ export interface PersistedCharacterDraft {
     PersistedCharacterBloodSorceryRituals
   oblivionCeremonies:
     PersistedCharacterOblivionCeremonies
+  thinBloodAlchemy:
+    PersistedCharacterThinBloodAlchemy
+  thinBloodTraits:
+    PersistedCharacterThinBloodTrait[]
   humanity: PersistedCharacterHumanity
 }
 
@@ -193,6 +219,10 @@ export interface CreateCharacterDraftData {
     PersistedCharacterBloodSorceryRituals
   oblivionCeremonies:
     PersistedCharacterOblivionCeremonies
+  thinBloodAlchemy:
+    PersistedCharacterThinBloodAlchemy
+  thinBloodTraits:
+    PersistedCharacterThinBloodTrait[]
   humanity: PersistedCharacterHumanity
   creation: {
     currentStep: CharacterCreationStep
@@ -215,6 +245,10 @@ export interface UpdateCharacterDraftData {
     PersistedCharacterBloodSorceryRituals
   oblivionCeremonies?:
     PersistedCharacterOblivionCeremonies
+  thinBloodAlchemy?:
+    PersistedCharacterThinBloodAlchemy
+  thinBloodTraits?:
+    PersistedCharacterThinBloodTrait[]
   humanityValue?: number
   humanityNarrative?: {
     convictions: PersistedCharacterConviction[]

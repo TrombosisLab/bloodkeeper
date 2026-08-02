@@ -7,6 +7,7 @@ import {
   Prisma,
   SkillDistributionMethod as PrismaSkillDistributionMethod,
   SkillSpecialtyOrigin as PrismaSkillSpecialtyOrigin,
+  ThinBloodAlchemyMethod as PrismaThinBloodAlchemyMethod,
 } from '@prisma/client'
 
 import {
@@ -29,6 +30,7 @@ import type {
   PersistedCharacterSkills,
   SkillDistributionMethod,
   SkillSpecialtyOrigin,
+  ThinBloodAlchemyMethod,
   UpdateCharacterDraftData,
 } from '../domain/persisted-character.types'
 
@@ -130,6 +132,25 @@ const disciplineOriginFromPrisma: Record<
   THIN_BLOOD: 'thinBlood',
 }
 
+const alchemyMethodToPrisma: Record<
+  ThinBloodAlchemyMethod,
+  PrismaThinBloodAlchemyMethod
+> = {
+  athanorCorporis:
+    PrismaThinBloodAlchemyMethod.ATHANOR_CORPORIS,
+  calcinatio: PrismaThinBloodAlchemyMethod.CALCINATIO,
+  fixatio: PrismaThinBloodAlchemyMethod.FIXATIO,
+}
+
+const alchemyMethodFromPrisma: Record<
+  PrismaThinBloodAlchemyMethod,
+  ThinBloodAlchemyMethod
+> = {
+  ATHANOR_CORPORIS: 'athanorCorporis',
+  CALCINATIO: 'calcinatio',
+  FIXATIO: 'fixatio',
+}
+
 const characterRelations = {
   identity: true,
   creationState: true,
@@ -156,6 +177,13 @@ const characterRelations = {
   },
   oblivionCeremonies: {
     orderBy: { ceremonyKey: 'asc' },
+  },
+  thinBloodAlchemy: true,
+  thinBloodFormulas: {
+    orderBy: { formulaKey: 'asc' },
+  },
+  thinBloodTraits: {
+    orderBy: { definitionKey: 'asc' },
   },
   humanity: true,
   convictions: {
@@ -215,6 +243,7 @@ function toPersistedDraft(
     row.creationState === null ||
     row.attributes === null ||
     row.blood === null ||
+    row.thinBloodAlchemy === null ||
     row.humanity === null
   ) {
     throw new Error(
@@ -349,6 +378,52 @@ function toPersistedDraft(
         (ceremony) => ceremony.ceremonyKey,
       ),
     },
+    thinBloodAlchemy: {
+      rating: row.thinBloodAlchemy.rating,
+      method:
+        row.thinBloodAlchemy.method === null
+          ? null
+          : alchemyMethodFromPrisma[
+              row.thinBloodAlchemy.method
+            ],
+      formulaKeys: row.thinBloodFormulas.map(
+        (formula) => formula.formulaKey,
+      ),
+    },
+    thinBloodTraits: row.thinBloodTraits.map(
+      (trait) => {
+        const disciplineKey =
+          trait.disciplineAffinityDisciplineKey
+
+        if (
+          disciplineKey !== null &&
+          !isCharacterDisciplineKey(disciplineKey)
+        ) {
+          throw new Error(
+            `Character ${row.id} has unknown affinity discipline ${disciplineKey}`,
+          )
+        }
+
+        return {
+          definitionKey: trait.definitionKey,
+          clanCurseDetails:
+            trait.clanCurseClanKey === null
+              ? null
+              : {
+                  clanKey: trait.clanCurseClanKey,
+                },
+          disciplineAffinityDetails:
+            disciplineKey === null ||
+            trait.disciplineAffinityPowerKey === null
+              ? null
+              : {
+                  disciplineKey,
+                  powerKey:
+                    trait.disciplineAffinityPowerKey,
+                },
+        }
+      },
+    ),
     humanity: {
       value: row.humanity.value,
       convictions: row.convictions.map(
@@ -470,6 +545,39 @@ export class PrismaCharacterDraftRepository
                     .map((ceremonyKey) => ({
                       ceremonyKey,
                     })),
+              },
+              thinBloodAlchemy: {
+                create: {
+                  rating: data.thinBloodAlchemy.rating,
+                  method:
+                    data.thinBloodAlchemy.method === null
+                      ? null
+                      : alchemyMethodToPrisma[
+                          data.thinBloodAlchemy.method
+                        ],
+                },
+              },
+              thinBloodFormulas: {
+                create:
+                  data.thinBloodAlchemy.formulaKeys
+                    .map((formulaKey) => ({
+                      formulaKey,
+                    })),
+              },
+              thinBloodTraits: {
+                create: data.thinBloodTraits.map(
+                  (trait) => ({
+                    definitionKey: trait.definitionKey,
+                    clanCurseClanKey:
+                      trait.clanCurseDetails?.clanKey ??
+                      null,
+                    disciplineAffinityDisciplineKey:
+                      trait.disciplineAffinityDetails
+                        ?.disciplineKey ?? null,
+                    disciplineAffinityPowerKey:
+                      trait.disciplineAffinityDetails
+                        ?.powerKey ?? null,
+                  })),
               },
               humanity: {
                 create: {
@@ -764,6 +872,78 @@ export class PrismaCharacterDraftRepository
                         ceremonyKey,
                       }),
                     ),
+              })
+          }
+        }
+
+        if (data.thinBloodAlchemy !== undefined) {
+          await transaction
+            .characterThinBloodAlchemyState
+            .update({
+              where: {
+                characterId: data.characterId,
+              },
+              data: {
+                rating: data.thinBloodAlchemy.rating,
+                method:
+                  data.thinBloodAlchemy.method === null
+                    ? null
+                    : alchemyMethodToPrisma[
+                        data.thinBloodAlchemy.method
+                      ],
+              },
+            })
+
+          await transaction
+            .characterThinBloodAlchemyFormula
+            .deleteMany({
+              where: {
+                characterId: data.characterId,
+              },
+            })
+
+          if (
+            data.thinBloodAlchemy.formulaKeys.length >
+            0
+          ) {
+            await transaction
+              .characterThinBloodAlchemyFormula
+              .createMany({
+                data: data.thinBloodAlchemy.formulaKeys
+                  .map((formulaKey) => ({
+                    characterId: data.characterId,
+                    formulaKey,
+                  })),
+              })
+          }
+        }
+
+        if (data.thinBloodTraits !== undefined) {
+          await transaction.characterThinBloodTrait
+            .deleteMany({
+              where: {
+                characterId: data.characterId,
+              },
+            })
+
+          if (data.thinBloodTraits.length > 0) {
+            await transaction.characterThinBloodTrait
+              .createMany({
+                data: data.thinBloodTraits.map(
+                  (trait) => ({
+                    characterId: data.characterId,
+                    definitionKey: trait.definitionKey,
+                    clanCurseClanKey:
+                      trait.clanCurseDetails?.clanKey ??
+                      null,
+                    disciplineAffinityDisciplineKey:
+                      trait.disciplineAffinityDetails
+                        ?.disciplineKey ?? null,
+                    disciplineAffinityPowerKey:
+                      trait.disciplineAffinityDetails
+                        ?.powerKey ?? null,
+                  }),
+                ),
               })
           }
         }

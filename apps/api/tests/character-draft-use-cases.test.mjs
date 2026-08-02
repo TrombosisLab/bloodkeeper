@@ -93,6 +93,12 @@ test(
       oblivionCeremonies: {
         ceremonyKeys: [],
       },
+      thinBloodAlchemy: {
+        rating: 0,
+        method: null,
+        formulaKeys: [],
+      },
+      thinBloodTraits: [],
       humanity: {
         value: 7,
         convictions: [],

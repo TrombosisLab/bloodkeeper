@@ -47,6 +47,14 @@ test(
       repository,
       /oblivionCeremonies:\s*{\s*create:/,
     )
+    assert.match(
+      repository,
+      /thinBloodAlchemy:\s*{\s*create:/,
+    )
+    assert.match(
+      repository,
+      /thinBloodTraits:\s*{\s*create:/,
+    )
   },
 )
 
@@ -55,7 +63,7 @@ test(
   () => {
     assert.match(
       repository,
-      /identity: true,[\s\S]*creationState: true,[\s\S]*attributes: true,[\s\S]*blood: true,[\s\S]*skills:[\s\S]*disciplines:[\s\S]*bloodSorceryRituals:[\s\S]*oblivionCeremonies:[\s\S]*humanity: true/,
+      /identity: true,[\s\S]*creationState: true,[\s\S]*attributes: true,[\s\S]*blood: true,[\s\S]*skills:[\s\S]*disciplines:[\s\S]*bloodSorceryRituals:[\s\S]*oblivionCeremonies:[\s\S]*thinBloodAlchemy: true,[\s\S]*thinBloodFormulas:[\s\S]*thinBloodTraits:[\s\S]*humanity: true/,
     )
     assert.match(repository, /character\.findUnique/)
   },
@@ -104,6 +112,14 @@ test(
     assert.match(
       repository,
       /characterOblivionCeremony[\s\S]*\.deleteMany/,
+    )
+    assert.match(
+      repository,
+      /characterThinBloodAlchemyFormula[\s\S]*\.deleteMany/,
+    )
+    assert.match(
+      repository,
+      /characterThinBloodTrait[\s\S]*\.deleteMany/,
     )
   },
 )
