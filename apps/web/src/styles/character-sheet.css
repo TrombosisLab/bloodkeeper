@@ -350,12 +350,33 @@
   background: #0e0c0c;
 }
 
+.damage-box-item {
+  min-width: 0;
+}
+
+.damage-box-item > .damage-box {
+  width: 100%;
+}
+
 .damage-box--available {
   border-color: #816168;
 }
 
 .damage-box--unavailable {
   opacity: 0.22;
+}
+
+.damage-box--editable {
+  padding: 0;
+
+  cursor: pointer;
+
+  font: inherit;
+}
+
+.damage-box--editable:focus-visible {
+  outline: 2px solid #e0a2aa;
+  outline-offset: 3px;
 }
 
 .damage-box__symbol {

@@ -14,6 +14,7 @@ export type CharacterDamageTrackViolation =
   | 'CAPACITY_OUT_OF_RANGE'
   | 'DAMAGE_COUNT_INVALID'
   | 'DAMAGE_EXCEEDS_CAPACITY'
+  | 'BOX_INDEX_OUT_OF_RANGE'
 
 export class InvalidCharacterDamageTrackError
   extends Error {
@@ -104,4 +105,80 @@ export function toDamageStates(
         track.superficial,
     ).fill('empty'),
   ]
+}
+
+export function getNextDamageState(
+  state: DamageState,
+): DamageState {
+  switch (state) {
+    case 'empty':
+      return 'superficial'
+
+    case 'superficial':
+      return 'aggravated'
+
+    case 'aggravated':
+      return 'empty'
+  }
+}
+
+export function setDamageBoxState(
+  capacity: number,
+  track: CharacterDamageTrack,
+  boxIndex: number,
+  nextState: DamageState,
+): CharacterDamageTrack {
+  const states = toDamageStates(
+    capacity,
+    track,
+  )
+
+  if (
+    !Number.isInteger(boxIndex) ||
+    boxIndex < 0 ||
+    boxIndex >= capacity
+  ) {
+    throw new InvalidCharacterDamageTrackError(
+      ['BOX_INDEX_OUT_OF_RANGE'],
+    )
+  }
+
+  states[boxIndex] = nextState
+
+  return {
+    superficial: states.filter(
+      (state) => state === 'superficial',
+    ).length,
+    aggravated: states.filter(
+      (state) => state === 'aggravated',
+    ).length,
+  }
+}
+
+export function cycleDamageBoxState(
+  capacity: number,
+  track: CharacterDamageTrack,
+  boxIndex: number,
+): CharacterDamageTrack {
+  const states = toDamageStates(
+    capacity,
+    track,
+  )
+
+  if (
+    !Number.isInteger(boxIndex) ||
+    boxIndex < 0 ||
+    boxIndex >= capacity
+  ) {
+    throw new InvalidCharacterDamageTrackError(
+      ['BOX_INDEX_OUT_OF_RANGE'],
+    )
+  }
+
+  return setDamageBoxState(
+    capacity,
+    track,
+    boxIndex,
+    getNextDamageState(states[boxIndex]),
+  )
 }

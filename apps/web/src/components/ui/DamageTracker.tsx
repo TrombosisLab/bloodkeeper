@@ -3,15 +3,31 @@ import type {
   DamageState,
 } from '../../features/character-sheet/domain/damage-track-rules'
 import {
+  cycleDamageBoxState,
+  getNextDamageState,
   MAX_DAMAGE_TRACK_CAPACITY,
   toDamageStates,
 } from '../../features/character-sheet/domain/damage-track-rules'
 
-interface DamageTrackerProps {
+interface DamageTrackerBaseProps {
   label: string
   capacity: number
   track: CharacterDamageTrack
 }
+
+type DamageTrackerProps =
+  DamageTrackerBaseProps & (
+    | {
+        mode?: 'readOnly'
+        onChange?: never
+      }
+    | {
+        mode: 'editable'
+        onChange: (
+          track: CharacterDamageTrack,
+        ) => void
+      }
+  )
 
 function getDamageLabel(
   state: DamageState,
@@ -47,6 +63,8 @@ export function DamageTracker({
   label,
   capacity,
   track,
+  mode = 'readOnly',
+  onChange,
 }: DamageTrackerProps) {
   const damage = toDamageStates(
     capacity,
@@ -99,40 +117,75 @@ export function DamageTracker({
               ? getDamageLabel(state)
               : 'Capacidad no disponible'
 
+            const boxClassName = [
+              'damage-box',
+
+              available
+                ? 'damage-box--available'
+                : 'damage-box--unavailable',
+
+              available &&
+              state === 'superficial'
+                ? 'damage-box--superficial'
+                : '',
+
+              available &&
+              state === 'aggravated'
+                ? 'damage-box--aggravated'
+                : '',
+
+              available && mode === 'editable'
+                ? 'damage-box--editable'
+                : '',
+            ]
+              .filter(Boolean)
+              .join(' ')
+
+            const symbol = (
+              <span
+                className="damage-box__symbol"
+                aria-hidden="true"
+              >
+                {available
+                  ? getDamageSymbol(state)
+                  : ''}
+              </span>
+            )
+
             return (
               <span
                 key={index}
                 role="listitem"
-                className={[
-                  'damage-box',
-
-                  available
-                    ? 'damage-box--available'
-                    : 'damage-box--unavailable',
-
-                  available &&
-                  state === 'superficial'
-                    ? 'damage-box--superficial'
-                    : '',
-
-                  available &&
-                  state === 'aggravated'
-                    ? 'damage-box--aggravated'
-                    : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-                title={stateLabel}
-                aria-label={`Casilla ${index + 1}: ${stateLabel}`}
+                className="damage-box-item"
               >
-                <span
-                  className="damage-box__symbol"
-                  aria-hidden="true"
-                >
-                  {available
-                    ? getDamageSymbol(state)
-                    : ''}
-                </span>
+                {available &&
+                mode === 'editable' ? (
+                  <button
+                    type="button"
+                    className={boxClassName}
+                    title={stateLabel}
+                    aria-label={`Casilla ${index + 1}: ${stateLabel}. Cambiar a ${getDamageLabel(getNextDamageState(state))}`}
+                    onClick={() =>
+                      onChange?.(
+                        cycleDamageBoxState(
+                          capacity,
+                          track,
+                          index,
+                        ),
+                      )
+                    }
+                  >
+                    {symbol}
+                  </button>
+                ) : (
+                  <span
+                    className={boxClassName}
+                    title={stateLabel}
+                    aria-label={`Casilla ${index + 1}: ${stateLabel}`}
+                  >
+                    {symbol}
+                  </span>
+                )}
               </span>
             )
           },

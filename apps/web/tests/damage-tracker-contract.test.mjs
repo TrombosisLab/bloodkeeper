@@ -18,6 +18,14 @@ const trackerData = await readFile(
   'utf8',
 )
 
+const trackerStyles = await readFile(
+  new URL(
+    '../src/styles/character-sheet.css',
+    import.meta.url,
+  ),
+  'utf8',
+)
+
 test(
   '006-B reconstruye las casillas desde el contrato de dominio',
   () => {
@@ -35,6 +43,61 @@ test(
     )
     assert.match(trackerData, /track: \{/)
     assert.doesNotMatch(trackerData, /damage: \[/)
+  },
+)
+
+test(
+  '006-F mantiene solo lectura como modo predeterminado',
+  () => {
+    assert.match(
+      damageTracker,
+      /mode = 'readOnly'/,
+    )
+    assert.match(
+      damageTracker,
+      /mode: 'editable'/,
+    )
+    assert.match(
+      damageTracker,
+      /onChange: \(/,
+    )
+  },
+)
+
+test(
+  '006-F delega cada cambio de casilla al dominio',
+  () => {
+    assert.match(
+      damageTracker,
+      /cycleDamageBoxState\(/,
+    )
+    assert.match(
+      damageTracker,
+      /onChange\?\.\(/,
+    )
+    assert.doesNotMatch(
+      damageTracker,
+      /superficial\s*[+][+]/,
+    )
+  },
+)
+
+test(
+  '006-F usa controles deliberados accesibles por teclado',
+  () => {
+    assert.match(damageTracker, /<button/)
+    assert.match(
+      damageTracker,
+      /type="button"/,
+    )
+    assert.match(
+      damageTracker,
+      /Cambiar a/,
+    )
+    assert.match(
+      trackerStyles,
+      /damage-box--editable:focus-visible/,
+    )
   },
 )
 
