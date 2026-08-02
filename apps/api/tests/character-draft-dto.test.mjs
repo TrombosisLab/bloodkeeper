@@ -1,0 +1,199 @@
+import assert from 'node:assert/strict'
+import test from 'node:test'
+
+import {
+  InvalidCharacterDraftRequestError,
+  parseCharacterDraftIdParam,
+  parseCreateCharacterDraftRequest,
+  parseUpdateCharacterDraftRequest,
+  toCharacterDraftResponse,
+} from '../dist/characters/presentation/character-draft.dto.js'
+
+import {
+  CHARACTER_SKILL_KEYS,
+} from '../dist/characters/domain/persisted-character.types.js'
+
+const ownerId =
+  '3bbc46f8-a45f-4589-9872-129e6652082c'
+const characterId =
+  '39c1801e-68fe-4c92-8795-723cac284bdf'
+
+function createBody() {
+  return {
+    chronicleId: null,
+    identity: { name: 'Alicia' },
+    attributes: {
+      strength: 1,
+      dexterity: 1,
+      stamina: 1,
+      charisma: 1,
+      manipulation: 1,
+      composure: 1,
+      intelligence: 1,
+      wits: 1,
+      resolve: 1,
+    },
+    blood: {
+      bloodPotency: 1,
+      hunger: 1,
+    },
+    skills: Object.fromEntries(
+      CHARACTER_SKILL_KEYS.map(
+        (skillKey) => [skillKey, 0],
+      ),
+    ),
+    skillSpecialties: [],
+    disciplines: [],
+    bloodSorceryRituals: { ritualKeys: [] },
+    oblivionCeremonies: { ceremonyKeys: [] },
+    thinBloodAlchemy: {
+      rating: 0,
+      method: null,
+      formulaKeys: [],
+    },
+    thinBloodTraits: [],
+    advantages: { selections: [] },
+    humanity: {
+      value: 7,
+      convictions: [],
+      touchstones: [],
+    },
+    creation: {
+      currentStep: 'identity',
+      skillDistributionMethod: 'balanced',
+    },
+  }
+}
+
+test(
+  '004-D.1 crea el comando desde propietario confiable y DTO válido',
+  () => {
+    const body = createBody()
+    const command =
+      parseCreateCharacterDraftRequest(
+        ownerId,
+        body,
+      )
+
+    assert.equal(command.ownerId, ownerId)
+    assert.equal(command.identity.name, 'Alicia')
+    assert.notEqual(command, body)
+  },
+)
+
+test(
+  '004-D.1 rechaza campos inesperados y uniones inválidas',
+  () => {
+    assert.throws(
+      () =>
+        parseCreateCharacterDraftRequest(
+          ownerId,
+          {
+            ...createBody(),
+            ownerId,
+          },
+        ),
+      InvalidCharacterDraftRequestError,
+    )
+
+    assert.throws(
+      () =>
+        parseCreateCharacterDraftRequest(
+          ownerId,
+          {
+            ...createBody(),
+            advantages: {
+              selections: [
+                {
+                  selectionId: 'mask-1',
+                  definitionKey: 'mask',
+                  category: 'background',
+                  rating: 2,
+                  origin: 'creation',
+                  parentSelectionId: null,
+                  details: {
+                    kind: 'mask',
+                    benefits: ['unsupported'],
+                  },
+                },
+              ],
+            },
+          },
+        ),
+      /unsupported value/,
+    )
+  },
+)
+
+test(
+  '004-D.1 valida identidad estable y revisión optimista al actualizar',
+  () => {
+    const command =
+      parseUpdateCharacterDraftRequest(
+        characterId,
+        {
+          expectedRevision: 4,
+          identity: { concept: 'Investigadora' },
+          attributes: { strength: 3 },
+        },
+      )
+
+    assert.equal(command.characterId, characterId)
+    assert.equal(command.expectedRevision, 4)
+    assert.equal(
+      parseCharacterDraftIdParam(characterId),
+      characterId,
+    )
+
+    assert.throws(
+      () =>
+        parseUpdateCharacterDraftRequest(
+          'not-a-uuid',
+          { expectedRevision: 1 },
+        ),
+      /must be a UUID/,
+    )
+
+    assert.throws(
+      () =>
+        parseUpdateCharacterDraftRequest(
+          characterId,
+          { expectedRevision: '4' },
+        ),
+      /must be an integer/,
+    )
+  },
+)
+
+test(
+  '004-D.1 serializa fechas sin filtrar objetos Date al transporte',
+  () => {
+    const body = createBody()
+    const now = new Date('2026-08-03T00:30:00.000Z')
+    const draft = {
+      ...body,
+      characterId,
+      ownerId,
+      status: 'draft',
+      revision: 1,
+      createdAt: now,
+      updatedAt: now,
+      creation: {
+        ...body.creation,
+        schemaVersion: 1,
+        updatedAt: now,
+      },
+    }
+
+    const response = toCharacterDraftResponse(draft)
+
+    assert.equal(
+      response.createdAt,
+      '2026-08-03T00:30:00.000Z',
+    )
+    assert.equal(
+      response.creation.updatedAt,
+      '2026-08-03T00:30:00.000Z',
+    )
+  },
+)
