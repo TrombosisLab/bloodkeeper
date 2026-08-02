@@ -2,9 +2,11 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import {
+  applyDamageToTrack,
   createEmptyDamageTrack,
   cycleDamageBoxState,
   getNextDamageState,
+  mendDamageFromTrack,
   setDamageBoxState,
   toDamageStates,
   validateCharacterDamageTrack,
@@ -18,6 +20,167 @@ test(
       {
         superficial: 0,
         aggravated: 0,
+      },
+    )
+  },
+)
+
+test(
+  '006-H aplica puntos ya resueltos sobre casillas vacías',
+  () => {
+    assert.deepEqual(
+      applyDamageToTrack(
+        5,
+        createEmptyDamageTrack(),
+        'superficial',
+        2,
+      ),
+      {
+        track: {
+          superficial: 2,
+          aggravated: 0,
+        },
+        converted: 0,
+        overflow: 0,
+      },
+    )
+  },
+)
+
+test(
+  '006-H convierte el daño superficial que desborda una pista llena',
+  () => {
+    assert.deepEqual(
+      applyDamageToTrack(
+        5,
+        {
+          superficial: 4,
+          aggravated: 1,
+        },
+        'superficial',
+        2,
+      ),
+      {
+        track: {
+          superficial: 2,
+          aggravated: 3,
+        },
+        converted: 2,
+        overflow: 0,
+      },
+    )
+  },
+)
+
+test(
+  '006-H el daño agravado ocupa huecos y sustituye superficial',
+  () => {
+    assert.deepEqual(
+      applyDamageToTrack(
+        5,
+        {
+          superficial: 3,
+          aggravated: 1,
+        },
+        'aggravated',
+        3,
+      ),
+      {
+        track: {
+          superficial: 1,
+          aggravated: 4,
+        },
+        converted: 2,
+        overflow: 0,
+      },
+    )
+  },
+)
+
+test(
+  '006-H informa desbordamiento sin interpretar consecuencias',
+  () => {
+    assert.deepEqual(
+      applyDamageToTrack(
+        4,
+        {
+          superficial: 0,
+          aggravated: 4,
+        },
+        'aggravated',
+        2,
+      ),
+      {
+        track: {
+          superficial: 0,
+          aggravated: 4,
+        },
+        converted: 0,
+        overflow: 2,
+      },
+    )
+  },
+)
+
+test(
+  '006-H retira solo el tipo y cantidad solicitados',
+  () => {
+    assert.deepEqual(
+      mendDamageFromTrack(
+        5,
+        {
+          superficial: 2,
+          aggravated: 2,
+        },
+        'aggravated',
+        1,
+      ),
+      {
+        track: {
+          superficial: 2,
+          aggravated: 1,
+        },
+        mended: 1,
+        remainder: 0,
+      },
+    )
+  },
+)
+
+test(
+  '006-H valida cantidades y devuelve lo no reparado',
+  () => {
+    assert.deepEqual(
+      mendDamageFromTrack(
+        5,
+        {
+          superficial: 1,
+          aggravated: 0,
+        },
+        'superficial',
+        3,
+      ),
+      {
+        track: {
+          superficial: 0,
+          aggravated: 0,
+        },
+        mended: 1,
+        remainder: 2,
+      },
+    )
+
+    assert.throws(
+      () =>
+        applyDamageToTrack(
+          5,
+          createEmptyDamageTrack(),
+          'superficial',
+          -1,
+        ),
+      {
+        name: 'InvalidCharacterDamageTrackError',
+        violations: ['DAMAGE_AMOUNT_INVALID'],
       },
     )
   },

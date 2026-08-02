@@ -3,6 +3,11 @@ export type DamageState =
   | 'superficial'
   | 'aggravated'
 
+export type DamageKind = Exclude<
+  DamageState,
+  'empty'
+>
+
 export interface CharacterDamageTrack {
   superficial: number
   aggravated: number
@@ -15,6 +20,7 @@ export type CharacterDamageTrackViolation =
   | 'DAMAGE_COUNT_INVALID'
   | 'DAMAGE_EXCEEDS_CAPACITY'
   | 'BOX_INDEX_OUT_OF_RANGE'
+  | 'DAMAGE_AMOUNT_INVALID'
 
 export class InvalidCharacterDamageTrackError
   extends Error {
@@ -181,4 +187,96 @@ export function cycleDamageBoxState(
     boxIndex,
     getNextDamageState(states[boxIndex]),
   )
+}
+
+export interface DamageApplicationResult {
+  track: CharacterDamageTrack
+  converted: number
+  overflow: number
+}
+
+export interface DamageMendingResult {
+  track: CharacterDamageTrack
+  mended: number
+  remainder: number
+}
+
+function assertValidDamageAmount(
+  amount: number,
+): void {
+  if (
+    !Number.isInteger(amount) ||
+    amount < 0
+  ) {
+    throw new InvalidCharacterDamageTrackError(
+      ['DAMAGE_AMOUNT_INVALID'],
+    )
+  }
+}
+
+export function applyDamageToTrack(
+  capacity: number,
+  track: CharacterDamageTrack,
+  kind: DamageKind,
+  amount: number,
+): DamageApplicationResult {
+  const states = toDamageStates(
+    capacity,
+    track,
+  )
+  assertValidDamageAmount(amount)
+
+  const nextTrack = { ...track }
+  const emptyBoxes = states.filter(
+    (state) => state === 'empty',
+  ).length
+  const marked = Math.min(
+    amount,
+    emptyBoxes,
+  )
+
+  nextTrack[kind] += marked
+
+  let overflow = amount - marked
+  let converted = 0
+
+  if (overflow > 0) {
+    converted = Math.min(
+      overflow,
+      nextTrack.superficial,
+    )
+    nextTrack.superficial -= converted
+    nextTrack.aggravated += converted
+    overflow -= converted
+  }
+
+  return {
+    track: nextTrack,
+    converted,
+    overflow,
+  }
+}
+
+export function mendDamageFromTrack(
+  capacity: number,
+  track: CharacterDamageTrack,
+  kind: DamageKind,
+  amount: number,
+): DamageMendingResult {
+  toDamageStates(capacity, track)
+  assertValidDamageAmount(amount)
+
+  const mended = Math.min(
+    amount,
+    track[kind],
+  )
+
+  return {
+    track: {
+      ...track,
+      [kind]: track[kind] - mended,
+    },
+    mended,
+    remainder: amount - mended,
+  }
 }
