@@ -233,6 +233,44 @@ export function validateCharacterAdvantageDefinitions(
     const requirementRules =
       definition.requirementRules ?? []
 
+    const incompatibleDefinitionKeys =
+      definition.incompatibleDefinitionKeys ?? []
+
+    if (
+      new Set(
+        incompatibleDefinitionKeys,
+      ).size !==
+      incompatibleDefinitionKeys.length
+    ) {
+      errors.push(
+        `La definición ${definition.key || '(sin clave)'} contiene incompatibilidades duplicadas.`,
+      )
+    }
+
+    for (
+      const incompatibleDefinitionKey of
+      incompatibleDefinitionKeys
+    ) {
+      if (
+        !knownKeys.has(
+          incompatibleDefinitionKey,
+        )
+      ) {
+        errors.push(
+          `La definición ${definition.key || '(sin clave)'} referencia una incompatibilidad inexistente: ${incompatibleDefinitionKey}.`,
+        )
+      }
+
+      if (
+        incompatibleDefinitionKey ===
+        definition.key
+      ) {
+        errors.push(
+          `La definición ${definition.key || '(sin clave)'} no puede ser incompatible consigo misma.`,
+        )
+      }
+    }
+
     const serializedRequirementRules =
       requirementRules.map(
         (requirement) =>

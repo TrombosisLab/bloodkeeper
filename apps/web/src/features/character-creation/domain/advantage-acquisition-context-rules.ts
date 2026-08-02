@@ -1,6 +1,17 @@
 import type {
+  CharacterAdvantageDefinition,
+} from '../types/character-advantage-definition.types.ts'
+import type {
   CharacterAdvantagesDraft,
 } from '../types/character-advantages-draft.types.ts'
+
+import {
+  characterAdvantageDefinitions,
+} from '../data/character-advantage-definitions.ts'
+
+import {
+  validateCharacterAdvantageIncompatibilities,
+} from './advantage-incompatibility-rules.ts'
 
 import {
   validateCharacterAdvantagesStructure,
@@ -36,10 +47,19 @@ export function validateCharacterAdvantagesForContext(
     CharacterAdvantagesDraft,
   context:
     CharacterAdvantageAcquisitionContext,
+  definitions:
+    readonly CharacterAdvantageDefinition[] =
+      characterAdvantageDefinitions,
 ): CharacterAdvantageContextValidationResult {
   const structural =
     validateCharacterAdvantagesStructure(
       draft,
+    )
+
+  const incompatibilities =
+    validateCharacterAdvantageIncompatibilities(
+      draft,
+      definitions,
     )
 
   if (
@@ -55,8 +75,13 @@ export function validateCharacterAdvantagesForContext(
       context,
       structurallyValid:
         structural.valid,
-      valid: creation.valid,
-      errors: creation.errors,
+      valid:
+        creation.valid &&
+        incompatibilities.valid,
+      errors: [
+        ...creation.errors,
+        ...incompatibilities.errors,
+      ],
     }
   }
 
@@ -67,6 +92,7 @@ export function validateCharacterAdvantagesForContext(
     valid: false,
     errors: [
       ...structural.errors,
+      ...incompatibilities.errors,
       ADVANTAGE_ADVANCEMENT_RULES_REQUIRED,
     ],
   }
