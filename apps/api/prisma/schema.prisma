@@ -48,6 +48,8 @@ model Character {
 
   identity      CharacterIdentity?
   creationState CharacterCreationState?
+  attributes    CharacterAttributes?
+  blood         CharacterBloodState?
 
   @@index([ownerId])
   @@index([chronicleId])
@@ -82,4 +84,31 @@ model CharacterCreationState {
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("character_creation_states")
+}
+
+model CharacterAttributes {
+  characterId String @id @db.Uuid
+  strength     Int    @default(1)
+  dexterity    Int    @default(1)
+  stamina      Int    @default(1)
+  charisma     Int    @default(1)
+  manipulation Int    @default(1)
+  composure    Int    @default(1)
+  intelligence Int    @default(1)
+  wits         Int    @default(1)
+  resolve      Int    @default(1)
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("character_attributes")
+}
+
+model CharacterBloodState {
+  characterId  String @id @db.Uuid
+  bloodPotency Int    @default(1)
+  hunger       Int    @default(1)
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("character_blood_states")
 }

@@ -36,6 +36,23 @@ export interface PersistedCharacterCreationState {
   updatedAt: Date
 }
 
+export interface PersistedCharacterAttributes {
+  strength: number
+  dexterity: number
+  stamina: number
+  charisma: number
+  manipulation: number
+  composure: number
+  intelligence: number
+  wits: number
+  resolve: number
+}
+
+export interface PersistedCharacterBlood {
+  bloodPotency: number
+  hunger: number
+}
+
 export interface PersistedCharacterDraft {
   characterId: string
   ownerId: string
@@ -46,12 +63,16 @@ export interface PersistedCharacterDraft {
   updatedAt: Date
   identity: PersistedCharacterIdentity
   creation: PersistedCharacterCreationState
+  attributes: PersistedCharacterAttributes
+  blood: PersistedCharacterBlood
 }
 
 export interface CreateCharacterDraftData {
   ownerId: string
   chronicleId: string | null
   identity: Partial<PersistedCharacterIdentity>
+  attributes: PersistedCharacterAttributes
+  blood: PersistedCharacterBlood
   creation: {
     currentStep: CharacterCreationStep
     skillDistributionMethod: SkillDistributionMethod
@@ -63,6 +84,8 @@ export interface UpdateCharacterDraftData {
   expectedRevision: number
   chronicleId?: string | null
   identity?: Partial<PersistedCharacterIdentity>
+  attributes?: Partial<PersistedCharacterAttributes>
+  blood?: Partial<PersistedCharacterBlood>
   creation?: Partial<
     Pick<
       PersistedCharacterCreationState,

@@ -57,6 +57,21 @@ test(
         '3bbc46f8-a45f-4589-9872-129e6652082c',
       chronicleId: null,
       identity: { name: 'Alicia' },
+      attributes: {
+        strength: 1,
+        dexterity: 1,
+        stamina: 1,
+        charisma: 1,
+        manipulation: 1,
+        composure: 1,
+        intelligence: 1,
+        wits: 1,
+        resolve: 1,
+      },
+      blood: {
+        bloodPotency: 1,
+        hunger: 1,
+      },
       creation: {
         currentStep: 'identity',
         skillDistributionMethod: 'balanced',

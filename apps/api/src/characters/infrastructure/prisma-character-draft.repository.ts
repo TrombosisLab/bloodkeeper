@@ -85,6 +85,8 @@ const statusFromPrisma: Record<
 const characterRelations = {
   identity: true,
   creationState: true,
+  attributes: true,
+  blood: true,
 } satisfies Prisma.CharacterInclude
 
 type CharacterWithRelations =
@@ -113,7 +115,9 @@ function toPersistedDraft(
 ): PersistedCharacterDraft {
   if (
     row.identity === null ||
-    row.creationState === null
+    row.creationState === null ||
+    row.attributes === null ||
+    row.blood === null
   ) {
     throw new Error(
       `Character ${row.id} has incomplete persistence relations`,
@@ -153,6 +157,23 @@ function toPersistedDraft(
         ],
       updatedAt: row.creationState.updatedAt,
     },
+    attributes: {
+      strength: row.attributes.strength,
+      dexterity: row.attributes.dexterity,
+      stamina: row.attributes.stamina,
+      charisma: row.attributes.charisma,
+      manipulation:
+        row.attributes.manipulation,
+      composure: row.attributes.composure,
+      intelligence:
+        row.attributes.intelligence,
+      wits: row.attributes.wits,
+      resolve: row.attributes.resolve,
+    },
+    blood: {
+      bloodPotency: row.blood.bloodPotency,
+      hunger: row.blood.hunger,
+    },
   }
 }
 
@@ -187,6 +208,12 @@ export class PrismaCharacterDraftRepository
                   .skillDistributionMethod
               ],
           },
+        },
+        attributes: {
+          create: data.attributes,
+        },
+        blood: {
+          create: data.blood,
         },
       },
       include: characterRelations,
@@ -284,6 +311,24 @@ export class PrismaCharacterDraftRepository
               },
               data: creationUpdate,
             })
+        }
+
+        if (data.attributes !== undefined) {
+          await transaction.characterAttributes.update({
+            where: {
+              characterId: data.characterId,
+            },
+            data: data.attributes,
+          })
+        }
+
+        if (data.blood !== undefined) {
+          await transaction.characterBloodState.update({
+            where: {
+              characterId: data.characterId,
+            },
+            data: data.blood,
+          })
         }
 
         const row =

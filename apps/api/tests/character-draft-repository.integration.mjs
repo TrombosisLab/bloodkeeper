@@ -29,6 +29,21 @@ test(
         identity: {
           name: 'Borrador 004-C',
         },
+        attributes: {
+          strength: 1,
+          dexterity: 2,
+          stamina: 3,
+          charisma: 2,
+          manipulation: 2,
+          composure: 3,
+          intelligence: 4,
+          wits: 2,
+          resolve: 3,
+        },
+        blood: {
+          bloodPotency: 1,
+          hunger: 1,
+        },
         creation: {
           currentStep: 'identity',
           skillDistributionMethod: 'balanced',
@@ -39,6 +54,8 @@ test(
 
       assert.equal(created.status, 'draft')
       assert.equal(created.revision, 1)
+      assert.equal(created.attributes.intelligence, 4)
+      assert.equal(created.blood.hunger, 1)
 
       const loaded =
         await repository.findById(characterId)
@@ -57,6 +74,12 @@ test(
         creation: {
           currentStep: 'attributes',
         },
+        attributes: {
+          strength: 4,
+        },
+        blood: {
+          hunger: 2,
+        },
       })
 
       assert.equal(updated.revision, 2)
@@ -68,6 +91,8 @@ test(
         updated.creation.currentStep,
         'attributes',
       )
+      assert.equal(updated.attributes.strength, 4)
+      assert.equal(updated.blood.hunger, 2)
 
       await assert.rejects(
         repository.update({

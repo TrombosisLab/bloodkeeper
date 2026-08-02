@@ -22,6 +22,11 @@ test(
       repository,
       /creationState:\s*{\s*create:/,
     )
+    assert.match(
+      repository,
+      /attributes:\s*{\s*create:/,
+    )
+    assert.match(repository, /blood:\s*{\s*create:/)
   },
 )
 
@@ -30,7 +35,7 @@ test(
   () => {
     assert.match(
       repository,
-      /identity: true,[\s\S]*creationState: true/,
+      /identity: true,[\s\S]*creationState: true,[\s\S]*attributes: true,[\s\S]*blood: true/,
     )
     assert.match(repository, /character\.findUnique/)
   },
