@@ -18,8 +18,9 @@ export class UpdateCharacterDraftUseCase {
   }
 
   execute(
+    ownerId: string,
     data: UpdateCharacterDraftData,
   ): Promise<PersistedCharacterDraft> {
-    return this.repository.update(data)
+    return this.repository.update(ownerId, data)
   }
 }

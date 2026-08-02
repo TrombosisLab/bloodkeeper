@@ -26,20 +26,21 @@ function createSkills(overrides = {}) {
 }
 
 test(
-  '004-C persiste, carga y actualiza un borrador de forma atómica',
+  '004-D.2 persiste con acceso aislado por propietario',
   async () => {
     const database = new DatabaseService()
     const repository =
       new PrismaCharacterDraftRepository(
         database,
       )
+    const ownerId = randomUUID()
     let characterId = null
 
     await database.$connect()
 
     try {
       const created = await repository.create({
-        ownerId: randomUUID(),
+        ownerId,
         chronicleId: null,
         identity: {
           name: 'Borrador 004-C',
@@ -228,14 +229,36 @@ test(
       )
 
       const loaded =
-        await repository.findById(characterId)
+        await repository.findById(
+          ownerId,
+          characterId,
+        )
 
       assert.equal(
         loaded?.identity.name,
         'Borrador 004-C',
       )
 
-      const updated = await repository.update({
+      assert.equal(
+        await repository.findById(
+          randomUUID(),
+          characterId,
+        ),
+        null,
+      )
+
+      await assert.rejects(
+        repository.update(randomUUID(), {
+          characterId,
+          expectedRevision: 1,
+          identity: { name: 'Intruso' },
+        }),
+        {
+          name: 'CharacterDraftWriteConflictError',
+        },
+      )
+
+      const updated = await repository.update(ownerId, {
         characterId,
         expectedRevision: 1,
         identity: {
@@ -401,7 +424,7 @@ test(
       )
 
       await assert.rejects(
-        repository.update({
+        repository.update(ownerId, {
           characterId,
           expectedRevision: 1,
           identity: { name: 'Obsoleto' },

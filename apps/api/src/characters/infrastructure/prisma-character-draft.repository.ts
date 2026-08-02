@@ -1079,11 +1079,15 @@ export class PrismaCharacterDraftRepository
   }
 
   async findById(
+    ownerId: string,
     characterId: string,
   ): Promise<PersistedCharacterDraft | null> {
     const row =
-      await this.database.character.findUnique({
-        where: { id: characterId },
+      await this.database.character.findFirst({
+        where: {
+          id: characterId,
+          ownerId,
+        },
         include: characterRelations,
       })
 
@@ -1093,6 +1097,7 @@ export class PrismaCharacterDraftRepository
   }
 
   async update(
+    ownerId: string,
     data: UpdateCharacterDraftData,
   ): Promise<PersistedCharacterDraft> {
     return this.database.$transaction(
@@ -1111,6 +1116,7 @@ export class PrismaCharacterDraftRepository
           await transaction.character.updateMany({
             where: {
               id: data.characterId,
+              ownerId,
               revision: data.expectedRevision,
               status: PrismaCharacterStatus.DRAFT,
             },

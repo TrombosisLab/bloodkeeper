@@ -13,10 +13,12 @@ export interface CharacterDraftRepository {
   ): Promise<PersistedCharacterDraft>
 
   findById(
+    ownerId: string,
     characterId: string,
   ): Promise<PersistedCharacterDraft | null>
 
   update(
+    ownerId: string,
     data: UpdateCharacterDraftData,
   ): Promise<PersistedCharacterDraft>
 }

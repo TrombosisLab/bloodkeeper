@@ -40,14 +40,14 @@ function createRepository() {
       calls.push(['create', data])
       return record
     },
-    async findById(characterId) {
-      calls.push(['findById', characterId])
+    async findById(ownerId, characterId) {
+      calls.push(['findById', ownerId, characterId])
       return characterId === record.characterId
         ? record
         : null
     },
-    async update(data) {
-      calls.push(['update', data])
+    async update(ownerId, data) {
+      calls.push(['update', ownerId, data])
       return {
         ...record,
         revision: data.expectedRevision + 1,
@@ -124,27 +124,38 @@ test(
 )
 
 test(
-  '004-C carga un borrador por su identidad estable',
+  '004-D.2 carga un borrador en el contexto de su propietario',
   async () => {
     const repository = createRepository()
     const useCase =
       new LoadCharacterDraftUseCase(repository)
+    const ownerId =
+      '3bbc46f8-a45f-4589-9872-129e6652082c'
 
     assert.equal(
       await useCase.execute(
+        ownerId,
         repository.record.characterId,
       ),
       repository.record,
     )
     assert.equal(
-      await useCase.execute('missing'),
+      await useCase.execute(ownerId, 'missing'),
       null,
     )
+    assert.deepEqual(repository.calls, [
+      [
+        'findById',
+        ownerId,
+        repository.record.characterId,
+      ],
+      ['findById', ownerId, 'missing'],
+    ])
   },
 )
 
 test(
-  '004-C actualiza mediante revisión optimista',
+  '004-D.2 actualiza con propietario y revisión optimista',
   async () => {
     const repository = createRepository()
     const useCase =
@@ -156,13 +167,18 @@ test(
       expectedRevision: 4,
       identity: { concept: 'Investigadora' },
     }
+    const ownerId =
+      '3bbc46f8-a45f-4589-9872-129e6652082c'
 
-    const result = await useCase.execute(command)
+    const result = await useCase.execute(
+      ownerId,
+      command,
+    )
 
     assert.equal(result.revision, 5)
     assert.deepEqual(
       repository.calls,
-      [['update', command]],
+      [['update', ownerId, command]],
     )
   },
 )

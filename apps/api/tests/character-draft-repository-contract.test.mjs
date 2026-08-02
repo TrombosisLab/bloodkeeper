@@ -69,7 +69,7 @@ test(
       repository,
       /identity: true,[\s\S]*creationState: true,[\s\S]*attributes: true,[\s\S]*blood: true,[\s\S]*skills:[\s\S]*disciplines:[\s\S]*bloodSorceryRituals:[\s\S]*oblivionCeremonies:[\s\S]*thinBloodAlchemy: true,[\s\S]*thinBloodFormulas:[\s\S]*thinBloodTraits:[\s\S]*advantages:[\s\S]*humanity: true/,
     )
-    assert.match(repository, /character\.findUnique/)
+    assert.match(repository, /character\.findFirst/)
   },
 )
 
@@ -128,6 +128,28 @@ test(
     assert.match(
       repository,
       /characterAdvantageSelection[\s\S]*\.deleteMany/,
+    )
+  },
+)
+
+test(
+  '004-D.2 limita carga y actualizacion al propietario',
+  () => {
+    assert.match(
+      repository,
+      /async findById\(\s*ownerId: string,\s*characterId: string/,
+    )
+    assert.match(
+      repository,
+      /character\.findFirst\(\{\s*where: \{\s*id: characterId,\s*ownerId,/,
+    )
+    assert.match(
+      repository,
+      /async update\(\s*ownerId: string,\s*data: UpdateCharacterDraftData/,
+    )
+    assert.match(
+      repository,
+      /id: data\.characterId,\s*ownerId,\s*revision: data\.expectedRevision/,
     )
   },
 )

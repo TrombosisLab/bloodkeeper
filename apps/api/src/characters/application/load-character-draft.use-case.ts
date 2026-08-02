@@ -17,9 +17,11 @@ export class LoadCharacterDraftUseCase {
   }
 
   execute(
+    ownerId: string,
     characterId: string,
   ): Promise<PersistedCharacterDraft | null> {
     return this.repository.findById(
+      ownerId,
       characterId,
     )
   }
