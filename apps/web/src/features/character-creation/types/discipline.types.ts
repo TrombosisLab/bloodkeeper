@@ -19,6 +19,7 @@ export type DisciplineKey =
 export interface DisciplineDefinition {
   key: DisciplineKey
   name: string
+  active: boolean
 }
 
 export type CharacterDisciplineOrigin =

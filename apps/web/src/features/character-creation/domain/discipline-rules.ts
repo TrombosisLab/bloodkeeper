@@ -1,6 +1,9 @@
 import {
   getClanDefinition,
 } from '../data/clan-definitions.ts'
+import {
+  disciplineDefinitions,
+} from '../data/discipline-definitions.ts'
 
 import type {
   ClanKey,
@@ -11,6 +14,11 @@ import type {
   CharacterDisciplinesDraft,
   DisciplineKey,
 } from '../types/discipline.types'
+
+import {
+  filterActiveDisciplineKeys,
+  isDisciplineActive,
+} from './discipline-catalog-rules.ts'
 
 export interface DisciplineValidationResult {
   valid: boolean
@@ -39,15 +47,15 @@ export function getAvailableDisciplinesForClan(
       clanKey,
     )
 
-  if (clan.kind === 'caitiff') {
-    return [
-      ...caitiffAvailableDisciplines,
-    ]
-  }
+  const available =
+    clan.kind === 'caitiff'
+      ? caitiffAvailableDisciplines
+      : clan.inClanDisciplines
 
-  return [
-    ...clan.inClanDisciplines,
-  ]
+  return filterActiveDisciplineKeys(
+    disciplineDefinitions,
+    available,
+  )
 }
 
 export function createEmptyDisciplines():
@@ -79,6 +87,15 @@ export function updateDiscipline(
     getClanDefinition(
       clanKey,
     )
+
+  if (
+    !isDisciplineActive(
+      disciplineDefinitions,
+      key,
+    )
+  ) {
+    return disciplines
+  }
 
   if (
     clan.kind === 'clan' &&
@@ -150,6 +167,10 @@ export function normalizeDisciplinesForClan(
       (discipline) =>
         caitiffAvailableDisciplines.includes(
           discipline.key,
+        ) &&
+        isDisciplineActive(
+          disciplineDefinitions,
+          discipline.key,
         ),
     )
   }
@@ -161,6 +182,10 @@ export function normalizeDisciplinesForClan(
   return disciplines.filter(
     (discipline) =>
       clan.inClanDisciplines.includes(
+        discipline.key,
+      ) &&
+      isDisciplineActive(
+        disciplineDefinitions,
         discipline.key,
       ),
   )
@@ -188,6 +213,19 @@ export function validateDisciplines(
     getClanDefinition(
       clanKey,
     )
+
+  for (const discipline of disciplines) {
+    if (
+      !isDisciplineActive(
+        disciplineDefinitions,
+        discipline.key,
+      )
+    ) {
+      errors.push(
+        'No puedes seleccionar una Disciplina inactiva.',
+      )
+    }
+  }
 
   if (clan.kind === 'caitiff') {
     for (
@@ -346,7 +384,9 @@ export function randomizeCaitiffDisciplines(
     Math.random,
 ): CharacterDisciplinesDraft {
   const shuffled = [
-    ...caitiffAvailableDisciplines,
+    ...getAvailableDisciplinesForClan(
+      'caitiff',
+    ),
   ]
 
   for (
@@ -393,15 +433,19 @@ export function randomizeClanDisciplines(
       clanKey,
     )
 
-  if (
-    clan.kind !== 'clan' ||
-    clan.inClanDisciplines.length < 2
-  ) {
+  const availableDisciplines =
+    clan.kind === 'clan'
+      ? getAvailableDisciplinesForClan(
+          clanKey,
+        )
+      : []
+
+  if (availableDisciplines.length < 2) {
     return []
   }
 
   const shuffled = [
-    ...clan.inClanDisciplines,
+    ...availableDisciplines,
   ]
 
   for (

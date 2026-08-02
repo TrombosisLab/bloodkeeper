@@ -39,6 +39,7 @@ export function DisciplineAffinitySection({
     disciplineDefinitions
       .filter(
         (definition) =>
+          definition.active &&
           allowedDisciplineKeys.includes(
             definition.key,
           ),
