@@ -4,6 +4,10 @@ import {
   characterAdvantageDefinitions,
 } from '../data/character-advantage-definitions.ts'
 
+import {
+  getActiveCharacterAdvantageDefinitions,
+} from './advantage-catalog-rules.ts'
+
 import type {
   PredatorTypeChoice,
   PredatorTypeChoiceGrant,
@@ -323,7 +327,9 @@ export function resolvePredatorTypeBloodPotencyModifier(
 export function resolvePredatorTypePointDistributionOptionDefinitions(
   option: PredatorTypePointDistributionOption,
 ): CharacterAdvantageDefinition[] {
-  return characterAdvantageDefinitions.filter(
+  return getActiveCharacterAdvantageDefinitions(
+    characterAdvantageDefinitions,
+  ).filter(
     definition => {
       if (
         definition.category !==
@@ -585,7 +591,9 @@ export function validatePredatorTypePointDistributionAllocation(
     }
 
     const definition =
-      characterAdvantageDefinitions.find(
+      getActiveCharacterAdvantageDefinitions(
+        characterAdvantageDefinitions,
+      ).find(
         candidate =>
           candidate.key ===
           allocation.definitionKey,
@@ -1195,4 +1203,3 @@ export function applyPredatorTypeEffects(
       ),
   }
 }
-

@@ -6,6 +6,10 @@ import type {
   CharacterAdvantagesDraft,
 } from '../types/character-advantages-draft.types'
 
+import {
+  isCharacterAdvantageActive,
+} from './advantage-catalog-rules.ts'
+
 export interface CharacterAdvantageDefinitionValidationResult {
   valid: boolean
   errors: string[]
@@ -44,6 +48,15 @@ export function validateCharacterAdvantageDefinitions(
     if (!definition.name.trim()) {
       errors.push(
         'Toda definición debe tener un nombre.',
+      )
+    }
+
+    if (
+      definition.active !== undefined &&
+      typeof definition.active !== 'boolean'
+    ) {
+      errors.push(
+        `La definición ${definition.key || '(sin clave)'} contiene un estado activo no válido.`,
       )
     }
 
@@ -681,6 +694,16 @@ export function validateCharacterAdvantageSelectionsAgainstDefinitions(
       )
 
       continue
+    }
+
+    if (
+      !isCharacterAdvantageActive(
+        definition,
+      )
+    ) {
+      errors.push(
+        `La definición ${definition.key} no está activa para nuevas selecciones.`,
+      )
     }
 
     if (

@@ -13,7 +13,7 @@ import type {
  * - Contactos
  * - Criados
  */
-export const characterAdvantageDefinitions:
+const sourceCharacterAdvantageDefinitions:
   readonly CharacterAdvantageDefinition[] = [
     {
       key: 'allies',
@@ -1245,6 +1245,16 @@ export const characterAdvantageDefinitions:
 
   ]
 
+export const characterAdvantageDefinitions:
+  readonly CharacterAdvantageDefinition[] =
+    sourceCharacterAdvantageDefinitions.map(
+      (definition) => ({
+        ...definition,
+        active:
+          definition.active ?? true,
+      }),
+    )
+
 export function getCharacterAdvantageDefinition(
   key: string,
 ): CharacterAdvantageDefinition | null {
@@ -1261,6 +1271,7 @@ export function getCharacterAdvantageDefinitionsByCategory(
 ): CharacterAdvantageDefinition[] {
   return characterAdvantageDefinitions.filter(
     (definition) =>
-      definition.category === category,
+      definition.category === category &&
+      definition.active !== false,
   )
 }

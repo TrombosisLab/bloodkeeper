@@ -11,6 +11,10 @@ import {
 } from '../domain/advantage-visibility-rules'
 
 import {
+  getActiveCharacterAdvantageDefinitions,
+} from '../domain/advantage-catalog-rules'
+
+import {
   createInitialAdvantageInstanceDetails,
 } from '../domain/advantage-instance-details-rules'
 
@@ -133,7 +137,9 @@ function getDefinitionSelections(
 function getChildAdvantageDefinitions(
   parentDefinitionKey: string,
 ) {
-  return characterAdvantageDefinitions.filter(
+  return getActiveCharacterAdvantageDefinitions(
+    characterAdvantageDefinitions,
+  ).filter(
     (definition) =>
       (
         definition.requiresParentSelection === true ||
@@ -429,10 +435,11 @@ export function AdvantagesStep({
       {categories.map(
         (category) => {
           const definitions =
-            characterAdvantageDefinitions.filter(
+            getActiveCharacterAdvantageDefinitions(
+              characterAdvantageDefinitions,
+              category,
+            ).filter(
               (definition) =>
-                definition.category ===
-                  category &&
                 (
                   definition.requiresParentSelection !== true ||
                   definition.allowsOptionalParentSelection === true

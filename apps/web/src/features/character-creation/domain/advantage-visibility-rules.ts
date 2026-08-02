@@ -8,7 +8,11 @@ import type {
 
 import {
   validateCharacterAdvantageEligibility,
-} from './advantage-eligibility-rules'
+} from './advantage-eligibility-rules.ts'
+
+import {
+  isCharacterAdvantageActive,
+} from './advantage-catalog-rules.ts'
 
 export function canShowAdvantageDefinition(
   definition: CharacterAdvantageDefinition,
@@ -20,6 +24,14 @@ export function canShowAdvantageDefinition(
     ageCategory?: 'neonate' | 'ancilla' | 'elder' | null
   },
 ): boolean {
+
+  if (
+    !isCharacterAdvantageActive(
+      definition,
+    )
+  ) {
+    return false
+  }
 
   if (
     definition.requiresParentSelection === true

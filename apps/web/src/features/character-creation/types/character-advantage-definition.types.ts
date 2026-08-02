@@ -90,6 +90,13 @@ export interface CharacterAdvantageDefinition {
   name: string
 
   /*
+   * Los catálogos fuente pueden omitirlo.
+   * La fachada canónica materializa siempre
+   * un booleano para controlar su disponibilidad.
+   */
+  active?: boolean
+
+  /*
    * Categoría de la ventaja:
    * - mérito
    * - defecto
