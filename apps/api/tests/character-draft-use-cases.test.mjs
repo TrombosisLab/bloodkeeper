@@ -13,6 +13,18 @@ import {
   UpdateCharacterDraftUseCase,
 } from '../dist/characters/application/update-character-draft.use-case.js'
 
+import {
+  CHARACTER_SKILL_KEYS,
+} from '../dist/characters/domain/persisted-character.types.js'
+
+function createEmptySkills() {
+  return Object.fromEntries(
+    CHARACTER_SKILL_KEYS.map(
+      (skillKey) => [skillKey, 0],
+    ),
+  )
+}
+
 function createRepository() {
   const calls = []
   const record = {
@@ -72,6 +84,8 @@ test(
         bloodPotency: 1,
         hunger: 1,
       },
+      skills: createEmptySkills(),
+      skillSpecialties: [],
       creation: {
         currentStep: 'identity',
         skillDistributionMethod: 'balanced',

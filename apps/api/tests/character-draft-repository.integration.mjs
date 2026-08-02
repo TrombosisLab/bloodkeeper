@@ -10,6 +10,21 @@ import {
   PrismaCharacterDraftRepository,
 } from '../dist/characters/infrastructure/prisma-character-draft.repository.js'
 
+import {
+  CHARACTER_SKILL_KEYS,
+} from '../dist/characters/domain/persisted-character.types.js'
+
+function createSkills(overrides = {}) {
+  return {
+    ...Object.fromEntries(
+      CHARACTER_SKILL_KEYS.map(
+        (skillKey) => [skillKey, 0],
+      ),
+    ),
+    ...overrides,
+  }
+}
+
 test(
   '004-C persiste, carga y actualiza un borrador de forma atómica',
   async () => {
@@ -44,6 +59,18 @@ test(
           bloodPotency: 1,
           hunger: 1,
         },
+        skills: createSkills({
+          athletics: 2,
+          investigation: 3,
+        }),
+        skillSpecialties: [
+          {
+            id: 'specialty-004-c-3',
+            skillKey: 'investigation',
+            name: 'Escenas del crimen',
+            origin: 'creation',
+          },
+        ],
         creation: {
           currentStep: 'identity',
           skillDistributionMethod: 'balanced',
@@ -56,6 +83,11 @@ test(
       assert.equal(created.revision, 1)
       assert.equal(created.attributes.intelligence, 4)
       assert.equal(created.blood.hunger, 1)
+      assert.equal(created.skills.investigation, 3)
+      assert.equal(
+        created.skillSpecialties[0]?.name,
+        'Escenas del crimen',
+      )
 
       const loaded =
         await repository.findById(characterId)
@@ -80,6 +112,17 @@ test(
         blood: {
           hunger: 2,
         },
+        skills: {
+          investigation: 4,
+        },
+        skillSpecialties: [
+          {
+            id: 'specialty-004-c-3-updated',
+            skillKey: 'investigation',
+            name: 'Forense',
+            origin: null,
+          },
+        ],
       })
 
       assert.equal(updated.revision, 2)
@@ -93,6 +136,13 @@ test(
       )
       assert.equal(updated.attributes.strength, 4)
       assert.equal(updated.blood.hunger, 2)
+      assert.equal(updated.skills.investigation, 4)
+      assert.deepEqual(
+        updated.skillSpecialties.map(
+          ({ name, origin }) => ({ name, origin }),
+        ),
+        [{ name: 'Forense', origin: null }],
+      )
 
       await assert.rejects(
         repository.update({

@@ -5,6 +5,7 @@ import {
   CharacterStatus as PrismaCharacterStatus,
   Prisma,
   SkillDistributionMethod as PrismaSkillDistributionMethod,
+  SkillSpecialtyOrigin as PrismaSkillSpecialtyOrigin,
 } from '@prisma/client'
 
 import {
@@ -18,11 +19,18 @@ import type {
 import type {
   CharacterCreationStep,
   CharacterLifecycleStatus,
+  CharacterSkillKey,
   CreateCharacterDraftData,
   PersistedCharacterDraft,
   PersistedCharacterIdentity,
+  PersistedCharacterSkills,
   SkillDistributionMethod,
+  SkillSpecialtyOrigin,
   UpdateCharacterDraftData,
+} from '../domain/persisted-character.types'
+
+import {
+  CHARACTER_SKILL_KEYS,
 } from '../domain/persisted-character.types'
 
 import { DatabaseService } from '../../database/database.service'
@@ -82,11 +90,36 @@ const statusFromPrisma: Record<
   ARCHIVED: 'archived',
 }
 
+const specialtyOriginToPrisma: Record<
+  SkillSpecialtyOrigin,
+  PrismaSkillSpecialtyOrigin
+> = {
+  creation: PrismaSkillSpecialtyOrigin.CREATION,
+  predatorType:
+    PrismaSkillSpecialtyOrigin.PREDATOR_TYPE,
+}
+
+const specialtyOriginFromPrisma: Record<
+  PrismaSkillSpecialtyOrigin,
+  SkillSpecialtyOrigin
+> = {
+  CREATION: 'creation',
+  PREDATOR_TYPE: 'predatorType',
+}
+
 const characterRelations = {
   identity: true,
   creationState: true,
   attributes: true,
   blood: true,
+  skills: {
+    include: {
+      specialties: {
+        orderBy: { id: 'asc' },
+      },
+    },
+    orderBy: { skillKey: 'asc' },
+  },
 } satisfies Prisma.CharacterInclude
 
 type CharacterWithRelations =
@@ -110,6 +143,16 @@ function toIdentityCreate(
   }
 }
 
+const characterSkillKeySet = new Set<string>(
+  CHARACTER_SKILL_KEYS,
+)
+
+function isCharacterSkillKey(
+  value: string,
+): value is CharacterSkillKey {
+  return characterSkillKeySet.has(value)
+}
+
 function toPersistedDraft(
   row: CharacterWithRelations,
 ): PersistedCharacterDraft {
@@ -122,6 +165,22 @@ function toPersistedDraft(
     throw new Error(
       `Character ${row.id} has incomplete persistence relations`,
     )
+  }
+
+  const skills = Object.fromEntries(
+    CHARACTER_SKILL_KEYS.map(
+      (skillKey) => [skillKey, 0],
+    ),
+  ) as PersistedCharacterSkills
+
+  for (const skill of row.skills) {
+    if (!isCharacterSkillKey(skill.skillKey)) {
+      throw new Error(
+        `Character ${row.id} has unknown skill ${skill.skillKey}`,
+      )
+    }
+
+    skills[skill.skillKey] = skill.rating
   }
 
   return {
@@ -174,6 +233,30 @@ function toPersistedDraft(
       bloodPotency: row.blood.bloodPotency,
       hunger: row.blood.hunger,
     },
+    skills,
+    skillSpecialties: row.skills.flatMap(
+      (skill) => {
+        const skillKey = skill.skillKey
+
+        if (!isCharacterSkillKey(skillKey)) {
+          return []
+        }
+
+        return skill.specialties.map(
+          (specialty) => ({
+            id: specialty.id,
+            skillKey,
+            name: specialty.name,
+            origin:
+              specialty.origin === null
+                ? null
+                : specialtyOriginFromPrisma[
+                    specialty.origin
+                  ],
+          }),
+        )
+      },
+    ),
   }
 }
 
@@ -214,6 +297,31 @@ export class PrismaCharacterDraftRepository
         },
         blood: {
           create: data.blood,
+        },
+        skills: {
+          create: CHARACTER_SKILL_KEYS.map(
+            (skillKey) => ({
+              skillKey,
+              rating: data.skills[skillKey],
+              specialties: {
+                create: data.skillSpecialties
+                  .filter(
+                    (specialty) =>
+                      specialty.skillKey === skillKey,
+                  )
+                  .map((specialty) => ({
+                    id: specialty.id,
+                    name: specialty.name,
+                    origin:
+                      specialty.origin === null
+                        ? null
+                        : specialtyOriginToPrisma[
+                            specialty.origin
+                          ],
+                  })),
+              },
+            }),
+          ),
         },
       },
       include: characterRelations,
@@ -329,6 +437,59 @@ export class PrismaCharacterDraftRepository
             },
             data: data.blood,
           })
+        }
+
+        if (data.skills !== undefined) {
+          await Promise.all(
+            Object.entries(data.skills).map(
+              ([skillKey, rating]) =>
+                transaction.characterSkill.upsert({
+                  where: {
+                    characterId_skillKey: {
+                      characterId: data.characterId,
+                      skillKey,
+                    },
+                  },
+                  create: {
+                    characterId: data.characterId,
+                    skillKey,
+                    rating,
+                  },
+                  update: { rating },
+                }),
+            ),
+          )
+        }
+
+        if (
+          data.skillSpecialties !== undefined
+        ) {
+          await transaction
+            .characterSkillSpecialty.deleteMany({
+              where: {
+                characterId: data.characterId,
+              },
+            })
+
+          if (data.skillSpecialties.length > 0) {
+            await transaction
+              .characterSkillSpecialty.createMany({
+                data: data.skillSpecialties.map(
+                  (specialty) => ({
+                    id: specialty.id,
+                    characterId: data.characterId,
+                    skillKey: specialty.skillKey,
+                    name: specialty.name,
+                    origin:
+                      specialty.origin === null
+                        ? null
+                        : specialtyOriginToPrisma[
+                            specialty.origin
+                          ],
+                  }),
+                ),
+              })
+          }
         }
 
         const row =

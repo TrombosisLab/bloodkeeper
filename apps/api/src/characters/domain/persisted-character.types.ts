@@ -53,6 +53,53 @@ export interface PersistedCharacterBlood {
   hunger: number
 }
 
+export const CHARACTER_SKILL_KEYS = [
+  'athletics',
+  'brawl',
+  'craft',
+  'drive',
+  'firearms',
+  'larceny',
+  'melee',
+  'stealth',
+  'survival',
+  'animalKen',
+  'etiquette',
+  'insight',
+  'intimidation',
+  'leadership',
+  'performance',
+  'persuasion',
+  'streetwise',
+  'subterfuge',
+  'academics',
+  'awareness',
+  'finance',
+  'investigation',
+  'medicine',
+  'occult',
+  'politics',
+  'science',
+  'technology',
+] as const
+
+export type CharacterSkillKey =
+  typeof CHARACTER_SKILL_KEYS[number]
+
+export type PersistedCharacterSkills =
+  Record<CharacterSkillKey, number>
+
+export type SkillSpecialtyOrigin =
+  | 'creation'
+  | 'predatorType'
+
+export interface PersistedCharacterSkillSpecialty {
+  id: string
+  skillKey: CharacterSkillKey
+  name: string
+  origin: SkillSpecialtyOrigin | null
+}
+
 export interface PersistedCharacterDraft {
   characterId: string
   ownerId: string
@@ -65,6 +112,9 @@ export interface PersistedCharacterDraft {
   creation: PersistedCharacterCreationState
   attributes: PersistedCharacterAttributes
   blood: PersistedCharacterBlood
+  skills: PersistedCharacterSkills
+  skillSpecialties:
+    PersistedCharacterSkillSpecialty[]
 }
 
 export interface CreateCharacterDraftData {
@@ -73,6 +123,9 @@ export interface CreateCharacterDraftData {
   identity: Partial<PersistedCharacterIdentity>
   attributes: PersistedCharacterAttributes
   blood: PersistedCharacterBlood
+  skills: PersistedCharacterSkills
+  skillSpecialties:
+    PersistedCharacterSkillSpecialty[]
   creation: {
     currentStep: CharacterCreationStep
     skillDistributionMethod: SkillDistributionMethod
@@ -86,6 +139,9 @@ export interface UpdateCharacterDraftData {
   identity?: Partial<PersistedCharacterIdentity>
   attributes?: Partial<PersistedCharacterAttributes>
   blood?: Partial<PersistedCharacterBlood>
+  skills?: Partial<PersistedCharacterSkills>
+  skillSpecialties?:
+    PersistedCharacterSkillSpecialty[]
   creation?: Partial<
     Pick<
       PersistedCharacterCreationState,

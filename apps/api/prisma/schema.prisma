@@ -37,6 +37,11 @@ enum SkillDistributionMethod {
   SPECIALIST
 }
 
+enum SkillSpecialtyOrigin {
+  CREATION
+  PREDATOR_TYPE
+}
+
 model Character {
   id          String          @id @default(uuid()) @db.Uuid
   ownerId     String          @db.Uuid
@@ -50,6 +55,7 @@ model Character {
   creationState CharacterCreationState?
   attributes    CharacterAttributes?
   blood         CharacterBloodState?
+  skills        CharacterSkill[]
 
   @@index([ownerId])
   @@index([chronicleId])
@@ -111,4 +117,29 @@ model CharacterBloodState {
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("character_blood_states")
+}
+
+model CharacterSkill {
+  characterId String @db.Uuid
+  skillKey    String
+  rating      Int    @default(0)
+
+  character  Character               @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  specialties CharacterSkillSpecialty[]
+
+  @@id([characterId, skillKey])
+  @@map("character_skills")
+}
+
+model CharacterSkillSpecialty {
+  id          String               @id
+  characterId String               @db.Uuid
+  skillKey    String
+  name        String
+  origin      SkillSpecialtyOrigin?
+
+  skill CharacterSkill @relation(fields: [characterId, skillKey], references: [characterId, skillKey], onDelete: Cascade)
+
+  @@index([characterId, skillKey])
+  @@map("character_skill_specialties")
 }
