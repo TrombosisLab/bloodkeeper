@@ -44,8 +44,8 @@ import {
 } from './blood-rules.ts'
 
 import {
-  validateInitialCharacterAdvantagesBudget,
-} from './advantage-rules.ts'
+  validateCharacterAdvantagesForContext,
+} from './advantage-acquisition-context-rules.ts'
 
 import {
   characterAdvantageDefinitions,
@@ -301,8 +301,9 @@ export function validateStep(
 
     case 'advantages': {
       const advantageValidation =
-        validateInitialCharacterAdvantagesBudget(
+        validateCharacterAdvantagesForContext(
           draft.advantages,
+          'characterCreation',
         )
 
       const characterKind =
