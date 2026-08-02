@@ -141,7 +141,7 @@ export function getRequiredPowerCount(
   )
 }
 
-export function validateSelectedPowers(
+export function validateInitialDisciplinePowers(
   definitions:
     DisciplinePowerDefinition[],
   disciplines:
@@ -230,6 +230,29 @@ export function validateSelectedPowers(
       ...new Set(errors),
     ],
   }
+}
+
+/*
+ * Compatibilidad con consumidores anteriores.
+ * La validación implementada es exclusivamente
+ * la selección inicial durante la creación.
+ */
+export function validateSelectedPowers(
+  definitions:
+    DisciplinePowerDefinition[],
+  disciplines:
+    CharacterDisciplinesDraft,
+  disciplineKey:
+    DisciplineKey,
+  selectedPowerKeys:
+    DisciplinePowerKey[],
+): PowerValidationResult {
+  return validateInitialDisciplinePowers(
+    definitions,
+    disciplines,
+    disciplineKey,
+    selectedPowerKeys,
+  )
 }
 
 export function updateSelectedPower(

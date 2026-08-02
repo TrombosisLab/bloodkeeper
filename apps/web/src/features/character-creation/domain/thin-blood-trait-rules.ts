@@ -22,7 +22,7 @@ import type {
 } from '../types/discipline.types.ts'
 
 import {
-  validateSelectedPowers,
+  validateInitialDisciplinePowers,
 } from './discipline-power-rules.ts'
 
 export const THIN_BLOOD_TRAIT_MIN_PER_CATEGORY = 1
@@ -341,7 +341,7 @@ export function validateThinBloodDisciplineAffinityDetails(
       }
 
     const powerValidation =
-      validateSelectedPowers(
+      validateInitialDisciplinePowers(
         disciplinePowerDefinitions,
         [
           effect,

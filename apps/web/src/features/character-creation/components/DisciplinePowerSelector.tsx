@@ -3,13 +3,15 @@ import {
 } from '../data/discipline-power-definitions'
 
 import {
-  canLearnDisciplinePower,
   updateSelectedPower,
-  validateSelectedPowers,
+  validateInitialDisciplinePowers,
 } from '../domain/discipline-power-rules'
 import {
   getActiveDisciplinePowers,
 } from '../domain/discipline-power-catalog-rules'
+import {
+  validateDisciplinePowerAcquisition,
+} from '../domain/discipline-power-acquisition-rules'
 
 import type {
   CharacterDisciplinesDraft,
@@ -55,7 +57,7 @@ export function DisciplinePowerSelector({
     )
 
   const validation =
-    validateSelectedPowers(
+    validateInitialDisciplinePowers(
       disciplinePowerDefinitions,
       disciplines,
       disciplineKey,
@@ -103,23 +105,18 @@ export function DisciplinePowerSelector({
               )
 
             const learnability =
-              canLearnDisciplinePower(
-                power,
+              validateDisciplinePowerAcquisition(
+                disciplinePowerDefinitions,
                 disciplines,
+                disciplineKey,
+                power.key,
                 selectedPowerKeys,
+                'characterCreation',
               )
-
-            const limitReached =
-              !selected &&
-              selectedPowerKeys.length >=
-                level
 
             const disabled =
               !selected &&
-              (
-                !learnability.valid ||
-                limitReached
-              )
+              !learnability.valid
 
             return (
               <button

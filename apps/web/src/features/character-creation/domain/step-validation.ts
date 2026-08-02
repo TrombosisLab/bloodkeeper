@@ -28,7 +28,7 @@ import {
 } from '../data/discipline-power-definitions.ts'
 
 import {
-  validateSelectedPowers,
+  validateInitialDisciplinePowers,
 } from './discipline-power-rules.ts'
 
 import {
@@ -387,7 +387,7 @@ export function validateStep(
         }
 
         const result =
-          validateSelectedPowers(
+          validateInitialDisciplinePowers(
             disciplinePowerDefinitions,
             draft.disciplines,
             discipline.key,
