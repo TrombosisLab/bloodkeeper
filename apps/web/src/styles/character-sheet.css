@@ -591,12 +591,17 @@
 .humanity-box {
   aspect-ratio: 1;
 
+  display: grid;
+
+  place-items: center;
+
   border: 1px solid #554447;
 
   background: #0d0b0b;
 }
 
-.humanity-box--filled {
+.humanity-box--filled,
+.humanity-box--humanity {
   border-color: #9b7479;
 
   background:
@@ -608,6 +613,21 @@
 
   box-shadow:
     inset 0 0 0 3px #171112;
+}
+
+.humanity-box--stain {
+  border-color: #bd6874;
+
+  background: #241215;
+}
+
+.humanity-box__symbol {
+  color: #e0a2aa;
+
+  font-family: Arial, sans-serif;
+  font-size: clamp(0.8rem, 1.6vw, 1.1rem);
+  font-weight: 700;
+  line-height: 1;
 }
 
 .hunger-track {

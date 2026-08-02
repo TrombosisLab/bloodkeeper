@@ -31,15 +31,17 @@ export function CharacterState() {
             <div>
               <span>Humanidad</span>
               <strong>
-                {demoState.humanity}
+                {demoState.humanity.value}
               </strong>
             </div>
 
-            <small>Máximo 10</small>
+            <small>
+              Manchas {demoState.humanity.stains}
+            </small>
           </div>
 
           <HumanityTrack
-            value={demoState.humanity}
+            state={demoState.humanity}
           />
         </div>
 

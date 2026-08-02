@@ -3,7 +3,10 @@ import type {
 } from '../types/character-state.types'
 
 export const demoState: CharacterState = {
-  humanity: 7,
+  humanity: {
+    value: 7,
+    stains: 2,
+  },
   hunger: 2,
   bloodPotency: 1,
 }

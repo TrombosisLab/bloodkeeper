@@ -1,35 +1,75 @@
+import type {
+  CharacterHumanityState,
+  HumanityBoxState,
+} from '../domain/humanity-state-rules'
+import {
+  toHumanityBoxStates,
+} from '../domain/humanity-state-rules'
+
 interface HumanityTrackProps {
-  value: number
+  state: CharacterHumanityState
+}
+
+function getBoxLabel(
+  state: HumanityBoxState,
+): string {
+  switch (state) {
+    case 'humanity':
+      return 'Humanidad'
+
+    case 'stain':
+      return 'Mancha'
+
+    default:
+      return 'Vacía'
+  }
+}
+
+function getBoxSymbol(
+  state: HumanityBoxState,
+): string {
+  switch (state) {
+    case 'humanity':
+      return '◆'
+
+    case 'stain':
+      return '×'
+
+    default:
+      return ''
+  }
 }
 
 export function HumanityTrack({
-  value,
+  state,
 }: HumanityTrackProps) {
-  const safeValue = Math.max(
-    0,
-    Math.min(value, 10),
-  )
+  const boxes = toHumanityBoxStates(state)
 
   return (
-    <div className="humanity-track">
-      {Array.from(
-        { length: 10 },
-        (_, index) => (
+    <div
+      className="humanity-track"
+      role="list"
+      aria-label={`Humanidad ${state.value} de 10; ${state.stains} Manchas`}
+    >
+      {boxes.map((boxState, index) => (
+        <span
+          key={index}
+          role="listitem"
+          className={[
+            'humanity-box',
+            `humanity-box--${boxState}`,
+          ].join(' ')}
+          aria-label={`Casilla ${index + 1}: ${getBoxLabel(boxState)}`}
+          title={getBoxLabel(boxState)}
+        >
           <span
-            key={index}
-            className={
-              index < safeValue
-                ? 'humanity-box humanity-box--filled'
-                : 'humanity-box'
-            }
+            className="humanity-box__symbol"
             aria-hidden="true"
-          />
-        ),
-      )}
-
-      <span className="sr-only">
-        Humanidad {safeValue} de 10
-      </span>
+          >
+            {getBoxSymbol(boxState)}
+          </span>
+        </span>
+      ))}
     </div>
   )
 }
