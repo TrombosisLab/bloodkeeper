@@ -664,13 +664,20 @@ export function parseCreateCharacterDraftRequest(
   ownerIdInput: unknown,
   input: unknown,
 ): CreateCharacterDraftData {
-  const ownerId = uuid(ownerIdInput, 'ownerId')
+  const ownerId =
+    parseCharacterDraftOwnerId(ownerIdInput)
   validateCreateBody(input)
 
   return {
     ownerId,
     ...(input as CreateCharacterDraftRequestDto),
   }
+}
+
+export function parseCharacterDraftOwnerId(
+  ownerIdInput: unknown,
+): string {
+  return uuid(ownerIdInput, 'ownerId')
 }
 
 export function parseCharacterDraftIdParam(

@@ -20,6 +20,10 @@ import {
   PrismaCharacterDraftRepository,
 } from './infrastructure/prisma-character-draft.repository'
 
+import {
+  CharacterDraftController,
+} from './presentation/character-draft.controller'
+
 const useCaseProviders = [
   {
     provide: CreateCharacterDraftUseCase,
@@ -45,6 +49,7 @@ const useCaseProviders = [
 ]
 
 @Module({
+  controllers: [CharacterDraftController],
   providers: [
     PrismaCharacterDraftRepository,
     {
