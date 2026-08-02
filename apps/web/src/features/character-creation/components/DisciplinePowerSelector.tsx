@@ -7,6 +7,9 @@ import {
   updateSelectedPower,
   validateSelectedPowers,
 } from '../domain/discipline-power-rules'
+import {
+  getActiveDisciplinePowers,
+} from '../domain/discipline-power-catalog-rules'
 
 import type {
   CharacterDisciplinesDraft,
@@ -46,10 +49,9 @@ export function DisciplinePowerSelector({
     discipline?.powerKeys ?? []
 
   const availablePowers =
-    disciplinePowerDefinitions.filter(
-      (power) =>
-        power.disciplineKey ===
-        disciplineKey,
+    getActiveDisciplinePowers(
+      disciplinePowerDefinitions,
+      disciplineKey,
     )
 
   const validation =

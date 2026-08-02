@@ -17,6 +17,9 @@ import {
 import {
   getThinBloodDisciplineAffinityKeys,
 } from '../../domain/thin-blood-trait-rules'
+import {
+  getActiveDisciplinePowers,
+} from '../../domain/discipline-power-catalog-rules'
 
 import {
   DisciplineAffinityEditor,
@@ -53,11 +56,12 @@ export function DisciplineAffinitySection({
 
   const powerOptions =
     disciplineAffinity
-      ? disciplinePowerDefinitions
+      ? getActiveDisciplinePowers(
+          disciplinePowerDefinitions,
+          disciplineAffinity.disciplineKey,
+        )
           .filter(
             (power) =>
-              power.disciplineKey ===
-                disciplineAffinity.disciplineKey &&
               power.level === 1,
           )
           .map(

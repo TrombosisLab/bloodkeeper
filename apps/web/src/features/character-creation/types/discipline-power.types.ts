@@ -31,6 +31,13 @@ export interface DisciplinePowerDefinition {
   level: number
 
   /*
+   * Los catálogos fuente pueden omitirlo.
+   * La fachada canónica materializa siempre
+   * un booleano y permite desactivar opciones.
+   */
+  active?: boolean
+
+  /*
    * Resumen editorial propio de la aplicación.
    * No debe contener reproducción extensa
    * del texto de los manuales.

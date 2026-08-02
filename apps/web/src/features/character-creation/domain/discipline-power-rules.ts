@@ -8,6 +8,10 @@ import type {
   DisciplinePowerKey,
 } from '../types/discipline-power.types.ts'
 
+import {
+  isDisciplinePowerActive,
+} from './discipline-power-catalog-rules.ts'
+
 export interface PowerValidationResult {
   valid: boolean
   errors: string[]
@@ -34,6 +38,12 @@ export function canLearnDisciplinePower(
     DisciplinePowerKey[],
 ): PowerValidationResult {
   const errors: string[] = []
+
+  if (!isDisciplinePowerActive(power)) {
+    errors.push(
+      `El poder ${power.key} no está activo.`,
+    )
+  }
 
   const disciplineLevel =
     getCharacterDisciplineLevel(
@@ -333,6 +343,9 @@ export function normalizeDisciplinePowers(
 
         if (
           !definition ||
+          !isDisciplinePowerActive(
+            definition,
+          ) ||
           definition.disciplineKey !==
             discipline.key ||
           definition.level >

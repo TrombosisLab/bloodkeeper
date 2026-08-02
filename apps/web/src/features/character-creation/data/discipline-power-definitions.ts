@@ -56,7 +56,7 @@ import type {
  * disciplinePowerDefinitions desde este módulo.
  */
 
-export const disciplinePowerDefinitions:
+const sourceDisciplinePowerDefinitions:
   DisciplinePowerDefinition[] = [
     ...bloodSorceryPowerDefinitions,
     ...celerityPowerDefinitions,
@@ -70,3 +70,13 @@ export const disciplinePowerDefinitions:
     ...obfuscatePowerDefinitions,
     ...oblivionPowerDefinitions,
   ]
+
+export const disciplinePowerDefinitions:
+  DisciplinePowerDefinition[] =
+    sourceDisciplinePowerDefinitions.map(
+      (definition) => ({
+        ...definition,
+        active:
+          definition.active ?? true,
+      }),
+    )
