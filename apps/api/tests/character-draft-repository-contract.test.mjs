@@ -55,6 +55,10 @@ test(
       repository,
       /thinBloodTraits:\s*{\s*create:/,
     )
+    assert.match(
+      repository,
+      /createAdvantageSelections\(/,
+    )
   },
 )
 
@@ -63,7 +67,7 @@ test(
   () => {
     assert.match(
       repository,
-      /identity: true,[\s\S]*creationState: true,[\s\S]*attributes: true,[\s\S]*blood: true,[\s\S]*skills:[\s\S]*disciplines:[\s\S]*bloodSorceryRituals:[\s\S]*oblivionCeremonies:[\s\S]*thinBloodAlchemy: true,[\s\S]*thinBloodFormulas:[\s\S]*thinBloodTraits:[\s\S]*humanity: true/,
+      /identity: true,[\s\S]*creationState: true,[\s\S]*attributes: true,[\s\S]*blood: true,[\s\S]*skills:[\s\S]*disciplines:[\s\S]*bloodSorceryRituals:[\s\S]*oblivionCeremonies:[\s\S]*thinBloodAlchemy: true,[\s\S]*thinBloodFormulas:[\s\S]*thinBloodTraits:[\s\S]*advantages:[\s\S]*humanity: true/,
     )
     assert.match(repository, /character\.findUnique/)
   },
@@ -120,6 +124,10 @@ test(
     assert.match(
       repository,
       /characterThinBloodTrait[\s\S]*\.deleteMany/,
+    )
+    assert.match(
+      repository,
+      /characterAdvantageSelection[\s\S]*\.deleteMany/,
     )
   },
 )

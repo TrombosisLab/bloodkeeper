@@ -160,6 +160,105 @@ export interface PersistedCharacterThinBloodTrait {
   } | null
 }
 
+export type CharacterAdvantageCategory =
+  | 'merit'
+  | 'background'
+  | 'flaw'
+
+export type CharacterAdvantageSelectionOrigin =
+  | 'creation'
+  | 'predatorType'
+  | 'thinBlood'
+
+export type AdvantageMaskBenefitKey =
+  | 'erased'
+  | 'tailor'
+
+export type PersistedCharacterAdvantageDetails =
+  | {
+      kind: 'allies'
+      effectiveness: number
+      reliability: number
+      identity?: string
+    }
+  | {
+      kind: 'contact' | 'retainer' | 'mawla'
+        | 'herd' | 'haven' | 'famousFace'
+        | 'enemy' | 'stalker'
+      identity?: string
+    }
+  | {
+      kind: 'status' | 'fame' | 'influence'
+      sphere?: string
+    }
+  | {
+      kind: 'mask'
+      identity?: string
+      benefits: AdvantageMaskBenefitKey[]
+    }
+  | {
+      kind: 'darkSecret'
+      secret?: string
+    }
+  | {
+      kind: 'resources'
+      source?: string
+    }
+  | {
+      kind: 'substanceUse'
+      substance: string
+      poolCategory?: string
+    }
+  | {
+      kind: 'folkloricBane'
+      source: string
+    }
+  | {
+      kind: 'folkloricBlock'
+      taboo: string
+    }
+  | {
+      kind: 'preyExclusion'
+      excludedPrey: string
+    }
+  | {
+      kind: 'loresheet'
+      loresheetKey: string
+      benefitKey: string
+    }
+  | {
+      kind: 'linguistics'
+      languages: string[]
+    }
+  | {
+      kind: 'methuselahVisage'
+      resembles?: string
+    }
+  | {
+      kind: 'childOfTheScene'
+      subculture?: string
+    }
+  | {
+      kind: 'infamy' | 'despised' | 'hatred'
+        | 'exiled' | 'suspect' | 'shunned'
+        | 'mortalPretender'
+      description?: string
+    }
+
+export interface PersistedCharacterAdvantageSelection {
+  selectionId: string
+  definitionKey: string
+  category: CharacterAdvantageCategory
+  rating: number
+  origin: CharacterAdvantageSelectionOrigin
+  parentSelectionId: string | null
+  details: PersistedCharacterAdvantageDetails | null
+}
+
+export interface PersistedCharacterAdvantages {
+  selections: PersistedCharacterAdvantageSelection[]
+}
+
 export interface PersistedCharacterConviction {
   convictionId: string
   text: string
@@ -202,6 +301,7 @@ export interface PersistedCharacterDraft {
     PersistedCharacterThinBloodAlchemy
   thinBloodTraits:
     PersistedCharacterThinBloodTrait[]
+  advantages: PersistedCharacterAdvantages
   humanity: PersistedCharacterHumanity
 }
 
@@ -223,6 +323,7 @@ export interface CreateCharacterDraftData {
     PersistedCharacterThinBloodAlchemy
   thinBloodTraits:
     PersistedCharacterThinBloodTrait[]
+  advantages: PersistedCharacterAdvantages
   humanity: PersistedCharacterHumanity
   creation: {
     currentStep: CharacterCreationStep
@@ -249,6 +350,7 @@ export interface UpdateCharacterDraftData {
     PersistedCharacterThinBloodAlchemy
   thinBloodTraits?:
     PersistedCharacterThinBloodTrait[]
+  advantages?: PersistedCharacterAdvantages
   humanityValue?: number
   humanityNarrative?: {
     convictions: PersistedCharacterConviction[]

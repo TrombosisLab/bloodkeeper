@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common'
 
 import {
+  AdvantageCategory as PrismaAdvantageCategory,
+  AdvantageDetailsKind as PrismaAdvantageDetailsKind,
+  AdvantageMaskBenefit as PrismaAdvantageMaskBenefit,
+  AdvantageSelectionOrigin as PrismaAdvantageSelectionOrigin,
   CharacterCreationStep as PrismaCharacterCreationStep,
   CharacterStatus as PrismaCharacterStatus,
   DisciplineOrigin as PrismaDisciplineOrigin,
@@ -19,6 +23,9 @@ import type {
 } from '../application/character-draft.repository'
 
 import type {
+  AdvantageMaskBenefitKey,
+  CharacterAdvantageCategory,
+  CharacterAdvantageSelectionOrigin,
   CharacterCreationStep,
   CharacterDisciplineKey,
   CharacterDisciplineOrigin,
@@ -26,6 +33,8 @@ import type {
   CharacterSkillKey,
   CreateCharacterDraftData,
   PersistedCharacterDraft,
+  PersistedCharacterAdvantageDetails,
+  PersistedCharacterAdvantages,
   PersistedCharacterIdentity,
   PersistedCharacterSkills,
   SkillDistributionMethod,
@@ -151,6 +160,117 @@ const alchemyMethodFromPrisma: Record<
   FIXATIO: 'fixatio',
 }
 
+const advantageCategoryToPrisma: Record<
+  CharacterAdvantageCategory,
+  PrismaAdvantageCategory
+> = {
+  merit: PrismaAdvantageCategory.MERIT,
+  background: PrismaAdvantageCategory.BACKGROUND,
+  flaw: PrismaAdvantageCategory.FLAW,
+}
+
+const advantageCategoryFromPrisma: Record<
+  PrismaAdvantageCategory,
+  CharacterAdvantageCategory
+> = {
+  MERIT: 'merit',
+  BACKGROUND: 'background',
+  FLAW: 'flaw',
+}
+
+const advantageOriginToPrisma: Record<
+  CharacterAdvantageSelectionOrigin,
+  PrismaAdvantageSelectionOrigin
+> = {
+  creation: PrismaAdvantageSelectionOrigin.CREATION,
+  predatorType:
+    PrismaAdvantageSelectionOrigin.PREDATOR_TYPE,
+  thinBlood:
+    PrismaAdvantageSelectionOrigin.THIN_BLOOD,
+}
+
+const advantageOriginFromPrisma: Record<
+  PrismaAdvantageSelectionOrigin,
+  CharacterAdvantageSelectionOrigin
+> = {
+  CREATION: 'creation',
+  PREDATOR_TYPE: 'predatorType',
+  THIN_BLOOD: 'thinBlood',
+}
+
+const maskBenefitToPrisma: Record<
+  AdvantageMaskBenefitKey,
+  PrismaAdvantageMaskBenefit
+> = {
+  erased: PrismaAdvantageMaskBenefit.ERASED,
+  tailor: PrismaAdvantageMaskBenefit.TAILOR,
+}
+
+const maskBenefitFromPrisma: Record<
+  PrismaAdvantageMaskBenefit,
+  AdvantageMaskBenefitKey
+> = {
+  ERASED: 'erased',
+  TAILOR: 'tailor',
+}
+
+type AdvantageDetailsKind =
+  PersistedCharacterAdvantageDetails['kind']
+
+const advantageDetailsKindToPrisma: Record<
+  AdvantageDetailsKind,
+  PrismaAdvantageDetailsKind
+> = {
+  allies: PrismaAdvantageDetailsKind.ALLIES,
+  contact: PrismaAdvantageDetailsKind.CONTACT,
+  retainer: PrismaAdvantageDetailsKind.RETAINER,
+  status: PrismaAdvantageDetailsKind.STATUS,
+  fame: PrismaAdvantageDetailsKind.FAME,
+  influence: PrismaAdvantageDetailsKind.INFLUENCE,
+  mask: PrismaAdvantageDetailsKind.MASK,
+  darkSecret: PrismaAdvantageDetailsKind.DARK_SECRET,
+  mawla: PrismaAdvantageDetailsKind.MAWLA,
+  herd: PrismaAdvantageDetailsKind.HERD,
+  resources: PrismaAdvantageDetailsKind.RESOURCES,
+  haven: PrismaAdvantageDetailsKind.HAVEN,
+  substanceUse:
+    PrismaAdvantageDetailsKind.SUBSTANCE_USE,
+  folkloricBane:
+    PrismaAdvantageDetailsKind.FOLKLORIC_BANE,
+  folkloricBlock:
+    PrismaAdvantageDetailsKind.FOLKLORIC_BLOCK,
+  preyExclusion:
+    PrismaAdvantageDetailsKind.PREY_EXCLUSION,
+  loresheet: PrismaAdvantageDetailsKind.LORESHEET,
+  linguistics:
+    PrismaAdvantageDetailsKind.LINGUISTICS,
+  methuselahVisage:
+    PrismaAdvantageDetailsKind.METHUSELAH_VISAGE,
+  famousFace:
+    PrismaAdvantageDetailsKind.FAMOUS_FACE,
+  childOfTheScene:
+    PrismaAdvantageDetailsKind.CHILD_OF_THE_SCENE,
+  enemy: PrismaAdvantageDetailsKind.ENEMY,
+  stalker: PrismaAdvantageDetailsKind.STALKER,
+  infamy: PrismaAdvantageDetailsKind.INFAMY,
+  despised: PrismaAdvantageDetailsKind.DESPISED,
+  hatred: PrismaAdvantageDetailsKind.HATRED,
+  exiled: PrismaAdvantageDetailsKind.EXILED,
+  suspect: PrismaAdvantageDetailsKind.SUSPECT,
+  shunned: PrismaAdvantageDetailsKind.SHUNNED,
+  mortalPretender:
+    PrismaAdvantageDetailsKind.MORTAL_PRETENDER,
+}
+
+const advantageDetailsKindFromPrisma =
+  Object.fromEntries(
+    Object.entries(advantageDetailsKindToPrisma)
+      .map(([key, value]) => [value, key]),
+  ) as Record<
+    PrismaAdvantageDetailsKind,
+    AdvantageDetailsKind
+  >
+
 const characterRelations = {
   identity: true,
   creationState: true,
@@ -185,6 +305,10 @@ const characterRelations = {
   thinBloodTraits: {
     orderBy: { definitionKey: 'asc' },
   },
+  advantages: {
+    include: { details: true },
+    orderBy: { selectionId: 'asc' },
+  },
   humanity: true,
   convictions: {
     orderBy: { convictionId: 'asc' },
@@ -198,6 +322,315 @@ type CharacterWithRelations =
   Prisma.CharacterGetPayload<{
     include: typeof characterRelations
   }>
+
+type AdvantageDetailsRow = NonNullable<
+  CharacterWithRelations['advantages'][number]['details']
+>
+
+function requiredStored<T>(
+  value: T | null,
+  field: string,
+): T {
+  if (value === null) {
+    throw new Error(
+      `Stored advantage detail is missing ${field}`,
+    )
+  }
+
+  return value
+}
+
+function toAdvantageDetailsCreate(
+  characterId: string,
+  selectionId: string,
+  details: PersistedCharacterAdvantageDetails,
+): Prisma.CharacterAdvantageDetailsUncheckedCreateInput {
+  const base = {
+    characterId,
+    selectionId,
+    kind: advantageDetailsKindToPrisma[details.kind],
+  }
+
+  switch (details.kind) {
+    case 'allies':
+      return {
+        ...base,
+        effectiveness: details.effectiveness,
+        reliability: details.reliability,
+        identity: details.identity,
+      }
+    case 'contact':
+    case 'retainer':
+    case 'mawla':
+    case 'herd':
+    case 'haven':
+    case 'famousFace':
+    case 'enemy':
+    case 'stalker':
+      return { ...base, identity: details.identity }
+    case 'status':
+    case 'fame':
+    case 'influence':
+      return { ...base, sphere: details.sphere }
+    case 'mask':
+      return {
+        ...base,
+        identity: details.identity,
+        maskBenefits: details.benefits.map(
+          (benefit) => maskBenefitToPrisma[benefit],
+        ),
+      }
+    case 'darkSecret':
+      return { ...base, secret: details.secret }
+    case 'resources':
+      return {
+        ...base,
+        resourceSource: details.source,
+      }
+    case 'substanceUse':
+      return {
+        ...base,
+        substance: details.substance,
+        poolCategory: details.poolCategory,
+      }
+    case 'folkloricBane':
+      return {
+        ...base,
+        folkloricSource: details.source,
+      }
+    case 'folkloricBlock':
+      return { ...base, taboo: details.taboo }
+    case 'preyExclusion':
+      return {
+        ...base,
+        excludedPrey: details.excludedPrey,
+      }
+    case 'loresheet':
+      return {
+        ...base,
+        loresheetKey: details.loresheetKey,
+        benefitKey: details.benefitKey,
+      }
+    case 'linguistics':
+      return {
+        ...base,
+        languages: details.languages,
+      }
+    case 'methuselahVisage':
+      return { ...base, resembles: details.resembles }
+    case 'childOfTheScene':
+      return { ...base, subculture: details.subculture }
+    case 'infamy':
+    case 'despised':
+    case 'hatred':
+    case 'exiled':
+    case 'suspect':
+    case 'shunned':
+    case 'mortalPretender':
+      return {
+        ...base,
+        description: details.description,
+      }
+  }
+
+  throw new Error('Unsupported advantage detail kind')
+}
+
+function toPersistedAdvantageDetails(
+  details: AdvantageDetailsRow,
+): PersistedCharacterAdvantageDetails {
+  const kind =
+    advantageDetailsKindFromPrisma[details.kind]
+
+  switch (kind) {
+    case 'allies':
+      return {
+        kind,
+        effectiveness: requiredStored(
+          details.effectiveness,
+          'effectiveness',
+        ),
+        reliability: requiredStored(
+          details.reliability,
+          'reliability',
+        ),
+        identity: details.identity ?? undefined,
+      }
+    case 'contact':
+    case 'retainer':
+    case 'mawla':
+    case 'herd':
+    case 'haven':
+    case 'famousFace':
+    case 'enemy':
+    case 'stalker':
+      return {
+        kind,
+        identity: details.identity ?? undefined,
+      }
+    case 'status':
+    case 'fame':
+    case 'influence':
+      return {
+        kind,
+        sphere: details.sphere ?? undefined,
+      }
+    case 'mask':
+      return {
+        kind,
+        identity: details.identity ?? undefined,
+        benefits: details.maskBenefits.map(
+          (benefit) => maskBenefitFromPrisma[benefit],
+        ),
+      }
+    case 'darkSecret':
+      return {
+        kind,
+        secret: details.secret ?? undefined,
+      }
+    case 'resources':
+      return {
+        kind,
+        source: details.resourceSource ?? undefined,
+      }
+    case 'substanceUse':
+      return {
+        kind,
+        substance: requiredStored(
+          details.substance,
+          'substance',
+        ),
+        poolCategory:
+          details.poolCategory ?? undefined,
+      }
+    case 'folkloricBane':
+      return {
+        kind,
+        source: requiredStored(
+          details.folkloricSource,
+          'folkloricSource',
+        ),
+      }
+    case 'folkloricBlock':
+      return {
+        kind,
+        taboo: requiredStored(details.taboo, 'taboo'),
+      }
+    case 'preyExclusion':
+      return {
+        kind,
+        excludedPrey: requiredStored(
+          details.excludedPrey,
+          'excludedPrey',
+        ),
+      }
+    case 'loresheet':
+      return {
+        kind,
+        loresheetKey: requiredStored(
+          details.loresheetKey,
+          'loresheetKey',
+        ),
+        benefitKey: requiredStored(
+          details.benefitKey,
+          'benefitKey',
+        ),
+      }
+    case 'linguistics':
+      return { kind, languages: details.languages }
+    case 'methuselahVisage':
+      return {
+        kind,
+        resembles: details.resembles ?? undefined,
+      }
+    case 'childOfTheScene':
+      return {
+        kind,
+        subculture: details.subculture ?? undefined,
+      }
+    case 'infamy':
+    case 'despised':
+    case 'hatred':
+    case 'exiled':
+    case 'suspect':
+    case 'shunned':
+    case 'mortalPretender':
+      return {
+        kind,
+        description: details.description ?? undefined,
+      }
+  }
+
+  throw new Error('Unsupported stored advantage detail kind')
+}
+
+async function createAdvantageSelections(
+  transaction: Prisma.TransactionClient,
+  characterId: string,
+  advantages: PersistedCharacterAdvantages,
+): Promise<void> {
+  const selections = advantages.selections
+
+  if (selections.length === 0) {
+    return
+  }
+
+  await transaction.characterAdvantageSelection
+    .createMany({
+      data: selections.map((selection) => ({
+        characterId,
+        selectionId: selection.selectionId,
+        definitionKey: selection.definitionKey,
+        category:
+          advantageCategoryToPrisma[selection.category],
+        rating: selection.rating,
+        origin:
+          advantageOriginToPrisma[selection.origin],
+        parentSelectionId: null,
+      })),
+    })
+
+  await Promise.all(
+    selections
+      .filter(
+        (selection) =>
+          selection.parentSelectionId !== null,
+      )
+      .map((selection) =>
+        transaction.characterAdvantageSelection
+          .update({
+            where: {
+              characterId_selectionId: {
+                characterId,
+                selectionId: selection.selectionId,
+              },
+            },
+            data: {
+              parentSelectionId:
+                selection.parentSelectionId,
+            },
+          }),
+      ),
+  )
+
+  const details = selections.flatMap(
+    (selection) =>
+      selection.details === null
+        ? []
+        : [
+            toAdvantageDetailsCreate(
+              characterId,
+              selection.selectionId,
+              selection.details,
+            ),
+          ],
+  )
+
+  if (details.length > 0) {
+    await transaction.characterAdvantageDetails
+      .createMany({ data: details })
+  }
+}
 
 function toIdentityCreate(
   identity: Partial<PersistedCharacterIdentity>,
@@ -424,6 +857,31 @@ function toPersistedDraft(
         }
       },
     ),
+    advantages: {
+      selections: row.advantages.map(
+        (selection) => ({
+          selectionId: selection.selectionId,
+          definitionKey: selection.definitionKey,
+          category:
+            advantageCategoryFromPrisma[
+              selection.category
+            ],
+          rating: selection.rating,
+          origin:
+            advantageOriginFromPrisma[
+              selection.origin
+            ],
+          parentSelectionId:
+            selection.parentSelectionId,
+          details:
+            selection.details === null
+              ? null
+              : toPersistedAdvantageDetails(
+                  selection.details,
+                ),
+        }),
+      ),
+    },
     humanity: {
       value: row.humanity.value,
       convictions: row.convictions.map(
@@ -589,6 +1047,12 @@ export class PrismaCharacterDraftRepository
               },
             },
           })
+
+        await createAdvantageSelections(
+          transaction,
+          character.id,
+          data.advantages,
+        )
 
         if (data.humanity.convictions.length > 0) {
           await transaction.characterConviction
@@ -946,6 +1410,22 @@ export class PrismaCharacterDraftRepository
                 ),
               })
           }
+        }
+
+        if (data.advantages !== undefined) {
+          await transaction
+            .characterAdvantageSelection
+            .deleteMany({
+              where: {
+                characterId: data.characterId,
+              },
+            })
+
+          await createAdvantageSelections(
+            transaction,
+            data.characterId,
+            data.advantages,
+          )
         }
 
         if (data.humanityValue !== undefined) {

@@ -110,6 +110,31 @@ test(
             },
           },
         ],
+        advantages: {
+          selections: [
+            {
+              selectionId: 'haven-1',
+              definitionKey: 'haven',
+              category: 'background',
+              rating: 2,
+              origin: 'creation',
+              parentSelectionId: null,
+              details: {
+                kind: 'haven',
+                identity: 'Almacén del puerto',
+              },
+            },
+            {
+              selectionId: 'haunted-1',
+              definitionKey: 'haven-haunted',
+              category: 'flaw',
+              rating: 1,
+              origin: 'creation',
+              parentSelectionId: 'haven-1',
+              details: null,
+            },
+          ],
+        },
         humanity: {
           value: 7,
           touchstones: [
@@ -180,6 +205,23 @@ test(
         'auspex',
       )
       assert.equal(
+        created.advantages.selections.find(
+          (selection) =>
+            selection.selectionId === 'haunted-1',
+        )?.parentSelectionId,
+        'haven-1',
+      )
+      assert.deepEqual(
+        created.advantages.selections.find(
+          (selection) =>
+            selection.selectionId === 'haven-1',
+        )?.details,
+        {
+          kind: 'haven',
+          identity: 'Almacén del puerto',
+        },
+      )
+      assert.equal(
         created.humanity.convictions[0]
           ?.touchstoneId,
         'touchstone-004-c-4',
@@ -245,6 +287,23 @@ test(
             disciplineAffinityDetails: null,
           },
         ],
+        advantages: {
+          selections: [
+            {
+              selectionId: 'mask-1',
+              definitionKey: 'mask',
+              category: 'background',
+              rating: 2,
+              origin: 'creation',
+              parentSelectionId: null,
+              details: {
+                kind: 'mask',
+                identity: 'Lucía Varela',
+                benefits: ['erased', 'tailor'],
+              },
+            },
+          ],
+        },
         humanityValue: 6,
         humanityNarrative: {
           touchstones: [
@@ -312,6 +371,24 @@ test(
           (trait) => trait.definitionKey,
         ),
         ['day-drinker'],
+      )
+      assert.deepEqual(
+        updated.advantages.selections,
+        [
+          {
+            selectionId: 'mask-1',
+            definitionKey: 'mask',
+            category: 'background',
+            rating: 2,
+            origin: 'creation',
+            parentSelectionId: null,
+            details: {
+              kind: 'mask',
+              identity: 'Lucía Varela',
+              benefits: ['erased', 'tailor'],
+            },
+          },
+        ],
       )
       assert.equal(
         updated.humanity.touchstones[0]?.name,

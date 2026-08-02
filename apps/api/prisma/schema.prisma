@@ -54,6 +54,56 @@ enum ThinBloodAlchemyMethod {
   FIXATIO
 }
 
+enum AdvantageCategory {
+  MERIT
+  BACKGROUND
+  FLAW
+}
+
+enum AdvantageSelectionOrigin {
+  CREATION
+  PREDATOR_TYPE
+  THIN_BLOOD
+}
+
+enum AdvantageDetailsKind {
+  ALLIES
+  CONTACT
+  RETAINER
+  STATUS
+  FAME
+  INFLUENCE
+  MASK
+  DARK_SECRET
+  MAWLA
+  HERD
+  RESOURCES
+  HAVEN
+  SUBSTANCE_USE
+  FOLKLORIC_BANE
+  FOLKLORIC_BLOCK
+  PREY_EXCLUSION
+  LORESHEET
+  LINGUISTICS
+  METHUSELAH_VISAGE
+  FAMOUS_FACE
+  CHILD_OF_THE_SCENE
+  ENEMY
+  STALKER
+  INFAMY
+  DESPISED
+  HATRED
+  EXILED
+  SUSPECT
+  SHUNNED
+  MORTAL_PRETENDER
+}
+
+enum AdvantageMaskBenefit {
+  ERASED
+  TAILOR
+}
+
 model Character {
   id          String          @id @default(uuid()) @db.Uuid
   ownerId     String          @db.Uuid
@@ -74,6 +124,7 @@ model Character {
   thinBloodAlchemy    CharacterThinBloodAlchemyState?
   thinBloodFormulas   CharacterThinBloodAlchemyFormula[]
   thinBloodTraits     CharacterThinBloodTrait[]
+  advantages          CharacterAdvantageSelection[]
   humanity      CharacterHumanityState?
   convictions   CharacterConviction[]
   touchstones   CharacterTouchstone[]
@@ -240,6 +291,54 @@ model CharacterThinBloodTrait {
 
   @@id([characterId, definitionKey])
   @@map("character_thin_blood_traits")
+}
+
+model CharacterAdvantageSelection {
+  characterId      String                   @db.Uuid
+  selectionId      String
+  definitionKey    String
+  category         AdvantageCategory
+  rating           Int
+  origin           AdvantageSelectionOrigin
+  parentSelectionId String?
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  parent    CharacterAdvantageSelection?  @relation("CharacterAdvantageParent", fields: [characterId, parentSelectionId], references: [characterId, selectionId], onDelete: NoAction, onUpdate: NoAction)
+  children  CharacterAdvantageSelection[] @relation("CharacterAdvantageParent")
+  details   CharacterAdvantageDetails?
+
+  @@id([characterId, selectionId])
+  @@index([characterId, parentSelectionId])
+  @@map("character_advantage_selections")
+}
+
+model CharacterAdvantageDetails {
+  characterId      String @db.Uuid
+  selectionId      String
+  kind             AdvantageDetailsKind
+  effectiveness    Int?
+  reliability      Int?
+  identity         String?
+  sphere           String?
+  maskBenefits     AdvantageMaskBenefit[] @default([])
+  secret           String?
+  resourceSource   String?
+  substance        String?
+  poolCategory     String?
+  folkloricSource  String?
+  taboo            String?
+  excludedPrey     String?
+  loresheetKey     String?
+  benefitKey       String?
+  languages        String[] @default([])
+  resembles        String?
+  subculture       String?
+  description      String?
+
+  selection CharacterAdvantageSelection @relation(fields: [characterId, selectionId], references: [characterId, selectionId], onDelete: Cascade)
+
+  @@id([characterId, selectionId])
+  @@map("character_advantage_details")
 }
 
 model CharacterHumanityState {

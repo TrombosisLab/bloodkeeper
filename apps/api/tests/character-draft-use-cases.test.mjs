@@ -99,6 +99,9 @@ test(
         formulaKeys: [],
       },
       thinBloodTraits: [],
+      advantages: {
+        selections: [],
+      },
       humanity: {
         value: 7,
         convictions: [],
