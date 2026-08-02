@@ -92,3 +92,68 @@ export function toHumanityBoxStates(
     ).fill('empty'),
   ]
 }
+
+function assertValidHumanityState(
+  state: CharacterHumanityState,
+): void {
+  const violations =
+    validateCharacterHumanityState(state)
+
+  if (violations.length > 0) {
+    throw new InvalidCharacterHumanityStateError(
+      violations,
+    )
+  }
+}
+
+export function setHumanityValue(
+  state: CharacterHumanityState,
+  value: number,
+): CharacterHumanityState {
+  const nextState = {
+    ...state,
+    value,
+  }
+
+  assertValidHumanityState(nextState)
+
+  return nextState
+}
+
+export function setHumanityStains(
+  state: CharacterHumanityState,
+  stains: number,
+): CharacterHumanityState {
+  const nextState = {
+    ...state,
+    stains,
+  }
+
+  assertValidHumanityState(nextState)
+
+  return nextState
+}
+
+export function canSetHumanityValue(
+  state: CharacterHumanityState,
+  value: number,
+): boolean {
+  return (
+    validateCharacterHumanityState({
+      ...state,
+      value,
+    }).length === 0
+  )
+}
+
+export function canSetHumanityStains(
+  state: CharacterHumanityState,
+  stains: number,
+): boolean {
+  return (
+    validateCharacterHumanityState({
+      ...state,
+      stains,
+    }).length === 0
+  )
+}

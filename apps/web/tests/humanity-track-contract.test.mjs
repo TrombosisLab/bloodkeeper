@@ -18,6 +18,14 @@ const characterState = await readFile(
   'utf8',
 )
 
+const trackerStyles = await readFile(
+  new URL(
+    '../src/styles/character-sheet.css',
+    import.meta.url,
+  ),
+  'utf8',
+)
+
 test(
   '006-E renderiza el estado desde el dominio',
   () => {
@@ -30,6 +38,62 @@ test(
       /state: CharacterHumanityState/,
     )
     assert.doesNotMatch(humanityTrack, /Math\.min/)
+  },
+)
+
+test(
+  '006-G mantiene solo lectura como modo predeterminado',
+  () => {
+    assert.match(
+      humanityTrack,
+      /mode = 'readOnly'/,
+    )
+    assert.match(
+      humanityTrack,
+      /mode: 'editable'/,
+    )
+    assert.match(
+      humanityTrack,
+      /onChange: \(/,
+    )
+  },
+)
+
+test(
+  '006-G ofrece operaciones separadas para Humanidad y Manchas',
+  () => {
+    assert.match(
+      humanityTrack,
+      /setHumanityValue\(/,
+    )
+    assert.match(
+      humanityTrack,
+      /setHumanityStains\(/,
+    )
+    assert.match(
+      humanityTrack,
+      /Humanidad −/,
+    )
+    assert.match(humanityTrack, /Mancha \+/)
+  },
+)
+
+test(
+  '006-G usa controles táctiles y accesibles por teclado',
+  () => {
+    assert.match(humanityTrack, /<button/)
+    assert.match(
+      humanityTrack,
+      /disabled={!humanityCanDecrease}/,
+    )
+    assert.match(
+      trackerStyles,
+      /min-height: 44px/,
+    )
+    assert.match(
+      trackerStyles,
+      /humanity-track__controls button:focus-visible/,
+    )
   },
 )
 

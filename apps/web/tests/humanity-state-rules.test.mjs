@@ -2,7 +2,11 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import {
+  canSetHumanityStains,
+  canSetHumanityValue,
   InvalidCharacterHumanityStateError,
+  setHumanityStains,
+  setHumanityValue,
   toHumanityBoxStates,
   validateCharacterHumanityState,
 } from '../src/features/character-sheet/domain/humanity-state-rules.ts'
@@ -20,6 +24,52 @@ test(
         ...Array(2).fill('stain'),
         'empty',
       ],
+    )
+  },
+)
+
+test(
+  '006-G modifica Humanidad sin alterar las Manchas',
+  () => {
+    assert.deepEqual(
+      setHumanityValue(
+        { value: 7, stains: 2 },
+        6,
+      ),
+      { value: 6, stains: 2 },
+    )
+  },
+)
+
+test(
+  '006-G modifica Manchas sin alterar Humanidad',
+  () => {
+    assert.deepEqual(
+      setHumanityStains(
+        { value: 7, stains: 1 },
+        2,
+      ),
+      { value: 7, stains: 2 },
+    )
+  },
+)
+
+test(
+  '006-G impide operaciones que producirían estados imposibles',
+  () => {
+    const state = { value: 7, stains: 3 }
+
+    assert.equal(
+      canSetHumanityValue(state, 8),
+      false,
+    )
+    assert.equal(
+      canSetHumanityStains(state, 4),
+      false,
+    )
+    assert.throws(
+      () => setHumanityStains(state, 4),
+      InvalidCharacterHumanityStateError,
     )
   },
 )
