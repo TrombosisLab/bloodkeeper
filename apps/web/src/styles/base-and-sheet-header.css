@@ -210,6 +210,41 @@ select {
   letter-spacing: -0.04em;
 }
 
+.sheet-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.sheet-header__state-edit {
+  min-height: 44px;
+
+  padding: 10px 16px;
+
+  border: 1px solid #733943;
+  border-radius: 3px;
+
+  color: #e8d9da;
+  background: #251518;
+
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.sheet-header__state-edit:hover,
+.sheet-header__state-edit[aria-pressed="true"] {
+  border-color: #b15f6b;
+  background: #4c2027;
+}
+
+.sheet-header__state-edit:focus-visible {
+  outline: 2px solid #dca0a8;
+  outline-offset: 3px;
+}
+
 .sheet-header__edition {
   width: 72px;
   height: 72px;
@@ -231,6 +266,18 @@ select {
 
   font-family: Georgia, serif;
   font-size: 1.5rem;
+}
+
+.sheet-edit-notice {
+  margin: 0;
+  padding: 12px clamp(24px, 4vw, 52px);
+
+  border-bottom: 1px solid #4c292e;
+
+  color: #d9b1b6;
+  background: #261417;
+
+  font-size: 0.82rem;
 }
 
 .sheet-section {
@@ -420,9 +467,23 @@ select {
     padding: 28px 22px;
   }
 
+  .sheet-header__actions {
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    gap: 18px;
+  }
+
+  .sheet-header__state-edit {
+    padding-inline: 12px;
+  }
+
   .sheet-header__edition {
     width: 54px;
     height: 54px;
+  }
+
+  .sheet-edit-notice {
+    padding-inline: 22px;
   }
 
   .sheet-section {
@@ -508,4 +569,3 @@ select {
     grid-column: auto;
   }
 }
-

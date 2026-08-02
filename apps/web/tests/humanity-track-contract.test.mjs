@@ -119,11 +119,11 @@ test(
   () => {
     assert.match(
       characterState,
-      /demoState\.humanity\.value/,
+      /humanity\.value/,
     )
     assert.match(
       characterState,
-      /demoState\.humanity\.stains/,
+      /humanity\.stains/,
     )
   },
 )

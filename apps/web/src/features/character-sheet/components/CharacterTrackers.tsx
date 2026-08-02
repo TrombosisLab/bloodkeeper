@@ -4,21 +4,62 @@ import {
   demoHealth,
   demoWillpower,
 } from '../data/demo-trackers'
+import type {
+  CharacterDamageTrack,
+} from '../domain/damage-track-rules'
 
-export function CharacterTrackers() {
+interface CharacterTrackersProps {
+  health: CharacterDamageTrack
+  willpower: CharacterDamageTrack
+  stateEditing: boolean
+  onHealthChange: (
+    track: CharacterDamageTrack,
+  ) => void
+  onWillpowerChange: (
+    track: CharacterDamageTrack,
+  ) => void
+}
+
+export function CharacterTrackers({
+  health,
+  willpower,
+  stateEditing,
+  onHealthChange,
+  onWillpowerChange,
+}: CharacterTrackersProps) {
   return (
     <div className="character-trackers">
-      <DamageTracker
-        label={demoHealth.label}
-        capacity={demoHealth.capacity}
-        track={demoHealth.track}
-      />
+      {stateEditing ? (
+        <DamageTracker
+          label={demoHealth.label}
+          capacity={demoHealth.capacity}
+          track={health}
+          mode="editable"
+          onChange={onHealthChange}
+        />
+      ) : (
+        <DamageTracker
+          label={demoHealth.label}
+          capacity={demoHealth.capacity}
+          track={health}
+        />
+      )}
 
-      <DamageTracker
-        label={demoWillpower.label}
-        capacity={demoWillpower.capacity}
-        track={demoWillpower.track}
-      />
+      {stateEditing ? (
+        <DamageTracker
+          label={demoWillpower.label}
+          capacity={demoWillpower.capacity}
+          track={willpower}
+          mode="editable"
+          onChange={onWillpowerChange}
+        />
+      ) : (
+        <DamageTracker
+          label={demoWillpower.label}
+          capacity={demoWillpower.capacity}
+          track={willpower}
+        />
+      )}
     </div>
   )
 }

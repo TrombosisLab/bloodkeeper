@@ -1,8 +1,29 @@
 import { demoAttributes } from '../data/demo-attributes'
+import type {
+  CharacterDamageTrack,
+} from '../domain/damage-track-rules'
 import { AttributeRow } from './AttributeRow'
 import { CharacterTrackers } from './CharacterTrackers'
 
-export function CharacterAttributes() {
+interface CharacterAttributesProps {
+  health: CharacterDamageTrack
+  willpower: CharacterDamageTrack
+  stateEditing: boolean
+  onHealthChange: (
+    track: CharacterDamageTrack,
+  ) => void
+  onWillpowerChange: (
+    track: CharacterDamageTrack,
+  ) => void
+}
+
+export function CharacterAttributes({
+  health,
+  willpower,
+  stateEditing,
+  onHealthChange,
+  onWillpowerChange,
+}: CharacterAttributesProps) {
   return (
     <section
       className="sheet-section attributes-section"
@@ -49,7 +70,13 @@ export function CharacterAttributes() {
         ))}
       </div>
 
-      <CharacterTrackers />
+      <CharacterTrackers
+        health={health}
+        willpower={willpower}
+        stateEditing={stateEditing}
+        onHealthChange={onHealthChange}
+        onWillpowerChange={onWillpowerChange}
+      />
     </section>
   )
 }

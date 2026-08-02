@@ -1,9 +1,24 @@
 import { demoState } from '../data/demo-state'
+import type {
+  CharacterHumanityState,
+} from '../domain/humanity-state-rules'
 
 import { HumanityTrack } from './HumanityTrack'
 import { HungerTrack } from './HungerTrack'
 
-export function CharacterState() {
+interface CharacterStateProps {
+  humanity: CharacterHumanityState
+  stateEditing: boolean
+  onHumanityChange: (
+    state: CharacterHumanityState,
+  ) => void
+}
+
+export function CharacterState({
+  humanity,
+  stateEditing,
+  onHumanityChange,
+}: CharacterStateProps) {
   return (
     <section
       className="sheet-section state-section"
@@ -31,18 +46,24 @@ export function CharacterState() {
             <div>
               <span>Humanidad</span>
               <strong>
-                {demoState.humanity.value}
+                {humanity.value}
               </strong>
             </div>
 
             <small>
-              Manchas {demoState.humanity.stains}
+              Manchas {humanity.stains}
             </small>
           </div>
 
-          <HumanityTrack
-            state={demoState.humanity}
-          />
+          {stateEditing ? (
+            <HumanityTrack
+              state={humanity}
+              mode="editable"
+              onChange={onHumanityChange}
+            />
+          ) : (
+            <HumanityTrack state={humanity} />
+          )}
         </div>
 
         <div className="state-card state-card--hunger">
