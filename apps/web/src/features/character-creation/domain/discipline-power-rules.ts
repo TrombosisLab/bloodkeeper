@@ -307,8 +307,9 @@ export function normalizeDisciplinePowers(
       ),
     )
 
-  return disciplines.map(
-    (discipline) => {
+  const structurallyNormalized =
+    disciplines.map(
+      (discipline) => {
       const seen =
         new Set<
           DisciplinePowerKey
@@ -321,13 +322,6 @@ export function normalizeDisciplinePowers(
         const powerKey of
         discipline.powerKeys
       ) {
-        if (
-          normalized.length >=
-          discipline.value
-        ) {
-          break
-        }
-
         if (
           seen.has(
             powerKey,
@@ -368,7 +362,87 @@ export function normalizeDisciplinePowers(
         powerKeys:
           normalized,
       }
-    },
+      },
+    )
+
+  function removeBrokenRequirements(
+    current:
+      CharacterDisciplinesDraft,
+  ): CharacterDisciplinesDraft {
+    let candidate = current
+
+    while (true) {
+      const learnedPowerKeys =
+        candidate.flatMap(
+          (discipline) =>
+            discipline.powerKeys,
+        )
+
+      const next = candidate.map(
+        (discipline) => ({
+          ...discipline,
+          powerKeys:
+            discipline.powerKeys.filter(
+              (powerKey) => {
+                const definition =
+                  definitionMap.get(
+                    powerKey,
+                  )
+
+                return (
+                  definition !== undefined &&
+                  canLearnDisciplinePower(
+                    definition,
+                    candidate,
+                    learnedPowerKeys,
+                  ).valid
+                )
+              },
+            ),
+        }),
+      )
+
+      const previousCount =
+        candidate.reduce(
+          (total, discipline) =>
+            total +
+            discipline.powerKeys.length,
+          0,
+        )
+      const nextCount = next.reduce(
+        (total, discipline) =>
+          total +
+          discipline.powerKeys.length,
+        0,
+      )
+
+      if (nextCount === previousCount) {
+        return next
+      }
+
+      candidate = next
+    }
+  }
+
+  const requirementsNormalized =
+    removeBrokenRequirements(
+      structurallyNormalized,
+    )
+
+  const capacityNormalized =
+    requirementsNormalized.map(
+      (discipline) => ({
+        ...discipline,
+        powerKeys:
+          discipline.powerKeys.slice(
+            0,
+            discipline.value,
+          ),
+      }),
+    )
+
+  return removeBrokenRequirements(
+    capacityNormalized,
   )
 }
 

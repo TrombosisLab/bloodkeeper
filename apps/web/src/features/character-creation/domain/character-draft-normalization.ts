@@ -13,6 +13,12 @@ import {
 import {
   normalizeDisciplinesForClan,
 } from './discipline-rules.ts'
+import {
+  normalizeDisciplinePowers,
+} from './discipline-power-rules.ts'
+import {
+  disciplinePowerDefinitions,
+} from '../data/discipline-power-definitions.ts'
 
 import {
   normalizePredatorTypeForCharacter,
@@ -104,6 +110,15 @@ export function normalizeCharacterDraft(
     normalizeCharacterDraftPredatorType(
       normalized,
     )
+
+  normalized = {
+    ...normalized,
+    disciplines:
+      normalizeDisciplinePowers(
+        disciplinePowerDefinitions,
+        normalized.disciplines,
+      ),
+  }
 
   /*
    * Los datos exclusivos de Sangre Débil sólo pueden
