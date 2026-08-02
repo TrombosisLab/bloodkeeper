@@ -130,6 +130,14 @@ export interface PersistedCharacterDiscipline {
   origin: CharacterDisciplineOrigin | null
 }
 
+export interface PersistedCharacterBloodSorceryRituals {
+  ritualKeys: string[]
+}
+
+export interface PersistedCharacterOblivionCeremonies {
+  ceremonyKeys: string[]
+}
+
 export interface PersistedCharacterConviction {
   convictionId: string
   text: string
@@ -164,6 +172,10 @@ export interface PersistedCharacterDraft {
   skillSpecialties:
     PersistedCharacterSkillSpecialty[]
   disciplines: PersistedCharacterDiscipline[]
+  bloodSorceryRituals:
+    PersistedCharacterBloodSorceryRituals
+  oblivionCeremonies:
+    PersistedCharacterOblivionCeremonies
   humanity: PersistedCharacterHumanity
 }
 
@@ -177,6 +189,10 @@ export interface CreateCharacterDraftData {
   skillSpecialties:
     PersistedCharacterSkillSpecialty[]
   disciplines: PersistedCharacterDiscipline[]
+  bloodSorceryRituals:
+    PersistedCharacterBloodSorceryRituals
+  oblivionCeremonies:
+    PersistedCharacterOblivionCeremonies
   humanity: PersistedCharacterHumanity
   creation: {
     currentStep: CharacterCreationStep
@@ -195,6 +211,10 @@ export interface UpdateCharacterDraftData {
   skillSpecialties?:
     PersistedCharacterSkillSpecialty[]
   disciplines?: PersistedCharacterDiscipline[]
+  bloodSorceryRituals?:
+    PersistedCharacterBloodSorceryRituals
+  oblivionCeremonies?:
+    PersistedCharacterOblivionCeremonies
   humanityValue?: number
   humanityNarrative?: {
     convictions: PersistedCharacterConviction[]

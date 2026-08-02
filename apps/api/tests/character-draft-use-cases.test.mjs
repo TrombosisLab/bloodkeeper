@@ -87,6 +87,12 @@ test(
       skills: createEmptySkills(),
       skillSpecialties: [],
       disciplines: [],
+      bloodSorceryRituals: {
+        ritualKeys: [],
+      },
+      oblivionCeremonies: {
+        ceremonyKeys: [],
+      },
       humanity: {
         value: 7,
         convictions: [],

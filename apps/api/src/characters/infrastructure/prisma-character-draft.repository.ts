@@ -151,6 +151,12 @@ const characterRelations = {
     },
     orderBy: { disciplineKey: 'asc' },
   },
+  bloodSorceryRituals: {
+    orderBy: { ritualKey: 'asc' },
+  },
+  oblivionCeremonies: {
+    orderBy: { ceremonyKey: 'asc' },
+  },
   humanity: true,
   convictions: {
     orderBy: { convictionId: 'asc' },
@@ -333,6 +339,16 @@ function toPersistedDraft(
         }
       },
     ),
+    bloodSorceryRituals: {
+      ritualKeys: row.bloodSorceryRituals.map(
+        (ritual) => ritual.ritualKey,
+      ),
+    },
+    oblivionCeremonies: {
+      ceremonyKeys: row.oblivionCeremonies.map(
+        (ceremony) => ceremony.ceremonyKey,
+      ),
+    },
     humanity: {
       value: row.humanity.value,
       convictions: row.convictions.map(
@@ -440,6 +456,20 @@ export class PrismaCharacterDraftRepository
                       ),
                     },
                   })),
+              },
+              bloodSorceryRituals: {
+                create:
+                  data.bloodSorceryRituals.ritualKeys
+                    .map((ritualKey) => ({
+                      ritualKey,
+                    })),
+              },
+              oblivionCeremonies: {
+                create:
+                  data.oblivionCeremonies.ceremonyKeys
+                    .map((ceremonyKey) => ({
+                      ceremonyKey,
+                    })),
               },
               humanity: {
                 create: {
@@ -674,6 +704,68 @@ export class PrismaCharacterDraftRepository
                   }),
             ),
           )
+        }
+
+        if (
+          data.bloodSorceryRituals !== undefined
+        ) {
+          await transaction
+            .characterBloodSorceryRitual
+            .deleteMany({
+              where: {
+                characterId: data.characterId,
+              },
+            })
+
+          if (
+            data.bloodSorceryRituals.ritualKeys
+              .length > 0
+          ) {
+            await transaction
+              .characterBloodSorceryRitual
+              .createMany({
+                data:
+                  data.bloodSorceryRituals
+                    .ritualKeys.map(
+                      (ritualKey) => ({
+                        characterId:
+                          data.characterId,
+                        ritualKey,
+                      }),
+                    ),
+              })
+          }
+        }
+
+        if (
+          data.oblivionCeremonies !== undefined
+        ) {
+          await transaction
+            .characterOblivionCeremony
+            .deleteMany({
+              where: {
+                characterId: data.characterId,
+              },
+            })
+
+          if (
+            data.oblivionCeremonies.ceremonyKeys
+              .length > 0
+          ) {
+            await transaction
+              .characterOblivionCeremony
+              .createMany({
+                data:
+                  data.oblivionCeremonies
+                    .ceremonyKeys.map(
+                      (ceremonyKey) => ({
+                        characterId:
+                          data.characterId,
+                        ceremonyKey,
+                      }),
+                    ),
+              })
+          }
         }
 
         if (data.humanityValue !== undefined) {

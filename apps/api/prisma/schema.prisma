@@ -63,6 +63,8 @@ model Character {
   blood         CharacterBloodState?
   skills        CharacterSkill[]
   disciplines   CharacterDiscipline[]
+  bloodSorceryRituals CharacterBloodSorceryRitual[]
+  oblivionCeremonies  CharacterOblivionCeremony[]
   humanity      CharacterHumanityState?
   convictions   CharacterConviction[]
   touchstones   CharacterTouchstone[]
@@ -176,6 +178,26 @@ model CharacterDisciplinePower {
 
   @@id([characterId, disciplineKey, powerKey])
   @@map("character_discipline_powers")
+}
+
+model CharacterBloodSorceryRitual {
+  characterId String @db.Uuid
+  ritualKey   String
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@id([characterId, ritualKey])
+  @@map("character_blood_sorcery_rituals")
+}
+
+model CharacterOblivionCeremony {
+  characterId String @db.Uuid
+  ceremonyKey String
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@id([characterId, ceremonyKey])
+  @@map("character_oblivion_ceremonies")
 }
 
 model CharacterHumanityState {

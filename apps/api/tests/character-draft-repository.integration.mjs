@@ -82,6 +82,12 @@ test(
             origin: 'creation',
           },
         ],
+        bloodSorceryRituals: {
+          ritualKeys: ['wake-with-evenings-freshness'],
+        },
+        oblivionCeremonies: {
+          ceremonyKeys: ['the-binding-fetter'],
+        },
         humanity: {
           value: 7,
           touchstones: [
@@ -128,6 +134,14 @@ test(
           origin: 'creation',
         },
       ])
+      assert.deepEqual(
+        created.bloodSorceryRituals.ritualKeys,
+        ['wake-with-evenings-freshness'],
+      )
+      assert.deepEqual(
+        created.oblivionCeremonies.ceremonyKeys,
+        ['the-binding-fetter'],
+      )
       assert.equal(
         created.humanity.convictions[0]
           ?.touchstoneId,
@@ -176,6 +190,12 @@ test(
             origin: 'predatorType',
           },
         ],
+        bloodSorceryRituals: {
+          ritualKeys: ['blood-walk'],
+        },
+        oblivionCeremonies: {
+          ceremonyKeys: ['summon-spirit'],
+        },
         humanityValue: 6,
         humanityNarrative: {
           touchstones: [
@@ -225,6 +245,14 @@ test(
           origin: 'predatorType',
         },
       ])
+      assert.deepEqual(
+        updated.bloodSorceryRituals.ritualKeys,
+        ['blood-walk'],
+      )
+      assert.deepEqual(
+        updated.oblivionCeremonies.ceremonyKeys,
+        ['summon-spirit'],
+      )
       assert.equal(
         updated.humanity.touchstones[0]?.name,
         'Marcos',
