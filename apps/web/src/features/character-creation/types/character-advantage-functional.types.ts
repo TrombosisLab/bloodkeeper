@@ -8,6 +8,7 @@
 export type CharacterAdvantageFunctionalType =
   | 'scalar'
   | 'entity'
+  | 'location'
   | 'collection'
   | 'dependent'
   | 'fixed'

@@ -157,8 +157,13 @@ test(
         value: 1,
         category: 'merit',
         categoryLabel: 'Mérito',
+        functionalType: 'fixed',
+        functionalTypeLabel: 'Rasgo fijo',
         origin: 'creation',
+        originLabel: 'Creación',
         detail: undefined,
+        sourceLabel: undefined,
+        sourcePage: undefined,
         catalogStatus: 'missing',
       },
     )

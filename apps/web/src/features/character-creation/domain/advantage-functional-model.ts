@@ -31,6 +31,9 @@ const entityKinds = new Set([
   'influence',
   'mask',
   'mawla',
+])
+
+const locationKinds = new Set([
   'haven',
 ])
 
@@ -53,6 +56,10 @@ export function getCharacterAdvantageFunctionalType(
 
   if (kind && entityKinds.has(kind)) {
     return 'entity'
+  }
+
+  if (kind && locationKinds.has(kind)) {
+    return 'location'
   }
 
   if (kind && scalarKinds.has(kind)) {

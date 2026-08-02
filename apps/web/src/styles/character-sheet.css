@@ -1058,12 +1058,6 @@
 .rated-trait {
   min-height: 60px;
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 14px;
-
   border-bottom: 1px solid #292324;
 }
 
@@ -1073,6 +1067,55 @@
 
 .rated-trait__identity {
   min-width: 0;
+}
+
+.rated-trait__details {
+  width: 100%;
+}
+
+.rated-trait__details summary {
+  min-height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  cursor: pointer;
+  list-style: none;
+}
+
+.rated-trait__details summary::marker,
+.rated-trait__details summary::-webkit-details-marker {
+  display: none;
+}
+
+.rated-trait__details summary:focus-visible {
+  outline: 2px solid #8f5961;
+  outline-offset: 4px;
+}
+
+.rated-trait__metadata {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 6px;
+
+  padding: 0 0 13px;
+}
+
+.rated-trait__metadata span {
+  padding: 3px 7px;
+
+  border: 1px solid #392d2f;
+  border-radius: 999px;
+
+  color: #827673;
+  background: #171313;
+
+  font-size: 0.61rem;
+  letter-spacing: 0.04em;
 }
 
 .rated-trait__identity span,

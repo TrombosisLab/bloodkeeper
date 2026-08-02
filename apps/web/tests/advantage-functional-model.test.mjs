@@ -29,7 +29,7 @@ test(
         requiresInstanceDetails: true,
         instanceDetailsKind: 'haven',
       }),
-      'entity',
+      'location',
     )
 
     assert.equal(

@@ -1,11 +1,19 @@
 import type {
   CharacterAdvantageDefinition,
+  CharacterAdvantageSource,
 } from '../../character-creation/types/character-advantage-definition.types'
+import type {
+  CharacterAdvantageFunctionalType,
+} from '../../character-creation/types/character-advantage-functional.types'
 import type {
   CharacterAdvantageCategory,
   CharacterAdvantageInstanceDetails,
+  CharacterAdvantageSelectionOrigin,
   CharacterAdvantageSelectionDraft,
 } from '../../character-creation/types/character-advantages-draft.types'
+import {
+  getCharacterAdvantageFunctionalType,
+} from '../../character-creation/domain/advantage-functional-model.ts'
 import type {
   CharacterAdvantages,
   RatedTrait,
@@ -16,6 +24,31 @@ const CATEGORY_LABELS:
     merit: 'Mérito',
     background: 'Trasfondo',
     flaw: 'Defecto',
+  }
+
+const FUNCTIONAL_TYPE_LABELS:
+  Record<CharacterAdvantageFunctionalType, string> = {
+    scalar: 'Valor',
+    entity: 'Entidad',
+    location: 'Localización',
+    collection: 'Colección',
+    dependent: 'Elemento dependiente',
+    fixed: 'Rasgo fijo',
+  }
+
+const ORIGIN_LABELS:
+  Record<CharacterAdvantageSelectionOrigin, string> = {
+    creation: 'Creación',
+    predatorType: 'Tipo de Depredador',
+    thinBlood: 'Sangre Débil',
+  }
+
+const SOURCE_LABELS:
+  Record<CharacterAdvantageSource, string> = {
+    core: 'Libro Básico',
+    playersGuide: 'Guía del Jugador',
+    bloodSigils: 'Blood Sigils',
+    other: 'Otra fuente autorizada',
   }
 
 function textOrUndefined(
@@ -158,6 +191,13 @@ function createRatedTrait(
     definition?.category ??
     selection.category
 
+  const functionalType =
+    definition
+      ? getCharacterAdvantageFunctionalType(
+          definition,
+        )
+      : 'fixed'
+
   return {
     key: selection.selectionId,
     definitionKey:
@@ -169,11 +209,27 @@ function createRatedTrait(
     category,
     categoryLabel:
       CATEGORY_LABELS[category],
+    functionalType,
+    functionalTypeLabel:
+      FUNCTIONAL_TYPE_LABELS[
+        functionalType
+      ],
     origin: selection.origin,
+    originLabel:
+      ORIGIN_LABELS[
+        selection.origin
+      ],
     detail:
       getCharacterAdvantageDetail(
         selection.details,
       ),
+    sourceLabel: definition
+      ? SOURCE_LABELS[
+          definition.source
+        ]
+      : undefined,
+    sourcePage:
+      definition?.sourcePage,
     catalogStatus: definition
       ? 'resolved'
       : 'missing',

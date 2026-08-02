@@ -2,6 +2,9 @@ import type {
   CharacterAdvantageCategory,
   CharacterAdvantageSelectionOrigin,
 } from '../../character-creation/types/character-advantages-draft.types'
+import type {
+  CharacterAdvantageFunctionalType,
+} from '../../character-creation/types/character-advantage-functional.types'
 
 export type CharacterAdvantageCatalogStatus =
   | 'resolved'
@@ -14,8 +17,13 @@ export interface RatedTrait {
   value: number
   category: CharacterAdvantageCategory
   categoryLabel: string
+  functionalType: CharacterAdvantageFunctionalType
+  functionalTypeLabel: string
   origin: CharacterAdvantageSelectionOrigin
+  originLabel: string
   detail?: string
+  sourceLabel?: string
+  sourcePage?: number
   catalogStatus: CharacterAdvantageCatalogStatus
 }
 
