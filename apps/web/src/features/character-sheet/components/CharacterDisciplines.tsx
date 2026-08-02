@@ -1,7 +1,23 @@
 import { demoDisciplines } from '../data/demo-disciplines'
+import {
+  disciplineDefinitions,
+} from '../../character-creation/data/discipline-definitions'
+import {
+  disciplinePowerDefinitions,
+} from '../../character-creation/data/discipline-power-definitions'
+import {
+  buildCharacterDisciplineReadModel,
+} from '../domain/character-discipline-read-model'
 import { DisciplineCard } from './DisciplineCard'
 
 export function CharacterDisciplines() {
+  const disciplines =
+    buildCharacterDisciplineReadModel(
+      demoDisciplines,
+      disciplineDefinitions,
+      disciplinePowerDefinitions,
+    )
+
   return (
     <section
       className="sheet-section disciplines-section"
@@ -24,7 +40,7 @@ export function CharacterDisciplines() {
       </div>
 
       <div className="disciplines-grid">
-        {demoDisciplines.map((discipline) => (
+        {disciplines.map((discipline) => (
           <DisciplineCard
             key={discipline.key}
             discipline={discipline}

@@ -1,52 +1,28 @@
 import type {
-  CharacterDiscipline,
+  CharacterDisciplineState,
 } from '../types/character-disciplines.types'
 
-export const demoDisciplines: CharacterDiscipline[] = [
-  {
-    key: 'celerity',
-    name: 'Celeridad',
-    value: 2,
-    powers: [
-      {
-        key: 'cats-grace',
-        name: 'Gracia Felina',
-        level: 1,
-      },
-      {
-        key: 'rapid-reflexes',
-        name: 'Reflejos Rápidos',
-        level: 1,
-      },
-    ],
-  },
-  {
-    key: 'potence',
-    name: 'Potencia',
-    value: 2,
-    powers: [
-      {
-        key: 'lethal-body',
-        name: 'Cuerpo Letal',
-        level: 1,
-      },
-      {
-        key: 'prowess',
-        name: 'Proeza',
-        level: 2,
-      },
-    ],
-  },
-  {
-    key: 'presence',
-    name: 'Presencia',
-    value: 1,
-    powers: [
-      {
-        key: 'awe',
-        name: 'Fascinación',
-        level: 1,
-      },
-    ],
-  },
-]
+export const demoDisciplines:
+  CharacterDisciplineState[] = [
+    {
+      key: 'celerity',
+      value: 2,
+      powerKeys: [
+        'celerity-cats-grace',
+        'celerity-rapid-reflexes',
+      ],
+    },
+    {
+      key: 'potence',
+      value: 2,
+      powerKeys: [
+        'potence-lethal-body',
+        'potence-prowess',
+      ],
+    },
+    {
+      key: 'presence',
+      value: 1,
+      powerKeys: ['presence-awe'],
+    },
+  ]

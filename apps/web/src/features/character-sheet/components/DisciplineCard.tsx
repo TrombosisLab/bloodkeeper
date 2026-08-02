@@ -1,11 +1,11 @@
 import { DotRating } from '../../../components/ui/DotRating'
 
 import type {
-  CharacterDiscipline,
+  CharacterDisciplineView,
 } from '../types/character-disciplines.types'
 
 interface DisciplineCardProps {
-  discipline: CharacterDiscipline
+  discipline: CharacterDisciplineView
 }
 
 export function DisciplineCard({
@@ -16,7 +16,9 @@ export function DisciplineCard({
       <header className="discipline-card__header">
         <div>
           <span className="discipline-card__kicker">
-            Disciplina
+            {discipline.catalogStatus === 'resolved'
+              ? 'Disciplina'
+              : 'Referencia no disponible'}
           </span>
 
           <h3>{discipline.name}</h3>
@@ -40,7 +42,9 @@ export function DisciplineCard({
                 <span>{power.name}</span>
 
                 <small>
-                  Nivel {power.level}
+                  {power.level === null
+                    ? 'Referencia no disponible'
+                    : `Nivel ${power.level}`}
                 </small>
               </li>
             ))}
