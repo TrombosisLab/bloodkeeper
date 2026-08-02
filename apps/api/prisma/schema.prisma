@@ -56,6 +56,9 @@ model Character {
   attributes    CharacterAttributes?
   blood         CharacterBloodState?
   skills        CharacterSkill[]
+  humanity      CharacterHumanityState?
+  convictions   CharacterConviction[]
+  touchstones   CharacterTouchstone[]
 
   @@index([ownerId])
   @@index([chronicleId])
@@ -142,4 +145,40 @@ model CharacterSkillSpecialty {
 
   @@index([characterId, skillKey])
   @@map("character_skill_specialties")
+}
+
+model CharacterHumanityState {
+  characterId String @id @db.Uuid
+  value       Int    @default(7)
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("character_humanity_states")
+}
+
+model CharacterTouchstone {
+  characterId  String @db.Uuid
+  touchstoneId String
+  name         String
+  relationship String
+
+  character   Character             @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  convictions CharacterConviction[]
+
+  @@id([characterId, touchstoneId])
+  @@map("character_touchstones")
+}
+
+model CharacterConviction {
+  characterId  String  @db.Uuid
+  convictionId String
+  text         String
+  touchstoneId String?
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  touchstone CharacterTouchstone? @relation(fields: [characterId, touchstoneId], references: [characterId, touchstoneId], onDelete: Restrict)
+
+  @@id([characterId, convictionId])
+  @@index([characterId, touchstoneId])
+  @@map("character_convictions")
 }

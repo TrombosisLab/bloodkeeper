@@ -120,6 +120,13 @@ const characterRelations = {
     },
     orderBy: { skillKey: 'asc' },
   },
+  humanity: true,
+  convictions: {
+    orderBy: { convictionId: 'asc' },
+  },
+  touchstones: {
+    orderBy: { touchstoneId: 'asc' },
+  },
 } satisfies Prisma.CharacterInclude
 
 type CharacterWithRelations =
@@ -160,7 +167,8 @@ function toPersistedDraft(
     row.identity === null ||
     row.creationState === null ||
     row.attributes === null ||
-    row.blood === null
+    row.blood === null ||
+    row.humanity === null
   ) {
     throw new Error(
       `Character ${row.id} has incomplete persistence relations`,
@@ -257,6 +265,23 @@ function toPersistedDraft(
         )
       },
     ),
+    humanity: {
+      value: row.humanity.value,
+      convictions: row.convictions.map(
+        (conviction) => ({
+          convictionId: conviction.convictionId,
+          text: conviction.text,
+          touchstoneId: conviction.touchstoneId,
+        }),
+      ),
+      touchstones: row.touchstones.map(
+        (touchstone) => ({
+          touchstoneId: touchstone.touchstoneId,
+          name: touchstone.name,
+          relationship: touchstone.relationship,
+        }),
+      ),
+    },
   }
 }
 
@@ -270,64 +295,98 @@ export class PrismaCharacterDraftRepository
   async create(
     data: CreateCharacterDraftData,
   ): Promise<PersistedCharacterDraft> {
-    const row = await this.database.character.create({
-      data: {
-        ownerId: data.ownerId,
-        chronicleId: data.chronicleId,
-        status: PrismaCharacterStatus.DRAFT,
-        identity: {
-          create: toIdentityCreate(data.identity),
-        },
-        creationState: {
-          create: {
-            schemaVersion: 1,
-            currentStep:
-              stepToPrisma[
-                data.creation.currentStep
-              ],
-            skillDistributionMethod:
-              methodToPrisma[
-                data.creation
-                  .skillDistributionMethod
-              ],
-          },
-        },
-        attributes: {
-          create: data.attributes,
-        },
-        blood: {
-          create: data.blood,
-        },
-        skills: {
-          create: CHARACTER_SKILL_KEYS.map(
-            (skillKey) => ({
-              skillKey,
-              rating: data.skills[skillKey],
-              specialties: {
-                create: data.skillSpecialties
-                  .filter(
-                    (specialty) =>
-                      specialty.skillKey === skillKey,
-                  )
-                  .map((specialty) => ({
-                    id: specialty.id,
-                    name: specialty.name,
-                    origin:
-                      specialty.origin === null
-                        ? null
-                        : specialtyOriginToPrisma[
-                            specialty.origin
-                          ],
-                  })),
+    return this.database.$transaction(
+      async (transaction) => {
+        const character =
+          await transaction.character.create({
+            data: {
+              ownerId: data.ownerId,
+              chronicleId: data.chronicleId,
+              status: PrismaCharacterStatus.DRAFT,
+              identity: {
+                create: toIdentityCreate(
+                  data.identity,
+                ),
               },
-            }),
-          ),
-        },
-      },
-      include: characterRelations,
-    })
+              creationState: {
+                create: {
+                  schemaVersion: 1,
+                  currentStep:
+                    stepToPrisma[
+                      data.creation.currentStep
+                    ],
+                  skillDistributionMethod:
+                    methodToPrisma[
+                      data.creation
+                        .skillDistributionMethod
+                    ],
+                },
+              },
+              attributes: {
+                create: data.attributes,
+              },
+              blood: {
+                create: data.blood,
+              },
+              skills: {
+                create: CHARACTER_SKILL_KEYS.map(
+                  (skillKey) => ({
+                    skillKey,
+                    rating: data.skills[skillKey],
+                    specialties: {
+                      create: data.skillSpecialties
+                        .filter(
+                          (specialty) =>
+                            specialty.skillKey ===
+                            skillKey,
+                        )
+                        .map((specialty) => ({
+                          id: specialty.id,
+                          name: specialty.name,
+                          origin:
+                            specialty.origin === null
+                              ? null
+                              : specialtyOriginToPrisma[
+                                  specialty.origin
+                                ],
+                        })),
+                    },
+                  }),
+                ),
+              },
+              humanity: {
+                create: {
+                  value: data.humanity.value,
+                },
+              },
+              touchstones: {
+                create: data.humanity.touchstones,
+              },
+            },
+          })
 
-    return toPersistedDraft(row)
+        if (data.humanity.convictions.length > 0) {
+          await transaction.characterConviction
+            .createMany({
+              data: data.humanity.convictions.map(
+                (conviction) => ({
+                  characterId: character.id,
+                  ...conviction,
+                }),
+              ),
+            })
+        }
+
+        const row =
+          await transaction.character
+            .findUniqueOrThrow({
+              where: { id: character.id },
+              include: characterRelations,
+            })
+
+        return toPersistedDraft(row)
+      },
+    )
   }
 
   async findById(
@@ -488,6 +547,64 @@ export class PrismaCharacterDraftRepository
                           ],
                   }),
                 ),
+              })
+          }
+        }
+
+        if (data.humanityValue !== undefined) {
+          await transaction.characterHumanityState
+            .update({
+              where: {
+                characterId: data.characterId,
+              },
+              data: { value: data.humanityValue },
+            })
+        }
+
+        if (data.humanityNarrative !== undefined) {
+          await transaction.characterConviction
+            .deleteMany({
+              where: {
+                characterId: data.characterId,
+              },
+            })
+
+          await transaction.characterTouchstone
+            .deleteMany({
+              where: {
+                characterId: data.characterId,
+              },
+            })
+
+          if (
+            data.humanityNarrative.touchstones
+              .length > 0
+          ) {
+            await transaction.characterTouchstone
+              .createMany({
+                data: data.humanityNarrative
+                  .touchstones.map(
+                    (touchstone) => ({
+                      characterId: data.characterId,
+                      ...touchstone,
+                    }),
+                  ),
+              })
+          }
+
+          if (
+            data.humanityNarrative.convictions
+              .length > 0
+          ) {
+            await transaction.characterConviction
+              .createMany({
+                data: data.humanityNarrative
+                  .convictions.map(
+                    (conviction) => ({
+                      characterId: data.characterId,
+                      ...conviction,
+                    }),
+                  ),
               })
           }
         }

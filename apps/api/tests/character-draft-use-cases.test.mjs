@@ -86,6 +86,11 @@ test(
       },
       skills: createEmptySkills(),
       skillSpecialties: [],
+      humanity: {
+        value: 7,
+        convictions: [],
+        touchstones: [],
+      },
       creation: {
         currentStep: 'identity',
         skillDistributionMethod: 'balanced',

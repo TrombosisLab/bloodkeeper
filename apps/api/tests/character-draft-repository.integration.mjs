@@ -71,6 +71,23 @@ test(
             origin: 'creation',
           },
         ],
+        humanity: {
+          value: 7,
+          touchstones: [
+            {
+              touchstoneId: 'touchstone-004-c-4',
+              name: 'Elena',
+              relationship: 'Hermana mortal',
+            },
+          ],
+          convictions: [
+            {
+              convictionId: 'conviction-004-c-4',
+              text: 'Protege a tu familia',
+              touchstoneId: 'touchstone-004-c-4',
+            },
+          ],
+        },
         creation: {
           currentStep: 'identity',
           skillDistributionMethod: 'balanced',
@@ -87,6 +104,12 @@ test(
       assert.equal(
         created.skillSpecialties[0]?.name,
         'Escenas del crimen',
+      )
+      assert.equal(created.humanity.value, 7)
+      assert.equal(
+        created.humanity.convictions[0]
+          ?.touchstoneId,
+        'touchstone-004-c-4',
       )
 
       const loaded =
@@ -123,6 +146,26 @@ test(
             origin: null,
           },
         ],
+        humanityValue: 6,
+        humanityNarrative: {
+          touchstones: [
+            {
+              touchstoneId:
+                'touchstone-004-c-4-updated',
+              name: 'Marcos',
+              relationship: 'Amigo de infancia',
+            },
+          ],
+          convictions: [
+            {
+              convictionId:
+                'conviction-004-c-4-updated',
+              text: 'No abandones a los tuyos',
+              touchstoneId:
+                'touchstone-004-c-4-updated',
+            },
+          ],
+        },
       })
 
       assert.equal(updated.revision, 2)
@@ -142,6 +185,16 @@ test(
           ({ name, origin }) => ({ name, origin }),
         ),
         [{ name: 'Forense', origin: null }],
+      )
+      assert.equal(updated.humanity.value, 6)
+      assert.equal(
+        updated.humanity.touchstones[0]?.name,
+        'Marcos',
+      )
+      assert.equal(
+        updated.humanity.convictions[0]
+          ?.touchstoneId,
+        'touchstone-004-c-4-updated',
       )
 
       await assert.rejects(

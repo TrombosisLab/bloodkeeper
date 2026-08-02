@@ -100,6 +100,24 @@ export interface PersistedCharacterSkillSpecialty {
   origin: SkillSpecialtyOrigin | null
 }
 
+export interface PersistedCharacterConviction {
+  convictionId: string
+  text: string
+  touchstoneId: string | null
+}
+
+export interface PersistedCharacterTouchstone {
+  touchstoneId: string
+  name: string
+  relationship: string
+}
+
+export interface PersistedCharacterHumanity {
+  value: number
+  convictions: PersistedCharacterConviction[]
+  touchstones: PersistedCharacterTouchstone[]
+}
+
 export interface PersistedCharacterDraft {
   characterId: string
   ownerId: string
@@ -115,6 +133,7 @@ export interface PersistedCharacterDraft {
   skills: PersistedCharacterSkills
   skillSpecialties:
     PersistedCharacterSkillSpecialty[]
+  humanity: PersistedCharacterHumanity
 }
 
 export interface CreateCharacterDraftData {
@@ -126,6 +145,7 @@ export interface CreateCharacterDraftData {
   skills: PersistedCharacterSkills
   skillSpecialties:
     PersistedCharacterSkillSpecialty[]
+  humanity: PersistedCharacterHumanity
   creation: {
     currentStep: CharacterCreationStep
     skillDistributionMethod: SkillDistributionMethod
@@ -142,6 +162,11 @@ export interface UpdateCharacterDraftData {
   skills?: Partial<PersistedCharacterSkills>
   skillSpecialties?:
     PersistedCharacterSkillSpecialty[]
+  humanityValue?: number
+  humanityNarrative?: {
+    convictions: PersistedCharacterConviction[]
+    touchstones: PersistedCharacterTouchstone[]
+  }
   creation?: Partial<
     Pick<
       PersistedCharacterCreationState,

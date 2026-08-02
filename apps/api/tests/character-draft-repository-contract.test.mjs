@@ -15,7 +15,7 @@ test(
   () => {
     assert.match(
       repository,
-      /database\.character\.create/,
+      /transaction\.character\.create/,
     )
     assert.match(repository, /identity:\s*{\s*create:/)
     assert.match(
@@ -31,6 +31,10 @@ test(
       repository,
       /skills:\s*{\s*create:/,
     )
+    assert.match(
+      repository,
+      /humanity:\s*{\s*create:/,
+    )
   },
 )
 
@@ -39,7 +43,7 @@ test(
   () => {
     assert.match(
       repository,
-      /identity: true,[\s\S]*creationState: true,[\s\S]*attributes: true,[\s\S]*blood: true,[\s\S]*skills:/,
+      /identity: true,[\s\S]*creationState: true,[\s\S]*attributes: true,[\s\S]*blood: true,[\s\S]*skills:[\s\S]*humanity: true/,
     )
     assert.match(repository, /character\.findUnique/)
   },
@@ -68,6 +72,14 @@ test(
     assert.match(
       repository,
       /characterSkillSpecialty\.deleteMany/,
+    )
+    assert.match(
+      repository,
+      /characterConviction[\s\S]*\.deleteMany/,
+    )
+    assert.match(
+      repository,
+      /characterTouchstone[\s\S]*\.deleteMany/,
     )
   },
 )
