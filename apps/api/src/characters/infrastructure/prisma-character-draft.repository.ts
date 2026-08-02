@@ -1,0 +1,299 @@
+import { Injectable } from '@nestjs/common'
+
+import {
+  CharacterCreationStep as PrismaCharacterCreationStep,
+  CharacterStatus as PrismaCharacterStatus,
+  Prisma,
+  SkillDistributionMethod as PrismaSkillDistributionMethod,
+} from '@prisma/client'
+
+import {
+  CharacterDraftWriteConflictError,
+} from '../application/character-draft.repository'
+
+import type {
+  CharacterDraftRepository,
+} from '../application/character-draft.repository'
+
+import type {
+  CharacterCreationStep,
+  CharacterLifecycleStatus,
+  CreateCharacterDraftData,
+  PersistedCharacterDraft,
+  PersistedCharacterIdentity,
+  SkillDistributionMethod,
+  UpdateCharacterDraftData,
+} from '../domain/persisted-character.types'
+
+import { DatabaseService } from '../../database/database.service'
+
+const stepToPrisma: Record<
+  CharacterCreationStep,
+  PrismaCharacterCreationStep
+> = {
+  identity: PrismaCharacterCreationStep.IDENTITY,
+  attributes: PrismaCharacterCreationStep.ATTRIBUTES,
+  skills: PrismaCharacterCreationStep.SKILLS,
+  blood: PrismaCharacterCreationStep.BLOOD,
+  disciplines: PrismaCharacterCreationStep.DISCIPLINES,
+  advantages: PrismaCharacterCreationStep.ADVANTAGES,
+  humanity: PrismaCharacterCreationStep.HUMANITY,
+  review: PrismaCharacterCreationStep.REVIEW,
+}
+
+const stepFromPrisma: Record<
+  PrismaCharacterCreationStep,
+  CharacterCreationStep
+> = {
+  IDENTITY: 'identity',
+  ATTRIBUTES: 'attributes',
+  SKILLS: 'skills',
+  BLOOD: 'blood',
+  DISCIPLINES: 'disciplines',
+  ADVANTAGES: 'advantages',
+  HUMANITY: 'humanity',
+  REVIEW: 'review',
+}
+
+const methodToPrisma: Record<
+  SkillDistributionMethod,
+  PrismaSkillDistributionMethod
+> = {
+  generalist: PrismaSkillDistributionMethod.GENERALIST,
+  balanced: PrismaSkillDistributionMethod.BALANCED,
+  specialist: PrismaSkillDistributionMethod.SPECIALIST,
+}
+
+const methodFromPrisma: Record<
+  PrismaSkillDistributionMethod,
+  SkillDistributionMethod
+> = {
+  GENERALIST: 'generalist',
+  BALANCED: 'balanced',
+  SPECIALIST: 'specialist',
+}
+
+const statusFromPrisma: Record<
+  PrismaCharacterStatus,
+  CharacterLifecycleStatus
+> = {
+  DRAFT: 'draft',
+  ACTIVE: 'active',
+  ARCHIVED: 'archived',
+}
+
+const characterRelations = {
+  identity: true,
+  creationState: true,
+} satisfies Prisma.CharacterInclude
+
+type CharacterWithRelations =
+  Prisma.CharacterGetPayload<{
+    include: typeof characterRelations
+  }>
+
+function toIdentityCreate(
+  identity: Partial<PersistedCharacterIdentity>,
+): Prisma.CharacterIdentityUncheckedCreateWithoutCharacterInput {
+  return {
+    name: identity.name ?? '',
+    concept: identity.concept ?? null,
+    predatorTypeKey:
+      identity.predatorTypeKey ?? null,
+    ambition: identity.ambition ?? null,
+    clanKey: identity.clanKey ?? null,
+    sire: identity.sire ?? null,
+    desire: identity.desire ?? null,
+    generation: identity.generation ?? null,
+  }
+}
+
+function toPersistedDraft(
+  row: CharacterWithRelations,
+): PersistedCharacterDraft {
+  if (
+    row.identity === null ||
+    row.creationState === null
+  ) {
+    throw new Error(
+      `Character ${row.id} has incomplete persistence relations`,
+    )
+  }
+
+  return {
+    characterId: row.id,
+    ownerId: row.ownerId,
+    chronicleId: row.chronicleId,
+    status: statusFromPrisma[row.status],
+    revision: row.revision,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    identity: {
+      name: row.identity.name,
+      concept: row.identity.concept,
+      predatorTypeKey:
+        row.identity.predatorTypeKey,
+      ambition: row.identity.ambition,
+      clanKey: row.identity.clanKey,
+      sire: row.identity.sire,
+      desire: row.identity.desire,
+      generation: row.identity.generation,
+    },
+    creation: {
+      schemaVersion:
+        row.creationState.schemaVersion,
+      currentStep:
+        stepFromPrisma[
+          row.creationState.currentStep
+        ],
+      skillDistributionMethod:
+        methodFromPrisma[
+          row.creationState
+            .skillDistributionMethod
+        ],
+      updatedAt: row.creationState.updatedAt,
+    },
+  }
+}
+
+@Injectable()
+export class PrismaCharacterDraftRepository
+  implements CharacterDraftRepository {
+  constructor(
+    private readonly database: DatabaseService,
+  ) {}
+
+  async create(
+    data: CreateCharacterDraftData,
+  ): Promise<PersistedCharacterDraft> {
+    const row = await this.database.character.create({
+      data: {
+        ownerId: data.ownerId,
+        chronicleId: data.chronicleId,
+        status: PrismaCharacterStatus.DRAFT,
+        identity: {
+          create: toIdentityCreate(data.identity),
+        },
+        creationState: {
+          create: {
+            schemaVersion: 1,
+            currentStep:
+              stepToPrisma[
+                data.creation.currentStep
+              ],
+            skillDistributionMethod:
+              methodToPrisma[
+                data.creation
+                  .skillDistributionMethod
+              ],
+          },
+        },
+      },
+      include: characterRelations,
+    })
+
+    return toPersistedDraft(row)
+  }
+
+  async findById(
+    characterId: string,
+  ): Promise<PersistedCharacterDraft | null> {
+    const row =
+      await this.database.character.findUnique({
+        where: { id: characterId },
+        include: characterRelations,
+      })
+
+    return row === null
+      ? null
+      : toPersistedDraft(row)
+  }
+
+  async update(
+    data: UpdateCharacterDraftData,
+  ): Promise<PersistedCharacterDraft> {
+    return this.database.$transaction(
+      async (transaction) => {
+        const characterData:
+          Prisma.CharacterUpdateManyMutationInput = {
+            revision: { increment: 1 },
+          }
+
+        if ('chronicleId' in data) {
+          characterData.chronicleId =
+            data.chronicleId
+        }
+
+        const claimed =
+          await transaction.character.updateMany({
+            where: {
+              id: data.characterId,
+              revision: data.expectedRevision,
+              status: PrismaCharacterStatus.DRAFT,
+            },
+            data: characterData,
+          })
+
+        if (claimed.count !== 1) {
+          throw new CharacterDraftWriteConflictError(
+            data.characterId,
+          )
+        }
+
+        if (data.identity !== undefined) {
+          await transaction.characterIdentity.upsert({
+            where: {
+              characterId: data.characterId,
+            },
+            create: {
+              characterId: data.characterId,
+              ...toIdentityCreate(data.identity),
+            },
+            update: data.identity,
+          })
+        }
+
+        if (data.creation !== undefined) {
+          const creationUpdate:
+            Prisma.CharacterCreationStateUpdateInput = {}
+
+          if (
+            data.creation.currentStep !== undefined
+          ) {
+            creationUpdate.currentStep =
+              stepToPrisma[
+                data.creation.currentStep
+              ]
+          }
+
+          if (
+            data.creation
+              .skillDistributionMethod !== undefined
+          ) {
+            creationUpdate.skillDistributionMethod =
+              methodToPrisma[
+                data.creation
+                  .skillDistributionMethod
+              ]
+          }
+
+          await transaction
+            .characterCreationState.update({
+              where: {
+                characterId: data.characterId,
+              },
+              data: creationUpdate,
+            })
+        }
+
+        const row =
+          await transaction.character.findUniqueOrThrow({
+            where: { id: data.characterId },
+            include: characterRelations,
+          })
+
+        return toPersistedDraft(row)
+      },
+    )
+  }
+}
