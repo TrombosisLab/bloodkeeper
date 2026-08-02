@@ -117,6 +117,7 @@ model Character {
   creationState CharacterCreationState?
   attributes    CharacterAttributes?
   blood         CharacterBloodState?
+  damage        CharacterDamageState?
   skills        CharacterSkill[]
   disciplines   CharacterDiscipline[]
   bloodSorceryRituals CharacterBloodSorceryRitual[]
@@ -189,6 +190,18 @@ model CharacterBloodState {
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("character_blood_states")
+}
+
+model CharacterDamageState {
+  characterId               String @id @db.Uuid
+  healthSuperficial         Int    @default(0)
+  healthAggravated          Int    @default(0)
+  willpowerSuperficial      Int    @default(0)
+  willpowerAggravated       Int    @default(0)
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("character_damage_states")
 }
 
 model CharacterSkill {

@@ -276,6 +276,7 @@ const characterRelations = {
   creationState: true,
   attributes: true,
   blood: true,
+  damage: true,
   skills: {
     include: {
       specialties: {
@@ -676,6 +677,7 @@ function toPersistedDraft(
     row.creationState === null ||
     row.attributes === null ||
     row.blood === null ||
+    row.damage === null ||
     row.thinBloodAlchemy === null ||
     row.humanity === null
   ) {
@@ -749,6 +751,20 @@ function toPersistedDraft(
     blood: {
       bloodPotency: row.blood.bloodPotency,
       hunger: row.blood.hunger,
+    },
+    damage: {
+      health: {
+        superficial:
+          row.damage.healthSuperficial,
+        aggravated:
+          row.damage.healthAggravated,
+      },
+      willpower: {
+        superficial:
+          row.damage.willpowerSuperficial,
+        aggravated:
+          row.damage.willpowerAggravated,
+      },
     },
     skills,
     skillSpecialties: row.skills.flatMap(
@@ -944,6 +960,9 @@ export class PrismaCharacterDraftRepository
               },
               blood: {
                 create: data.blood,
+              },
+              damage: {
+                create: {},
               },
               skills: {
                 create: CHARACTER_SKILL_KEYS.map(
@@ -1191,6 +1210,25 @@ export class PrismaCharacterDraftRepository
             },
             data: data.blood,
           })
+        }
+
+        if (data.damage !== undefined) {
+          await transaction.characterDamageState
+            .update({
+              where: {
+                characterId: data.characterId,
+              },
+              data: {
+                healthSuperficial:
+                  data.damage.health.superficial,
+                healthAggravated:
+                  data.damage.health.aggravated,
+                willpowerSuperficial:
+                  data.damage.willpower.superficial,
+                willpowerAggravated:
+                  data.damage.willpower.aggravated,
+              },
+            })
         }
 
         if (data.skills !== undefined) {

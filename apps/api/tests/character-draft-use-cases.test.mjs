@@ -71,6 +71,16 @@ function createRepository() {
       '39c1801e-68fe-4c92-8795-723cac284bdf',
     revision: 1,
     attributes: createValidAttributes(),
+    damage: {
+      health: {
+        superficial: 0,
+        aggravated: 0,
+      },
+      willpower: {
+        superficial: 0,
+        aggravated: 0,
+      },
+    },
     skills: createBalancedSkills(),
     skillSpecialties: [],
     creation: {
@@ -241,6 +251,55 @@ test(
       ],
       ['findById', ownerId, 'missing'],
     ])
+  },
+)
+
+test(
+  '006-C valida daño contra los máximos derivados',
+  async () => {
+    const repository = createRepository()
+    const useCase =
+      new UpdateCharacterDraftUseCase(
+        repository,
+      )
+    const ownerId =
+      '3bbc46f8-a45f-4589-9872-129e6652082c'
+
+    await assert.rejects(
+      useCase.execute(ownerId, {
+        characterId: repository.record.characterId,
+        expectedRevision: 1,
+        damage: {
+          health: {
+            superficial: 7,
+            aggravated: 0,
+          },
+          willpower: {
+            superficial: 0,
+            aggravated: 0,
+          },
+        },
+      }),
+      {
+        name: 'InvalidCharacterDamageStateError',
+      },
+    )
+
+    repository.record.damage.health.superficial = 5
+
+    await assert.rejects(
+      useCase.execute(ownerId, {
+        characterId: repository.record.characterId,
+        expectedRevision: 1,
+        attributes: {
+          stamina: 1,
+          resolve: 3,
+        },
+      }),
+      {
+        name: 'InvalidCharacterDamageStateError',
+      },
+    )
   },
 )
 

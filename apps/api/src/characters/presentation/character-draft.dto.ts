@@ -597,6 +597,38 @@ function validateHumanity(
     })
 }
 
+function validateDamage(
+  input: unknown,
+  path: string,
+): void {
+  const value = record(input, path)
+  onlyKeys(value, ['health', 'willpower'], path)
+
+  for (const trackKey of [
+    'health',
+    'willpower',
+  ] as const) {
+    const trackPath = `${path}.${trackKey}`
+    const track = record(
+      required(value, trackKey, path),
+      trackPath,
+    )
+    onlyKeys(
+      track,
+      ['superficial', 'aggravated'],
+      trackPath,
+    )
+    integer(
+      required(track, 'superficial', trackPath),
+      `${trackPath}.superficial`,
+    )
+    integer(
+      required(track, 'aggravated', trackPath),
+      `${trackPath}.aggravated`,
+    )
+  }
+}
+
 function validateCreation(
   input: unknown,
   path: string,
@@ -689,7 +721,7 @@ export function parseUpdateCharacterDraftRequest(
   const value = record(input, 'body')
   const keys = [
     'expectedRevision', 'chronicleId', 'identity',
-    'attributes', 'blood', 'skills', 'skillSpecialties',
+    'attributes', 'blood', 'damage', 'skills', 'skillSpecialties',
     'disciplines', 'bloodSorceryRituals',
     'oblivionCeremonies', 'thinBloodAlchemy',
     'thinBloodTraits', 'advantages', 'humanityValue',
@@ -706,6 +738,7 @@ export function parseUpdateCharacterDraftRequest(
   if (Object.hasOwn(value, 'identity')) validateIdentity(value.identity, 'body.identity')
   if (Object.hasOwn(value, 'attributes')) validateIntegerRecord(value.attributes, CHARACTER_ATTRIBUTE_KEYS, 'body.attributes', false)
   if (Object.hasOwn(value, 'blood')) validateIntegerRecord(value.blood, ['bloodPotency', 'hunger'], 'body.blood', false)
+  if (Object.hasOwn(value, 'damage')) validateDamage(value.damage, 'body.damage')
   if (Object.hasOwn(value, 'skills')) validateIntegerRecord(value.skills, CHARACTER_SKILL_KEYS, 'body.skills', false)
   if (Object.hasOwn(value, 'skillSpecialties')) validateSpecialties(value.skillSpecialties, 'body.skillSpecialties')
   if (Object.hasOwn(value, 'disciplines')) validateDisciplines(value.disciplines, 'body.disciplines')

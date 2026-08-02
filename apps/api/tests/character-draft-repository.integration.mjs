@@ -165,6 +165,16 @@ test(
       assert.equal(created.revision, 1)
       assert.equal(created.attributes.intelligence, 4)
       assert.equal(created.blood.hunger, 1)
+      assert.deepEqual(created.damage, {
+        health: {
+          superficial: 0,
+          aggravated: 0,
+        },
+        willpower: {
+          superficial: 0,
+          aggravated: 0,
+        },
+      })
       assert.equal(created.skills.investigation, 3)
       assert.equal(
         created.skillSpecialties[0]?.name,
@@ -273,6 +283,16 @@ test(
         blood: {
           hunger: 2,
         },
+        damage: {
+          health: {
+            superficial: 2,
+            aggravated: 1,
+          },
+          willpower: {
+            superficial: 1,
+            aggravated: 0,
+          },
+        },
         skills: {
           investigation: 4,
         },
@@ -360,6 +380,16 @@ test(
       )
       assert.equal(updated.attributes.strength, 4)
       assert.equal(updated.blood.hunger, 2)
+      assert.deepEqual(updated.damage, {
+        health: {
+          superficial: 2,
+          aggravated: 1,
+        },
+        willpower: {
+          superficial: 1,
+          aggravated: 0,
+        },
+      })
       assert.equal(updated.skills.investigation, 4)
       assert.deepEqual(
         updated.skillSpecialties.map(

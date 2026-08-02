@@ -27,6 +27,7 @@ test(
       /attributes:\s*{\s*create:/,
     )
     assert.match(repository, /blood:\s*{\s*create:/)
+    assert.match(repository, /damage:\s*{\s*create:/)
     assert.match(
       repository,
       /skills:\s*{\s*create:/,
@@ -67,7 +68,7 @@ test(
   () => {
     assert.match(
       repository,
-      /identity: true,[\s\S]*creationState: true,[\s\S]*attributes: true,[\s\S]*blood: true,[\s\S]*skills:[\s\S]*disciplines:[\s\S]*bloodSorceryRituals:[\s\S]*oblivionCeremonies:[\s\S]*thinBloodAlchemy: true,[\s\S]*thinBloodFormulas:[\s\S]*thinBloodTraits:[\s\S]*advantages:[\s\S]*humanity: true/,
+      /identity: true,[\s\S]*creationState: true,[\s\S]*attributes: true,[\s\S]*blood: true,[\s\S]*damage: true,[\s\S]*skills:[\s\S]*disciplines:[\s\S]*bloodSorceryRituals:[\s\S]*oblivionCeremonies:[\s\S]*thinBloodAlchemy: true,[\s\S]*thinBloodFormulas:[\s\S]*thinBloodTraits:[\s\S]*advantages:[\s\S]*humanity: true/,
     )
     assert.match(repository, /character\.findFirst/)
   },
@@ -92,6 +93,10 @@ test(
     assert.match(
       repository,
       /characterSkill\.upsert/,
+    )
+    assert.match(
+      repository,
+      /characterDamageState[\s\S]*\.update/,
     )
     assert.match(
       repository,

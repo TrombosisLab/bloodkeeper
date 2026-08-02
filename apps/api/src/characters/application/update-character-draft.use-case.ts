@@ -15,6 +15,10 @@ import {
   assertValidCharacterAttributeSkillState,
 } from '../domain/character-attribute-skill.rules'
 
+import {
+  assertValidCharacterDamageState,
+} from '../domain/character-damage.rules'
+
 export class UpdateCharacterDraftUseCase {
   private readonly repository:
     CharacterDraftRepository
@@ -37,7 +41,16 @@ export class UpdateCharacterDraftUseCase {
         undefined ||
       data.creation?.currentStep !== undefined
 
-    if (changesAttributeSkillState) {
+    const changesDamageState =
+      data.damage !== undefined ||
+      data.attributes?.stamina !== undefined ||
+      data.attributes?.composure !== undefined ||
+      data.attributes?.resolve !== undefined
+
+    if (
+      changesAttributeSkillState ||
+      changesDamageState
+    ) {
       const current =
         await this.repository.findById(
           ownerId,
@@ -53,24 +66,35 @@ export class UpdateCharacterDraftUseCase {
         )
       }
 
-      assertValidCharacterAttributeSkillState(
-        {
-          ...current.attributes,
-          ...data.attributes,
-        },
-        {
-          ...current.skills,
-          ...data.skills,
-        },
-        data.creation
-          ?.skillDistributionMethod ??
-          current.creation
-            .skillDistributionMethod,
-        data.creation?.currentStep ??
-          current.creation.currentStep,
-        data.skillSpecialties ??
-          current.skillSpecialties,
-      )
+      const attributes = {
+        ...current.attributes,
+        ...data.attributes,
+      }
+
+      if (changesAttributeSkillState) {
+        assertValidCharacterAttributeSkillState(
+          attributes,
+          {
+            ...current.skills,
+            ...data.skills,
+          },
+          data.creation
+            ?.skillDistributionMethod ??
+            current.creation
+              .skillDistributionMethod,
+          data.creation?.currentStep ??
+            current.creation.currentStep,
+          data.skillSpecialties ??
+            current.skillSpecialties,
+        )
+      }
+
+      if (changesDamageState) {
+        assertValidCharacterDamageState(
+          attributes,
+          data.damage ?? current.damage,
+        )
+      }
     }
 
     return this.repository.update(ownerId, data)

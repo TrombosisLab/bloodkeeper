@@ -166,6 +166,50 @@ test(
 )
 
 test(
+  '006-C acepta el contrato completo de daño y rechaza formas ambiguas',
+  () => {
+    const damage = {
+      health: {
+        superficial: 2,
+        aggravated: 1,
+      },
+      willpower: {
+        superficial: 1,
+        aggravated: 0,
+      },
+    }
+
+    assert.deepEqual(
+      parseUpdateCharacterDraftRequest(
+        characterId,
+        {
+          expectedRevision: 1,
+          damage,
+        },
+      ).damage,
+      damage,
+    )
+
+    assert.throws(
+      () =>
+        parseUpdateCharacterDraftRequest(
+          characterId,
+          {
+            expectedRevision: 1,
+            damage: {
+              ...damage,
+              health: {
+                superficial: 2,
+              },
+            },
+          },
+        ),
+      /aggravated is required/,
+    )
+  },
+)
+
+test(
   '004-D.1 serializa fechas sin filtrar objetos Date al transporte',
   () => {
     const body = createBody()

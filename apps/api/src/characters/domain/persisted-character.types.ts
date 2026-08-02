@@ -59,6 +59,16 @@ export interface PersistedCharacterBlood {
   hunger: number
 }
 
+export interface PersistedCharacterDamageTrack {
+  superficial: number
+  aggravated: number
+}
+
+export interface PersistedCharacterDamageState {
+  health: PersistedCharacterDamageTrack
+  willpower: PersistedCharacterDamageTrack
+}
+
 export const CHARACTER_SKILL_KEYS = [
   'athletics',
   'brawl',
@@ -295,6 +305,7 @@ export interface PersistedCharacterDraft {
   creation: PersistedCharacterCreationState
   attributes: PersistedCharacterAttributes
   blood: PersistedCharacterBlood
+  damage: PersistedCharacterDamageState
   skills: PersistedCharacterSkills
   skillSpecialties:
     PersistedCharacterSkillSpecialty[]
@@ -344,6 +355,7 @@ export interface UpdateCharacterDraftData {
   identity?: Partial<PersistedCharacterIdentity>
   attributes?: Partial<PersistedCharacterAttributes>
   blood?: Partial<PersistedCharacterBlood>
+  damage?: PersistedCharacterDamageState
   skills?: Partial<PersistedCharacterSkills>
   skillSpecialties?:
     PersistedCharacterSkillSpecialty[]

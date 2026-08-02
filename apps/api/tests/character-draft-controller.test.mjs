@@ -15,6 +15,10 @@ import {
 } from '../dist/characters/domain/character-attribute-skill.rules.js'
 
 import {
+  InvalidCharacterDamageStateError,
+} from '../dist/characters/domain/character-damage.rules.js'
+
+import {
   CharacterDraftController,
 } from '../dist/characters/presentation/character-draft.controller.js'
 
@@ -248,6 +252,32 @@ test(
         async execute() {
           throw new InvalidCharacterAttributeSkillStateError(
             ['SKILL_DISTRIBUTION_INVALID'],
+          )
+        },
+      },
+    })
+
+    await assert.rejects(
+      instance.update(
+        authenticatedRequest(),
+        characterId,
+        { expectedRevision: 1 },
+      ),
+      hasStatus(422),
+    )
+  },
+)
+
+test(
+  '006-C expone daño imposible como respuesta 422',
+  async () => {
+    const { instance } = controller({
+      updateDraft: {
+        async execute() {
+          throw new InvalidCharacterDamageStateError(
+            [
+              'HEALTH_DAMAGE_EXCEEDS_CAPACITY',
+            ],
           )
         },
       },
