@@ -39,13 +39,36 @@ export function DisciplineCard({
           <ul>
             {discipline.powers.map((power) => (
               <li key={power.key}>
-                <span>{power.name}</span>
+                <details className="discipline-power-details">
+                  <summary>
+                    <span>{power.name}</span>
 
-                <small>
-                  {power.level === null
-                    ? 'Referencia no disponible'
-                    : `Nivel ${power.level}`}
-                </small>
+                    <small>
+                      {power.level === null
+                        ? 'Referencia no disponible'
+                        : `Nivel ${power.level}`}
+                    </small>
+                  </summary>
+
+                  <div className="discipline-power-details__content">
+                    {power.summary ? (
+                      <p>{power.summary}</p>
+                    ) : (
+                      <p>
+                        Sin información adicional autorizada.
+                      </p>
+                    )}
+
+                    {power.sourceName ? (
+                      <small>
+                        Fuente: {power.sourceName}
+                        {power.sourcePage
+                          ? ` · p. ${power.sourcePage}`
+                          : ''}
+                      </small>
+                    ) : null}
+                  </div>
+                </details>
               </li>
             ))}
           </ul>

@@ -6,6 +6,9 @@ import {
   disciplinePowerDefinitions,
 } from '../../character-creation/data/discipline-power-definitions'
 import {
+  contentSources,
+} from '../../character-creation/data/content-sources'
+import {
   buildCharacterDisciplineReadModel,
 } from '../domain/character-discipline-read-model'
 import { DisciplineCard } from './DisciplineCard'
@@ -16,6 +19,7 @@ export function CharacterDisciplines() {
       demoDisciplines,
       disciplineDefinitions,
       disciplinePowerDefinitions,
+      contentSources,
     )
 
   return (

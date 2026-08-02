@@ -5,6 +5,9 @@ import type {
   DisciplineDefinition,
 } from '../../character-creation/types/discipline.types'
 import type {
+  ContentSourceDefinition,
+} from '../../character-creation/types/content-source.types'
+import type {
   CharacterDisciplineState,
   CharacterDisciplineView,
   DisciplinePowerView,
@@ -16,6 +19,8 @@ export function buildCharacterDisciplineReadModel(
     readonly DisciplineDefinition[],
   powerDefinitions:
     readonly DisciplinePowerDefinition[],
+  contentSourceDefinitions:
+    readonly ContentSourceDefinition[],
 ): CharacterDisciplineView[] {
   const disciplinesByKey =
     new Map<string, DisciplineDefinition>(
@@ -29,6 +34,15 @@ export function buildCharacterDisciplineReadModel(
   const powersByKey =
     new Map<string, DisciplinePowerDefinition>(
       powerDefinitions.map(
+        (definition) => [
+          definition.key,
+          definition,
+        ],
+      ),
+    )
+  const contentSourcesByKey =
+    new Map<string, ContentSourceDefinition>(
+      contentSourceDefinitions.map(
         (definition) => [
           definition.key,
           definition,
@@ -68,6 +82,12 @@ export function buildCharacterDisciplineReadModel(
             level: powerDefinition.level,
             summary: powerDefinition.summary,
             sourceKey: powerDefinition.sourceKey,
+            sourceName:
+              powerDefinition.sourceKey
+                ? contentSourcesByKey.get(
+                    powerDefinition.sourceKey,
+                  )?.shortName
+                : undefined,
             sourcePage: powerDefinition.sourcePage,
             catalogStatus: 'resolved',
           }

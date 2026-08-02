@@ -18,6 +18,7 @@ export interface DisciplinePowerView {
   level: number | null
   summary?: string
   sourceKey?: ContentSourceKey
+  sourceName?: string
   sourcePage?: number
   catalogStatus: CatalogReferenceStatus
 }

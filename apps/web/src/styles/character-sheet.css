@@ -881,12 +881,6 @@
 .discipline-card__powers li {
   min-height: 40px;
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 12px;
-
   border-bottom: 1px solid #292324;
 }
 
@@ -915,6 +909,47 @@
   letter-spacing: 0.06em;
 
   text-transform: uppercase;
+}
+
+.discipline-power-details {
+  width: 100%;
+}
+
+.discipline-power-details summary {
+  min-height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  cursor: pointer;
+}
+
+.discipline-power-details summary::marker {
+  color: #a76d75;
+}
+
+.discipline-power-details summary:focus-visible {
+  outline: 2px solid #dca0a8;
+  outline-offset: 3px;
+}
+
+.discipline-power-details__content {
+  padding: 2px 0 16px;
+}
+
+.discipline-power-details__content p {
+  margin: 0 0 10px;
+
+  color: #9b918d;
+
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.discipline-power-details__content small {
+  display: block;
 }
 
 .discipline-card__empty {

@@ -9,6 +9,9 @@ import {
   disciplinePowerDefinitions,
 } from '../src/features/character-creation/data/discipline-power-definitions.ts'
 import {
+  contentSources,
+} from '../src/features/character-creation/data/content-sources.ts'
+import {
   demoDisciplines,
 } from '../src/features/character-sheet/data/demo-disciplines.ts'
 import {
@@ -39,6 +42,7 @@ test(
         demoDisciplines,
         disciplineDefinitions,
         disciplinePowerDefinitions,
+        contentSources,
       )
 
     assert.equal(result[0].name, 'Celeridad')
@@ -73,6 +77,7 @@ test(
         ],
         disciplineDefinitions,
         disciplinePowerDefinitions,
+        contentSources,
       )
 
     assert.equal(
@@ -101,6 +106,7 @@ test(
         ],
         disciplineDefinitions,
         disciplinePowerDefinitions,
+        contentSources,
       )
 
     assert.equal(
