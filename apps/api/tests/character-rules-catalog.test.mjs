@@ -17,7 +17,7 @@ test(
     )
     assert.equal(
       characterRulesCatalog.stateOf('disciplines'),
-      'pending',
+      'ready',
     )
     assert.equal(
       characterRulesCatalog.stateOf('advantages'),
@@ -26,6 +26,17 @@ test(
     assert.equal(
       characterRulesCatalog.stateOf('dependencies'),
       'pending',
+    )
+    assert.equal(
+      characterRulesCatalog.disciplineCatalog
+        .disciplines.length,
+      12,
+    )
+    assert.equal(
+      Object.isFrozen(
+        characterRulesCatalog.disciplineCatalog,
+      ),
+      true,
     )
   },
 )
@@ -127,6 +138,14 @@ test(
     assert.match(
       source,
       /useValue:\s*characterRulesCatalog/,
+    )
+    assert.match(
+      source,
+      /inject:\s*\[CHARACTER_RULES_CATALOG\]/,
+    )
+    assert.match(
+      source,
+      /createCharacterDisciplineValidationContributor\(\s*rulesCatalog,?\s*\)/,
     )
   },
 )

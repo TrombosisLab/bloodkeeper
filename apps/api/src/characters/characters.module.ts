@@ -57,7 +57,7 @@ import {
 } from './domain/character-advantage-validation.contributor'
 
 import {
-  characterDisciplineValidationContributor,
+  createCharacterDisciplineValidationContributor,
 } from './domain/character-discipline-validation.contributor'
 
 import {
@@ -67,6 +67,10 @@ import {
 import {
   CHARACTER_RULES_CATALOG,
   characterRulesCatalog,
+} from './domain/character-rules-catalog'
+
+import type {
+  CharacterRulesCatalog,
 } from './domain/character-rules-catalog'
 
 import {
@@ -208,10 +212,15 @@ const useCaseProviders = [
     },
     {
       provide: CharacterValidator,
-      useFactory: () =>
+      inject: [CHARACTER_RULES_CATALOG],
+      useFactory: (
+        rulesCatalog: CharacterRulesCatalog,
+      ) =>
         new CharacterValidator([
           characterCoreValidationContributor,
-          characterDisciplineValidationContributor,
+          createCharacterDisciplineValidationContributor(
+            rulesCatalog,
+          ),
           characterAdvantageValidationContributor,
           characterDependencyValidationContributor,
         ]),

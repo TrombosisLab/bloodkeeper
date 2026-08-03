@@ -12,8 +12,8 @@ function character(overrides = {}) {
         disciplineKey: 'auspex',
         rating: 2,
         powerKeys: [
-          'heightened-senses',
-          'premonition',
+          'auspex-heightened-senses',
+          'auspex-premonition',
         ],
         origin: 'creation',
       },
@@ -39,16 +39,13 @@ function codes(result) {
 }
 
 test(
-  '029-M valida estructura sin declarar completo el catalogo',
+  '029-R completa la seccion con el catalogo canonico',
   () => {
     const result = validate()
 
     assert.equal(result.section, 'disciplines')
-    assert.equal(result.state, 'pending')
-    assert.deepEqual(codes(result), [
-      'CHARACTER_DISCIPLINE_CATALOG_VALIDATION_PENDING',
-    ])
-    assert.equal(result.issues[0].severity, 'warning')
+    assert.equal(result.state, 'complete')
+    assert.deepEqual(codes(result), [])
   },
 )
 
