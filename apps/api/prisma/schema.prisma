@@ -104,6 +104,11 @@ enum AdvantageMaskBenefit {
   TAILOR
 }
 
+enum InventoryItemStatus {
+  ACTIVE
+  ARCHIVED
+}
+
 model Character {
   id          String          @id @default(uuid()) @db.Uuid
   ownerId     String          @db.Uuid
@@ -129,6 +134,9 @@ model Character {
   humanity      CharacterHumanityState?
   convictions   CharacterConviction[]
   touchstones   CharacterTouchstone[]
+  inventoryItems CharacterInventoryItem[]
+  notes          CharacterNote[]
+  historyEntries CharacterHistoryEntry[]
 
   @@index([ownerId])
   @@index([chronicleId])
@@ -389,4 +397,49 @@ model CharacterConviction {
   @@id([characterId, convictionId])
   @@index([characterId, touchstoneId])
   @@map("character_convictions")
+}
+
+model CharacterInventoryItem {
+  id          String              @id @default(uuid()) @db.Uuid
+  characterId String              @db.Uuid
+  name        String
+  quantity    Int                 @default(1)
+  description String?
+  category    String?
+  notes       String?
+  status      InventoryItemStatus @default(ACTIVE)
+  createdAt   DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime            @updatedAt @db.Timestamptz(3)
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([characterId, status])
+  @@map("character_inventory_items")
+}
+
+model CharacterNote {
+  id          String   @id @default(uuid()) @db.Uuid
+  characterId String   @db.Uuid
+  content     String
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([characterId])
+  @@map("character_notes")
+}
+
+model CharacterHistoryEntry {
+  id          String   @id @default(uuid()) @db.Uuid
+  characterId String   @db.Uuid
+  title       String
+  description String
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([characterId])
+  @@map("character_history_entries")
 }
