@@ -165,6 +165,10 @@ test(
         sourceLabel: undefined,
         sourcePage: undefined,
         catalogStatus: 'missing',
+        narrativeStatus:
+          'notApplicable',
+        narrativeStatusLabel:
+          'Sin información narrativa pendiente',
       },
     )
   },

@@ -54,6 +54,12 @@ export function RatedTraitRow({
           {trait.catalogStatus === 'missing' ? (
             <span>Referencia no disponible</span>
           ) : null}
+
+          {trait.narrativeStatus === 'pending' ? (
+            <span className="rated-trait__narrative-pending">
+              {trait.narrativeStatusLabel}
+            </span>
+          ) : null}
         </div>
       </details>
     </div>

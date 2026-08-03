@@ -1118,6 +1118,11 @@
   letter-spacing: 0.04em;
 }
 
+.rated-trait__metadata .rated-trait__narrative-pending {
+  border-color: rgb(184 139 73 / 45%);
+  color: #d9c17a;
+}
+
 .rated-trait__identity span,
 .rated-trait__identity small {
   display: block;

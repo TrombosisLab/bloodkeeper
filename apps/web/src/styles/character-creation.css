@@ -2776,6 +2776,16 @@
   background: rgba(255, 255, 255, 0.035);
 }
 
+.advantage-instance-block {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.advantage-instance-block__narrative-pending {
+  color: #d9c17a;
+  line-height: 1.4;
+}
+
 .advantage-instance-editor h5 {
   margin: 0;
   font-size: 0.85rem;

@@ -15,6 +15,10 @@ import {
 } from '../domain/advantage-catalog-rules'
 
 import {
+  getCharacterAdvantageNarrativeState,
+} from '../domain/advantage-functional-model'
+
+import {
   createInitialAdvantageInstanceDetails,
 } from '../domain/advantage-instance-details-rules'
 
@@ -972,30 +976,49 @@ export function AdvantagesStep({
 
                         {!simple &&
                           selections.map(
-                            (selection) => (
-                              <AdvantageInstanceDetailsEditor
-                                key={
-                                  selection.selectionId
-                                }
-                                selection={
-                                  selection
-                                }
-                                onChange={(
-                                  updated,
-                                ) =>
-                                  onChange({
-                                    selections:
-                                      value.selections.map(
-                                        (current) =>
-                                          current.selectionId ===
-                                          updated.selectionId
-                                            ? updated
-                                            : current,
-                                      ),
-                                  })
-                                }
-                              />
-                            ),
+                            (selection) => {
+                              const narrativeState =
+                                getCharacterAdvantageNarrativeState(
+                                  definition,
+                                  selection.details,
+                                )
+
+                              return (
+                                <div
+                                  key={
+                                    selection.selectionId
+                                  }
+                                  className="advantage-instance-block"
+                                >
+                                  <AdvantageInstanceDetailsEditor
+                                    selection={
+                                      selection
+                                    }
+                                    onChange={(
+                                      updated,
+                                    ) =>
+                                      onChange({
+                                        selections:
+                                          value.selections.map(
+                                            (current) =>
+                                              current.selectionId ===
+                                              updated.selectionId
+                                                ? updated
+                                                : current,
+                                          ),
+                                      })
+                                    }
+                                  />
+
+                                  {narrativeState.status ===
+                                    'pending' ? (
+                                    <small className="advantage-instance-block__narrative-pending">
+                                      Puedes completar la información narrativa más adelante.
+                                    </small>
+                                  ) : null}
+                                </div>
+                              )
+                            },
                           )}
 
                         {simple &&

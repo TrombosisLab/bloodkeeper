@@ -4,6 +4,7 @@ import type {
 } from '../../character-creation/types/character-advantage-definition.types'
 import type {
   CharacterAdvantageFunctionalType,
+  CharacterAdvantageNarrativeCompletionStatus,
 } from '../../character-creation/types/character-advantage-functional.types'
 import type {
   CharacterAdvantageCategory,
@@ -13,6 +14,7 @@ import type {
 } from '../../character-creation/types/character-advantages-draft.types'
 import {
   getCharacterAdvantageFunctionalType,
+  getCharacterAdvantageNarrativeState,
 } from '../../character-creation/domain/advantage-functional-model.ts'
 import type {
   CharacterAdvantages,
@@ -48,7 +50,20 @@ const SOURCE_LABELS:
     core: 'Libro Básico',
     playersGuide: 'Guía del Jugador',
     bloodSigils: 'Blood Sigils',
-    other: 'Otra fuente autorizada',
+  other: 'Otra fuente autorizada',
+}
+
+const NARRATIVE_STATUS_LABELS:
+  Record<
+    CharacterAdvantageNarrativeCompletionStatus,
+    string
+  > = {
+    notApplicable:
+      'Sin información narrativa pendiente',
+    pending:
+      'Información narrativa pendiente',
+    complete:
+      'Información narrativa completa',
   }
 
 function textOrUndefined(
@@ -198,6 +213,14 @@ function createRatedTrait(
         )
       : 'fixed'
 
+  const narrativeStatus =
+    definition
+      ? getCharacterAdvantageNarrativeState(
+          definition,
+          selection.details,
+        ).status
+      : 'notApplicable'
+
   return {
     key: selection.selectionId,
     definitionKey:
@@ -233,6 +256,11 @@ function createRatedTrait(
     catalogStatus: definition
       ? 'resolved'
       : 'missing',
+    narrativeStatus,
+    narrativeStatusLabel:
+      NARRATIVE_STATUS_LABELS[
+        narrativeStatus
+      ],
   }
 }
 

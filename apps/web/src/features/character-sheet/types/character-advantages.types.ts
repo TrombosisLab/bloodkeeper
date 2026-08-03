@@ -4,6 +4,7 @@ import type {
 } from '../../character-creation/types/character-advantages-draft.types'
 import type {
   CharacterAdvantageFunctionalType,
+  CharacterAdvantageNarrativeCompletionStatus,
 } from '../../character-creation/types/character-advantage-functional.types'
 
 export type CharacterAdvantageCatalogStatus =
@@ -25,6 +26,9 @@ export interface RatedTrait {
   sourceLabel?: string
   sourcePage?: number
   catalogStatus: CharacterAdvantageCatalogStatus
+  narrativeStatus:
+    CharacterAdvantageNarrativeCompletionStatus
+  narrativeStatusLabel: string
 }
 
 export interface CharacterAdvantages {
