@@ -1,4 +1,18 @@
 import type {
+  CharacterRulesAdvantageCatalog,
+  CharacterRulesAdvantageDefinition,
+  CharacterRulesAdvantageSelectionOrigin,
+} from '@v5r/character-rules'
+
+import {
+  characterRulesCatalog,
+} from './character-rules-catalog'
+
+import type {
+  CharacterRulesCatalog,
+} from './character-rules-catalog'
+
+import type {
   PersistedCharacterAdvantageSelection,
   PersistedCharacterDraft,
 } from './persisted-character.types'
@@ -11,10 +25,19 @@ import type {
   CharacterSectionValidation,
   CharacterValidationContext,
   CharacterValidationIssue,
+  CharacterValidationSeverity,
 } from './character-validation.types'
+
+interface AdvantageCatalogIndex {
+  readonly definitions: ReadonlyMap<
+    string,
+    CharacterRulesAdvantageDefinition
+  >
+}
 
 function issue(
   code: string,
+  severity: CharacterValidationSeverity,
   field: string | null,
   message: string,
   details?: Readonly<
@@ -23,12 +46,29 @@ function issue(
 ): CharacterValidationIssue {
   return {
     code,
-    severity: 'error',
+    severity,
     section: 'advantages',
     field,
     message,
     details,
   }
+}
+
+function errorIssue(
+  code: string,
+  field: string | null,
+  message: string,
+  details?: Readonly<
+    Record<string, string | number | boolean | null>
+  >,
+): CharacterValidationIssue {
+  return issue(
+    code,
+    'error',
+    field,
+    message,
+    details,
+  )
 }
 
 function duplicateValues(
@@ -45,6 +85,74 @@ function duplicateValues(
   return [...duplicated]
 }
 
+function sectionResult(
+  issues: readonly CharacterValidationIssue[],
+): CharacterSectionValidation {
+  if (
+    issues.some(
+      ({ severity }) => severity === 'error',
+    )
+  ) {
+    return {
+      section: 'advantages',
+      state: 'invalid',
+      issues,
+    }
+  }
+
+  if (issues.length > 0) {
+    return {
+      section: 'advantages',
+      state: 'pending',
+      issues,
+    }
+  }
+
+  return {
+    section: 'advantages',
+    state: 'complete',
+    issues: [],
+  }
+}
+
+function completionSeverity(
+  context: CharacterValidationContext,
+): CharacterValidationSeverity {
+  return context === 'draftSave'
+    ? 'warning'
+    : 'error'
+}
+
+function validatesCreationBudget(
+  context: CharacterValidationContext,
+): boolean {
+  return (
+    context === 'draftSave' ||
+    context === 'activation'
+  )
+}
+
+function buildCatalogIndex(
+  catalog: CharacterRulesAdvantageCatalog,
+): AdvantageCatalogIndex {
+  const definitions = new Map<
+    string,
+    CharacterRulesAdvantageDefinition
+  >()
+
+  for (const definition of catalog.definitions) {
+    if (definitions.has(definition.key)) {
+      throw new Error(
+        `Duplicate advantage definition: ${definition.key}`,
+      )
+    }
+
+    definitions.set(definition.key, definition)
+  }
+
+  return Object.freeze({ definitions })
+}
+
 function validateStructure(
   selections:
     readonly PersistedCharacterAdvantageSelection[],
@@ -57,7 +165,7 @@ function validateStructure(
     ),
   )) {
     issues.push(
-      issue(
+      errorIssue(
         'CHARACTER_ADVANTAGE_SELECTION_ID_DUPLICATE',
         'advantages',
         'Las selecciones deben tener identificadores unicos.',
@@ -69,7 +177,7 @@ function validateStructure(
   for (const selection of selections) {
     if (selection.selectionId.trim().length === 0) {
       issues.push(
-        issue(
+        errorIssue(
           'CHARACTER_ADVANTAGE_SELECTION_ID_REQUIRED',
           'advantages',
           'Toda seleccion necesita un identificador.',
@@ -79,7 +187,7 @@ function validateStructure(
 
     if (selection.definitionKey.trim().length === 0) {
       issues.push(
-        issue(
+        errorIssue(
           'CHARACTER_ADVANTAGE_DEFINITION_KEY_REQUIRED',
           'advantages',
           'Toda seleccion debe referenciar una definicion.',
@@ -94,7 +202,7 @@ function validateStructure(
       selection.rating > 7
     ) {
       issues.push(
-        issue(
+        errorIssue(
           'CHARACTER_ADVANTAGE_RATING_OUT_OF_RANGE',
           'advantages',
           'La puntuacion debe ser un entero entre 1 y 7.',
@@ -131,7 +239,7 @@ function validateParentRelations(
 
     if (parentId === selection.selectionId) {
       issues.push(
-        issue(
+        errorIssue(
           'CHARACTER_ADVANTAGE_SELF_PARENT',
           'advantages',
           'Una seleccion no puede ser su propio padre.',
@@ -143,7 +251,7 @@ function validateParentRelations(
 
     if (!byId.has(parentId)) {
       issues.push(
-        issue(
+        errorIssue(
           'CHARACTER_ADVANTAGE_PARENT_NOT_FOUND',
           'advantages',
           'La seleccion padre no existe.',
@@ -164,7 +272,7 @@ function validateParentRelations(
     while (candidateId !== null) {
       if (visited.has(candidateId)) {
         issues.push(
-          issue(
+          errorIssue(
             'CHARACTER_ADVANTAGE_PARENT_CYCLE',
             'advantages',
             'Las relaciones padre no pueden formar ciclos.',
@@ -199,7 +307,7 @@ function validateDetails(
       message: string,
     ): void => {
       issues.push(
-        issue(
+        errorIssue(
           code,
           'advantages',
           message,
@@ -306,12 +414,348 @@ function validateDetails(
   return issues
 }
 
+function allowedRatingsFor(
+  definition: CharacterRulesAdvantageDefinition,
+  origin: CharacterRulesAdvantageSelectionOrigin,
+): readonly number[] {
+  return (
+    definition.originRatingConstraints?.find(
+      (constraint) => constraint.origin === origin,
+    )?.allowedRatings ?? definition.allowedRatings
+  )
+}
+
+function validateCatalogSelections(
+  selections:
+    readonly PersistedCharacterAdvantageSelection[],
+  context: CharacterValidationContext,
+  index: AdvantageCatalogIndex,
+): CharacterValidationIssue[] {
+  const issues: CharacterValidationIssue[] = []
+  const bySelectionId = new Map(
+    selections.map(
+      (selection) => [
+        selection.selectionId,
+        selection,
+      ] as const,
+    ),
+  )
+  const byDefinitionKey = new Map<
+    string,
+    PersistedCharacterAdvantageSelection[]
+  >()
+
+  for (const selection of selections) {
+    const definition = index.definitions.get(
+      selection.definitionKey,
+    )
+
+    if (definition === undefined) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_ADVANTAGE_DEFINITION_UNKNOWN',
+          'advantages',
+          'La seleccion referencia una Ventaja inexistente.',
+          {
+            selectionId: selection.selectionId,
+            definitionKey: selection.definitionKey,
+          },
+        ),
+      )
+      continue
+    }
+
+    const selected =
+      byDefinitionKey.get(definition.key) ?? []
+    selected.push(selection)
+    byDefinitionKey.set(definition.key, selected)
+
+    if (!definition.active) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_ADVANTAGE_DEFINITION_INACTIVE',
+          'advantages',
+          'La Ventaja seleccionada no esta activa.',
+          {
+            selectionId: selection.selectionId,
+            definitionKey: definition.key,
+          },
+        ),
+      )
+    }
+
+    if (selection.category !== definition.category) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_ADVANTAGE_CATEGORY_MISMATCH',
+          'advantages',
+          'La categoria persistida no coincide con el catalogo.',
+          {
+            selectionId: selection.selectionId,
+            definitionKey: definition.key,
+          },
+        ),
+      )
+    }
+
+    if (
+      !allowedRatingsFor(
+        definition,
+        selection.origin,
+      ).includes(selection.rating)
+    ) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_ADVANTAGE_RATING_NOT_ALLOWED',
+          'advantages',
+          'La puntuacion no esta permitida para esta Ventaja y origen.',
+          {
+            selectionId: selection.selectionId,
+            definitionKey: definition.key,
+            rating: selection.rating,
+            origin: selection.origin,
+          },
+        ),
+      )
+    }
+
+    if (
+      definition.requiresInstanceDetails &&
+      selection.details === null
+    ) {
+      issues.push(
+        issue(
+          'CHARACTER_ADVANTAGE_DETAILS_REQUIRED',
+          completionSeverity(context),
+          'advantages',
+          'La Ventaja necesita datos propios de la instancia.',
+          {
+            selectionId: selection.selectionId,
+            definitionKey: definition.key,
+          },
+        ),
+      )
+    }
+
+    if (selection.details !== null) {
+      if (definition.instanceDetailsKind === undefined) {
+        issues.push(
+          errorIssue(
+            'CHARACTER_ADVANTAGE_DETAILS_NOT_ALLOWED',
+            'advantages',
+            'La definicion no admite datos de instancia.',
+            {
+              selectionId: selection.selectionId,
+              definitionKey: definition.key,
+            },
+          ),
+        )
+      } else if (
+        selection.details.kind !==
+        definition.instanceDetailsKind
+      ) {
+        issues.push(
+          errorIssue(
+            'CHARACTER_ADVANTAGE_DETAILS_KIND_MISMATCH',
+            'advantages',
+            'El tipo de datos no coincide con la definicion.',
+            {
+              selectionId: selection.selectionId,
+              definitionKey: definition.key,
+              expectedKind:
+                definition.instanceDetailsKind,
+              actualKind: selection.details.kind,
+            },
+          ),
+        )
+      }
+    }
+
+    const parentId = selection.parentSelectionId
+
+    if (
+      definition.requiresParentSelection === true &&
+      parentId === null
+    ) {
+      issues.push(
+        issue(
+          'CHARACTER_ADVANTAGE_CATALOG_PARENT_REQUIRED',
+          completionSeverity(context),
+          'advantages',
+          'La Ventaja necesita una seleccion padre compatible.',
+          {
+            selectionId: selection.selectionId,
+            definitionKey: definition.key,
+          },
+        ),
+      )
+    }
+
+    if (parentId !== null) {
+      const parent = bySelectionId.get(parentId)
+      const parentAllowed =
+        definition.requiresParentSelection === true ||
+        definition.allowsOptionalParentSelection === true
+
+      if (!parentAllowed) {
+        issues.push(
+          errorIssue(
+            'CHARACTER_ADVANTAGE_CATALOG_PARENT_NOT_ALLOWED',
+            'advantages',
+            'La definicion no admite una seleccion padre.',
+            {
+              selectionId: selection.selectionId,
+              definitionKey: definition.key,
+            },
+          ),
+        )
+      } else if (parent !== undefined) {
+        if (
+          !(
+            definition.allowedParentDefinitionKeys ?? []
+          ).includes(parent.definitionKey)
+        ) {
+          issues.push(
+            errorIssue(
+              'CHARACTER_ADVANTAGE_PARENT_DEFINITION_NOT_ALLOWED',
+              'advantages',
+              'La seleccion padre no pertenece a una definicion permitida.',
+              {
+                selectionId: selection.selectionId,
+                parentSelectionId: parentId,
+                parentDefinitionKey:
+                  parent.definitionKey,
+              },
+            ),
+          )
+        }
+
+        if (
+          definition.minimumParentRating !== undefined &&
+          parent.rating < definition.minimumParentRating
+        ) {
+          issues.push(
+            errorIssue(
+              'CHARACTER_ADVANTAGE_PARENT_RATING_TOO_LOW',
+              'advantages',
+              'La puntuacion de la seleccion padre es insuficiente.',
+              {
+                selectionId: selection.selectionId,
+                parentSelectionId: parentId,
+                parentRating: parent.rating,
+                minimumParentRating:
+                  definition.minimumParentRating,
+              },
+            ),
+          )
+        }
+
+        const parentConstraint =
+          definition.parentRatingConstraints?.find(
+            (constraint) =>
+              constraint.parentRating === parent.rating,
+          )
+
+        if (
+          parentConstraint !== undefined &&
+          !parentConstraint.allowedRatings.includes(
+            selection.rating,
+          )
+        ) {
+          issues.push(
+            errorIssue(
+              'CHARACTER_ADVANTAGE_PARENT_RATING_CONSTRAINT_VIOLATED',
+              'advantages',
+              'La puntuacion no esta permitida para el nivel del padre.',
+              {
+                selectionId: selection.selectionId,
+                parentSelectionId: parentId,
+                parentRating: parent.rating,
+                rating: selection.rating,
+              },
+            ),
+          )
+        }
+      }
+    }
+  }
+
+  for (const [definitionKey, selected] of byDefinitionKey) {
+    const definition = index.definitions.get(definitionKey)
+
+    if (
+      definition !== undefined &&
+      !definition.allowMultiple &&
+      selected.length > 1
+    ) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_ADVANTAGE_MULTIPLE_NOT_ALLOWED',
+          'advantages',
+          'La Ventaja no admite multiples instancias.',
+          {
+            definitionKey,
+            selectionCount: selected.length,
+          },
+        ),
+      )
+    }
+  }
+
+  const selectedDefinitionKeys = new Set(
+    selections.map(
+      (selection) => selection.definitionKey,
+    ),
+  )
+  const incompatiblePairs = new Set<string>()
+
+  for (const selection of selections) {
+    const definition = index.definitions.get(
+      selection.definitionKey,
+    )
+
+    if (definition === undefined) continue
+
+    for (
+      const incompatibleKey of
+        definition.incompatibleDefinitionKeys ?? []
+    ) {
+      if (!selectedDefinitionKeys.has(incompatibleKey)) {
+        continue
+      }
+
+      const pair = [
+        definition.key,
+        incompatibleKey,
+      ].sort().join('|')
+
+      if (incompatiblePairs.has(pair)) continue
+      incompatiblePairs.add(pair)
+
+      issues.push(
+        errorIssue(
+          'CHARACTER_ADVANTAGE_INCOMPATIBLE_SELECTIONS',
+          'advantages',
+          'El personaje contiene Ventajas incompatibles.',
+          {
+            definitionKey: definition.key,
+            incompatibleDefinitionKey:
+              incompatibleKey,
+          },
+        ),
+      )
+    }
+  }
+
+  return issues
+}
+
 function validateCreationBudget(
   selections:
     readonly PersistedCharacterAdvantageSelection[],
   context: CharacterValidationContext,
 ): CharacterValidationIssue[] {
-  if (context !== 'activation') return []
+  if (!validatesCreationBudget(context)) return []
 
   let advantagePoints = 0
   let flawPoints = 0
@@ -334,12 +778,14 @@ function validateCreationBudget(
     }
   }
 
+  const severity = completionSeverity(context)
   const issues: CharacterValidationIssue[] = []
 
   if (advantagePoints !== 7) {
     issues.push(
       issue(
         'CHARACTER_ADVANTAGE_CREATION_BUDGET_INVALID',
+        severity,
         'advantages',
         'La creacion requiere exactamente 7 puntos de Meritos y Trasfondos.',
         { advantagePoints },
@@ -351,6 +797,7 @@ function validateCreationBudget(
     issues.push(
       issue(
         'CHARACTER_FLAW_CREATION_BUDGET_INVALID',
+        severity,
         'advantages',
         'La creacion requiere exactamente 2 puntos de Defectos.',
         { flawPoints },
@@ -364,51 +811,72 @@ function validateCreationBudget(
 function validatePersistedAdvantageState(
   character: PersistedCharacterDraft,
   context: CharacterValidationContext,
+  catalog: CharacterRulesCatalog,
+  index: AdvantageCatalogIndex,
 ): CharacterSectionValidation {
-  const selections =
-    character.advantages.selections
-  const issues = [
+  const selections = character.advantages.selections
+  const structuralIssues = [
     ...validateStructure(selections),
     ...validateParentRelations(selections),
     ...validateDetails(selections),
-    ...validateCreationBudget(selections, context),
   ]
 
-  if (issues.length > 0) {
+  if (structuralIssues.length > 0) {
+    return sectionResult(structuralIssues)
+  }
+
+  if (catalog.stateOf('advantages') !== 'ready') {
     return {
       section: 'advantages',
-      state: 'invalid',
-      issues,
+      state: 'pending',
+      issues: [
+        issue(
+          'CHARACTER_ADVANTAGE_CATALOG_VALIDATION_PENDING',
+          'warning',
+          null,
+          'Falta contrastar Ventajas con el catalogo canonico del backend.',
+        ),
+      ],
     }
   }
 
-  return {
-    section: 'advantages',
-    state: 'pending',
-    issues: [
-      {
-        code:
-          'CHARACTER_ADVANTAGE_CATALOG_VALIDATION_PENDING',
-        severity: 'warning',
-        section: 'advantages',
-        field: null,
-        message:
-          'Falta contrastar requisitos e incompatibilidades con el catalogo canonico del backend.',
-      },
-    ],
-  }
+  return sectionResult([
+    ...validateCatalogSelections(
+      selections,
+      context,
+      index,
+    ),
+    ...validateCreationBudget(selections, context),
+  ])
 }
 
-export const characterAdvantageValidationContributor:
-  CharacterValidationContributor = {
-  sections: ['advantages'],
+export function createCharacterAdvantageValidationContributor(
+  catalog: CharacterRulesCatalog,
+): CharacterValidationContributor {
+  const index = buildCatalogIndex(
+    catalog.advantageCatalog,
+  )
 
-  validate(character, context) {
-    return [
-      validatePersistedAdvantageState(
-        character,
-        context,
-      ),
-    ]
-  },
+  return Object.freeze({
+    sections: ['advantages'] as const,
+
+    validate(
+      character: PersistedCharacterDraft,
+      context: CharacterValidationContext,
+    ) {
+      return [
+        validatePersistedAdvantageState(
+          character,
+          context,
+          catalog,
+          index,
+        ),
+      ]
+    },
+  })
 }
+
+export const characterAdvantageValidationContributor =
+  createCharacterAdvantageValidationContributor(
+    characterRulesCatalog,
+  )

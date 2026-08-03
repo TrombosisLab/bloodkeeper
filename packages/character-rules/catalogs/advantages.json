@@ -1,0 +1,1565 @@
+[
+  {
+    "key": "allies",
+    "name": "Aliados",
+    "category": "background",
+    "allowedRatings": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "allies",
+    "active": true
+  },
+  {
+    "key": "contacts",
+    "name": "Contactos",
+    "category": "background",
+    "allowedRatings": [
+      1,
+      2,
+      3
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "contact",
+    "active": true
+  },
+  {
+    "key": "retainers",
+    "name": "Criados",
+    "category": "background",
+    "allowedRatings": [
+      1,
+      2,
+      3
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "retainer",
+    "active": true
+  },
+  {
+    "key": "status",
+    "name": "Estatus",
+    "category": "background",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "status",
+    "active": true
+  },
+  {
+    "key": "fame",
+    "name": "Fama",
+    "category": "background",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "fame",
+    "active": true
+  },
+  {
+    "key": "influence",
+    "name": "Influencia",
+    "category": "background",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "influence",
+    "active": true
+  },
+  {
+    "key": "mask",
+    "name": "Máscara",
+    "category": "background",
+    "allowedRatings": [
+      1,
+      2
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "mask",
+    "active": true
+  },
+  {
+    "key": "mawla",
+    "name": "Mawla",
+    "category": "background",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "mawla",
+    "active": true
+  },
+  {
+    "key": "herd",
+    "name": "Rebaño",
+    "category": "background",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "herd",
+    "active": true
+  },
+  {
+    "key": "resources",
+    "name": "Recursos",
+    "category": "background",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "resources",
+    "active": true
+  },
+  {
+    "key": "dark-secret",
+    "name": "Secreto Oscuro",
+    "category": "background",
+    "allowedRatings": [
+      1,
+      2
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "darkSecret",
+    "active": true
+  },
+  {
+    "key": "haven",
+    "name": "Refugio",
+    "category": "background",
+    "allowedRatings": [
+      1,
+      2,
+      3
+    ],
+    "source": "core",
+    "sourcePage": 192,
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "haven",
+    "active": true
+  },
+  {
+    "key": "haven-hidden-armory",
+    "name": "Arsenal Oculto",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": [
+      "haven"
+    ],
+    "active": true
+  },
+  {
+    "key": "haven-library",
+    "name": "Biblioteca",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": [
+      "haven"
+    ],
+    "parentRatingConstraints": [
+      {
+        "parentRating": 1,
+        "allowedRatings": [
+          1
+        ]
+      }
+    ],
+    "active": true
+  },
+  {
+    "key": "haven-cell",
+    "name": "Celda",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": [
+      "haven"
+    ],
+    "active": true
+  },
+  {
+    "key": "haven-laboratory",
+    "name": "Laboratorio",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": [
+      "haven"
+    ],
+    "active": true
+  },
+  {
+    "key": "haven-location",
+    "name": "Localización",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": [
+      "haven"
+    ],
+    "active": true
+  },
+  {
+    "key": "haven-luxury",
+    "name": "Lujo",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": [
+      "haven"
+    ],
+    "active": true
+  },
+  {
+    "key": "haven-protection",
+    "name": "Protección",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": [
+      "haven"
+    ],
+    "active": true
+  },
+  {
+    "key": "haven-backdoor",
+    "name": "Puerta Trasera",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": [
+      "haven"
+    ],
+    "active": true
+  },
+  {
+    "key": "haven-operating-room",
+    "name": "Quirófano",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": [
+      "haven"
+    ],
+    "active": true
+  },
+  {
+    "key": "haven-security-system",
+    "name": "Sistema de Seguridad",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": [
+      "haven"
+    ],
+    "active": true
+  },
+  {
+    "key": "haven-watchmen",
+    "name": "Vigilantes",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": [
+      "haven"
+    ],
+    "active": true
+  },
+  {
+    "key": "haven-compromised",
+    "name": "Comprometido",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": false,
+    "allowsOptionalParentSelection": true,
+    "allowedParentDefinitionKeys": [
+      "haven"
+    ],
+    "active": true
+  },
+  {
+    "key": "haven-creepy",
+    "name": "Espeluznante",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": false,
+    "allowsOptionalParentSelection": true,
+    "allowedParentDefinitionKeys": [
+      "haven"
+    ],
+    "active": true
+  },
+  {
+    "key": "haven-haunted",
+    "name": "Embrujado",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": false,
+    "allowsOptionalParentSelection": true,
+    "allowedParentDefinitionKeys": [
+      "haven"
+    ],
+    "active": true
+  },
+  {
+    "key": "linguistics",
+    "name": "Lingüística",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "linguistics",
+    "active": true
+  },
+  {
+    "key": "illiterate",
+    "name": "Analfabeto",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "ugly",
+    "name": "Feo",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "repulsive",
+    "name": "Repulsivo",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "enemy",
+    "name": "Enemigo",
+    "category": "flaw",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "enemy",
+    "active": true
+  },
+  {
+    "key": "stalker",
+    "name": "Acosador",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "stalker",
+    "active": true
+  },
+  {
+    "key": "infamy",
+    "name": "Infamia",
+    "category": "flaw",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "infamy",
+    "active": true
+  },
+  {
+    "key": "despised",
+    "name": "Despreciado",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "despised",
+    "active": true
+  },
+  {
+    "key": "hatred",
+    "name": "Odio",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "hatred",
+    "active": true
+  },
+  {
+    "key": "exiled",
+    "name": "Expulsado",
+    "category": "flaw",
+    "allowedRatings": [
+      1,
+      2,
+      3
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "exiled",
+    "active": true
+  },
+  {
+    "key": "suspect",
+    "name": "Sospechoso",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "suspect",
+    "active": true
+  },
+  {
+    "key": "shunned",
+    "name": "Rechazado",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "shunned",
+    "active": true
+  },
+  {
+    "key": "mortal-pretender",
+    "name": "Pretendiente Mortal",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "mortalPretender",
+    "active": true
+  },
+  {
+    "key": "beautiful",
+    "name": "Bello",
+    "category": "merit",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "stunning",
+    "name": "Despampanante",
+    "category": "merit",
+    "allowedRatings": [
+      4
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "methuselah-visage",
+    "name": "Semblante de Matusalén",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "methuselahVisage",
+    "active": true
+  },
+  {
+    "key": "famous-face",
+    "name": "Cara Famosa",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "famousFace",
+    "active": true
+  },
+  {
+    "key": "innocent-face",
+    "name": "Cara Inocente",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "distinctive-feature",
+    "name": "Rasgo Llamativo",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "awake-all-night",
+    "name": "Despierto Toda la Noche",
+    "category": "merit",
+    "allowedRatings": [
+      2,
+      4
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "child-of-the-scene",
+    "name": "Niño de la Escena",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "childOfTheScene",
+    "active": true
+  },
+  {
+    "key": "hopeless-addiction",
+    "name": "Caso Perdido de Adicción",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "substanceUse",
+    "active": true
+  },
+  {
+    "key": "addiction",
+    "name": "Adicción",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "substanceUse",
+    "active": true
+  },
+  {
+    "key": "functional-addict",
+    "name": "Adicto Funcional",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "sourcePage": 179,
+    "allowMultiple": false,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "substanceUse",
+    "active": true
+  },
+  {
+    "key": "archaic",
+    "name": "Arcaico",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "sourcePage": 180,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {
+      "minimumAgeCategory": "ancilla"
+    },
+    "active": true
+  },
+  {
+    "key": "living-in-the-past",
+    "name": "Vivir en el Pasado",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "sourcePage": 180,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {
+      "minimumAgeCategory": "ancilla"
+    },
+    "active": true
+  },
+  {
+    "key": "custodian-of-history",
+    "name": "Custodio de la Historia",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirementRules": [
+      {
+        "type": "generation",
+        "max": 11
+      }
+    ],
+    "active": true
+  },
+  {
+    "key": "bondslave",
+    "name": "Esclavo Vinculado",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "sourcePage": 180,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "bond-junkie",
+    "name": "Yonqui del Vínculo",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "sourcePage": 180,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "long-bond",
+    "name": "Vínculo Largo",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "sourcePage": 181,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "bond-resistance",
+    "name": "Resistencia al Vínculo",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2,
+      3
+    ],
+    "source": "core",
+    "sourcePage": 181,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "short-bond",
+    "name": "Vínculo Breve",
+    "category": "merit",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "sourcePage": 181,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "unbondable",
+    "name": "Invinculable",
+    "category": "merit",
+    "allowedRatings": [
+      5
+    ],
+    "source": "core",
+    "sourcePage": 181,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "long-lasting-bond",
+    "name": "Vínculo Duradero",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "loyalty-bonds",
+    "name": "Lazos de Lealtad",
+    "category": "merit",
+    "allowedRatings": [
+      3
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "vegan",
+    "name": "Vegano",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "sourcePage": 181,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {
+      "excludedClanKeys": [
+        "ventrue"
+      ]
+    },
+    "active": true
+  },
+  {
+    "key": "organovore",
+    "name": "Organóvoro",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "sourcePage": 181,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "methuselah-thirst",
+    "name": "Sed de Matusalén",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "sourcePage": 181,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "bloodhound",
+    "name": "Sabueso de Sangre",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "iron-stomach",
+    "name": "Garganta de Hierro",
+    "category": "merit",
+    "allowedRatings": [
+      3
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "vessel-recognition",
+    "name": "Reconocimiento del Recipiente",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "self-service",
+    "name": "Autoservicio",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "prey-exclusion",
+    "name": "Exclusión de Presa",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "originRatingConstraints": [
+      {
+        "origin": "predatorType",
+        "allowedRatings": [
+          1,
+          2
+        ]
+      }
+    ],
+    "source": "core",
+    "sourcePage": 181,
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "preyExclusion",
+    "active": true
+  },
+  {
+    "key": "stake-bait",
+    "name": "Carne de Estaca",
+    "category": "flaw",
+    "families": [
+      "mythic-flaw"
+    ],
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "sourcePage": 182,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "folkloric-bane",
+    "name": "Daño Folclórico",
+    "category": "flaw",
+    "families": [
+      "mythic-flaw"
+    ],
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "sourcePage": 182,
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "folkloricBane",
+    "active": true
+  },
+  {
+    "key": "folkloric-block",
+    "name": "Tabú Folclórico",
+    "category": "flaw",
+    "families": [
+      "mythic-flaw"
+    ],
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "sourcePage": 182,
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "folkloricBlock",
+    "active": true
+  },
+  {
+    "key": "stigmata",
+    "name": "Estigmas",
+    "category": "flaw",
+    "families": [
+      "mythic-flaw"
+    ],
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "sourcePage": 182,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "eat-food",
+    "name": "Comer Comida",
+    "category": "merit",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "sourcePage": 182,
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "hunger-cold-dead",
+    "name": "Hambre Fría y Muerta",
+    "category": "merit",
+    "allowedRatings": [
+      3
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "pack-diablerie",
+    "name": "Diablerie en Manada",
+    "category": "merit",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "demon-luck",
+    "name": "Suerte del Demonio",
+    "category": "merit",
+    "allowedRatings": [
+      4
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "night-mode",
+    "name": "Modo Noche",
+    "category": "merit",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "power-object",
+    "name": "Objeto de Poder",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2,
+      3
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "persistent-blush",
+    "name": "Rubor Persistente",
+    "category": "merit",
+    "allowedRatings": [
+      3
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "ley-line-power",
+    "name": "Ley de Líneas de Poder",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "unholy-will",
+    "name": "Voluntad Impía",
+    "category": "merit",
+    "allowedRatings": [
+      2,
+      4
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "zealotry",
+    "name": "Fanatismo",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2,
+      3
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "penitence",
+    "name": "Penitencia",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "soothed-beast",
+    "name": "Bestia Calmada",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "false-love",
+    "name": "Falso Amor",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "consanguineous-sense",
+    "name": "Sentido Consanguíneo",
+    "category": "merit",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "consanguineous-influence",
+    "name": "Influencia Consanguínea",
+    "category": "merit",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "sins-of-the-father",
+    "name": "Pecados del Padre",
+    "category": "merit",
+    "allowedRatings": [
+      2,
+      3
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "check-the-trunk",
+    "name": "Revisa el Maletero",
+    "category": "merit",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "side-hustler",
+    "name": "Trabajo Secundario / Negocio Propio",
+    "category": "merit",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "tempered-will",
+    "name": "Voluntad Templada",
+    "category": "merit",
+    "allowedRatings": [
+      3
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "untouchable",
+    "name": "Intocable",
+    "category": "merit",
+    "allowedRatings": [
+      5
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "mystic-of-the-void",
+    "name": "Místico del Vacío",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "transparent",
+    "name": "Transparente",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "stench",
+    "name": "Hedor",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "imperishable-face",
+    "name": "Rostro Imperecedero",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "old-tricks",
+    "name": "Viejos Trucos",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "duel-phobia",
+    "name": "Fobia al Duelo",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "vein-extractor",
+    "name": "Extractor de Venas",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "obsolete-preference",
+    "name": "Preferencia Obsoleta",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "resonance-sensitivity",
+    "name": "Sensibilidad a la Resonancia",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "resonance-mimicry",
+    "name": "Mimetismo de Resonancia",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "hungry-decay",
+    "name": "Decadencia Hambrienta",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "cursed-object",
+    "name": "Objeto Maldito",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "twice-cursed",
+    "name": "Dos Veces Maldito",
+    "category": "flaw",
+    "allowedRatings": [
+      2
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "blush-resistant",
+    "name": "Resistente al Rubor",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "trapped-on-land",
+    "name": "Atrapado en Tierra",
+    "category": "flaw",
+    "allowedRatings": [
+      1
+    ],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  }
+]

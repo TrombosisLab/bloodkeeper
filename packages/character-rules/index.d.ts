@@ -177,8 +177,153 @@ export interface CharacterRulesDisciplineCatalog {
     readonly CharacterRulesThinBloodAlchemyFormulaDefinition[]
 }
 
+
+export type CharacterRulesAdvantageCategory =
+  | 'merit'
+  | 'background'
+  | 'flaw'
+
+export type CharacterRulesAdvantageSelectionOrigin =
+  | 'creation'
+  | 'predatorType'
+  | 'thinBlood'
+
+export type CharacterRulesAdvantageSource =
+  | 'core'
+  | 'playersGuide'
+  | 'bloodSigils'
+  | 'other'
+
+export type CharacterRulesAdvantageFamily =
+  | 'mythic-flaw'
+
+export type CharacterRulesAdvantageCharacterKind =
+  | 'standard'
+  | 'caitiff'
+  | 'thinBlood'
+
+export type CharacterRulesAdvantageAgeCategory =
+  | 'neonate'
+  | 'ancilla'
+  | 'elder'
+
+export type CharacterRulesAdvantageInstanceDetailsKind =
+  | 'allies'
+  | 'contact'
+  | 'retainer'
+  | 'status'
+  | 'fame'
+  | 'influence'
+  | 'mask'
+  | 'mawla'
+  | 'herd'
+  | 'resources'
+  | 'haven'
+  | 'substanceUse'
+  | 'preyExclusion'
+  | 'folkloricBane'
+  | 'folkloricBlock'
+  | 'loresheet'
+  | 'linguistics'
+  | 'methuselahVisage'
+  | 'famousFace'
+  | 'childOfTheScene'
+  | 'enemy'
+  | 'stalker'
+  | 'darkSecret'
+  | 'infamy'
+  | 'despised'
+  | 'hatred'
+  | 'exiled'
+  | 'suspect'
+  | 'shunned'
+  | 'mortalPretender'
+
+export interface CharacterRulesAdvantageLegacyRequirements {
+  readonly characterKinds?:
+    readonly CharacterRulesAdvantageCharacterKind[]
+  readonly clanKeys?: readonly string[]
+  readonly excludedClanKeys?: readonly string[]
+  readonly requiredDefinitionKeys?: readonly string[]
+  readonly minimumAgeCategory?:
+    CharacterRulesAdvantageAgeCategory
+}
+
+export type CharacterRulesAdvantageRequirement =
+  | {
+      readonly type: 'advantage'
+      readonly definitionKey: string
+      readonly minRating?: number
+    }
+  | {
+      readonly type: 'clan'
+      readonly allowedClanKeys: readonly string[]
+    }
+  | {
+      readonly type: 'predatorType'
+      readonly allowedPredatorTypeKeys:
+        readonly string[]
+    }
+  | {
+      readonly type: 'thinBlood'
+      readonly expected: boolean
+    }
+  | {
+      readonly type: 'humanity'
+      readonly min: number
+    }
+  | {
+      readonly type: 'generation'
+      readonly max: number
+    }
+
+export interface CharacterRulesAdvantageDefinition {
+  readonly key: string
+  readonly name: string
+  readonly active: boolean
+  readonly category:
+    CharacterRulesAdvantageCategory
+  readonly allowedRatings: readonly number[]
+  readonly source: CharacterRulesAdvantageSource
+  readonly sourcePage?: number
+  readonly originRatingConstraints?: readonly {
+    readonly origin:
+      CharacterRulesAdvantageSelectionOrigin
+    readonly allowedRatings: readonly number[]
+  }[]
+  readonly allowMultiple: boolean
+  readonly requiresInstanceDetails: boolean
+  readonly instanceDetailsKind?:
+    CharacterRulesAdvantageInstanceDetailsKind
+  readonly requiresParentSelection?: boolean
+  readonly allowsOptionalParentSelection?: boolean
+  readonly allowedParentDefinitionKeys?:
+    readonly string[]
+  readonly minimumParentRating?: number
+  readonly parentRatingConstraints?: readonly {
+    readonly parentRating: number
+    readonly allowedRatings: readonly number[]
+  }[]
+  readonly requirementRules?:
+    readonly CharacterRulesAdvantageRequirement[]
+  readonly requirements?:
+    CharacterRulesAdvantageLegacyRequirements
+  readonly families?:
+    readonly CharacterRulesAdvantageFamily[]
+  readonly incompatibleDefinitionKeys?:
+    readonly string[]
+}
+
+export interface CharacterRulesAdvantageCatalog {
+  readonly definitions:
+    readonly CharacterRulesAdvantageDefinition[]
+}
+
 export const characterRulesCatalogManifest:
   CharacterRulesCatalogManifest
 
 export const characterDisciplineCatalog:
   CharacterRulesDisciplineCatalog
+
+export const characterAdvantageCatalog:
+  CharacterRulesAdvantageCatalog

@@ -1,9 +1,11 @@
 import {
+  characterAdvantageCatalog,
   characterDisciplineCatalog,
   characterRulesCatalogManifest,
 } from '@v5r/character-rules'
 
 import type {
+  CharacterRulesAdvantageCatalog,
   CharacterRulesCatalogDomain,
   CharacterRulesCatalogDomainState,
   CharacterRulesCatalogManifest,
@@ -18,6 +20,8 @@ export interface CharacterRulesCatalog {
   readonly manifest: CharacterRulesCatalogManifest
   readonly disciplineCatalog:
     CharacterRulesDisciplineCatalog
+  readonly advantageCatalog:
+    CharacterRulesAdvantageCatalog
 
   stateOf(
     domain: CharacterRulesCatalogDomain,
@@ -71,6 +75,7 @@ export function createCharacterRulesCatalog(
   return Object.freeze({
     manifest: snapshot,
     disciplineCatalog: characterDisciplineCatalog,
+    advantageCatalog: characterAdvantageCatalog,
 
     stateOf(
       domain: CharacterRulesCatalogDomain,

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "2026.08.03-r",
+  "catalogVersion": "2026.08.03-s",
   "domains": {
     "disciplines": "ready",
-    "advantages": "pending",
+    "advantages": "ready",
     "dependencies": "pending"
   }
 }

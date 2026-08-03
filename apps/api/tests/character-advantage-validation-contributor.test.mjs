@@ -62,15 +62,13 @@ function validBudgetSelections() {
 }
 
 test(
-  '029-N valida estructura sin declarar completo el catalogo',
+  '029-S completa Ventajas con el catalogo canonico',
   () => {
     const result = validate(validBudgetSelections())
 
     assert.equal(result.section, 'advantages')
-    assert.equal(result.state, 'pending')
-    assert.deepEqual(codes(result), [
-      'CHARACTER_ADVANTAGE_CATALOG_VALIDATION_PENDING',
-    ])
+    assert.equal(result.state, 'complete')
+    assert.deepEqual(codes(result), [])
   },
 )
 

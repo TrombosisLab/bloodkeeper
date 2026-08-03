@@ -16,6 +16,9 @@ import oblivionCeremonies from './catalogs/oblivion-ceremonies.json' with {
 import thinBloodAlchemyFormulas from './catalogs/thin-blood-alchemy-formulas.json' with {
   type: 'json',
 }
+import advantageDefinitions from './catalogs/advantages.json' with {
+  type: 'json',
+}
 
 function deepFreeze(value) {
   if (value === null || typeof value !== 'object') {
@@ -46,4 +49,9 @@ export const characterDisciplineCatalog =
       clone(oblivionCeremonies),
     thinBloodAlchemyFormulas:
       clone(thinBloodAlchemyFormulas),
+  })
+
+export const characterAdvantageCatalog =
+  deepFreeze({
+    definitions: clone(advantageDefinitions),
   })

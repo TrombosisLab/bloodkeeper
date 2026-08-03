@@ -15,13 +15,13 @@ test(
     )
     assert.equal(
       characterRulesCatalogManifest.catalogVersion,
-      '2026.08.03-r',
+      '2026.08.03-s',
     )
   },
 )
 
 test(
-  '029-R publica Disciplinas y conserva pendientes los dominios no migrados',
+  '029-S publica Disciplinas y Ventajas y conserva Dependencias pendiente',
   () => {
     assert.equal(
       isCharacterRulesCatalogReady('disciplines'),
@@ -29,7 +29,7 @@ test(
     )
     assert.equal(
       isCharacterRulesCatalogReady('advantages'),
-      false,
+      true,
     )
     assert.equal(
       isCharacterRulesCatalogReady('dependencies'),
