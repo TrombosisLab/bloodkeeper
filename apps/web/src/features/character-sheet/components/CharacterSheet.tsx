@@ -30,6 +30,10 @@ export function CharacterSheet() {
   const [humanity, setHumanity] = useState({
     ...demoState.humanity,
   })
+  const [hunger, setHunger] =
+    useState(
+      demoState.hunger,
+    )
 
   return (
     <article className="character-sheet">
@@ -88,8 +92,10 @@ export function CharacterSheet() {
 
       <CharacterState
         humanity={humanity}
+        hunger={hunger}
         stateEditing={stateEditing}
         onHumanityChange={setHumanity}
+        onHungerChange={setHunger}
       />
 
       <CharacterDisciplines />

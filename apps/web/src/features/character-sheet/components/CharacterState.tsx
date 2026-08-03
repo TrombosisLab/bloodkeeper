@@ -8,16 +8,22 @@ import { HungerTrack } from './HungerTrack'
 
 interface CharacterStateProps {
   humanity: CharacterHumanityState
+  hunger: number
   stateEditing: boolean
   onHumanityChange: (
     state: CharacterHumanityState,
+  ) => void
+  onHungerChange: (
+    hunger: number,
   ) => void
 }
 
 export function CharacterState({
   humanity,
+  hunger,
   stateEditing,
   onHumanityChange,
+  onHungerChange,
 }: CharacterStateProps) {
   return (
     <section
@@ -71,16 +77,24 @@ export function CharacterState({
             <div>
               <span>Hambre</span>
               <strong>
-                {demoState.hunger}
+                {hunger}
               </strong>
             </div>
 
             <small>Máximo 5</small>
           </div>
 
-          <HungerTrack
-            value={demoState.hunger}
-          />
+          {stateEditing ? (
+            <HungerTrack
+              value={hunger}
+              mode="editable"
+              onChange={onHungerChange}
+            />
+          ) : (
+            <HungerTrack
+              value={hunger}
+            />
+          )}
         </div>
 
         <div className="state-card state-card--blood">

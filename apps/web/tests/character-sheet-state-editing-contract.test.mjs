@@ -60,6 +60,10 @@ test(
       /onHumanityChange={setHumanity}/,
     )
     assert.match(
+      characterSheet,
+      /onHungerChange={setHunger}/,
+    )
+    assert.match(
       characterTrackers,
       /mode="editable"/,
     )

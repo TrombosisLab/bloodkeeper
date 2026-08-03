@@ -726,6 +726,33 @@
     inset 0 0 0 3px #171112;
 }
 
+.hunger-track__controls {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.hunger-track__controls button {
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid #745158;
+  color: #dcc9c4;
+  background: #171112;
+  cursor: pointer;
+}
+
+.hunger-track__controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.hunger-track__controls button:focus-visible {
+  outline: 2px solid #e0a2aa;
+  outline-offset: 2px;
+}
+
 .blood-potency-display {
   min-height: 42px;
 
