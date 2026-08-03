@@ -198,14 +198,14 @@ function validateSpecialties(
   return violations
 }
 
-export function assertValidCharacterAttributeSkillState(
+export function validateCharacterAttributeSkillState(
   attributes: PersistedCharacterAttributes,
   skills: PersistedCharacterSkills,
   method: SkillDistributionMethod,
   currentStep: CharacterCreationStep,
   specialties:
     PersistedCharacterSkillSpecialty[],
-): void {
+): CharacterAttributeSkillViolation[] {
   const steps: CharacterCreationStep[] = [
     'identity',
     'attributes',
@@ -223,7 +223,7 @@ export function assertValidCharacterAttributeSkillState(
   const skillsComplete =
     currentStepIndex > steps.indexOf('skills')
 
-  const violations = [
+  return [
     ...validateAttributes(
       attributes,
       attributesComplete,
@@ -235,6 +235,24 @@ export function assertValidCharacterAttributeSkillState(
     ),
     ...validateSpecialties(skills, specialties),
   ]
+}
+
+export function assertValidCharacterAttributeSkillState(
+  attributes: PersistedCharacterAttributes,
+  skills: PersistedCharacterSkills,
+  method: SkillDistributionMethod,
+  currentStep: CharacterCreationStep,
+  specialties:
+    PersistedCharacterSkillSpecialty[],
+): void {
+  const violations =
+    validateCharacterAttributeSkillState(
+      attributes,
+      skills,
+      method,
+      currentStep,
+      specialties,
+    )
 
   if (violations.length > 0) {
     throw new InvalidCharacterAttributeSkillStateError(
