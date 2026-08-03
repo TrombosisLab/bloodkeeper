@@ -2,11 +2,13 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package.json ./
+COPY apps/web/package.json ./apps/web/
+COPY packages/character-rules ./packages/character-rules
 
+WORKDIR /app/apps/web
 RUN npm install
 
-COPY . .
+COPY apps/web .
 
 EXPOSE 5173
 

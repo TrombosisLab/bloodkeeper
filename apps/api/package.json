@@ -11,6 +11,7 @@
     "test:integration": "npm run build --silent && node --test tests/*.integration.mjs"
   },
   "dependencies": {
+    "@v5r/character-rules": "file:../../packages/character-rules",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",

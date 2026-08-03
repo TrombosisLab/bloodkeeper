@@ -65,6 +65,11 @@ import {
 } from './domain/character-dependency-validation.contributor'
 
 import {
+  CHARACTER_RULES_CATALOG,
+  characterRulesCatalog,
+} from './domain/character-rules-catalog'
+
+import {
   CharacterValidator,
 } from './domain/character-validator'
 
@@ -197,6 +202,10 @@ const useCaseProviders = [
   providers: [
     PrismaCharacterDraftRepository,
     PrismaCharacterSecondaryRepository,
+    {
+      provide: CHARACTER_RULES_CATALOG,
+      useValue: characterRulesCatalog,
+    },
     {
       provide: CharacterValidator,
       useFactory: () =>

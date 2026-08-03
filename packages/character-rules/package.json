@@ -1,0 +1,23 @@
+{
+  "name": "@v5r/character-rules",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.cjs",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./index.cjs"
+    },
+    "./catalog-manifest.json": "./catalog-manifest.json"
+  },
+  "files": [
+    "catalog-manifest.json",
+    "index.cjs",
+    "index.d.ts",
+    "index.js"
+  ]
+}
