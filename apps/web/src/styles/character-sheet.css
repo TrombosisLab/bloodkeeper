@@ -1621,6 +1621,124 @@
   padding: 25px 20px;
 }
 
+.secondary-section__actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.secondary-section__actions button,
+.secondary-editor button,
+.secondary-item-actions button {
+  min-height: 34px;
+  border: 1px solid #574145;
+  border-radius: 3px;
+  background: #181516;
+  color: #b9aaa6;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.68rem;
+}
+
+.secondary-section__actions button {
+  padding: 7px 12px;
+}
+
+.secondary-section__actions button:hover,
+.secondary-editor button:hover,
+.secondary-item-actions button:hover {
+  border-color: #8c5962;
+  color: #eee2dc;
+}
+
+.secondary-section__actions button:focus-visible,
+.secondary-editor input:focus-visible,
+.secondary-editor textarea:focus-visible,
+.secondary-editor button:focus-visible,
+.secondary-item-actions button:focus-visible {
+  outline: 2px solid #b77b85;
+  outline-offset: 2px;
+}
+
+.secondary-edit-notice {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border: 1px solid #4a383b;
+  border-radius: 3px;
+  background: #171314;
+  color: #a79691;
+  font-size: 0.72rem;
+}
+
+.secondary-editor {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 10px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #342b2d;
+  background: #141112;
+}
+
+.secondary-editor--single {
+  grid-template-columns: 1fr;
+}
+
+.secondary-editor label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: #8c7d78;
+  font-size: 0.66rem;
+}
+
+.secondary-editor input,
+.secondary-editor textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #3c3234;
+  border-radius: 3px;
+  background: #0f0d0e;
+  color: #d2c5bf;
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.secondary-editor input {
+  min-height: 38px;
+  padding: 8px 9px;
+}
+
+.secondary-editor textarea {
+  min-height: 66px;
+  padding: 9px;
+  resize: vertical;
+}
+
+.secondary-editor__wide,
+.secondary-editor__actions {
+  grid-column: 1 / -1;
+}
+
+.secondary-editor__actions,
+.secondary-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.secondary-editor__actions button,
+.secondary-item-actions button {
+  padding: 5px 9px;
+}
+
+.secondary-item-actions {
+  margin-top: 9px;
+}
+
+.notes-list .secondary-item-actions {
+  margin-left: -17px;
+}
+
 .inventory-item,
 .history-entry {
   border-bottom: 1px solid #292324;
@@ -1706,6 +1824,10 @@
 
 @media (max-width: 900px) {
   .secondary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .secondary-editor {
     grid-template-columns: 1fr;
   }
 

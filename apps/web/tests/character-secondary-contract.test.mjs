@@ -48,3 +48,38 @@ test(
     )
   },
 )
+
+test(
+  '028-B expone edición local explícita sin simular persistencia',
+  () => {
+    assert.match(componentSource, /Editar sección/)
+    assert.match(componentSource, /Finalizar edición/)
+    assert.match(componentSource, /Añadir objeto/)
+    assert.match(componentSource, /Añadir nota/)
+    assert.match(componentSource, /Añadir hito/)
+    assert.match(componentSource, /Archivar/)
+    assert.match(componentSource, /Restaurar/)
+    assert.match(
+      componentSource,
+      /Los cambios aún\s+no se guardan/,
+    )
+  },
+)
+
+test(
+  '028-B exige confirmación para eliminaciones definitivas',
+  () => {
+    assert.match(
+      componentSource,
+      /window\.confirm/,
+    )
+    assert.match(
+      componentSource,
+      /Eliminar esta nota definitivamente/,
+    )
+    assert.match(
+      componentSource,
+      /Eliminar este hito narrativo definitivamente/,
+    )
+  },
+)
