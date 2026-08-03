@@ -53,6 +53,10 @@ import {
 } from './domain/character-core-validation.contributor'
 
 import {
+  characterAdvantageValidationContributor,
+} from './domain/character-advantage-validation.contributor'
+
+import {
   characterDisciplineValidationContributor,
 } from './domain/character-discipline-validation.contributor'
 
@@ -195,6 +199,7 @@ const useCaseProviders = [
         new CharacterValidator([
           characterCoreValidationContributor,
           characterDisciplineValidationContributor,
+          characterAdvantageValidationContributor,
         ]),
     },
     {
