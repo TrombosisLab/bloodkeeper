@@ -10,10 +10,14 @@ export type CharacterLifecycleStatus =
 export type CharacterLifecycleTargetStatus =
   Exclude<CharacterLifecycleStatus, 'draft'>
 
-export interface CharacterLifecycleSnapshot {
+export interface CharacterLifecycleState {
   readonly characterId: string
   readonly status: CharacterLifecycleStatus
   readonly revision: number
+}
+
+export interface CharacterLifecycleSnapshot
+  extends CharacterLifecycleState {
   readonly validation:
     CharacterValidationReport | null
 }

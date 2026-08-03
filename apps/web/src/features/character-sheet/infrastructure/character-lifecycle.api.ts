@@ -5,6 +5,7 @@ import {
 
 import type {
   CharacterLifecycleSnapshot,
+  CharacterLifecycleState,
   CharacterLifecycleTargetStatus,
 } from '../types/character-lifecycle.types.ts'
 
@@ -28,6 +29,10 @@ export class CharacterLifecycleApiError
 }
 
 export interface CharacterLifecycleGateway {
+  load(
+    characterId: string,
+  ): Promise<CharacterLifecycleState>
+
   transition(
     characterId: string,
     expectedRevision: number,
@@ -55,24 +60,43 @@ function invalidResponse(): never {
   )
 }
 
+function parseState(
+  value: unknown,
+): CharacterLifecycleState {
+  if (
+    !isRecord(value) ||
+    typeof value.characterId !== 'string' ||
+    !['draft', 'active', 'archived'].includes(
+      value.status as string,
+    ) ||
+    typeof value.revision !== 'number' ||
+    !Number.isSafeInteger(value.revision) ||
+    value.revision < 1
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    characterId: value.characterId,
+    status:
+      value.status as CharacterLifecycleState['status'],
+    revision: value.revision,
+  }
+}
+
 function parseSnapshot(
   value: unknown,
 ): CharacterLifecycleSnapshot {
   if (
     !isRecord(value) ||
     !isRecord(value.character) ||
-    typeof value.character.characterId !== 'string' ||
-    !['draft', 'active', 'archived'].includes(
-      value.character.status as string,
-    ) ||
-    typeof value.character.revision !== 'number' ||
-    !Number.isSafeInteger(value.character.revision) ||
-    value.character.revision < 1 ||
     (value.validation !== null &&
       !isRecord(value.validation))
   ) {
     return invalidResponse()
   }
+
+  const state = parseState(value.character)
 
   let validation = null
 
@@ -94,10 +118,7 @@ function parseSnapshot(
   }
 
   return {
-    characterId: value.character.characterId,
-    status: value.character.status as
-      CharacterLifecycleSnapshot['status'],
-    revision: value.character.revision,
+    ...state,
     validation,
   }
 }
@@ -136,6 +157,29 @@ export function createCharacterLifecycleGateway(
     globalThis.fetch,
 ): CharacterLifecycleGateway {
   return {
+    async load(characterId) {
+      const response = await fetchImplementation(
+        `/api/characters/drafts/${encodeURIComponent(characterId)}`,
+        { credentials: 'include' },
+      )
+
+      if (!response.ok) {
+        throw await responseError(response)
+      }
+
+      try {
+        return parseState(await response.json())
+      } catch (error: unknown) {
+        if (
+          error instanceof CharacterLifecycleApiError
+        ) {
+          throw error
+        }
+
+        return invalidResponse()
+      }
+    },
+
     async transition(
       characterId,
       expectedRevision,

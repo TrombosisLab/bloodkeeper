@@ -61,6 +61,74 @@ function jsonResponse(body, status = 200) {
 }
 
 test(
+  '029-K carga estado y revision reales del personaje',
+  async () => {
+    const calls = []
+    const gateway = createCharacterLifecycleGateway(
+      async (...parameters) => {
+        calls.push(parameters)
+        return jsonResponse(
+          responseBody().character,
+        )
+      },
+    )
+
+    assert.deepEqual(
+      await gateway.load(characterId),
+      {
+        characterId,
+        status: 'active',
+        revision: 5,
+      },
+    )
+    assert.equal(
+      calls[0][0],
+      `/api/characters/drafts/${characterId}`,
+    )
+    assert.equal(
+      calls[0][1].credentials,
+      'include',
+    )
+    assert.equal(calls[0][1].method, undefined)
+  },
+)
+
+test(
+  '029-K rechaza metadatos de ciclo de vida invalidos',
+  async () => {
+    for (const character of [
+      {
+        characterId,
+        status: 'unknown',
+        revision: 2,
+      },
+      {
+        characterId,
+        status: 'draft',
+        revision: 0,
+      },
+      {
+        status: 'draft',
+        revision: 1,
+      },
+    ]) {
+      const gateway =
+        createCharacterLifecycleGateway(
+          async () => jsonResponse(character),
+        )
+
+      await assert.rejects(
+        gateway.load(characterId),
+        {
+          code:
+            'INVALID_CHARACTER_LIFECYCLE_RESPONSE',
+        },
+      )
+    }
+  },
+)
+
+test(
   '029-J envia una transicion explicita con sesion y revision',
   async () => {
     const calls = []
