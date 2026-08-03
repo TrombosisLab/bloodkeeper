@@ -7,6 +7,7 @@ const bloodSorceryRituals = require('./catalogs/blood-sorcery-rituals.json')
 const oblivionCeremonies = require('./catalogs/oblivion-ceremonies.json')
 const thinBloodAlchemyFormulas = require('./catalogs/thin-blood-alchemy-formulas.json')
 const advantageDefinitions = require('./catalogs/advantages.json')
+const predatorTypes = require('./catalogs/predator-types.json')
 
 function deepFreeze(value) {
   if (value === null || typeof value !== 'object') {
@@ -44,8 +45,14 @@ const characterAdvantageCatalog =
     definitions: clone(advantageDefinitions),
   })
 
+const characterDependencyCatalog =
+  deepFreeze({
+    predatorTypes: clone(predatorTypes),
+  })
+
 module.exports = {
   characterRulesCatalogManifest,
   characterDisciplineCatalog,
   characterAdvantageCatalog,
+  characterDependencyCatalog,
 }

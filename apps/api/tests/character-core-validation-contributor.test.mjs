@@ -279,7 +279,7 @@ test(
 )
 
 test(
-  '029-C valida Humanidad inicial y vinculos narrativos',
+  '029-T deja el valor inicial de Humanidad al validador de dependencias',
   () => {
     const character = validCharacter()
     character.humanity.value = 8
@@ -296,8 +296,9 @@ test(
       'humanity',
     ).issues.map(({ code }) => code)
 
-    assert.ok(
+    assert.equal(
       codes.includes('INITIAL_HUMANITY_VALUE_INVALID'),
+      false,
     )
     assert.ok(codes.includes('CONVICTION_DATA_INVALID'))
     assert.ok(

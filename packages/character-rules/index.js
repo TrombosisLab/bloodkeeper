@@ -19,6 +19,9 @@ import thinBloodAlchemyFormulas from './catalogs/thin-blood-alchemy-formulas.jso
 import advantageDefinitions from './catalogs/advantages.json' with {
   type: 'json',
 }
+import predatorTypes from './catalogs/predator-types.json' with {
+  type: 'json',
+}
 
 function deepFreeze(value) {
   if (value === null || typeof value !== 'object') {
@@ -54,4 +57,9 @@ export const characterDisciplineCatalog =
 export const characterAdvantageCatalog =
   deepFreeze({
     definitions: clone(advantageDefinitions),
+  })
+
+export const characterDependencyCatalog =
+  deepFreeze({
+    predatorTypes: clone(predatorTypes),
   })

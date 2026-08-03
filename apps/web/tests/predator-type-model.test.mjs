@@ -62,11 +62,11 @@ test('bagger non tremere receives obfuscate',()=>{
 
 });
 
-test('pending references detected',()=>{
+test('029-T resuelve las referencias pendientes de Bolsero',()=>{
 
     assert.deepEqual(
         predatorPendingReferences('bagger'),
-        ['enemy']
+        []
     );
 
 });
@@ -363,6 +363,11 @@ test(
           'iron-stomach',
           'predatorType',
           3,
+        ],
+        [
+          'enemy',
+          'predatorType',
+          2,
         ],
       ],
     )
@@ -954,6 +959,10 @@ test(
         [
           'iron-stomach',
           3,
+        ],
+        [
+          'enemy',
+          2,
         ],
       ],
     )
@@ -2623,7 +2632,7 @@ test(
 )
 
 test(
-  '003-K.3 Blood Leech conserva sus referencias narrativas',
+  '029-T resuelve las referencias narrativas de Blood Leech',
   async () => {
     const {
       predatorPendingReferences,
@@ -2635,11 +2644,7 @@ test(
       predatorPendingReferences(
         'blood-leech',
       ),
-      [
-        'dark-secret',
-        'shunned',
-        'prey-exclusion',
-      ],
+      [],
     )
   },
 )
@@ -3166,4 +3171,3 @@ test(
     )
   },
 )
-

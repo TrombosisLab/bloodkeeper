@@ -370,18 +370,6 @@ function humanityCreationIssues(
       (value): value is string => value !== null,
     )
 
-  if (humanity.value !== 7) {
-    issues.push(
-      issue(
-        'INITIAL_HUMANITY_VALUE_INVALID',
-        severity,
-        'humanity',
-        'value',
-        'La Humanidad inicial debe ser 7.',
-      ),
-    )
-  }
-
   if (
     humanity.convictions.length < 1 ||
     humanity.convictions.length > 3

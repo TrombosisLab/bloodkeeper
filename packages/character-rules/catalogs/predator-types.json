@@ -1,0 +1,753 @@
+[
+  {
+    "key": "bagger",
+    "name": "Bolsero",
+    "restrictions": {
+      "excludedClans": [
+        "ventrue"
+      ]
+    },
+    "fixedGrants": {
+      "advantages": [
+        {
+          "definitionKey": "iron-stomach",
+          "category": "merit",
+          "rating": 3
+        },
+        {
+          "definitionKey": "enemy",
+          "category": "flaw",
+          "rating": 2
+        }
+      ]
+    },
+    "choices": [
+      {
+        "id": "bagger-specialty",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "larceny",
+              "name": "Forzar Cerraduras"
+            }
+          },
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "streetwise",
+              "name": "Mercado Negro"
+            }
+          }
+        ]
+      },
+      {
+        "id": "bagger-discipline",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "when": {
+              "clan": "tremere"
+            },
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "bloodSorcery",
+              "dots": 1
+            }
+          },
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "obfuscate",
+              "dots": 1
+            }
+          }
+        ]
+      }
+    ],
+    "tags": [
+      "criminal",
+      "institutional"
+    ]
+  },
+  {
+    "key": "osiris",
+    "name": "Osiris",
+    "fixedGrants": {
+      "pointDistributions": [
+        {
+          "type": "pointDistribution",
+          "points": 3,
+          "options": [
+            {
+              "definitionKey": "fame",
+              "category": "background"
+            },
+            {
+              "definitionKey": "herd",
+              "category": "background"
+            }
+          ]
+        },
+        {
+          "type": "pointDistribution",
+          "points": 2,
+          "options": [
+            {
+              "definitionKey": "enemy",
+              "category": "flaw"
+            },
+            {
+              "family": "mythic-flaw",
+              "category": "flaw"
+            }
+          ]
+        }
+      ]
+    },
+    "choices": [
+      {
+        "id": "osiris-specialty",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "occult",
+              "name": "Tradición específica"
+            }
+          },
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "performance",
+              "name": "Campo de entretenimiento específico"
+            }
+          }
+        ]
+      },
+      {
+        "id": "osiris-discipline",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "when": {
+              "clan": "tremere"
+            },
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "bloodSorcery",
+              "dots": 1
+            }
+          },
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "presence",
+              "dots": 1
+            }
+          }
+        ]
+      }
+    ],
+    "tags": [
+      "cult",
+      "fame",
+      "followers"
+    ]
+  },
+  {
+    "key": "sandman",
+    "name": "Sandman",
+    "fixedGrants": {
+      "advantages": [
+        {
+          "definitionKey": "resources",
+          "category": "background",
+          "rating": 1
+        }
+      ]
+    },
+    "choices": [
+      {
+        "id": "sandman-specialty",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "medicine",
+              "name": "Anestesia"
+            }
+          },
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "stealth",
+              "name": "Entradas silenciosas"
+            }
+          }
+        ]
+      },
+      {
+        "id": "sandman-discipline",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "when": {
+              "clan": "tremere"
+            },
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "bloodSorcery",
+              "dots": 1
+            }
+          },
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "obfuscate",
+              "dots": 1
+            }
+          }
+        ]
+      }
+    ],
+    "tags": [
+      "sleep",
+      "intrusion"
+    ]
+  },
+  {
+    "key": "scene-queen",
+    "name": "Reina del Ambiente",
+    "fixedGrants": {
+      "advantages": [
+        {
+          "definitionKey": "fame",
+          "category": "background",
+          "rating": 1
+        },
+        {
+          "definitionKey": "contacts",
+          "category": "background",
+          "rating": 1
+        }
+      ]
+    },
+    "choices": [
+      {
+        "id": "scene-queen-specialty",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "etiquette",
+              "name": "Ambiente específico"
+            }
+          },
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "leadership",
+              "name": "Ambiente específico"
+            }
+          },
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "streetwise",
+              "name": "Ambiente específico"
+            }
+          }
+        ]
+      },
+      {
+        "id": "scene-queen-discipline",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "dominate",
+              "dots": 1
+            }
+          },
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "potence",
+              "dots": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "scene-queen-flaw",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "advantage",
+              "definitionKey": "despised",
+              "category": "flaw",
+              "rating": 1
+            }
+          },
+          {
+            "grant": {
+              "type": "advantage",
+              "definitionKey": "prey-exclusion",
+              "category": "flaw",
+              "rating": 1
+            }
+          }
+        ]
+      }
+    ],
+    "tags": [
+      "social",
+      "subculture",
+      "status"
+    ]
+  },
+  {
+    "key": "siren",
+    "name": "Sirena",
+    "fixedGrants": {
+      "advantages": [
+        {
+          "definitionKey": "beautiful",
+          "category": "merit",
+          "rating": 2
+        },
+        {
+          "definitionKey": "enemy",
+          "category": "flaw",
+          "rating": 1
+        }
+      ]
+    },
+    "choices": [
+      {
+        "id": "siren-specialty",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "persuasion",
+              "name": "Seducción"
+            }
+          },
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "subterfuge",
+              "name": "Seducción"
+            }
+          }
+        ]
+      },
+      {
+        "id": "siren-discipline",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "fortitude",
+              "dots": 1
+            }
+          },
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "presence",
+              "dots": 1
+            }
+          }
+        ]
+      }
+    ],
+    "tags": [
+      "seduction",
+      "social",
+      "intimacy"
+    ]
+  },
+  {
+    "key": "blood-leech",
+    "name": "Sanguijuela",
+    "fixedGrants": {
+      "humanityModifier": -1,
+      "bloodPotencyModifier": 1,
+      "advantages": [
+        {
+          "definitionKey": "prey-exclusion",
+          "category": "flaw",
+          "rating": 2
+        }
+      ]
+    },
+    "choices": [
+      {
+        "id": "blood-leech-specialty",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "brawl",
+              "name": "Vástagos"
+            }
+          },
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "stealth",
+              "name": "Contra Vástagos"
+            }
+          }
+        ]
+      },
+      {
+        "id": "blood-leech-discipline",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "celerity",
+              "dots": 1
+            }
+          },
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "protean",
+              "dots": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "blood-leech-social-flaw",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "advantage",
+              "definitionKey": "dark-secret",
+              "category": "background",
+              "rating": 2
+            }
+          },
+          {
+            "grant": {
+              "type": "advantage",
+              "definitionKey": "shunned",
+              "category": "flaw",
+              "rating": 2
+            }
+          }
+        ]
+      }
+    ],
+    "storyEffects": [
+      "Secreto Oscuro: Diablerista, cuando se elija Secreto Oscuro.",
+      "Exclusión de Presa: mortales."
+    ],
+    "tags": [
+      "kindred",
+      "diablerie"
+    ]
+  },
+  {
+    "key": "cleaver",
+    "name": "Cleaver",
+    "fixedGrants": {
+      "advantages": [
+        {
+          "definitionKey": "dark-secret",
+          "category": "background",
+          "rating": 2
+        },
+        {
+          "definitionKey": "herd",
+          "category": "background",
+          "rating": 1
+        }
+      ]
+    },
+    "choices": [
+      {
+        "id": "cleaver-specialty",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "persuasion",
+              "name": "Luz de Gas"
+            }
+          },
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "subterfuge",
+              "name": "Encubrimiento"
+            }
+          }
+        ]
+      },
+      {
+        "id": "cleaver-discipline",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "dominate",
+              "dots": 1
+            }
+          },
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "animalism",
+              "dots": 1
+            }
+          }
+        ]
+      }
+    ],
+    "storyEffects": [
+      "El Secreto Oscuro debe especificar: Carnicero.",
+      "Añadir la familia mortal al Mapa de Relaciones."
+    ],
+    "tags": [
+      "family",
+      "masquerade"
+    ]
+  },
+  {
+    "key": "consensualist",
+    "name": "Consensualista",
+    "fixedGrants": {
+      "humanityModifier": 1,
+      "advantages": [
+        {
+          "definitionKey": "dark-secret",
+          "category": "background",
+          "rating": 1
+        },
+        {
+          "definitionKey": "prey-exclusion",
+          "category": "flaw",
+          "rating": 1
+        }
+      ]
+    },
+    "choices": [
+      {
+        "id": "consensualist-specialty",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "medicine",
+              "name": "Flebotomía"
+            }
+          },
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "persuasion",
+              "name": "Víctimas"
+            }
+          }
+        ]
+      },
+      {
+        "id": "consensualist-discipline",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "auspex",
+              "dots": 1
+            }
+          },
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "fortitude",
+              "dots": 1
+            }
+          }
+        ]
+      }
+    ],
+    "storyEffects": [
+      "El Secreto Oscuro debe especificar: Ruptura de la Mascarada.",
+      "La Exclusión de Presa debe especificar: víctimas sin consentimiento."
+    ],
+    "tags": [
+      "consent",
+      "masquerade"
+    ]
+  },
+  {
+    "key": "alleycat",
+    "name": "Gato Callejero",
+    "fixedGrants": {
+      "humanityModifier": -1,
+      "advantages": [
+        {
+          "definitionKey": "contacts",
+          "category": "background",
+          "rating": 3
+        }
+      ]
+    },
+    "choices": [
+      {
+        "id": "alleycat-specialty",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "intimidation",
+              "name": "Atracos"
+            }
+          },
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "brawl",
+              "name": "Realizar Presas"
+            }
+          }
+        ]
+      },
+      {
+        "id": "alleycat-discipline",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "celerity",
+              "dots": 1
+            }
+          },
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "potence",
+              "dots": 1
+            }
+          }
+        ]
+      }
+    ],
+    "tags": [
+      "criminal",
+      "violent"
+    ]
+  },
+  {
+    "key": "farmer",
+    "name": "Granjero",
+    "restrictions": {
+      "excludedClans": [
+        "ventrue"
+      ],
+      "maximumBloodPotency": 2
+    },
+    "fixedGrants": {
+      "humanityModifier": 1,
+      "advantages": [
+        {
+          "definitionKey": "vegan",
+          "category": "flaw",
+          "rating": 2
+        }
+      ]
+    },
+    "choices": [
+      {
+        "id": "farmer-specialty",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "animalKen",
+              "name": "Animal específico"
+            }
+          },
+          {
+            "grant": {
+              "type": "specialty",
+              "skillKey": "survival",
+              "name": "Caza"
+            }
+          }
+        ]
+      },
+      {
+        "id": "farmer-discipline",
+        "minimumSelections": 1,
+        "maximumSelections": 1,
+        "options": [
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "animalism",
+              "dots": 1
+            }
+          },
+          {
+            "grant": {
+              "type": "discipline",
+              "disciplineKey": "protean",
+              "dots": 1
+            }
+          }
+        ]
+      }
+    ],
+    "tags": [
+      "animals",
+      "ethical"
+    ]
+  }
+]

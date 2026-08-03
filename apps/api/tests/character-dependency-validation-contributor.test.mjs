@@ -3,17 +3,81 @@ import test from 'node:test'
 
 import {
   characterDependencyValidationContributor,
+  createCharacterDependencyValidationContributor,
 } from '../dist/characters/domain/character-dependency-validation.contributor.js'
+
+import {
+  createCharacterRulesCatalog,
+} from '../dist/characters/domain/character-rules-catalog.js'
+
+function advantage(
+  selectionId,
+  definitionKey,
+  category,
+  rating,
+) {
+  return {
+    selectionId,
+    definitionKey,
+    category,
+    rating,
+    origin: 'predatorType',
+    parentSelectionId: null,
+    details: null,
+  }
+}
+
+function discipline(disciplineKey, rating = 1) {
+  return {
+    disciplineKey,
+    rating,
+    powerKeys: [],
+    origin: 'predatorType',
+  }
+}
+
+function specialty(id, skillKey, name) {
+  return {
+    id,
+    skillKey,
+    name,
+    origin: 'predatorType',
+  }
+}
 
 function character(overrides = {}) {
   return {
     identity: {
       clanKey: 'ventrue',
       predatorTypeKey: 'sandman',
+      generation: 13,
     },
-    disciplines: [],
-    skillSpecialties: [],
-    advantages: { selections: [] },
+    blood: {
+      bloodPotency: 1,
+    },
+    humanity: {
+      value: 7,
+    },
+    disciplines: [
+      discipline('obfuscate'),
+    ],
+    skillSpecialties: [
+      specialty(
+        'predatorType:sandman:specialty:medicine',
+        'medicine',
+        'Anestesia',
+      ),
+    ],
+    advantages: {
+      selections: [
+        advantage(
+          'predatorType:sandman:resources',
+          'resources',
+          'background',
+          1,
+        ),
+      ],
+    },
     thinBloodAlchemy: {
       rating: 0,
       method: null,
@@ -24,9 +88,12 @@ function character(overrides = {}) {
   }
 }
 
-function validate(value = character()) {
-  return characterDependencyValidationContributor
-    .validate(value, 'activation')[0]
+function validate(
+  value = character(),
+  context = 'activation',
+  contributor = characterDependencyValidationContributor,
+) {
+  return contributor.validate(value, context)[0]
 }
 
 function codes(result) {
@@ -34,15 +101,333 @@ function codes(result) {
 }
 
 test(
-  '029-O mantiene pendientes solo las dependencias de catalogo',
+  '029-T completa dependencias cuando los efectos coinciden con el Tipo',
   () => {
     const result = validate()
 
     assert.equal(result.section, 'dependencies')
-    assert.equal(result.state, 'pending')
-    assert.deepEqual(codes(result), [
-      'CHARACTER_CATALOG_DEPENDENCY_VALIDATION_PENDING',
-    ])
+    assert.equal(result.state, 'complete')
+    assert.deepEqual(result.issues, [])
+  },
+)
+
+test(
+  '029-T diferencia borrador incompleto y activacion incompleta',
+  () => {
+    const value = character({
+      disciplines: [],
+      skillSpecialties: [],
+      advantages: { selections: [] },
+    })
+    const draft = validate(value, 'draftSave')
+    const activation = validate(value, 'activation')
+
+    assert.equal(draft.state, 'pending')
+    assert.ok(
+      draft.issues.every(
+        (candidate) => candidate.severity === 'warning',
+      ),
+    )
+    assert.equal(activation.state, 'invalid')
+    assert.ok(
+      codes(activation).includes(
+        'CHARACTER_PREDATOR_TYPE_FIXED_ADVANTAGE_MISSING',
+      ),
+    )
+    assert.ok(
+      codes(activation).includes(
+        'CHARACTER_PREDATOR_TYPE_CHOICE_MISSING',
+      ),
+    )
+  },
+)
+
+test(
+  '029-T rechaza Tipo desconocido y efectos ajenos',
+  () => {
+    const unknown = validate(
+      character({
+        identity: {
+          clanKey: 'ventrue',
+          predatorTypeKey: 'unknown',
+          generation: 13,
+        },
+      }),
+    )
+    const unexpected = validate(
+      character({
+        disciplines: [
+          discipline('potence'),
+        ],
+      }),
+    )
+
+    assert.ok(
+      codes(unknown).includes(
+        'CHARACTER_PREDATOR_TYPE_UNKNOWN',
+      ),
+    )
+    assert.ok(
+      codes(unexpected).includes(
+        'CHARACTER_PREDATOR_TYPE_DISCIPLINE_UNEXPECTED',
+      ),
+    )
+  },
+)
+
+test(
+  '029-T aplica restricciones de clan y Potencia de Sangre',
+  () => {
+    const result = validate(
+      character({
+        identity: {
+          clanKey: 'ventrue',
+          predatorTypeKey: 'farmer',
+          generation: 13,
+        },
+        blood: {
+          bloodPotency: 3,
+        },
+        humanity: {
+          value: 8,
+        },
+        disciplines: [
+          discipline('animalism'),
+        ],
+        skillSpecialties: [
+          specialty(
+            'farmer-specialty',
+            'animalKen',
+            'Animal específico',
+          ),
+        ],
+        advantages: {
+          selections: [
+            advantage(
+              'farmer-vegan',
+              'vegan',
+              'flaw',
+              2,
+            ),
+          ],
+        },
+      }),
+    )
+
+    assert.ok(
+      codes(result).includes(
+        'CHARACTER_PREDATOR_TYPE_CLAN_EXCLUDED',
+      ),
+    )
+    assert.ok(
+      codes(result).includes(
+        'CHARACTER_PREDATOR_TYPE_BLOOD_POTENCY_TOO_HIGH',
+      ),
+    )
+  },
+)
+
+test(
+  '029-T une modificadores de Humanidad y Potencia de Sangre',
+  () => {
+    const valid = validate(
+      character({
+        identity: {
+          clanKey: 'brujah',
+          predatorTypeKey: 'blood-leech',
+          generation: 13,
+        },
+        blood: {
+          bloodPotency: 2,
+        },
+        humanity: {
+          value: 6,
+        },
+        disciplines: [
+          discipline('celerity'),
+        ],
+        skillSpecialties: [
+          specialty(
+            'blood-leech-specialty',
+            'brawl',
+            'Vástagos',
+          ),
+        ],
+        advantages: {
+          selections: [
+            advantage(
+              'blood-leech-prey',
+              'prey-exclusion',
+              'flaw',
+              2,
+            ),
+            advantage(
+              'blood-leech-social',
+              'shunned',
+              'flaw',
+              2,
+            ),
+          ],
+        },
+      }),
+    )
+    const invalid = validate(
+      character({
+        identity: {
+          clanKey: 'brujah',
+          predatorTypeKey: 'blood-leech',
+          generation: 13,
+        },
+        blood: {
+          bloodPotency: 1,
+        },
+        humanity: {
+          value: 7,
+        },
+        disciplines: [
+          discipline('celerity'),
+        ],
+        skillSpecialties: [
+          specialty(
+            'blood-leech-specialty',
+            'brawl',
+            'Vástagos',
+          ),
+        ],
+        advantages: {
+          selections: [
+            advantage(
+              'blood-leech-prey',
+              'prey-exclusion',
+              'flaw',
+              2,
+            ),
+            advantage(
+              'blood-leech-social',
+              'shunned',
+              'flaw',
+              2,
+            ),
+          ],
+        },
+      }),
+    )
+
+    assert.equal(valid.state, 'complete')
+    assert.ok(
+      codes(invalid).includes(
+        'CHARACTER_PREDATOR_TYPE_HUMANITY_MODIFIER_MISSING',
+      ),
+    )
+    assert.ok(
+      codes(invalid).includes(
+        'CHARACTER_PREDATOR_TYPE_BLOOD_POTENCY_MODIFIER_MISSING',
+      ),
+    )
+  },
+)
+
+test(
+  '029-T valida los dos repartos de puntos de Osiris',
+  () => {
+    const valid = validate(
+      character({
+        identity: {
+          clanKey: 'brujah',
+          predatorTypeKey: 'osiris',
+          generation: 13,
+        },
+        disciplines: [
+          discipline('presence'),
+        ],
+        skillSpecialties: [
+          specialty(
+            'osiris-specialty',
+            'occult',
+            'Tradición específica',
+          ),
+        ],
+        advantages: {
+          selections: [
+            advantage(
+              'osiris-fame',
+              'fame',
+              'background',
+              3,
+            ),
+            advantage(
+              'osiris-enemy',
+              'enemy',
+              'flaw',
+              2,
+            ),
+          ],
+        },
+      }),
+    )
+    const incomplete = validate(
+      character({
+        identity: {
+          clanKey: 'brujah',
+          predatorTypeKey: 'osiris',
+          generation: 13,
+        },
+        disciplines: [
+          discipline('presence'),
+        ],
+        skillSpecialties: [
+          specialty(
+            'osiris-specialty',
+            'occult',
+            'Tradición específica',
+          ),
+        ],
+        advantages: {
+          selections: [
+            advantage(
+              'osiris-fame',
+              'fame',
+              'background',
+              3,
+            ),
+          ],
+        },
+      }),
+    )
+
+    assert.equal(valid.state, 'complete')
+    assert.ok(
+      codes(incomplete).includes(
+        'CHARACTER_PREDATOR_TYPE_POINT_DISTRIBUTION_INCOMPLETE',
+      ),
+    )
+  },
+)
+
+test(
+  '029-T conserva Humanidad inicial 7 sin modificador depredador',
+  () => {
+    const result = validate(
+      character({
+        identity: {
+          clanKey: 'ventrue',
+          predatorTypeKey: null,
+          generation: 13,
+        },
+        humanity: {
+          value: 8,
+        },
+        disciplines: [],
+        skillSpecialties: [],
+        advantages: { selections: [] },
+      }),
+    )
+
+    assert.ok(
+      codes(result).includes(
+        'INITIAL_HUMANITY_VALUE_INVALID',
+      ),
+    )
   },
 )
 
@@ -54,23 +439,19 @@ test(
         identity: {
           clanKey: 'ventrue',
           predatorTypeKey: null,
+          generation: 13,
         },
         disciplines: [
-          {
-            disciplineKey: 'dominate',
-            rating: 1,
-            powerKeys: ['cloud-memory'],
-            origin: 'predatorType',
-          },
+          discipline('dominate'),
         ],
         skillSpecialties: [
-          {
-            id: 'specialty-029-o',
-            skillKey: 'stealth',
-            name: 'Allanamiento',
-            origin: 'predatorType',
-          },
+          specialty(
+            'specialty-029-o',
+            'stealth',
+            'Allanamiento',
+          ),
         ],
+        advantages: { selections: [] },
       }),
     )
 
@@ -87,6 +468,13 @@ test(
   () => {
     const result = validate(
       character({
+        identity: {
+          clanKey: 'ventrue',
+          predatorTypeKey: null,
+          generation: 13,
+        },
+        disciplines: [],
+        skillSpecialties: [],
         advantages: {
           selections: [
             {
@@ -141,7 +529,11 @@ test(
         identity: {
           clanKey: 'thinBlood',
           predatorTypeKey: null,
+          generation: 14,
         },
+        disciplines: [],
+        skillSpecialties: [],
+        advantages: { selections: [] },
         thinBloodTraits: [
           {
             definitionKey: 'day-drinker',
@@ -188,7 +580,11 @@ test(
         identity: {
           clanKey: 'thinBlood',
           predatorTypeKey: null,
+          generation: 14,
         },
+        disciplines: [],
+        skillSpecialties: [],
+        advantages: { selections: [] },
         thinBloodTraits: [
           {
             definitionKey: 'clan-curse',
@@ -205,7 +601,11 @@ test(
         identity: {
           clanKey: 'thinBlood',
           predatorTypeKey: null,
+          generation: 14,
         },
+        disciplines: [],
+        skillSpecialties: [],
+        advantages: { selections: [] },
         thinBloodTraits: [
           {
             definitionKey: 'clan-curse',
@@ -239,7 +639,11 @@ test(
         identity: {
           clanKey: 'thinBlood',
           predatorTypeKey: null,
+          generation: 14,
         },
+        disciplines: [],
+        skillSpecialties: [],
+        advantages: { selections: [] },
         thinBloodTraits: [
           {
             definitionKey: 'discipline-affinity',
@@ -263,6 +667,33 @@ test(
           },
         ],
       }),
+    )
+
+    assert.equal(result.state, 'complete')
+    assert.deepEqual(result.issues, [])
+  },
+)
+
+test(
+  '029-T conserva pending cuando el manifiesto no autoriza Dependencias',
+  () => {
+    const catalog = createCharacterRulesCatalog({
+      schemaVersion: 1,
+      catalogVersion: 'pending-test',
+      domains: {
+        disciplines: 'ready',
+        advantages: 'ready',
+        dependencies: 'pending',
+      },
+    })
+    const contributor =
+      createCharacterDependencyValidationContributor(
+        catalog,
+      )
+    const result = validate(
+      character(),
+      'activation',
+      contributor,
     )
 
     assert.equal(result.state, 'pending')

@@ -19,7 +19,7 @@ function duplicateValues(values) {
 }
 
 test(
-  '029-S publica el catalogo compartido de Ventajas',
+  '029-T conserva Ventajas al completar Dependencias',
   () => {
     const definitions =
       characterAdvantageCatalog.definitions
@@ -49,7 +49,7 @@ test(
     )
     assert.equal(
       characterRulesCatalogManifest.domains.dependencies,
-      'pending',
+      'ready',
     )
   },
 )

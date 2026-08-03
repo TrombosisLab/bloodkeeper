@@ -61,7 +61,7 @@ import {
 } from './domain/character-discipline-validation.contributor'
 
 import {
-  characterDependencyValidationContributor,
+  createCharacterDependencyValidationContributor,
 } from './domain/character-dependency-validation.contributor'
 
 import {
@@ -224,7 +224,9 @@ const useCaseProviders = [
           createCharacterAdvantageValidationContributor(
             rulesCatalog,
           ),
-          characterDependencyValidationContributor,
+          createCharacterDependencyValidationContributor(
+            rulesCatalog,
+          ),
         ]),
     },
     {

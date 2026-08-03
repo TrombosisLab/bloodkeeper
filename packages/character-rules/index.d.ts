@@ -319,6 +319,130 @@ export interface CharacterRulesAdvantageCatalog {
     readonly CharacterRulesAdvantageDefinition[]
 }
 
+export interface CharacterRulesPredatorTypeRestriction {
+  readonly excludedClans?: readonly string[]
+  readonly requiredClans?: readonly string[]
+  readonly requiredMerits?: readonly string[]
+  readonly forbiddenMerits?: readonly string[]
+  readonly minimumHumanity?: number
+  readonly maximumHumanity?: number
+  readonly minimumBloodPotency?: number
+  readonly maximumBloodPotency?: number
+  readonly requiresStorytellerApproval?: boolean
+}
+
+export interface CharacterRulesPredatorTypeChoiceCondition {
+  readonly clan?: string
+}
+
+export interface CharacterRulesPredatorTypeSpecialtyGrant {
+  readonly type: 'specialty'
+  readonly skillKey: CharacterRulesSkillKey
+  readonly name: string
+}
+
+export interface CharacterRulesPredatorTypeDisciplineGrant {
+  readonly type: 'discipline'
+  readonly disciplineKey: CharacterRulesDisciplineKey
+  readonly dots: number
+}
+
+export interface CharacterRulesPredatorTypeAdvantageGrant {
+  readonly type: 'advantage'
+  readonly definitionKey: string
+  readonly category: CharacterRulesAdvantageCategory
+  readonly rating: number
+}
+
+export interface CharacterRulesPredatorTypeHumanityGrant {
+  readonly type: 'humanity'
+  readonly modifier: number
+}
+
+export interface CharacterRulesPredatorTypeBloodPotencyGrant {
+  readonly type: 'bloodPotency'
+  readonly modifier: number
+}
+
+interface CharacterRulesPredatorTypePointDistributionOptionBase {
+  readonly category: CharacterRulesAdvantageCategory
+  readonly maximumRating?: number
+}
+
+export type CharacterRulesPredatorTypePointDistributionOption =
+  | (
+      CharacterRulesPredatorTypePointDistributionOptionBase & {
+        readonly definitionKey: string
+        readonly family?: never
+      }
+    )
+  | (
+      CharacterRulesPredatorTypePointDistributionOptionBase & {
+        readonly definitionKey?: never
+        readonly family: CharacterRulesAdvantageFamily
+      }
+    )
+
+export interface CharacterRulesPredatorTypePointDistributionGrant {
+  readonly type: 'pointDistribution'
+  readonly points: number
+  readonly options:
+    readonly CharacterRulesPredatorTypePointDistributionOption[]
+}
+
+export type CharacterRulesPredatorTypeChoiceGrant =
+  | CharacterRulesPredatorTypeSpecialtyGrant
+  | CharacterRulesPredatorTypeDisciplineGrant
+  | CharacterRulesPredatorTypeAdvantageGrant
+  | CharacterRulesPredatorTypeHumanityGrant
+  | CharacterRulesPredatorTypeBloodPotencyGrant
+  | CharacterRulesPredatorTypePointDistributionGrant
+
+export interface CharacterRulesPredatorTypeChoiceOption {
+  readonly when?: CharacterRulesPredatorTypeChoiceCondition
+  readonly grant: CharacterRulesPredatorTypeChoiceGrant
+}
+
+export interface CharacterRulesPredatorTypeChoice {
+  readonly id: string
+  readonly minimumSelections: number
+  readonly maximumSelections: number
+  readonly options:
+    readonly CharacterRulesPredatorTypeChoiceOption[]
+}
+
+export interface CharacterRulesPredatorTypeFixedAdvantageGrant {
+  readonly definitionKey: string
+  readonly category: CharacterRulesAdvantageCategory
+  readonly rating: number
+}
+
+export interface CharacterRulesPredatorTypeDefinition {
+  readonly key: string
+  readonly name: string
+  readonly restrictions?: CharacterRulesPredatorTypeRestriction
+  readonly fixedGrants?: {
+    readonly advantages?:
+      readonly CharacterRulesPredatorTypeFixedAdvantageGrant[]
+    readonly humanityModifier?: number
+    readonly bloodPotencyModifier?: number
+    readonly pointDistributions?:
+      readonly CharacterRulesPredatorTypePointDistributionGrant[]
+  }
+  readonly choices?: readonly CharacterRulesPredatorTypeChoice[]
+  readonly pendingReferences?: readonly {
+    readonly definitionKey: string
+  }[]
+  readonly storyEffects?: readonly string[]
+  readonly notes?: readonly string[]
+  readonly tags?: readonly string[]
+}
+
+export interface CharacterRulesDependencyCatalog {
+  readonly predatorTypes:
+    readonly CharacterRulesPredatorTypeDefinition[]
+}
+
 export const characterRulesCatalogManifest:
   CharacterRulesCatalogManifest
 
@@ -327,3 +451,6 @@ export const characterDisciplineCatalog:
 
 export const characterAdvantageCatalog:
   CharacterRulesAdvantageCatalog
+
+export const characterDependencyCatalog:
+  CharacterRulesDependencyCatalog

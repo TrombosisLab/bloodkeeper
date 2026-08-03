@@ -1,5 +1,6 @@
 import {
   characterAdvantageCatalog,
+  characterDependencyCatalog,
   characterDisciplineCatalog,
   characterRulesCatalogManifest,
 } from '@v5r/character-rules'
@@ -9,6 +10,7 @@ import type {
   CharacterRulesCatalogDomain,
   CharacterRulesCatalogDomainState,
   CharacterRulesCatalogManifest,
+  CharacterRulesDependencyCatalog,
   CharacterRulesDisciplineCatalog,
 } from '@v5r/character-rules'
 
@@ -22,6 +24,8 @@ export interface CharacterRulesCatalog {
     CharacterRulesDisciplineCatalog
   readonly advantageCatalog:
     CharacterRulesAdvantageCatalog
+  readonly dependencyCatalog:
+    CharacterRulesDependencyCatalog
 
   stateOf(
     domain: CharacterRulesCatalogDomain,
@@ -76,6 +80,7 @@ export function createCharacterRulesCatalog(
     manifest: snapshot,
     disciplineCatalog: characterDisciplineCatalog,
     advantageCatalog: characterAdvantageCatalog,
+    dependencyCatalog: characterDependencyCatalog,
 
     stateOf(
       domain: CharacterRulesCatalogDomain,
