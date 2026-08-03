@@ -1,75 +1,20 @@
+import {
+  characterDisciplineCatalog,
+} from '@v5r/character-rules'
+
 import type {
   DisciplineDefinition,
   DisciplineKey,
 } from '../types/discipline.types.ts'
 
 export const disciplineDefinitions:
-  DisciplineDefinition[] = [
-    {
-      key: 'animalism',
-      name: 'Animalismo',
-      active: true,
-    },
-    {
-      key: 'auspex',
-      name: 'Auspex',
-      active: true,
-    },
-    {
-      key: 'bloodSorcery',
-      name: 'Hechicería de Sangre',
-      active: true,
-    },
-    {
-      key: 'celerity',
-      name: 'Celeridad',
-      active: true,
-    },
-    {
-      key: 'dominate',
-      name: 'Dominación',
-      active: true,
-    },
-    {
-      key: 'fortitude',
-      name: 'Fortaleza',
-      active: true,
-    },
-    {
-      key: 'obfuscate',
-      name: 'Ofuscación',
-      active: true,
-    },
-    {
-      key: 'oblivion',
-      name: 'Olvido',
-      active: true,
-    },
-    {
-      key: 'potence',
-      name: 'Potencia',
-      active: true,
-    },
-    {
-      key: 'presence',
-      name: 'Presencia',
-      active: true,
-    },
-    {
-      key: 'protean',
-      name: 'Protean',
-      active: true,
-    },
-    {
-      key: 'thinBloodAlchemy',
-      name: 'Alquimia de Sangre Débil',
-      active: true,
-    },
-  ]
+  DisciplineDefinition[] =
+    characterDisciplineCatalog.disciplines.map(
+      (definition) => ({ ...definition }),
+    )
 
 export const disciplineKeys:
   DisciplineKey[] =
     disciplineDefinitions.map(
-      (discipline) =>
-        discipline.key,
+      (discipline) => discipline.key,
     )

@@ -1,15 +1,44 @@
 'use strict'
 
 const manifest = require('./catalog-manifest.json')
+const disciplines = require('./catalogs/disciplines.json')
+const powers = require('./catalogs/discipline-powers.json')
+const bloodSorceryRituals = require('./catalogs/blood-sorcery-rituals.json')
+const oblivionCeremonies = require('./catalogs/oblivion-ceremonies.json')
+const thinBloodAlchemyFormulas = require('./catalogs/thin-blood-alchemy-formulas.json')
 
-const characterRulesCatalogManifest = Object.freeze({
-  schemaVersion: manifest.schemaVersion,
-  catalogVersion: manifest.catalogVersion,
-  domains: Object.freeze({
-    ...manifest.domains,
-  }),
-})
+function deepFreeze(value) {
+  if (value === null || typeof value !== 'object') {
+    return value
+  }
+
+  for (const child of Object.values(value)) {
+    deepFreeze(child)
+  }
+
+  return Object.freeze(value)
+}
+
+function clone(value) {
+  return JSON.parse(JSON.stringify(value))
+}
+
+const characterRulesCatalogManifest =
+  deepFreeze(clone(manifest))
+
+const characterDisciplineCatalog =
+  deepFreeze({
+    disciplines: clone(disciplines),
+    powers: clone(powers),
+    bloodSorceryRituals:
+      clone(bloodSorceryRituals),
+    oblivionCeremonies:
+      clone(oblivionCeremonies),
+    thinBloodAlchemyFormulas:
+      clone(thinBloodAlchemyFormulas),
+  })
 
 module.exports = {
   characterRulesCatalogManifest,
+  characterDisciplineCatalog,
 }

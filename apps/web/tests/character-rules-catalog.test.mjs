@@ -15,7 +15,7 @@ test(
     )
     assert.equal(
       characterRulesCatalogManifest.catalogVersion,
-      '2026.08.03',
+      '2026.08.03-q',
     )
   },
 )

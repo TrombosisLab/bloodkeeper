@@ -1,0 +1,62 @@
+[
+  {
+    "key": "animalism",
+    "name": "Animalismo",
+    "active": true
+  },
+  {
+    "key": "auspex",
+    "name": "Auspex",
+    "active": true
+  },
+  {
+    "key": "bloodSorcery",
+    "name": "Hechicería de Sangre",
+    "active": true
+  },
+  {
+    "key": "celerity",
+    "name": "Celeridad",
+    "active": true
+  },
+  {
+    "key": "dominate",
+    "name": "Dominación",
+    "active": true
+  },
+  {
+    "key": "fortitude",
+    "name": "Fortaleza",
+    "active": true
+  },
+  {
+    "key": "obfuscate",
+    "name": "Ofuscación",
+    "active": true
+  },
+  {
+    "key": "oblivion",
+    "name": "Olvido",
+    "active": true
+  },
+  {
+    "key": "potence",
+    "name": "Potencia",
+    "active": true
+  },
+  {
+    "key": "presence",
+    "name": "Presencia",
+    "active": true
+  },
+  {
+    "key": "protean",
+    "name": "Protean",
+    "active": true
+  },
+  {
+    "key": "thinBloodAlchemy",
+    "name": "Alquimia de Sangre Débil",
+    "active": true
+  }
+]

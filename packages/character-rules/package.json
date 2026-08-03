@@ -16,6 +16,7 @@
   },
   "files": [
     "catalog-manifest.json",
+    "catalogs",
     "index.cjs",
     "index.d.ts",
     "index.js"
