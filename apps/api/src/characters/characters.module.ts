@@ -8,6 +8,10 @@ import {
   CHARACTER_SECONDARY_REPOSITORY,
 } from './application/character-secondary.repository'
 
+import type {
+  CharacterSecondaryRepository,
+} from './application/character-secondary.repository'
+
 import {
   CreateCharacterDraftUseCase,
 } from './application/create-character-draft.use-case'
@@ -25,8 +29,16 @@ import {
 } from './application/load-character-hunger.use-case'
 
 import {
+  LoadCharacterSecondaryUseCase,
+} from './application/load-character-secondary.use-case'
+
+import {
   UpdateCharacterDraftUseCase,
 } from './application/update-character-draft.use-case'
+
+import {
+  UpdateCharacterSecondaryUseCase,
+} from './application/update-character-secondary.use-case'
 
 import {
   PrismaCharacterDraftRepository,
@@ -39,6 +51,10 @@ import {
 import {
   CharacterDraftController,
 } from './presentation/character-draft.controller'
+
+import {
+  CharacterSecondaryController,
+} from './presentation/character-secondary.controller'
 
 const useCaseProviders = [
   {
@@ -83,10 +99,33 @@ const useCaseProviders = [
       repository: PrismaCharacterDraftRepository,
     ) => new UpdateCharacterDraftUseCase(repository),
   },
+  {
+    provide: LoadCharacterSecondaryUseCase,
+    inject: [CHARACTER_SECONDARY_REPOSITORY],
+    useFactory: (
+      repository: CharacterSecondaryRepository,
+    ) =>
+      new LoadCharacterSecondaryUseCase(
+        repository,
+      ),
+  },
+  {
+    provide: UpdateCharacterSecondaryUseCase,
+    inject: [CHARACTER_SECONDARY_REPOSITORY],
+    useFactory: (
+      repository: CharacterSecondaryRepository,
+    ) =>
+      new UpdateCharacterSecondaryUseCase(
+        repository,
+      ),
+  },
 ]
 
 @Module({
-  controllers: [CharacterDraftController],
+  controllers: [
+    CharacterDraftController,
+    CharacterSecondaryController,
+  ],
   providers: [
     PrismaCharacterDraftRepository,
     PrismaCharacterSecondaryRepository,
@@ -107,7 +146,9 @@ const useCaseProviders = [
     LoadCharacterAttributeSkillRatingsUseCase,
     LoadCharacterHungerUseCase,
     LoadCharacterDraftUseCase,
+    LoadCharacterSecondaryUseCase,
     UpdateCharacterDraftUseCase,
+    UpdateCharacterSecondaryUseCase,
   ],
 })
 export class CharactersModule {}
