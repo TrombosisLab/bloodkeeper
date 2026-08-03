@@ -134,7 +134,7 @@ function parseSection(
   }
 }
 
-function parseReport(
+export function parseCharacterValidationReportResponse(
   value: unknown,
 ): CharacterValidationReport {
   if (
@@ -216,7 +216,9 @@ export function createCharacterValidationGateway(
       }
 
       try {
-        return parseReport(await response.json())
+        return parseCharacterValidationReportResponse(
+          await response.json(),
+        )
       } catch (error: unknown) {
         if (
           error instanceof CharacterValidationApiError
