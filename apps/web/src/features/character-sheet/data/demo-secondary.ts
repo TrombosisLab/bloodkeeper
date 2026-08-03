@@ -5,46 +5,74 @@ import type {
 export const demoSecondary: CharacterSecondaryData = {
   inventory: [
     {
-      key: 'motorcycle',
+      id: 'motorcycle',
       name: 'Motocicleta',
-      detail: 'Vehículo personal',
+      quantity: 1,
+      description: 'Vehículo personal',
+      category: 'Transporte',
+      notes: null,
+      status: 'active',
     },
     {
-      key: 'phone',
+      id: 'phone',
       name: 'Teléfono móvil',
-      detail: 'Identidad mortal',
+      quantity: 1,
+      description: 'Identidad mortal',
+      category: 'Tecnología',
+      notes: null,
+      status: 'active',
     },
     {
-      key: 'jacket',
+      id: 'jacket',
       name: 'Chaqueta reforzada',
+      quantity: 1,
+      description: null,
+      category: 'Ropa',
+      notes: null,
+      status: 'active',
     },
     {
-      key: 'cash',
+      id: 'cash',
       name: 'Efectivo',
-      detail: '200 €',
+      quantity: 1,
+      description: '200 €',
+      category: 'Recursos',
+      notes: null,
+      status: 'active',
     },
   ],
 
   notes: [
-    'Mantener discreción sobre los vínculos con la familia mortal.',
-    'Debe un favor menor a un miembro de la corte.',
+    {
+      id: 'mortal-family',
+      content:
+        'Mantener discreción sobre los vínculos con la familia mortal.',
+    },
+    {
+      id: 'court-favor',
+      content:
+        'Debe un favor menor a un miembro de la corte.',
+    },
   ],
 
   history: [
     {
-      key: 'embrace',
+      id: 'embrace',
       title: 'Abrazo',
-      detail: 'Convertido hace aproximadamente cincuenta años.',
+      description:
+        'Convertido hace aproximadamente cincuenta años.',
     },
     {
-      key: 'coruna',
+      id: 'coruna',
       title: 'Regreso a A Coruña',
-      detail: 'Recuperó contactos políticos y sociales en la ciudad.',
+      description:
+        'Recuperó contactos políticos y sociales en la ciudad.',
     },
     {
-      key: 'court',
+      id: 'court',
       title: 'Acercamiento a la corte',
-      detail: 'Busca consolidar una posición de influencia.',
+      description:
+        'Busca consolidar una posición de influencia.',
     },
   ],
 }

@@ -1,6 +1,16 @@
 import { demoSecondary } from '../data/demo-secondary'
 
-export function CharacterSecondary() {
+import type {
+  CharacterSecondaryData,
+} from '../types/character-secondary.types'
+
+interface CharacterSecondaryProps {
+  data?: CharacterSecondaryData
+}
+
+export function CharacterSecondary({
+  data = demoSecondary,
+}: CharacterSecondaryProps) {
   return (
     <section
       className="sheet-section secondary-section"
@@ -13,7 +23,7 @@ export function CharacterSecondary() {
           </p>
 
           <h2 id="secondary-title">
-            Equipo, Notas e Historial
+            Inventario, Notas e Historial
           </h2>
         </div>
 
@@ -26,19 +36,39 @@ export function CharacterSecondary() {
         <article className="secondary-panel">
           <header>
             <span>Posesiones</span>
-            <h3>Equipo</h3>
+            <h3>Inventario</h3>
           </header>
 
           <div className="inventory-list">
-            {demoSecondary.inventory.map((item) => (
+            {data.inventory.length === 0 ? (
+              <p className="secondary-empty">
+                No hay objetos registrados.
+              </p>
+            ) : data.inventory.map((item) => (
               <div
                 className="inventory-item"
-                key={item.key}
+                key={item.id}
               >
-                <strong>{item.name}</strong>
+                <strong>
+                  {item.name}
+                  {item.quantity > 1
+                    ? ` ×${item.quantity}`
+                    : ''}
+                </strong>
 
-                {item.detail && (
-                  <span>{item.detail}</span>
+                {item.description && (
+                  <span>{item.description}</span>
+                )}
+
+                <span>
+                  {item.category ?? 'Sin categoría'}
+                  {item.status === 'archived'
+                    ? ' · Archivado'
+                    : ''}
+                </span>
+
+                {item.notes && (
+                  <span>{item.notes}</span>
                 )}
               </div>
             ))}
@@ -51,13 +81,19 @@ export function CharacterSecondary() {
             <h3>Notas</h3>
           </header>
 
-          <ul className="notes-list">
-            {demoSecondary.notes.map((note, index) => (
-              <li key={index}>
-                {note}
-              </li>
-            ))}
-          </ul>
+          {data.notes.length === 0 ? (
+            <p className="secondary-empty">
+              No hay notas guardadas.
+            </p>
+          ) : (
+            <ul className="notes-list">
+              {data.notes.map((note) => (
+                <li key={note.id}>
+                  {note.content}
+                </li>
+              ))}
+            </ul>
+          )}
         </article>
 
         <article className="secondary-panel">
@@ -67,17 +103,21 @@ export function CharacterSecondary() {
           </header>
 
           <div className="history-list">
-            {demoSecondary.history.map((entry) => (
+            {data.history.length === 0 ? (
+              <p className="secondary-empty">
+                No hay hitos narrativos.
+              </p>
+            ) : data.history.map((entry) => (
               <div
                 className="history-entry"
-                key={entry.key}
+                key={entry.id}
               >
                 <strong>
                   {entry.title}
                 </strong>
 
                 <p>
-                  {entry.detail}
+                  {entry.description}
                 </p>
               </div>
             ))}
