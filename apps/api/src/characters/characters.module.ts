@@ -41,6 +41,18 @@ import {
 } from './application/update-character-secondary.use-case'
 
 import {
+  ValidateCharacterUseCase,
+} from './application/validate-character.use-case'
+
+import {
+  characterCoreValidationContributor,
+} from './domain/character-core-validation.contributor'
+
+import {
+  CharacterValidator,
+} from './domain/character-validator'
+
+import {
   PrismaCharacterDraftRepository,
 } from './infrastructure/prisma-character-draft.repository'
 
@@ -55,6 +67,10 @@ import {
 import {
   CharacterSecondaryController,
 } from './presentation/character-secondary.controller'
+
+import {
+  CharacterValidationController,
+} from './presentation/character-validation.controller'
 
 const useCaseProviders = [
   {
@@ -119,16 +135,39 @@ const useCaseProviders = [
         repository,
       ),
   },
+  {
+    provide: ValidateCharacterUseCase,
+    inject: [
+      CHARACTER_DRAFT_REPOSITORY,
+      CharacterValidator,
+    ],
+    useFactory: (
+      repository: PrismaCharacterDraftRepository,
+      validator: CharacterValidator,
+    ) =>
+      new ValidateCharacterUseCase(
+        repository,
+        validator,
+      ),
+  },
 ]
 
 @Module({
   controllers: [
     CharacterDraftController,
     CharacterSecondaryController,
+    CharacterValidationController,
   ],
   providers: [
     PrismaCharacterDraftRepository,
     PrismaCharacterSecondaryRepository,
+    {
+      provide: CharacterValidator,
+      useFactory: () =>
+        new CharacterValidator([
+          characterCoreValidationContributor,
+        ]),
+    },
     {
       provide: CHARACTER_DRAFT_REPOSITORY,
       useExisting: PrismaCharacterDraftRepository,
@@ -149,6 +188,7 @@ const useCaseProviders = [
     LoadCharacterSecondaryUseCase,
     UpdateCharacterDraftUseCase,
     UpdateCharacterSecondaryUseCase,
+    ValidateCharacterUseCase,
   ],
 })
 export class CharactersModule {}
