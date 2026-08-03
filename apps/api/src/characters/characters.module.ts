@@ -5,6 +5,10 @@ import {
 } from './application/character-draft.repository'
 
 import {
+  CHARACTER_SECONDARY_REPOSITORY,
+} from './application/character-secondary.repository'
+
+import {
   CreateCharacterDraftUseCase,
 } from './application/create-character-draft.use-case'
 
@@ -27,6 +31,10 @@ import {
 import {
   PrismaCharacterDraftRepository,
 } from './infrastructure/prisma-character-draft.repository'
+
+import {
+  PrismaCharacterSecondaryRepository,
+} from './infrastructure/prisma-character-secondary.repository'
 
 import {
   CharacterDraftController,
@@ -81,13 +89,20 @@ const useCaseProviders = [
   controllers: [CharacterDraftController],
   providers: [
     PrismaCharacterDraftRepository,
+    PrismaCharacterSecondaryRepository,
     {
       provide: CHARACTER_DRAFT_REPOSITORY,
       useExisting: PrismaCharacterDraftRepository,
     },
+    {
+      provide: CHARACTER_SECONDARY_REPOSITORY,
+      useExisting:
+        PrismaCharacterSecondaryRepository,
+    },
     ...useCaseProviders,
   ],
   exports: [
+    CHARACTER_SECONDARY_REPOSITORY,
     CreateCharacterDraftUseCase,
     LoadCharacterAttributeSkillRatingsUseCase,
     LoadCharacterHungerUseCase,
