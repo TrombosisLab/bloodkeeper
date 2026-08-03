@@ -27,3 +27,12 @@ export interface CharacterSecondaryData {
   readonly history:
     readonly HistoryEntry[]
 }
+
+export type CharacterSecondarySection =
+  keyof CharacterSecondaryData
+
+export interface CharacterSecondarySnapshot
+  extends CharacterSecondaryData {
+  readonly characterId: string
+  readonly revision: number
+}

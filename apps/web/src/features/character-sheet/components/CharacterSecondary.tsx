@@ -20,12 +20,24 @@ import {
 
 import type {
   CharacterSecondaryData,
+  CharacterSecondarySection,
   HistoryEntry,
   InventoryItem,
 } from '../types/character-secondary.types'
 
 interface CharacterSecondaryProps {
+  busy?: boolean
   data?: CharacterSecondaryData
+  interactionDisabled?: boolean
+  onChange?: (
+    section: CharacterSecondarySection,
+    data: CharacterSecondaryData,
+  ) => void
+  status?: {
+    message: string
+    actionLabel?: string
+    onAction?: () => void
+  }
 }
 
 interface InventoryDraft {
@@ -69,8 +81,8 @@ const emptyHistoryDraft: HistoryDraft = {
   description: '',
 }
 
-function createLocalId(prefix: string): string {
-  return `${prefix}-${crypto.randomUUID()}`
+function createLocalId(): string {
+  return crypto.randomUUID()
 }
 
 function optionalText(value: string): string | null {
@@ -97,12 +109,20 @@ function cloneSecondaryData(
 }
 
 export function CharacterSecondary({
-  data = demoSecondary,
+  busy = false,
+  data,
+  interactionDisabled = false,
+  onChange,
+  status,
 }: CharacterSecondaryProps) {
-  const [secondary, setSecondary] =
+  const [localSecondary, setLocalSecondary] =
     useState<CharacterSecondaryData>(
-      () => cloneSecondaryData(data),
+      () =>
+        cloneSecondaryData(
+          data ?? demoSecondary,
+        ),
     )
+  const secondary = data ?? localSecondary
   const [editing, setEditing] =
     useState(false)
   const [inventoryDraft, setInventoryDraft] =
@@ -113,6 +133,19 @@ export function CharacterSecondary({
     useState<NoteDraft>(emptyNoteDraft)
   const [historyDraft, setHistoryDraft] =
     useState<HistoryDraft>(emptyHistoryDraft)
+
+  function commit(
+    section: CharacterSecondarySection,
+    next: CharacterSecondaryData,
+  ): void {
+    if (interactionDisabled) return
+
+    if (data === undefined) {
+      setLocalSecondary(next)
+    }
+
+    onChange?.(section, next)
+  }
 
   function submitInventory(
     event: FormEvent<HTMLFormElement>,
@@ -132,36 +165,35 @@ export function CharacterSecondary({
       return
     }
 
-    setSecondary((current) => {
-      const existing =
-        inventoryDraft.id === null
-          ? undefined
-          : current.inventory.find(
-              (item) =>
-                item.id === inventoryDraft.id,
-            )
-      const item: InventoryItem = {
-        id:
-          inventoryDraft.id ??
-          createLocalId('inventory'),
-        name,
-        quantity,
-        description: optionalText(
-          inventoryDraft.description,
-        ),
-        category: optionalText(
-          inventoryDraft.category,
-        ),
-        notes: optionalText(
-          inventoryDraft.notes,
-        ),
-        status: existing?.status ?? 'active',
-      }
+    const existing =
+      inventoryDraft.id === null
+        ? undefined
+        : secondary.inventory.find(
+            (item) =>
+              item.id === inventoryDraft.id,
+          )
+    const item: InventoryItem = {
+      id:
+        inventoryDraft.id ??
+        createLocalId(),
+      name,
+      quantity,
+      description: optionalText(
+        inventoryDraft.description,
+      ),
+      category: optionalText(
+        inventoryDraft.category,
+      ),
+      notes: optionalText(
+        inventoryDraft.notes,
+      ),
+      status: existing?.status ?? 'active',
+    }
+    const next = existing
+      ? updateInventoryItem(secondary, item)
+      : addInventoryItem(secondary, item)
 
-      return existing
-        ? updateInventoryItem(current, item)
-        : addInventoryItem(current, item)
-    })
+    commit('inventory', next)
     setInventoryDraft(emptyInventoryDraft)
   }
 
@@ -186,18 +218,17 @@ export function CharacterSecondary({
 
     if (content.length === 0) return
 
-    setSecondary((current) => {
-      const note = {
-        id:
-          noteDraft.id ??
-          createLocalId('note'),
-        content,
-      }
+    const note = {
+      id:
+        noteDraft.id ??
+        createLocalId(),
+      content,
+    }
+    const next = noteDraft.id === null
+      ? addCharacterNote(secondary, note)
+      : updateCharacterNote(secondary, note)
 
-      return noteDraft.id === null
-        ? addCharacterNote(current, note)
-        : updateCharacterNote(current, note)
-    })
+    commit('notes', next)
     setNoteDraft(emptyNoteDraft)
   }
 
@@ -216,19 +247,18 @@ export function CharacterSecondary({
       return
     }
 
-    setSecondary((current) => {
-      const entry: HistoryEntry = {
-        id:
-          historyDraft.id ??
-          createLocalId('history'),
-        title,
-        description,
-      }
+    const entry: HistoryEntry = {
+      id:
+        historyDraft.id ??
+        createLocalId(),
+      title,
+      description,
+    }
+    const next = historyDraft.id === null
+      ? addHistoryEntry(secondary, entry)
+      : updateHistoryEntry(secondary, entry)
 
-      return historyDraft.id === null
-        ? addHistoryEntry(current, entry)
-        : updateHistoryEntry(current, entry)
-    })
+    commit('history', next)
     setHistoryDraft(emptyHistoryDraft)
   }
 
@@ -238,8 +268,9 @@ export function CharacterSecondary({
         '¿Eliminar esta nota definitivamente?',
       )
     ) {
-      setSecondary((current) =>
-        removeCharacterNote(current, noteId),
+      commit(
+        'notes',
+        removeCharacterNote(secondary, noteId),
       )
     }
   }
@@ -250,8 +281,9 @@ export function CharacterSecondary({
         '¿Eliminar este hito narrativo definitivamente?',
       )
     ) {
-      setSecondary((current) =>
-        removeHistoryEntry(current, entryId),
+      commit(
+        'history',
+        removeHistoryEntry(secondary, entryId),
       )
     }
   }
@@ -260,6 +292,7 @@ export function CharacterSecondary({
     <section
       className="sheet-section secondary-section"
       aria-labelledby="secondary-title"
+      aria-busy={busy}
     >
       <div className="section-title">
         <div>
@@ -276,6 +309,7 @@ export function CharacterSecondary({
           <button
             type="button"
             aria-pressed={editing}
+            disabled={interactionDisabled}
             onClick={() => setEditing((value) => !value)}
           >
             {editing
@@ -289,7 +323,23 @@ export function CharacterSecondary({
         </div>
       </div>
 
-      {editing ? (
+      {status ? (
+        <p
+          className="secondary-edit-notice"
+          role="status"
+        >
+          {status.message}
+
+          {status.actionLabel && status.onAction ? (
+            <button
+              type="button"
+              onClick={status.onAction}
+            >
+              {status.actionLabel}
+            </button>
+          ) : null}
+        </p>
+      ) : editing ? (
         <p
           className="secondary-edit-notice"
           role="status"
@@ -383,7 +433,10 @@ export function CharacterSecondary({
               </label>
 
               <div className="secondary-editor__actions">
-                <button type="submit">
+                <button
+                  type="submit"
+                  disabled={interactionDisabled}
+                >
                   {inventoryDraft.id
                     ? 'Guardar objeto'
                     : 'Añadir objeto'}
@@ -392,6 +445,7 @@ export function CharacterSecondary({
                 {inventoryDraft.id ? (
                   <button
                     type="button"
+                    disabled={interactionDisabled}
                     onClick={() =>
                       setInventoryDraft(
                         emptyInventoryDraft,
@@ -441,6 +495,7 @@ export function CharacterSecondary({
                   <div className="secondary-item-actions">
                     <button
                       type="button"
+                      disabled={interactionDisabled}
                       onClick={() => editInventoryItem(item)}
                     >
                       Editar
@@ -448,10 +503,12 @@ export function CharacterSecondary({
 
                     <button
                       type="button"
+                      disabled={interactionDisabled}
                       onClick={() =>
-                        setSecondary((current) =>
+                        commit(
+                          'inventory',
                           setInventoryItemArchived(
-                            current,
+                            secondary,
                             item.id,
                             item.status === 'active',
                           ),
@@ -496,7 +553,10 @@ export function CharacterSecondary({
               </label>
 
               <div className="secondary-editor__actions">
-                <button type="submit">
+                <button
+                  type="submit"
+                  disabled={interactionDisabled}
+                >
                   {noteDraft.id
                     ? 'Guardar nota'
                     : 'Añadir nota'}
@@ -505,6 +565,7 @@ export function CharacterSecondary({
                 {noteDraft.id ? (
                   <button
                     type="button"
+                    disabled={interactionDisabled}
                     onClick={() =>
                       setNoteDraft(emptyNoteDraft)
                     }
@@ -530,6 +591,7 @@ export function CharacterSecondary({
                     <div className="secondary-item-actions">
                       <button
                         type="button"
+                        disabled={interactionDisabled}
                         onClick={() =>
                           setNoteDraft({ ...note })
                         }
@@ -539,6 +601,7 @@ export function CharacterSecondary({
 
                       <button
                         type="button"
+                        disabled={interactionDisabled}
                         onClick={() =>
                           confirmRemoveNote(note.id)
                         }
@@ -594,7 +657,10 @@ export function CharacterSecondary({
               </label>
 
               <div className="secondary-editor__actions">
-                <button type="submit">
+                <button
+                  type="submit"
+                  disabled={interactionDisabled}
+                >
                   {historyDraft.id
                     ? 'Guardar hito'
                     : 'Añadir hito'}
@@ -603,6 +669,7 @@ export function CharacterSecondary({
                 {historyDraft.id ? (
                   <button
                     type="button"
+                    disabled={interactionDisabled}
                     onClick={() =>
                       setHistoryDraft(
                         emptyHistoryDraft,
@@ -634,6 +701,7 @@ export function CharacterSecondary({
                   <div className="secondary-item-actions">
                     <button
                       type="button"
+                      disabled={interactionDisabled}
                       onClick={() =>
                         setHistoryDraft({ ...entry })
                       }
@@ -643,6 +711,7 @@ export function CharacterSecondary({
 
                     <button
                       type="button"
+                      disabled={interactionDisabled}
                       onClick={() =>
                         confirmRemoveHistory(entry.id)
                       }

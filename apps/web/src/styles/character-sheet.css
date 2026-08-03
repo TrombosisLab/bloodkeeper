@@ -1670,6 +1670,21 @@
   font-size: 0.72rem;
 }
 
+.secondary-edit-notice button {
+  margin-left: 0.75rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.secondary-section[aria-busy='true'] {
+  cursor: progress;
+}
+
 .secondary-editor {
   display: grid;
   grid-template-columns: 2fr 1fr;

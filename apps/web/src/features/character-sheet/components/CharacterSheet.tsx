@@ -16,8 +16,15 @@ import { CharacterAdvantages } from './CharacterAdvantages'
 import { CharacterNarrative } from './CharacterNarrative'
 import { CharacterBloodExperience } from './CharacterBloodExperience'
 import { CharacterSecondary } from './CharacterSecondary'
+import { PersistedCharacterSecondary } from './PersistedCharacterSecondary'
 
-export function CharacterSheet() {
+interface CharacterSheetProps {
+  characterId?: string
+}
+
+export function CharacterSheet({
+  characterId,
+}: CharacterSheetProps) {
   const [stateEditing, setStateEditing] =
     useState(false)
   const [health, setHealth] = useState({
@@ -106,7 +113,13 @@ export function CharacterSheet() {
 
       <CharacterBloodExperience />
 
-      <CharacterSecondary />
+      {characterId ? (
+        <PersistedCharacterSecondary
+          characterId={characterId}
+        />
+      ) : (
+        <CharacterSecondary />
+      )}
     </article>
   )
 }
