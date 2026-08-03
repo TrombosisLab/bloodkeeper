@@ -16,6 +16,7 @@ import {
 
 import {
   CharacterDraftWriteConflictError,
+  CharacterLifecycleWriteConflictError,
 } from '../application/character-draft.repository'
 
 import type {
@@ -40,6 +41,7 @@ import type {
   SkillDistributionMethod,
   SkillSpecialtyOrigin,
   ThinBloodAlchemyMethod,
+  TransitionCharacterLifecycleData,
   UpdateCharacterDraftData,
 } from '../domain/persisted-character.types'
 
@@ -103,6 +105,15 @@ const statusFromPrisma: Record<
   DRAFT: 'draft',
   ACTIVE: 'active',
   ARCHIVED: 'archived',
+}
+
+const statusToPrisma: Record<
+  CharacterLifecycleStatus,
+  PrismaCharacterStatus
+> = {
+  draft: PrismaCharacterStatus.DRAFT,
+  active: PrismaCharacterStatus.ACTIVE,
+  archived: PrismaCharacterStatus.ARCHIVED,
 }
 
 const specialtyOriginToPrisma: Record<
@@ -1549,6 +1560,48 @@ export class PrismaCharacterDraftRepository
             where: { id: data.characterId },
             include: characterRelations,
           })
+
+        return toPersistedDraft(row)
+      },
+    )
+  }
+
+  async transitionLifecycle(
+    ownerId: string,
+    data: TransitionCharacterLifecycleData,
+  ): Promise<PersistedCharacterDraft> {
+    return this.database.$transaction(
+      async (transaction) => {
+        const claimed =
+          await transaction.character.updateMany({
+            where: {
+              id: data.characterId,
+              ownerId,
+              revision: data.expectedRevision,
+              status:
+                statusToPrisma[
+                  data.expectedStatus
+                ],
+            },
+            data: {
+              status:
+                statusToPrisma[data.nextStatus],
+              revision: { increment: 1 },
+            },
+          })
+
+        if (claimed.count !== 1) {
+          throw new CharacterLifecycleWriteConflictError(
+            data.characterId,
+          )
+        }
+
+        const row =
+          await transaction.character
+            .findUniqueOrThrow({
+              where: { id: data.characterId },
+              include: characterRelations,
+            })
 
         return toPersistedDraft(row)
       },

@@ -349,6 +349,13 @@ export interface CreateCharacterDraftData {
   }
 }
 
+export interface TransitionCharacterLifecycleData {
+  characterId: string
+  expectedRevision: number
+  expectedStatus: CharacterLifecycleStatus
+  nextStatus: CharacterLifecycleStatus
+}
+
 export interface UpdateCharacterDraftData {
   characterId: string
   expectedRevision: number

@@ -467,6 +467,49 @@ test(
           name: 'CharacterDraftWriteConflictError',
         },
       )
+
+      await assert.rejects(
+        repository.transitionLifecycle(
+          randomUUID(),
+          {
+            characterId,
+            expectedRevision: 2,
+            expectedStatus: 'draft',
+            nextStatus: 'active',
+          },
+        ),
+        {
+          name:
+            'CharacterLifecycleWriteConflictError',
+        },
+      )
+
+      const activated =
+        await repository.transitionLifecycle(
+          ownerId,
+          {
+            characterId,
+            expectedRevision: 2,
+            expectedStatus: 'draft',
+            nextStatus: 'active',
+          },
+        )
+
+      assert.equal(activated.status, 'active')
+      assert.equal(activated.revision, 3)
+
+      await assert.rejects(
+        repository.transitionLifecycle(ownerId, {
+          characterId,
+          expectedRevision: 2,
+          expectedStatus: 'draft',
+          nextStatus: 'active',
+        }),
+        {
+          name:
+            'CharacterLifecycleWriteConflictError',
+        },
+      )
     } finally {
       if (characterId !== null) {
         await database.character.delete({

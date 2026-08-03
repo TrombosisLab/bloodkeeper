@@ -162,3 +162,25 @@ test(
     )
   },
 )
+
+test(
+  '029-E persiste transiciones de ciclo de vida de forma atomica',
+  () => {
+    assert.match(
+      repository,
+      /async transitionLifecycle\(\s*ownerId: string,\s*data: TransitionCharacterLifecycleData/,
+    )
+    assert.match(
+      repository,
+      /id: data\.characterId,\s*ownerId,\s*revision: data\.expectedRevision,\s*status:\s*statusToPrisma\[\s*data\.expectedStatus/,
+    )
+    assert.match(
+      repository,
+      /status:\s*statusToPrisma\[data\.nextStatus\],\s*revision: \{ increment: 1 \}/,
+    )
+    assert.match(
+      repository,
+      /CharacterLifecycleWriteConflictError/,
+    )
+  },
+)
