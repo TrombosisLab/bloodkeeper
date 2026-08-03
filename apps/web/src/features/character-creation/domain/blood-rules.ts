@@ -11,6 +11,12 @@ import type {
   CharacterGeneration,
 } from '../types/character-generation.types'
 
+import {
+  CHARACTER_INITIAL_HUNGER,
+  normalizeCharacterHunger,
+  validateCharacterHunger,
+} from '../../character/domain/hunger-rules.ts'
+
 export interface BloodValidationResult {
   valid: boolean
   errors: string[]
@@ -59,7 +65,8 @@ export function createInitialBloodDraft(
         generation,
       ),
 
-    hunger: 1,
+    hunger:
+      CHARACTER_INITIAL_HUNGER,
   }
 }
 
@@ -120,12 +127,8 @@ export function updateHunger(
     ...blood,
 
     hunger:
-      Math.max(
-        0,
-        Math.min(
-          5,
-          Math.trunc(hunger),
-        ),
+      normalizeCharacterHunger(
+        hunger,
       ),
   }
 }
@@ -181,17 +184,11 @@ export function validateBloodDraft(
     )
   }
 
-  if (
-    !Number.isInteger(
+  errors.push(
+    ...validateCharacterHunger(
       blood.hunger,
-    ) ||
-    blood.hunger < 0 ||
-    blood.hunger > 5
-  ) {
-    errors.push(
-      'El Hambre debe estar entre 0 y 5.',
-    )
-  }
+    ).errors,
+  )
 
   return {
     valid: errors.length === 0,

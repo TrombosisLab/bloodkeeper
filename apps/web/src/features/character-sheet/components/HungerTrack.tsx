@@ -1,3 +1,8 @@
+import {
+  CHARACTER_HUNGER_MAX,
+  normalizeCharacterHunger,
+} from '../../character/domain/hunger-rules'
+
 interface HungerTrackProps {
   value: number
 }
@@ -5,15 +10,18 @@ interface HungerTrackProps {
 export function HungerTrack({
   value,
 }: HungerTrackProps) {
-  const safeValue = Math.max(
-    0,
-    Math.min(value, 5),
-  )
+  const safeValue =
+    normalizeCharacterHunger(
+      value,
+    )
 
   return (
     <div className="hunger-track">
       {Array.from(
-        { length: 5 },
+        {
+          length:
+            CHARACTER_HUNGER_MAX,
+        },
         (_, index) => (
           <span
             key={index}
@@ -28,7 +36,8 @@ export function HungerTrack({
       )}
 
       <span className="sr-only">
-        Hambre {safeValue} de 5
+        Hambre {safeValue} de{' '}
+        {CHARACTER_HUNGER_MAX}
       </span>
     </div>
   )
