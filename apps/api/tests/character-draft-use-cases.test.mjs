@@ -71,6 +71,10 @@ function createRepository() {
       '39c1801e-68fe-4c92-8795-723cac284bdf',
     revision: 1,
     attributes: createValidAttributes(),
+    blood: {
+      bloodPotency: 1,
+      hunger: 1,
+    },
     damage: {
       health: {
         superficial: 0,
@@ -187,9 +191,77 @@ test(
       },
     )
 
+    assert.throws(
+      () =>
+        useCase.execute({
+          ...command,
+          blood: {
+            ...command.blood,
+            hunger: 6,
+          },
+        }),
+      {
+        name:
+          'InvalidCharacterHungerError',
+      },
+    )
+
     assert.deepEqual(
       repository.calls,
       [['create', command]],
+    )
+  },
+)
+
+test(
+  '027-C valida Hambre antes de actualizar el borrador persistido',
+  async () => {
+    const repository = createRepository()
+    const useCase =
+      new UpdateCharacterDraftUseCase(
+        repository,
+      )
+    const ownerId =
+      '3bbc46f8-a45f-4589-9872-129e6652082c'
+
+    await assert.rejects(
+      useCase.execute(ownerId, {
+        characterId:
+          repository.record.characterId,
+        expectedRevision: 1,
+        blood: {
+          hunger: -1,
+        },
+      }),
+      {
+        name:
+          'InvalidCharacterHungerError',
+      },
+    )
+
+    assert.equal(
+      repository.calls.some(
+        ([operation]) =>
+          operation === 'update',
+      ),
+      false,
+    )
+
+    await useCase.execute(ownerId, {
+      characterId:
+        repository.record.characterId,
+      expectedRevision: 1,
+      blood: {
+        hunger: 5,
+      },
+    })
+
+    assert.equal(
+      repository.calls.some(
+        ([operation]) =>
+          operation === 'update',
+      ),
+      true,
     )
   },
 )

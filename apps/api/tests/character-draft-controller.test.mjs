@@ -23,6 +23,10 @@ import {
 } from '../dist/characters/domain/character-humanity-state.rules.js'
 
 import {
+  InvalidCharacterHungerError,
+} from '../dist/characters/domain/character-hunger.rules.js'
+
+import {
   CharacterDraftController,
 } from '../dist/characters/presentation/character-draft.controller.js'
 
@@ -307,6 +311,32 @@ test(
           throw new InvalidCharacterHumanityStateError(
             [
               'HUMANITY_STAINS_EXCEED_AVAILABLE_BOXES',
+            ],
+          )
+        },
+      },
+    })
+
+    await assert.rejects(
+      instance.update(
+        authenticatedRequest(),
+        characterId,
+        { expectedRevision: 1 },
+      ),
+      hasStatus(422),
+    )
+  },
+)
+
+test(
+  '027-C expone Hambre inválida como respuesta 422',
+  async () => {
+    const { instance } = controller({
+      updateDraft: {
+        async execute() {
+          throw new InvalidCharacterHungerError(
+            [
+              'HUNGER_VALUE_INVALID',
             ],
           )
         },

@@ -54,6 +54,10 @@ import {
   InvalidCharacterHumanityStateError,
 } from '../domain/character-humanity-state.rules'
 
+import {
+  InvalidCharacterHungerError,
+} from '../domain/character-hunger.rules'
+
 export interface AuthenticatedCharacterRequest {
   user?: {
     id?: unknown
@@ -102,7 +106,9 @@ function throwCharacterDraftHttpError(
     error instanceof
       InvalidCharacterDamageStateError ||
     error instanceof
-      InvalidCharacterHumanityStateError
+      InvalidCharacterHumanityStateError ||
+    error instanceof
+      InvalidCharacterHungerError
   ) {
     throw new UnprocessableEntityException({
       code: 'CHARACTER_DRAFT_RULE_VIOLATION',

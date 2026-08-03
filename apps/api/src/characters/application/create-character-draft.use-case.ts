@@ -15,6 +15,10 @@ import {
   assertValidCharacterHumanityState,
 } from '../domain/character-humanity-state.rules'
 
+import {
+  assertValidCharacterHunger,
+} from '../domain/character-hunger.rules'
+
 export class CreateCharacterDraftUseCase {
   private readonly repository:
     CharacterDraftRepository
@@ -39,6 +43,10 @@ export class CreateCharacterDraftUseCase {
     assertValidCharacterHumanityState(
       data.humanity.value,
       data.humanity.stains,
+    )
+
+    assertValidCharacterHunger(
+      data.blood.hunger,
     )
 
     return this.repository.create(data)

@@ -23,6 +23,10 @@ import {
   assertValidCharacterHumanityState,
 } from '../domain/character-humanity-state.rules'
 
+import {
+  assertValidCharacterHunger,
+} from '../domain/character-hunger.rules'
+
 export class UpdateCharacterDraftUseCase {
   private readonly repository:
     CharacterDraftRepository
@@ -55,10 +59,14 @@ export class UpdateCharacterDraftUseCase {
       data.humanityValue !== undefined ||
       data.humanityStains !== undefined
 
+    const changesHungerState =
+      data.blood?.hunger !== undefined
+
     if (
       changesAttributeSkillState ||
       changesDamageState ||
-      changesHumanityState
+      changesHumanityState ||
+      changesHungerState
     ) {
       const current =
         await this.repository.findById(
@@ -111,6 +119,13 @@ export class UpdateCharacterDraftUseCase {
             current.humanity.value,
           data.humanityStains ??
             current.humanity.stains,
+        )
+      }
+
+      if (changesHungerState) {
+        assertValidCharacterHunger(
+          data.blood?.hunger ??
+            current.blood.hunger,
         )
       }
     }
