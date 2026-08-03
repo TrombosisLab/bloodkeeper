@@ -88,6 +88,9 @@ test(
             2,
           origin:
             'creation',
+          details: {
+            kind: 'haven',
+          },
         },
         {
           selectionId:
@@ -114,12 +117,15 @@ test(
             4,
           origin:
             'creation',
+          details: {
+            kind: 'status',
+          },
         },
         {
           selectionId:
-            'archaic-1',
+            'illiterate-1',
           definitionKey:
-            'archaic',
+            'illiterate',
           category:
             'flaw',
           rating:
@@ -194,12 +200,15 @@ test(
             4,
           origin:
             'creation',
+          details: {
+            kind: 'status',
+          },
         },
         {
           selectionId:
-            'archaic-1',
+            'illiterate-1',
           definitionKey:
-            'archaic',
+            'illiterate',
           category:
             'flaw',
           rating:
@@ -247,6 +256,9 @@ test(
             2,
           origin:
             'creation',
+          details: {
+            kind: 'haven',
+          },
         },
         {
           selectionId:
@@ -273,12 +285,15 @@ test(
             4,
           origin:
             'creation',
+          details: {
+            kind: 'status',
+          },
         },
         {
           selectionId:
-            'archaic-1',
+            'illiterate-1',
           definitionKey:
-            'archaic',
+            'illiterate',
           category:
             'flaw',
           rating:

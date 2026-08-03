@@ -40,22 +40,28 @@ function validAdvantages() {
   return {
     selections: [
       {
-        selectionId: 'merit-3',
-        definitionKey: 'test-merit-3',
-        category: 'merit',
-        rating: 3,
-        origin: 'creation',
-      },
-      {
-        selectionId: 'background-4',
-        definitionKey: 'test-background-4',
+        selectionId: 'status-5',
+        definitionKey: 'status',
         category: 'background',
-        rating: 4,
+        rating: 5,
         origin: 'creation',
+        details: {
+          kind: 'status',
+        },
       },
       {
-        selectionId: 'flaw-2',
-        definitionKey: 'test-flaw-2',
+        selectionId: 'contacts-2',
+        definitionKey: 'contacts',
+        category: 'background',
+        rating: 2,
+        origin: 'creation',
+        details: {
+          kind: 'contact',
+        },
+      },
+      {
+        selectionId: 'illiterate-2',
+        definitionKey: 'illiterate',
         category: 'flaw',
         rating: 2,
         origin: 'creation',

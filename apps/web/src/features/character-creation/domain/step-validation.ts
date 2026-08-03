@@ -48,6 +48,10 @@ import {
 } from './advantage-acquisition-context-rules.ts'
 
 import {
+  validateCharacterAdvantageRegulatoryState,
+} from './character-advantage-regulatory-rules.ts'
+
+import {
   characterAdvantageDefinitions,
 } from '../data/character-advantage-definitions.ts'
 
@@ -306,6 +310,11 @@ export function validateStep(
           'characterCreation',
         )
 
+      const regulatoryValidation =
+        validateCharacterAdvantageRegulatoryState(
+          draft,
+        )
+
       const characterKind =
         draft.identity.clan ===
           'thinBlood'
@@ -333,6 +342,7 @@ export function validateStep(
 
       const errors = [
         ...advantageValidation.errors,
+        ...regulatoryValidation.errors,
         ...thinBloodValidation.errors,
         ...alchemyValidation.errors,
         ...parentValidation.errors,
@@ -341,6 +351,7 @@ export function validateStep(
       return {
         valid:
           advantageValidation.valid &&
+          regulatoryValidation.valid &&
           thinBloodValidation.valid &&
           alchemyValidation.valid &&
           parentValidation.valid,

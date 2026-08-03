@@ -10,56 +10,64 @@ import {
   validateStep,
 } from '../src/features/character-creation/domain/step-validation.ts'
 
-function splitIntoValidRatings(
-  total,
-) {
-  const ratings = []
-  let remaining = total
-
-  while (remaining > 0) {
-    const rating =
-      Math.min(remaining, 4)
-
-    ratings.push(rating)
-    remaining -= rating
-  }
-
-  return ratings
-}
-
 function draftWithBudget(
   advantagePoints,
   flawPoints,
 ) {
   const advantageSelections =
-    splitIntoValidRatings(
-      advantagePoints,
-    ).map(
-      (rating, index) => ({
+    [
+      {
         selectionId:
-          `merit-budget-${index}`,
+          'background-budget-status',
         definitionKey:
-          `test-merit-${index}`,
-        category: 'merit',
-        rating,
+          'status',
+        category: 'background',
+        rating:
+          Math.min(
+            advantagePoints,
+            5,
+          ),
         origin: 'creation',
-      }),
-    )
+        details: {
+          kind: 'status',
+        },
+      },
+      ...(advantagePoints > 5
+        ? [
+            {
+              selectionId:
+                'background-budget-contacts',
+              definitionKey:
+                'contacts',
+              category:
+                'background',
+              rating:
+                advantagePoints - 5,
+              origin:
+                'creation',
+              details: {
+                kind: 'contact',
+              },
+            },
+          ]
+        : []),
+    ]
 
   const flawSelections =
-    splitIntoValidRatings(
-      flawPoints,
-    ).map(
-      (rating, index) => ({
+    flawPoints > 0
+      ? [{
         selectionId:
-          `flaw-budget-${index}`,
+          'flaw-budget-enemy',
         definitionKey:
-          `test-flaw-${index}`,
+          'enemy',
         category: 'flaw',
-        rating,
+        rating: flawPoints,
         origin: 'creation',
-      }),
-    )
+        details: {
+          kind: 'enemy',
+        },
+      }]
+      : []
 
   return {
     ...initialCharacterDraft,
@@ -116,6 +124,34 @@ test(
     assert.equal(
       result.valid,
       true,
+    )
+  },
+)
+
+test(
+  'advantages rechaza un estado 7/2 que no existe en el catálogo',
+  () => {
+    const draft =
+      draftWithBudget(7, 2)
+
+    draft.advantages.selections[0]
+      .definitionKey =
+      'unknown-background'
+
+    const result =
+      validateStep(
+        'advantages',
+        draft,
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+
+    assert.match(
+      result.errors.join('\n'),
+      /definici.n inexistente/,
     )
   },
 )
