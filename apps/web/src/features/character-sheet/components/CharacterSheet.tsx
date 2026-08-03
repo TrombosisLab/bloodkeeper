@@ -17,6 +17,7 @@ import { CharacterNarrative } from './CharacterNarrative'
 import { CharacterBloodExperience } from './CharacterBloodExperience'
 import { CharacterSecondary } from './CharacterSecondary'
 import { PersistedCharacterSecondary } from './PersistedCharacterSecondary'
+import { PersistedCharacterValidation } from './PersistedCharacterValidation'
 
 interface CharacterSheetProps {
   characterId?: string
@@ -112,6 +113,12 @@ export function CharacterSheet({
       <CharacterNarrative />
 
       <CharacterBloodExperience />
+
+      {characterId ? (
+        <PersistedCharacterValidation
+          characterId={characterId}
+        />
+      ) : null}
 
       {characterId ? (
         <PersistedCharacterSecondary
