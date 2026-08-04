@@ -1,0 +1,177 @@
+.app-section-navigation {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem clamp(1rem, 4vw, 3rem) 0;
+}
+
+.app-section-navigation button {
+  border: 1px solid rgba(178, 55, 55, 0.45);
+  border-radius: 999px;
+  background: rgba(30, 18, 18, 0.78);
+  color: inherit;
+  cursor: pointer;
+  padding: 0.65rem 1.1rem;
+}
+
+.app-section-navigation button[aria-pressed='true'] {
+  border-color: currentColor;
+  background: rgba(118, 24, 24, 0.58);
+}
+
+.chronicle-workspace {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 1rem auto 3rem;
+}
+
+.chronicle-workspace__header,
+.chronicle-create,
+.chronicle-list {
+  border: 1px solid rgba(178, 55, 55, 0.28);
+  border-radius: 1rem;
+  background: rgba(20, 14, 14, 0.86);
+  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.22);
+}
+
+.chronicle-workspace__header {
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.chronicle-workspace__header h1,
+.chronicle-create h2,
+.chronicle-list h2,
+.chronicle-card h3 {
+  margin: 0;
+}
+
+.chronicle-workspace__header p {
+  margin: 0.65rem 0 0;
+  max-width: 62ch;
+}
+
+.chronicle-workspace__eyebrow {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.chronicle-workspace__grid {
+  display: grid;
+  grid-template-columns:
+    minmax(260px, 0.85fr)
+    minmax(0, 1.4fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.chronicle-create,
+.chronicle-list {
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.chronicle-create form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.chronicle-create label {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.chronicle-create input,
+.chronicle-create textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0.65rem;
+  background: rgba(0, 0, 0, 0.24);
+  color: inherit;
+  font: inherit;
+  padding: 0.75rem;
+}
+
+.chronicle-create textarea {
+  resize: vertical;
+}
+
+.chronicle-create button,
+.chronicle-list__heading button {
+  border: 1px solid rgba(210, 86, 86, 0.55);
+  border-radius: 0.65rem;
+  background: rgba(126, 27, 27, 0.74);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.7rem 1rem;
+}
+
+.chronicle-create button:disabled,
+.chronicle-list__heading button:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.chronicle-list__heading,
+.chronicle-card__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.chronicle-list__heading button {
+  padding: 0.45rem 0.8rem;
+}
+
+.chronicle-cards {
+  display: grid;
+  gap: 0.8rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chronicle-card {
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.035);
+  padding: 1rem;
+}
+
+.chronicle-card__heading span {
+  border-radius: 999px;
+  background: rgba(126, 27, 27, 0.5);
+  font-size: 0.78rem;
+  padding: 0.35rem 0.65rem;
+  white-space: nowrap;
+}
+
+.chronicle-card p {
+  margin: 0.75rem 0 0;
+  line-height: 1.55;
+}
+
+.chronicle-card__empty,
+.chronicle-message {
+  opacity: 0.7;
+}
+
+.chronicle-message--error {
+  color: #ffb5b5;
+  opacity: 1;
+}
+
+@media (max-width: 760px) {
+  .chronicle-workspace__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chronicle-list__heading,
+  .chronicle-card__heading {
+    align-items: flex-start;
+  }
+}

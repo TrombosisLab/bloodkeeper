@@ -1,20 +1,19 @@
-export type ChronicleStatus =
+export type ChronicleApiStatus =
   | 'preparation'
   | 'active'
   | 'archived'
 
-export interface Chronicle {
+export interface ChronicleApiSnapshot {
   readonly id: string
   readonly narratorId: string
   readonly name: string
   readonly description: string | null
-  readonly status: ChronicleStatus
-  readonly createdAt: Date
-  readonly updatedAt: Date
+  readonly status: ChronicleApiStatus
+  readonly createdAt: string
+  readonly updatedAt: string
 }
 
-export interface CreateChronicleData {
-  readonly narratorId: string
+export interface CreateChronicleApiRequest {
   readonly name: string
   readonly description: string | null
 }

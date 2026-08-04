@@ -63,6 +63,20 @@ test(
 )
 
 test(
+  '030-B publica la identidad autenticada mediante un contexto controlado',
+  () => {
+    assert.match(
+      gate,
+      /AuthenticationProvider/,
+    )
+    assert.match(
+      gate,
+      /user=\{state\.user\}/,
+    )
+  },
+)
+
+test(
   '015-B no guarda credenciales ni tokens en almacenamiento web',
   () => {
     assert.doesNotMatch(

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { AuthModule } from './auth/auth.module'
 import { CharactersModule } from './characters/characters.module'
+import { ChroniclesModule } from './chronicles/chronicles.module'
 import { DatabaseModule } from './database/database.module'
 import { HealthModule } from './health/health.module'
 
@@ -9,6 +10,7 @@ import { HealthModule } from './health/health.module'
     DatabaseModule,
     AuthModule,
     CharactersModule,
+    ChroniclesModule,
     HealthModule,
   ],
 })

@@ -6,6 +6,10 @@ import {
 } from 'react'
 
 import {
+  AuthenticationProvider,
+} from '../context/authentication.context'
+
+import {
   AuthenticationApiError,
   authenticationApi,
 } from '../infrastructure/auth.api'
@@ -268,7 +272,9 @@ export function AuthenticationGate({
   }
 
   return (
-    <>
+    <AuthenticationProvider
+      user={state.user}
+    >
       <aside
         className="authentication-session"
         aria-label="Sesión actual"
@@ -294,6 +300,6 @@ export function AuthenticationGate({
       </aside>
 
       {children}
-    </>
+    </AuthenticationProvider>
   )
 }
