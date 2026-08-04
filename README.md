@@ -30,7 +30,9 @@ Después del primer despliegue:
 ./scripts/start.sh
 ./scripts/status.sh
 ./scripts/check.sh
+./scripts/status.sh
 ./scripts/logs.sh
+./scripts/backup.sh
 ./scripts/stop.sh
 ```
 
@@ -38,6 +40,7 @@ Después del primer despliegue:
 
 - `docs/DEPLOYMENT.md`: instalación y despliegue.
 - `docs/VALIDATION.md`: validación técnica y funcional.
+- `docs/RECOVERY.md`: copias y recuperación.
 - `scripts/README.md`: catálogo de scripts.
 
 ## Estado

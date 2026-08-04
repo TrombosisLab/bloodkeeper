@@ -13,6 +13,8 @@ despliegue y mantenimiento mediante SSH.
 | `status.sh` | Muestra estado, API y disco |
 | `check.sh` | Ejecuta los smoke tests operativos |
 | `logs.sh` | Consulta los registros de Docker Compose |
+| `backup.sh` | Crea y verifica una copia PostgreSQL |
+| `restore.sh` | Verifica o aplica una restauración segura |
 | `create-initial-admin.sh` | Crea la primera cuenta administrativa |
 
 ## Desarrollo

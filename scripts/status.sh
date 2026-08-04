@@ -1,11 +1,51 @@
 #!/usr/bin/env sh
 set -eu
 
-cd "$(dirname "$0")/.."
+ROOT="$(
+  cd "$(dirname "$0")/.."
+  pwd
+)"
 
+cd "$ROOT"
+
+echo "== Sistema =="
+
+printf 'Host: '
+hostname
+
+printf 'Kernel: '
+uname -sr
+
+printf 'CPU lógicas: '
+getconf _NPROCESSORS_ONLN
+
+printf 'Carga: '
+cut -d' ' -f1-3 /proc/loadavg
+
+echo
+echo "== Memoria =="
+
+free -h
+
+echo
+echo "== Disco =="
+
+df -hT /
+echo
+docker system df
+
+echo
 echo "== Contenedores =="
 
 docker compose ps
+
+echo
+echo "== Consumo Docker =="
+
+docker stats \
+  --no-stream \
+  --format \
+  'table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}'
 
 echo
 echo "== API =="
@@ -17,8 +57,3 @@ then
 else
   echo "API no disponible"
 fi
-
-echo
-echo "== Disco =="
-
-df -h /

@@ -32,3 +32,9 @@ temp/
 # Docker local overrides
 compose.override.yaml
 docker-compose.override.yml
+
+# Runtime database backups
+backups/**/*.dump
+backups/**/*.dump.sha256
+backups/**/*.dump.meta
+backups/**/*.partial.*

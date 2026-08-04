@@ -53,6 +53,19 @@ docker compose exec -T web npm test
 
 Todas las suites deben finalizar con cero fallos.
 
+## Validación de backup y recuperación
+
+```bash
+backup="$(
+  ./scripts/backup.sh     --output-dir /tmp/bloodkeeper-backup-validation |
+  tail -n 1
+)"
+
+./scripts/restore.sh --verify "$backup"
+```
+
+Esta prueba restaura en una base temporal y no modifica la base activa.
+
 ## Comprobación desde navegador
 
 1. Abrir `http://DIRECCION_LAN:5173`.

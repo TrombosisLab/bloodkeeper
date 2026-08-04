@@ -98,6 +98,17 @@ mediante `/api`.
 ./scripts/stop.sh
 ```
 
+## Copia previa a actualizaciones
+
+Antes de una actualización relevante:
+
+```bash
+./scripts/backup.sh
+./scripts/restore.sh --verify backups/ARCHIVO.dump
+```
+
+El procedimiento completo está en `docs/RECOVERY.md`.
+
 ## Datos
 
 PostgreSQL usa el volumen Docker `postgres_data`. `docker compose down`
