@@ -18,12 +18,27 @@ test(
     const options = getPredatorTypeOptions()
 
     assert.deepEqual(
-      options,
+      options.map(
+        option =>
+          option.value,
+      ),
       predatorTypeDefinitions.map(
-        (definition) => ({
-          value: definition.key,
-          label: definition.name,
-        }),
+        definition =>
+          definition.key,
+      ),
+    )
+
+    assert.deepEqual(
+      options.map(
+        option =>
+          option.label.replace(
+            / \((Violento|Sociable|Invisible|Limitante)\)$/,
+            '',
+          ),
+      ),
+      predatorTypeDefinitions.map(
+        definition =>
+          definition.name,
       ),
     )
 
@@ -48,7 +63,7 @@ test(
       ),
       {
         value: 'bagger',
-        label: 'Bolsero',
+        label: 'Bolsero (Limitante)',
       },
     )
 
@@ -59,7 +74,7 @@ test(
       ),
       {
         value: 'alleycat',
-        label: 'Gato Callejero',
+        label: 'Gato Callejero (Violento)',
       },
     )
 
@@ -70,7 +85,7 @@ test(
       ),
       {
         value: 'scene-queen',
-        label: 'Reina del Ambiente',
+        label: 'Reina del Ambiente (Sociable)',
       },
     )
 
@@ -81,7 +96,7 @@ test(
       ),
       {
         value: 'siren',
-        label: 'Sirena',
+        label: 'Sirena (Sociable)',
       },
     )
   },
@@ -139,6 +154,93 @@ test(
     assert.doesNotMatch(
       source,
       /predatorTypeOptions[\s\S]*from '\.\.\/data\/identity-options'/,
+    )
+  },
+)
+
+
+test(
+  '029-U.14 muestra el contexto visual de los diez Tipos de Depredador Core',
+  async () => {
+    const {
+      getPredatorTypeOptions,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    const labelsByKey =
+      Object.fromEntries(
+        getPredatorTypeOptions().map(
+          option => [
+            option.value,
+            option.label,
+          ],
+        ),
+      )
+
+    assert.deepEqual(
+      labelsByKey,
+      {
+        bagger:
+          'Bolsero (Limitante)',
+
+        osiris:
+          'Osiris (Sociable)',
+
+        sandman:
+          'Sandman (Invisible)',
+
+        'scene-queen':
+          'Reina del Ambiente (Sociable)',
+
+        siren:
+          'Sirena (Sociable)',
+
+        'blood-leech':
+          'Sanguijuela (Limitante)',
+
+        cleaver:
+          'Cleaver (Sociable)',
+
+        consensualist:
+          'Consensualista (Sociable)',
+
+        alleycat:
+          'Gato Callejero (Violento)',
+
+        farmer:
+          'Granjero (Limitante)',
+      },
+    )
+  },
+)
+
+test(
+  '029-U.14 conserva las claves internas del selector',
+  async () => {
+    const {
+      getPredatorTypeOptions,
+    } = await import(
+      '../src/features/character-creation/domain/predator-type-rules.ts'
+    )
+
+    assert.deepEqual(
+      getPredatorTypeOptions().map(
+        option =>
+          option.value,
+      ),
+      [
+        'bagger',
+        'osiris',
+        'sandman',
+        'scene-queen',
+        'siren',
+        'blood-leech',
+        'cleaver',
+        'consensualist',
+        'alleycat',
+        'farmer',
+      ],
     )
   },
 )

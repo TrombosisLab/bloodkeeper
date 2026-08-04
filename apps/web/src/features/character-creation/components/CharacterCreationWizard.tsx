@@ -238,12 +238,41 @@ export function CharacterCreationWizard({
           {currentStepId === 'identity' ? (
             <IdentityStep
               value={draft.identity}
-              onChange={(identity) =>
+              choiceSelections={
+                draft.predatorTypeChoices ?? {}
+              }
+              onChange={(
+                identity,
+              ) =>
+                updateDraft(
+                  (current) => {
+                    const identityContextChanged =
+                      current.identity.clan !==
+                        identity.clan ||
+                      current.identity
+                        .predatorType !==
+                        identity.predatorType
+
+                    return {
+                      ...current,
+                      identity,
+                      predatorTypeChoices:
+                        identityContextChanged
+                          ? {}
+                          : current
+                              .predatorTypeChoices ??
+                            {},
+                    }
+                  },
+                )
+              }
+              onChoiceSelectionsChange={(
+                predatorTypeChoices,
+              ) =>
                 updateDraft(
                   (current) => ({
                     ...current,
-
-                    identity,
+                    predatorTypeChoices,
                   }),
                 )
               }

@@ -14,6 +14,10 @@ import {
   getPredatorTypeOptions,
 } from '../domain/predator-type-rules'
 
+import {
+  PredatorTypeChoiceSelector,
+} from './PredatorTypeChoiceSelector'
+
 import type {
   ClanKey,
 } from '../types/clan.types'
@@ -29,8 +33,14 @@ import type {
 interface IdentityStepProps {
   value: CharacterIdentityDraft
 
+  choiceSelections: Record<string, number>
+
   onChange: (
     value: CharacterIdentityDraft,
+  ) => void
+
+  onChoiceSelectionsChange: (
+    value: Record<string, number>,
   ) => void
 }
 
@@ -42,7 +52,9 @@ type TextIdentityFieldName =
 
 export function IdentityStep({
   value,
+  choiceSelections,
   onChange,
+  onChoiceSelectionsChange,
 }: IdentityStepProps) {
   const predatorTypeOptions =
     getPredatorTypeOptions()
@@ -191,6 +203,17 @@ export function IdentityStep({
             )}
           </select>
         </label>
+
+        <PredatorTypeChoiceSelector
+          predatorTypeKey={
+            value.predatorType
+          }
+          clanKey={value.clan}
+          value={choiceSelections}
+          onChange={
+            onChoiceSelectionsChange
+          }
+        />
 
         <label className="creation-field">
           <span>Generación</span>

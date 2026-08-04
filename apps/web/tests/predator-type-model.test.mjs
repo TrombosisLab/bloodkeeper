@@ -244,6 +244,7 @@ test(
 
         choiceSelections: {
           'bagger-specialty': 1,
+          'bagger-discipline': 0,
         },
 
         advantages: {
@@ -532,6 +533,11 @@ test(
     draft.identity.predatorType =
       'bagger'
 
+
+    draft.predatorTypeChoices = {
+      'bagger-specialty': 0,
+      'bagger-discipline': 0,
+    }
     draft.advantages = {
       selections: [
         {
@@ -1921,55 +1927,61 @@ test(
 )
 
 test(
-  '003-H.PREDATOR.SANDMAN reglas oficiales',
+  '003-H.PREDATOR.SANDMAN permite Auspex u Ofuscación',
   async () => {
-
     const {
       getPredatorType,
-      resolvePredatorChoices,
+      resolveSelectedPredatorChoices,
     } = await import(
       '../src/features/character-creation/domain/predator-type-rules.ts'
     )
 
-    const definition=getPredatorType('sandman')
+    const definition =
+      getPredatorType('sandman')
 
     assert.ok(definition)
 
-    assert.equal(
-      definition.name,
-      'Sandman',
-    )
-
-    const tremere=
-      resolvePredatorChoices(
+    const auspex =
+      resolveSelectedPredatorChoices(
         'sandman',
-        { clan:'tremere' },
+        {
+          clan: 'malkavian',
+        },
+        {
+          'sandman-specialty': 0,
+          'sandman-discipline': 0,
+        },
+      )
+
+    const obfuscate =
+      resolveSelectedPredatorChoices(
+        'sandman',
+        {
+          clan: 'malkavian',
+        },
+        {
+          'sandman-specialty': 0,
+          'sandman-discipline': 1,
+        },
       )
 
     assert.equal(
-      tremere.some(
-        x =>
-          x.type==='discipline' &&
-          x.disciplineKey==='bloodSorcery'
+      auspex.some(
+        grant =>
+          grant.type === 'discipline' &&
+          grant.disciplineKey === 'auspex',
       ),
       true,
     )
 
-    const ventrue=
-      resolvePredatorChoices(
-        'sandman',
-        { clan:'ventrue' },
-      )
-
     assert.equal(
-      ventrue.some(
-        x =>
-          x.type==='discipline' &&
-          x.disciplineKey==='obfuscate'
+      obfuscate.some(
+        grant =>
+          grant.type === 'discipline' &&
+          grant.disciplineKey === 'obfuscate',
       ),
       true,
     )
-
   },
 )
 

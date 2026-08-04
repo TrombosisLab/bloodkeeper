@@ -42,13 +42,41 @@ export interface PredatorTypeOption {
   label: string
 }
 
+const predatorTypeContextLabels:
+  Readonly<Record<string, string>> = {
+    'alleycat': 'Violento',
+
+    'cleaver': 'Sociable',
+    'osiris': 'Sociable',
+    'consensualist': 'Sociable',
+    'scene-queen': 'Sociable',
+    'siren': 'Sociable',
+
+    'sandman': 'Invisible',
+
+    'bagger': 'Limitante',
+    'farmer': 'Limitante',
+    'blood-leech': 'Limitante',
+  }
+
 export function getPredatorTypeOptions():
   readonly PredatorTypeOption[] {
   return predatorTypeDefinitions.map(
-    (definition) => ({
-      value: definition.key,
-      label: definition.name,
-    }),
+    (definition) => {
+      const contextLabel =
+        predatorTypeContextLabels[
+          definition.key
+        ]
+
+      return {
+        value: definition.key,
+
+        label:
+          contextLabel === undefined
+            ? definition.name
+            : `${definition.name} (${contextLabel})`,
+      }
+    },
   )
 }
 
@@ -831,6 +859,85 @@ export function removePredatorTypeEffects(
 export type PredatorTypeChoiceSelections =
   Record<string, number>
 
+export interface AvailablePredatorTypeChoiceOption {
+  index: number
+  option: PredatorTypeChoice['options'][number]
+}
+
+export interface PredatorTypeChoiceSelectionValidationResult {
+  valid: boolean
+  errors: string[]
+}
+
+export function getAvailablePredatorTypeChoiceOptions(
+  choice: PredatorTypeChoice,
+  context: Record<string, unknown> = {},
+): AvailablePredatorTypeChoiceOption[] {
+  return choice.options
+    .map(
+      (option, index) => ({
+        index,
+        option,
+      }),
+    )
+    .filter(
+      ({ option }) => {
+        if (option.when === undefined) {
+          return true
+        }
+
+        return Object.entries(
+          option.when,
+        ).every(
+          ([key, expected]) =>
+            context[key] === expected,
+        )
+      },
+    )
+}
+
+export function getPredatorTypeChoiceLabel(
+  choice: PredatorTypeChoice,
+): string {
+  const grantTypes =
+    new Set(
+      choice.options.map(
+        option =>
+          option.grant.type,
+      ),
+    )
+
+  if (grantTypes.size !== 1) {
+    return 'Elección del Tipo de Depredador'
+  }
+
+  const [grantType] =
+    [...grantTypes]
+
+  switch (grantType) {
+    case 'discipline':
+      return 'Disciplina del Tipo de Depredador'
+
+    case 'specialty':
+      return 'Especialidad del Tipo de Depredador'
+
+    case 'advantage':
+      return 'Ventaja del Tipo de Depredador'
+
+    case 'humanity':
+      return 'Modificador de Humanidad'
+
+    case 'bloodPotency':
+      return 'Modificador de Potencia de Sangre'
+
+    case 'pointDistribution':
+      return 'Reparto del Tipo de Depredador'
+
+    default:
+      return 'Elección del Tipo de Depredador'
+  }
+}
+
 export function resolveSelectedPredatorChoices(
   predatorTypeKey: string,
   context: Record<string, unknown> = {},
@@ -846,51 +953,121 @@ export function resolveSelectedPredatorChoices(
   const grants: PredatorTypeChoiceGrant[] = []
 
   for (const choice of definition.choices ?? []) {
-    const selectableOptions =
-      choice.options.filter(
-        option =>
-          option.when === undefined,
-      )
-
-    const hasMultipleUnconditionalOptions =
-      selectableOptions.length > 1
-
-    if (hasMultipleUnconditionalOptions) {
-      const selectedIndex =
-        selections[choice.id]
-
-      if (
-        selectedIndex === undefined ||
-        selectedIndex < 0 ||
-        selectedIndex >=
-          choice.options.length
-      ) {
-        continue
-      }
-
-      const selectedOption =
-        choice.options[selectedIndex]
-
-      if (selectedOption.when !== undefined) {
-        continue
-      }
-
-      grants.push(selectedOption.grant)
-      continue
-    }
-
-    const resolved =
-      resolveChoice(
+    const availableOptions =
+      getAvailablePredatorTypeChoiceOptions(
         choice,
         context,
       )
 
-    if (resolved !== null) {
-      grants.push(resolved)
+    if (availableOptions.length === 0) {
+      continue
     }
+
+    if (availableOptions.length === 1) {
+      grants.push(
+        availableOptions[0].option.grant,
+      )
+      continue
+    }
+
+    const selectedIndex =
+      selections[choice.id]
+
+    const selected =
+      availableOptions.find(
+        entry =>
+          entry.index === selectedIndex,
+      )
+
+    if (!selected) {
+      continue
+    }
+
+    grants.push(
+      selected.option.grant,
+    )
   }
 
   return grants
+}
+
+export function validatePredatorTypeChoiceSelections(
+  predatorTypeKey: string,
+  context: Record<string, unknown> = {},
+  selections: PredatorTypeChoiceSelections = {},
+): PredatorTypeChoiceSelectionValidationResult {
+  if (predatorTypeKey === '') {
+    return {
+      valid: true,
+      errors: [],
+    }
+  }
+
+  const definition =
+    getPredatorType(predatorTypeKey)
+
+  if (!definition) {
+    return {
+      valid: false,
+      errors: [
+        'El Tipo de Depredador seleccionado no existe.',
+      ],
+    }
+  }
+
+  const errors: string[] = []
+
+  for (const choice of definition.choices ?? []) {
+    const availableOptions =
+      getAvailablePredatorTypeChoiceOptions(
+        choice,
+        context,
+      )
+
+    if (availableOptions.length === 0) {
+      if (choice.minimumSelections > 0) {
+        errors.push(
+          `No hay opciones disponibles para ${getPredatorTypeChoiceLabel(choice)}.`,
+        )
+      }
+
+      continue
+    }
+
+    /*
+     * Una única opción aplicable se resuelve automáticamente.
+     * Sólo exigimos una elección explícita cuando el usuario
+     * dispone realmente de varias alternativas.
+     */
+    if (availableOptions.length === 1) {
+      continue
+    }
+
+    const selectedIndex =
+      selections[choice.id]
+
+    const selectedIsAvailable =
+      availableOptions.some(
+        entry =>
+          entry.index === selectedIndex,
+      )
+
+    if (
+      choice.minimumSelections > 0 &&
+      !selectedIsAvailable
+    ) {
+      errors.push(
+        `Debes seleccionar una opción para ${getPredatorTypeChoiceLabel(choice)}.`,
+      )
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors: [
+      ...new Set(errors),
+    ],
+  }
 }
 
 function createPredatorTypeSelectionId(
@@ -1015,6 +1192,30 @@ export function applyPredatorTypeDisciplines(
   disciplines: CharacterDisciplinesDraft,
   selections: PredatorTypeChoiceSelections = {},
 ): CharacterDisciplinesDraft {
+  /*
+   * La normalización del borrador reaplica los efectos del
+   * Tipo de Depredador después de cada cambio. Conservamos
+   * los Poderes ya elegidos cuando la concesión resultante
+   * continúa siendo la misma Disciplina.
+   */
+  const existingPredatorDisciplinePowers =
+    new Map(
+      disciplines
+        .filter(
+          discipline =>
+            discipline.origin ===
+            'predatorType',
+        )
+        .map(
+          discipline => [
+            discipline.key,
+            [
+              ...discipline.powerKeys,
+            ],
+          ] as const,
+        ),
+    )
+
   const cleaned =
     removePredatorTypeDisciplines(
       disciplines,
@@ -1063,8 +1264,13 @@ export function applyPredatorTypeDisciplines(
             value:
               grant.dots,
 
-            powerKeys:
-              [],
+            powerKeys: [
+              ...(
+                existingPredatorDisciplinePowers.get(
+                  grant.disciplineKey,
+                ) ?? []
+              ),
+            ],
 
             origin:
               'predatorType',

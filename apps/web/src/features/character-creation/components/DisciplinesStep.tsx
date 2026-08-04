@@ -90,9 +90,23 @@ export function DisciplinesStep({
       clanKey,
     )
 
+  const creationDisciplines =
+    value.filter(
+      discipline =>
+        discipline.origin === undefined ||
+        discipline.origin === 'creation',
+    )
+
+  const nonCreationDisciplines =
+    value.filter(
+      discipline =>
+        discipline.origin !== undefined &&
+        discipline.origin !== 'creation',
+    )
+
   const validation =
     validateDisciplines(
-      value,
+      creationDisciplines,
       clanKey,
     )
 
@@ -100,14 +114,18 @@ export function DisciplinesStep({
     key: DisciplineKey,
     nextValue: number,
   ) {
-    onChange(
+    const updatedCreationDisciplines =
       updateDiscipline(
-        value,
+        creationDisciplines,
         clanKey,
         key,
         nextValue,
-      ),
-    )
+      )
+
+    onChange([
+      ...updatedCreationDisciplines,
+      ...nonCreationDisciplines,
+    ])
   }
 
   const availableDisciplines =
@@ -115,17 +133,45 @@ export function DisciplinesStep({
       clanKey,
     )
 
+  const predatorDisciplines =
+    value.filter(
+      discipline =>
+        discipline.origin ===
+          'predatorType' &&
+        discipline.value > 0,
+    )
+
+  const powerDisciplineKeys = [
+    ...new Set<DisciplineKey>([
+      ...availableDisciplines,
+      ...predatorDisciplines.map(
+        discipline =>
+          discipline.key,
+      ),
+    ]),
+  ]
+
   const isCaitiff =
     clan.kind === 'caitiff'
 
   function randomize() {
-    onChange(
+    const randomized =
       isCaitiff
         ? randomizeCaitiffDisciplines()
         : randomizeClanDisciplines(
             clanKey,
-          ),
-    )
+          )
+
+    onChange([
+      ...randomized.map(
+        discipline => ({
+          ...discipline,
+          origin:
+            'creation' as const,
+        }),
+      ),
+      ...nonCreationDisciplines,
+    ])
   }
 
   if (clan.kind === 'thinBlood') {
@@ -222,6 +268,12 @@ export function DisciplinesStep({
               }
               value={
                 getDisciplineValue(
+                  creationDisciplines,
+                  disciplineKey,
+                )
+              }
+              effectiveValue={
+                getDisciplineValue(
                   value,
                   disciplineKey,
                 )
@@ -234,8 +286,43 @@ export function DisciplinesStep({
         )}
       </div>
 
+      {predatorDisciplines.length > 0 && (
+        <section className="discipline-special-case">
+          <span>
+            Tipo de Depredador
+          </span>
+
+          <h3>
+            Disciplina adicional
+          </h3>
+
+          <p>
+            Esta concesión no consume el
+            reparto inicial 2 + 1. Debes
+            seleccionar también el Poder
+            correspondiente.
+          </p>
+
+          {predatorDisciplines.map(
+            discipline => (
+              <p key={discipline.key}>
+                <strong>
+                  {
+                    getDisciplineName(
+                      discipline.key,
+                    )
+                  }
+                </strong>
+                {' · '}
+                {discipline.value}
+              </p>
+            ),
+          )}
+        </section>
+      )}
+
       <div className="discipline-power-selectors">
-        {availableDisciplines.map(
+        {powerDisciplineKeys.map(
           (disciplineKey) => (
             <DisciplinePowerSelector
               key={disciplineKey}

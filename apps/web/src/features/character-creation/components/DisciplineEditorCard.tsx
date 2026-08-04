@@ -6,6 +6,7 @@ interface DisciplineEditorCardProps {
   disciplineKey: DisciplineKey
   name: string
   value: number
+  effectiveValue?: number
 
   onChange: (
     key: DisciplineKey,
@@ -17,12 +18,28 @@ export function DisciplineEditorCard({
   disciplineKey,
   name,
   value,
+  effectiveValue,
   onChange,
 }: DisciplineEditorCardProps) {
+  const displayedValue =
+    effectiveValue ?? value
+
+  const predatorBonus =
+    Math.max(
+      0,
+      displayedValue - value,
+    )
+
+  const visibleDots =
+    Math.max(
+      2,
+      displayedValue,
+    )
+
   return (
     <article
       className={
-        value > 0
+        displayedValue > 0
           ? 'discipline-editor-card discipline-editor-card--selected'
           : 'discipline-editor-card'
       }
@@ -37,7 +54,7 @@ export function DisciplineEditorCard({
         </div>
 
         <strong>
-          {value}
+          {displayedValue}
         </strong>
       </header>
 
@@ -58,15 +75,15 @@ export function DisciplineEditorCard({
 
         <div
           className="discipline-editor-card__dots"
-          aria-label={`${name}: ${value} de 2`}
+          aria-label={`${name}: ${displayedValue} de ${visibleDots}`}
         >
           {Array.from(
-            { length: 2 },
+            { length: visibleDots },
             (_, index) => (
               <span
                 key={index}
                 className={
-                  index < value
+                  index < displayedValue
                     ? 'discipline-editor-dot discipline-editor-dot--filled'
                     : 'discipline-editor-dot'
                 }
@@ -92,11 +109,13 @@ export function DisciplineEditorCard({
       </div>
 
       <p className="discipline-editor-card__hint">
-        {value === 0
-          ? 'Sin puntos asignados'
-          : value === 1
-            ? 'Un punto asignado'
-            : 'Dos puntos asignados'}
+        {predatorBonus > 0
+          ? `${value} de creación + ${predatorBonus} por Tipo de Depredador`
+          : value === 0
+            ? 'Sin puntos asignados'
+            : value === 1
+              ? 'Un punto asignado'
+              : 'Dos puntos asignados'}
       </p>
     </article>
   )

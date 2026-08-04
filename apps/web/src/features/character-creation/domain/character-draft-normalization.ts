@@ -79,15 +79,41 @@ export function normalizeCharacterDraft(
     }
   }
 
+  /*
+   * La normalización de clan sólo debe filtrar las
+   * Disciplinas sometidas a dicha regla.
+   *
+   * Las concesiones del Tipo de Depredador deben llegar
+   * intactas a normalizeCharacterDraftPredatorType para
+   * que ese subsistema pueda retirarlas, reaplicarlas o
+   * conservar sus Poderes según la selección vigente.
+   */
+  const predatorTypeDisciplines =
+    normalized.disciplines.filter(
+      discipline =>
+        discipline.origin ===
+        'predatorType',
+    )
+
+  const clanNormalizedDisciplines =
+    normalized.disciplines.filter(
+      discipline =>
+        discipline.origin !==
+        'predatorType',
+    )
+
   normalized = {
     ...normalized,
     disciplines:
       normalized.identity.clan === null
         ? []
-        : normalizeDisciplinesForClan(
-            normalized.disciplines,
-            normalized.identity.clan,
-          ),
+        : [
+            ...normalizeDisciplinesForClan(
+              clanNormalizedDisciplines,
+              normalized.identity.clan,
+            ),
+            ...predatorTypeDisciplines,
+          ],
   }
 
 

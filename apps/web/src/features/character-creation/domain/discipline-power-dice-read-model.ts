@@ -127,18 +127,17 @@ export function readDisciplinePowerDiceInput(
     }
   }
 
-  const characterDiscipline =
-    disciplines.find(
-      (discipline) =>
+  const acquired =
+    disciplines.some(
+      discipline =>
         discipline.key ===
-        definition.disciplineKey,
+          definition.disciplineKey &&
+        discipline.powerKeys.includes(
+          powerKey,
+        ),
     )
 
-  if (
-    !characterDiscipline?.powerKeys.includes(
-      powerKey,
-    )
-  ) {
+  if (!acquired) {
     return {
       status: 'unavailable',
       reason: 'POWER_NOT_ACQUIRED',

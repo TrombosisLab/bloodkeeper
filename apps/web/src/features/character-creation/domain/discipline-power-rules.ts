@@ -22,12 +22,33 @@ export function getCharacterDisciplineLevel(
     CharacterDisciplinesDraft,
   key: DisciplineKey,
 ): number {
-  return (
-    disciplines.find(
-      (discipline) =>
-        discipline.key === key,
-    )?.value ?? 0
+  return disciplines.reduce(
+    (total, discipline) =>
+      discipline.key === key
+        ? total + discipline.value
+        : total,
+    0,
   )
+}
+
+export function getSelectedDisciplinePowerKeys(
+  disciplines:
+    CharacterDisciplinesDraft,
+  key: DisciplineKey,
+): DisciplinePowerKey[] {
+  return [
+    ...new Set(
+      disciplines
+        .filter(
+          discipline =>
+            discipline.key === key,
+        )
+        .flatMap(
+          discipline =>
+            discipline.powerKeys,
+        ),
+    ),
+  ]
 }
 
 export function canLearnDisciplinePower(
@@ -264,53 +285,79 @@ export function updateSelectedPower(
     DisciplinePowerKey,
   selected: boolean,
 ): CharacterDisciplinesDraft {
+  if (!selected) {
+    return disciplines.map(
+      discipline =>
+        discipline.key ===
+          disciplineKey
+          ? {
+              ...discipline,
+              powerKeys:
+                discipline.powerKeys.filter(
+                  key =>
+                    key !== powerKey,
+                ),
+            }
+          : discipline,
+    )
+  }
+
+  const selectedPowerKeys =
+    getSelectedDisciplinePowerKeys(
+      disciplines,
+      disciplineKey,
+    )
+
+  if (
+    selectedPowerKeys.includes(
+      powerKey,
+    ) ||
+    selectedPowerKeys.length >=
+      getCharacterDisciplineLevel(
+        disciplines,
+        disciplineKey,
+      )
+  ) {
+    return disciplines
+  }
+
+  const creationTargetIndex =
+    disciplines.findIndex(
+      discipline =>
+        discipline.key ===
+          disciplineKey &&
+        discipline.origin !==
+          'predatorType' &&
+        discipline.powerKeys.length <
+          discipline.value,
+    )
+
+  const targetIndex =
+    creationTargetIndex >= 0
+      ? creationTargetIndex
+      : disciplines.findIndex(
+          discipline =>
+            discipline.key ===
+              disciplineKey &&
+            discipline.powerKeys.length <
+              discipline.value,
+        )
+
+  if (targetIndex < 0) {
+    return disciplines
+  }
+
   return disciplines.map(
-    (discipline) => {
-      if (
-        discipline.key !==
-        disciplineKey
-      ) {
-        return discipline
-      }
-
-      const withoutPower =
-        discipline.powerKeys.filter(
-          (key) =>
-            key !== powerKey,
-        )
-
-      if (!selected) {
-        return {
-          ...discipline,
-          powerKeys:
-            withoutPower,
-        }
-      }
-
-      if (
-        discipline.powerKeys.includes(
-          powerKey,
-        )
-      ) {
-        return discipline
-      }
-
-      if (
-        discipline.powerKeys.length >=
-        discipline.value
-      ) {
-        return discipline
-      }
-
-      return {
-        ...discipline,
-
-        powerKeys: [
-          ...discipline.powerKeys,
-          powerKey,
-        ],
-      }
-    },
+    (discipline, index) =>
+      index === targetIndex
+        ? {
+            ...discipline,
+            powerKeys: [
+              ...discipline.powerKeys,
+              powerKey,
+            ],
+          }
+        : discipline,
   )
 }
 
@@ -330,13 +377,33 @@ export function normalizeDisciplinePowers(
       ),
     )
 
+  const seenByDiscipline =
+    new Map<
+      DisciplineKey,
+      Set<DisciplinePowerKey>
+    >()
+
   const structurallyNormalized =
     disciplines.map(
       (discipline) => {
       const seen =
+        seenByDiscipline.get(
+          discipline.key,
+        ) ??
         new Set<
           DisciplinePowerKey
         >()
+
+      seenByDiscipline.set(
+        discipline.key,
+        seen,
+      )
+
+      const effectiveLevel =
+        getCharacterDisciplineLevel(
+          disciplines,
+          discipline.key,
+        )
 
       const normalized:
         DisciplinePowerKey[] = []
@@ -366,7 +433,7 @@ export function normalizeDisciplinePowers(
           definition.disciplineKey !==
             discipline.key ||
           definition.level >
-            discipline.value
+            effectiveLevel
         ) {
           continue
         }

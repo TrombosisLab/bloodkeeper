@@ -201,12 +201,9 @@
         "maximumSelections": 1,
         "options": [
           {
-            "when": {
-              "clan": "tremere"
-            },
             "grant": {
               "type": "discipline",
-              "disciplineKey": "bloodSorcery",
+              "disciplineKey": "auspex",
               "dots": 1
             }
           },

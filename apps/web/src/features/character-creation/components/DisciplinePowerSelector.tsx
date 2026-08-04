@@ -3,6 +3,8 @@ import {
 } from '../data/discipline-power-definitions'
 
 import {
+  getCharacterDisciplineLevel,
+  getSelectedDisciplinePowerKeys,
   updateSelectedPower,
   validateInitialDisciplinePowers,
 } from '../domain/discipline-power-rules'
@@ -37,18 +39,17 @@ export function DisciplinePowerSelector({
   disciplines,
   onChange,
 }: DisciplinePowerSelectorProps) {
-  const discipline =
-    disciplines.find(
-      (candidate) =>
-        candidate.key ===
-        disciplineKey,
+  const level =
+    getCharacterDisciplineLevel(
+      disciplines,
+      disciplineKey,
     )
 
-  const level =
-    discipline?.value ?? 0
-
   const selectedPowerKeys =
-    discipline?.powerKeys ?? []
+    getSelectedDisciplinePowerKeys(
+      disciplines,
+      disciplineKey,
+    )
 
   const availablePowers =
     getActiveDisciplinePowers(

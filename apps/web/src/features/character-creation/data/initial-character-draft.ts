@@ -15,6 +15,8 @@ export const initialCharacterDraft: CharacterDraft = {
     generation: null,
   },
 
+  predatorTypeChoices: {},
+
   attributes: {
     strength: 1,
     dexterity: 1,

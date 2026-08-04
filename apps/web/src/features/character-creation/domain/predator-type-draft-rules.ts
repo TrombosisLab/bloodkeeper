@@ -88,6 +88,9 @@ export function normalizeCharacterDraftPredatorType(
       clanKey:
         draft.identity.clan,
 
+      choiceSelections:
+        draft.predatorTypeChoices ?? {},
+
       advantages:
         draft.advantages,
 

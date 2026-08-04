@@ -63,16 +63,23 @@ export function createEmptyDisciplines():
   return []
 }
 
+/*
+ * Devuelve la puntuación efectiva de una Disciplina.
+ *
+ * Las entradas conservan su origen para que cada subsistema
+ * pueda retirar únicamente sus propias concesiones.
+ */
 export function getDisciplineValue(
   disciplines:
     CharacterDisciplinesDraft,
   key: DisciplineKey,
 ): number {
-  return (
-    disciplines.find(
-      (discipline) =>
-        discipline.key === key,
-    )?.value ?? 0
+  return disciplines.reduce(
+    (total, discipline) =>
+      discipline.key === key
+        ? total + discipline.value
+        : total,
+    0,
   )
 }
 

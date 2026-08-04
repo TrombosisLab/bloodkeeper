@@ -47,6 +47,15 @@ import type {
 
 export interface CharacterDraft {
   identity: CharacterIdentityDraft
+
+  /*
+   * Elecciones realizadas dentro del Tipo de Depredador.
+   *
+   * Es opcional para mantener compatibles borradores previos;
+   * los borradores nuevos siempre se inicializan con {}.
+   */
+  predatorTypeChoices?: Record<string, number>
+
   attributes: CharacterAttributesDraft
   blood: CharacterBloodDraft
   disciplines: CharacterDisciplinesDraft

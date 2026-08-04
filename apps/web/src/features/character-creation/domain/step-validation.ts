@@ -1,4 +1,8 @@
 import {
+  validatePredatorTypeChoiceSelections,
+} from './predator-type-rules.ts'
+
+import {
   BLOOD_SORCERY_RITUAL_DEFINITIONS,
 } from '../data/blood-sorcery-ritual-definitions.ts'
 
@@ -28,6 +32,7 @@ import {
 } from '../data/discipline-power-definitions.ts'
 
 import {
+  getSelectedDisciplinePowerKeys,
   validateInitialDisciplinePowers,
 } from './discipline-power-rules.ts'
 
@@ -138,6 +143,20 @@ export function validateIdentityStep(
     )
   }
 
+  const predatorTypeChoiceValidation =
+    validatePredatorTypeChoiceSelections(
+      draft.identity.predatorType,
+      {
+        clan:
+          draft.identity.clan,
+      },
+      draft.predatorTypeChoices ?? {},
+    )
+
+  errors.push(
+    ...predatorTypeChoiceValidation.errors,
+  )
+
   return {
     valid: errors.length === 0,
     errors,
@@ -191,9 +210,27 @@ export function validateBloodStep(
 export function validateDisciplinesStepBase(
   draft: CharacterDraft,
 ): StepValidationResult {
+  /*
+   * El reparto inicial 2 + 1 pertenece exclusivamente
+   * a las Disciplinas elegidas durante la creación.
+   *
+   * Las concesiones posteriores del Tipo de Depredador
+   * se validan por su propio origen y no deben alterar
+   * ni el catálogo de clan ni el presupuesto inicial.
+   *
+   * La ausencia de origin se conserva como creación
+   * para mantener compatibilidad con borradores previos.
+   */
+  const creationDisciplines =
+    draft.disciplines.filter(
+      discipline =>
+        discipline.origin === undefined ||
+        discipline.origin === 'creation',
+    )
+
   const result =
     validateDisciplines(
-      draft.disciplines,
+      creationDisciplines,
       draft.identity.clan,
     )
 
@@ -388,22 +425,33 @@ export function validateStep(
 
       const powerErrors: string[] = []
 
-      for (
-        const discipline of
-        draft.disciplines
-      ) {
-        if (
-          discipline.value <= 0
-        ) {
-          continue
-        }
+      const disciplineKeys = [
+        ...new Set(
+          draft.disciplines
+            .filter(
+              discipline =>
+                discipline.value > 0,
+            )
+            .map(
+              discipline =>
+                discipline.key,
+            ),
+        ),
+      ]
 
+      for (
+        const disciplineKey of
+        disciplineKeys
+      ) {
         const result =
           validateInitialDisciplinePowers(
             disciplinePowerDefinitions,
             draft.disciplines,
-            discipline.key,
-            discipline.powerKeys,
+            disciplineKey,
+            getSelectedDisciplinePowerKeys(
+              draft.disciplines,
+              disciplineKey,
+            ),
           )
 
         powerErrors.push(
