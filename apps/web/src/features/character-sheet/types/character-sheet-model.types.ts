@@ -37,7 +37,9 @@ export type CharacterSheetLifecycleStatus =
 
 export interface CharacterSheetDamageModel {
   health: CharacterDamageTrack
+  healthCapacity: number
   willpower: CharacterDamageTrack
+  willpowerCapacity: number
 }
 
 export interface CharacterSheetAvailability {

@@ -30,6 +30,10 @@ import {
   getPredatorType,
 } from '../../character-creation/domain/predator-type-rules.ts'
 
+import {
+  deriveCharacterTraits,
+} from '../../character-creation/domain/blood-rules.ts'
+
 import type {
   CharacterDraftApiSnapshot,
 } from '../../character-creation/types/character-draft-api.types.ts'
@@ -292,6 +296,11 @@ function advantageSelections(
 export function adaptPersistedCharacterToSheetModel(
   snapshot: CharacterDraftApiSnapshot,
 ): CharacterSheetModel {
+  const derived =
+    deriveCharacterTraits(
+      snapshot.attributes,
+    )
+
   const disciplines =
     buildCharacterDisciplineReadModel(
       aggregateDisciplines(snapshot),
@@ -378,9 +387,13 @@ export function adaptPersistedCharacterToSheetModel(
       health: {
         ...snapshot.damage.health,
       },
+      healthCapacity:
+        derived.health,
       willpower: {
         ...snapshot.damage.willpower,
       },
+      willpowerCapacity:
+        derived.willpower,
     },
 
     disciplines,

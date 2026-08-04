@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client'
 import { AppHeader } from './components/layout/AppHeader'
 import { CharacterCreationWizard } from './features/character-creation/components/CharacterCreationWizard'
 import { CharacterSheet } from './features/character-sheet/components/CharacterSheet'
+import { PersistedCharacterSheet } from './features/character-sheet/components/PersistedCharacterSheet'
 
 import './styles.css'
 
@@ -33,14 +34,18 @@ function App() {
               </span>
 
               <strong>
-                Adrián Varela
+                {creationCharacterId === null
+                  ? 'Ficha de demostración'
+                  : 'Personaje persistido'}
               </strong>
             </div>
 
             <button
               type="button"
               className="sheet-toolbar__action"
-              onClick={() => setView('creation')}
+              onClick={() =>
+                setView('creation')
+              }
             >
               {creationCharacterId === null
                 ? 'Crear personaje'
@@ -48,15 +53,23 @@ function App() {
             </button>
           </div>
 
-          <CharacterSheet />
+          {creationCharacterId === null ? (
+            <CharacterSheet />
+          ) : (
+            <PersistedCharacterSheet
+              characterId={
+                creationCharacterId
+              }
+            />
+          )}
         </main>
       ) : (
         <CharacterCreationWizard
           characterId={creationCharacterId}
-          onCharacterPersisted={
-            setCreationCharacterId
+          onCharacterPersisted={setCreationCharacterId}
+          onBackToSheet={() =>
+            setView('sheet')
           }
-          onBackToSheet={() => setView('sheet')}
         />
       )}
     </div>

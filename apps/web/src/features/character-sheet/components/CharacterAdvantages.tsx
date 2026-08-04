@@ -1,7 +1,18 @@
 import { demoAdvantages } from '../data/demo-advantages'
+
+import type {
+  CharacterAdvantages as CharacterAdvantagesModel,
+} from '../types/character-advantages.types'
+
 import { TraitGroup } from './TraitGroup'
 
-export function CharacterAdvantages() {
+interface CharacterAdvantagesProps {
+  advantages?: CharacterAdvantagesModel
+}
+
+export function CharacterAdvantages({
+  advantages = demoAdvantages,
+}: CharacterAdvantagesProps) {
   return (
     <section
       className="sheet-section advantages-section"
@@ -27,19 +38,19 @@ export function CharacterAdvantages() {
         <TraitGroup
           title="Ventajas"
           subtitle="Méritos"
-          traits={demoAdvantages.advantages}
+          traits={advantages.advantages}
         />
 
         <TraitGroup
           title="Trasfondos"
           subtitle="Recursos y vínculos"
-          traits={demoAdvantages.backgrounds}
+          traits={advantages.backgrounds}
         />
 
         <TraitGroup
           title="Defectos"
           subtitle="Complicaciones"
-          traits={demoAdvantages.flaws}
+          traits={advantages.flaws}
           negative
         />
       </div>

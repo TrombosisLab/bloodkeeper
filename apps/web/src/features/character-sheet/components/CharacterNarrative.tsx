@@ -1,6 +1,18 @@
-import { demoNarrativeState } from '../data/demo-convictions'
+import {
+  demoNarrativeState,
+} from '../data/demo-convictions'
 
-export function CharacterNarrative() {
+import type {
+  CharacterNarrativeState,
+} from '../types/character-convictions.types'
+
+interface CharacterNarrativeProps {
+  narrative?: CharacterNarrativeState
+}
+
+export function CharacterNarrative({
+  narrative = demoNarrativeState,
+}: CharacterNarrativeProps) {
   return (
     <section
       className="sheet-section narrative-section"
@@ -30,7 +42,7 @@ export function CharacterNarrative() {
           </header>
 
           <ul className="narrative-list">
-            {demoNarrativeState.convictions.map(
+            {narrative.convictions.map(
               (conviction) => (
                 <li key={conviction.key}>
                   {conviction.text}
@@ -47,7 +59,7 @@ export function CharacterNarrative() {
           </header>
 
           <div className="touchstone-list">
-            {demoNarrativeState.touchstones.map(
+            {narrative.touchstones.map(
               (touchstone) => (
                 <div
                   className="touchstone"
@@ -73,7 +85,7 @@ export function CharacterNarrative() {
           </header>
 
           <p>
-            {demoNarrativeState.notes}
+            {narrative.notes}
           </p>
         </div>
       </div>

@@ -4,13 +4,16 @@ import {
   demoHealth,
   demoWillpower,
 } from '../data/demo-trackers'
+
 import type {
   CharacterDamageTrack,
 } from '../domain/damage-track-rules'
 
 interface CharacterTrackersProps {
   health: CharacterDamageTrack
+  healthCapacity?: number
   willpower: CharacterDamageTrack
+  willpowerCapacity?: number
   stateEditing: boolean
   onHealthChange: (
     track: CharacterDamageTrack,
@@ -22,7 +25,11 @@ interface CharacterTrackersProps {
 
 export function CharacterTrackers({
   health,
+  healthCapacity =
+    demoHealth.capacity,
   willpower,
+  willpowerCapacity =
+    demoWillpower.capacity,
   stateEditing,
   onHealthChange,
   onWillpowerChange,
@@ -32,7 +39,7 @@ export function CharacterTrackers({
       {stateEditing ? (
         <DamageTracker
           label={demoHealth.label}
-          capacity={demoHealth.capacity}
+          capacity={healthCapacity}
           track={health}
           mode="editable"
           onChange={onHealthChange}
@@ -40,7 +47,7 @@ export function CharacterTrackers({
       ) : (
         <DamageTracker
           label={demoHealth.label}
-          capacity={demoHealth.capacity}
+          capacity={healthCapacity}
           track={health}
         />
       )}
@@ -48,7 +55,7 @@ export function CharacterTrackers({
       {stateEditing ? (
         <DamageTracker
           label={demoWillpower.label}
-          capacity={demoWillpower.capacity}
+          capacity={willpowerCapacity}
           track={willpower}
           mode="editable"
           onChange={onWillpowerChange}
@@ -56,7 +63,7 @@ export function CharacterTrackers({
       ) : (
         <DamageTracker
           label={demoWillpower.label}
-          capacity={demoWillpower.capacity}
+          capacity={willpowerCapacity}
           track={willpower}
         />
       )}

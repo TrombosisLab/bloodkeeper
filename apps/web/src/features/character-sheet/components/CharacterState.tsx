@@ -1,4 +1,5 @@
 import { demoState } from '../data/demo-state'
+
 import type {
   CharacterHumanityState,
 } from '../domain/humanity-state-rules'
@@ -9,6 +10,7 @@ import { HungerTrack } from './HungerTrack'
 interface CharacterStateProps {
   humanity: CharacterHumanityState
   hunger: number
+  bloodPotency?: number
   stateEditing: boolean
   onHumanityChange: (
     state: CharacterHumanityState,
@@ -21,6 +23,8 @@ interface CharacterStateProps {
 export function CharacterState({
   humanity,
   hunger,
+  bloodPotency =
+    demoState.bloodPotency,
   stateEditing,
   onHumanityChange,
   onHungerChange,
@@ -68,7 +72,9 @@ export function CharacterState({
               onChange={onHumanityChange}
             />
           ) : (
-            <HumanityTrack state={humanity} />
+            <HumanityTrack
+              state={humanity}
+            />
           )}
         </div>
 
@@ -102,7 +108,7 @@ export function CharacterState({
             <div>
               <span>Potencia de Sangre</span>
               <strong>
-                {demoState.bloodPotency}
+                {bloodPotency}
               </strong>
             </div>
 
@@ -113,7 +119,7 @@ export function CharacterState({
             <span>PS</span>
 
             <strong>
-              {demoState.bloodPotency}
+              {bloodPotency}
             </strong>
           </div>
         </div>

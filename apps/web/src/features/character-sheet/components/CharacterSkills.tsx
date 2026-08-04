@@ -1,7 +1,18 @@
 import { demoSkills } from '../data/demo-skills'
+
+import type {
+  CharacterSkillCategory,
+} from '../types/character-skills.types'
+
 import { SkillRow } from './SkillRow'
 
-export function CharacterSkills() {
+interface CharacterSkillsProps {
+  skills?: CharacterSkillCategory[]
+}
+
+export function CharacterSkills({
+  skills = demoSkills,
+}: CharacterSkillsProps) {
   return (
     <section
       className="sheet-section skills-section"
@@ -24,7 +35,7 @@ export function CharacterSkills() {
       </div>
 
       <div className="skills-grid">
-        {demoSkills.map((category) => (
+        {skills.map((category) => (
           <div
             className="skill-category"
             key={category.key}
@@ -37,7 +48,9 @@ export function CharacterSkills() {
                   key={skill.key}
                   label={skill.label}
                   value={skill.value}
-                  specialties={skill.specialties}
+                  specialties={
+                    skill.specialties
+                  }
                 />
               ))}
             </div>

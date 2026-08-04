@@ -1,13 +1,22 @@
 import { demoAttributes } from '../data/demo-attributes'
+
 import type {
   CharacterDamageTrack,
 } from '../domain/damage-track-rules'
+
+import type {
+  CharacterAttributeCategory,
+} from '../types/character-attributes.types'
+
 import { AttributeRow } from './AttributeRow'
 import { CharacterTrackers } from './CharacterTrackers'
 
 interface CharacterAttributesProps {
+  attributes?: CharacterAttributeCategory[]
   health: CharacterDamageTrack
+  healthCapacity?: number
   willpower: CharacterDamageTrack
+  willpowerCapacity?: number
   stateEditing: boolean
   onHealthChange: (
     track: CharacterDamageTrack,
@@ -18,8 +27,11 @@ interface CharacterAttributesProps {
 }
 
 export function CharacterAttributes({
+  attributes = demoAttributes,
   health,
+  healthCapacity,
   willpower,
+  willpowerCapacity,
   stateEditing,
   onHealthChange,
   onWillpowerChange,
@@ -46,7 +58,7 @@ export function CharacterAttributes({
       </div>
 
       <div className="attributes-grid">
-        {demoAttributes.map((category) => (
+        {attributes.map((category) => (
           <div
             className="attribute-category"
             key={category.key}
@@ -72,10 +84,16 @@ export function CharacterAttributes({
 
       <CharacterTrackers
         health={health}
+        healthCapacity={healthCapacity}
         willpower={willpower}
+        willpowerCapacity={
+          willpowerCapacity
+        }
         stateEditing={stateEditing}
         onHealthChange={onHealthChange}
-        onWillpowerChange={onWillpowerChange}
+        onWillpowerChange={
+          onWillpowerChange
+        }
       />
     </section>
   )

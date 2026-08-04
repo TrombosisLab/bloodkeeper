@@ -1,11 +1,17 @@
 import { useState } from 'react'
 
 import { demoCharacter } from '../data/demo-character'
+
 import {
   demoHealth,
   demoWillpower,
 } from '../data/demo-trackers'
+
 import { demoState } from '../data/demo-state'
+
+import type {
+  CharacterSheetModel,
+} from '../types/character-sheet-model.types'
 
 import { CharacterAttributes } from './CharacterAttributes'
 import { CharacterIdentity } from './CharacterIdentity'
@@ -22,26 +28,53 @@ import { PersistedCharacterValidation } from './PersistedCharacterValidation'
 
 interface CharacterSheetProps {
   characterId?: string
+  model?: CharacterSheetModel
 }
 
 export function CharacterSheet({
   characterId,
+  model,
 }: CharacterSheetProps) {
+  const persisted =
+    model !== undefined
+
   const [stateEditing, setStateEditing] =
     useState(false)
-  const [health, setHealth] = useState({
-    ...demoHealth.track,
-  })
+
+  const [health, setHealth] = useState(
+    () => ({
+      ...(
+        model?.damage.health ??
+        demoHealth.track
+      ),
+    }),
+  )
+
   const [willpower, setWillpower] =
-    useState({
-      ...demoWillpower.track,
-    })
-  const [humanity, setHumanity] = useState({
-    ...demoState.humanity,
-  })
+    useState(
+      () => ({
+        ...(
+          model?.damage.willpower ??
+          demoWillpower.track
+        ),
+      }),
+    )
+
+  const [humanity, setHumanity] =
+    useState(
+      () => ({
+        ...(
+          model?.state.humanity ??
+          demoState.humanity
+        ),
+      }),
+    )
+
   const [hunger, setHunger] =
     useState(
-      demoState.hunger,
+      () =>
+        model?.state.hunger ??
+        demoState.hunger,
     )
 
   return (
@@ -56,18 +89,22 @@ export function CharacterSheet({
         </div>
 
         <div className="sheet-header__actions">
-          <button
-            type="button"
-            className="sheet-header__state-edit"
-            aria-pressed={stateEditing}
-            onClick={() =>
-              setStateEditing((editing) => !editing)
-            }
-          >
-            {stateEditing
-              ? 'Finalizar edición'
-              : 'Editar estados'}
-          </button>
+          {!persisted ? (
+            <button
+              type="button"
+              className="sheet-header__state-edit"
+              aria-pressed={stateEditing}
+              onClick={() =>
+                setStateEditing(
+                  (editing) => !editing,
+                )
+              }
+            >
+              {stateEditing
+                ? 'Finalizar edición'
+                : 'Editar estados'}
+            </button>
+          ) : null}
 
           <div className="sheet-header__edition">
             <span>V5</span>
@@ -75,7 +112,15 @@ export function CharacterSheet({
         </div>
       </header>
 
-      {stateEditing ? (
+      {persisted ? (
+        <p
+          className="sheet-edit-notice"
+          role="status"
+        >
+          Ficha persistida · revisión{' '}
+          {model.revision}
+        </p>
+      ) : stateEditing ? (
         <p
           className="sheet-edit-notice"
           role="status"
@@ -86,34 +131,65 @@ export function CharacterSheet({
       ) : null}
 
       <CharacterIdentity
-        character={demoCharacter}
+        character={
+          model?.identity ??
+          demoCharacter
+        }
       />
 
       <CharacterAttributes
+        attributes={model?.attributes}
         health={health}
+        healthCapacity={
+          model?.damage.healthCapacity
+        }
         willpower={willpower}
-        stateEditing={stateEditing}
+        willpowerCapacity={
+          model?.damage.willpowerCapacity
+        }
+        stateEditing={
+          !persisted && stateEditing
+        }
         onHealthChange={setHealth}
         onWillpowerChange={setWillpower}
       />
 
-      <CharacterSkills />
+      <CharacterSkills
+        skills={model?.skills}
+      />
 
       <CharacterState
         humanity={humanity}
         hunger={hunger}
-        stateEditing={stateEditing}
+        bloodPotency={
+          model?.state.bloodPotency
+        }
+        stateEditing={
+          !persisted && stateEditing
+        }
         onHumanityChange={setHumanity}
         onHungerChange={setHunger}
       />
 
-      <CharacterDisciplines />
+      <CharacterDisciplines
+        disciplines={model?.disciplines}
+      />
 
-      <CharacterAdvantages />
+      <CharacterAdvantages
+        advantages={model?.advantages}
+      />
 
-      <CharacterNarrative />
+      <CharacterNarrative
+        narrative={model?.narrative}
+      />
 
-      <CharacterBloodExperience />
+      <CharacterBloodExperience
+        available={
+          model?.availability
+            .bloodExperience ??
+          true
+        }
+      />
 
       {characterId ? (
         <>

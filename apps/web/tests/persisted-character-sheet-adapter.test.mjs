@@ -390,10 +390,12 @@ test(
           superficial: 1,
           aggravated: 0,
         },
+        healthCapacity: 6,
         willpower: {
           superficial: 0,
           aggravated: 1,
         },
+        willpowerCapacity: 2,
       },
     )
 
@@ -463,9 +465,9 @@ test(
       sheetSource,
       /demoState/,
     )
-    assert.doesNotMatch(
+    assert.match(
       mainSource,
-      /<CharacterSheet[\s\S]{0,120}characterId=/,
+      /<PersistedCharacterSheet[\s\S]{0,180}characterId=/,
     )
   },
 )

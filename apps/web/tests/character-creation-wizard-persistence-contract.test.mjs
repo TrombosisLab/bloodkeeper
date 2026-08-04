@@ -51,7 +51,7 @@ test(
     assert.match(main, /Continuar creación/)
     assert.doesNotMatch(
       main,
-      /<CharacterSheet[\s\S]{0,120}characterId=/,
+      /<CharacterSheet\b[^>]*\bcharacterId=/,
     )
   },
 )

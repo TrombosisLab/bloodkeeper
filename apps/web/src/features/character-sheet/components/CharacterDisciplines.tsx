@@ -1,20 +1,36 @@
 import { demoDisciplines } from '../data/demo-disciplines'
+
 import {
   disciplineDefinitions,
 } from '../../character-creation/data/discipline-definitions'
+
 import {
   disciplinePowerDefinitions,
 } from '../../character-creation/data/discipline-power-definitions'
+
 import {
   contentSources,
 } from '../../character-creation/data/content-sources'
+
 import {
   buildCharacterDisciplineReadModel,
 } from '../domain/character-discipline-read-model'
+
+import type {
+  CharacterDisciplineView,
+} from '../types/character-disciplines.types'
+
 import { DisciplineCard } from './DisciplineCard'
 
-export function CharacterDisciplines() {
-  const disciplines =
+interface CharacterDisciplinesProps {
+  disciplines?: CharacterDisciplineView[]
+}
+
+export function CharacterDisciplines({
+  disciplines,
+}: CharacterDisciplinesProps) {
+  const resolvedDisciplines =
+    disciplines ??
     buildCharacterDisciplineReadModel(
       demoDisciplines,
       disciplineDefinitions,
@@ -44,12 +60,14 @@ export function CharacterDisciplines() {
       </div>
 
       <div className="disciplines-grid">
-        {disciplines.map((discipline) => (
-          <DisciplineCard
-            key={discipline.key}
-            discipline={discipline}
-          />
-        ))}
+        {resolvedDisciplines.map(
+          (discipline) => (
+            <DisciplineCard
+              key={discipline.key}
+              discipline={discipline}
+            />
+          ),
+        )}
       </div>
     </section>
   )
