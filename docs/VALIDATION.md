@@ -104,6 +104,23 @@ backup="$(
 
 Esta prueba restaura en una base temporal y no modifica la base activa.
 
+## Validación de SPEC-007
+
+```bash
+./scripts/check-backup-recovery.sh
+./scripts/check-backup-recovery.sh --with-full-backup
+```
+
+La primera comprueba alcance, política, tarea programada y operación.
+La segunda crea una copia completa real, captura el volumen y restaura
+el dump en una base temporal sin sustituir la base activa.
+
+El resultado esperado termina con:
+
+```text
+BACKUP Y RECUPERACIÓN SPEC-007 CORRECTOS
+```
+
 ## Comprobación desde navegador
 
 1. Abrir `http://DIRECCION_LAN:5173`.

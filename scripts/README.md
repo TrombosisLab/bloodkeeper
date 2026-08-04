@@ -19,6 +19,10 @@ despliegue y mantenimiento mediante SSH.
 | `logs.sh` | Consulta los registros de Docker Compose |
 | `backup.sh` | Crea y verifica una copia PostgreSQL |
 | `restore.sh` | Verifica o aplica una restauración segura |
+| `backup-full.sh` | Crea el paquete completo de SPEC-007 |
+| `restore-full.sh` | Verifica o extrae un paquete completo |
+| `install-backup-schedule.sh` | Gestiona la tarea diaria de backup |
+| `check-backup-recovery.sh` | Valida backup y recuperación de SPEC-007 |
 | `create-initial-admin.sh` | Crea la primera cuenta administrativa |
 
 ## Desarrollo

@@ -38,3 +38,10 @@ backups/**/*.dump
 backups/**/*.dump.sha256
 backups/**/*.dump.meta
 backups/**/*.partial.*
+
+# Full recovery bundles
+backups/**/*.tar.gz
+backups/**/*.tar.gz.sha256
+backups/**/*.tar.gz.meta
+backups/**/backup.log
+backups/**/.backup-full.lock

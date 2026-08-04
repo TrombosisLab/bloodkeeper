@@ -2,13 +2,25 @@
 
 ## Alcance
 
-Las copias oficiales protegen la base PostgreSQL. El código y los
-scripts se recuperan desde Git o desde una copia íntegra del repositorio.
+Este documento materializa SPEC-007 y define la estrategia oficial de
+copias y recuperación de BloodKeeper.
 
-Los archivos de backup no deben conservarse únicamente dentro de la
-misma VM.
+Una copia completa protege:
 
-## Crear una copia
+- Base de datos PostgreSQL mediante dump lógico;
+- Volumen Docker de PostgreSQL mediante snapshot con el servicio parado;
+- configuración local y plantillas;
+- historial Git y ramas;
+- árbol de trabajo, documentación, scripts y recursos no ignorados;
+- checksums y metadatos de trazabilidad.
+
+Los paquetes no deben conservarse únicamente dentro de la misma VM.
+`scripts/backup-full.sh` admite un directorio espejo cuando exista un
+disco, carpeta compartida o almacenamiento externo disponible.
+
+## Copia lógica de PostgreSQL
+
+Para una copia rápida y sin parada:
 
 ```bash
 ./scripts/backup.sh
@@ -20,32 +32,101 @@ Destino alternativo:
 ./scripts/backup.sh --output-dir /ruta/externa
 ```
 
-Se generan:
+Se generan un dump custom, su SHA-256 y metadatos no sensibles.
 
-- `*.dump`: archivo PostgreSQL en formato custom;
-- `*.dump.sha256`: integridad SHA-256;
-- `*.dump.meta`: fecha, base, formato y commit de referencia.
-
-El script no detiene la aplicación y valida que el archivo pueda ser
-leído por `pg_restore`.
-
-## Verificar una copia
+## Copia completa
 
 ```bash
-./scripts/restore.sh --verify backups/ARCHIVO.dump
+./scripts/backup-full.sh
 ```
 
-La verificación:
+La captura:
 
-1. comprueba el checksum cuando está disponible;
-2. crea una base temporal;
-3. restaura el archivo;
-4. valida tablas y migraciones Prisma;
-5. elimina la base temporal.
+1. crea y valida el dump PostgreSQL;
+2. conserva el repositorio mediante `git bundle`;
+3. empaqueta el árbol de trabajo y los recursos no ignorados;
+4. copia `.env`, Compose y Dockerfiles;
+5. detiene brevemente web, API y PostgreSQL;
+6. captura el volumen Docker de forma consistente;
+7. reinicia y valida los servicios;
+8. genera el paquete, checksum y metadatos;
+9. aplica la política de conservación.
 
-No modifica la base activa.
+Destino y espejo explícitos:
 
-## Aplicar una restauración
+```bash
+./scripts/backup-full.sh \
+  --output-dir "$HOME/bloodkeeper_backups/scheduled" \
+  --mirror-dir /ruta/fuera/de/la/VM \
+  --keep 7
+```
+
+## Programación
+
+La política inicial es:
+
+- una copia completa diaria a las 03:00, hora local;
+- conservación de los siete conjuntos completos más recientes;
+- registro en `backup.log` dentro del destino;
+- una sola ejecución simultánea mediante bloqueo;
+- espejo externo cuando exista una ruta disponible.
+
+Instalar o revisar la tarea:
+
+```bash
+./scripts/install-backup-schedule.sh --install
+./scripts/install-backup-schedule.sh --status
+```
+
+Eliminarla:
+
+```bash
+./scripts/install-backup-schedule.sh --remove
+```
+
+No se aplican copias incrementales en esta fase: el volumen actual es
+pequeño y una estrategia incremental añadiría complejidad y riesgo sin
+beneficio operativo demostrado. Esta decisión deberá revisarse si el
+tamaño o la ventana de copia cambian sustancialmente.
+
+## Verificación periódica
+
+Cada copia valida automáticamente:
+
+- legibilidad del dump con `pg_restore`;
+- legibilidad del snapshot del volumen;
+- integridad interna mediante SHA-256;
+- integridad del paquete exterior;
+- recuperación de los servicios tras la captura.
+
+Comprobación contractual:
+
+```bash
+./scripts/check-backup-recovery.sh
+```
+
+Prueba completa real:
+
+```bash
+./scripts/check-backup-recovery.sh --with-full-backup
+```
+
+La prueba completa crea un paquete, restaura el dump en una base temporal
+y no sustituye la base activa.
+
+## Verificar un paquete completo
+
+```bash
+./scripts/restore-full.sh \
+  --verify /ruta/bloodkeeper_full_FECHA.tar.gz
+```
+
+La verificación comprueba el paquete, el repositorio, el árbol de trabajo,
+el volumen y restaura la base en un destino temporal.
+
+## Aplicar una restauración de base
+
+Después de verificar el dump incluido:
 
 ```bash
 ./scripts/restore.sh \
@@ -53,31 +134,42 @@ No modifica la base activa.
   --confirm
 ```
 
-La operación:
+La operación crea una copia previa, restaura en una base de preparación,
+intercambia las bases y revierte automáticamente si los health checks
+fallan.
 
-1. crea una copia previa de la base actual;
-2. restaura y valida en una base de preparación;
-3. detiene API y web;
-4. intercambia las bases;
-5. reinicia y ejecuta los health checks;
-6. conserva automáticamente la base anterior si la validación falla.
-
-La restauración debe ejecutarse desde SSH y durante una ventana sin
-usuarios activos.
-
-## Recuperación completa del servidor
+## Recuperación desde servidor limpio
 
 1. Instalar Ubuntu Server 24.04 LTS.
-2. Copiar o clonar el repositorio.
-3. Ejecutar `./scripts/bootstrap-server.sh`.
-4. Copiar el backup elegido al servidor.
-5. Verificarlo con `restore.sh --verify`.
-6. Aplicarlo con `restore.sh --apply ... --confirm`.
-7. Ejecutar `./scripts/check.sh`.
-8. Confirmar el acceso desde otro equipo de la red.
+2. Copiar el paquete completo y verificar su SHA-256.
+3. Extraer o reconstruir el proyecto:
 
-## Conservación
+```bash
+./scripts/restore-full.sh \
+  --extract /ruta/bloodkeeper_full_FECHA.tar.gz \
+  --target-dir "$HOME/vampiro-v5-revolution-recuperado" \
+  --confirm
+```
 
-Mantener al menos una copia reciente fuera de la VM. La política de
-retención concreta se definirá cuando exista una frecuencia operativa
-real y no debe automatizarse sin necesidad.
+4. Entrar en el directorio recuperado.
+5. Ejecutar `./scripts/bootstrap-server.sh`.
+6. Verificar el dump de `backups/full-recovery/`.
+7. Aplicarlo con `restore.sh --apply ... --confirm`.
+8. Ejecutar `./scripts/check.sh`.
+9. Confirmar el acceso desde otro equipo de la red.
+
+El snapshot del volumen se conserva como segunda vía de recuperación y
+evidencia del estado persistente. La restauración ordinaria usa el dump
+lógico validado porque es portable entre instalaciones PostgreSQL
+compatibles.
+
+## Evidencia
+
+Conservar junto a cada paquete:
+
+- archivo `.tar.gz`;
+- checksum `.tar.gz.sha256`;
+- metadatos `.tar.gz.meta`;
+- registro de la tarea programada;
+- resultado periódico de `check-backup-recovery.sh`;
+- al menos una copia reciente fuera de la VM.
