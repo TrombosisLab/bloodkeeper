@@ -14,6 +14,17 @@ model MilestoneValidation {
   @@map("milestone_validation")
 }
 
+enum UserAccountStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum UserRole {
+  ADMIN
+  NARRATOR
+  PLAYER
+}
+
 enum CharacterStatus {
   DRAFT
   ACTIVE
@@ -113,6 +124,39 @@ enum AdvantageMaskBenefit {
 enum InventoryItemStatus {
   ACTIVE
   ARCHIVED
+}
+
+model User {
+  id           String            @id @default(uuid()) @db.Uuid
+  username     String            @unique
+  displayName  String
+  passwordHash String
+  status       UserAccountStatus @default(ACTIVE)
+  roles        UserRole[]        @default([PLAYER])
+  createdAt    DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime          @updatedAt @db.Timestamptz(3)
+
+  sessions AuthSession[]
+
+  @@index([status])
+  @@map("users")
+}
+
+model AuthSession {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  tokenHash String   @unique
+  expiresAt DateTime @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  lastSeenAt DateTime @default(now()) @db.Timestamptz(3)
+  revokedAt DateTime? @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([revokedAt])
+  @@map("auth_sessions")
 }
 
 model Chronicle {
