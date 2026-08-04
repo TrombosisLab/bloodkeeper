@@ -1,4 +1,9 @@
-import { useMemo, useState } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 
 import { creationSteps } from '../data/creation-steps'
 import { initialCharacterDraft } from '../data/initial-character-draft'
@@ -6,6 +11,29 @@ import { initialCharacterDraft } from '../data/initial-character-draft'
 import {
   buildStepValidationMap,
 } from '../domain/step-validation'
+
+import {
+  loadCharacterDraftEditorState,
+  messageForCharacterDraftPersistenceState,
+  persistCharacterDraftEditorState,
+  stateForCharacterDraftPersistenceError,
+} from '../domain/character-draft-persistence'
+
+import type {
+  CharacterDraftPersistenceUiState,
+} from '../domain/character-draft-persistence'
+
+import {
+  createCharacterDraftGateway,
+} from '../infrastructure/character-draft.api'
+
+import type {
+  CharacterDraftGateway,
+} from '../infrastructure/character-draft.api'
+
+import type {
+  CharacterDraftApiEditorState,
+} from '../domain/character-draft-api.mapper'
 
 import {
   applyCharacterDraftUpdate,
@@ -41,11 +69,54 @@ import { ReviewStep } from './ReviewStep'
 
 interface CharacterCreationWizardProps {
   onBackToSheet: () => void
+  characterId?: string | null
+  onCharacterPersisted?: (
+    characterId: string,
+  ) => void
+  gateway?: CharacterDraftGateway
 }
 
 export function CharacterCreationWizard({
   onBackToSheet,
+  characterId = null,
+  onCharacterPersisted,
+  gateway: providedGateway,
 }: CharacterCreationWizardProps) {
+  const gateway = useMemo(
+    () =>
+      providedGateway ??
+      createCharacterDraftGateway(),
+    [providedGateway],
+  )
+
+  const [
+    editorState,
+    setEditorState,
+  ] = useState<CharacterDraftApiEditorState | null>(
+    null,
+  )
+
+  const [
+    persistenceState,
+    setPersistenceState,
+  ] = useState<CharacterDraftPersistenceUiState>(
+    characterId === null
+      ? 'ready'
+      : 'loading',
+  )
+
+  const [
+    reloadVersion,
+    setReloadVersion,
+  ] = useState(0)
+
+  const [
+    hasUnsavedChanges,
+    setHasUnsavedChanges,
+  ] = useState(false)
+
+  const loadedCharacterIdRef =
+    useRef<string | null>(null)
   const [currentStepId, setCurrentStepId] =
     useState<CreationStepId>('identity')
 
@@ -79,11 +150,158 @@ export function CharacterCreationWizard({
   const currentValidation =
     validations[currentStepId]
 
+  const persistenceBusy =
+    persistenceState === 'loading' ||
+    persistenceState === 'saving'
+
+  const persistenceMessage =
+    messageForCharacterDraftPersistenceState(
+      persistenceState,
+    )
+
+  const canRetryPersistence =
+    ![
+      'ready',
+      'loading',
+      'saving',
+    ].includes(persistenceState)
+
+  useEffect(() => {
+    if (characterId === null) {
+      setPersistenceState('ready')
+      return
+    }
+
+    if (
+      loadedCharacterIdRef.current ===
+      characterId
+    ) {
+      return
+    }
+
+    let active = true
+    setPersistenceState('loading')
+
+    void loadCharacterDraftEditorState(
+      gateway,
+      characterId,
+    )
+      .then((loaded) => {
+        if (!active) return
+
+        loadedCharacterIdRef.current =
+          loaded.characterId
+        setEditorState(loaded)
+        setDraft(loaded.draft)
+        setCurrentStepId(
+          loaded.currentStepId,
+        )
+        setShowValidation(false)
+        setHasUnsavedChanges(false)
+        setPersistenceState('ready')
+        onCharacterPersisted?.(
+          loaded.characterId,
+        )
+      })
+      .catch((error: unknown) => {
+        if (!active) return
+
+        setPersistenceState(
+          stateForCharacterDraftPersistenceError(
+            error,
+          ),
+        )
+      })
+
+    return () => {
+      active = false
+    }
+  }, [
+    characterId,
+    gateway,
+    onCharacterPersisted,
+    reloadVersion,
+  ])
+
+  async function persistDraft() {
+    if (persistenceState !== 'ready') {
+      return
+    }
+
+    setPersistenceState('saving')
+
+    try {
+      const persisted =
+        await persistCharacterDraftEditorState(
+          gateway,
+          draft,
+          currentStepId,
+          editorState,
+        )
+
+      loadedCharacterIdRef.current =
+        persisted.characterId
+      setEditorState(persisted)
+      setDraft(persisted.draft)
+      setCurrentStepId(
+        persisted.currentStepId,
+      )
+      setShowValidation(false)
+      setHasUnsavedChanges(false)
+      setPersistenceState('ready')
+      onCharacterPersisted?.(
+        persisted.characterId,
+      )
+    } catch (error: unknown) {
+      setPersistenceState(
+        stateForCharacterDraftPersistenceError(
+          error,
+        ),
+      )
+    }
+  }
+
+  function retryPersistence() {
+    const persistedCharacterId =
+      editorState?.characterId ??
+      characterId
+
+    if (persistedCharacterId === null) {
+      setPersistenceState('ready')
+      return
+    }
+
+    loadedCharacterIdRef.current = null
+    setReloadVersion(
+      (version) => version + 1,
+    )
+  }
+
+  function changeCurrentStep(
+    stepId: CreationStepId,
+  ) {
+    if (
+      persistenceBusy ||
+      stepId === currentStepId
+    ) {
+      return
+    }
+
+    setHasUnsavedChanges(true)
+    setCurrentStepId(stepId)
+  }
+
   function updateDraft(
     updater: (
       current: CharacterDraft,
     ) => CharacterDraft,
   ) {
+    if (persistenceBusy) {
+      return
+    }
+
+    setHasUnsavedChanges(true)
+
     setDraft(
       (current) =>
         applyCharacterDraftUpdate(
@@ -103,7 +321,7 @@ export function CharacterCreationWizard({
 
     if (targetIndex <= currentIndex) {
       setShowValidation(false)
-      setCurrentStepId(stepId)
+      changeCurrentStep(stepId)
       return
     }
 
@@ -117,18 +335,22 @@ export function CharacterCreationWizard({
 
       if (!validations[step.id].valid) {
         setShowValidation(true)
-        setCurrentStepId(step.id)
+        changeCurrentStep(step.id)
         return
       }
     }
 
     setShowValidation(false)
-    setCurrentStepId(stepId)
+    changeCurrentStep(stepId)
   }
 
   function canNavigateTo(
     stepId: CreationStepId,
   ): boolean {
+    if (persistenceBusy) {
+      return stepId === currentStepId
+    }
+
     const targetIndex =
       creationSteps.findIndex(
         (step) => step.id === stepId,
@@ -161,7 +383,7 @@ export function CharacterCreationWizard({
 
     setShowValidation(false)
 
-    setCurrentStepId(
+    changeCurrentStep(
       creationSteps[
         currentIndex - 1
       ].id,
@@ -180,15 +402,25 @@ export function CharacterCreationWizard({
 
     setShowValidation(false)
 
-    setCurrentStepId(
+    changeCurrentStep(
       creationSteps[
         currentIndex + 1
       ].id,
     )
   }
 
+  const persistenceSummary =
+    editorState === null
+      ? 'Borrador local sin guardar'
+      : hasUnsavedChanges
+        ? `Cambios pendientes · revisión ${editorState.revision}`
+        : `Guardado · revisión ${editorState.revision}`
+
   return (
-    <main className="creation-page">
+    <main
+      className="creation-page"
+      aria-busy={persistenceBusy}
+    >
       <header className="creation-header">
         <div>
           <p className="creation-header__eyebrow">
@@ -203,13 +435,63 @@ export function CharacterCreationWizard({
           </p>
         </div>
 
-        <button
-          type="button"
-          className="creation-header__back"
-          onClick={onBackToSheet}
-        >
-          Ver ficha
-        </button>
+        <div>
+          <p aria-live="polite">
+            <strong>
+              {persistenceSummary}
+            </strong>
+          </p>
+
+          {persistenceMessage !== null ? (
+            <p
+              role={
+                persistenceBusy
+                  ? 'status'
+                  : 'alert'
+              }
+            >
+              {persistenceMessage}
+            </p>
+          ) : null}
+
+          <div className="creation-actions">
+            <button
+              type="button"
+              className="creation-button creation-button--primary"
+              disabled={
+                persistenceState !== 'ready'
+              }
+              onClick={() => {
+                void persistDraft()
+              }}
+            >
+              {persistenceState === 'saving'
+                ? 'Guardando…'
+                : editorState === null
+                  ? 'Crear borrador'
+                  : 'Guardar cambios'}
+            </button>
+
+            {canRetryPersistence ? (
+              <button
+                type="button"
+                className="creation-button creation-button--secondary"
+                onClick={retryPersistence}
+              >
+                Recargar borrador
+              </button>
+            ) : null}
+
+            <button
+              type="button"
+              className="creation-header__back"
+              onClick={onBackToSheet}
+              disabled={persistenceBusy}
+            >
+              Ver ficha
+            </button>
+          </div>
+        </div>
       </header>
 
       <div className="creation-layout">
@@ -508,7 +790,10 @@ export function CharacterCreationWizard({
               type="button"
               className="creation-button creation-button--secondary"
               onClick={goPrevious}
-              disabled={isFirst}
+              disabled={
+                isFirst ||
+                persistenceBusy
+              }
             >
               Anterior
             </button>
@@ -523,7 +808,10 @@ export function CharacterCreationWizard({
               type="button"
               className="creation-button creation-button--primary"
               onClick={goNext}
-              disabled={isLast}
+              disabled={
+                isLast ||
+                persistenceBusy
+              }
             >
               Siguiente
             </button>

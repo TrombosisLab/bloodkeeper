@@ -15,6 +15,11 @@ function App() {
   const [view, setView] =
     useState<AppView>('sheet')
 
+  const [
+    creationCharacterId,
+    setCreationCharacterId,
+  ] = useState<string | null>(null)
+
   return (
     <div className="application">
       <AppHeader />
@@ -37,7 +42,9 @@ function App() {
               className="sheet-toolbar__action"
               onClick={() => setView('creation')}
             >
-              Crear personaje
+              {creationCharacterId === null
+                ? 'Crear personaje'
+                : 'Continuar creación'}
             </button>
           </div>
 
@@ -45,6 +52,10 @@ function App() {
         </main>
       ) : (
         <CharacterCreationWizard
+          characterId={creationCharacterId}
+          onCharacterPersisted={
+            setCreationCharacterId
+          }
           onBackToSheet={() => setView('sheet')}
         />
       )}
