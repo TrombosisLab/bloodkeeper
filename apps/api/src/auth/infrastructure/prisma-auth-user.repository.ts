@@ -100,6 +100,21 @@ export class PrismaAuthUserRepository
     return toDomain(row)
   }
 
+  async findById(
+    id: string,
+  ): Promise<AuthUser | null> {
+    const row =
+      await this.database.user.findUnique({
+        where: {
+          id,
+        },
+      })
+
+    return row === null
+      ? null
+      : toDomain(row)
+  }
+
   async findByUsername(
     username: string,
   ): Promise<AuthUser | null> {

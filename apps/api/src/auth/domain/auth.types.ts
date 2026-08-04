@@ -25,3 +25,10 @@ export interface CreateAuthUserData {
   readonly status: UserAccountStatus
   readonly roles: readonly UserRole[]
 }
+
+export interface AuthenticatedUser {
+  readonly id: string
+  readonly username: string
+  readonly displayName: string
+  readonly roles: readonly UserRole[]
+}

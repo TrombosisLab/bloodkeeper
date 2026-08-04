@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
 
 import { AppHeader } from './components/layout/AppHeader'
+import { AuthenticationGate } from './features/authentication/components/AuthenticationGate'
 import { CharacterCreationWizard } from './features/character-creation/components/CharacterCreationWizard'
 import { CharacterSheet } from './features/character-sheet/components/CharacterSheet'
 import { PersistedCharacterSheet } from './features/character-sheet/components/PersistedCharacterSheet'
@@ -80,6 +81,8 @@ ReactDOM.createRoot(
   document.getElementById('root')!,
 ).render(
   <React.StrictMode>
-    <App />
+    <AuthenticationGate>
+      <App />
+    </AuthenticationGate>
   </React.StrictMode>,
 )

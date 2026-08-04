@@ -8,6 +8,10 @@ export interface AuthUserRepository {
     data: CreateAuthUserData,
   ): Promise<AuthUser>
 
+  findById(
+    id: string,
+  ): Promise<AuthUser | null>
+
   findByUsername(
     username: string,
   ): Promise<AuthUser | null>
