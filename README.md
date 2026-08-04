@@ -30,7 +30,6 @@ Después del primer despliegue:
 ./scripts/start.sh
 ./scripts/status.sh
 ./scripts/check.sh
-./scripts/status.sh
 ./scripts/logs.sh
 ./scripts/backup.sh
 ./scripts/stop.sh
@@ -41,6 +40,7 @@ Después del primer despliegue:
 - `docs/DEPLOYMENT.md`: instalación y despliegue.
 - `docs/DOCKER_ARCHITECTURE.md`: arquitectura Docker oficial.
 - `docs/PROJECT_STRUCTURE.md`: estructura oficial del repositorio.
+- `docs/DEVELOPMENT_WORKFLOW.md`: flujo oficial de desarrollo.
 - `docs/VALIDATION.md`: validación técnica y funcional.
 - `docs/RECOVERY.md`: copias y recuperación.
 - `scripts/README.md`: catálogo de scripts.

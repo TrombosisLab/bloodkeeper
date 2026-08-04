@@ -22,6 +22,24 @@ La comprobación valida:
 - health check de API y PostgreSQL;
 - comunicación web → API.
 
+## Validación estándar de un incremento
+
+```bash
+./scripts/dev/check.sh
+```
+
+Ejecuta revisión de diff y shell, Compose, estructura, arquitectura
+Docker, typecheck, pruebas, integración, Prisma, builds y smoke tests.
+
+El resultado esperado termina con:
+
+```text
+VALIDACIÓN DE DESARROLLO COMPLETA
+```
+
+El flujo y las evidencias obligatorias están definidos en
+`docs/DEVELOPMENT_WORKFLOW.md`.
+
 ## Validación de estructura
 
 ```bash

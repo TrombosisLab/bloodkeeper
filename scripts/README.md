@@ -14,6 +14,7 @@ despliegue y mantenimiento mediante SSH.
 | `check.sh` | Ejecuta los smoke tests operativos |
 | `check-docker-architecture.sh` | Valida aislamiento, usuarios y persistencia Docker |
 | `check-project-structure.sh` | Valida la estructura oficial del repositorio |
+| `check-development-workflow.sh` | Valida el flujo oficial de desarrollo |
 | `logs.sh` | Consulta los registros de Docker Compose |
 | `backup.sh` | Crea y verifica una copia PostgreSQL |
 | `restore.sh` | Verifica o aplica una restauración segura |
@@ -21,10 +22,19 @@ despliegue y mantenimiento mediante SSH.
 
 ## Desarrollo
 
-Los scripts de `scripts/dev/` conservan su finalidad histórica. El
-repositorio actual usa `npm`; las validaciones oficiales deben
-ejecutarse dentro de los contenedores con los comandos documentados en
-`docs/VALIDATION.md`.
+Los scripts de `scripts/dev/` constituyen la automatización oficial del
+incremento y ejecutan Node exclusivamente dentro de Docker mediante
+`npm`.
+
+| Script | Función |
+|---|---|
+| `dev/typecheck.sh` | Comprueba TypeScript en API y web |
+| `dev/test.sh` | Ejecuta pruebas web, API e integración |
+| `dev/build.sh` | Valida Prisma y construye API y web |
+| `dev/check.sh` | Ejecuta la validación estándar completa |
+
+El procedimiento y las evidencias de cierre están documentados en
+`docs/DEVELOPMENT_WORKFLOW.md`.
 
 ## Reglas
 
