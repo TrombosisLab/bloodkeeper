@@ -2,8 +2,9 @@
 
 ## Alcance
 
-Este procedimiento instala y despliega BloodKeeper en Ubuntu Server
-24.04 LTS mediante Docker Engine y Docker Compose.
+Este documento materializa SPEC-006 y define el procedimiento oficial
+para instalar y desplegar BloodKeeper en Ubuntu Server 24.04 LTS
+mediante Docker Engine y Docker Compose.
 
 La topología, el aislamiento y la persistencia se describen en
 `docs/DOCKER_ARCHITECTURE.md`.
@@ -99,6 +100,26 @@ mediante `/api`.
 ./scripts/check.sh
 ./scripts/logs.sh
 ./scripts/stop.sh
+```
+
+## Validación del despliegue
+
+Comprobación operativa y contractual:
+
+```bash
+./scripts/check-deployment.sh
+```
+
+Validación adicional de backup y restauración temporal:
+
+```bash
+./scripts/check-deployment.sh --with-backup
+```
+
+La segunda opción no sustituye la base activa. Ambas terminan con:
+
+```text
+DESPLIEGUE SPEC-006 CORRECTO
 ```
 
 ## Copia previa a actualizaciones

@@ -15,6 +15,7 @@ despliegue y mantenimiento mediante SSH.
 | `check-docker-architecture.sh` | Valida aislamiento, usuarios y persistencia Docker |
 | `check-project-structure.sh` | Valida la estructura oficial del repositorio |
 | `check-development-workflow.sh` | Valida el flujo oficial de desarrollo |
+| `check-deployment.sh` | Valida el despliegue oficial de SPEC-006 |
 | `logs.sh` | Consulta los registros de Docker Compose |
 | `backup.sh` | Crea y verifica una copia PostgreSQL |
 | `restore.sh` | Verifica o aplica una restauración segura |

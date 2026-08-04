@@ -80,6 +80,17 @@ docker compose exec -T web npm test
 
 Todas las suites deben finalizar con cero fallos.
 
+## Validación de SPEC-006
+
+```bash
+./scripts/check-deployment.sh
+./scripts/check-deployment.sh --with-backup
+```
+
+La primera comprobación valida host, entorno, contratos de despliegue y
+servicios. La segunda añade un backup real y una restauración en una
+base temporal sin sustituir la base activa.
+
 ## Validación de backup y recuperación
 
 ```bash
