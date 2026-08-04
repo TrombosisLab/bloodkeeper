@@ -48,6 +48,29 @@ function emptySkills() {
   )
 }
 
+function completeSpecialties() {
+  return [
+    {
+      id: 'creation-free',
+      skillKey: 'drive',
+      name: 'Motocicletas',
+      origin: 'creation',
+    },
+    {
+      id: 'creation-craft',
+      skillKey: 'craft',
+      name: 'Carpintería',
+      origin: 'creation',
+    },
+    {
+      id: 'creation-performance',
+      skillKey: 'performance',
+      name: 'Canto',
+      origin: 'creation',
+    },
+  ]
+}
+
 function violations(action) {
   let error = null
 
@@ -74,7 +97,7 @@ test(
         skills(),
         'balanced',
         'blood',
-        [],
+        completeSpecialties(),
       ),
     )
   },
@@ -138,7 +161,7 @@ test(
           state,
           'balanced',
           'blood',
-          [],
+          completeSpecialties(),
         ),
       ),
       [
@@ -162,23 +185,24 @@ test(
           'balanced',
           'blood',
           [
+            ...completeSpecialties(),
             {
               id: 'specialty-1',
               skillKey: 'technology',
               name: '   ',
-              origin: null,
+              origin: 'predatorType',
             },
             {
               id: 'specialty-2',
               skillKey: 'athletics',
               name: 'Carrera',
-              origin: null,
+              origin: 'predatorType',
             },
             {
               id: 'specialty-3',
               skillKey: 'athletics',
               name: ' carrera ',
-              origin: null,
+              origin: 'predatorType',
             },
           ],
         ),

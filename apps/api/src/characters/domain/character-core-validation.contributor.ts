@@ -65,6 +65,12 @@ const attributeSkillMessages: Record<
     'Una Especialidad requiere puntuación en su Habilidad.',
   SKILL_SPECIALTY_DUPLICATE:
     'No puede repetirse una Especialidad en la misma Habilidad.',
+  SKILL_SPECIALTY_CREATION_LIMIT_EXCEEDED:
+    'Hay más Especialidades de creación de las permitidas por las Habilidades elegidas.',
+  SKILL_SPECIALTY_CREATION_COUNT_INCOMPLETE:
+    'Faltan Especialidades obligatorias de creación.',
+  SKILL_SPECIALTY_REQUIRED_MISSING:
+    'Academicismo, Artesanía, Ciencia e Interpretación requieren una Especialidad propia cuando tienen puntuación.',
 }
 
 function issue(
@@ -264,7 +270,11 @@ function validateAttributesAndSkills(
         (violation ===
           'ATTRIBUTE_DISTRIBUTION_INVALID' ||
           violation ===
-            'SKILL_DISTRIBUTION_INVALID')
+            'SKILL_DISTRIBUTION_INVALID' ||
+          violation ===
+            'SKILL_SPECIALTY_CREATION_COUNT_INCOMPLETE' ||
+          violation ===
+            'SKILL_SPECIALTY_REQUIRED_MISSING')
       ) {
         issues.push(
           attributeSkillIssue(

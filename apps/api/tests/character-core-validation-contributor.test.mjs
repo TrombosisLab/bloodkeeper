@@ -27,6 +27,29 @@ function balancedSkills() {
   )
 }
 
+function completeSkillSpecialties() {
+  return [
+    {
+      id: 'creation-free',
+      skillKey: 'drive',
+      name: 'Motocicletas',
+      origin: 'creation',
+    },
+    {
+      id: 'creation-craft',
+      skillKey: 'craft',
+      name: 'Carpintería',
+      origin: 'creation',
+    },
+    {
+      id: 'creation-performance',
+      skillKey: 'performance',
+      name: 'Canto',
+      origin: 'creation',
+    },
+  ]
+}
+
 function validCharacter() {
   const touchstoneId =
     '4f3c19eb-e667-43a3-b94b-31b2b5adb742'
@@ -85,7 +108,8 @@ function validCharacter() {
       },
     },
     skills: balancedSkills(),
-    skillSpecialties: [],
+    skillSpecialties:
+      completeSkillSpecialties(),
     disciplines: [],
     bloodSorceryRituals: { ritualKeys: [] },
     oblivionCeremonies: { ceremonyKeys: [] },
@@ -173,6 +197,7 @@ test(
     character.skills = Object.fromEntries(
       CHARACTER_SKILL_KEYS.map((key) => [key, 0]),
     )
+    character.skillSpecialties = []
     character.humanity.convictions = []
     character.humanity.touchstones = []
 

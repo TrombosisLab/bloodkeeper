@@ -42,6 +42,29 @@ function createBalancedSkills() {
   )
 }
 
+function createCompleteSpecialties() {
+  return [
+    {
+      id: 'creation-free',
+      skillKey: 'drive',
+      name: 'Motocicletas',
+      origin: 'creation',
+    },
+    {
+      id: 'creation-craft',
+      skillKey: 'craft',
+      name: 'Carpintería',
+      origin: 'creation',
+    },
+    {
+      id: 'creation-performance',
+      skillKey: 'performance',
+      name: 'Canto',
+      origin: 'creation',
+    },
+  ]
+}
+
 function createValidAttributes() {
   return {
     strength: 4,
@@ -90,7 +113,8 @@ function createRepository() {
       stains: 0,
     },
     skills: createBalancedSkills(),
-    skillSpecialties: [],
+    skillSpecialties:
+      createCompleteSpecialties(),
     creation: {
       currentStep: 'blood',
       skillDistributionMethod: 'balanced',

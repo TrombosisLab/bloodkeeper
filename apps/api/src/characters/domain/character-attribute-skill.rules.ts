@@ -19,6 +19,9 @@ export type CharacterAttributeSkillViolation =
   | 'SKILL_SPECIALTY_EMPTY'
   | 'SKILL_SPECIALTY_WITH_ZERO_RATING'
   | 'SKILL_SPECIALTY_DUPLICATE'
+  | 'SKILL_SPECIALTY_CREATION_LIMIT_EXCEEDED'
+  | 'SKILL_SPECIALTY_CREATION_COUNT_INCOMPLETE'
+  | 'SKILL_SPECIALTY_REQUIRED_MISSING'
 
 export class InvalidCharacterAttributeSkillStateError
   extends Error {
@@ -159,10 +162,20 @@ function validateSkills(
   return violations
 }
 
+const creationSpecialtySkillKeys = [
+  'academics',
+  'craft',
+  'performance',
+  'science',
+] as const satisfies readonly (
+  typeof CHARACTER_SKILL_KEYS[number]
+)[]
+
 function validateSpecialties(
   skills: PersistedCharacterSkills,
   specialties:
     PersistedCharacterSkillSpecialty[],
+  requireCompleteCreation: boolean,
 ): CharacterAttributeSkillViolation[] {
   const violations:
     CharacterAttributeSkillViolation[] = []
@@ -193,6 +206,54 @@ function validateSpecialties(
     }
 
     identities.add(identity)
+  }
+
+  const creationSpecialties =
+    specialties.filter(
+      (specialty) =>
+        specialty.origin !== 'predatorType',
+    )
+
+  const mandatorySkillKeys =
+    creationSpecialtySkillKeys.filter(
+      (skillKey) => skills[skillKey] > 0,
+    )
+
+  const requiredCreationCount =
+    1 + mandatorySkillKeys.length
+
+  if (
+    creationSpecialties.length >
+    requiredCreationCount
+  ) {
+    violations.push(
+      'SKILL_SPECIALTY_CREATION_LIMIT_EXCEEDED',
+    )
+  }
+
+  if (
+    requireCompleteCreation &&
+    creationSpecialties.length <
+      requiredCreationCount
+  ) {
+    violations.push(
+      'SKILL_SPECIALTY_CREATION_COUNT_INCOMPLETE',
+    )
+  }
+
+  if (
+    requireCompleteCreation &&
+    mandatorySkillKeys.some(
+      (skillKey) =>
+        !creationSpecialties.some(
+          (specialty) =>
+            specialty.skillKey === skillKey,
+        ),
+    )
+  ) {
+    violations.push(
+      'SKILL_SPECIALTY_REQUIRED_MISSING',
+    )
   }
 
   return violations
@@ -233,7 +294,11 @@ export function validateCharacterAttributeSkillState(
       method,
       skillsComplete,
     ),
-    ...validateSpecialties(skills, specialties),
+    ...validateSpecialties(
+      skills,
+      specialties,
+      skillsComplete,
+    ),
   ]
 }
 

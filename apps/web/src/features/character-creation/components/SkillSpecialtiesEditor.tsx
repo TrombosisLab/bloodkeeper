@@ -6,6 +6,8 @@ import {
 
 import {
   addSpecialty,
+  getSpecialtyCreationBudget,
+  isCreationSpecialty,
   removeSpecialty,
 } from '../domain/skill-specialty-rules'
 
@@ -35,6 +37,12 @@ export function SkillSpecialtiesEditor({
         skills[skill.key] > 0,
     )
 
+  const budget =
+    getSpecialtyCreationBudget(
+      value,
+      skills,
+    )
+
   const [requestedSkillKey, setRequestedSkillKey] =
     useState<SkillKey | null>(null)
 
@@ -53,12 +61,28 @@ export function SkillSpecialtiesEditor({
       ? requestedSkillKey
       : availableSkills[0]?.key ?? null
 
+  const missingMandatoryLabels =
+    budget.missingMandatorySkillKeys.map(
+      (skillKey) =>
+        skillDefinitions.find(
+          (definition) =>
+            definition.key === skillKey,
+        )?.label ?? skillKey,
+    )
+
   function submit() {
     setError('')
 
     if (!selectedSkillKey) {
       setError(
         'Necesitas una habilidad con al menos un punto.',
+      )
+      return
+    }
+
+    if (budget.remaining === 0) {
+      setError(
+        'Ya has asignado todas las especialidades permitidas durante la creación.',
       )
       return
     }
@@ -121,9 +145,40 @@ export function SkillSpecialtiesEditor({
         </div>
 
         <p>
-          Añade especialidades a habilidades
-          que tengan al menos un punto.
+          Una especialidad libre, más una
+          obligatoria en Academicismo,
+          Artesanía, Ciencia e Interpretación
+          cuando tengan puntuación. Las del
+          Tipo de Depredador se añaden aparte.
         </p>
+      </div>
+
+      <div
+        className={
+          budget.complete
+            ? 'skill-validation skill-validation--valid'
+            : 'skill-validation'
+        }
+      >
+        <p>
+          Especialidades de creación:{' '}
+          <strong>
+            {budget.selected} / {budget.required}
+          </strong>
+        </p>
+
+        {missingMandatoryLabels.length > 0 && (
+          <p>
+            Pendientes obligatorias:{' '}
+            {missingMandatoryLabels.join(', ')}.
+          </p>
+        )}
+
+        {budget.complete && (
+          <p className="skill-validation__ok">
+            Cupo de especialidades completo.
+          </p>
+        )}
       </div>
 
       <div className="skill-specialties-editor__form">
@@ -135,7 +190,8 @@ export function SkillSpecialtiesEditor({
               selectedSkillKey ?? ''
             }
             disabled={
-              availableSkills.length === 0
+              availableSkills.length === 0 ||
+              budget.remaining === 0
             }
             onChange={(event) => {
               setRequestedSkillKey(
@@ -173,7 +229,8 @@ export function SkillSpecialtiesEditor({
             value={name}
             placeholder="Ej. Motocicletas"
             disabled={
-              availableSkills.length === 0
+              availableSkills.length === 0 ||
+              budget.remaining === 0
             }
             onChange={(event) => {
               setName(
@@ -198,7 +255,8 @@ export function SkillSpecialtiesEditor({
           className="creation-button creation-button--secondary"
           disabled={
             !selectedSkillKey ||
-            !name.trim()
+            !name.trim() ||
+            budget.remaining === 0
           }
           onClick={submit}
         >
@@ -230,6 +288,11 @@ export function SkillSpecialtiesEditor({
                     specialty.skillKey,
                 )
 
+              const creation =
+                isCreationSpecialty(
+                  specialty,
+                )
+
               return (
                 <div
                   className="skill-specialty-chip"
@@ -243,24 +306,32 @@ export function SkillSpecialtiesEditor({
                     <strong>
                       {specialty.name}
                     </strong>
+
+                    <small>
+                      {creation
+                        ? 'Creación'
+                        : 'Tipo de Depredador'}
+                    </small>
                   </div>
 
-                  <button
-                    type="button"
-                    aria-label={
-                      `Eliminar especialidad ${specialty.name}`
-                    }
-                    onClick={() =>
-                      onChange(
-                        removeSpecialty(
-                          value,
-                          specialty.id,
-                        ),
-                      )
-                    }
-                  >
-                    ×
-                  </button>
+                  {creation && (
+                    <button
+                      type="button"
+                      aria-label={
+                        `Eliminar especialidad ${specialty.name}`
+                      }
+                      onClick={() =>
+                        onChange(
+                          removeSpecialty(
+                            value,
+                            specialty.id,
+                          ),
+                        )
+                      }
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
               )
             },

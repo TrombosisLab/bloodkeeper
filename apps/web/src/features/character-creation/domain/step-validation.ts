@@ -1,4 +1,8 @@
 import {
+  validateSpecialties,
+} from './skill-specialty-rules.ts'
+
+import {
   validatePredatorTypeChoiceSelections,
 } from './predator-type-rules.ts'
 
@@ -180,15 +184,27 @@ export function validateAttributesStep(
 export function validateSkillsStep(
   draft: CharacterDraft,
 ): StepValidationResult {
-  const result =
+  const distribution =
     validateSkillDistribution(
       draft.skills,
       draft.skillDistributionMethod,
     )
 
+  const specialties =
+    validateSpecialties(
+      draft.skillSpecialties,
+      draft.skills,
+      true,
+    )
+
   return {
-    valid: result.valid,
-    errors: result.errors,
+    valid:
+      distribution.valid &&
+      specialties.valid,
+    errors: [
+      ...distribution.errors,
+      ...specialties.errors,
+    ],
   }
 }
 
