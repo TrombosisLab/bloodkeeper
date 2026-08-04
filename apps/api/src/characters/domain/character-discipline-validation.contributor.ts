@@ -182,24 +182,59 @@ function validatesInitialSelection(
   )
 }
 
+function disciplineContributionIdentity(
+  discipline:
+    PersistedCharacterDraft['disciplines'][number],
+): string {
+  return [
+    discipline.disciplineKey,
+    discipline.origin ?? 'unspecified',
+  ].join(':')
+}
+
+function effectiveDisciplineRatings(
+  character: PersistedCharacterDraft,
+): ReadonlyMap<string, number> {
+  const ratings = new Map<string, number>()
+
+  for (const discipline of character.disciplines) {
+    ratings.set(
+      discipline.disciplineKey,
+      (
+        ratings.get(
+          discipline.disciplineKey,
+        ) ?? 0
+      ) + discipline.rating,
+    )
+  }
+
+  return ratings
+}
+
 function validateDisciplines(
   character: PersistedCharacterDraft,
 ): CharacterValidationIssue[] {
   const issues: CharacterValidationIssue[] = []
-  const disciplineKeys =
+  const identities =
     character.disciplines.map(
-      (discipline) => discipline.disciplineKey,
+      disciplineContributionIdentity,
     )
 
-  for (const disciplineKey of duplicateValues(
-    disciplineKeys,
+  for (const identity of duplicateValues(
+    identities,
   )) {
+    const [disciplineKey, origin] =
+      identity.split(':')
+
     issues.push(
       errorIssue(
         'CHARACTER_DISCIPLINE_DUPLICATE',
         'disciplines',
-        'Una Disciplina no puede aparecer mas de una vez.',
-        { disciplineKey },
+        'Una contribucion de Disciplina no puede repetirse para el mismo origen.',
+        {
+          disciplineKey,
+          origin,
+        },
       ),
     )
   }
@@ -216,7 +251,7 @@ function validateDisciplines(
         errorIssue(
           'CHARACTER_DISCIPLINE_RATING_OUT_OF_RANGE',
           'disciplines',
-          'La puntuacion de Disciplina debe estar entre 1 y 5.',
+          'La puntuacion de una contribucion de Disciplina debe estar entre 1 y 5.',
           {
             disciplineKey:
               discipline.disciplineKey,
@@ -233,7 +268,7 @@ function validateDisciplines(
         errorIssue(
           'CHARACTER_DISCIPLINE_POWER_CAPACITY_EXCEEDED',
           'disciplines',
-          'Una Disciplina no puede registrar mas Poderes que su puntuacion.',
+          'Una contribucion no puede registrar mas Poderes que su puntuacion.',
           {
             disciplineKey:
               discipline.disciplineKey,
@@ -264,6 +299,25 @@ function validateDisciplines(
     }
   }
 
+  for (
+    const [disciplineKey, rating] of
+      effectiveDisciplineRatings(character)
+  ) {
+    if (rating > 5) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_DISCIPLINE_EFFECTIVE_RATING_OUT_OF_RANGE',
+          'disciplines',
+          'La suma efectiva de una Disciplina no puede superar 5.',
+          {
+            disciplineKey,
+            rating,
+          },
+        ),
+      )
+    }
+  }
+
   for (const powerKey of duplicateValues(
     learnedPowerKeys,
   )) {
@@ -284,12 +338,16 @@ function disciplineRating(
   character: PersistedCharacterDraft,
   disciplineKey: string,
 ): number {
-  return (
-    character.disciplines.find(
+  return character.disciplines
+    .filter(
       (discipline) =>
         discipline.disciplineKey === disciplineKey,
-    )?.rating ?? 0
-  )
+    )
+    .reduce(
+      (total, discipline) =>
+        total + discipline.rating,
+      0,
+    )
 }
 
 function learnedPowerSet(
@@ -428,6 +486,10 @@ function validateCatalogDisciplinesAndPowers(
     const definition = index.disciplines.get(
       discipline.disciplineKey,
     )
+    const effectiveRating = disciplineRating(
+      character,
+      discipline.disciplineKey,
+    )
 
     if (definition === undefined) {
       issues.push(
@@ -529,18 +591,18 @@ function validateCatalogDisciplinesAndPowers(
         continue
       }
 
-      if (power.level > discipline.rating) {
+      if (power.level > effectiveRating) {
         issues.push(
           errorIssue(
             'CHARACTER_DISCIPLINE_POWER_LEVEL_UNMET',
             'disciplines',
-            'El nivel del Poder supera la puntuacion de Disciplina.',
+            'El nivel del Poder supera la puntuacion efectiva de Disciplina.',
             {
               disciplineKey:
                 discipline.disciplineKey,
               powerKey,
               powerLevel: power.level,
-              rating: discipline.rating,
+              rating: effectiveRating,
             },
           ),
         )

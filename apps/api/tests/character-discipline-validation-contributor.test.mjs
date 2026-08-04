@@ -65,7 +65,7 @@ test(
             disciplineKey: 'auspex',
             rating: 6,
             powerKeys: [],
-            origin: 'predatorType',
+            origin: 'creation',
           },
         ],
       }),
@@ -247,6 +247,81 @@ test(
     assert.ok(
       codes(outOfRange).includes(
         'CHARACTER_THIN_BLOOD_ALCHEMY_RATING_OUT_OF_RANGE',
+      ),
+    )
+  },
+)
+
+test(
+  '004-E.1B.2 acepta contribuciones separadas para la misma Disciplina',
+  () => {
+    const result =
+      characterDisciplineValidationContributor
+        .validate(
+          character({
+            disciplines: [
+              {
+                disciplineKey: 'auspex',
+                rating: 2,
+                powerKeys: [
+                  'auspex-heightened-senses',
+                  'auspex-premonition',
+                ],
+                origin: 'creation',
+              },
+              {
+                disciplineKey: 'auspex',
+                rating: 1,
+                powerKeys: [],
+                origin: 'predatorType',
+              },
+            ],
+          }),
+          'draftSave',
+        )[0]
+
+    assert.equal(result.state, 'pending')
+    assert.equal(
+      codes(result).includes(
+        'CHARACTER_DISCIPLINE_DUPLICATE',
+      ),
+      false,
+    )
+    assert.equal(
+      codes(result).includes(
+        'CHARACTER_DISCIPLINE_EFFECTIVE_RATING_OUT_OF_RANGE',
+      ),
+      false,
+    )
+  },
+)
+
+test(
+  '004-E.1B.2 limita la puntuacion efectiva sumada a cinco',
+  () => {
+    const result = validate(
+      character({
+        disciplines: [
+          {
+            disciplineKey: 'auspex',
+            rating: 5,
+            powerKeys: [],
+            origin: 'creation',
+          },
+          {
+            disciplineKey: 'auspex',
+            rating: 1,
+            powerKeys: [],
+            origin: 'predatorType',
+          },
+        ],
+      }),
+    )
+
+    assert.equal(result.state, 'invalid')
+    assert.ok(
+      codes(result).includes(
+        'CHARACTER_DISCIPLINE_EFFECTIVE_RATING_OUT_OF_RANGE',
       ),
     )
   },

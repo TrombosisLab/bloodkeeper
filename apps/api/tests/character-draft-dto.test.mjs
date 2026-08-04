@@ -325,3 +325,60 @@ test(
     )
   },
 )
+
+test(
+  '004-E.1B.2 transporta contribuciones por origen sin perderlas',
+  () => {
+    const disciplines = [
+      {
+        disciplineKey: 'auspex',
+        rating: 2,
+        powerKeys: [
+          'auspex-heightened-senses',
+          'auspex-premonition',
+        ],
+        origin: 'creation',
+      },
+      {
+        disciplineKey: 'auspex',
+        rating: 1,
+        powerKeys: [
+          'auspex-scry-the-soul',
+        ],
+        origin: 'predatorType',
+      },
+    ]
+
+    const parsed =
+      parseCreateCharacterDraftRequest(
+        ownerId,
+        {
+          ...createBody(),
+          disciplines,
+        },
+      )
+
+    assert.deepEqual(
+      parsed.disciplines,
+      disciplines,
+    )
+
+    assert.throws(
+      () =>
+        parseCreateCharacterDraftRequest(
+          ownerId,
+          {
+            ...createBody(),
+            disciplines: [
+              disciplines[0],
+              {
+                ...disciplines[1],
+                origin: 'creation',
+              },
+            ],
+          },
+        ),
+      /duplicates a Discipline contribution/,
+    )
+  },
+)

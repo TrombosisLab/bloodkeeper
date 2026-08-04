@@ -206,7 +206,7 @@ test(
 )
 
 test(
-  '004-E.1A rechaza respuestas incompletas y disciplinas duplicadas',
+  '004-E.1B.2 acepta orígenes separados y rechaza contribuciones duplicadas',
   () => {
     assert.throws(
       () =>
@@ -228,6 +228,27 @@ test(
       },
     )
 
+    const parsed =
+      parseCharacterDraftApiSnapshotResponse({
+        ...snapshot(),
+        disciplines: [
+          {
+            disciplineKey: 'presence',
+            rating: 2,
+            powerKeys: ['a'],
+            origin: 'creation',
+          },
+          {
+            disciplineKey: 'presence',
+            rating: 1,
+            powerKeys: ['b'],
+            origin: 'predatorType',
+          },
+        ],
+      })
+
+    assert.equal(parsed.disciplines.length, 2)
+
     assert.throws(
       () =>
         parseCharacterDraftApiSnapshotResponse({
@@ -243,7 +264,7 @@ test(
               disciplineKey: 'presence',
               rating: 1,
               powerKeys: ['b'],
-              origin: 'predatorType',
+              origin: 'creation',
             },
           ],
         }),

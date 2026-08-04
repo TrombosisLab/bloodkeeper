@@ -521,3 +521,137 @@ test(
     }
   },
 )
+
+test(
+  '004-E.1B.2 conserva dos contribuciones de la misma Disciplina',
+  async () => {
+    const database = new DatabaseService()
+    const repository =
+      new PrismaCharacterDraftRepository(
+        database,
+      )
+    const ownerId = randomUUID()
+    let characterId = null
+
+    await database.$connect()
+
+    try {
+      const created = await repository.create({
+        ownerId,
+        chronicleId: null,
+        identity: {
+          name: 'Solapamiento 004-E',
+          predatorTypeKey: 'sandman',
+        },
+        attributes: {
+          strength: 1,
+          dexterity: 1,
+          stamina: 1,
+          charisma: 1,
+          manipulation: 1,
+          composure: 1,
+          intelligence: 1,
+          wits: 1,
+          resolve: 1,
+        },
+        blood: {
+          bloodPotency: 1,
+          hunger: 1,
+        },
+        skills: createSkills(),
+        skillSpecialties: [],
+        disciplines: [
+          {
+            disciplineKey: 'auspex',
+            rating: 2,
+            powerKeys: [
+              'auspex-heightened-senses',
+              'auspex-premonition',
+            ],
+            origin: 'creation',
+          },
+          {
+            disciplineKey: 'auspex',
+            rating: 1,
+            powerKeys: [
+              'auspex-scry-the-soul',
+            ],
+            origin: 'predatorType',
+          },
+        ],
+        bloodSorceryRituals: {
+          ritualKeys: [],
+        },
+        oblivionCeremonies: {
+          ceremonyKeys: [],
+        },
+        thinBloodAlchemy: {
+          rating: 0,
+          method: null,
+          formulaKeys: [],
+        },
+        thinBloodTraits: [],
+        advantages: {
+          selections: [],
+        },
+        humanity: {
+          value: 7,
+          stains: 0,
+          convictions: [],
+          touchstones: [],
+        },
+        creation: {
+          currentStep: 'identity',
+          skillDistributionMethod: 'balanced',
+          predatorTypeChoices: {
+            'discipline-choice': 0,
+          },
+        },
+      })
+
+      characterId = created.characterId
+
+      assert.deepEqual(
+        created.disciplines,
+        [
+          {
+            disciplineKey: 'auspex',
+            rating: 2,
+            powerKeys: [
+              'auspex-heightened-senses',
+              'auspex-premonition',
+            ],
+            origin: 'creation',
+          },
+          {
+            disciplineKey: 'auspex',
+            rating: 1,
+            powerKeys: [
+              'auspex-scry-the-soul',
+            ],
+            origin: 'predatorType',
+          },
+        ],
+      )
+
+      const loaded =
+        await repository.findById(
+          ownerId,
+          characterId,
+        )
+
+      assert.deepEqual(
+        loaded?.disciplines,
+        created.disciplines,
+      )
+    } finally {
+      if (characterId !== null) {
+        await database.character.delete({
+          where: { id: characterId },
+        })
+      }
+
+      await database.$disconnect()
+    }
+  },
+)

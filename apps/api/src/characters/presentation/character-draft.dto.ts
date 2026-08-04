@@ -261,40 +261,93 @@ function validateDisciplines(
   input: unknown,
   path: string,
 ): void {
+  const identities = new Set<string>()
+  const powerKeys = new Set<string>()
+
   arrayValue(input, path).forEach((item, index) => {
     const itemPath = `${path}[${index}]`
     const value = record(item, itemPath)
+
     onlyKeys(
       value,
-      ['disciplineKey', 'rating', 'powerKeys', 'origin'],
+      [
+        'disciplineKey',
+        'rating',
+        'powerKeys',
+        'origin',
+      ],
       itemPath,
     )
+
+    const disciplineKey = required(
+      value,
+      'disciplineKey',
+      itemPath,
+    )
+
     oneOf(
-      required(value, 'disciplineKey', itemPath),
+      disciplineKey,
       CHARACTER_DISCIPLINE_KEYS,
       `${itemPath}.disciplineKey`,
     )
+
     integer(
       required(value, 'rating', itemPath),
       `${itemPath}.rating`,
     )
-    arrayValue(
-      required(value, 'powerKeys', itemPath),
-      `${itemPath}.powerKeys`,
-    ).forEach((powerKey, powerIndex) =>
-      stringValue(
-        powerKey,
-        `${itemPath}.powerKeys[${powerIndex}]`,
-      ),
+
+    const origin = required(
+      value,
+      'origin',
+      itemPath,
     )
-    const origin = required(value, 'origin', itemPath)
+
     if (origin !== null) {
       oneOf(
         origin,
-        ['creation', 'predatorType', 'thinBlood'],
+        [
+          'creation',
+          'predatorType',
+          'thinBlood',
+        ],
         `${itemPath}.origin`,
       )
     }
+
+    const identity = [
+      disciplineKey as string,
+      origin === null
+        ? 'unspecified'
+        : origin as string,
+    ].join(':')
+
+    if (identities.has(identity)) {
+      throw new InvalidCharacterDraftRequestError(
+        itemPath,
+        'duplicates a Discipline contribution',
+      )
+    }
+
+    identities.add(identity)
+
+    arrayValue(
+      required(value, 'powerKeys', itemPath),
+      `${itemPath}.powerKeys`,
+    ).forEach((powerKey, powerIndex) => {
+      stringValue(
+        powerKey,
+        `${itemPath}.powerKeys[${powerIndex}]`,
+      )
+
+      if (powerKeys.has(powerKey)) {
+        throw new InvalidCharacterDraftRequestError(
+          `${itemPath}.powerKeys[${powerIndex}]`,
+          'duplicates an acquired Power',
+        )
+      }
+
+      powerKeys.add(powerKey)
+    })
   })
 }
 

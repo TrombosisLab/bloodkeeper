@@ -358,7 +358,10 @@ function validDisciplines(
     }
 
     disciplineIdentities.push(
-      item.disciplineKey,
+      [
+        item.disciplineKey,
+        item.origin ?? 'unspecified',
+      ].join(':'),
     )
     powerIdentities.push(
       ...item.powerKeys,

@@ -239,26 +239,28 @@ model CharacterSkillSpecialty {
 }
 
 model CharacterDiscipline {
-  characterId  String            @db.Uuid
-  disciplineKey String
-  rating        Int               @default(0)
-  origin        DisciplineOrigin?
+  characterId    String            @db.Uuid
+  disciplineKey  String
+  contributionKey String
+  rating          Int               @default(0)
+  origin          DisciplineOrigin?
 
   character Character                  @relation(fields: [characterId], references: [id], onDelete: Cascade)
   powers    CharacterDisciplinePower[]
 
-  @@id([characterId, disciplineKey])
+  @@id([characterId, disciplineKey, contributionKey])
   @@map("character_disciplines")
 }
 
 model CharacterDisciplinePower {
-  characterId  String @db.Uuid
-  disciplineKey String
-  powerKey      String
+  characterId     String @db.Uuid
+  disciplineKey   String
+  contributionKey String
+  powerKey         String
 
-  discipline CharacterDiscipline @relation(fields: [characterId, disciplineKey], references: [characterId, disciplineKey], onDelete: Cascade)
+  discipline CharacterDiscipline @relation(fields: [characterId, disciplineKey, contributionKey], references: [characterId, disciplineKey, contributionKey], onDelete: Cascade)
 
-  @@id([characterId, disciplineKey, powerKey])
+  @@id([characterId, disciplineKey, contributionKey, powerKey])
   @@map("character_discipline_powers")
 }
 

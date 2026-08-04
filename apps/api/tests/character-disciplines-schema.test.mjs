@@ -15,6 +15,14 @@ const migration = await readFile(
   'utf8',
 )
 
+const contributionMigration = await readFile(
+  new URL(
+    '../prisma/migrations/20260804132500_preserve_discipline_contributions/migration.sql',
+    import.meta.url,
+  ),
+  'utf8',
+)
+
 test(
   '004-C.5 separa Disciplinas y Poderes adquiridos',
   () => {
@@ -25,11 +33,11 @@ test(
     )
     assert.match(
       schema,
-      /@@id\(\[characterId, disciplineKey\]\)/,
+      /@@id\(\[characterId, disciplineKey, contributionKey\]\)/,
     )
     assert.match(
       schema,
-      /@@id\(\[characterId, disciplineKey, powerKey\]\)/,
+      /@@id\(\[characterId, disciplineKey, contributionKey, powerKey\]\)/,
     )
   },
 )
@@ -54,6 +62,24 @@ test(
     assert.doesNotMatch(
       migration,
       /INSERT INTO "character_disciplines"/,
+    )
+  },
+)
+
+test(
+  '004-E.1B.2 migra la identidad de contribuciones y sus Poderes',
+  () => {
+    assert.match(
+      contributionMigration,
+      /ADD COLUMN "contributionKey" TEXT/,
+    )
+    assert.match(
+      contributionMigration,
+      /PRIMARY KEY \(\s*"characterId",\s*"disciplineKey",\s*"contributionKey"\s*\)/,
+    )
+    assert.match(
+      contributionMigration,
+      /FOREIGN KEY \(\s*"characterId",\s*"disciplineKey",\s*"contributionKey"\s*\)/,
     )
   },
 )

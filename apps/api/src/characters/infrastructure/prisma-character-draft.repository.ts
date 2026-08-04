@@ -152,6 +152,12 @@ const disciplineOriginFromPrisma: Record<
   THIN_BLOOD: 'thinBlood',
 }
 
+function disciplineContributionKey(
+  origin: CharacterDisciplineOrigin | null,
+): string {
+  return origin ?? 'unspecified'
+}
+
 const alchemyMethodToPrisma: Record<
   ThinBloodAlchemyMethod,
   PrismaThinBloodAlchemyMethod
@@ -354,7 +360,10 @@ const characterRelations = {
         orderBy: { powerKey: 'asc' },
       },
     },
-    orderBy: { disciplineKey: 'asc' },
+    orderBy: [
+      { disciplineKey: 'asc' },
+      { contributionKey: 'asc' },
+    ],
   },
   bloodSorceryRituals: {
     orderBy: { ritualKey: 'asc' },
@@ -1069,6 +1078,10 @@ export class PrismaCharacterDraftRepository
                   (discipline) => ({
                     disciplineKey:
                       discipline.disciplineKey,
+                    contributionKey:
+                      disciplineContributionKey(
+                        discipline.origin,
+                      ),
                     rating: discipline.rating,
                     origin:
                       discipline.origin === null
@@ -1387,6 +1400,10 @@ export class PrismaCharacterDraftRepository
                       characterId: data.characterId,
                       disciplineKey:
                         discipline.disciplineKey,
+                      contributionKey:
+                        disciplineContributionKey(
+                          discipline.origin,
+                        ),
                       rating: discipline.rating,
                       origin:
                         discipline.origin === null
