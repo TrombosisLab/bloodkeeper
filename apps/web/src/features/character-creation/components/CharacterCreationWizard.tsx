@@ -47,6 +47,10 @@ import {
   removeInvalidSpecialties,
 } from '../domain/skill-specialty-rules'
 
+import {
+  normalizeCharacterDraftPredatorType,
+} from '../domain/predator-type-draft-rules'
+
 
 import type {
   CharacterDraft,
@@ -189,15 +193,35 @@ export function CharacterCreationWizard({
       .then((loaded) => {
         if (!active) return
 
+        const normalizedDraft =
+          normalizeCharacterDraftPredatorType(
+            loaded.draft,
+          )
+
+        const normalizationChanged =
+          JSON.stringify(
+            normalizedDraft,
+          ) !==
+          JSON.stringify(
+            loaded.draft,
+          )
+
+        const normalizedLoaded = {
+          ...loaded,
+          draft: normalizedDraft,
+        }
+
         loadedCharacterIdRef.current =
-          loaded.characterId
-        setEditorState(loaded)
-        setDraft(loaded.draft)
+          normalizedLoaded.characterId
+        setEditorState(normalizedLoaded)
+        setDraft(normalizedDraft)
         setCurrentStepId(
-          loaded.currentStepId,
+          normalizedLoaded.currentStepId,
         )
         setShowValidation(false)
-        setHasUnsavedChanges(false)
+        setHasUnsavedChanges(
+          normalizationChanged,
+        )
         setPersistenceState('ready')
         onCharacterPersisted?.(
           loaded.characterId,

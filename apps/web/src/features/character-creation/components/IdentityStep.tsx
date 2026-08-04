@@ -18,6 +18,10 @@ import {
   PredatorTypeChoiceSelector,
 } from './PredatorTypeChoiceSelector'
 
+import {
+  PredatorTypeAdvantageSummary,
+} from './PredatorTypeAdvantageSummary'
+
 import type {
   ClanKey,
 } from '../types/clan.types'
@@ -212,6 +216,16 @@ export function IdentityStep({
           value={choiceSelections}
           onChange={
             onChoiceSelectionsChange
+          }
+        />
+
+        <PredatorTypeAdvantageSummary
+          predatorTypeKey={
+            value.predatorType
+          }
+          clanKey={value.clan}
+          choiceSelections={
+            choiceSelections
           }
         />
 

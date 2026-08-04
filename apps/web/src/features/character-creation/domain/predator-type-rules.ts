@@ -8,6 +8,10 @@ import {
   getActiveCharacterAdvantageDefinitions,
 } from './advantage-catalog-rules.ts'
 
+import {
+  createInitialAdvantageInstanceDetails,
+} from './advantage-instance-details-rules.ts'
+
 import type {
   PredatorTypeChoice,
   PredatorTypeChoiceGrant,
@@ -1089,6 +1093,29 @@ export function applyPredatorTypeAdvantages(
   advantages: CharacterAdvantagesDraft,
   choiceSelections: PredatorTypeChoiceSelections = {},
 ): CharacterAdvantagesDraft {
+  /*
+   * Las concesiones se reconstruyen durante cada
+   * normalización del CharacterDraft.
+   *
+   * Conservamos los detalles narrativos ya introducidos
+   * cuando la misma concesión continúa activa.
+   */
+  const existingPredatorSelections =
+    new Map(
+      advantages.selections
+        .filter(
+          selection =>
+            selection.origin ===
+            'predatorType',
+        )
+        .map(
+          selection => [
+            selection.selectionId,
+            selection,
+          ] as const,
+        ),
+    )
+
   const cleaned =
     removePredatorTypeAdvantages(
       advantages,
@@ -1151,8 +1178,8 @@ export function applyPredatorTypeAdvantages(
           (
             grant,
             index,
-          ) => ({
-            selectionId:
+          ) => {
+            const selectionId =
               createPredatorTypeSelectionId(
                 predatorTypeKey,
                 'advantage',
@@ -1160,20 +1187,72 @@ export function applyPredatorTypeAdvantages(
                   grant.definitionKey,
                   index,
                 ].join(':'),
-              ),
+              )
 
-            definitionKey:
-              grant.definitionKey,
+            const existingSelection =
+              existingPredatorSelections.get(
+                selectionId,
+              )
 
-            category:
-              grant.category,
+            const advantageDefinition =
+              getActiveCharacterAdvantageDefinitions(
+                characterAdvantageDefinitions,
+              ).find(
+                candidate =>
+                  candidate.key ===
+                  grant.definitionKey,
+              )
 
-            rating:
-              grant.rating,
+            const initialDetails =
+              advantageDefinition ===
+              undefined
+                ? undefined
+                : createInitialAdvantageInstanceDetails(
+                    advantageDefinition,
+                  )
 
-            origin:
-              'predatorType',
-          }),
+            return {
+              selectionId,
+
+              definitionKey:
+                grant.definitionKey,
+
+              category:
+                grant.category,
+
+              rating:
+                grant.rating,
+
+              origin:
+                'predatorType' as const,
+
+              ...(existingSelection
+                ?.parentSelectionId ===
+              undefined
+                ? {}
+                : {
+                    parentSelectionId:
+                      existingSelection
+                        .parentSelectionId,
+                  }),
+
+              ...(existingSelection
+                ?.details !== undefined
+                ? {
+                    details:
+                      structuredClone(
+                        existingSelection.details,
+                      ),
+                  }
+                : initialDetails ===
+                  undefined
+                  ? {}
+                  : {
+                      details:
+                        initialDetails,
+                    }),
+            }
+          },
         )
 
   return {

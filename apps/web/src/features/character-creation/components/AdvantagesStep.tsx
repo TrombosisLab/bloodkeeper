@@ -180,6 +180,13 @@ export function AdvantagesStep({
   const budget =
     getCharacterAdvantagesBudget(value)
 
+  const predatorTypeSelections =
+    value.selections.filter(
+      (selection) =>
+        selection.origin ===
+        'predatorType',
+    )
+
   const advantageDelta =
     7 - budget.advantagePoints
 
@@ -270,9 +277,16 @@ export function AdvantagesStep({
         definition.key,
       )
 
+    const alreadyGranted =
+      value.selections.some(
+        (selection) =>
+          selection.definitionKey ===
+          definition.key,
+      )
+
     if (
       !definition.allowMultiple &&
-      existing.length > 0
+      alreadyGranted
     ) {
       return
     }
@@ -424,6 +438,78 @@ export function AdvantagesStep({
       </section>
 
 
+      {predatorTypeSelections.length > 0 && (
+        <section className="advantages-category">
+          <header className="advantages-category__heading">
+            <div>
+              <span>Tipo de Depredador</span>
+
+              <h3>
+                Concesiones automáticas
+              </h3>
+
+              <p>
+                No consumen el presupuesto normal 7/2
+                y no se seleccionan de nuevo.
+              </p>
+            </div>
+
+            <strong>
+              {predatorTypeSelections.length}
+            </strong>
+          </header>
+
+          <div className="advantages-catalog-grid advantages-catalog-grid--merit">
+            {predatorTypeSelections.map(
+              (selection) => {
+                const definition =
+                  characterAdvantageDefinitions.find(
+                    (candidate) =>
+                      candidate.key ===
+                      selection.definitionKey,
+                  )
+
+                return (
+                  <article
+                    key={selection.selectionId}
+                    className="advantage-sheet-entry advantage-sheet-entry--selected"
+                  >
+                    <header>
+                      <div>
+                        <span>
+                          {
+                            categoryLabels[
+                              selection.category
+                            ]
+                          }
+                        </span>
+
+                        <h4>
+                          {
+                            definition?.name ??
+                            selection.definitionKey
+                          }
+                        </h4>
+                      </div>
+
+                      <strong>
+                        {'•'.repeat(
+                          selection.rating,
+                        )}
+                      </strong>
+                    </header>
+
+                    <p className="advantage-catalog-card__pending">
+                      Concedido por el Tipo de Depredador.
+                    </p>
+                  </article>
+                )
+              },
+            )}
+          </div>
+        </section>
+      )}
+
       {isThinBlood && (
         <ThinBloodSection
           thinBlood={thinBlood}
@@ -455,6 +541,14 @@ export function AdvantagesStep({
                     clanKey,
                     generation,
                   },
+                ),
+            ).filter(
+              (definition) =>
+                definition.allowMultiple ||
+                !predatorTypeSelections.some(
+                  (selection) =>
+                    selection.definitionKey ===
+                    definition.key,
                 ),
             )
 
