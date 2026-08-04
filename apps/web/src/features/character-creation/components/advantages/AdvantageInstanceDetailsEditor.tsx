@@ -802,6 +802,10 @@ export function AdvantageInstanceDetailsEditor({
   if (
     details.kind === 'substanceUse'
   ) {
+    const isFunctionalAddict =
+      selection.definitionKey ===
+      'functional-addict'
+
     return (
       <div className="advantage-instance-editor">
         <h5>
@@ -819,13 +823,38 @@ export function AdvantageInstanceDetailsEditor({
               onChange({
                 ...selection,
                 details: {
+                  ...details,
                   kind: 'substanceUse',
-                  substance: event.target.value,
+                  substance:
+                    event.target.value,
                 },
               })
             }
           />
         </label>
+
+        {isFunctionalAddict && (
+          <label>
+            Categoría de reserva
+
+            <input
+              value={
+                details.poolCategory ?? ''
+              }
+              onChange={(event) =>
+                onChange({
+                  ...selection,
+                  details: {
+                    ...details,
+                    kind: 'substanceUse',
+                    poolCategory:
+                      event.target.value,
+                  },
+                })
+              }
+            />
+          </label>
+        )}
       </div>
     )
   }
