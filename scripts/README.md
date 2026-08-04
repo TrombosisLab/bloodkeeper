@@ -13,6 +13,7 @@ despliegue y mantenimiento mediante SSH.
 | `status.sh` | Muestra estado, API y disco |
 | `check.sh` | Ejecuta los smoke tests operativos |
 | `check-docker-architecture.sh` | Valida aislamiento, usuarios y persistencia Docker |
+| `check-project-structure.sh` | Valida la estructura oficial del repositorio |
 | `logs.sh` | Consulta los registros de Docker Compose |
 | `backup.sh` | Crea y verifica una copia PostgreSQL |
 | `restore.sh` | Verifica o aplica una restauración segura |

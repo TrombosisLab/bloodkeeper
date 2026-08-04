@@ -22,6 +22,15 @@ La comprobación valida:
 - health check de API y PostgreSQL;
 - comunicación web → API.
 
+## Validación de estructura
+
+```bash
+./scripts/check-project-structure.sh
+```
+
+La comprobación valida aplicaciones, pruebas, paquete compartido,
+scripts, documentación, secretos y datos de ejecución.
+
 ## Estado de los contenedores
 
 ```bash
