@@ -5,6 +5,9 @@
 Este procedimiento instala y despliega BloodKeeper en Ubuntu Server
 24.04 LTS mediante Docker Engine y Docker Compose.
 
+La topología, el aislamiento y la persistencia se describen en
+`docs/DOCKER_ARCHITECTURE.md`.
+
 El servidor puede permanecer sin acceso a Internet después de construir
 las imágenes. La preparación inicial necesita acceso a los repositorios
 de Ubuntu, Docker y npm, o un espejo local equivalente.

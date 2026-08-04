@@ -6,9 +6,17 @@ services:
       dockerfile: apps/web/Dockerfile
 
     container_name: v5r-web
+    init: true
+    user: "node"
+
+    security_opt:
+      - no-new-privileges:true
 
     ports:
       - "5173:5173"
+
+    networks:
+      - application
 
     depends_on:
       api:
@@ -36,6 +44,11 @@ services:
       dockerfile: apps/api/Dockerfile
 
     container_name: v5r-api
+    init: true
+    user: "node"
+
+    security_opt:
+      - no-new-privileges:true
 
     environment:
       PORT: 3000
@@ -43,6 +56,9 @@ services:
 
     ports:
       - "3000:3000"
+
+    networks:
+      - application
 
     depends_on:
       postgres:
@@ -77,6 +93,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+    networks:
+      - application
+
     healthcheck:
       test:
         [
@@ -92,3 +111,7 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  application:
+    driver: bridge

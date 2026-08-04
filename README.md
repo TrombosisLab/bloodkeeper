@@ -39,6 +39,7 @@ Después del primer despliegue:
 ## Documentación
 
 - `docs/DEPLOYMENT.md`: instalación y despliegue.
+- `docs/DOCKER_ARCHITECTURE.md`: arquitectura Docker oficial.
 - `docs/VALIDATION.md`: validación técnica y funcional.
 - `docs/RECOVERY.md`: copias y recuperación.
 - `scripts/README.md`: catálogo de scripts.
