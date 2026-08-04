@@ -282,6 +282,58 @@ const advantageDetailsKindFromPrisma =
     AdvantageDetailsKind
   >
 
+function toPredatorTypeChoicesJson(
+  value:
+    | Record<string, number>
+    | undefined,
+): Prisma.InputJsonValue {
+  return Object.fromEntries(
+    Object.entries(value ?? {}).map(
+      ([choiceId, optionIndex]) => [
+        choiceId,
+        optionIndex,
+      ],
+    ),
+  )
+}
+
+function fromPredatorTypeChoicesJson(
+  value: Prisma.JsonValue,
+): Record<string, number> {
+  if (
+    typeof value !== 'object' ||
+    value === null ||
+    Array.isArray(value)
+  ) {
+    throw new Error(
+      'Stored predator type choices must be an object',
+    )
+  }
+
+  const choices:
+    Record<string, number> = {}
+
+  for (
+    const [choiceId, optionIndex] of
+    Object.entries(value)
+  ) {
+    if (
+      choiceId.trim().length === 0 ||
+      !Number.isSafeInteger(optionIndex) ||
+      (optionIndex as number) < 0
+    ) {
+      throw new Error(
+        'Stored predator type choices are invalid',
+      )
+    }
+
+    choices[choiceId] =
+      optionIndex as number
+  }
+
+  return choices
+}
+
 const characterRelations = {
   identity: true,
   creationState: true,
@@ -744,6 +796,11 @@ function toPersistedDraft(
           row.creationState
             .skillDistributionMethod
         ],
+      predatorTypeChoices:
+        fromPredatorTypeChoicesJson(
+          row.creationState
+            .predatorTypeChoices,
+        ),
       updatedAt: row.creationState.updatedAt,
     },
     attributes: {
@@ -965,6 +1022,11 @@ export class PrismaCharacterDraftRepository
                       data.creation
                         .skillDistributionMethod
                     ],
+                  predatorTypeChoices:
+                    toPredatorTypeChoicesJson(
+                      data.creation
+                        .predatorTypeChoices,
+                    ),
                 },
               },
               attributes: {
@@ -1196,6 +1258,17 @@ export class PrismaCharacterDraftRepository
                 data.creation
                   .skillDistributionMethod
               ]
+          }
+
+          if (
+            data.creation
+              .predatorTypeChoices !== undefined
+          ) {
+            creationUpdate.predatorTypeChoices =
+              toPredatorTypeChoicesJson(
+                data.creation
+                  .predatorTypeChoices,
+              )
           }
 
           await transaction

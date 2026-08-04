@@ -33,6 +33,7 @@ export interface PersistedCharacterCreationState {
   schemaVersion: number
   currentStep: CharacterCreationStep
   skillDistributionMethod: SkillDistributionMethod
+  predatorTypeChoices: Record<string, number>
   updatedAt: Date
 }
 
@@ -346,6 +347,7 @@ export interface CreateCharacterDraftData {
   creation: {
     currentStep: CharacterCreationStep
     skillDistributionMethod: SkillDistributionMethod
+    predatorTypeChoices: Record<string, number>
   }
 }
 
@@ -386,7 +388,9 @@ export interface UpdateCharacterDraftData {
   creation?: Partial<
     Pick<
       PersistedCharacterCreationState,
-      'currentStep' | 'skillDistributionMethod'
+      | 'currentStep'
+      | 'skillDistributionMethod'
+      | 'predatorTypeChoices'
     >
   >
 }

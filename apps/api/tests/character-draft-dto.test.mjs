@@ -62,6 +62,7 @@ function createBody() {
     creation: {
       currentStep: 'identity',
       skillDistributionMethod: 'balanced',
+      predatorTypeChoices: {},
     },
   }
 }
@@ -257,6 +258,70 @@ test(
     assert.equal(
       response.creation.updatedAt,
       '2026-08-03T00:30:00.000Z',
+    )
+  },
+)
+
+
+test(
+  '004-E.1B.1 transporta y valida elecciones de Tipo de Depredador',
+  () => {
+    const created =
+      parseCreateCharacterDraftRequest(
+        ownerId,
+        {
+          ...createBody(),
+          creation: {
+            ...createBody().creation,
+            predatorTypeChoices: {
+              'discipline-choice': 1,
+            },
+          },
+        },
+      )
+
+    assert.deepEqual(
+      created.creation.predatorTypeChoices,
+      {
+        'discipline-choice': 1,
+      },
+    )
+
+    const updated =
+      parseUpdateCharacterDraftRequest(
+        characterId,
+        {
+          expectedRevision: 1,
+          creation: {
+            predatorTypeChoices: {
+              'specialty-choice': 0,
+            },
+          },
+        },
+      )
+
+    assert.deepEqual(
+      updated.creation
+        .predatorTypeChoices,
+      {
+        'specialty-choice': 0,
+      },
+    )
+
+    assert.throws(
+      () =>
+        parseUpdateCharacterDraftRequest(
+          characterId,
+          {
+            expectedRevision: 1,
+            creation: {
+              predatorTypeChoices: {
+                'discipline-choice': -1,
+              },
+            },
+          },
+        ),
+      /zero or greater/,
     )
   },
 )

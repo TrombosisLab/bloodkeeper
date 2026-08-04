@@ -630,13 +630,52 @@ function validateDamage(
   }
 }
 
+function validatePredatorTypeChoices(
+  input: unknown,
+  path: string,
+): void {
+  const value = record(input, path)
+
+  for (
+    const [choiceId, optionIndex] of
+    Object.entries(value)
+  ) {
+    if (choiceId.trim().length === 0) {
+      throw new InvalidCharacterDraftRequestError(
+        path,
+        'contains an empty choice identifier',
+      )
+    }
+
+    integer(
+      optionIndex,
+      `${path}.${choiceId}`,
+    )
+
+    if ((optionIndex as number) < 0) {
+      throw new InvalidCharacterDraftRequestError(
+        `${path}.${choiceId}`,
+        'must be zero or greater',
+      )
+    }
+  }
+}
+
 function validateCreation(
   input: unknown,
   path: string,
   complete: boolean,
 ): void {
   const value = record(input, path)
-  onlyKeys(value, ['currentStep', 'skillDistributionMethod'], path)
+  onlyKeys(
+    value,
+    [
+      'currentStep',
+      'skillDistributionMethod',
+      'predatorTypeChoices',
+    ],
+    path,
+  )
 
   if (complete || Object.hasOwn(value, 'currentStep')) {
     oneOf(
@@ -653,6 +692,25 @@ function validateCreation(
         : value.skillDistributionMethod,
       ['generalist', 'balanced', 'specialist'],
       `${path}.skillDistributionMethod`,
+    )
+  }
+
+  if (
+    complete ||
+    Object.hasOwn(
+      value,
+      'predatorTypeChoices',
+    )
+  ) {
+    validatePredatorTypeChoices(
+      complete
+        ? required(
+            value,
+            'predatorTypeChoices',
+            path,
+          )
+        : value.predatorTypeChoices,
+      `${path}.predatorTypeChoices`,
     )
   }
 }

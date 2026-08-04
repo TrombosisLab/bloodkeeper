@@ -166,6 +166,7 @@ model CharacterCreationState {
   schemaVersion          Int                     @default(1)
   currentStep            CharacterCreationStep   @default(IDENTITY)
   skillDistributionMethod SkillDistributionMethod @default(BALANCED)
+  predatorTypeChoices    Json                    @default("{}")
   updatedAt              DateTime                @updatedAt @db.Timestamptz(3)
 
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
