@@ -502,6 +502,31 @@ export function AdvantagesStep({
                     <p className="advantage-catalog-card__pending">
                       Concedido por el Tipo de Depredador.
                     </p>
+
+                    {definition?.requiresInstanceDetails ===
+                      true && (
+                      <AdvantageInstanceDetailsEditor
+                        selection={
+                          selection
+                        }
+                        onChange={(
+                          updated,
+                        ) =>
+                          onChange({
+                            selections:
+                              value.selections.map(
+                                (
+                                  current,
+                                ) =>
+                                  current.selectionId ===
+                                  updated.selectionId
+                                    ? updated
+                                    : current,
+                              ),
+                          })
+                        }
+                      />
+                    )}
                   </article>
                 )
               },
