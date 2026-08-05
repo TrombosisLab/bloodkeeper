@@ -28,6 +28,11 @@
   --color-warning: #d9c17a;
   --color-danger: #ffb5b5;
 
+  --color-accent-glow: rgb(137 18 39 / 0.24);
+  --color-surface-translucent: rgb(20 14 14 / 0.86);
+  --color-surface-control: rgb(0 0 0 / 0.24);
+  --color-surface-card: rgb(255 255 255 / 0.035);
+
   /* Tipografía */
   --font-family-body:
     Inter,
@@ -64,9 +69,15 @@
   --radius-sm: 3px;
   --radius-md: 4px;
   --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-control: 0.65rem;
+  --radius-pill: 999px;
   --radius-round: 50%;
 
   --shadow-sheet: 0 28px 80px rgb(0 0 0 / 0.28);
+  --shadow-raised: 0 1rem 2.5rem rgb(0 0 0 / 0.22);
+  --shadow-floating: 0 1.5rem 4rem rgb(0 0 0 / 0.45);
+  --shadow-overlay: 0 0.8rem 2rem rgb(0 0 0 / 0.35);
   --transition-fast: 140ms ease;
   --content-max-width: 1440px;
 }

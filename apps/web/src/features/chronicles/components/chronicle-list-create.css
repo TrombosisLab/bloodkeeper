@@ -1,13 +1,13 @@
 .app-section-navigation {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--space-3);
   padding: 1rem clamp(1rem, 4vw, 3rem) 0;
 }
 
 .app-section-navigation button {
-  border: 1px solid rgba(178, 55, 55, 0.45);
-  border-radius: 999px;
-  background: rgba(30, 18, 18, 0.78);
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-soft);
   color: inherit;
   cursor: pointer;
   padding: 0.65rem 1.1rem;
@@ -15,7 +15,7 @@
 
 .app-section-navigation button[aria-pressed='true'] {
   border-color: currentColor;
-  background: rgba(118, 24, 24, 0.58);
+  background: var(--color-surface-emphasis);
 }
 
 .chronicle-workspace {
@@ -26,10 +26,10 @@
 .chronicle-workspace__header,
 .chronicle-create,
 .chronicle-list {
-  border: 1px solid rgba(178, 55, 55, 0.28);
-  border-radius: 1rem;
-  background: rgba(20, 14, 14, 0.86);
-  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-translucent);
+  box-shadow: var(--shadow-raised);
 }
 
 .chronicle-workspace__header {
@@ -62,8 +62,8 @@
   grid-template-columns:
     minmax(260px, 0.85fr)
     minmax(0, 1.4fr);
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
 }
 
 .chronicle-create,
@@ -73,8 +73,8 @@
 
 .chronicle-create form {
   display: grid;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
 }
 
 .chronicle-create label {
@@ -86,12 +86,12 @@
 .chronicle-create textarea {
   width: 100%;
   box-sizing: border-box;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 0.65rem;
-  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-control);
   color: inherit;
   font: inherit;
-  padding: 0.75rem;
+  padding: var(--space-3);
 }
 
 .chronicle-create textarea {
@@ -100,9 +100,9 @@
 
 .chronicle-create button,
 .chronicle-list__heading button {
-  border: 1px solid rgba(210, 86, 86, 0.55);
-  border-radius: 0.65rem;
-  background: rgba(126, 27, 27, 0.74);
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-emphasis);
   color: inherit;
   cursor: pointer;
   font: inherit;
@@ -120,7 +120,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .chronicle-list__heading button {
@@ -136,23 +136,23 @@
 }
 
 .chronicle-card {
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  border-radius: 0.8rem;
-  background: rgba(255, 255, 255, 0.035);
-  padding: 1rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-card);
+  padding: var(--space-4);
 }
 
 .chronicle-card__heading span {
-  border-radius: 999px;
-  background: rgba(126, 27, 27, 0.5);
-  font-size: 0.78rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-emphasis);
+  font-size: var(--font-size-sm);
   padding: 0.35rem 0.65rem;
   white-space: nowrap;
 }
 
 .chronicle-card p {
   margin: 0.75rem 0 0;
-  line-height: 1.55;
+  line-height: var(--line-height-normal);
 }
 
 .chronicle-card__empty,
@@ -161,7 +161,7 @@
 }
 
 .chronicle-message--error {
-  color: #ffb5b5;
+  color: var(--color-danger);
   opacity: 1;
 }
 

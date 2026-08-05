@@ -75,3 +75,11 @@ SPEC correspondiente lo autorice.
 
 La validación automática debe completarse con una revisión visual manual de las
 vistas afectadas. Hasta realizarla, SPEC-010.A no debe considerarse cerrada.
+
+## Adopción incremental: SPEC-010.C.1
+
+Autenticación y crónicas son los primeros módulos completos migrados al
+lenguaje visual oficial. Conservan su estructura, comportamiento y media
+queries, pero consumen la paleta, espaciado, radios y sombras comunes.
+
+Este bloque no crea componentes genéricos ni adelanta SPEC-014.

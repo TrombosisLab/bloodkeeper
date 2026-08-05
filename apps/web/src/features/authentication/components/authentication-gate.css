@@ -2,27 +2,25 @@
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 2rem;
+  padding: var(--space-6);
   background:
     radial-gradient(
       circle at top,
-      rgba(137, 18, 39, 0.24),
+      var(--color-accent-glow),
       transparent 42%
     ),
-    #09090b;
+    var(--color-canvas);
 }
 
 .authentication-card {
   width: min(100%, 28rem);
   display: grid;
-  gap: 1rem;
-  padding: 2rem;
-  border: 1px solid #3f3f46;
-  border-radius: 0.75rem;
-  background: #18181b;
-  box-shadow:
-    0 1.5rem 4rem
-    rgba(0, 0, 0, 0.45);
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-floating);
 }
 
 .authentication-card h1,
@@ -31,8 +29,8 @@
 }
 
 .authentication-card__eyebrow {
-  color: #ef4444;
-  font-size: 0.75rem;
+  color: var(--color-accent-strong);
+  font-size: var(--font-size-sm);
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -47,15 +45,15 @@
 .authentication-card input {
   min-height: 2.75rem;
   padding: 0.65rem 0.75rem;
-  border: 1px solid #52525b;
-  border-radius: 0.45rem;
-  background: #09090b;
-  color: #fafafa;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-control);
+  background: var(--color-canvas);
+  color: var(--color-text-primary);
   font: inherit;
 }
 
 .authentication-card input:focus {
-  outline: 2px solid #dc2626;
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -63,10 +61,10 @@
 .authentication-session button {
   min-height: 2.5rem;
   padding: 0.55rem 0.9rem;
-  border: 1px solid #b91c1c;
-  border-radius: 0.45rem;
-  background: #991b1b;
-  color: #fff;
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-emphasis);
+  color: var(--color-text-primary);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -79,24 +77,22 @@
 }
 
 .authentication-card__error {
-  color: #fca5a5;
+  color: var(--color-danger);
 }
 
 .authentication-session {
   position: fixed;
   z-index: 20;
-  right: 1rem;
-  bottom: 1rem;
+  right: var(--space-4);
+  bottom: var(--space-4);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
   padding: 0.65rem;
-  border: 1px solid #3f3f46;
-  border-radius: 0.6rem;
-  background: rgba(24, 24, 27, 0.96);
-  box-shadow:
-    0 0.8rem 2rem
-    rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-overlay);
+  box-shadow: var(--shadow-overlay);
 }
 
 .authentication-session span {
@@ -104,14 +100,14 @@
 }
 
 .authentication-session small {
-  color: #a1a1aa;
+  color: var(--color-text-muted);
 }
 
 @media (max-width: 40rem) {
   .authentication-session {
-    right: 0.5rem;
-    bottom: 0.5rem;
-    left: 0.5rem;
+    right: var(--space-2);
+    bottom: var(--space-2);
+    left: var(--space-2);
     justify-content: space-between;
   }
 }
