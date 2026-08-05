@@ -1242,10 +1242,10 @@
   margin-top: 22px;
   padding: 20px;
 
-  border: 1px solid #3a2e30;
+  border: 1px solid var(--color-panel-border-soft);
 
   background:
-    rgb(255 255 255 / 0.015);
+    var(--color-panel-glass);
 }
 
 .skill-specialties-editor__heading {
@@ -1253,13 +1253,13 @@
   align-items: flex-end;
   justify-content: space-between;
 
-  gap: 24px;
+  gap: var(--space-5);
 
   margin-bottom: 18px;
 }
 
 .skill-specialties-editor__heading span {
-  color: #9b5963;
+  color: var(--color-accent-subtle);
 
   font-size: 0.62rem;
   font-weight: 800;
@@ -1272,12 +1272,9 @@
 .skill-specialties-editor__heading h3 {
   margin: 5px 0 0;
 
-  color: #d2c4bf;
+  color: var(--color-text-heading-soft);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-weight: 400;
 }
@@ -1287,7 +1284,7 @@
 
   margin: 0;
 
-  color: #776c68;
+  color: var(--color-text-support-muted);
 
   font-size: 0.72rem;
 }
@@ -1302,7 +1299,7 @@
 
   align-items: end;
 
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .skill-specialties-editor__form label span {
@@ -1310,7 +1307,7 @@
 
   margin-bottom: 7px;
 
-  color: #776b68;
+  color: var(--color-text-label-soft);
 
   font-size: 0.6rem;
   font-weight: 700;
@@ -1329,16 +1326,16 @@
 
   padding: 9px 11px;
 
-  border: 1px solid #453638;
+  border: 1px solid var(--color-border-control-muted);
 
-  color: #d0c4bf;
-  background: #121010;
+  color: var(--color-text-field);
+  background: var(--color-surface);
 }
 
 .skill-specialties-editor__empty {
   margin: 18px 0 0;
 
-  color: #6f6662;
+  color: var(--color-text-disabled-soft);
 
   font-size: 0.75rem;
 
@@ -1349,7 +1346,7 @@
   display: flex;
   flex-wrap: wrap;
 
-  gap: 8px;
+  gap: var(--space-2);
 
   margin-top: 18px;
 }
@@ -1362,9 +1359,9 @@
 
   padding: 8px 10px 8px 12px;
 
-  border: 1px solid #4a363a;
+  border: 1px solid var(--color-border-item-muted);
 
-  background: #171213;
+  background: var(--color-surface-elevated-deep);
 }
 
 .skill-specialty-chip span,
@@ -1375,7 +1372,7 @@
 .skill-specialty-chip span {
   margin-bottom: 2px;
 
-  color: #786b68;
+  color: var(--color-text-caption-soft);
 
   font-size: 0.55rem;
 
@@ -1383,12 +1380,9 @@
 }
 
 .skill-specialty-chip strong {
-  color: #c7b9b4;
+  color: var(--color-text-item);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 0.82rem;
 
@@ -1398,10 +1392,10 @@
 .skill-specialty-chip button {
   border: 0;
 
-  color: #96616a;
+  color: var(--color-action-subtle);
   background: transparent;
 
-  font-size: 1.15rem;
+  font-size: var(--font-size-lg);
 
   cursor: pointer;
 }
@@ -1420,7 +1414,7 @@
 .skill-specialties-editor__error {
   margin: 12px 0 0;
 
-  color: #c77d86;
+  color: var(--color-danger-inline);
 
   font-size: 0.75rem;
 }

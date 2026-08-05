@@ -76,6 +76,20 @@
   --color-text-option-muted: #948783;
   --color-text-row: #d0c5bf;
 
+  --color-accent-subtle: #9b5963;
+  --color-action-subtle: #96616a;
+  --color-border-control-muted: #453638;
+  --color-border-item-muted: #4a363a;
+  --color-danger-inline: #c77d86;
+  --color-surface-elevated-deep: #171213;
+  --color-text-caption-soft: #786b68;
+  --color-text-disabled-soft: #6f6662;
+  --color-text-field: #d0c4bf;
+  --color-text-heading-soft: #d2c4bf;
+  --color-text-item: #c7b9b4;
+  --color-text-label-soft: #776b68;
+  --color-text-support-muted: #776c68;
+
   /* Tipografía */
   --font-family-body:
     Inter,

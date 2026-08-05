@@ -132,3 +132,18 @@ API ni Prisma.
 **Especialidades** y todas las fases posteriores permanecen fuera del
 alcance y protegidas por contrato. Los tokens nuevos son semánticos y
 reutilizables; no crean componentes genéricos ni adelantan SPEC-014.
+
+## Adopción incremental: SPEC-010.C.2E
+
+El bloque **Especialidades** adopta los tokens visuales oficiales para
+su cabecera, formulario, estado vacío, listado, elementos seleccionados
+y mensajes de error.
+
+La migración conserva los selectores, estructura, comportamiento
+responsive y controles existentes. No modifica componentes React,
+reglas de Especialidades, presupuestos de creación, `CharacterDraft`,
+catálogos, persistencia, API ni Prisma.
+
+**Sangre** y todas las fases posteriores permanecen fuera del alcance
+y protegidas por contrato. Los tokens nuevos son semánticos y
+reutilizables; no crean componentes genéricos ni adelantan SPEC-014.
