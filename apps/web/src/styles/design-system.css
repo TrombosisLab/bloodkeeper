@@ -32,6 +32,12 @@
   --color-surface-translucent: rgb(20 14 14 / 0.86);
   --color-surface-control: rgb(0 0 0 / 0.24);
   --color-surface-card: rgb(255 255 255 / 0.035);
+  --color-surface-hover: #2d1c20;
+  --color-surface-hover-subtle: rgb(255 255 255 / 0.02);
+  --color-surface-inset-subtle: rgb(255 255 255 / 0.012);
+  --color-accent-active: #98515b;
+  --color-accent-tint: rgb(117 43 54 / 0.14);
+  --color-focus-soft: rgb(131 80 90 / 0.1);
 
   /* Tipografía */
   --font-family-body:

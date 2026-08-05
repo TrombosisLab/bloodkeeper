@@ -83,3 +83,13 @@ lenguaje visual oficial. Conservan su estructura, comportamiento y media
 queries, pero consumen la paleta, espaciado, radios y sombras comunes.
 
 Este bloque no crea componentes genéricos ni adelanta SPEC-014.
+
+## Adopción incremental: SPEC-010.C.2A
+
+El shell del creador y el paso Identidad adoptan los tokens oficiales de
+color, tipografía, forma, transición y espaciado. Se conservan la estructura,
+los selectores y los breakpoints existentes.
+
+El alcance termina antes de Atributos. Los pasos Atributos, Habilidades,
+Sangre, Disciplinas, Ventajas y Sangre Débil permanecen sin cambios para poder
+validar la migración del creador en bloques pequeños y reversibles.
