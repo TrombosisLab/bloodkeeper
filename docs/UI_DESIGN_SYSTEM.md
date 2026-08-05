@@ -93,3 +93,15 @@ los selectores y los breakpoints existentes.
 El alcance termina antes de Atributos. Los pasos Atributos, Habilidades,
 Sangre, Disciplinas, Ventajas y Sangre Débil permanecen sin cambios para poder
 validar la migración del creador en bloques pequeños y reversibles.
+
+## Adopción incremental: SPEC-010.C.2B
+
+El paso **Atributos** adopta los tokens visuales oficiales para paneles,
+grupos, filas, controles, indicadores y estados de validación.
+
+La migración conserva los componentes, selectores, estructura, distribución
+y breakpoints existentes. No modifica la validación de navegación ni los
+pasos Habilidades, Sangre, Disciplinas, Ventajas o Humanidad.
+
+Los tokens incorporados son reutilizables por editores posteriores y no
+crean componentes genéricos ni adelantan SPEC-014.

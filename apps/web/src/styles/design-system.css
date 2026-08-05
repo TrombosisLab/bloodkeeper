@@ -39,6 +39,30 @@
   --color-accent-tint: rgb(117 43 54 / 0.14);
   --color-focus-soft: rgb(131 80 90 / 0.1);
 
+  /* Paneles, controles y validación compartidos */
+  --color-panel-border-soft: #3a2e30;
+  --color-panel-glass: rgb(255 255 255 / 0.015);
+  --color-text-quiet: #766b67;
+  --color-text-emphasis: #cdbfba;
+  --color-group-border: #392d2f;
+  --color-group-accent: #b8777f;
+  --color-group-tint: rgb(93 30 39 / 0.07);
+  --color-row-divider: #292324;
+  --color-label-strong: #d6ccc6;
+  --color-control-border-soft: #523b3f;
+  --color-control-text: #c8bbb5;
+  --color-control-surface-dark: #171214;
+  --color-indicator-fill: #171112;
+  --color-validation-border: #51343a;
+  --color-validation-tint: rgb(104 39 49 / 0.08);
+  --color-success-border: #385643;
+  --color-success-tint: rgb(62 103 75 / 0.08);
+  --color-summary-border: #33292b;
+  --color-text-detail: #756b67;
+  --color-text-value: #d1c5bf;
+  --color-danger-muted: #b98289;
+  --color-success-muted: #86a68d;
+
   /* Tipografía */
   --font-family-body:
     Inter,

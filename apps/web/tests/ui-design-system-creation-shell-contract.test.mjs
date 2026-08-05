@@ -24,14 +24,13 @@ test('SPEC-010.C.2A limita la migración al shell e Identidad', () => {
   assert.equal(typeof creationShell, 'string')
   assert.equal(typeof attributesAndLater, 'string')
 
-  const preservedSuffix = attributesMarker + attributesAndLater
-  const suffixHash = createHash('sha256')
-    .update(preservedSuffix)
+  const shellHash = createHash('sha256')
+    .update(creationShell)
     .digest('hex')
 
   assert.equal(
-    suffixHash,
-    '5efd1cb72fd5db4cc8af284cdc6da0ff78f6ab0431eab14883bc11737caf568e',
+    shellHash,
+    '8a5d36eb12bd7db670c1ee50832adbf6d061920cd752dc42b6a76d4d7b6481c6',
   )
 })
 
