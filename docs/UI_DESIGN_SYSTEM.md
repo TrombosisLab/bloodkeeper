@@ -105,3 +105,15 @@ pasos Habilidades, Sangre, Disciplinas, Ventajas o Humanidad.
 
 Los tokens incorporados son reutilizables por editores posteriores y no
 crean componentes genéricos ni adelantan SPEC-014.
+
+## Adopción incremental: SPEC-010.C.2C
+
+La **Validación de Navegación** adopta tokens semánticos oficiales para
+los estados bloqueados y el panel accesible de errores del creador.
+
+La migración conserva los selectores, estados, estructura y semántica
+existentes. No modifica los componentes React, la lógica de validación,
+la navegación entre pasos ni el bloque Habilidades o fases posteriores.
+
+Los nuevos tokens de peligro son reutilizables y no crean componentes
+genéricos ni adelantan SPEC-014.

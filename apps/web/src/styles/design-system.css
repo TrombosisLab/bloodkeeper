@@ -62,6 +62,10 @@
   --color-text-value: #d1c5bf;
   --color-danger-muted: #b98289;
   --color-success-muted: #86a68d;
+  --color-danger-border: #693d45;
+  --color-danger-surface: rgb(111 48 59 / 0.1);
+  --color-danger-emphasis: #c58a92;
+  --color-danger-text-muted: #a8787e;
 
   /* Tipografía */
   --font-family-body:

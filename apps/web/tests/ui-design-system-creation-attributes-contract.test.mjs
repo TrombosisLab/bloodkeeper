@@ -30,13 +30,13 @@ const navigationAndLater =
   navigationMarker + navigationAndLaterBody
 
 test('SPEC-010.C.2B limita la migración al paso Atributos', () => {
-  const suffixHash = createHash('sha256')
-    .update(navigationAndLater)
+  const attributesHash = createHash('sha256')
+    .update(attributesBlock)
     .digest('hex')
 
   assert.equal(
-    suffixHash,
-    '405b47dfd9ce340dea1c1275c9e856b0339cfa24e680c038a952345a05987c38',
+    attributesHash,
+    '1f73c6b2dc540e85271809d50d509ec047a2162312c1924edd3eca948451b349',
   )
 })
 

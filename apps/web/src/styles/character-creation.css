@@ -871,23 +871,20 @@
 
   padding: 16px 18px;
 
-  border: 1px solid #693d45;
+  border: 1px solid var(--color-danger-border);
 
   background:
-    rgb(111 48 59 / 0.1);
+    var(--color-danger-surface);
 }
 
 .creation-step-errors strong {
   display: block;
 
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 
-  color: #c58a92;
+  color: var(--color-danger-emphasis);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-weight: 400;
 }
@@ -897,9 +894,9 @@
 
   padding-left: 18px;
 
-  color: #a8787e;
+  color: var(--color-danger-text-muted);
 
-  font-size: 0.78rem;
+  font-size: var(--font-size-sm);
 
   line-height: 1.6;
 }
