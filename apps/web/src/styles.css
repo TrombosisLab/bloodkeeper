@@ -1,3 +1,4 @@
+@import './styles/design-system.css';
 @import './styles/base-and-sheet-header.css';
 @import './styles/character-sheet.css';
 @import './styles/character-creation.css';

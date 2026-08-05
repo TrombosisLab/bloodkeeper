@@ -46,6 +46,7 @@ Después del primer despliegue:
 - `docs/VALIDATION.md`: validación técnica y funcional.
 - `docs/RECOVERY.md`: copias y recuperación.
 - `docs/MAINTENANCE_OPERATIONS.md`: mantenimiento por SSH.
+- `docs/UI_DESIGN_SYSTEM.md`: fundamentos visuales de SPEC-010.
 - `scripts/README.md`: catálogo de scripts.
 
 ## Estado

@@ -1,0 +1,121 @@
+:root {
+  color-scheme: dark;
+
+  /* Colores semánticos */
+  --color-canvas: #0b0a0a;
+  --color-surface: #121010;
+  --color-surface-raised: #181516;
+  --color-surface-soft: #251518;
+  --color-surface-emphasis: #4c2027;
+  --color-overlay: rgb(12 10 10 / 0.92);
+
+  --color-text-primary: #e9e3de;
+  --color-text-secondary: #c4bab4;
+  --color-text-muted: #887d79;
+  --color-text-subtle: #756c68;
+
+  --color-border-subtle: #2d2526;
+  --color-border-default: #3a2c2f;
+  --color-border-strong: #71343c;
+  --color-border-accent: #733943;
+
+  --color-accent: #a66c73;
+  --color-accent-strong: #b15f6b;
+  --color-accent-text: #e2c5c8;
+  --color-focus: #dca0a8;
+
+  --color-success: #72b783;
+  --color-warning: #d9c17a;
+  --color-danger: #ffb5b5;
+
+  /* Tipografía */
+  --font-family-body:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  --font-family-heading:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  --font-size-xs: 0.68rem;
+  --font-size-sm: 0.78rem;
+  --font-size-md: 0.95rem;
+  --font-size-lg: 1.15rem;
+  --font-size-display: clamp(2rem, 5vw, 4rem);
+
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.65;
+
+  /* Espaciado y forma */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 0.75rem;
+  --radius-round: 50%;
+
+  --shadow-sheet: 0 28px 80px rgb(0 0 0 / 0.28);
+  --transition-fast: 140ms ease;
+  --content-max-width: 1440px;
+}
+
+:where(button, input, select, textarea) {
+  font: inherit;
+}
+
+:where(
+  button,
+  [href],
+  input,
+  select,
+  textarea,
+  [tabindex]:not([tabindex="-1"])
+):focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+:where(button, input, select, textarea):disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :where(
+    button,
+    [href],
+    input,
+    select,
+    textarea,
+    [tabindex]:not([tabindex="-1"])
+  ):focus-visible {
+    outline-color: CanvasText;
+  }
+}

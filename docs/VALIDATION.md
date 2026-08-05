@@ -156,6 +156,16 @@ El resultado esperado termina con:
 MANTENIMIENTO SPEC-009 CORRECTO
 ```
 
+## Validación de SPEC-010.A
+
+```bash
+./scripts/check-ui-design-system.sh
+```
+
+Comprueba tokens, adopción inicial, accesibilidad base, ausencia de una
+biblioteca UI externa, typecheck, pruebas y build web. Después debe realizarse
+una revisión visual manual de las vistas afectadas.
+
 ## Comprobación desde navegador
 
 1. Abrir `http://DIRECCION_LAN:5173`.

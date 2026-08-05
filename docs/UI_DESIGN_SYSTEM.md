@@ -1,0 +1,77 @@
+# Sistema de diseño de la interfaz
+
+## Estado
+
+Este documento materializa el bloque **SPEC-010.A — Fundamentos y adopción inicial**.
+No declara cerrada la totalidad de SPEC-010.
+
+La fuente oficial de tokens reside en:
+
+```text
+apps/web/src/styles/design-system.css
+```
+
+## Principios
+
+1. Claridad.
+2. Consistencia.
+3. Accesibilidad.
+4. Diseño responsive.
+5. Prioridad al contenido.
+6. Ambientación de Vampiro V5 sin reducir la usabilidad.
+
+## Tokens oficiales
+
+Los estilos nuevos deben utilizar nombres semánticos para:
+
+- canvas y superficies;
+- texto principal, secundario y atenuado;
+- bordes y acento;
+- foco, éxito, aviso y error;
+- tipografía y tamaños;
+- espaciado, radios y sombras.
+
+Los valores literales existentes se migrarán de forma incremental, únicamente
+cuando la SPEC activa autorice la vista afectada.
+
+## Adopción inicial
+
+SPEC-010.A aplica los tokens a la base global, la cabecera de aplicación y la
+cabecera de ficha sin cambiar su composición ni su comportamiento.
+
+No introduce componentes React, reglas de dominio, tablas, diálogos ni una
+biblioteca genérica de controles. La arquitectura de componentes reutilizables
+pertenece a SPEC-014.
+
+## Responsive
+
+Los layouts existentes conservan sus breakpoints actuales. SPEC-010.A no los
+reescribe ni declara completa la validación responsive de toda la aplicación.
+Cada vista modificada deberá revisarse en escritorio, tablet y móvil.
+
+## Accesibilidad
+
+La base común mantiene:
+
+- foco visible mediante teclado;
+- estado `disabled` perceptible;
+- respeto por `prefers-reduced-motion`;
+- soporte de foco en colores forzados;
+- etiquetas y atributos ARIA en los componentes consumidores.
+
+Los errores deben comunicarse mediante texto y no solamente mediante color.
+
+## Iconografía
+
+No se añade una biblioteca externa ni iconografía ornamental. Una estrategia
+única de iconos solo se incorporará cuando exista una necesidad funcional y la
+SPEC correspondiente lo autorice.
+
+## Validación
+
+```bash
+./scripts/check-ui-design-system.sh
+```
+
+La validación automática debe completarse con una revisión visual manual de las
+vistas afectadas. Hasta realizarla, SPEC-010.A no debe considerarse cerrada.

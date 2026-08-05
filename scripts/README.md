@@ -27,6 +27,7 @@ despliegue y mantenimiento mediante SSH.
 | `check-system-monitoring.sh` | Valida la supervisión oficial de SPEC-008 |
 | `prepare-update.sh` | Comprueba y prepara actualizaciones sin aplicarlas |
 | `check-maintenance-operations.sh` | Valida el mantenimiento de SPEC-009 |
+| `check-ui-design-system.sh` | Valida los fundamentos de SPEC-010.A |
 | `create-initial-admin.sh` | Crea la primera cuenta administrativa |
 
 ## Desarrollo
