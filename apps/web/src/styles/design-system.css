@@ -117,6 +117,28 @@
   --color-validation-border-strong: #54363c;
   --color-validation-tint-strong: rgb(105 38 49 / 0.08);
 
+  --color-accent-border-strong: #ba6672;
+  --color-accent-fill-strong: #994651;
+  --color-accent-label-strong: #a15e68;
+  --color-accent-rule: #bd707a;
+  --color-accent-value-strong: #bd6874;
+  --color-border-divider-muted: #3c3032;
+  --color-border-section-subtle: #302729;
+  --color-control-border-strong: #563b40;
+  --color-group-border-soft: #392e30;
+  --color-indicator-border: #795159;
+  --color-panel-border-accent-muted: #5b4146;
+  --color-panel-border-muted: #3b2e30;
+  --color-selected-border-muted: #654148;
+  --color-selected-surface-muted: rgb(94 35 45 / 0.08);
+  --color-surface-accent-tint-soft: rgb(102 41 51 / 0.08);
+  --color-text-caption-muted: #756a67;
+  --color-text-heading-muted: #d0c3bd;
+  --color-text-heading-strong: #d1c3bd;
+  --color-text-overline-muted: #725e61;
+  --color-text-paragraph-muted: #8a7d79;
+  --color-text-title-soft: #d2c5bf;
+
   /* Tipografía */
   --font-family-body:
     Inter,

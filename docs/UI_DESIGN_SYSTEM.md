@@ -163,3 +163,20 @@ Voluntad, `CharacterDraft`, catálogos, persistencia, API ni Prisma.
 **Disciplinas** y todas las fases posteriores permanecen fuera del
 alcance y protegidas por contrato. Los tokens nuevos son semánticos y
 reutilizables; no crean componentes genéricos ni adelantan SPEC-014.
+
+## Adopción incremental: SPEC-010.C.2G
+
+El bloque **Disciplinas** adopta los tokens visuales oficiales para la
+cabecera de clan, explicación reglamentaria, tarjetas de Disciplina,
+controles de puntuación, círculos, casos especiales y estados de
+validación.
+
+La migración conserva selectores, estructura, estados seleccionados y
+deshabilitados, comportamiento responsive y consumidores existentes.
+No modifica componentes React, reglas de Disciplinas, concesiones del
+Tipo de Depredador, Poderes, Rituales, Ceremonias, Sangre Débil,
+Alquimia, `CharacterDraft`, catálogos, persistencia, API ni Prisma.
+
+**Poderes** y todo el contenido posterior permanecen fuera del alcance
+y protegidos por contrato. Los tokens nuevos son semánticos y
+reutilizables; no crean componentes genéricos ni adelantan SPEC-014.
