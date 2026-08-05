@@ -230,3 +230,21 @@ El bloque de **Ventajas** y todo el contenido posterior permanecen
 fuera del alcance y protegidos por contrato. Los tokens nuevos son
 semánticos y reutilizables; no crean componentes genéricos ni adelantan
 SPEC-014.
+
+## Adopción incremental: SPEC-010.C.2K
+
+El bloque **Ventajas** adopta los tokens visuales oficiales para el
+presupuesto, categorías, rejilla, tarjetas, controles de puntuación,
+editores de instancia, avisos narrativos, selecciones y estados de
+validación.
+
+La migración conserva selectores, estructura, interacción, controles
+habilitados y deshabilitados, estados válido e inválido y
+comportamiento responsive. No modifica componentes React, catálogo,
+reglas de presupuesto 7/2, requisitos, dependencias, `CharacterDraft`,
+persistencia, API ni Prisma.
+
+El bloque de **Sangre Débil** y todo el contenido posterior permanecen
+fuera del alcance y protegidos por contrato. Los tokens nuevos son
+semánticos y reutilizables; no crean componentes genéricos ni adelantan
+SPEC-014.

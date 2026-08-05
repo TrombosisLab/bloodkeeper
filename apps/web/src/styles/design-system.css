@@ -170,6 +170,15 @@
   --color-text-kicker-secondary: #8d737f;
   --color-text-level-secondary: #98788f;
 
+  --color-border-control-translucent: rgba(255, 255, 255, 0.16);
+  --color-border-emphasis-translucent: rgba(255, 255, 255, 0.3);
+  --color-border-hairline: rgba(255, 255, 255, 0.08);
+  --color-border-high-contrast: rgba(255, 255, 255, 0.48);
+  --color-border-translucent: rgba(255, 255, 255, 0.12);
+  --color-surface-chip: rgba(255, 255, 255, 0.09);
+  --color-surface-control-emphasis: rgba(0, 0, 0, 0.25);
+  --color-surface-input-soft: rgba(0, 0, 0, 0.15);
+
   /* Tipografía */
   --font-family-body:
     Inter,

@@ -38,7 +38,7 @@ test('SPEC-010.C.2G limita la migración al bloque Disciplinas', () => {
 
   assert.equal(
     suffixHash,
-    'a6e6c031ae02824ddd503094947056c30b052944cb0c5b912eac24a8bf4f3b1e',
+    '2419a4a5c1b76dcf37607d33742d8b5a692e4462c63a9fd31877b9c8dbb8fd3b',
   )
 })
 
