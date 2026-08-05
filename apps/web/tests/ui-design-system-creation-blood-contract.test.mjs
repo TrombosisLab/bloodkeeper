@@ -36,7 +36,7 @@ test('SPEC-010.C.2F limita la migración al bloque Sangre', () => {
 
   assert.equal(
     suffixHash,
-    '7e5c709d335923c62b4552027cea4fff8b51d17e93a8de5779e8f1657a06301b',
+    '7f2f36e60ea6b4b30fa932fdd28e9905633b8ec76cb7090a71d26d7266d2890c',
   )
 })
 

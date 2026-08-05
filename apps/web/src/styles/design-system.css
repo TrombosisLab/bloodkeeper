@@ -148,6 +148,21 @@
   --color-text-option-subtle: #9c8e89;
   --color-text-state-muted: #756966;
 
+  --color-card-border-muted: #382d2f;
+  --color-card-hover-border: #604047;
+  --color-panel-border-accent-soft: #493337;
+  --color-panel-tint-muted: rgb(105 35 47 / 0.08);
+  --color-selected-border-soft: #8d4d58;
+  --color-selected-surface-soft: rgb(110 38 50 / 0.14);
+  --color-surface-overlay-soft: rgb(18 16 16 / 0.35);
+  --color-text-card-title: #d6c8c2;
+  --color-text-description-muted: #8c817d;
+  --color-text-footnote-muted: #665d5a;
+  --color-text-intro-muted: #918481;
+  --color-text-kicker-muted: #8d656b;
+  --color-text-level-muted: #9b6870;
+  --color-text-section-title: #ddd0ca;
+
   /* Tipografía */
   --font-family-body:
     Inter,
