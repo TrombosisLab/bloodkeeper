@@ -36,7 +36,7 @@ test('SPEC-010.C.2D limita la migración al paso Habilidades', () => {
 
   assert.equal(
     suffixHash,
-    '014fa0d036773baadaeee4191fcb80442f93335b6fa874fb86418876d8eb42c0',
+    'a3b1edf87e5591ad88143ec8ba75b0bfbf703f097e505449f204809e3d2a73c6',
   )
 })
 

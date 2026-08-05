@@ -90,6 +90,33 @@
   --color-text-label-soft: #776b68;
   --color-text-support-muted: #776c68;
 
+  --color-accent-border: #b2636e;
+  --color-accent-fill: #8e3f4a;
+  --color-accent-label: #94545e;
+  --color-accent-text-soft: #bd6d78;
+  --color-accent-value: #c97983;
+  --color-action-border-muted: #5c4045;
+  --color-control-border-muted: #443438;
+  --color-control-text-strong: #c6b7b2;
+  --color-danger-text-soft: #bd7b84;
+  --color-meter-border: #704a50;
+  --color-panel-border-strong: #3b2d30;
+  --color-selected-border-strong: #a45b66;
+  --color-selected-surface-strong: rgb(117 39 51 / 0.18);
+  --color-selected-text-strong: #d2929b;
+  --color-success-border-soft: #385642;
+  --color-success-text: #87a78e;
+  --color-success-tint-soft: rgb(61 101 73 / 0.08);
+  --color-text-caption: #756a66;
+  --color-text-control-muted: #827672;
+  --color-text-detail-muted: #716662;
+  --color-text-disabled: #6f6561;
+  --color-text-heading: #d0c2bd;
+  --color-text-label-muted: #827571;
+  --color-text-value-soft: #cdbeba;
+  --color-validation-border-strong: #54363c;
+  --color-validation-tint-strong: rgb(105 38 49 / 0.08);
+
   /* Tipografía */
   --font-family-body:
     Inter,

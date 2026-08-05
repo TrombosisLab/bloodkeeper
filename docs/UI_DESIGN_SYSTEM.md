@@ -147,3 +147,19 @@ catálogos, persistencia, API ni Prisma.
 **Sangre** y todas las fases posteriores permanecen fuera del alcance
 y protegidas por contrato. Los tokens nuevos son semánticos y
 reutilizables; no crean componentes genéricos ni adelantan SPEC-014.
+
+## Adopción incremental: SPEC-010.C.2F
+
+El bloque **Sangre** adopta los tokens visuales oficiales para sus
+paneles, resumen de Generación, control de Potencia de Sangre, editor
+de Hambre, rasgos derivados y estados de validación.
+
+La migración conserva selectores, estructura, estados deshabilitados,
+círculos de Hambre, comportamiento responsive y consumidores
+existentes de los estilos de validación. No modifica componentes React,
+reglas de Sangre, Generación, Potencia, Hambre, Salud o Fuerza de
+Voluntad, `CharacterDraft`, catálogos, persistencia, API ni Prisma.
+
+**Disciplinas** y todas las fases posteriores permanecen fuera del
+alcance y protegidas por contrato. Los tokens nuevos son semánticos y
+reutilizables; no crean componentes genéricos ni adelantan SPEC-014.

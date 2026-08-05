@@ -1438,9 +1438,9 @@
 
 .blood-panel,
 .derived-traits {
-  border: 1px solid #3b2d30;
+  border: 1px solid var(--color-panel-border-strong);
   background:
-    rgb(255 255 255 / 0.015);
+    var(--color-panel-glass);
 }
 
 .blood-panel {
@@ -1449,7 +1449,7 @@
 
 .blood-panel__heading span,
 .derived-traits__heading span {
-  color: #94545e;
+  color: var(--color-accent-label);
   font-size: 0.6rem;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -1459,11 +1459,8 @@
 .blood-panel__heading h3,
 .derived-traits__heading h3 {
   margin: 5px 0 18px;
-  color: #d0c2bd;
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  color: var(--color-text-heading);
+  font-family: var(--font-family-heading);
   font-weight: 400;
 }
 
@@ -1476,17 +1473,17 @@
 
 .generation-option {
   min-height: 45px;
-  border: 1px solid #443438;
-  color: #827672;
-  background: #121010;
+  border: 1px solid var(--color-control-border-muted);
+  color: var(--color-text-control-muted);
+  background: var(--color-surface);
   cursor: pointer;
 }
 
 .generation-option--active {
-  border-color: #a45b66;
-  color: #d2929b;
+  border-color: var(--color-selected-border-strong);
+  color: var(--color-selected-text-strong);
   background:
-    rgb(117 39 51 / 0.18);
+    var(--color-selected-surface-strong);
 }
 
 .blood-rating-control {
@@ -1500,10 +1497,10 @@
 .blood-rating-control > button {
   width: 36px;
   height: 36px;
-  border: 1px solid #5c4045;
-  border-radius: 50%;
-  color: #c6b7b2;
-  background: #171213;
+  border: 1px solid var(--color-action-border-muted);
+  border-radius: var(--radius-round);
+  color: var(--color-control-text-strong);
+  background: var(--color-surface-elevated-deep);
   cursor: pointer;
 }
 
@@ -1519,11 +1516,8 @@
 
 .blood-rating-control__value strong {
   display: block;
-  color: #bd6d78;
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  color: var(--color-accent-text-soft);
+  font-family: var(--font-family-heading);
   font-size: 2.5rem;
   font-weight: 400;
 }
@@ -1531,7 +1525,7 @@
 .blood-rating-control__value span {
   display: block;
   margin-top: 5px;
-  color: #756a66;
+  color: var(--color-text-caption);
   font-size: 0.62rem;
 }
 
@@ -1553,31 +1547,28 @@
   width: 19px;
   height: 19px;
   padding: 0;
-  border: 1px solid #704a50;
-  border-radius: 50%;
+  border: 1px solid var(--color-meter-border);
+  border-radius: var(--radius-round);
   background: transparent;
   cursor: pointer;
 }
 
 .hunger-editor__dot--filled {
-  border-color: #b2636e;
-  background: #8e3f4a;
+  border-color: var(--color-accent-border);
+  background: var(--color-accent-fill);
   box-shadow:
-    inset 0 0 0 3px #171112;
+    inset 0 0 0 3px var(--color-indicator-fill);
 }
 
 .hunger-editor strong {
-  color: #cdbeba;
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  color: var(--color-text-value-soft);
+  font-family: var(--font-family-heading);
   font-weight: 400;
 }
 
 .hunger-editor > span {
   margin-top: 4px;
-  color: #6f6561;
+  color: var(--color-text-disabled);
   font-size: 0.62rem;
 }
 
@@ -1595,8 +1586,8 @@
 
 .derived-trait-card {
   padding: 20px;
-  border: 1px solid #33292b;
-  background: #121010;
+  border: 1px solid var(--color-summary-border);
+  background: var(--color-surface);
 }
 
 .derived-trait-card > span,
@@ -1606,7 +1597,7 @@
 }
 
 .derived-trait-card > span {
-  color: #827571;
+  color: var(--color-text-label-muted);
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -1615,34 +1606,31 @@
 
 .derived-trait-card > strong {
   margin: 8px 0;
-  color: #c97983;
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  color: var(--color-accent-value);
+  font-family: var(--font-family-heading);
   font-size: 2rem;
   font-weight: 400;
 }
 
 .derived-trait-card > small {
-  color: #716662;
+  color: var(--color-text-detail-muted);
   font-size: 0.68rem;
 }
 
 .blood-validation {
   margin-top: 16px;
   padding: 14px 18px;
-  border: 1px solid #54363c;
-  color: #bd7b84;
+  border: 1px solid var(--color-validation-border-strong);
+  color: var(--color-danger-text-soft);
   background:
-    rgb(105 38 49 / 0.08);
+    var(--color-validation-tint-strong);
 }
 
 .blood-validation--valid {
-  border-color: #385642;
-  color: #87a78e;
+  border-color: var(--color-success-border-soft);
+  color: var(--color-success-text);
   background:
-    rgb(61 101 73 / 0.08);
+    var(--color-success-tint-soft);
 }
 
 .blood-validation p,
@@ -1672,12 +1660,9 @@
 }
 
 .blood-generation-summary strong {
-  color: #bd6d78;
+  color: var(--color-accent-text-soft);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 2.5rem;
   font-weight: 400;
@@ -1686,7 +1671,7 @@
 .blood-generation-summary span {
   margin-top: 5px;
 
-  color: #756a66;
+  color: var(--color-text-caption);
 
   font-size: 0.62rem;
 }
