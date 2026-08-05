@@ -121,6 +121,23 @@ El resultado esperado termina con:
 BACKUP Y RECUPERACIÓN SPEC-007 CORRECTOS
 ```
 
+## Validación de SPEC-008
+
+```bash
+./scripts/status.sh
+./scripts/check-system-monitoring.sh
+```
+
+La primera orden muestra el estado completo. La segunda valida el
+contrato documental, los scripts de diagnóstico y el funcionamiento
+operativo.
+
+El resultado esperado termina con:
+
+```text
+MONITORIZACIÓN SPEC-008 CORRECTA
+```
+
 ## Comprobación desde navegador
 
 1. Abrir `http://DIRECCION_LAN:5173`.
