@@ -35,13 +35,13 @@ const attributesBlock = sheetStyles.slice(
 const healthAndLater = sheetStyles.slice(healthStart)
 
 test('SPEC-010 limita la adopción de ficha al bloque 002-B Atributos', () => {
-  const suffixHash = createHash('sha256')
-    .update(healthAndLater)
+  const attributesHash = createHash('sha256')
+    .update(attributesBlock)
     .digest('hex')
 
   assert.equal(
-    suffixHash,
-    '013948aa87ab6c82b291d591df68fdd81ab5388dbcb94bb3185239facf982555',
+    attributesHash,
+    '4358b594491cf50b89639fb02a37e7bcc977e4d29ea2d98bf7d1f5077eac5f21',
   )
   assert.equal(
     attributesBlock.includes('002-B — ATRIBUTOS'),

@@ -283,3 +283,24 @@ Este incremento no recibe un identificador `SPEC-010.C.3`: continúa la
 adopción mínima y secuencial exigida por SPEC-010 sin modificar componentes
 React, dominio, catálogos, persistencia, API o Prisma, ni adelantar
 SPEC-011–014.
+
+## Adopción incremental de ficha: 002-C — Salud y Fuerza de Voluntad
+
+El bloque de **Salud y Fuerza de Voluntad** de la ficha adopta los tokens
+visuales oficiales para sus contenedores, textos, bordes, fondos, foco y
+símbolos de daño.
+
+La migración conserva los dos consumidores reales, los estados disponible,
+editable y no disponible de cada casilla, el foco visible, la diferenciación
+simbólica del daño y los breakpoints existentes de 900 y 600 píxeles. La
+lógica de capacidad, daño superficial, daño agravado y transiciones permanece
+intacta.
+
+La frontera `002-D — Habilidades` y todos los bloques posteriores quedan
+fuera de este incremento. El contrato anterior de `002-B — Atributos` pasa a
+proteger su propio bloque en lugar de congelar toda la ficha posterior, lo
+que permite continuar la adopción secuencial sin debilitar su cierre.
+
+Este incremento no recibe un identificador `SPEC-010.C.3` y no modifica
+componentes React, dominio, catálogos, persistencia, API o Prisma, ni adelanta
+SPEC-011–014.

@@ -252,9 +252,9 @@
 
   margin-top: 22px;
 
-  border: 1px solid #392d2f;
+  border: 1px solid var(--color-group-border);
 
-  background: #392d2f;
+  background: var(--color-group-border);
 }
 
 .damage-tracker {
@@ -262,7 +262,7 @@
 
   padding: 20px;
 
-  background: #121010;
+  background: var(--color-surface);
 }
 
 .damage-tracker__header {
@@ -283,7 +283,7 @@
 .damage-tracker__label {
   margin-bottom: 4px;
 
-  color: #a76d75;
+  color: var(--color-label-accent);
 
   font-size: 0.7rem;
   font-weight: 800;
@@ -294,19 +294,16 @@
 }
 
 .damage-tracker__capacity {
-  color: #e1d8d2;
+  color: var(--color-text-strong);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 1.7rem;
   font-weight: 400;
 }
 
 .damage-tracker__maximum {
-  color: #675e5b;
+  color: var(--color-text-subtle-muted);
 
   font-size: 0.68rem;
 
@@ -333,9 +330,9 @@
 
   place-items: center;
 
-  border: 1px solid #4d3b3e;
+  border: 1px solid var(--color-control-border);
 
-  background: #0e0c0c;
+  background: var(--color-control-surface);
 }
 
 .damage-box-item {
@@ -347,7 +344,7 @@
 }
 
 .damage-box--available {
-  border-color: #816168;
+  border-color: var(--color-focus-border);
 }
 
 .damage-box--unavailable {
@@ -363,14 +360,14 @@
 }
 
 .damage-box--editable:focus-visible {
-  outline: 2px solid #e0a2aa;
+  outline: 2px solid var(--color-symbol-soft);
   outline-offset: 3px;
 }
 
 .damage-box__symbol {
-  color: #d5848e;
+  color: var(--color-symbol-accent);
 
-  font-family: Arial, sans-serif;
+  font-family: var(--font-family-body-soft);
   font-size: clamp(1rem, 2vw, 1.45rem);
   font-weight: 700;
   line-height: 1;

@@ -198,7 +198,17 @@
   --color-text-muted-dark: #655d59;
   --color-text-subtle-soft: #817572;
 
+  --color-control-border: #4d3b3e;
+  --color-control-surface: #0e0c0c;
+  --color-focus-border: #816168;
+  --color-label-accent: #a76d75;
+  --color-symbol-accent: #d5848e;
+  --color-symbol-soft: #e0a2aa;
+  --color-text-strong: #e1d8d2;
+  --color-text-subtle-muted: #675e5b;
+
   /* Tipografía */
+  --font-family-body-soft: Arial, sans-serif;
   --font-family-body:
     Inter,
     ui-sans-serif,
