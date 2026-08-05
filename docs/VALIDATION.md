@@ -138,6 +138,24 @@ El resultado esperado termina con:
 MONITORIZACIÓN SPEC-008 CORRECTA
 ```
 
+## Validación de SPEC-009
+
+```bash
+./scripts/check-maintenance-operations.sh
+./scripts/check-maintenance-operations.sh \
+  --with-restart \
+  --with-backup
+```
+
+La primera orden valida los contratos y operaciones no destructivas. La
+segunda añade un reinicio real controlado y una restauración temporal.
+
+El resultado esperado termina con:
+
+```text
+MANTENIMIENTO SPEC-009 CORRECTO
+```
+
 ## Comprobación desde navegador
 
 1. Abrir `http://DIRECCION_LAN:5173`.

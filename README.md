@@ -28,10 +28,12 @@ Después del primer despliegue:
 
 ```bash
 ./scripts/start.sh
+./scripts/restart.sh
 ./scripts/status.sh
 ./scripts/check.sh
 ./scripts/logs.sh
 ./scripts/backup.sh
+./scripts/prepare-update.sh --check --target HEAD
 ./scripts/stop.sh
 ```
 
@@ -43,6 +45,7 @@ Después del primer despliegue:
 - `docs/DEVELOPMENT_WORKFLOW.md`: flujo oficial de desarrollo.
 - `docs/VALIDATION.md`: validación técnica y funcional.
 - `docs/RECOVERY.md`: copias y recuperación.
+- `docs/MAINTENANCE_OPERATIONS.md`: mantenimiento por SSH.
 - `scripts/README.md`: catálogo de scripts.
 
 ## Estado

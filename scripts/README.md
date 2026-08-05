@@ -10,6 +10,7 @@ despliegue y mantenimiento mediante SSH.
 | `bootstrap-server.sh` | Prepara Ubuntu y despliega la aplicación |
 | `start.sh` | Inicia los servicios |
 | `stop.sh` | Detiene los servicios sin borrar datos |
+| `restart.sh` | Reinicia servicios y valida su salud |
 | `status.sh` | Muestra estado completo, recursos, backups y versión |
 | `check.sh` | Ejecuta los smoke tests operativos |
 | `check-docker-architecture.sh` | Valida aislamiento, usuarios y persistencia Docker |
@@ -24,6 +25,8 @@ despliegue y mantenimiento mediante SSH.
 | `install-backup-schedule.sh` | Gestiona la tarea diaria de backup |
 | `check-backup-recovery.sh` | Valida backup y recuperación de SPEC-007 |
 | `check-system-monitoring.sh` | Valida la supervisión oficial de SPEC-008 |
+| `prepare-update.sh` | Comprueba y prepara actualizaciones sin aplicarlas |
+| `check-maintenance-operations.sh` | Valida el mantenimiento de SPEC-009 |
 | `create-initial-admin.sh` | Crea la primera cuenta administrativa |
 
 ## Desarrollo

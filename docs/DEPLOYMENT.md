@@ -96,11 +96,16 @@ mediante `/api`.
 
 ```bash
 ./scripts/start.sh
+./scripts/restart.sh
 ./scripts/status.sh
 ./scripts/check.sh
 ./scripts/logs.sh
+./scripts/prepare-update.sh --check --target HEAD
 ./scripts/stop.sh
 ```
+
+El catálogo completo de mantenimiento está en
+`docs/MAINTENANCE_OPERATIONS.md`.
 
 ## Validación del despliegue
 
