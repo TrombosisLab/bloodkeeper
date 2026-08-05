@@ -139,6 +139,15 @@
   --color-text-paragraph-muted: #8a7d79;
   --color-text-title-soft: #d2c5bf;
 
+  --color-accent-label-muted: #8e555e;
+  --color-accent-state: #bd737d;
+  --color-option-border-muted: #3a3031;
+  --color-option-hover-border: #67434a;
+  --color-selected-border-emphasis: #8b4c57;
+  --color-selected-surface-emphasis: rgb(112 45 56 / 0.14);
+  --color-text-option-subtle: #9c8e89;
+  --color-text-state-muted: #756966;
+
   /* Tipografía */
   --font-family-body:
     Inter,

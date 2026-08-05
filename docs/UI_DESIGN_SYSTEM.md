@@ -180,3 +180,19 @@ Alquimia, `CharacterDraft`, catálogos, persistencia, API ni Prisma.
 **Poderes** y todo el contenido posterior permanecen fuera del alcance
 y protegidos por contrato. Los tokens nuevos son semánticos y
 reutilizables; no crean componentes genéricos ni adelantan SPEC-014.
+
+## Adopción incremental: SPEC-010.C.2H
+
+El bloque **Poderes** adopta los tokens visuales oficiales para sus
+contenedores, cabeceras, textos de ayuda, opciones, niveles, estados
+seleccionados y deshabilitados y mensajes de validación.
+
+La migración conserva selectores, estructura, interacción, estados,
+comportamiento responsive y consumidores existentes. No modifica
+componentes React, reglas de adquisición, prerrequisitos, Amalgamas,
+catálogos, `CharacterDraft`, persistencia, API ni Prisma.
+
+El bloque de **Ritual inicial de Hechicería** y todo el contenido
+posterior permanecen fuera del alcance y protegidos por contrato. Los
+tokens nuevos son semánticos y reutilizables; no crean componentes
+genéricos ni adelantan SPEC-014.
