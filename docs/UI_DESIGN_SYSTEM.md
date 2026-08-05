@@ -213,3 +213,20 @@ El bloque de **Ceremonia inicial de Olvido** y todo el contenido
 posterior permanecen fuera del alcance y protegidos por contrato. Los
 tokens nuevos son semánticos y reutilizables; no crean componentes
 genéricos ni adelantan SPEC-014.
+
+## Adopción incremental: SPEC-010.C.2J
+
+El bloque **Ceremonia inicial de Olvido** adopta los tokens visuales
+oficiales para su contenedor, cabecera, texto introductorio, rejilla,
+tarjetas, niveles, títulos, descripciones, referencias y estados
+normal, `hover` y seleccionado.
+
+La migración conserva selectores, estructura, interacción,
+comportamiento responsive y consumidores existentes. No modifica
+componentes React, catálogo de Ceremonias, requisitos de Olvido,
+validación, `CharacterDraft`, persistencia, API ni Prisma.
+
+El bloque de **Ventajas** y todo el contenido posterior permanecen
+fuera del alcance y protegidos por contrato. Los tokens nuevos son
+semánticos y reutilizables; no crean componentes genéricos ni adelantan
+SPEC-014.

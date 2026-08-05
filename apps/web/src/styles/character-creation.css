@@ -2386,12 +2386,12 @@
 .oblivion-ceremony-selector {
   margin-top: 28px;
   padding: 24px;
-  border: 1px solid #493337;
+  border: 1px solid var(--color-panel-border-accent-soft);
   background:
     linear-gradient(
       180deg,
-      rgb(72 53 82 / 0.12),
-      rgb(18 16 16 / 0.35)
+      var(--color-panel-tint-secondary),
+      var(--color-surface-overlay-soft)
     );
 }
 
@@ -2401,13 +2401,13 @@
   justify-content: space-between;
   gap: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #392d2f;
+  border-bottom: 1px solid var(--color-group-border);
 }
 
 .oblivion-ceremony-selector__heading span {
   display: block;
   margin-bottom: 5px;
-  color: #8d737f;
+  color: var(--color-text-kicker-secondary);
   font-size: 0.6rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -2416,17 +2416,14 @@
 
 .oblivion-ceremony-selector__heading h3 {
   margin: 0;
-  color: #ddd0ca;
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  color: var(--color-text-section-title);
+  font-family: var(--font-family-heading);
   font-size: 1.35rem;
   font-weight: 400;
 }
 
 .oblivion-ceremony-selector__heading > strong {
-  color: #bd707a;
+  color: var(--color-accent-rule);
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2434,7 +2431,7 @@
 
 .oblivion-ceremony-selector__intro {
   margin: 18px 0;
-  color: #918481;
+  color: var(--color-text-intro-muted);
   line-height: 1.6;
 }
 
@@ -2448,8 +2445,8 @@
 .oblivion-ceremony-card {
   min-width: 0;
   padding: 18px;
-  border: 1px solid #382d2f;
-  background: #121010;
+  border: 1px solid var(--color-card-border-muted);
+  background: var(--color-surface);
   color: inherit;
   text-align: left;
   cursor: pointer;
@@ -2460,20 +2457,20 @@
 }
 
 .oblivion-ceremony-card:hover {
-  border-color: #604b5e;
+  border-color: var(--color-card-hover-border-secondary);
   transform: translateY(-1px);
 }
 
 .oblivion-ceremony-card--selected {
-  border-color: #80607d;
+  border-color: var(--color-selected-border-secondary);
   background:
-    rgb(82 57 89 / 0.18);
+    var(--color-selected-surface-secondary);
 }
 
 .oblivion-ceremony-card__level {
   display: block;
   margin-bottom: 8px;
-  color: #98788f;
+  color: var(--color-text-level-secondary);
   font-size: 0.58rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -2482,24 +2479,21 @@
 
 .oblivion-ceremony-card > strong {
   display: block;
-  color: #d6c8c2;
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  color: var(--color-text-card-title);
+  font-family: var(--font-family-heading);
   font-size: 1rem;
   font-weight: 400;
 }
 
 .oblivion-ceremony-card p {
   margin: 10px 0;
-  color: #8c817d;
+  color: var(--color-text-description-muted);
   font-size: 0.78rem;
   line-height: 1.5;
 }
 
 .oblivion-ceremony-card small {
-  color: #665d5a;
+  color: var(--color-text-footnote-muted);
   font-size: 0.62rem;
 }
 

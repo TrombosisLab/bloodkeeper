@@ -163,6 +163,13 @@
   --color-text-level-muted: #9b6870;
   --color-text-section-title: #ddd0ca;
 
+  --color-card-hover-border-secondary: #604b5e;
+  --color-panel-tint-secondary: rgb(72 53 82 / 0.12);
+  --color-selected-border-secondary: #80607d;
+  --color-selected-surface-secondary: rgb(82 57 89 / 0.18);
+  --color-text-kicker-secondary: #8d737f;
+  --color-text-level-secondary: #98788f;
+
   /* Tipografía */
   --font-family-body:
     Inter,
