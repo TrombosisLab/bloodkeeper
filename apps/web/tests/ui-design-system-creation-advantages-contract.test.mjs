@@ -40,7 +40,7 @@ test('SPEC-010.C.2K limita la migración al bloque Ventajas', () => {
 
   assert.equal(
     suffixHash,
-    'd1f9d55e9da6a0192771767c3b4f46181159468c9d6f9e4e9975b9ac64fa01a6',
+    '7c7f109fd676c146beaea9abb655dd7bf8d2dbeea2bc61a3aae8446f48060bb8',
   )
   assert.equal(
     laterStyles.includes(

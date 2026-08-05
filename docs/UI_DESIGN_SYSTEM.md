@@ -248,3 +248,21 @@ El bloque de **Sangre Débil** y todo el contenido posterior permanecen
 fuera del alcance y protegidos por contrato. Los tokens nuevos son
 semánticos y reutilizables; no crean componentes genéricos ni adelantan
 SPEC-014.
+
+## Adopción incremental: SPEC-010.C.2L
+
+El bloque final de **Sangre Débil** adopta los tokens visuales
+oficiales para columnas, grupos, opciones, estados de selección,
+validación, entradas con aspecto de ficha y controles de puntuación
+compartidos.
+
+La migración conserva selectores, estructura, interacción, estados
+normal, `hover`, seleccionado, válido, inválido y deshabilitado, así
+como el comportamiento responsive existente. El final del archivo CSS
+actúa como frontera posterior contractual.
+
+No modifica componentes React, reglas de Méritos y Defectos de Sangre
+Débil, Alquimia, Afinidad de Disciplina, Maldición de Clan,
+`CharacterDraft`, catálogos, persistencia, API ni Prisma. Los tokens
+nuevos son semánticos y reutilizables; no crean componentes genéricos
+ni adelantan SPEC-014.

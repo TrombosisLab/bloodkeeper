@@ -2850,7 +2850,7 @@
   min-height: 3rem;
   padding: 0.75rem 0.9rem;
   border: 1px solid
-    var(--creation-border, rgba(255, 255, 255, 0.16));
+    var(--creation-border, var(--color-border-control-translucent));
   border-radius: 0.65rem;
   background: transparent;
   color: inherit;
@@ -2868,7 +2868,7 @@
   border-color:
     var(--creation-accent, currentColor);
   background:
-    rgba(255, 255, 255, 0.06);
+    var(--color-surface-control-hover-soft);
 }
 
 .thin-blood-trait-option span {
@@ -2931,15 +2931,15 @@
   min-height: 3rem;
   padding: 0.45rem 0.75rem;
 
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid var(--color-border-translucent);
   border-radius: 0.45rem;
 
-  background: rgba(255,255,255,0.025);
+  background: var(--color-surface-control-subtle);
 }
 
 
 .advantage-sheet-entry--selected {
-  background: rgba(255,255,255,0.06);
+  background: var(--color-surface-control-hover-soft);
 }
 
 
@@ -2978,7 +2978,7 @@
   align-items: center;
   min-height: 3rem;
   padding: 0.4rem 0.7rem;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid var(--color-border-translucent);
   border-radius: 0.5rem;
 }
 
@@ -3030,11 +3030,11 @@
   display: grid;
   place-items: center;
 
-  border: 1px solid #523b3f;
+  border: 1px solid var(--color-control-border-soft);
   border-radius: 50%;
 
-  color: #c8bbb5;
-  background: #171214;
+  color: var(--color-control-text);
+  background: var(--color-control-surface-dark);
 
   cursor: pointer;
 }
@@ -3058,7 +3058,7 @@
 
   display: block;
 
-  border: 1px solid #72545a;
+  border: 1px solid var(--color-control-indicator-border);
   border-radius: 50%;
 
   background: transparent;
@@ -3066,9 +3066,9 @@
 
 
 .advantage-rating-control__dot--active {
-  border-color: #b46d76;
-  background: #9d4d58;
+  border-color: var(--color-control-indicator-active);
+  background: var(--color-control-indicator-fill);
 
   box-shadow:
-    inset 0 0 0 2px #171112;
+    inset 0 0 0 2px var(--color-indicator-fill);
 }

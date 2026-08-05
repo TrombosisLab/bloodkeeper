@@ -40,7 +40,7 @@ test('SPEC-010.C.2J limita la migración a la Ceremonia inicial', () => {
 
   assert.equal(
     suffixHash,
-    '5e7d5d4f206d2272672a2fbd6b6dd14879a6498a36638e25cb151f6c0060ba93',
+    '631b8d34e2c2142652b6fd2d85c75742e56c7146db41fa4b8e676022148d0fa2',
   )
   assert.equal(
     laterStyles.includes(

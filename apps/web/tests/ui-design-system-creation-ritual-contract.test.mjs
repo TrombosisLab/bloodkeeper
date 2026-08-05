@@ -40,7 +40,7 @@ test('SPEC-010.C.2I limita la migración al Ritual inicial', () => {
 
   assert.equal(
     suffixHash,
-    'e25e9e6cd0c7b814fd9f68120ed9091015f571f88e3af6cc0892bcecdb75f88d',
+    'fb631c6f20db8200f6b786d5184e0c229f65e4d625be960e17dc75f60561cb1c',
   )
   assert.equal(
     laterStyles.includes(

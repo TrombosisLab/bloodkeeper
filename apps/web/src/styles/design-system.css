@@ -179,6 +179,12 @@
   --color-surface-control-emphasis: rgba(0, 0, 0, 0.25);
   --color-surface-input-soft: rgba(0, 0, 0, 0.15);
 
+  --color-control-indicator-active: #b46d76;
+  --color-control-indicator-border: #72545a;
+  --color-control-indicator-fill: #9d4d58;
+  --color-surface-control-hover-soft: rgba(255, 255, 255, 0.06);
+  --color-surface-control-subtle: rgba(255,255,255,0.025);
+
   /* Tipografía */
   --font-family-body:
     Inter,
