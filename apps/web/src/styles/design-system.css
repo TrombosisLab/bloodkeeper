@@ -185,6 +185,19 @@
   --color-surface-control-hover-soft: rgba(255, 255, 255, 0.06);
   --color-surface-control-subtle: rgba(255,255,255,0.025);
 
+  --color-control-border-accent: #b05b65;
+  --color-control-border-muted-soft: #4f393d;
+  --color-control-indicator-border-muted: #74565a;
+  --color-control-tint: rgb(157 77 88 / 0.08);
+  --color-control-tint-active: rgb(176 91 101 / 0.14);
+  --color-group-tint-soft: rgb(93 30 39 / 0.08);
+  --color-heading-muted: #4f4142;
+  --color-label-emphasis: #d9d0ca;
+  --color-section-border: #4c292e;
+  --color-section-tint: rgb(82 22 30 / 0.08);
+  --color-text-muted-dark: #655d59;
+  --color-text-subtle-soft: #817572;
+
   /* Tipografía */
   --font-family-body:
     Inter,

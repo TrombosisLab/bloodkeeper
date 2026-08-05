@@ -266,3 +266,20 @@ Débil, Alquimia, Afinidad de Disciplina, Maldición de Clan,
 `CharacterDraft`, catálogos, persistencia, API ni Prisma. Los tokens
 nuevos son semánticos y reutilizables; no crean componentes genéricos
 ni adelantan SPEC-014.
+
+## Adopción incremental de ficha: 002-B — Atributos
+
+El primer bloque de la **ficha de personaje** adopta los tokens visuales
+oficiales para el fondo de sección, encabezados, categorías, filas,
+puntuaciones con círculos y valores derivados.
+
+La migración conserva los selectores, la estructura, los estados editable,
+bloqueado y error de `DotRating`, así como los breakpoints existentes de
+900 y 600 píxeles. Las reglas de `002-C — Salud y Fuerza de Voluntad` y
+todos los bloques posteriores permanecen intactos mediante una frontera
+contractual.
+
+Este incremento no recibe un identificador `SPEC-010.C.3`: continúa la
+adopción mínima y secuencial exigida por SPEC-010 sin modificar componentes
+React, dominio, catálogos, persistencia, API o Prisma, ni adelantar
+SPEC-011–014.
