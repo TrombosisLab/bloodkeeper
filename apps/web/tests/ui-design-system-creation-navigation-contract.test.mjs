@@ -29,13 +29,13 @@ const navigationBlock = navigationMarker + navigationBody
 const skillsAndLater = skillsMarker + skillsAndLaterBody
 
 test('SPEC-010.C.2C limita la migración a Validación de Navegación', () => {
-  const suffixHash = createHash('sha256')
-    .update(skillsAndLater)
+  const navigationHash = createHash('sha256')
+    .update(navigationBlock)
     .digest('hex')
 
   assert.equal(
-    suffixHash,
-    '66e7d4298ead72a62d45c10c81091f306474a79786463dbab9904cc986d1002b',
+    navigationHash,
+    '324f2a3251ee43a18e505c0d0f1c7323ae3bf008cfa49738e52372d0b5e4f36c',
   )
 })
 

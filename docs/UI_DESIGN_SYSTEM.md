@@ -117,3 +117,18 @@ la navegación entre pasos ni el bloque Habilidades o fases posteriores.
 
 Los nuevos tokens de peligro son reutilizables y no crean componentes
 genéricos ni adelantan SPEC-014.
+
+## Adopción incremental: SPEC-010.C.2D
+
+El paso **Habilidades** adopta los tokens visuales oficiales para los
+métodos de reparto, la barra de estado, las categorías, los controles
+de puntuación y los paneles de validación.
+
+La migración conserva los selectores, estados, distribución responsive
+y comportamiento existentes. No modifica componentes React, reglas de
+Habilidades, especialidades, `CharacterDraft`, catálogos, persistencia,
+API ni Prisma.
+
+**Especialidades** y todas las fases posteriores permanecen fuera del
+alcance y protegidas por contrato. Los tokens nuevos son semánticos y
+reutilizables; no crean componentes genéricos ni adelantan SPEC-014.

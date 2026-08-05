@@ -67,6 +67,15 @@
   --color-danger-emphasis: #c58a92;
   --color-danger-text-muted: #a8787e;
 
+  --color-option-border: #3b3031;
+  --color-selected-border: #874a55;
+  --color-selected-surface: rgb(110 42 54 / 0.14);
+  --color-selected-text: #c9838d;
+  --color-surface-option: #141112;
+  --color-text-option: #c9bbb6;
+  --color-text-option-muted: #948783;
+  --color-text-row: #d0c5bf;
+
   /* Tipografía */
   --font-family-body:
     Inter,
