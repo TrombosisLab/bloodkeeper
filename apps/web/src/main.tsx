@@ -1,4 +1,7 @@
-import React, { useState } from 'react'
+import React, {
+  useEffect,
+  useState,
+} from 'react'
 import ReactDOM from 'react-dom/client'
 
 import { AppHeader } from './components/layout/AppHeader'
@@ -8,18 +11,25 @@ import { CharacterCreationWizard } from './features/character-creation/component
 import { CharacterSheet } from './features/character-sheet/components/CharacterSheet'
 import { PersistedCharacterSheet } from './features/character-sheet/components/PersistedCharacterSheet'
 import { ChronicleListCreate } from './features/chronicles/components/ChronicleListCreate'
+import { AppNavigation } from './features/navigation/components/AppNavigation'
+import {
+  appViewFromHash,
+  hashForAppView,
+  sectionForAppView,
+} from './features/navigation/domain/app-navigation-location'
+
+import type {
+  AppSection,
+} from './features/navigation/types/app-navigation.types'
 
 import './styles.css'
 
 type AppView =
-  | 'sheet'
-  | 'creation'
+  | 'characters'
+  | 'character-creation'
   | 'chronicles'
 
 function App() {
-  const [view, setView] =
-    useState<AppView>('sheet')
-
   const authenticatedUser =
     useAuthenticatedUser()
 
@@ -28,96 +38,171 @@ function App() {
       'narrator',
     )
 
+  const [view, setView] =
+    useState<AppView>(() =>
+      appViewFromHash(
+        window.location.hash,
+        {
+          canManageChronicles,
+        },
+      ),
+    )
+
   const [
     creationCharacterId,
     setCreationCharacterId,
   ] = useState<string | null>(null)
 
+  useEffect(() => {
+    const synchronizeLocation = () => {
+      const synchronizedView =
+        appViewFromHash(
+          window.location.hash,
+          {
+            canManageChronicles,
+          },
+        )
+
+      const canonicalHash =
+        hashForAppView(
+          synchronizedView,
+        )
+
+      setView(synchronizedView)
+
+      if (
+        window.location.hash !==
+        canonicalHash
+      ) {
+        window.history.replaceState(
+          null,
+          '',
+          canonicalHash,
+        )
+      }
+    }
+
+    synchronizeLocation()
+
+    window.addEventListener(
+      'hashchange',
+      synchronizeLocation,
+    )
+
+    return () => {
+      window.removeEventListener(
+        'hashchange',
+        synchronizeLocation,
+      )
+    }
+  }, [canManageChronicles])
+
+  function navigateTo(
+    nextView: AppView,
+  ) {
+    const allowedView =
+      appViewFromHash(
+        hashForAppView(nextView),
+        {
+          canManageChronicles,
+        },
+      )
+
+    const nextHash =
+      hashForAppView(allowedView)
+
+    if (
+      window.location.hash ===
+      nextHash
+    ) {
+      setView(allowedView)
+      return
+    }
+
+    window.location.hash = nextHash
+  }
+
+  function navigateToSection(
+    section: AppSection,
+  ) {
+    navigateTo(
+      section === 'chronicles'
+        ? 'chronicles'
+        : 'characters',
+    )
+  }
+
   return (
     <div className="application">
       <AppHeader />
 
-      {view !== 'creation' ? (
-        <nav
-          className="app-section-navigation"
+      <div className="application-shell">
+        <AppNavigation
           aria-label="Secciones principales"
-        >
-          <button
-            type="button"
-            aria-pressed={view === 'sheet'}
-            onClick={() =>
-              setView('sheet')
-            }
-          >
-            Personajes
-          </button>
+          activeSection={
+            sectionForAppView(view)
+          }
+          canManageChronicles={
+            canManageChronicles
+          }
+          onNavigate={
+            navigateToSection
+          }
+        />
 
-          {canManageChronicles ? (
-            <button
-              type="button"
-              aria-pressed={
-                view === 'chronicles'
-              }
-              onClick={() =>
-                setView('chronicles')
-              }
-            >
-              Crónicas
-            </button>
-          ) : null}
-        </nav>
-      ) : null}
+        <div className="application-shell__content">
+          {view === 'chronicles' &&
+          canManageChronicles ? (
+            <ChronicleListCreate />
+          ) : view === 'characters' ? (
+            <main className="application-content">
+              <div className="sheet-toolbar">
+                <div>
+                  <span className="sheet-toolbar__eyebrow">
+                    Personajes
+                  </span>
 
-      {view === 'chronicles' &&
-      canManageChronicles ? (
-        <ChronicleListCreate />
-      ) : view === 'sheet' ? (
-        <main className="application-content">
-          <div className="sheet-toolbar">
-            <div>
-              <span className="sheet-toolbar__eyebrow">
-                Personajes
-              </span>
+                  <strong>
+                    {creationCharacterId === null
+                      ? 'Ficha de demostración'
+                      : 'Personaje persistido'}
+                  </strong>
+                </div>
 
-              <strong>
-                {creationCharacterId === null
-                  ? 'Ficha de demostración'
-                  : 'Personaje persistido'}
-              </strong>
-            </div>
+                <button
+                  type="button"
+                  className="sheet-toolbar__action"
+                  onClick={() =>
+                    navigateTo(
+                      'character-creation',
+                    )
+                  }
+                >
+                  {creationCharacterId === null
+                    ? 'Crear personaje'
+                    : 'Continuar creación'}
+                </button>
+              </div>
 
-            <button
-              type="button"
-              className="sheet-toolbar__action"
-              onClick={() =>
-                setView('creation')
-              }
-            >
-              {creationCharacterId === null
-                ? 'Crear personaje'
-                : 'Continuar creación'}
-            </button>
-          </div>
-
-          {creationCharacterId === null ? (
-            <CharacterSheet />
+              {creationCharacterId === null ? (
+                <CharacterSheet />
+              ) : (
+                <PersistedCharacterSheet
+                  characterId={creationCharacterId}
+                />
+              )}
+            </main>
           ) : (
-            <PersistedCharacterSheet
-              characterId={
-                creationCharacterId
+            <CharacterCreationWizard
+              characterId={creationCharacterId}
+              onCharacterPersisted={setCreationCharacterId}
+              onBackToSheet={() =>
+                navigateTo('characters')
               }
             />
           )}
-        </main>
-      ) : (
-        <CharacterCreationWizard
-          characterId={creationCharacterId}
-          onCharacterPersisted={setCreationCharacterId}
-          onBackToSheet={() =>
-            setView('sheet')
-          }
-        />
-      )}
+        </div>
+      </div>
     </div>
   )
 }
