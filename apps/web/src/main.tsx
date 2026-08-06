@@ -4,6 +4,7 @@ import React, {
 } from 'react'
 import ReactDOM from 'react-dom/client'
 
+import { AppLayout } from './components/layout/AppLayout'
 import { AppHeader } from './components/layout/AppHeader'
 import { AuthenticationGate } from './features/authentication/components/AuthenticationGate'
 import { useAuthenticatedUser } from './features/authentication/context/authentication.context'
@@ -134,10 +135,23 @@ function App() {
   }
 
   return (
-    <div className="application">
-      <AppHeader />
-
-      <div className="application-shell">
+    <AppLayout
+      breadcrumbs={
+        view === 'character-creation' ? (
+          <AppBreadcrumbs
+            onNavigateCharacters={() =>
+              navigateTo('characters')
+            }
+          />
+        ) : null
+      }
+      contentClassName={
+        view === 'characters'
+          ? 'application-content'
+          : undefined
+      }
+      header={<AppHeader />}
+      navigation={
         <AppNavigation
           aria-label="Secciones principales"
           activeSection={
@@ -150,69 +164,61 @@ function App() {
             navigateToSection
           }
         />
+      }
+    >
+      {view === 'chronicles' &&
+      canManageChronicles ? (
+        <ChronicleListCreate />
+      ) : view === 'characters' ? (
+        <>
+          <div className="sheet-toolbar">
+            <div>
+              <span className="sheet-toolbar__eyebrow">
+                Personajes
+              </span>
 
-        <div className="application-shell__content">
-          {view === 'character-creation' ? (
-            <AppBreadcrumbs
-              onNavigateCharacters={() =>
-                navigateTo('characters')
+              <strong>
+                {creationCharacterId === null
+                  ? 'Ficha de demostración'
+                  : 'Personaje persistido'}
+              </strong>
+            </div>
+
+            <button
+              type="button"
+              className="sheet-toolbar__action"
+              onClick={() =>
+                navigateTo(
+                  'character-creation',
+                )
               }
-            />
-          ) : null}
+            >
+              {creationCharacterId === null
+                ? 'Crear personaje'
+                : 'Continuar creación'}
+            </button>
+          </div>
 
-          {view === 'chronicles' &&
-          canManageChronicles ? (
-            <ChronicleListCreate />
-          ) : view === 'characters' ? (
-            <main className="application-content">
-              <div className="sheet-toolbar">
-                <div>
-                  <span className="sheet-toolbar__eyebrow">
-                    Personajes
-                  </span>
-
-                  <strong>
-                    {creationCharacterId === null
-                      ? 'Ficha de demostración'
-                      : 'Personaje persistido'}
-                  </strong>
-                </div>
-
-                <button
-                  type="button"
-                  className="sheet-toolbar__action"
-                  onClick={() =>
-                    navigateTo(
-                      'character-creation',
-                    )
-                  }
-                >
-                  {creationCharacterId === null
-                    ? 'Crear personaje'
-                    : 'Continuar creación'}
-                </button>
-              </div>
-
-              {creationCharacterId === null ? (
-                <CharacterSheet />
-              ) : (
-                <PersistedCharacterSheet
-                  characterId={creationCharacterId}
-                />
-              )}
-            </main>
+          {creationCharacterId === null ? (
+            <CharacterSheet />
           ) : (
-            <CharacterCreationWizard
-              characterId={creationCharacterId}
-              onCharacterPersisted={setCreationCharacterId}
-              onBackToSheet={() =>
-                navigateTo('characters')
+            <PersistedCharacterSheet
+              characterId={
+                creationCharacterId
               }
             />
           )}
-        </div>
-      </div>
-    </div>
+        </>
+      ) : (
+        <CharacterCreationWizard
+          characterId={creationCharacterId}
+          onCharacterPersisted={setCreationCharacterId}
+          onBackToSheet={() =>
+            navigateTo('characters')
+          }
+        />
+      )}
+    </AppLayout>
   )
 }
 

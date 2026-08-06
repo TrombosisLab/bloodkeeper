@@ -441,7 +441,7 @@ export function CharacterCreationWizard({
         : `Guardado · revisión ${editorState.revision}`
 
   return (
-    <main
+    <section
       className="creation-page"
       aria-busy={persistenceBusy}
     >
@@ -842,6 +842,6 @@ export function CharacterCreationWizard({
           </footer>
         </section>
       </div>
-    </main>
+    </section>
   )
 }

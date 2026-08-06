@@ -134,7 +134,7 @@ export function ChronicleListCreate() {
   }
 
   return (
-    <main className="chronicle-workspace">
+    <section className="chronicle-workspace">
       <header className="chronicle-workspace__header">
         <div>
           <span className="chronicle-workspace__eyebrow">
@@ -280,6 +280,6 @@ export function ChronicleListCreate() {
           )}
         </section>
       </div>
-    </main>
+    </section>
   )
 }
