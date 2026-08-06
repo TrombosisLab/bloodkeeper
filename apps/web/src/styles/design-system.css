@@ -25,6 +25,8 @@
   --color-focus: #dca0a8;
 
   --color-success: #72b783;
+
+  --color-success-halo: rgb(114 183 131 / 0.1);
   --color-warning: #d9c17a;
   --color-danger: #ffb5b5;
 
@@ -51,6 +53,8 @@
   --color-label-strong: #d6ccc6;
   --color-control-border-soft: #523b3f;
   --color-control-text: #c8bbb5;
+  --color-border: var(--color-control-border);
+  --color-text: var(--color-control-text);
   --color-control-surface-dark: #171214;
   --color-indicator-fill: #171112;
   --color-validation-border: #51343a;

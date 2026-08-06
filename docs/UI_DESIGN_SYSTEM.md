@@ -430,3 +430,22 @@ secundario, operaciones, persistencia, permisos, validación, ciclo de vida,
 API o Prisma. `002-J` continúa siendo el bloque final del archivo y EOF
 permanece como frontera exacta. Este trabajo no recibe un identificador
 `SPEC-010.C.3` y no adelanta SPEC-011–014.
+
+## Corrección de residuos técnicos previa al cierre global de SPEC-010
+
+La revisión global posterior a la adopción incremental detectó y eliminó los
+últimos residuos técnicos de estilo: un halo de estado correcto todavía
+expresado como color literal, cuatro bordes de identidad con un valor literal
+ya representado por `--color-group-border` y tres referencias históricas a
+variables CSS sin definición en los controles de puntuación de Ventajas.
+
+El halo reutiliza el nuevo token semántico `--color-success-halo`. Para
+preservar exactamente los bloques CSS ya cerrados, `--color-border` y
+`--color-text` quedan definidos como alias globales de
+`--color-control-border` y `--color-control-text`. No se modifican componentes
+React, estructura, responsive, dominio, catálogos, reglas, API, Prisma ni
+persistencia.
+
+Este ajuste es una corrección técnica de cierre de SPEC-010. No recibe un
+identificador `SPEC-010.C.3`, no inicia SPEC-011–014 y mantiene SPEC-016.A
+suspendida hasta que la autoridad documental determine su reanudación.
