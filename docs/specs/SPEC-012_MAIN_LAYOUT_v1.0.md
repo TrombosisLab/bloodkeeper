@@ -1,5 +1,7 @@
 # SPEC-012 – MAIN_LAYOUT
 
+**Estado:** Cerrada (2026-08-07)
+
 ## Información
 | Campo | Valor |
 |---|---|
@@ -46,3 +48,34 @@ Todas las vistas deberán contemplar:
 - Navegación coherente.
 - Responsive.
 - Sin duplicación estructural entre módulos.
+
+<!-- SPEC-012-CLOSURE:START -->
+## Acta de cierre
+
+SPEC-012 queda cerrada el 7 de agosto de 2026.
+
+Implementación consolidada:
+
+- `a8c0a8f` — `feat(layout): add reusable application layout`;
+- `b636c28` — `feat(layout): standardize reachable view states`.
+
+Validación de cierre:
+
+- contrato de layout: 8/8;
+- contrato de estados: 10/10;
+- contratos SPEC-011: 16/16;
+- suite web: 1262/1262;
+- API unitaria: 265/265;
+- integración API: 9/9;
+- typecheck, builds, Prisma, sistema de diseño y workflow correctos;
+- validación visual manual confirmada;
+- máximo simultáneo de landmarks `<main>`: 1;
+- repositorio limpio y sin regresiones detectadas.
+
+Fronteras preservadas:
+
+- SPEC-013 no se inicia automáticamente;
+- SPEC-014 no se inicia automáticamente;
+- SPEC-016.A continúa suspendida;
+- no se añaden rutas, destinos, acciones o módulos ficticios.
+<!-- SPEC-012-CLOSURE:END -->

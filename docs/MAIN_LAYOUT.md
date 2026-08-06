@@ -90,6 +90,29 @@ La validación visual manual fue confirmada por el usuario el 6 de agosto de
 - carga, vacío y listado de Crónicas;
 - ausencia de cambios visuales, saltos de layout y mensajes duplicados.
 
-SPEC-012 permanece activa únicamente hasta completar su auditoría de cierre.
+SPEC-012 queda cerrada tras superar la auditoría de cierre V3.
 
 SPEC-014 no se inicia. SPEC-016.A continúa suspendida.
+
+<!-- SPEC-012-CLOSURE:START -->
+## Cierre de SPEC-012
+
+SPEC-012 queda cerrada el 7 de agosto de 2026.
+
+La auditoría de cierre V3 confirmó el layout principal reutilizable, los
+estados alcanzables uniformes, la ausencia de duplicación estructural y un
+máximo de un landmark `<main>` renderizable simultáneamente.
+
+Resultado consolidado:
+
+- layout: 8/8;
+- estados: 10/10;
+- SPEC-011: 16/16;
+- web: 1262/1262;
+- API: 265/265;
+- integración: 9/9;
+- validación visual manual: correcta;
+- builds, Prisma, diseño, workflow y servicios: correctos.
+
+No se inicia SPEC-013 ni SPEC-014. SPEC-016.A continúa suspendida.
+<!-- SPEC-012-CLOSURE:END -->
