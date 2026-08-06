@@ -501,12 +501,12 @@
 }
 
 .state-section {
-  border-top: 1px solid #4c292e;
+  border-top: 1px solid var(--color-section-border);
 
   background:
     linear-gradient(
       180deg,
-      rgb(82 22 30 / 0.07),
+      var(--color-section-tint-medium),
       transparent 280px
     );
 }
@@ -519,9 +519,9 @@
 
   gap: 1px;
 
-  border: 1px solid #392d2f;
+  border: 1px solid var(--color-group-border);
 
-  background: #392d2f;
+  background: var(--color-group-border);
 }
 
 .state-card {
@@ -529,7 +529,7 @@
 
   padding: 22px;
 
-  background: #121010;
+  background: var(--color-surface);
 }
 
 .state-card__heading {
@@ -550,7 +550,7 @@
 .state-card__heading span {
   margin-bottom: 5px;
 
-  color: #a76d75;
+  color: var(--color-label-accent);
 
   font-size: 0.7rem;
   font-weight: 800;
@@ -561,19 +561,16 @@
 }
 
 .state-card__heading strong {
-  color: #e1d8d2;
+  color: var(--color-text-strong);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 1.8rem;
   font-weight: 400;
 }
 
 .state-card__heading small {
-  color: #675e5b;
+  color: var(--color-text-subtle-muted);
 
   font-size: 0.65rem;
 
@@ -598,36 +595,36 @@
 
   place-items: center;
 
-  border: 1px solid #554447;
+  border: 1px solid var(--color-indicator-border-muted);
 
-  background: #0d0b0b;
+  background: var(--color-control-surface-deep);
 }
 
 .humanity-box--filled,
 .humanity-box--humanity {
-  border-color: #9b7479;
+  border-color: var(--color-indicator-border-strong);
 
   background:
     linear-gradient(
       135deg,
-      #795159,
-      #4c3035
+      var(--color-indicator-border),
+      var(--color-indicator-fill-deep)
     );
 
   box-shadow:
-    inset 0 0 0 3px #171112;
+    inset 0 0 0 3px var(--color-indicator-fill);
 }
 
 .humanity-box--stain {
-  border-color: #bd6874;
+  border-color: var(--color-accent-value-strong);
 
-  background: #241215;
+  background: var(--color-indicator-surface-accent);
 }
 
 .humanity-box__symbol {
-  color: #e0a2aa;
+  color: var(--color-symbol-soft);
 
-  font-family: Arial, sans-serif;
+  font-family: var(--font-family-body-soft);
   font-size: clamp(0.8rem, 1.6vw, 1.1rem);
   font-weight: 700;
   line-height: 1;
@@ -649,10 +646,10 @@
 
   padding: 8px 10px;
 
-  border: 1px solid #745158;
+  border: 1px solid var(--color-control-border-emphasis);
 
-  color: #dcc9c4;
-  background: #171112;
+  color: var(--color-control-text-soft);
+  background: var(--color-indicator-fill);
 
   cursor: pointer;
 }
@@ -664,7 +661,7 @@
 }
 
 .humanity-track__controls button:focus-visible {
-  outline: 2px solid #e0a2aa;
+  outline: 2px solid var(--color-symbol-soft);
   outline-offset: 2px;
 }
 
@@ -683,7 +680,7 @@
 
   display: block;
 
-  border: 1px solid #6f444b;
+  border: 1px solid var(--color-indicator-border-dark);
 
   border-radius:
     55% 55% 58% 58% /
@@ -691,21 +688,21 @@
 
   transform: rotate(45deg);
 
-  background: #0d0b0b;
+  background: var(--color-control-surface-deep);
 }
 
 .hunger-drop--filled {
-  border-color: #a34d59;
+  border-color: var(--color-indicator-border-accent);
 
   background:
     linear-gradient(
       135deg,
-      #8d2837,
-      #4e1720
+      var(--color-indicator-fill-accent),
+      var(--color-indicator-fill-accent-dark)
     );
 
   box-shadow:
-    inset 0 0 0 3px #171112;
+    inset 0 0 0 3px var(--color-indicator-fill);
 }
 
 .hunger-track__controls {
@@ -719,9 +716,9 @@
 .hunger-track__controls button {
   min-height: 44px;
   padding: 8px 10px;
-  border: 1px solid #745158;
-  color: #dcc9c4;
-  background: #171112;
+  border: 1px solid var(--color-control-border-emphasis);
+  color: var(--color-control-text-soft);
+  background: var(--color-indicator-fill);
   cursor: pointer;
 }
 
@@ -731,7 +728,7 @@
 }
 
 .hunger-track__controls button:focus-visible {
-  outline: 2px solid #e0a2aa;
+  outline: 2px solid var(--color-symbol-soft);
   outline-offset: 2px;
 }
 
@@ -751,7 +748,7 @@
   display: grid;
   place-items: center;
 
-  border: 1px solid #704149;
+  border: 1px solid var(--color-indicator-border-soft);
 
   transform: rotate(45deg);
 
@@ -759,12 +756,9 @@
 }
 
 .blood-potency-display strong {
-  color: #bd747d;
+  color: var(--color-symbol-accent-soft);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 1.6rem;
 

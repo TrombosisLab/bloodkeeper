@@ -320,3 +320,20 @@ La frontera `002-E — Estado vampírico` y todos los bloques posteriores quedan
 fuera de este incremento. Este trabajo no recibe un identificador
 `SPEC-010.C.3`, no modifica dominio, catálogos, API o Prisma y no adelanta
 SPEC-011–014.
+
+## Adopción incremental de ficha: 002-E — Estado vampírico
+
+El bloque de **Estado vampírico** adopta los tokens visuales oficiales para
+sus tarjetas, cabeceras, indicadores, controles, símbolos, bordes, fondos y
+gradientes de Humanidad, Hambre y Potencia de Sangre.
+
+La migración conserva los consumidores reales del creador, la revisión y la
+ficha; los estados de Humanidad, Manchas y Hambre; los controles habilitados,
+deshabilitados y con foco visible; la comunicación mediante símbolos; y los
+breakpoints existentes de 900 y 600 píxeles. No modifica componentes React,
+reglas de dominio, valores ni transiciones.
+
+La frontera `002-F — Disciplinas` y todos los bloques posteriores quedan fuera
+de este incremento. Este trabajo no recibe un identificador
+`SPEC-010.C.3`, no modifica catálogos, persistencia, API o Prisma y no adelanta
+SPEC-011–014.

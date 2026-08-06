@@ -210,6 +210,21 @@
   --color-section-tint-soft: rgb(82 22 30 / 0.06);
   --color-text-soft: #d4cbc6;
 
+  --color-control-border-emphasis: #745158;
+  --color-control-surface-deep: #0d0b0b;
+  --color-control-text-soft: #dcc9c4;
+  --color-indicator-border-accent: #a34d59;
+  --color-indicator-border-dark: #6f444b;
+  --color-indicator-border-muted: #554447;
+  --color-indicator-border-soft: #704149;
+  --color-indicator-border-strong: #9b7479;
+  --color-indicator-fill-accent: #8d2837;
+  --color-indicator-fill-accent-dark: #4e1720;
+  --color-indicator-fill-deep: #4c3035;
+  --color-indicator-surface-accent: #241215;
+  --color-section-tint-medium: rgb(82 22 30 / 0.07);
+  --color-symbol-accent-soft: #bd747d;
+
   /* Tipografía */
   --font-family-body-soft: Arial, sans-serif;
   --font-family-body:
