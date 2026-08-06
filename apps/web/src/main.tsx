@@ -11,6 +11,7 @@ import { CharacterCreationWizard } from './features/character-creation/component
 import { CharacterSheet } from './features/character-sheet/components/CharacterSheet'
 import { PersistedCharacterSheet } from './features/character-sheet/components/PersistedCharacterSheet'
 import { ChronicleListCreate } from './features/chronicles/components/ChronicleListCreate'
+import { AppBreadcrumbs } from './features/navigation/components/AppBreadcrumbs'
 import { AppNavigation } from './features/navigation/components/AppNavigation'
 import {
   appViewFromHash,
@@ -151,6 +152,14 @@ function App() {
         />
 
         <div className="application-shell__content">
+          {view === 'character-creation' ? (
+            <AppBreadcrumbs
+              onNavigateCharacters={() =>
+                navigateTo('characters')
+              }
+            />
+          ) : null}
+
           {view === 'chronicles' &&
           canManageChronicles ? (
             <ChronicleListCreate />
