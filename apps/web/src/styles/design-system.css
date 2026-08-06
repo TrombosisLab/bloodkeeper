@@ -207,6 +207,9 @@
   --color-text-strong: #e1d8d2;
   --color-text-subtle-muted: #675e5b;
 
+  --color-section-tint-soft: rgb(82 22 30 / 0.06);
+  --color-text-soft: #d4cbc6;
+
   /* Tipografía */
   --font-family-body-soft: Arial, sans-serif;
   --font-family-body:

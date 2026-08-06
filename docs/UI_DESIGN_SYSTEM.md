@@ -304,3 +304,19 @@ que permite continuar la adopción secuencial sin debilitar su cierre.
 Este incremento no recibe un identificador `SPEC-010.C.3` y no modifica
 componentes React, dominio, catálogos, persistencia, API o Prisma, ni adelanta
 SPEC-011–014.
+
+## Adopción incremental de ficha: 002-D — Habilidades
+
+El bloque de **Habilidades** de la ficha adopta los tokens visuales oficiales
+para sus contenedores, cabeceras de categoría, filas, separadores, textos y
+puntuaciones mediante el componente compartido `DotRating`.
+
+La migración conserva las tres categorías, todas las filas y especialidades,
+las puntuaciones existentes, el tamaño específico de los círculos y el
+breakpoint de 1000 píxeles. No modifica componentes React ni reglas de
+Habilidades, Especialidades, edición o persistencia.
+
+La frontera `002-E — Estado vampírico` y todos los bloques posteriores quedan
+fuera de este incremento. Este trabajo no recibe un identificador
+`SPEC-010.C.3`, no modifica dominio, catálogos, API o Prisma y no adelanta
+SPEC-011–014.

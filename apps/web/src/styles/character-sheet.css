@@ -391,12 +391,12 @@
    ================================================== */
 
 .skills-section {
-  border-top: 1px solid #4c292e;
+  border-top: 1px solid var(--color-section-border);
 
   background:
     linear-gradient(
       180deg,
-      rgb(82 22 30 / 0.06),
+      var(--color-section-tint-soft),
       transparent 320px
     );
 }
@@ -407,13 +407,13 @@
   grid-template-columns:
     repeat(3, minmax(0, 1fr));
 
-  border-top: 1px solid #392d2f;
-  border-left: 1px solid #392d2f;
+  border-top: 1px solid var(--color-group-border);
+  border-left: 1px solid var(--color-group-border);
 }
 
 .skill-category {
-  border-right: 1px solid #392d2f;
-  border-bottom: 1px solid #392d2f;
+  border-right: 1px solid var(--color-group-border);
+  border-bottom: 1px solid var(--color-group-border);
 }
 
 .skill-category h3 {
@@ -421,9 +421,9 @@
 
   padding: 15px 20px;
 
-  border-bottom: 1px solid #392d2f;
+  border-bottom: 1px solid var(--color-group-border);
 
-  color: #b8777f;
+  color: var(--color-group-accent);
 
   font-size: 0.72rem;
   font-weight: 800;
@@ -432,7 +432,7 @@
 
   text-transform: uppercase;
 
-  background: rgb(93 30 39 / 0.08);
+  background: var(--color-group-tint-soft);
 }
 
 .skill-category__rows {
@@ -448,7 +448,7 @@
 
   gap: 14px;
 
-  border-bottom: 1px solid #292324;
+  border-bottom: 1px solid var(--color-row-divider);
 }
 
 .skill-row:last-child {
@@ -456,12 +456,9 @@
 }
 
 .skill-row__label {
-  color: #d4cbc6;
+  color: var(--color-text-soft);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 0.94rem;
 }
