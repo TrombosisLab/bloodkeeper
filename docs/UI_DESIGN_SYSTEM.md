@@ -410,3 +410,23 @@ La frontera `002-J — Especialidades y Secciones Secundarias` y todos los
 bloques posteriores quedan fuera de este incremento. Este trabajo no recibe
 un identificador `SPEC-010.C.3`, no modifica dominio, catálogos,
 persistencia, API o Prisma y no adelanta SPEC-011–014.
+
+## Adopción incremental de ficha: 002-J — Especialidades y Secciones Secundarias
+
+El bloque final de **Especialidades y Secciones Secundarias** adopta los
+tokens visuales oficiales para las especialidades mostradas junto a las
+Habilidades, Inventario, Notas, Historial, sus editores y estados vacíos,
+así como los paneles de ciclo de vida y validación del personaje.
+
+La migración conserva los consumidores reales `SkillRow`,
+`CharacterSecondary`, `PersistedCharacterLifecycle` y
+`PersistedCharacterValidation`, además del estado vacío compartido por
+`CharacterBloodExperience`. Mantiene estructura, controles, foco,
+confirmaciones, estados accesibles, colores de resultado y el breakpoint de
+900 píxeles.
+
+No modifica componentes React, reglas de Especialidades, contenido
+secundario, operaciones, persistencia, permisos, validación, ciclo de vida,
+API o Prisma. `002-J` continúa siendo el bloque final del archivo y EOF
+permanece como frontera exacta. Este trabajo no recibe un identificador
+`SPEC-010.C.3` y no adelanta SPEC-011–014.

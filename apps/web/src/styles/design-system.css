@@ -256,6 +256,31 @@
   --color-text-label-muted-soft: #806f6c;
   --color-text-value-soft-soft: #d9cfc9;
 
+  --color-accent-muted: #b77b85;
+  --color-action-danger-muted: #b87979;
+  --color-control-border-hover: #8c5962;
+  --color-control-border-muted-muted: #574145;
+  --color-control-border-subtle: #342b2d;
+  --color-group-tint-faint-soft: rgb(93 30 39 / 0.045);
+  --color-input-border: #3c3234;
+  --color-input-surface: #0f0d0e;
+  --color-marker-border-soft: #805159;
+  --color-notice-border: #4a383b;
+  --color-notice-surface: #171314;
+  --color-panel-border-subtle: #30292a;
+  --color-panel-surface-subtle: #171415;
+  --color-section-tint-faint-soft: rgb(82 22 30 / 0.045);
+  --color-status-error-muted: #ad7070;
+  --color-status-ready: #8aa785;
+  --color-status-success-muted: #789373;
+  --color-text-action-muted: #a99f99;
+  --color-text-content-soft-soft: #d0c6c0;
+  --color-text-control-hover: #eee2dc;
+  --color-text-control-muted-soft: #b9aaa6;
+  --color-text-detail-muted-muted: #776d69;
+  --color-text-field-label: #8c7d78;
+  --color-text-notice-muted: #a79691;
+
   /* Tipografía */
   --font-family-body-soft: Arial, sans-serif;
   --font-family-body:
