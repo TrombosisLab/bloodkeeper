@@ -232,6 +232,19 @@
   --color-text-kicker-muted-soft: #786c69;
   --color-text-metadata-muted: #716764;
 
+  --color-accent-border-muted: #8f5961;
+  --color-chip-surface: #171313;
+  --color-group-tint-faint: rgb(93 30 39 / 0.055);
+  --color-negative-border: #9d5962;
+  --color-negative-fill: #74333d;
+  --color-section-tint-faint: rgb(82 22 30 / 0.055);
+  --color-text-body-muted: #d2c8c2;
+  --color-text-chip-muted: #827673;
+  --color-text-heading-muted-soft: #d8cec8;
+  --color-text-metadata-soft: #706663;
+  --color-text-pending: #bd858b;
+  --color-warning-border-translucent: rgb(184 139 73 / 45%);
+
   /* Tipografía */
   --font-family-body-soft: Arial, sans-serif;
   --font-family-body:

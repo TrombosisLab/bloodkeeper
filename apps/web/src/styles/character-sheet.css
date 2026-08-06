@@ -976,12 +976,12 @@
    ================================================== */
 
 .advantages-section {
-  border-top: 1px solid #4c292e;
+  border-top: 1px solid var(--color-section-border);
 
   background:
     linear-gradient(
       180deg,
-      rgb(82 22 30 / 0.055),
+      var(--color-section-tint-faint),
       transparent 300px
     );
 }
@@ -994,15 +994,15 @@
 
   gap: 1px;
 
-  border: 1px solid #392d2f;
+  border: 1px solid var(--color-group-border);
 
-  background: #392d2f;
+  background: var(--color-group-border);
 }
 
 .trait-group {
   min-width: 0;
 
-  background: #121010;
+  background: var(--color-surface);
 }
 
 .trait-group__header {
@@ -1010,10 +1010,10 @@
 
   padding: 18px 20px;
 
-  border-bottom: 1px solid #392d2f;
+  border-bottom: 1px solid var(--color-group-border);
 
   background:
-    rgb(93 30 39 / 0.055);
+    var(--color-group-tint-faint);
 }
 
 .trait-group__header span {
@@ -1021,7 +1021,7 @@
 
   margin-bottom: 7px;
 
-  color: #776c68;
+  color: var(--color-text-support-muted);
 
   font-size: 0.62rem;
   font-weight: 700;
@@ -1034,12 +1034,9 @@
 .trait-group__header h3 {
   margin: 0;
 
-  color: #d8cec8;
+  color: var(--color-text-heading-muted-soft);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 1.35rem;
   font-weight: 400;
@@ -1052,7 +1049,7 @@
 .rated-trait {
   min-height: 60px;
 
-  border-bottom: 1px solid #292324;
+  border-bottom: 1px solid var(--color-row-divider);
 }
 
 .rated-trait:last-child {
@@ -1086,7 +1083,7 @@
 }
 
 .rated-trait__details summary:focus-visible {
-  outline: 2px solid #8f5961;
+  outline: 2px solid var(--color-accent-border-muted);
   outline-offset: 4px;
 }
 
@@ -1102,19 +1099,19 @@
 .rated-trait__metadata span {
   padding: 3px 7px;
 
-  border: 1px solid #392d2f;
+  border: 1px solid var(--color-group-border);
   border-radius: 999px;
 
-  color: #827673;
-  background: #171313;
+  color: var(--color-text-chip-muted);
+  background: var(--color-chip-surface);
 
   font-size: 0.61rem;
   letter-spacing: 0.04em;
 }
 
 .rated-trait__metadata .rated-trait__narrative-pending {
-  border-color: rgb(184 139 73 / 45%);
-  color: #d9c17a;
+  border-color: var(--color-warning-border-translucent);
+  color: var(--color-warning);
 }
 
 .rated-trait__identity span,
@@ -1123,12 +1120,9 @@
 }
 
 .rated-trait__identity span {
-  color: #d2c8c2;
+  color: var(--color-text-body-muted);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 0.92rem;
 }
@@ -1136,14 +1130,14 @@
 .rated-trait__identity small {
   margin-top: 4px;
 
-  color: #706663;
+  color: var(--color-text-metadata-soft);
 
   font-size: 0.66rem;
 }
 
 .rated-trait--negative
 .rated-trait__identity span {
-  color: #bd858b;
+  color: var(--color-text-pending);
 }
 
 .advantages-section .dot-rating {
@@ -1157,18 +1151,15 @@
 
 .rated-trait--negative
 .dot-rating__dot--filled {
-  border-color: #9d5962;
+  border-color: var(--color-negative-border);
 
-  background: #74333d;
+  background: var(--color-negative-fill);
 }
 
 .trait-group__empty {
-  color: #665d5a;
+  color: var(--color-text-footnote-muted);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 0.85rem;
   font-style: italic;

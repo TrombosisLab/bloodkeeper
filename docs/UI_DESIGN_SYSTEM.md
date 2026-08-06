@@ -355,3 +355,23 @@ La frontera `002-G — Ventajas, Trasfondos y Defectos` y todos los bloques
 posteriores quedan fuera de este incremento. Este trabajo no recibe un
 identificador `SPEC-010.C.3`, no modifica dominio, persistencia, API o Prisma
 y no adelanta SPEC-011–014.
+
+## Adopción incremental de ficha: 002-G — Ventajas, Trasfondos y Defectos
+
+El bloque de **Ventajas, Trasfondos y Defectos** de la ficha adopta los tokens
+visuales oficiales para su sección, cuadrícula, grupos, cabeceras, filas,
+metadatos, chips, estados narrativos pendientes, detalles desplegables,
+puntuaciones y tratamiento diferenciado de Defectos.
+
+La migración conserva los consumidores reales `CharacterAdvantages`,
+`TraitGroup`, `RatedTraitRow` y `DotRating`; las categorías y puntuaciones;
+los estados vacíos y narrativos pendientes; la distinción visual de rasgos
+negativos; la estructura semántica `details`/`summary`; el foco visible; y el
+breakpoint existente de 900 píxeles. No modifica componentes React,
+dependencias, requisitos, datos de instancia, narrativa ni reglas de
+adquisición.
+
+La frontera `002-H — Convicciones y Piedras de Toque` y todos los bloques
+posteriores quedan fuera de este incremento. Este trabajo no recibe un
+identificador `SPEC-010.C.3`, no modifica dominio, catálogos, persistencia,
+API o Prisma y no adelanta SPEC-011–014.
