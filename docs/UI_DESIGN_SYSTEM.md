@@ -375,3 +375,21 @@ La frontera `002-H — Convicciones y Piedras de Toque` y todos los bloques
 posteriores quedan fuera de este incremento. Este trabajo no recibe un
 identificador `SPEC-010.C.3`, no modifica dominio, catálogos, persistencia,
 API o Prisma y no adelanta SPEC-011–014.
+
+## Adopción incremental de ficha: 002-H — Convicciones y Piedras de Toque
+
+El bloque de **Convicciones y Piedras de Toque** de la ficha adopta los tokens
+visuales oficiales para su sección, cuadrícula narrativa, paneles, cabeceras,
+listas, marcadores, vínculos personales y notas.
+
+La migración conserva los consumidores reales `CharacterNarrative`,
+`HumanityStep` y `ReviewStep`; la estructura y contenido de Convicciones y
+Piedras de Toque; sus relaciones narrativas; los estados de notas; y el
+breakpoint existente de 900 píxeles. No modifica componentes React,
+Humanidad, Máculas, vínculos, requisitos, validación, edición ni datos de
+demostración o persistidos.
+
+La frontera `002-I — Resonancia y Experiencia` y todos los bloques
+posteriores quedan fuera de este incremento. Este trabajo no recibe un
+identificador `SPEC-010.C.3`, no modifica dominio, catálogos, persistencia,
+API o Prisma y no adelanta SPEC-011–014.

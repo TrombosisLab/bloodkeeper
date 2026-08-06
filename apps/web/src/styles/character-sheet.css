@@ -1176,12 +1176,12 @@
    ================================================== */
 
 .narrative-section {
-  border-top: 1px solid #4c292e;
+  border-top: 1px solid var(--color-section-border);
 
   background:
     linear-gradient(
       180deg,
-      rgb(82 22 30 / 0.05),
+      var(--color-section-tint-ghost),
       transparent 320px
     );
 }
@@ -1194,15 +1194,15 @@
 
   gap: 1px;
 
-  border: 1px solid #392d2f;
+  border: 1px solid var(--color-group-border);
 
-  background: #392d2f;
+  background: var(--color-group-border);
 }
 
 .narrative-panel {
   min-width: 0;
 
-  background: #121010;
+  background: var(--color-surface);
 }
 
 .narrative-panel header {
@@ -1210,10 +1210,10 @@
 
   padding: 18px 20px;
 
-  border-bottom: 1px solid #392d2f;
+  border-bottom: 1px solid var(--color-group-border);
 
   background:
-    rgb(93 30 39 / 0.05);
+    var(--color-group-tint-ghost);
 }
 
 .narrative-panel header span {
@@ -1221,7 +1221,7 @@
 
   margin-bottom: 7px;
 
-  color: #776c68;
+  color: var(--color-text-support-muted);
 
   font-size: 0.62rem;
   font-weight: 700;
@@ -1234,12 +1234,9 @@
 .narrative-panel header h3 {
   margin: 0;
 
-  color: #d8cec8;
+  color: var(--color-text-heading-muted-soft);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 1.28rem;
   font-weight: 400;
@@ -1261,14 +1258,11 @@
     14px
     18px;
 
-  border-bottom: 1px solid #292324;
+  border-bottom: 1px solid var(--color-row-divider);
 
-  color: #cfc5bf;
+  color: var(--color-text-body-soft);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 0.9rem;
 
@@ -1290,7 +1284,7 @@
   width: 7px;
   height: 7px;
 
-  border: 1px solid #8b535b;
+  border: 1px solid var(--color-marker-border);
 
   transform: rotate(45deg);
 }
@@ -1306,7 +1300,7 @@
   flex-direction: column;
   justify-content: center;
 
-  border-bottom: 1px solid #292324;
+  border-bottom: 1px solid var(--color-row-divider);
 }
 
 .touchstone:last-child {
@@ -1314,12 +1308,9 @@
 }
 
 .touchstone strong {
-  color: #d4cac4;
+  color: var(--color-text-content-soft);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 0.95rem;
   font-weight: 400;
@@ -1328,7 +1319,7 @@
 .touchstone span {
   margin-top: 4px;
 
-  color: #746a67;
+  color: var(--color-text-relation-muted);
 
   font-size: 0.68rem;
 }
@@ -1338,12 +1329,9 @@
 
   padding: 20px;
 
-  color: #bfb5af;
+  color: var(--color-text-note-muted);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 0.92rem;
 

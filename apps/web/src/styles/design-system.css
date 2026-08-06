@@ -245,6 +245,13 @@
   --color-text-pending: #bd858b;
   --color-warning-border-translucent: rgb(184 139 73 / 45%);
 
+  --color-group-tint-ghost: rgb(93 30 39 / 0.05);
+  --color-marker-border: #8b535b;
+  --color-section-tint-ghost: rgb(82 22 30 / 0.05);
+  --color-text-content-soft: #d4cac4;
+  --color-text-note-muted: #bfb5af;
+  --color-text-relation-muted: #746a67;
+
   /* Tipografía */
   --font-family-body-soft: Arial, sans-serif;
   --font-family-body:
