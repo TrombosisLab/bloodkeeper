@@ -225,6 +225,13 @@
   --color-section-tint-medium: rgb(82 22 30 / 0.07);
   --color-symbol-accent-soft: #bd747d;
 
+  --color-section-tint-subtle: rgb(82 22 30 / 0.065);
+  --color-text-body-soft: #cfc5bf;
+  --color-text-detail-muted-soft: #9b918d;
+  --color-text-heading-soft-soft: #ddd3cd;
+  --color-text-kicker-muted-soft: #786c69;
+  --color-text-metadata-muted: #716764;
+
   /* Tipografía */
   --font-family-body-soft: Arial, sans-serif;
   --font-family-body:

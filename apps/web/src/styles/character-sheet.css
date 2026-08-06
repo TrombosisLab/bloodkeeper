@@ -783,12 +783,12 @@
    ================================================== */
 
 .disciplines-section {
-  border-top: 1px solid #4c292e;
+  border-top: 1px solid var(--color-section-border);
 
   background:
     linear-gradient(
       180deg,
-      rgb(82 22 30 / 0.065),
+      var(--color-section-tint-subtle),
       transparent 300px
     );
 }
@@ -801,15 +801,15 @@
 
   gap: 1px;
 
-  border: 1px solid #392d2f;
+  border: 1px solid var(--color-group-border);
 
-  background: #392d2f;
+  background: var(--color-group-border);
 }
 
 .discipline-card {
   min-width: 0;
 
-  background: #121010;
+  background: var(--color-surface);
 }
 
 .discipline-card__header {
@@ -823,7 +823,7 @@
 
   padding: 20px;
 
-  border-bottom: 1px solid #392d2f;
+  border-bottom: 1px solid var(--color-group-border);
 }
 
 .discipline-card__kicker {
@@ -831,7 +831,7 @@
 
   margin-bottom: 7px;
 
-  color: #786c69;
+  color: var(--color-text-kicker-muted-soft);
 
   font-size: 0.62rem;
   font-weight: 700;
@@ -844,12 +844,9 @@
 .discipline-card h3 {
   margin: 0;
 
-  color: #ddd3cd;
+  color: var(--color-text-heading-soft-soft);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 1.4rem;
   font-weight: 400;
@@ -864,7 +861,7 @@
 
   margin-bottom: 12px;
 
-  color: #a76d75;
+  color: var(--color-label-accent);
 
   font-size: 0.65rem;
   font-weight: 800;
@@ -884,7 +881,7 @@
 .discipline-card__powers li {
   min-height: 40px;
 
-  border-bottom: 1px solid #292324;
+  border-bottom: 1px solid var(--color-row-divider);
 }
 
 .discipline-card__powers li:last-child {
@@ -892,12 +889,9 @@
 }
 
 .discipline-card__powers li span {
-  color: #cfc5bf;
+  color: var(--color-text-body-soft);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 0.9rem;
 }
@@ -905,7 +899,7 @@
 .discipline-card__powers li small {
   flex: 0 0 auto;
 
-  color: #716764;
+  color: var(--color-text-metadata-muted);
 
   font-size: 0.64rem;
 
@@ -930,11 +924,11 @@
 }
 
 .discipline-power-details summary::marker {
-  color: #a76d75;
+  color: var(--color-label-accent);
 }
 
 .discipline-power-details summary:focus-visible {
-  outline: 2px solid #dca0a8;
+  outline: 2px solid var(--color-focus);
   outline-offset: 3px;
 }
 
@@ -945,7 +939,7 @@
 .discipline-power-details__content p {
   margin: 0 0 10px;
 
-  color: #9b918d;
+  color: var(--color-text-detail-muted-soft);
 
   font-size: 0.78rem;
   line-height: 1.55;
@@ -958,12 +952,9 @@
 .discipline-card__empty {
   margin: 0;
 
-  color: #665d5a;
+  color: var(--color-text-footnote-muted);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 0.85rem;
   font-style: italic;

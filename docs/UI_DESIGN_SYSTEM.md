@@ -337,3 +337,21 @@ La frontera `002-F — Disciplinas` y todos los bloques posteriores quedan fuera
 de este incremento. Este trabajo no recibe un identificador
 `SPEC-010.C.3`, no modifica catálogos, persistencia, API o Prisma y no adelanta
 SPEC-011–014.
+
+## Adopción incremental de ficha: 002-F — Disciplinas
+
+El bloque de **Disciplinas** de la ficha adopta los tokens visuales oficiales
+para su sección, tarjetas, cabeceras, puntuaciones, listas de Poderes,
+metadatos, detalles desplegables y estados de foco.
+
+La migración conserva los consumidores reales de la ficha y del adaptador
+persistido, el componente compartido `DotRating`, la estructura semántica
+`details`/`summary`, el marcador nativo, el foco visible, el estado sin
+Poderes y el breakpoint existente de 900 píxeles. No modifica componentes
+React, puntuaciones, Poderes, Rituales, Ceremonias, catálogos, requisitos ni
+reglas de adquisición.
+
+La frontera `002-G — Ventajas, Trasfondos y Defectos` y todos los bloques
+posteriores quedan fuera de este incremento. Este trabajo no recibe un
+identificador `SPEC-010.C.3`, no modifica dominio, persistencia, API o Prisma
+y no adelanta SPEC-011–014.
