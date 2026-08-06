@@ -170,6 +170,18 @@ export function CharacterCreationWizard({
       'saving',
     ].includes(persistenceState)
 
+  const persistenceViewState =
+    persistenceBusy
+      ? 'loading'
+      : [
+            'unauthorized',
+            'not-found',
+          ].includes(persistenceState)
+        ? 'permission'
+        : persistenceState === 'ready'
+          ? 'content'
+          : 'error'
+
   useEffect(() => {
     if (characterId === null) {
       setPersistenceState('ready')
@@ -443,6 +455,7 @@ export function CharacterCreationWizard({
   return (
     <section
       className="creation-page"
+      data-view-state={persistenceViewState}
       aria-busy={persistenceBusy}
     >
       <header className="creation-header">
@@ -469,9 +482,16 @@ export function CharacterCreationWizard({
           {persistenceMessage !== null ? (
             <p
               role={
-                persistenceBusy
+                persistenceViewState ===
+                'loading'
                   ? 'status'
                   : 'alert'
+              }
+              aria-live={
+                persistenceViewState ===
+                'loading'
+                  ? 'polite'
+                  : 'assertive'
               }
             >
               {persistenceMessage}

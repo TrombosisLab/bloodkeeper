@@ -29,6 +29,24 @@ const statusLabels:
     archived: 'Archivada',
   }
 
+type ChronicleFailureState =
+  | 'error'
+  | 'permission'
+
+function stateForChronicleError(
+  error: unknown,
+): ChronicleFailureState {
+  if (
+    error instanceof ChronicleApiError &&
+    error.code ===
+      'AUTHENTICATION_REQUIRED'
+  ) {
+    return 'permission'
+  }
+
+  return 'error'
+}
+
 function errorMessage(
   error: unknown,
 ): string {
@@ -77,15 +95,28 @@ export function ChronicleListCreate() {
     setError,
   ] = useState<string | null>(null)
 
+  const [
+    failureState,
+    setFailureState,
+  ] = useState<ChronicleFailureState | null>(
+    null,
+  )
+
   async function loadChronicles() {
     setLoading(true)
     setError(null)
+    setFailureState(null)
 
     try {
       setChronicles(
         await gateway.list(),
       )
     } catch (loadError: unknown) {
+      setFailureState(
+        stateForChronicleError(
+          loadError,
+        ),
+      )
       setError(
         errorMessage(loadError),
       )
@@ -104,6 +135,7 @@ export function ChronicleListCreate() {
     event.preventDefault()
     setSubmitting(true)
     setError(null)
+    setFailureState(null)
 
     try {
       const created =
@@ -125,6 +157,11 @@ export function ChronicleListCreate() {
       setName('')
       setDescription('')
     } catch (creationError: unknown) {
+      setFailureState(
+        stateForChronicleError(
+          creationError,
+        ),
+      )
       setError(
         errorMessage(creationError),
       )
@@ -132,6 +169,15 @@ export function ChronicleListCreate() {
       setSubmitting(false)
     }
   }
+
+  const viewState =
+    loading
+      ? 'loading'
+      : error !== null
+        ? failureState ?? 'error'
+        : chronicles.length === 0
+          ? 'empty'
+          : 'content'
 
   return (
     <section className="chronicle-workspace">
@@ -203,7 +249,11 @@ export function ChronicleListCreate() {
           {error !== null ? (
             <p
               className="chronicle-message chronicle-message--error"
+              data-view-state={
+                failureState ?? 'error'
+              }
               role="alert"
+              aria-live="assertive"
             >
               {error}
             </p>
@@ -233,12 +283,19 @@ export function ChronicleListCreate() {
           {loading ? (
             <p
               className="chronicle-message"
+              data-view-state="loading"
               role="status"
+              aria-live="polite"
             >
               Cargando crónicas…
             </p>
           ) : chronicles.length === 0 ? (
-            <p className="chronicle-message">
+            <p
+              className="chronicle-message"
+              data-view-state="empty"
+              role="status"
+              aria-live="polite"
+            >
               Todavía no has creado ninguna crónica.
             </p>
           ) : (

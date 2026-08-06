@@ -104,6 +104,18 @@ export function PersistedCharacterSheet({
     resolvedGateway,
   ])
 
+  const viewState =
+    loadState.kind === 'loading'
+      ? 'loading'
+      : loadState.kind === 'ready'
+        ? 'content'
+        : [
+              'unauthorized',
+              'not-found',
+            ].includes(loadState.kind)
+          ? 'permission'
+          : 'error'
+
   if (loadState.kind === 'ready') {
     return (
       <CharacterSheet
@@ -122,6 +134,7 @@ export function PersistedCharacterSheet({
   return (
     <article
       className="character-sheet"
+      data-view-state={viewState}
       aria-busy={
         loadState.kind === 'loading'
       }
@@ -143,9 +156,14 @@ export function PersistedCharacterSheet({
       <p
         className="sheet-edit-notice"
         role={
-          loadState.kind === 'loading'
+          viewState === 'loading'
             ? 'status'
             : 'alert'
+        }
+        aria-live={
+          viewState === 'loading'
+            ? 'polite'
+            : 'assertive'
         }
       >
         {messageForCharacterSheetLoadState(

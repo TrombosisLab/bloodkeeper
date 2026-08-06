@@ -162,7 +162,10 @@ export function AuthenticationGate({
       <main className="authentication-shell">
         <section
           className="authentication-card"
+          data-view-state="loading"
+          role="status"
           aria-live="polite"
+          aria-busy="true"
         >
           <span className="authentication-card__eyebrow">
             BloodKeeper
@@ -181,7 +184,9 @@ export function AuthenticationGate({
       <main className="authentication-shell">
         <section
           className="authentication-card"
+          data-view-state="error"
           role="alert"
+          aria-live="assertive"
         >
           <span className="authentication-card__eyebrow">
             BloodKeeper
@@ -206,6 +211,8 @@ export function AuthenticationGate({
       <main className="authentication-shell">
         <form
           className="authentication-card"
+          data-view-state="permission"
+          aria-busy={submitting}
           onSubmit={handleLogin}
         >
           <span className="authentication-card__eyebrow">

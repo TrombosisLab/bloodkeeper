@@ -52,7 +52,44 @@ La validación visual manual fue confirmada por el usuario el 6 de agosto de
 - ausencia de desplazamiento horizontal nuevo;
 - conservación de cabecera, menú, migas y espacios visuales.
 
-El sistema uniforme de mensajes y estados continúa pendiente dentro de
-SPEC-012.
+## SPEC-012 — segundo bloque semántico
+
+Este incremento normaliza los estados alcanzables de las vistas reales sin
+crear componentes visuales genéricos:
+
+- `loading` usa `role="status"`, `aria-live="polite"` y `aria-busy` cuando
+  existe una operación en curso;
+- `error` usa `role="alert"` y `aria-live="assertive"`;
+- `permission` representa una sesión requerida, un recurso inaccesible o un
+  acceso no autorizado ya contemplado por la vista;
+- `empty` se anuncia de forma no intrusiva mediante `role="status"`;
+- `content` identifica contenido disponible donde la vista mantiene ramas
+  explícitas.
+
+Aplicación por vista:
+
+- Autenticación: loading, error, permission y contenido autenticado;
+- Creación: loading, error, permission y content según persistencia;
+- Crónicas: loading, empty, error, permission y content;
+- Ficha persistida: loading, error, permission y content;
+- Personajes: no añade estados propios porque orquesta la ficha demo, la ficha
+  persistida y el creador; sus estados pertenecen a esos consumidores reales.
+
+No se inventan ramas vacías o de permisos donde no existe una transición real.
+No se crean `LoadingState`, `EmptyState`, `ErrorState` ni `PermissionState`.
+Los estilos existentes permanecen intactos.
+
+## Estado tras el segundo bloque
+
+La validación visual manual fue confirmada por el usuario el 6 de agosto de
+2026. Se verificaron:
+
+- inicio y cierre de sesión;
+- creación de personaje y persistencia del borrador;
+- carga de ficha persistida;
+- carga, vacío y listado de Crónicas;
+- ausencia de cambios visuales, saltos de layout y mensajes duplicados.
+
+SPEC-012 permanece activa únicamente hasta completar su auditoría de cierre.
 
 SPEC-014 no se inicia. SPEC-016.A continúa suspendida.
