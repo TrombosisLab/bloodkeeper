@@ -1349,12 +1349,12 @@
    ================================================== */
 
 .blood-experience-section {
-  border-top: 1px solid #4c292e;
+  border-top: 1px solid var(--color-section-border);
 
   background:
     linear-gradient(
       180deg,
-      rgb(82 22 30 / 0.05),
+      var(--color-section-tint-ghost),
       transparent 260px
     );
 }
@@ -1367,16 +1367,16 @@
 
   gap: 1px;
 
-  border: 1px solid #392d2f;
+  border: 1px solid var(--color-group-border);
 
-  background: #392d2f;
+  background: var(--color-group-border);
 }
 
 .blood-info-card,
 .experience-card {
   min-width: 0;
 
-  background: #121010;
+  background: var(--color-surface);
 }
 
 .blood-info-card {
@@ -1388,7 +1388,7 @@
 
   margin-bottom: 10px;
 
-  color: #806f6c;
+  color: var(--color-text-label-muted-soft);
 
   font-size: 0.66rem;
   font-weight: 700;
@@ -1399,12 +1399,9 @@
 }
 
 .blood-info-card strong {
-  color: #d8cec8;
+  color: var(--color-text-heading-muted-soft);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 1.45rem;
   font-weight: 400;
@@ -1420,7 +1417,7 @@
 .experience-card > div {
   padding: 20px;
 
-  border-right: 1px solid #292324;
+  border-right: 1px solid var(--color-row-divider);
 }
 
 .experience-card > div:last-child {
@@ -1435,7 +1432,7 @@
 .experience-card span {
   margin-bottom: 9px;
 
-  color: #7a6f6b;
+  color: var(--color-text-caption-muted-soft);
 
   font-size: 0.62rem;
   font-weight: 700;
@@ -1446,12 +1443,9 @@
 }
 
 .experience-card strong {
-  color: #d9cfc9;
+  color: var(--color-text-value-soft-soft);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-family-heading);
 
   font-size: 1.5rem;
   font-weight: 400;
@@ -1468,7 +1462,7 @@
 
   .experience-card > div {
     border-right: 0;
-    border-bottom: 1px solid #292324;
+    border-bottom: 1px solid var(--color-row-divider);
   }
 
   .experience-card > div:last-child {

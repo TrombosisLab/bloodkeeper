@@ -252,6 +252,10 @@
   --color-text-note-muted: #bfb5af;
   --color-text-relation-muted: #746a67;
 
+  --color-text-caption-muted-soft: #7a6f6b;
+  --color-text-label-muted-soft: #806f6c;
+  --color-text-value-soft-soft: #d9cfc9;
+
   /* Tipografía */
   --font-family-body-soft: Arial, sans-serif;
   --font-family-body:

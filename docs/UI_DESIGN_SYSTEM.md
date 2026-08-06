@@ -393,3 +393,20 @@ La frontera `002-I — Resonancia y Experiencia` y todos los bloques
 posteriores quedan fuera de este incremento. Este trabajo no recibe un
 identificador `SPEC-010.C.3`, no modifica dominio, catálogos, persistencia,
 API o Prisma y no adelanta SPEC-011–014.
+
+## Adopción incremental de ficha: 002-I — Resonancia y Experiencia
+
+El bloque de **Resonancia y Experiencia** de la ficha adopta los tokens
+visuales oficiales para su sección, cuadrícula, tarjetas informativas,
+etiquetas y valores de Experiencia disponible, gastada y total.
+
+La migración conserva el consumidor real `CharacterBloodExperience`, su
+estructura actual, los datos de demostración existentes y el breakpoint de
+900 píxeles. No modifica componentes React, Resonancia, Temperamento,
+Experiencia, Deseo, cálculos, progresión, costes, edición, persistencia ni
+disponibilidad de la sección en personajes persistidos.
+
+La frontera `002-J — Especialidades y Secciones Secundarias` y todos los
+bloques posteriores quedan fuera de este incremento. Este trabajo no recibe
+un identificador `SPEC-010.C.3`, no modifica dominio, catálogos,
+persistencia, API o Prisma y no adelanta SPEC-011–014.
