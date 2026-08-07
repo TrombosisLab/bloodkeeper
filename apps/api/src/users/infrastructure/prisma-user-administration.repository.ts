@@ -26,6 +26,7 @@ import type {
 
 import type {
   CreateUserAdministrationData,
+  UpdateUserAdministrationData,
   UserAdministrationRecord,
 } from '../domain/user-administration.types'
 
@@ -107,6 +108,21 @@ export class PrismaUserAdministrationRepository
     return toDomain(row)
   }
 
+  async findById(
+    userId: string,
+  ): Promise<UserAdministrationRecord | null> {
+    const row =
+      await this.database.user.findUnique({
+        where: {
+          id: userId,
+        },
+      })
+
+    return row === null
+      ? null
+      : toDomain(row)
+  }
+
   async findByUsername(
     username: string,
   ): Promise<UserAdministrationRecord | null> {
@@ -138,5 +154,25 @@ export class PrismaUserAdministrationRepository
       })
 
     return rows.map(toDomain)
+  }
+
+  async update(
+    userId: string,
+    data: UpdateUserAdministrationData,
+  ): Promise<UserAdministrationRecord> {
+    const row =
+      await this.database.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          username: data.username,
+          displayName: data.displayName,
+          status:
+            statusToPrisma[data.status],
+        },
+      })
+
+    return toDomain(row)
   }
 }

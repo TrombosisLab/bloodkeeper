@@ -1,9 +1,11 @@
 import type {
+  UserAccountStatus,
   UserRole,
 } from '../../auth/domain/auth.types'
 
 import type {
   CreateUserAdministrationInput,
+  UpdateUserAdministrationInput,
   UserAdministrationRecord,
 } from '../domain/user-administration.types'
 
@@ -41,6 +43,12 @@ const roles =
     'admin',
     'narrator',
     'player',
+  ])
+
+const statuses =
+  new Set<UserAccountStatus>([
+    'active',
+    'disabled',
   ])
 
 function record(
@@ -108,23 +116,58 @@ function stringValue(
   return value
 }
 
-export function parseAuthenticatedAdministratorId(
+function uuidValue(
   value: unknown,
+  path: string,
 ): string {
   const id =
-    stringValue(
-      value,
-      'request.user.id',
-    )
+    stringValue(value, path)
 
   if (!uuidPattern.test(id)) {
     throw new InvalidUserAdministrationRequestError(
-      'request.user.id',
+      path,
       'must be a UUID',
     )
   }
 
   return id
+}
+
+function statusValue(
+  value: unknown,
+  path: string,
+): UserAccountStatus {
+  if (
+    typeof value !== 'string' ||
+    !statuses.has(
+      value as UserAccountStatus,
+    )
+  ) {
+    throw new InvalidUserAdministrationRequestError(
+      path,
+      'must be active or disabled',
+    )
+  }
+
+  return value as UserAccountStatus
+}
+
+export function parseAuthenticatedAdministratorId(
+  value: unknown,
+): string {
+  return uuidValue(
+    value,
+    'request.user.id',
+  )
+}
+
+export function parseUserAdministrationIdParam(
+  value: unknown,
+): string {
+  return uuidValue(
+    value,
+    'params.userId',
+  )
 }
 
 export function parseCreateUserAdministrationRequest(
@@ -191,6 +234,71 @@ export function parseCreateUserAdministrationRequest(
       'body.password',
     ),
     roles: parsedRoles,
+  }
+}
+
+export function parseUpdateUserAdministrationRequest(
+  userIdInput: unknown,
+  input: unknown,
+): UpdateUserAdministrationInput {
+  const userId =
+    parseUserAdministrationIdParam(
+      userIdInput,
+    )
+  const body = record(input, 'body')
+
+  onlyKeys(
+    body,
+    [
+      'username',
+      'displayName',
+      'status',
+    ],
+    'body',
+  )
+
+  if (Object.keys(body).length === 0) {
+    throw new InvalidUserAdministrationRequestError(
+      'body',
+      'must contain at least one editable field',
+    )
+  }
+
+  return {
+    userId,
+    ...(Object.hasOwn(
+      body,
+      'username',
+    )
+      ? {
+          username: stringValue(
+            body.username,
+            'body.username',
+          ),
+        }
+      : {}),
+    ...(Object.hasOwn(
+      body,
+      'displayName',
+    )
+      ? {
+          displayName: stringValue(
+            body.displayName,
+            'body.displayName',
+          ),
+        }
+      : {}),
+    ...(Object.hasOwn(
+      body,
+      'status',
+    )
+      ? {
+          status: statusValue(
+            body.status,
+            'body.status',
+          ),
+        }
+      : {}),
   }
 }
 

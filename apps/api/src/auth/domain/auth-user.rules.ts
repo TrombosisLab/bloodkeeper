@@ -15,6 +15,16 @@ export interface NormalizedAuthUserInput {
   readonly password: string
 }
 
+export interface AuthUserIdentityInput {
+  readonly username: string
+  readonly displayName: string
+}
+
+export interface NormalizedAuthUserIdentityInput {
+  readonly username: string
+  readonly displayName: string
+}
+
 export type InitialAdminInput =
   AuthUserInput
 
@@ -108,6 +118,39 @@ function passwordIssues(
   }
 
   return issues
+}
+
+export function normalizeAuthUserIdentityInput(
+  input: AuthUserIdentityInput,
+): NormalizedAuthUserIdentityInput {
+  const username =
+    input.username.trim().toLowerCase()
+  const displayName =
+    input.displayName.trim()
+  const issues: AuthUserRuleIssue[] = [
+    ...usernameIssues(username),
+  ]
+
+  if (
+    displayName.length === 0 ||
+    displayName.length > 80
+  ) {
+    issues.push({
+      code: 'AUTH_DISPLAY_NAME_INVALID',
+      field: 'displayName',
+      message:
+        'El nombre visible debe contener entre 1 y 80 caracteres.',
+    })
+  }
+
+  if (issues.length > 0) {
+    throw new InvalidAuthUserError(issues)
+  }
+
+  return {
+    username,
+    displayName,
+  }
 }
 
 export function normalizeAuthUserInput(

@@ -7,6 +7,14 @@ import {
 } from '../database/database.module'
 
 import {
+  DatabaseService,
+} from '../database/database.service'
+
+import {
+  PrismaAuthSessionRepository,
+} from '../auth/infrastructure/prisma-auth-session.repository'
+
+import {
   ScryptPasswordHasher,
 } from '../auth/infrastructure/scrypt-password-hasher'
 
@@ -17,6 +25,10 @@ import {
 import {
   ListUsersUseCase,
 } from './application/list-users.use-case'
+
+import {
+  UpdateUserUseCase,
+} from './application/update-user.use-case'
 
 import {
   USER_ADMINISTRATION_REPOSITORY,
@@ -44,6 +56,20 @@ import {
   providers: [
     PrismaUserAdministrationRepository,
     ScryptPasswordHasher,
+    {
+      provide:
+        PrismaAuthSessionRepository,
+      inject: [
+        DatabaseService,
+      ],
+      useFactory: (
+        database:
+          DatabaseService,
+      ) =>
+        new PrismaAuthSessionRepository(
+          database,
+        ),
+    },
     {
       provide:
         USER_ADMINISTRATION_REPOSITORY,
@@ -78,10 +104,28 @@ import {
       ) =>
         new ListUsersUseCase(users),
     },
+    {
+      provide: UpdateUserUseCase,
+      inject: [
+        USER_ADMINISTRATION_REPOSITORY,
+        PrismaAuthSessionRepository,
+      ],
+      useFactory: (
+        users:
+          UserAdministrationRepository,
+        sessions:
+          PrismaAuthSessionRepository,
+      ) =>
+        new UpdateUserUseCase(
+          users,
+          sessions,
+        ),
+    },
   ],
   exports: [
     CreateUserUseCase,
     ListUsersUseCase,
+    UpdateUserUseCase,
   ],
 })
 export class UsersModule {}

@@ -5,6 +5,9 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  NotFoundException,
+  Param,
+  Patch,
   Post,
   Req,
   UnauthorizedException,
@@ -21,6 +24,11 @@ import {
 } from '../application/list-users.use-case'
 
 import {
+  UpdateUserUseCase,
+  UserAdministrationUserNotFoundError,
+} from '../application/update-user.use-case'
+
+import {
   InvalidUserAdministrationError,
 } from '../domain/user-administration.rules'
 
@@ -28,6 +36,7 @@ import {
   InvalidUserAdministrationRequestError,
   parseAuthenticatedAdministratorId,
   parseCreateUserAdministrationRequest,
+  parseUpdateUserAdministrationRequest,
   toUserAdministrationResponse,
 } from './user-administration.dto'
 
@@ -105,6 +114,15 @@ function throwUserAdministrationHttpError(
     })
   }
 
+  if (
+    error instanceof
+      UserAdministrationUserNotFoundError
+  ) {
+    throw new NotFoundException({
+      code: 'USER_NOT_FOUND',
+    })
+  }
+
   throw error
 }
 
@@ -115,6 +133,8 @@ export class UserAdministrationController {
       CreateUserUseCase,
     private readonly listUsers:
       ListUsersUseCase,
+    private readonly updateUser:
+      UpdateUserUseCase,
   ) {}
 
   @Post()
@@ -161,5 +181,36 @@ export class UserAdministrationController {
     return users.map(
       toUserAdministrationResponse,
     )
+  }
+
+  @Patch(':userId')
+  async update(
+    @Req() request:
+      AuthenticatedUserAdministrationRequest,
+    @Param('userId') userIdInput: unknown,
+    @Body() body: unknown,
+  ): Promise<UserAdministrationResponseDto> {
+    assertAdministrator(request)
+
+    try {
+      const command =
+        parseUpdateUserAdministrationRequest(
+          userIdInput,
+          body,
+        )
+
+      const user =
+        await this.updateUser.execute(
+          command,
+        )
+
+      return toUserAdministrationResponse(
+        user,
+      )
+    } catch (error: unknown) {
+      throwUserAdministrationHttpError(
+        error,
+      )
+    }
   }
 }

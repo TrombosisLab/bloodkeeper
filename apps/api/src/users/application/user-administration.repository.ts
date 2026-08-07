@@ -1,5 +1,6 @@
 import type {
   CreateUserAdministrationData,
+  UpdateUserAdministrationData,
   UserAdministrationRecord,
 } from '../domain/user-administration.types'
 
@@ -11,6 +12,10 @@ export interface UserAdministrationRepository {
     data: CreateUserAdministrationData,
   ): Promise<UserAdministrationRecord>
 
+  findById(
+    userId: string,
+  ): Promise<UserAdministrationRecord | null>
+
   findByUsername(
     username: string,
   ): Promise<UserAdministrationRecord | null>
@@ -18,4 +23,9 @@ export interface UserAdministrationRepository {
   list(): Promise<
     readonly UserAdministrationRecord[]
   >
+
+  update(
+    userId: string,
+    data: UpdateUserAdministrationData,
+  ): Promise<UserAdministrationRecord>
 }

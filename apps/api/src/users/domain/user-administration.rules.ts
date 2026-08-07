@@ -1,5 +1,6 @@
 import {
   InvalidAuthUserError,
+  normalizeAuthUserIdentityInput,
   normalizeAuthUserInput,
 } from '../../auth/domain/auth-user.rules'
 
@@ -8,11 +9,13 @@ import type {
 } from '../../auth/domain/auth-user.rules'
 
 import type {
+  UserAccountStatus,
   UserRole,
 } from '../../auth/domain/auth.types'
 
 import type {
   CreateUserAdministrationInput,
+  UpdateUserAdministrationData,
 } from './user-administration.types'
 
 export interface NormalizedUserAdministrationInput {
@@ -29,6 +32,7 @@ export interface UserAdministrationRuleIssue {
     | 'displayName'
     | 'password'
     | 'roles'
+    | 'status'
   readonly message: string
 }
 
@@ -59,6 +63,12 @@ const roleOrder =
 
 const allowedRoles =
   new Set<UserRole>(roleOrder)
+
+const allowedStatuses =
+  new Set<UserAccountStatus>([
+    'active',
+    'disabled',
+  ])
 
 function authIssues(
   error: InvalidAuthUserError,
@@ -150,5 +160,57 @@ export function normalizeUserAdministrationInput(
     roles: roleOrder.filter(
       (role) => selected.has(role),
     ),
+  }
+}
+
+export function normalizeUserAdministrationUpdate(
+  input: UpdateUserAdministrationData,
+): UpdateUserAdministrationData {
+  const issues:
+    UserAdministrationRuleIssue[] = []
+
+  let normalizedIdentity:
+    ReturnType<
+      typeof normalizeAuthUserIdentityInput
+    > |
+    null = null
+
+  try {
+    normalizedIdentity =
+      normalizeAuthUserIdentityInput({
+        username: input.username,
+        displayName: input.displayName,
+      })
+  } catch (error: unknown) {
+    if (
+      error instanceof InvalidAuthUserError
+    ) {
+      issues.push(...authIssues(error))
+    } else {
+      throw error
+    }
+  }
+
+  if (!allowedStatuses.has(input.status)) {
+    issues.push({
+      code: 'USER_STATUS_INVALID',
+      field: 'status',
+      message:
+        'El estado debe ser active o disabled.',
+    })
+  }
+
+  if (
+    issues.length > 0 ||
+    normalizedIdentity === null
+  ) {
+    throw new InvalidUserAdministrationError(
+      issues,
+    )
+  }
+
+  return {
+    ...normalizedIdentity,
+    status: input.status,
   }
 }

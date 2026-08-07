@@ -27,3 +27,16 @@ export interface CreateUserAdministrationData {
   readonly status: UserAccountStatus
   readonly roles: readonly UserRole[]
 }
+
+export interface UpdateUserAdministrationInput {
+  readonly userId: string
+  readonly username?: string
+  readonly displayName?: string
+  readonly status?: UserAccountStatus
+}
+
+export interface UpdateUserAdministrationData {
+  readonly username: string
+  readonly displayName: string
+  readonly status: UserAccountStatus
+}
