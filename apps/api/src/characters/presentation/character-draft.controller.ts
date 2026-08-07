@@ -26,6 +26,10 @@ import {
 } from '../application/load-character-draft.use-case'
 
 import {
+  ListCharacterDraftsUseCase,
+} from '../application/list-character-drafts.use-case'
+
+import {
   UpdateCharacterDraftUseCase,
 } from '../application/update-character-draft.use-case'
 
@@ -126,6 +130,8 @@ export class CharacterDraftController {
       CreateCharacterDraftUseCase,
     private readonly loadDraft:
       LoadCharacterDraftUseCase,
+    private readonly listDrafts:
+      ListCharacterDraftsUseCase,
     private readonly updateDraft:
       UpdateCharacterDraftUseCase,
   ) {}
@@ -151,6 +157,20 @@ export class CharacterDraftController {
     } catch (error: unknown) {
       throwCharacterDraftHttpError(error)
     }
+  }
+
+  @Get()
+  async list(
+    @Req() request: AuthenticatedCharacterRequest,
+  ): Promise<readonly CharacterDraftResponseDto[]> {
+    const ownerId = authenticatedOwnerId(request)
+
+    const drafts =
+      await this.listDrafts.execute(ownerId)
+
+    return drafts.map(
+      toCharacterDraftResponse,
+    )
   }
 
   @Get(':characterId')

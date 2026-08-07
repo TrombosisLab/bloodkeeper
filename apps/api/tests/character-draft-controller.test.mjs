@@ -69,6 +69,12 @@ function controller(overrides = {}) {
       return draft()
     },
   }
+  const listDrafts = {
+    async execute(owner) {
+      calls.push(['list', owner])
+      return [draft()]
+    },
+  }
   const updateDraft = {
     async execute(owner, command) {
       calls.push(['update', owner, command])
@@ -81,6 +87,7 @@ function controller(overrides = {}) {
     instance: new CharacterDraftController(
       overrides.createDraft ?? createDraft,
       overrides.loadDraft ?? loadDraft,
+      overrides.listDrafts ?? listDrafts,
       overrides.updateDraft ?? updateDraft,
     ),
   }
@@ -110,6 +117,7 @@ test(
 
     const routes = [
       ['create', '/', RequestMethod.POST],
+      ['list', '/', RequestMethod.GET],
       ['load', ':characterId', RequestMethod.GET],
       ['update', ':characterId', RequestMethod.PATCH],
     ]
@@ -131,10 +139,35 @@ test(
 )
 
 test(
+  '019 lista y serializa sólo los personajes del propietario autenticado',
+  async () => {
+    const { instance, calls } = controller()
+
+    const response =
+      await instance.list(
+        authenticatedRequest(),
+      )
+
+    assert.equal(response.length, 1)
+    assert.equal(
+      response[0].updatedAt,
+      '2026-08-02T19:00:00.000Z',
+    )
+    assert.deepEqual(calls, [
+      ['list', ownerId],
+    ])
+  },
+)
+
+test(
   '004-D.3 exige contexto autenticado',
   async () => {
     const { instance, calls } = controller()
 
+    await assert.rejects(
+      instance.list({}),
+      hasStatus(401),
+    )
     await assert.rejects(
       instance.load({}, characterId),
       hasStatus(401),

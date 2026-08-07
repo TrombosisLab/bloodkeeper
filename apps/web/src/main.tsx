@@ -9,6 +9,7 @@ import { AppHeader } from './components/layout/AppHeader'
 import { AuthenticationGate } from './features/authentication/components/AuthenticationGate'
 import { useAuthenticatedUser } from './features/authentication/context/authentication.context'
 import { CharacterCreationWizard } from './features/character-creation/components/CharacterCreationWizard'
+import { CharacterList } from './features/character-list/components/CharacterList'
 import { CharacterSheet } from './features/character-sheet/components/CharacterSheet'
 import { PersistedCharacterSheet } from './features/character-sheet/components/PersistedCharacterSheet'
 import { ChronicleListCreate } from './features/chronicles/components/ChronicleListCreate'
@@ -51,6 +52,11 @@ function App() {
     creationCharacterId,
     setCreationCharacterId,
   ] = useState<string | null>(null)
+
+  const [
+    showDemoSheet,
+    setShowDemoSheet,
+  ] = useState(false)
 
   useEffect(() => {
     const synchronizeLocation = () => {
@@ -189,45 +195,79 @@ function App() {
         canManageChronicles ? (
         <ChronicleListCreate />
       ) : view === 'characters' ? (
-        <>
-          <div className="sheet-toolbar">
-            <div>
-              <span className="sheet-toolbar__eyebrow">
-                Personajes
-              </span>
+        creationCharacterId === null &&
+        !showDemoSheet ? (
+          <CharacterList
+            onOpenCharacter={(
+              characterId,
+            ) => {
+              setCreationCharacterId(
+                characterId,
+              )
+              setShowDemoSheet(false)
+            }}
+            onContinueCreation={(
+              characterId,
+            ) => {
+              setCreationCharacterId(
+                characterId,
+              )
+              setShowDemoSheet(false)
+              navigateTo(
+                'character-creation',
+              )
+            }}
+            onCreateCharacter={() => {
+              setCreationCharacterId(null)
+              setShowDemoSheet(false)
+              navigateTo(
+                'character-creation',
+              )
+            }}
+            onOpenDemo={() => {
+              setCreationCharacterId(null)
+              setShowDemoSheet(true)
+            }}
+          />
+        ) : (
+          <>
+            <div className="sheet-toolbar">
+              <div>
+                <span className="sheet-toolbar__eyebrow">
+                  Personajes
+                </span>
 
-              <strong>
-                {creationCharacterId === null
-                  ? 'Ficha de demostración'
-                  : 'Personaje persistido'}
-              </strong>
+                <strong>
+                  {showDemoSheet
+                    ? 'Ficha de demostración'
+                    : 'Personaje persistido'}
+                </strong>
+              </div>
+
+              <button
+                type="button"
+                className="sheet-toolbar__action"
+                onClick={() => {
+                  setCreationCharacterId(null)
+                  setShowDemoSheet(false)
+                }}
+              >
+                Volver a personajes
+              </button>
             </div>
 
-            <button
-              type="button"
-              className="sheet-toolbar__action"
-              onClick={() =>
-                navigateTo(
-                  'character-creation',
-                )
-              }
-            >
-              {creationCharacterId === null
-                ? 'Crear personaje'
-                : 'Continuar creación'}
-            </button>
-          </div>
-
-          {creationCharacterId === null ? (
-            <CharacterSheet />
-          ) : (
-            <PersistedCharacterSheet
-              characterId={
-                creationCharacterId
-              }
-            />
-          )}
-        </>
+            {showDemoSheet ? (
+              <CharacterSheet />
+            ) : creationCharacterId !==
+              null ? (
+              <PersistedCharacterSheet
+                characterId={
+                  creationCharacterId
+                }
+              />
+            ) : null}
+          </>
+        )
       ) : (
         <CharacterCreationWizard
           characterId={creationCharacterId}

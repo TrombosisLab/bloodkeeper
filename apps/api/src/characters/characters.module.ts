@@ -21,6 +21,10 @@ import {
 } from './application/load-character-draft.use-case'
 
 import {
+  ListCharacterDraftsUseCase,
+} from './application/list-character-drafts.use-case'
+
+import {
   LoadCharacterAttributeSkillRatingsUseCase,
 } from './application/load-character-attribute-skill-ratings.use-case'
 
@@ -115,6 +119,13 @@ const useCaseProviders = [
     useFactory: (
       repository: PrismaCharacterDraftRepository,
     ) => new LoadCharacterDraftUseCase(repository),
+  },
+  {
+    provide: ListCharacterDraftsUseCase,
+    inject: [CHARACTER_DRAFT_REPOSITORY],
+    useFactory: (
+      repository: PrismaCharacterDraftRepository,
+    ) => new ListCharacterDraftsUseCase(repository),
   },
   {
     provide:
@@ -246,6 +257,7 @@ const useCaseProviders = [
     LoadCharacterAttributeSkillRatingsUseCase,
     LoadCharacterHungerUseCase,
     LoadCharacterDraftUseCase,
+    ListCharacterDraftsUseCase,
     LoadCharacterSecondaryUseCase,
     UpdateCharacterDraftUseCase,
     UpdateCharacterSecondaryUseCase,

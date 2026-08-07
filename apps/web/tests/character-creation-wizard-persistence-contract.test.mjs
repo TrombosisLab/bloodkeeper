@@ -15,6 +15,14 @@ const main = await readFile(
   'utf8',
 )
 
+const characterList = await readFile(
+  new URL(
+    '../src/features/character-list/components/CharacterList.tsx',
+    import.meta.url,
+  ),
+  'utf8',
+)
+
 test(
   '004-E.2B conecta el wizard mediante guardado explícito',
   () => {
@@ -48,7 +56,10 @@ test(
       main,
       /onCharacterPersisted=\{setCreationCharacterId\}/,
     )
-    assert.match(main, /Continuar creación/)
+    assert.match(
+      characterList,
+      /Continuar creación/,
+    )
     assert.doesNotMatch(
       main,
       /<CharacterSheet\b[^>]*\bcharacterId=/,

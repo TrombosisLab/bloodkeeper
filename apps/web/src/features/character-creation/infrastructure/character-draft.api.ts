@@ -139,6 +139,10 @@ export class CharacterDraftApiError
 }
 
 export interface CharacterDraftGateway {
+  list(): Promise<
+    readonly CharacterDraftApiSnapshot[]
+  >
+
   create(
     request: CreateCharacterDraftApiRequest,
   ): Promise<CharacterDraftApiSnapshot>
@@ -673,6 +677,18 @@ export function parseCharacterDraftApiSnapshotResponse(
   ) as unknown as CharacterDraftApiSnapshot
 }
 
+export function parseCharacterDraftApiListResponse(
+  value: unknown,
+): readonly CharacterDraftApiSnapshot[] {
+  if (!Array.isArray(value)) {
+    return invalidResponse()
+  }
+
+  return value.map(
+    parseCharacterDraftApiSnapshotResponse,
+  )
+}
+
 async function responseError(
   response: Response,
 ): Promise<CharacterDraftApiError> {
@@ -731,6 +747,37 @@ export function createCharacterDraftGateway(
     globalThis.fetch,
 ): CharacterDraftGateway {
   return {
+    async list() {
+      const response =
+        await fetchImplementation(
+          '/api/characters/drafts',
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      if (!response.ok) {
+        throw await responseError(response)
+      }
+
+      try {
+        return parseCharacterDraftApiListResponse(
+          await response.json(),
+        )
+      } catch (error: unknown) {
+        if (
+          error instanceof CharacterDraftApiError
+        ) {
+          throw error
+        }
+
+        return invalidResponse()
+      }
+    },
+
     async create(request) {
       const response =
         await fetchImplementation(

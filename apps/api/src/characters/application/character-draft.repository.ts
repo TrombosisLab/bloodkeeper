@@ -13,6 +13,10 @@ export interface CharacterDraftRepository {
     data: CreateCharacterDraftData,
   ): Promise<PersistedCharacterDraft>
 
+  listByOwner(
+    ownerId: string,
+  ): Promise<readonly PersistedCharacterDraft[]>
+
   findById(
     ownerId: string,
     characterId: string,

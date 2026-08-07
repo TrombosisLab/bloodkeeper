@@ -1185,6 +1185,28 @@ export class PrismaCharacterDraftRepository
     )
   }
 
+  async listByOwner(
+    ownerId: string,
+  ): Promise<readonly PersistedCharacterDraft[]> {
+    const rows =
+      await this.database.character.findMany({
+        where: {
+          ownerId,
+        },
+        include: characterRelations,
+        orderBy: [
+          {
+            updatedAt: 'desc',
+          },
+          {
+            id: 'asc',
+          },
+        ],
+      })
+
+    return rows.map(toPersistedDraft)
+  }
+
   async findById(
     ownerId: string,
     characterId: string,

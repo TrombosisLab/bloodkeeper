@@ -10,6 +10,10 @@ import {
 } from '../dist/characters/application/load-character-draft.use-case.js'
 
 import {
+  ListCharacterDraftsUseCase,
+} from '../dist/characters/application/list-character-drafts.use-case.js'
+
+import {
   UpdateCharacterDraftUseCase,
 } from '../dist/characters/application/update-character-draft.use-case.js'
 
@@ -143,6 +147,46 @@ function createRepository() {
     },
   }
 }
+
+test(
+  '019 lista únicamente mediante el propietario autenticado',
+  async () => {
+    const calls = []
+    const records = [
+      {
+        characterId:
+          '39c1801e-68fe-4c92-8795-723cac284bdf',
+      },
+      {
+        characterId:
+          '49c1801e-68fe-4c92-8795-723cac284bde',
+      },
+    ]
+
+    const repository = {
+      async listByOwner(ownerId) {
+        calls.push(['listByOwner', ownerId])
+        return records
+      },
+    }
+
+    const useCase =
+      new ListCharacterDraftsUseCase(
+        repository,
+      )
+
+    const ownerId =
+      '3bbc46f8-a45f-4589-9872-129e6652082c'
+
+    const result =
+      await useCase.execute(ownerId)
+
+    assert.equal(result, records)
+    assert.deepEqual(calls, [
+      ['listByOwner', ownerId],
+    ])
+  },
+)
 
 test(
   '004-C crea borradores mediante el repositorio',

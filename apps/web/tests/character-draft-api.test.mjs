@@ -4,6 +4,7 @@ import test from 'node:test'
 import {
   CharacterDraftApiError,
   createCharacterDraftGateway,
+  parseCharacterDraftApiListResponse,
   parseCharacterDraftApiSnapshotResponse,
 } from '../src/features/character-creation/infrastructure/character-draft.api.ts'
 
@@ -185,6 +186,52 @@ function jsonResponse(
     },
   }
 }
+
+test(
+  '019 valida y consulta el listado de personajes del usuario',
+  async () => {
+    const source = [
+      snapshot(),
+      snapshot({
+        characterId:
+          '49c1801e-68fe-4c92-8795-723cac284bde',
+      }),
+    ]
+
+    const parsed =
+      parseCharacterDraftApiListResponse(
+        source,
+      )
+
+    assert.equal(parsed.length, 2)
+
+    const calls = []
+    const gateway =
+      createCharacterDraftGateway(
+        async (url, init) => {
+          calls.push([url, init])
+          return jsonResponse(source)
+        },
+      )
+
+    const listed =
+      await gateway.list()
+
+    assert.equal(listed.length, 2)
+    assert.equal(
+      calls[0][0],
+      '/api/characters/drafts',
+    )
+    assert.equal(
+      calls[0][1].credentials,
+      'include',
+    )
+    assert.equal(
+      calls[0][1].method,
+      undefined,
+    )
+  },
+)
 
 test(
   '004-E.1A acepta la respuesta completa del backend y entrega una copia',
