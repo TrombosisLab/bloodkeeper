@@ -37,7 +37,7 @@ confirmadas.
 | SPEC-016 | [SPEC-016 – USERS](SPEC-016_USERS_v1.0.md) | 1.1 | Aprobado | Cerrada | Gestión de usuarios y autorregistro player completados y validados; stash histórico preservado. |
 | SPEC-017 | [SPEC-017 – ROLES](SPEC-017_ROLES_v1.0.md) | 1.0 | Aprobado | Cerrada | Roles globales y responsabilidades validados contra consumidores reales. |
 | SPEC-018 | [SPEC-018 – PERMISSIONS](SPEC-018_PERMISSIONS_v1.0.md) | 1.0 | Aprobado | Cerrada | Permisos backend y autorización contextual validados incrementalmente. |
-| SPEC-019 | [SPEC-019 – CHARACTER_MODULE](SPEC-019_CHARACTER_MODULE_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
+| SPEC-019 | [SPEC-019 – CHARACTER_MODULE](SPEC-019_CHARACTER_MODULE_v1.0.md) | 1.0 | Aprobado | Cerrada | Arquitectura modular, persistencia, ficha, creación y listado de personajes validados funcionalmente. |
 | SPEC-020 | [SPEC-020 – CHARACTER_SHEET](SPEC-020_CHARACTER_SHEET_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-021 | [SPEC-021 – CHARACTER_CREATION](SPEC-021_CHARACTER_CREATION_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-022 | [SPEC-022 – CHARACTER_DATA_MODEL](SPEC-022_CHARACTER_DATA_MODEL_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
