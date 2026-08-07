@@ -33,10 +33,10 @@ confirmadas.
 | SPEC-012 | [SPEC-012 – MAIN_LAYOUT](SPEC-012_MAIN_LAYOUT_v1.0.md) | 1.0 | Aprobado | Activa | Siguiente SPEC autorizada para auditoría e implementación. |
 | SPEC-013 | [SPEC-013 – DASHBOARD](SPEC-013_DASHBOARD_v1.0.md) | 1.0 | Aprobado | No iniciada | No iniciar mientras SPEC-012 no autorice el avance. |
 | SPEC-014 | [SPEC-014 – COMPONENT_LIBRARY](SPEC-014_COMPONENT_LIBRARY_v1.0.md) | 1.0 | Aprobado | No iniciada | No iniciar mientras SPEC-012 no autorice el avance. |
-| SPEC-015 | [SPEC-015 – AUTHENTICATION](SPEC-015_AUTHENTICATION_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
+| SPEC-015 | [SPEC-015 – AUTHENTICATION](SPEC-015_AUTHENTICATION_v1.0.md) | 1.0 | Aprobado | Cerrada | Autenticación completada y validada. |
 | SPEC-016 | [SPEC-016 – USERS](SPEC-016_USERS_v1.0.md) | 1.0 | Aprobado | Cerrada | Gestión de usuarios backend completada y validada; stash histórico preservado. |
-| SPEC-017 | [SPEC-017 – ROLES](SPEC-017_ROLES_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
-| SPEC-018 | [SPEC-018 – PERMISSIONS](SPEC-018_PERMISSIONS_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
+| SPEC-017 | [SPEC-017 – ROLES](SPEC-017_ROLES_v1.0.md) | 1.0 | Aprobado | Cerrada | Roles globales y responsabilidades validados contra consumidores reales. |
+| SPEC-018 | [SPEC-018 – PERMISSIONS](SPEC-018_PERMISSIONS_v1.0.md) | 1.0 | Aprobado | Cerrada | Permisos backend y autorización contextual validados incrementalmente. |
 | SPEC-019 | [SPEC-019 – CHARACTER_MODULE](SPEC-019_CHARACTER_MODULE_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-020 | [SPEC-020 – CHARACTER_SHEET](SPEC-020_CHARACTER_SHEET_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-021 | [SPEC-021 – CHARACTER_CREATION](SPEC-021_CHARACTER_CREATION_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
