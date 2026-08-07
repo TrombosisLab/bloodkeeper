@@ -75,3 +75,15 @@ Su futura incorporación se realizará dentro de la SPEC correspondiente y no
 invalida este cierre incremental.
 
 SPEC-016.A continúa suspendida y su trabajo guardado no se modifica.
+
+## Integración posterior de Inicio mediante SPEC-013
+
+SPEC-013 materializa **Inicio** como consumidor real y autoriza su incorporación
+a la navegación con la ubicación `#/dashboard`.
+
+Las referencias anteriores de este documento a Inicio como área aplazada
+describen el estado existente durante el cierre de SPEC-011. Desde este bloque
+quedan superadas únicamente para Inicio.
+
+Dados, Administración, Configuración y Ayuda continúan sin consumidor real y
+no se incorporan a la navegación.

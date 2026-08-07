@@ -1,0 +1,139 @@
+.dashboard {
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1rem, 2vw, 2rem);
+}
+
+.dashboard__header {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 52rem;
+}
+
+.dashboard__header h1,
+.dashboard__header p,
+.dashboard-panel h2,
+.dashboard-panel h3,
+.dashboard-panel p {
+  margin: 0;
+}
+
+.dashboard__eyebrow,
+.dashboard-panel__heading span {
+  color: var(--color-control-text);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dashboard__grid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(min(100%, 21rem), 1fr)
+    );
+  gap: 1rem;
+  align-items: start;
+}
+
+.dashboard-panel {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+  padding: 1.25rem;
+  border:
+    1px solid
+    var(--color-panel-border-subtle);
+  border-radius: 0.75rem;
+  background:
+    var(--color-panel-surface-subtle);
+}
+
+.dashboard-panel__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dashboard-panel__heading > div {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.dashboard-panel[aria-busy='true'] {
+  opacity: 0.85;
+}
+
+.dashboard-message {
+  padding: 1rem;
+  border:
+    1px solid
+    var(--color-panel-border-subtle);
+  border-radius: 0.5rem;
+  background: var(--color-surface-card);
+}
+
+.dashboard-message--error {
+  display: grid;
+  gap: 0.75rem;
+  color: var(--color-status-error-muted);
+}
+
+.dashboard-chronicles {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-chronicles article {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+  border:
+    1px solid
+    var(--color-panel-border-subtle);
+  border-radius: 0.5rem;
+  background: var(--color-surface-card);
+}
+
+.dashboard-chronicles article > div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dashboard-chronicles h3 {
+  color: var(--color-text-card-title);
+}
+
+.dashboard-chronicles article > div span {
+  color: var(--color-status-ready);
+  font-size: 0.8rem;
+}
+
+.dashboard-chronicles__empty {
+  opacity: 0.75;
+}
+
+@media (max-width: 900px) {
+  .dashboard {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-panel__heading,
+  .dashboard-chronicles article > div {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .dashboard-panel__heading button {
+    width: 100%;
+  }
+}

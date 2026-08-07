@@ -21,6 +21,15 @@ const main = await readFile(
   'utf8',
 )
 
+const navigationTypes = await readFile(
+  new URL(
+    '../src/features/navigation/types/' +
+      'app-navigation.types.ts',
+    import.meta.url,
+  ),
+  'utf8',
+)
+
 test(
   '030-B ofrece creación y listado sin construir un panel completo',
   () => {
@@ -51,7 +60,7 @@ test(
   '030-B integra una navegación separada de Personajes',
   () => {
     assert.match(
-      main,
+      navigationTypes,
       /\| 'chronicles'/,
     )
     assert.match(

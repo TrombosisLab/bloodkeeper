@@ -123,6 +123,21 @@ export function AppNavigation({
         <button
           type="button"
           aria-current={
+            activeSection === 'dashboard'
+              ? 'page'
+              : undefined
+          }
+          onClick={() =>
+            selectSection('dashboard')
+          }
+        >
+          <span>Inicio</span>
+          <small>Resumen y accesos</small>
+        </button>
+
+        <button
+          type="button"
+          aria-current={
             activeSection === 'characters'
               ? 'page'
               : undefined

@@ -12,6 +12,7 @@ import { CharacterCreationWizard } from './features/character-creation/component
 import { CharacterSheet } from './features/character-sheet/components/CharacterSheet'
 import { PersistedCharacterSheet } from './features/character-sheet/components/PersistedCharacterSheet'
 import { ChronicleListCreate } from './features/chronicles/components/ChronicleListCreate'
+import { Dashboard } from './features/dashboard/components/Dashboard'
 import { AppBreadcrumbs } from './features/navigation/components/AppBreadcrumbs'
 import { AppNavigation } from './features/navigation/components/AppNavigation'
 import {
@@ -22,14 +23,10 @@ import {
 
 import type {
   AppSection,
+  AppView,
 } from './features/navigation/types/app-navigation.types'
 
 import './styles.css'
-
-type AppView =
-  | 'characters'
-  | 'character-creation'
-  | 'chronicles'
 
 function App() {
   const authenticatedUser =
@@ -127,11 +124,18 @@ function App() {
   function navigateToSection(
     section: AppSection,
   ) {
-    navigateTo(
-      section === 'chronicles'
-        ? 'chronicles'
-        : 'characters',
-    )
+    switch (section) {
+      case 'dashboard':
+        navigateTo('dashboard')
+        return
+
+      case 'chronicles':
+        navigateTo('chronicles')
+        return
+
+      case 'characters':
+        navigateTo('characters')
+    }
   }
 
   return (
@@ -166,8 +170,23 @@ function App() {
         />
       }
     >
-      {view === 'chronicles' &&
-      canManageChronicles ? (
+      {view === 'dashboard' ? (
+        <Dashboard
+          displayName={
+            authenticatedUser.displayName
+          }
+          canManageChronicles={
+            canManageChronicles
+          }
+          onNavigateCharacters={() =>
+            navigateTo('characters')
+          }
+          onNavigateChronicles={() =>
+            navigateTo('chronicles')
+          }
+        />
+      ) : view === 'chronicles' &&
+        canManageChronicles ? (
         <ChronicleListCreate />
       ) : view === 'characters' ? (
         <>

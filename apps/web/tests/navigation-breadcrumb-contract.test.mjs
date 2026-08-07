@@ -99,7 +99,7 @@ test('SPEC-011 mantiene accesibilidad foco y adaptación móvil', () => {
 test('SPEC-011 no convierte áreas bloqueadas en destinos ficticios', () => {
   assert.doesNotMatch(
     componentSource,
-    />\s*(?:Inicio|Dados|Administración|Configuración|Ayuda)\s*</,
+    />\s*(?:Dados|Administración|Configuración|Ayuda)\s*</,
   )
   assert.match(
     mainSource,

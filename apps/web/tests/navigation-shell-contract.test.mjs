@@ -78,20 +78,34 @@ test('SPEC-011 reconoce las ubicaciones reales de Personajes y Crónicas', () =>
   )
 })
 
-test('SPEC-011 normaliza una ubicación desconocida a Personajes', () => {
+test('SPEC-013 normaliza la entrada inicial y ubicaciones desconocidas a Inicio', () => {
   assert.equal(
     appViewFromHash(
       '#/unknown',
       { canManageChronicles: true },
     ),
-    'characters',
+    'dashboard',
   )
   assert.equal(
     appViewFromHash(
       '',
       { canManageChronicles: true },
     ),
-    'characters',
+    'dashboard',
+  )
+  assert.equal(
+    appViewFromHash(
+      '#',
+      { canManageChronicles: true },
+    ),
+    'dashboard',
+  )
+  assert.equal(
+    appViewFromHash(
+      '#/dashboard',
+      { canManageChronicles: true },
+    ),
+    'dashboard',
   )
 })
 
@@ -101,11 +115,15 @@ test('SPEC-011 impide abrir Crónicas sin el permiso ya existente', () => {
       '#/chronicles',
       { canManageChronicles: false },
     ),
-    'characters',
+    'dashboard',
   )
 })
 
 test('SPEC-011 mantiene hashes canónicos estables', () => {
+  assert.equal(
+    hashForAppView('dashboard'),
+    '#/dashboard',
+  )
   assert.equal(
     hashForAppView('characters'),
     '#/characters',
@@ -123,6 +141,10 @@ test('SPEC-011 mantiene hashes canónicos estables', () => {
 })
 
 test('SPEC-011 conserva la creación dentro de la sección Personajes', () => {
+  assert.equal(
+    sectionForAppView('dashboard'),
+    'dashboard',
+  )
   assert.equal(
     sectionForAppView(
       'character-creation',
@@ -150,6 +172,10 @@ test('SPEC-011 ofrece menú semántico persistente y sección activa', () => {
   )
   assert.match(
     componentSource,
+    /Inicio/,
+  )
+  assert.match(
+    componentSource,
     /Personajes/,
   )
   assert.match(
@@ -172,7 +198,7 @@ test('SPEC-011 conserva Crónicas condicionada por permisos', () => {
 test('SPEC-011 no inventa destinos sin consumidores reales', () => {
   assert.doesNotMatch(
     componentSource,
-    />\s*(?:Inicio|Dados|Administración|Configuración|Ayuda)\s*</,
+    />\s*(?:Dados|Administración|Configuración|Ayuda)\s*</,
   )
 })
 

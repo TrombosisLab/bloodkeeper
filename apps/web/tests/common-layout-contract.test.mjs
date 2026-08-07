@@ -130,6 +130,10 @@ test('SPEC-012 integra el layout sin cambiar los consumidores', () => {
     mainSource,
     /<ChronicleListCreate \/>/,
   )
+  assert.match(
+    mainSource,
+    /<Dashboard/,
+  )
 })
 
 test('SPEC-012 preserva navegación activa y permisos', () => {
@@ -208,6 +212,6 @@ test('SPEC-012 preserva autenticación y no crea estados genéricos', () => {
   )
   assert.doesNotMatch(
     navigationSource,
-    />\s*(?:Inicio|Dados|Administración|Configuración|Ayuda)\s*</,
+    />\s*(?:Dados|Administración|Configuración|Ayuda)\s*</,
   )
 })
