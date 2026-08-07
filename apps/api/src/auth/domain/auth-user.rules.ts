@@ -3,17 +3,23 @@ import type {
   UserRole,
 } from './auth.types'
 
-export interface InitialAdminInput {
+export interface AuthUserInput {
   readonly username: string
   readonly displayName: string
   readonly password: string
 }
 
-export interface NormalizedInitialAdminInput {
+export interface NormalizedAuthUserInput {
   readonly username: string
   readonly displayName: string
   readonly password: string
 }
+
+export type InitialAdminInput =
+  AuthUserInput
+
+export type NormalizedInitialAdminInput =
+  NormalizedAuthUserInput
 
 export interface PasswordRecoveryInput {
   readonly username: string
@@ -104,9 +110,9 @@ function passwordIssues(
   return issues
 }
 
-export function normalizeInitialAdminInput(
-  input: InitialAdminInput,
-): NormalizedInitialAdminInput {
+export function normalizeAuthUserInput(
+  input: AuthUserInput,
+): NormalizedAuthUserInput {
   const username =
     input.username.trim().toLowerCase()
   const displayName =
@@ -137,6 +143,12 @@ export function normalizeInitialAdminInput(
     displayName,
     password: input.password,
   }
+}
+
+export function normalizeInitialAdminInput(
+  input: InitialAdminInput,
+): NormalizedInitialAdminInput {
+  return normalizeAuthUserInput(input)
 }
 
 export function normalizePasswordRecoveryInput(
