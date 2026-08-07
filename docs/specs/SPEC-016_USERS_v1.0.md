@@ -7,7 +7,7 @@
 | Documento | USERS.md |
 | Proyecto | Vampiro V5 Revolution |
 | Versión | 1.1 |
-| Estado | Aprobado — ampliación 016-C activa |
+| Estado | Cerrada (2026-08-07) |
 
 ## Propósito
 Definir la gestión de usuarios de Vampiro V5 Revolution.
@@ -136,3 +136,30 @@ Reglas:
 - No se exponen credenciales ni hashes.
 
 <!-- SPEC-016-C:END -->
+
+<!-- SPEC-016-C-CLOSURE:START -->
+
+## Acta de cierre 016-C — 2026-08-07
+
+La ampliación 016-C queda cerrada tras validar el autorregistro limitado de jugadores.
+
+- `POST /users/register` funciona como ruta pública separada de la administración.
+- El body admite únicamente `username`, `displayName` y `password`.
+- El backend fuerza estado `active` y rol único `player`.
+- El envío de `roles` u otros campos no permitidos se rechaza.
+- Se reutilizan las reglas canónicas de usuario y contraseña y el hash Scrypt existente.
+- El username duplicado se rechaza con conflicto.
+- La nueva cuenta puede iniciar sesión mediante el flujo de autenticación existente.
+- El registro no realiza auto-login.
+- La respuesta pública no expone credenciales, hashes, roles ni fechas técnicas.
+- La pantalla de login permite alternar entre **Iniciar sesión** y **Crear cuenta**.
+- La administración existente conserva su autorización administrativa.
+- Validación focal API correcta.
+- Validación focal web correcta.
+- Typecheck API y web correctos.
+- Validación HTTP real a través del proxy web `/api` correcta.
+- Usuario y sesiones temporales de validación eliminados de la base de datos.
+- No se ejecuta una suite global redundante para este cierre.
+- No se realiza push automático.
+
+<!-- SPEC-016-C-CLOSURE:END -->
