@@ -49,12 +49,15 @@ import {
   parseAuthenticatedAdministratorId,
   parseCreateUserAdministrationRequest,
   parseResetUserCredentialsRequest,
+  parseSelfRegistrationRequest,
   parseUpdateUserAdministrationRequest,
   parseUpdateUserRolesRequest,
+  toSelfRegistrationResponse,
   toUserAdministrationResponse,
 } from './user-administration.dto'
 
 import type {
+  SelfRegistrationResponseDto,
   UserAdministrationResponseDto,
 } from './user-administration.dto'
 
@@ -165,6 +168,29 @@ export class UserAdministrationController {
     private readonly updateUserRoles:
       UpdateUserRolesUseCase,
   ) {}
+
+  @Post('register')
+  async register(
+    @Body() body: unknown,
+  ): Promise<SelfRegistrationResponseDto> {
+    try {
+      const command =
+        parseSelfRegistrationRequest(body)
+
+      const user =
+        await this.createUser.execute(
+          command,
+        )
+
+      return toSelfRegistrationResponse(
+        user,
+      )
+    } catch (error: unknown) {
+      throwUserAdministrationHttpError(
+        error,
+      )
+    }
+  }
 
   @Post()
   async create(

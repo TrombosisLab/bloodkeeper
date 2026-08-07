@@ -406,3 +406,49 @@ export function toUserAdministrationResponse(
       user.updatedAt.toISOString(),
   }
 }
+
+export interface SelfRegistrationResponseDto {
+  readonly username: string
+  readonly displayName: string
+}
+
+export function parseSelfRegistrationRequest(
+  input: unknown,
+): CreateUserAdministrationInput {
+  const body = record(input, 'body')
+
+  onlyKeys(
+    body,
+    [
+      'username',
+      'displayName',
+      'password',
+    ],
+    'body',
+  )
+
+  return {
+    username: stringValue(
+      required(body, 'username', 'body'),
+      'body.username',
+    ),
+    displayName: stringValue(
+      required(body, 'displayName', 'body'),
+      'body.displayName',
+    ),
+    password: stringValue(
+      required(body, 'password', 'body'),
+      'body.password',
+    ),
+    roles: ['player'],
+  }
+}
+
+export function toSelfRegistrationResponse(
+  user: UserAdministrationRecord,
+): SelfRegistrationResponseDto {
+  return {
+    username: user.username,
+    displayName: user.displayName,
+  }
+}

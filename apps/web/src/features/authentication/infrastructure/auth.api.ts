@@ -4,6 +4,8 @@ import type {
   AuthenticatedUserResponse,
   LoginRequest,
   LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
 } from '../types/auth-api.types'
 
 export class AuthenticationApiError
@@ -118,6 +120,25 @@ function parseLogin(
   }
 }
 
+function parseRegister(
+  value: unknown,
+): RegisterResponse {
+  if (
+    !isRecord(value) ||
+    typeof value.username !== 'string' ||
+    typeof value.displayName !== 'string'
+  ) {
+    throw new Error(
+      'Respuesta de registro inválida',
+    )
+  }
+
+  return {
+    username: value.username,
+    displayName: value.displayName,
+  }
+}
+
 async function parseError(
   response: Response,
 ): Promise<AuthenticationApiError> {
@@ -206,6 +227,34 @@ export function createAuthenticationApi(
       }
 
       return parseLogin(
+        await response.json(),
+      )
+    },
+
+    async register(
+      input: RegisterRequest,
+    ): Promise<RegisterResponse> {
+      const response =
+        await fetcher(
+          '/api/users/register',
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(input),
+          },
+        )
+
+      if (!response.ok) {
+        throw await parseError(
+          response,
+        )
+      }
+
+      return parseRegister(
         await response.json(),
       )
     },

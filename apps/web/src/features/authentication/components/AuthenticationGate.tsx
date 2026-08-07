@@ -30,7 +30,6 @@ type AuthenticationState =
     }
   | {
       readonly kind: 'anonymous'
-      readonly message: string | null
     }
   | {
       readonly kind: 'authenticated'
@@ -41,6 +40,17 @@ type AuthenticationState =
       readonly kind: 'error'
       readonly message: string
     }
+
+type AuthenticationMode =
+  | 'login'
+  | 'register'
+
+type AuthenticationFeedback =
+  | {
+      readonly kind: 'error' | 'success'
+      readonly message: string
+    }
+  | null
 
 function readableError(
   error: unknown,
@@ -65,11 +75,20 @@ export function AuthenticationGate({
       kind: 'loading',
     })
 
+  const [mode, setMode] =
+    useState<AuthenticationMode>('login')
+
   const [username, setUsername] =
+    useState('')
+
+  const [displayName, setDisplayName] =
     useState('')
 
   const [password, setPassword] =
     useState('')
+
+  const [feedback, setFeedback] =
+    useState<AuthenticationFeedback>(null)
 
   const [submitting, setSubmitting] =
     useState(false)
@@ -78,6 +97,7 @@ export function AuthenticationGate({
     setState({
       kind: 'loading',
     })
+    setFeedback(null)
 
     try {
       const session =
@@ -87,7 +107,6 @@ export function AuthenticationGate({
         session === null
           ? {
               kind: 'anonymous',
-              message: null,
             }
           : {
               kind: 'authenticated',
@@ -112,6 +131,7 @@ export function AuthenticationGate({
   ) => {
     event.preventDefault()
     setSubmitting(true)
+    setFeedback(null)
 
     try {
       const session =
@@ -128,12 +148,62 @@ export function AuthenticationGate({
     } catch (error: unknown) {
       setState({
         kind: 'anonymous',
-        message:
-          readableError(error),
+      })
+      setFeedback({
+        kind: 'error',
+        message: readableError(error),
       })
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const handleRegister = async (
+    event: FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault()
+    setSubmitting(true)
+    setFeedback(null)
+
+    try {
+      const registered =
+        await authenticationApi.register({
+          username,
+          displayName,
+          password,
+        })
+
+      setUsername(registered.username)
+      setDisplayName('')
+      setPassword('')
+      setMode('login')
+      setState({
+        kind: 'anonymous',
+      })
+      setFeedback({
+        kind: 'success',
+        message:
+          'Cuenta creada. Ya puedes iniciar sesión.',
+      })
+    } catch (error: unknown) {
+      setState({
+        kind: 'anonymous',
+      })
+      setFeedback({
+        kind: 'error',
+        message: readableError(error),
+      })
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const switchMode = (
+    nextMode: AuthenticationMode,
+  ) => {
+    setMode(nextMode)
+    setPassword('')
+    setFeedback(null)
   }
 
   const handleLogout = async () => {
@@ -142,9 +212,10 @@ export function AuthenticationGate({
     try {
       await authenticationApi.logout()
       setPassword('')
+      setFeedback(null)
+      setMode('login')
       setState({
         kind: 'anonymous',
-        message: null,
       })
     } catch (error: unknown) {
       setState({
@@ -207,20 +278,35 @@ export function AuthenticationGate({
   }
 
   if (state.kind === 'anonymous') {
+    const registering =
+      mode === 'register'
+
     return (
       <main className="authentication-shell">
         <form
           className="authentication-card"
           data-view-state="permission"
           aria-busy={submitting}
-          onSubmit={handleLogin}
+          onSubmit={
+            registering
+              ? handleRegister
+              : handleLogin
+          }
         >
           <span className="authentication-card__eyebrow">
             BloodKeeper
           </span>
-          <h1>Iniciar sesión</h1>
+
+          <h1>
+            {registering
+              ? 'Crear cuenta'
+              : 'Iniciar sesión'}
+          </h1>
+
           <p>
-            Acceso local a Vampiro V5 Revolution.
+            {registering
+              ? 'Crea una cuenta local de jugador.'
+              : 'Acceso local a Vampiro V5 Revolution.'}
           </p>
 
           <label>
@@ -239,29 +325,74 @@ export function AuthenticationGate({
             />
           </label>
 
-          <label>
-            Contraseña
-            <input
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              maxLength={200}
-              value={password}
-              onChange={(event) =>
-                setPassword(
-                  event.target.value,
-                )
-              }
-            />
-          </label>
+          {registering ? (
+            <label>
+              Nombre visible
+              <input
+                name="displayName"
+                autoComplete="name"
+                required
+                maxLength={80}
+                value={displayName}
+                onChange={(event) =>
+                  setDisplayName(
+                    event.target.value,
+                  )
+                }
+              />
+            </label>
+          ) : null}
 
-          {state.message !== null ? (
+          {registering ? (
+            <label>
+              Contraseña
+              <input
+                name="password"
+                type="password"
+                autoComplete="new-password"
+                required
+                maxLength={200}
+                value={password}
+                onChange={(event) =>
+                  setPassword(
+                    event.target.value,
+                  )
+                }
+              />
+            </label>
+          ) : (
+            <label>
+              Contraseña
+              <input
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                maxLength={200}
+                value={password}
+                onChange={(event) =>
+                  setPassword(
+                    event.target.value,
+                  )
+                }
+              />
+            </label>
+          )}
+
+          {feedback !== null ? (
             <p
-              className="authentication-card__error"
-              role="alert"
+              className={
+                feedback.kind === 'error'
+                  ? 'authentication-card__error'
+                  : undefined
+              }
+              role={
+                feedback.kind === 'error'
+                  ? 'alert'
+                  : 'status'
+              }
             >
-              {state.message}
+              {feedback.message}
             </p>
           ) : null}
 
@@ -270,8 +401,28 @@ export function AuthenticationGate({
             disabled={submitting}
           >
             {submitting
-              ? 'Accediendo…'
-              : 'Entrar'}
+              ? registering
+                ? 'Creando cuenta…'
+                : 'Accediendo…'
+              : registering
+                ? 'Crear cuenta'
+                : 'Entrar'}
+          </button>
+
+          <button
+            type="button"
+            disabled={submitting}
+            onClick={() =>
+              switchMode(
+                registering
+                  ? 'login'
+                  : 'register',
+              )
+            }
+          >
+            {registering
+              ? 'Volver a iniciar sesión'
+              : 'Crear cuenta'}
           </button>
         </form>
       </main>

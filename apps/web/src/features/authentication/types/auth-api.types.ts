@@ -25,3 +25,14 @@ export interface LoginRequest {
   readonly username: string
   readonly password: string
 }
+
+export interface RegisterRequest {
+  readonly username: string
+  readonly displayName: string
+  readonly password: string
+}
+
+export interface RegisterResponse {
+  readonly username: string
+  readonly displayName: string
+}
