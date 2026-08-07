@@ -33,6 +33,10 @@ import {
 } from '../application/reset-user-credentials.use-case'
 
 import {
+  UpdateUserRolesUseCase,
+} from '../application/update-user-roles.use-case'
+
+import {
   InvalidAuthUserError,
 } from '../../auth/domain/auth-user.rules'
 
@@ -46,6 +50,7 @@ import {
   parseCreateUserAdministrationRequest,
   parseResetUserCredentialsRequest,
   parseUpdateUserAdministrationRequest,
+  parseUpdateUserRolesRequest,
   toUserAdministrationResponse,
 } from './user-administration.dto'
 
@@ -157,6 +162,8 @@ export class UserAdministrationController {
       UpdateUserUseCase,
     private readonly resetUserCredentials:
       ResetUserCredentialsUseCase,
+    private readonly updateUserRoles:
+      UpdateUserRolesUseCase,
   ) {}
 
   @Post()
@@ -223,6 +230,37 @@ export class UserAdministrationController {
 
       const user =
         await this.updateUser.execute(
+          command,
+        )
+
+      return toUserAdministrationResponse(
+        user,
+      )
+    } catch (error: unknown) {
+      throwUserAdministrationHttpError(
+        error,
+      )
+    }
+  }
+
+  @Patch(':userId/roles')
+  async updateRoles(
+    @Req() request:
+      AuthenticatedUserAdministrationRequest,
+    @Param('userId') userIdInput: unknown,
+    @Body() body: unknown,
+  ): Promise<UserAdministrationResponseDto> {
+    assertAdministrator(request)
+
+    try {
+      const command =
+        parseUpdateUserRolesRequest(
+          userIdInput,
+          body,
+        )
+
+      const user =
+        await this.updateUserRoles.execute(
           command,
         )
 

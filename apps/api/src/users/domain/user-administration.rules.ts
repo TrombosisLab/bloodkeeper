@@ -82,32 +82,15 @@ function authIssues(
   )
 }
 
-export function normalizeUserAdministrationInput(
-  input: CreateUserAdministrationInput,
-): NormalizedUserAdministrationInput {
+export function normalizeUserAdministrationRoles(
+  input: readonly UserRole[],
+): readonly UserRole[] {
   const issues:
     UserAdministrationRuleIssue[] = []
 
-  let normalizedBase:
-    ReturnType<typeof normalizeAuthUserInput> |
-    null = null
-
-  try {
-    normalizedBase =
-      normalizeAuthUserInput(input)
-  } catch (error: unknown) {
-    if (
-      error instanceof InvalidAuthUserError
-    ) {
-      issues.push(...authIssues(error))
-    } else {
-      throw error
-    }
-  }
-
   if (
-    !Array.isArray(input.roles) ||
-    input.roles.length === 0
+    !Array.isArray(input) ||
+    input.length === 0
   ) {
     issues.push({
       code: 'USER_ROLES_REQUIRED',
@@ -118,7 +101,7 @@ export function normalizeUserAdministrationInput(
   } else {
     const seen = new Set<UserRole>()
 
-    for (const role of input.roles) {
+    for (const role of input) {
       if (!allowedRoles.has(role)) {
         issues.push({
           code: 'USER_ROLE_INVALID',
@@ -143,23 +126,75 @@ export function normalizeUserAdministrationInput(
     }
   }
 
-  if (
-    issues.length > 0 ||
-    normalizedBase === null
-  ) {
+  if (issues.length > 0) {
     throw new InvalidUserAdministrationError(
       issues,
     )
   }
 
   const selected =
-    new Set(input.roles)
+    new Set(input)
+
+  return roleOrder.filter(
+    (role) => selected.has(role),
+  )
+}
+
+export function normalizeUserAdministrationInput(
+  input: CreateUserAdministrationInput,
+): NormalizedUserAdministrationInput {
+  const issues:
+    UserAdministrationRuleIssue[] = []
+
+  let normalizedBase:
+    ReturnType<typeof normalizeAuthUserInput> |
+    null = null
+
+  let normalizedRoles:
+    readonly UserRole[] | null = null
+
+  try {
+    normalizedBase =
+      normalizeAuthUserInput(input)
+  } catch (error: unknown) {
+    if (
+      error instanceof InvalidAuthUserError
+    ) {
+      issues.push(...authIssues(error))
+    } else {
+      throw error
+    }
+  }
+
+  try {
+    normalizedRoles =
+      normalizeUserAdministrationRoles(
+        input.roles,
+      )
+  } catch (error: unknown) {
+    if (
+      error instanceof
+        InvalidUserAdministrationError
+    ) {
+      issues.push(...error.issues)
+    } else {
+      throw error
+    }
+  }
+
+  if (
+    issues.length > 0 ||
+    normalizedBase === null ||
+    normalizedRoles === null
+  ) {
+    throw new InvalidUserAdministrationError(
+      issues,
+    )
+  }
 
   return {
     ...normalizedBase,
-    roles: roleOrder.filter(
-      (role) => selected.has(role),
-    ),
+    roles: normalizedRoles,
   }
 }
 

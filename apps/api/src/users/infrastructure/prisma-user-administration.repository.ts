@@ -175,4 +175,23 @@ export class PrismaUserAdministrationRepository
 
     return toDomain(row)
   }
+
+  async updateRoles(
+    userId: string,
+    roles: readonly UserRole[],
+  ): Promise<UserAdministrationRecord> {
+    const row =
+      await this.database.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          roles: roles.map(
+            (role) => roleToPrisma[role],
+          ),
+        },
+      })
+
+    return toDomain(row)
+  }
 }

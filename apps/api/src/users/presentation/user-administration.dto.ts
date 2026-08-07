@@ -7,6 +7,7 @@ import type {
   CreateUserAdministrationInput,
   ResetUserCredentialsInput,
   UpdateUserAdministrationInput,
+  UpdateUserRolesInput,
   UserAdministrationRecord,
 } from '../domain/user-administration.types'
 
@@ -300,6 +301,66 @@ export function parseUpdateUserAdministrationRequest(
           ),
         }
       : {}),
+  }
+}
+
+export function parseUpdateUserRolesRequest(
+  userIdInput: unknown,
+  input: unknown,
+): UpdateUserRolesInput {
+  const userId =
+    parseUserAdministrationIdParam(
+      userIdInput,
+    )
+  const body = record(input, 'body')
+
+  onlyKeys(
+    body,
+    [
+      'roles',
+    ],
+    'body',
+  )
+
+  const rolesInput =
+    required(body, 'roles', 'body')
+
+  if (!Array.isArray(rolesInput)) {
+    throw new InvalidUserAdministrationRequestError(
+      'body.roles',
+      'must be an array',
+    )
+  }
+
+  const parsedRoles:
+    UserRole[] = []
+
+  for (
+    let index = 0;
+    index < rolesInput.length;
+    index += 1
+  ) {
+    const role =
+      rolesInput[index]
+
+    if (
+      typeof role !== 'string' ||
+      !roles.has(role as UserRole)
+    ) {
+      throw new InvalidUserAdministrationRequestError(
+        `body.roles[${index}]`,
+        'must be a supported role',
+      )
+    }
+
+    parsedRoles.push(
+      role as UserRole,
+    )
+  }
+
+  return {
+    userId,
+    roles: parsedRoles,
   }
 }
 

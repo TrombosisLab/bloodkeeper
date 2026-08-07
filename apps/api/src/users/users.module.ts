@@ -43,6 +43,10 @@ import {
 } from './application/reset-user-credentials.use-case'
 
 import {
+  UpdateUserRolesUseCase,
+} from './application/update-user-roles.use-case'
+
+import {
   USER_ADMINISTRATION_REPOSITORY,
 } from './application/user-administration.repository'
 
@@ -171,6 +175,20 @@ import {
     },
     {
       provide:
+        UpdateUserRolesUseCase,
+      inject: [
+        USER_ADMINISTRATION_REPOSITORY,
+      ],
+      useFactory: (
+        users:
+          UserAdministrationRepository,
+      ) =>
+        new UpdateUserRolesUseCase(
+          users,
+        ),
+    },
+    {
+      provide:
         ResetUserCredentialsUseCase,
       inject: [
         USER_ADMINISTRATION_REPOSITORY,
@@ -192,6 +210,7 @@ import {
     CreateUserUseCase,
     ListUsersUseCase,
     UpdateUserUseCase,
+    UpdateUserRolesUseCase,
     ResetUserCredentialsUseCase,
   ],
 })

@@ -45,3 +45,8 @@ export interface ResetUserCredentialsInput {
   readonly userId: string
   readonly password: string
 }
+
+export interface UpdateUserRolesInput {
+  readonly userId: string
+  readonly roles: readonly UserRole[]
+}

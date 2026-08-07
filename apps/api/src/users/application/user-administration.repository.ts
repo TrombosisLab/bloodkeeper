@@ -1,4 +1,8 @@
 import type {
+  UserRole,
+} from '../../auth/domain/auth.types'
+
+import type {
   CreateUserAdministrationData,
   UpdateUserAdministrationData,
   UserAdministrationRecord,
@@ -27,5 +31,10 @@ export interface UserAdministrationRepository {
   update(
     userId: string,
     data: UpdateUserAdministrationData,
+  ): Promise<UserAdministrationRecord>
+
+  updateRoles(
+    userId: string,
+    roles: readonly UserRole[],
   ): Promise<UserAdministrationRecord>
 }
