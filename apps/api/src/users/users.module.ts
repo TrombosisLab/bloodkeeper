@@ -15,8 +15,16 @@ import {
 } from '../auth/infrastructure/prisma-auth-session.repository'
 
 import {
+  PrismaAuthUserRepository,
+} from '../auth/infrastructure/prisma-auth-user.repository'
+
+import {
   ScryptPasswordHasher,
 } from '../auth/infrastructure/scrypt-password-hasher'
+
+import {
+  ResetUserPasswordUseCase,
+} from '../auth/application/reset-user-password.use-case'
 
 import {
   CreateUserUseCase,
@@ -29,6 +37,10 @@ import {
 import {
   UpdateUserUseCase,
 } from './application/update-user.use-case'
+
+import {
+  ResetUserCredentialsUseCase,
+} from './application/reset-user-credentials.use-case'
 
 import {
   USER_ADMINISTRATION_REPOSITORY,
@@ -58,6 +70,20 @@ import {
     ScryptPasswordHasher,
     {
       provide:
+        PrismaAuthUserRepository,
+      inject: [
+        DatabaseService,
+      ],
+      useFactory: (
+        database:
+          DatabaseService,
+      ) =>
+        new PrismaAuthUserRepository(
+          database,
+        ),
+    },
+    {
+      provide:
         PrismaAuthSessionRepository,
       inject: [
         DatabaseService,
@@ -68,6 +94,28 @@ import {
       ) =>
         new PrismaAuthSessionRepository(
           database,
+        ),
+    },
+    {
+      provide:
+        ResetUserPasswordUseCase,
+      inject: [
+        PrismaAuthUserRepository,
+        PrismaAuthSessionRepository,
+        ScryptPasswordHasher,
+      ],
+      useFactory: (
+        users:
+          PrismaAuthUserRepository,
+        sessions:
+          PrismaAuthSessionRepository,
+        passwords:
+          ScryptPasswordHasher,
+      ) =>
+        new ResetUserPasswordUseCase(
+          users,
+          sessions,
+          passwords,
         ),
     },
     {
@@ -121,11 +169,30 @@ import {
           sessions,
         ),
     },
+    {
+      provide:
+        ResetUserCredentialsUseCase,
+      inject: [
+        USER_ADMINISTRATION_REPOSITORY,
+        ResetUserPasswordUseCase,
+      ],
+      useFactory: (
+        users:
+          UserAdministrationRepository,
+        resetPassword:
+          ResetUserPasswordUseCase,
+      ) =>
+        new ResetUserCredentialsUseCase(
+          users,
+          resetPassword,
+        ),
+    },
   ],
   exports: [
     CreateUserUseCase,
     ListUsersUseCase,
     UpdateUserUseCase,
+    ResetUserCredentialsUseCase,
   ],
 })
 export class UsersModule {}

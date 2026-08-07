@@ -5,6 +5,7 @@ import type {
 
 import type {
   CreateUserAdministrationInput,
+  ResetUserCredentialsInput,
   UpdateUserAdministrationInput,
   UserAdministrationRecord,
 } from '../domain/user-administration.types'
@@ -299,6 +300,33 @@ export function parseUpdateUserAdministrationRequest(
           ),
         }
       : {}),
+  }
+}
+
+export function parseResetUserCredentialsRequest(
+  userIdInput: unknown,
+  input: unknown,
+): ResetUserCredentialsInput {
+  const userId =
+    parseUserAdministrationIdParam(
+      userIdInput,
+    )
+  const body = record(input, 'body')
+
+  onlyKeys(
+    body,
+    [
+      'password',
+    ],
+    'body',
+  )
+
+  return {
+    userId,
+    password: stringValue(
+      required(body, 'password', 'body'),
+      'body.password',
+    ),
   }
 }
 

@@ -29,6 +29,14 @@ import {
 } from '../application/update-user.use-case'
 
 import {
+  ResetUserCredentialsUseCase,
+} from '../application/reset-user-credentials.use-case'
+
+import {
+  InvalidAuthUserError,
+} from '../../auth/domain/auth-user.rules'
+
+import {
   InvalidUserAdministrationError,
 } from '../domain/user-administration.rules'
 
@@ -36,6 +44,7 @@ import {
   InvalidUserAdministrationRequestError,
   parseAuthenticatedAdministratorId,
   parseCreateUserAdministrationRequest,
+  parseResetUserCredentialsRequest,
   parseUpdateUserAdministrationRequest,
   toUserAdministrationResponse,
 } from './user-administration.dto'
@@ -94,6 +103,17 @@ function throwUserAdministrationHttpError(
 
   if (
     error instanceof
+      InvalidAuthUserError
+  ) {
+    throw new UnprocessableEntityException({
+      code:
+        'USER_ADMINISTRATION_RULE_VIOLATION',
+      violations: error.issues,
+    })
+  }
+
+  if (
+    error instanceof
       InvalidUserAdministrationError
   ) {
     throw new UnprocessableEntityException({
@@ -135,6 +155,8 @@ export class UserAdministrationController {
       ListUsersUseCase,
     private readonly updateUser:
       UpdateUserUseCase,
+    private readonly resetUserCredentials:
+      ResetUserCredentialsUseCase,
   ) {}
 
   @Post()
@@ -201,6 +223,37 @@ export class UserAdministrationController {
 
       const user =
         await this.updateUser.execute(
+          command,
+        )
+
+      return toUserAdministrationResponse(
+        user,
+      )
+    } catch (error: unknown) {
+      throwUserAdministrationHttpError(
+        error,
+      )
+    }
+  }
+
+  @Patch(':userId/credentials')
+  async resetCredentials(
+    @Req() request:
+      AuthenticatedUserAdministrationRequest,
+    @Param('userId') userIdInput: unknown,
+    @Body() body: unknown,
+  ): Promise<UserAdministrationResponseDto> {
+    assertAdministrator(request)
+
+    try {
+      const command =
+        parseResetUserCredentialsRequest(
+          userIdInput,
+          body,
+        )
+
+      const user =
+        await this.resetUserCredentials.execute(
           command,
         )
 

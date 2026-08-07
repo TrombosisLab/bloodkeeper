@@ -40,3 +40,8 @@ export interface UpdateUserAdministrationData {
   readonly displayName: string
   readonly status: UserAccountStatus
 }
+
+export interface ResetUserCredentialsInput {
+  readonly userId: string
+  readonly password: string
+}
