@@ -15,4 +15,9 @@ export interface AuthUserRepository {
   findByUsername(
     username: string,
   ): Promise<AuthUser | null>
+
+  updatePasswordHash(
+    userId: string,
+    passwordHash: string,
+  ): Promise<AuthUser>
 }

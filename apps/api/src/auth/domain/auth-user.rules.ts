@@ -15,6 +15,16 @@ export interface NormalizedInitialAdminInput {
   readonly password: string
 }
 
+export interface PasswordRecoveryInput {
+  readonly username: string
+  readonly password: string
+}
+
+export interface NormalizedPasswordRecoveryInput {
+  readonly username: string
+  readonly password: string
+}
+
 export interface AuthUserRuleIssue {
   readonly code:
     | 'AUTH_USERNAME_INVALID'
@@ -53,37 +63,27 @@ export const INITIAL_ADMIN_ROLES =
     'player',
   ] as const satisfies readonly UserRole[]
 
-export function normalizeInitialAdminInput(
-  input: InitialAdminInput,
-): NormalizedInitialAdminInput {
-  const username =
-    input.username.trim().toLowerCase()
-  const displayName =
-    input.displayName.trim()
+function usernameIssues(
+  username: string,
+): readonly AuthUserRuleIssue[] {
+  if (usernamePattern.test(username)) {
+    return []
+  }
+
+  return [{
+    code: 'AUTH_USERNAME_INVALID',
+    field: 'username',
+    message:
+      'El usuario debe tener entre 3 y 32 caracteres y usar letras minúsculas, números, punto, guion o guion bajo.',
+  }]
+}
+
+function passwordIssues(
+  password: string,
+): readonly AuthUserRuleIssue[] {
   const issues: AuthUserRuleIssue[] = []
 
-  if (!usernamePattern.test(username)) {
-    issues.push({
-      code: 'AUTH_USERNAME_INVALID',
-      field: 'username',
-      message:
-        'El usuario debe tener entre 3 y 32 caracteres y usar letras minúsculas, números, punto, guion o guion bajo.',
-    })
-  }
-
-  if (
-    displayName.length === 0 ||
-    displayName.length > 80
-  ) {
-    issues.push({
-      code: 'AUTH_DISPLAY_NAME_INVALID',
-      field: 'displayName',
-      message:
-        'El nombre visible debe contener entre 1 y 80 caracteres.',
-    })
-  }
-
-  if (input.password.length < 12) {
+  if (password.length < 12) {
     issues.push({
       code: 'AUTH_PASSWORD_TOO_SHORT',
       field: 'password',
@@ -92,12 +92,39 @@ export function normalizeInitialAdminInput(
     })
   }
 
-  if (input.password.length > 200) {
+  if (password.length > 200) {
     issues.push({
       code: 'AUTH_PASSWORD_TOO_LONG',
       field: 'password',
       message:
         'La contraseña no puede superar 200 caracteres.',
+    })
+  }
+
+  return issues
+}
+
+export function normalizeInitialAdminInput(
+  input: InitialAdminInput,
+): NormalizedInitialAdminInput {
+  const username =
+    input.username.trim().toLowerCase()
+  const displayName =
+    input.displayName.trim()
+  const issues: AuthUserRuleIssue[] = [
+    ...usernameIssues(username),
+    ...passwordIssues(input.password),
+  ]
+
+  if (
+    displayName.length === 0 ||
+    displayName.length > 80
+  ) {
+    issues.splice(1, 0, {
+      code: 'AUTH_DISPLAY_NAME_INVALID',
+      field: 'displayName',
+      message:
+        'El nombre visible debe contener entre 1 y 80 caracteres.',
     })
   }
 
@@ -108,6 +135,26 @@ export function normalizeInitialAdminInput(
   return {
     username,
     displayName,
+    password: input.password,
+  }
+}
+
+export function normalizePasswordRecoveryInput(
+  input: PasswordRecoveryInput,
+): NormalizedPasswordRecoveryInput {
+  const username =
+    input.username.trim().toLowerCase()
+  const issues: AuthUserRuleIssue[] = [
+    ...usernameIssues(username),
+    ...passwordIssues(input.password),
+  ]
+
+  if (issues.length > 0) {
+    throw new InvalidAuthUserError(issues)
+  }
+
+  return {
+    username,
     password: input.password,
   }
 }

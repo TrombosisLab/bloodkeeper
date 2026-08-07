@@ -106,4 +106,22 @@ export class PrismaAuthSessionRepository
 
     return result.count > 0
   }
+
+  async revokeAllByUserId(
+    userId: string,
+    revokedAt: Date,
+  ): Promise<number> {
+    const result =
+      await this.database.authSession.updateMany({
+        where: {
+          userId,
+          revokedAt: null,
+        },
+        data: {
+          revokedAt,
+        },
+      })
+
+    return result.count
+  }
 }

@@ -21,4 +21,9 @@ export interface AuthSessionRepository {
     tokenHash: string,
     revokedAt: Date,
   ): Promise<boolean>
+
+  revokeAllByUserId(
+    userId: string,
+    revokedAt: Date,
+  ): Promise<number>
 }

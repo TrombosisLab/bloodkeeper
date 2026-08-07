@@ -129,4 +129,21 @@ export class PrismaAuthUserRepository
       ? null
       : toDomain(row)
   }
+
+  async updatePasswordHash(
+    userId: string,
+    passwordHash: string,
+  ): Promise<AuthUser> {
+    const row =
+      await this.database.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          passwordHash,
+        },
+      })
+
+    return toDomain(row)
+  }
 }

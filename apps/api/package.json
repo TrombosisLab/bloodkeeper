@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "test": "npm run build --silent && node --test tests/*.test.mjs",
     "test:integration": "npm run build --silent && node --test tests/*.integration.mjs",
-    "admin:create": "npm run build --silent && node dist/auth/tools/create-initial-admin.js"
+    "admin:create": "npm run build --silent && node dist/auth/tools/create-initial-admin.js",
+    "admin:reset-password": "npm run build --silent && node dist/auth/tools/reset-user-password.js"
   },
   "dependencies": {
     "@v5r/character-rules": "file:../../packages/character-rules",
