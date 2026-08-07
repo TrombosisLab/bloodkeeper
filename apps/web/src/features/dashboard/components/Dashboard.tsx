@@ -18,6 +18,7 @@ import type {
 } from '../../chronicles/types/chronicle-api.types.ts'
 
 import './dashboard.css'
+import { ViewStateStatus } from '../../../components/ui/ViewStateStatus'
 
 interface DashboardProps {
   readonly displayName: string
@@ -242,14 +243,12 @@ export function Dashboard({
 
             {chronicleViewState ===
             'loading' ? (
-              <p
-                className="dashboard-message"
-                data-view-state="loading"
-                role="status"
-                aria-live="polite"
-              >
-                Cargando crónicas…
-              </p>
+              <ViewStateStatus
+                    state="loading"
+                    className="dashboard-message"
+                  >
+                    Cargando crónicas…
+                  </ViewStateStatus>
             ) : chronicleViewState ===
               'error' ? (
               <div
@@ -274,15 +273,13 @@ export function Dashboard({
               </div>
             ) : chronicleViewState ===
               'empty' ? (
-              <p
-                className="dashboard-message"
-                data-view-state="empty"
-                role="status"
-                aria-live="polite"
-              >
-                Todavía no has creado ninguna
-                crónica.
-              </p>
+              <ViewStateStatus
+                    state="empty"
+                    className="dashboard-message"
+                  >
+                    Todavía no has creado ninguna
+                    crónica.
+                  </ViewStateStatus>
             ) : (
               <ul className="dashboard-chronicles">
                 {chronicles.map(

@@ -18,6 +18,7 @@ import type {
 } from '../types/chronicle-api.types.ts'
 
 import './chronicle-list-create.css'
+import { ViewStateStatus } from '../../../components/ui/ViewStateStatus'
 
 const gateway =
   createChronicleGateway()
@@ -281,23 +282,19 @@ export function ChronicleListCreate() {
           </div>
 
           {loading ? (
-            <p
-              className="chronicle-message"
-              data-view-state="loading"
-              role="status"
-              aria-live="polite"
-            >
-              Cargando crónicas…
-            </p>
+            <ViewStateStatus
+                state="loading"
+                className="chronicle-message"
+              >
+                Cargando crónicas…
+              </ViewStateStatus>
           ) : chronicles.length === 0 ? (
-            <p
-              className="chronicle-message"
-              data-view-state="empty"
-              role="status"
-              aria-live="polite"
-            >
-              Todavía no has creado ninguna crónica.
-            </p>
+            <ViewStateStatus
+                state="empty"
+                className="chronicle-message"
+              >
+                Todavía no has creado ninguna crónica.
+              </ViewStateStatus>
           ) : (
             <ul className="chronicle-cards">
               {chronicles.map(

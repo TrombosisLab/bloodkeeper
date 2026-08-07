@@ -150,7 +150,7 @@ test('Crónicas clasifica loading empty error permission y content', () => {
   )
   assert.match(
     chroniclesSource,
-    /data-view-state="empty"/,
+    /ViewStateStatus[\s\S]*state="empty"/,
   )
   assert.match(
     chroniclesSource,
@@ -161,11 +161,11 @@ test('Crónicas clasifica loading empty error permission y content', () => {
 test('Crónicas anuncia carga vacío y fallo con semántica uniforme', () => {
   assert.match(
     chroniclesSource,
-    /data-view-state="loading"[\s\S]*role="status"[\s\S]*aria-live="polite"/,
+    /ViewStateStatus[\s\S]*state="loading"/,
   )
   assert.match(
     chroniclesSource,
-    /data-view-state="empty"[\s\S]*role="status"[\s\S]*aria-live="polite"/,
+    /ViewStateStatus[\s\S]*state="empty"/,
   )
   assert.match(
     chroniclesSource,

@@ -190,7 +190,11 @@ test('SPEC-013 representa carga vacío error contenido y reintento', () => {
 
   assert.match(
     dashboardSource,
-    /role="status"[\s\S]*aria-live="polite"/,
+    /ViewStateStatus[\s\S]*state="loading"/,
+  )
+  assert.match(
+    dashboardSource,
+    /ViewStateStatus[\s\S]*state="empty"/,
   )
   assert.match(
     dashboardSource,
