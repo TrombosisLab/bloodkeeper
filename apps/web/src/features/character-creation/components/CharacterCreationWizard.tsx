@@ -31,6 +31,28 @@ import type {
   CharacterDraftGateway,
 } from '../infrastructure/character-draft.api'
 
+import {
+  CharacterLifecycleApiError,
+  createCharacterLifecycleGateway,
+} from '../../character-sheet/infrastructure/character-lifecycle.api'
+
+import type {
+  CharacterLifecycleGateway,
+} from '../../character-sheet/infrastructure/character-lifecycle.api'
+
+import {
+  CharacterValidationApiError,
+  createCharacterValidationGateway,
+} from '../../character-sheet/infrastructure/character-validation.api'
+
+import type {
+  CharacterValidationGateway,
+} from '../../character-sheet/infrastructure/character-validation.api'
+
+import type {
+  CharacterValidationReport,
+} from '../../character-sheet/types/character-validation.types'
+
 import type {
   CharacterDraftApiEditorState,
 } from '../domain/character-draft-api.mapper'
@@ -81,6 +103,15 @@ import { AdvantagesStep } from './AdvantagesStep'
 import { HumanityStep } from './HumanityStep'
 import { ReviewStep } from './ReviewStep'
 
+type ReviewUiState =
+  | 'idle'
+  | 'checking'
+  | 'blocked'
+  | 'ready'
+  | 'finalizing'
+  | 'finalized'
+  | 'error'
+
 interface CharacterCreationWizardProps {
   onBackToSheet: () => void
   characterId?: string | null
@@ -88,6 +119,35 @@ interface CharacterCreationWizardProps {
     characterId: string,
   ) => void
   gateway?: CharacterDraftGateway
+  lifecycleGateway?: CharacterLifecycleGateway
+  validationGateway?: CharacterValidationGateway
+}
+
+function reviewErrorMessage(
+  error: unknown,
+): string {
+  if (
+    error instanceof CharacterLifecycleApiError ||
+    error instanceof CharacterValidationApiError
+  ) {
+    if (error.status === 401) {
+      return 'Necesitas una sesión válida para finalizar este personaje.'
+    }
+
+    if (error.status === 404) {
+      return 'El personaje no existe o ya no está disponible.'
+    }
+
+    if (error.status === 409) {
+      return 'El personaje cambió en otra sesión. Recarga el borrador antes de continuar.'
+    }
+
+    if (error.status === 422) {
+      return 'La validación global rechazó la finalización del personaje.'
+    }
+  }
+
+  return 'No se pudo completar la revisión final.'
 }
 
 export function CharacterCreationWizard({
@@ -95,12 +155,28 @@ export function CharacterCreationWizard({
   characterId = null,
   onCharacterPersisted,
   gateway: providedGateway,
+  lifecycleGateway: providedLifecycleGateway,
+  validationGateway: providedValidationGateway,
 }: CharacterCreationWizardProps) {
   const gateway = useMemo(
     () =>
       providedGateway ??
       createCharacterDraftGateway(),
     [providedGateway],
+  )
+
+  const lifecycleGateway = useMemo(
+    () =>
+      providedLifecycleGateway ??
+      createCharacterLifecycleGateway(),
+    [providedLifecycleGateway],
+  )
+
+  const validationGateway = useMemo(
+    () =>
+      providedValidationGateway ??
+      createCharacterValidationGateway(),
+    [providedValidationGateway],
   )
 
   const [
@@ -142,6 +218,28 @@ export function CharacterCreationWizard({
   const [showValidation, setShowValidation] =
     useState(false)
 
+  const [
+    reviewReport,
+    setReviewReport,
+  ] = useState<CharacterValidationReport | null>(
+    null,
+  )
+
+  const [
+    reviewRevision,
+    setReviewRevision,
+  ] = useState<number | null>(null)
+
+  const [
+    reviewState,
+    setReviewState,
+  ] = useState<ReviewUiState>('idle')
+
+  const [
+    reviewMessage,
+    setReviewMessage,
+  ] = useState<string | null>(null)
+
   const currentIndex = creationSteps.findIndex(
     (step) => step.id === currentStepId,
   )
@@ -167,6 +265,14 @@ export function CharacterCreationWizard({
   const persistenceBusy =
     persistenceState === 'loading' ||
     persistenceState === 'saving'
+
+  const reviewBusy =
+    reviewState === 'checking' ||
+    reviewState === 'finalizing'
+
+  const interactionBusy =
+    persistenceBusy ||
+    reviewBusy
 
   const persistenceMessage =
     messageForCharacterDraftPersistenceState(
@@ -241,6 +347,10 @@ export function CharacterCreationWizard({
           normalizedLoaded.currentStepId,
         )
         setShowValidation(false)
+        setReviewReport(null)
+        setReviewRevision(null)
+        setReviewState('idle')
+        setReviewMessage(null)
         setHasUnsavedChanges(
           normalizationChanged,
         )
@@ -269,9 +379,10 @@ export function CharacterCreationWizard({
     reloadVersion,
   ])
 
-  async function persistDraft() {
+  async function persistDraft():
+    Promise<CharacterDraftApiEditorState | null> {
     if (persistenceState !== 'ready') {
-      return
+      return null
     }
 
     setPersistenceState('saving')
@@ -298,16 +409,29 @@ export function CharacterCreationWizard({
       onCharacterPersisted?.(
         persisted.characterId,
       )
+
+      return persisted
     } catch (error: unknown) {
       setPersistenceState(
         stateForCharacterDraftPersistenceError(
           error,
         ),
       )
+
+      return null
     }
   }
 
+  function invalidateReview() {
+    setReviewReport(null)
+    setReviewRevision(null)
+    setReviewState('idle')
+    setReviewMessage(null)
+  }
+
   function retryPersistence() {
+    invalidateReview()
+
     const persistedCharacterId =
       editorState?.characterId ??
       characterId
@@ -327,12 +451,13 @@ export function CharacterCreationWizard({
     stepId: CreationStepId,
   ) {
     if (
-      persistenceBusy ||
+      interactionBusy ||
       stepId === currentStepId
     ) {
       return
     }
 
+    invalidateReview()
     setHasUnsavedChanges(true)
     setCurrentStepId(stepId)
   }
@@ -343,10 +468,11 @@ export function CharacterCreationWizard({
     ) => CharacterDraft,
     creationSkills?: CharacterSkillsDraft,
   ) {
-    if (persistenceBusy) {
+    if (interactionBusy) {
       return
     }
 
+    invalidateReview()
     setHasUnsavedChanges(true)
 
     setDraft(
@@ -402,7 +528,7 @@ export function CharacterCreationWizard({
   function canNavigateTo(
     stepId: CreationStepId,
   ): boolean {
-    if (persistenceBusy) {
+    if (interactionBusy) {
       return stepId === currentStepId
     }
 
@@ -464,6 +590,154 @@ export function CharacterCreationWizard({
     )
   }
 
+  async function checkReview() {
+    if (
+      currentStepId !== 'review' ||
+      interactionBusy
+    ) {
+      return
+    }
+
+    if (
+      editorState !== null &&
+      editorState.status !== 'draft'
+    ) {
+      setReviewState(
+        editorState.status === 'active'
+          ? 'finalized'
+          : 'error',
+      )
+      setReviewMessage(
+        editorState.status === 'active'
+          ? 'El personaje ya está finalizado.'
+          : 'Un personaje archivado no puede finalizarse desde el creador.',
+      )
+      return
+    }
+
+    setReviewReport(null)
+    setReviewRevision(null)
+    setReviewState('checking')
+    setReviewMessage(
+      'Guardando y comprobando el personaje...',
+    )
+
+    const persisted =
+      await persistDraft()
+
+    if (persisted === null) {
+      setReviewState('error')
+      setReviewMessage(
+        'No se pudo guardar el borrador antes de la validación final.',
+      )
+      return
+    }
+
+    try {
+      const report =
+        await validationGateway.validate(
+          persisted.characterId,
+          'activation',
+        )
+
+      setReviewReport(report)
+      setReviewRevision(
+        persisted.revision,
+      )
+
+      if (report.canProceed) {
+        setReviewState('ready')
+        setReviewMessage(
+          'La validación global permite finalizar el personaje.',
+        )
+      } else {
+        setReviewState('blocked')
+        setReviewMessage(
+          'El personaje todavía tiene errores o decisiones pendientes.',
+        )
+      }
+    } catch (error: unknown) {
+      setReviewState('error')
+      setReviewMessage(
+        reviewErrorMessage(error),
+      )
+    }
+  }
+
+  async function finalizeReview() {
+    if (
+      reviewState !== 'ready' ||
+      reviewReport?.canProceed !== true ||
+      editorState === null ||
+      editorState.status !== 'draft' ||
+      hasUnsavedChanges ||
+      reviewRevision !== editorState.revision ||
+      interactionBusy
+    ) {
+      return
+    }
+
+    setReviewState('finalizing')
+    setReviewMessage(
+      'Finalizando personaje...',
+    )
+
+    try {
+      const transitioned =
+        await lifecycleGateway.transition(
+          editorState.characterId,
+          editorState.revision,
+          'active',
+          false,
+        )
+
+      setEditorState(
+        (current) =>
+          current === null
+            ? current
+            : {
+                ...current,
+                status:
+                  transitioned.status,
+                revision:
+                  transitioned.revision,
+              },
+      )
+
+      if (transitioned.validation !== null) {
+        setReviewReport(
+          transitioned.validation,
+        )
+      }
+
+      setReviewRevision(
+        transitioned.revision,
+      )
+      setHasUnsavedChanges(false)
+      setReviewState('finalized')
+      setReviewMessage(
+        'Personaje finalizado correctamente.',
+      )
+      onCharacterPersisted?.(
+        transitioned.characterId,
+      )
+    } catch (error: unknown) {
+      setReviewState('error')
+      setReviewMessage(
+        reviewErrorMessage(error),
+      )
+    }
+  }
+
+  const canFinalizeReview =
+    currentStepId === 'review' &&
+    reviewState === 'ready' &&
+    reviewReport?.canProceed === true &&
+    editorState !== null &&
+    editorState.status === 'draft' &&
+    !hasUnsavedChanges &&
+    reviewRevision === editorState.revision
+
   const persistenceSummary =
     editorState === null
       ? 'Borrador local sin guardar'
@@ -475,7 +749,7 @@ export function CharacterCreationWizard({
     <section
       className="creation-page"
       data-view-state={persistenceViewState}
-      aria-busy={persistenceBusy}
+      aria-busy={interactionBusy}
     >
       <header className="creation-header">
         <div>
@@ -522,7 +796,8 @@ export function CharacterCreationWizard({
               type="button"
               className="creation-button creation-button--primary"
               disabled={
-                persistenceState !== 'ready'
+                persistenceState !== 'ready' ||
+                reviewBusy
               }
               onClick={() => {
                 void persistDraft()
@@ -549,7 +824,7 @@ export function CharacterCreationWizard({
               type="button"
               className="creation-header__back"
               onClick={onBackToSheet}
-              disabled={persistenceBusy}
+              disabled={interactionBusy}
             >
               Ver ficha
             </button>
@@ -853,6 +1128,27 @@ export function CharacterCreationWizard({
             'review' ? (
             <ReviewStep
               draft={draft}
+              validationReport={
+                reviewReport
+              }
+              lifecycleStatus={
+                editorState?.status ?? null
+              }
+              canFinalize={
+                canFinalizeReview
+              }
+              busy={
+                interactionBusy
+              }
+              message={
+                reviewMessage
+              }
+              onCheck={() => {
+                void checkReview()
+              }}
+              onFinalize={() => {
+                void finalizeReview()
+              }}
             />
           ) : (
             <CreationStepPlaceholder
@@ -890,7 +1186,7 @@ export function CharacterCreationWizard({
               onClick={goPrevious}
               disabled={
                 isFirst ||
-                persistenceBusy
+                interactionBusy
               }
             >
               Anterior
@@ -908,7 +1204,7 @@ export function CharacterCreationWizard({
               onClick={goNext}
               disabled={
                 isLast ||
-                persistenceBusy
+                interactionBusy
               }
             >
               Siguiente
