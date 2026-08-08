@@ -143,7 +143,8 @@ model User {
   createdAt    DateTime          @default(now()) @db.Timestamptz(3)
   updatedAt    DateTime          @updatedAt @db.Timestamptz(3)
 
-  sessions AuthSession[]
+  sessions        AuthSession[]
+  ownedCharacters Character[] @relation("CharacterOwner")
 
   @@index([status])
   @@map("users")
@@ -175,6 +176,8 @@ model Chronicle {
   createdAt   DateTime        @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime        @updatedAt @db.Timestamptz(3)
 
+  characters Character[] @relation("CharacterChronicle")
+
   @@index([narratorId])
   @@index([status])
   @@map("chronicles")
@@ -188,6 +191,9 @@ model Character {
   revision    Int             @default(1)
   createdAt   DateTime        @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime        @updatedAt @db.Timestamptz(3)
+
+  owner     User       @relation("CharacterOwner", fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  chronicle Chronicle? @relation("CharacterChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   identity      CharacterIdentity?
   creationState CharacterCreationState?

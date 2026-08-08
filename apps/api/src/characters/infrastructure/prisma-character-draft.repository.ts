@@ -1294,7 +1294,7 @@ export class PrismaCharacterDraftRepository
     return this.database.$transaction(
       async (transaction) => {
         const characterData:
-          Prisma.CharacterUpdateManyMutationInput = {
+          Prisma.CharacterUncheckedUpdateManyInput = {
             revision: { increment: 1 },
           }
 

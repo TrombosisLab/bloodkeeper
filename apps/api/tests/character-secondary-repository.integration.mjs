@@ -10,6 +10,21 @@ import {
   PrismaCharacterSecondaryRepository,
 } from '../dist/characters/infrastructure/prisma-character-secondary.repository.js'
 
+
+async function createTestOwner(
+  database,
+  ownerId,
+) {
+  await database.user.create({
+    data: {
+      id: ownerId,
+      username: `character-test-${ownerId}`,
+      displayName: 'Character integration owner',
+      passwordHash: 'integration-test-only',
+    },
+  })
+}
+
 test(
   '028-D persiste datos secundarios con propietario y revisión optimista',
   async () => {
@@ -29,6 +44,11 @@ test(
     await database.$connect()
 
     try {
+      await createTestOwner(
+        database,
+        ownerId,
+      )
+
       const character =
         await database.character.create({
           data: { ownerId },
@@ -182,6 +202,10 @@ test(
           where: { id: characterId },
         })
       }
+
+      await database.user.deleteMany({
+        where: { id: ownerId },
+      })
 
       await database.$disconnect()
     }

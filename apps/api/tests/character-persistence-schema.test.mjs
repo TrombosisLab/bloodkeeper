@@ -168,3 +168,62 @@ test(
     )
   },
 )
+
+test(
+  'SPEC-022 hace explícitas propiedad y crónica con integridad referencial',
+  async () => {
+    const relationalMigration =
+      await readFile(
+        new URL(
+          '../prisma/migrations/20260808220500_add_character_owner_chronicle_relations/migration.sql',
+          import.meta.url,
+        ),
+        'utf8',
+      )
+
+    assert.match(
+      schema,
+      /ownedCharacters\s+Character\[\]\s+@relation\("CharacterOwner"\)/,
+    )
+
+    assert.match(
+      schema,
+      /characters\s+Character\[\]\s+@relation\("CharacterChronicle"\)/,
+    )
+
+    assert.match(
+      schema,
+      /owner\s+User\s+@relation\("CharacterOwner",\s*fields:\s*\[ownerId\],\s*references:\s*\[id\],\s*onDelete:\s*Restrict,\s*onUpdate:\s*Cascade\)/,
+    )
+
+    assert.match(
+      schema,
+      /chronicle\s+Chronicle\?\s+@relation\("CharacterChronicle",\s*fields:\s*\[chronicleId\],\s*references:\s*\[id\],\s*onDelete:\s*Restrict,\s*onUpdate:\s*Cascade\)/,
+    )
+
+    assert.match(
+      relationalMigration,
+      /ADD CONSTRAINT "characters_ownerId_fkey"[\s\S]*FOREIGN KEY \("ownerId"\)[\s\S]*REFERENCES "users"\("id"\)[\s\S]*ON DELETE RESTRICT[\s\S]*ON UPDATE CASCADE/,
+    )
+
+    assert.match(
+      relationalMigration,
+      /ADD CONSTRAINT "characters_chronicleId_fkey"[\s\S]*FOREIGN KEY \("chronicleId"\)[\s\S]*REFERENCES "chronicles"\("id"\)[\s\S]*ON DELETE RESTRICT[\s\S]*ON UPDATE CASCADE/,
+    )
+
+    assert.match(
+      relationalMigration,
+      /RAISE EXCEPTION[\s\S]*orphan character owners exist/,
+    )
+
+    assert.match(
+      relationalMigration,
+      /RAISE EXCEPTION[\s\S]*orphan chronicle references exist/,
+    )
+
+    assert.doesNotMatch(
+      relationalMigration,
+      /\bDELETE\s+FROM\s+"characters"/i,
+    )
+  },
+)

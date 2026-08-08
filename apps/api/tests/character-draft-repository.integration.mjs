@@ -25,6 +25,21 @@ function createSkills(overrides = {}) {
   }
 }
 
+
+async function createTestOwner(
+  database,
+  ownerId,
+) {
+  await database.user.create({
+    data: {
+      id: ownerId,
+      username: `character-test-${ownerId}`,
+      displayName: 'Character integration owner',
+      passwordHash: 'integration-test-only',
+    },
+  })
+}
+
 test(
   '004-D.2 persiste con acceso aislado por propietario',
   async () => {
@@ -39,6 +54,11 @@ test(
     await database.$connect()
 
     try {
+      await createTestOwner(
+        database,
+        ownerId,
+      )
+
       const created = await repository.create({
         ownerId,
         chronicleId: null,
@@ -517,6 +537,10 @@ test(
         })
       }
 
+      await database.user.deleteMany({
+        where: { id: ownerId },
+      })
+
       await database.$disconnect()
     }
   },
@@ -536,6 +560,11 @@ test(
     await database.$connect()
 
     try {
+      await createTestOwner(
+        database,
+        ownerId,
+      )
+
       const created = await repository.create({
         ownerId,
         chronicleId: null,
@@ -650,6 +679,10 @@ test(
           where: { id: characterId },
         })
       }
+
+      await database.user.deleteMany({
+        where: { id: ownerId },
+      })
 
       await database.$disconnect()
     }
