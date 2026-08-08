@@ -1,0 +1,82 @@
+[
+  {
+    "clanKey": "banuHaqim",
+    "kind": "clan",
+    "disciplineKeys": ["bloodSorcery", "celerity", "obfuscate"]
+  },
+  {
+    "clanKey": "brujah",
+    "kind": "clan",
+    "disciplineKeys": ["celerity", "potence", "presence"]
+  },
+  {
+    "clanKey": "caitiff",
+    "kind": "caitiff",
+    "disciplineKeys": []
+  },
+  {
+    "clanKey": "gangrel",
+    "kind": "clan",
+    "disciplineKeys": ["animalism", "fortitude", "protean"]
+  },
+  {
+    "clanKey": "hecata",
+    "kind": "clan",
+    "disciplineKeys": ["auspex", "fortitude", "oblivion"]
+  },
+  {
+    "clanKey": "lasombra",
+    "kind": "clan",
+    "disciplineKeys": ["dominate", "oblivion", "potence"]
+  },
+  {
+    "clanKey": "malkavian",
+    "kind": "clan",
+    "disciplineKeys": ["auspex", "dominate", "obfuscate"]
+  },
+  {
+    "clanKey": "ministry",
+    "kind": "clan",
+    "disciplineKeys": ["obfuscate", "presence", "protean"]
+  },
+  {
+    "clanKey": "nosferatu",
+    "kind": "clan",
+    "disciplineKeys": ["animalism", "obfuscate", "potence"]
+  },
+  {
+    "clanKey": "ravnos",
+    "kind": "clan",
+    "disciplineKeys": ["animalism", "obfuscate", "presence"]
+  },
+  {
+    "clanKey": "salubri",
+    "kind": "clan",
+    "disciplineKeys": ["auspex", "dominate", "fortitude"]
+  },
+  {
+    "clanKey": "thinBlood",
+    "kind": "thinBlood",
+    "disciplineKeys": []
+  },
+  {
+    "clanKey": "toreador",
+    "kind": "clan",
+    "disciplineKeys": ["auspex", "celerity", "presence"]
+  },
+  {
+    "clanKey": "tremere",
+    "kind": "clan",
+    "disciplineKeys": ["auspex", "bloodSorcery", "dominate"]
+  },
+  {
+    "clanKey": "tzimisce",
+    "kind": "clan",
+    "disciplineKeys": ["animalism", "dominate", "protean"]
+  },
+  {
+    "clanKey": "ventrue",
+    "kind": "clan",
+    "disciplineKeys": ["dominate", "fortitude", "presence"]
+  }
+]

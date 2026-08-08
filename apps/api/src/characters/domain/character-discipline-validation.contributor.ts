@@ -35,6 +35,10 @@ interface DisciplineCatalogIndex {
     string,
     CharacterRulesDisciplineDefinition
   >
+  readonly clanAffinities: ReadonlyMap<
+    string,
+    CharacterRulesDisciplineCatalog['clanAffinities'][number]
+  >
   readonly powers: ReadonlyMap<
     string,
     CharacterRulesDisciplinePowerDefinition
@@ -110,6 +114,11 @@ function buildCatalogIndex(
     disciplines: new Map(
       catalog.disciplines.map(
         (definition) => [definition.key, definition],
+      ),
+    ),
+    clanAffinities: new Map(
+      catalog.clanAffinities.map(
+        (definition) => [definition.clanKey, definition],
       ),
     ),
     powers: new Map(
@@ -471,6 +480,102 @@ function validateRelatedAcquisitionStructure(
   }
 
   return issues
+}
+
+function validateInitialClanDisciplines(
+  character: PersistedCharacterDraft,
+  index: DisciplineCatalogIndex,
+  context: CharacterValidationContext,
+): CharacterValidationIssue[] {
+  if (!validatesInitialSelection(context)) {
+    return []
+  }
+
+  const clanKey =
+    character.identity?.clanKey ?? null
+
+  if (clanKey === null) {
+    return []
+  }
+
+  const affinity = index.clanAffinities.get(clanKey)
+
+  if (affinity === undefined) {
+    return [
+      errorIssue(
+        'CHARACTER_DISCIPLINE_CLAN_AFFINITY_UNKNOWN',
+        'identity.clanKey',
+        'No existe una relación canónica Clan-Disciplinas para el Clan seleccionado.',
+        { clanKey },
+      ),
+    ]
+  }
+
+  const creationContributions =
+    character.disciplines.filter(
+      (discipline) =>
+        discipline.origin === 'creation' ||
+        discipline.origin === null,
+    )
+
+  if (affinity.kind === 'thinBlood') {
+    if (creationContributions.length === 0) {
+      return []
+    }
+
+    return [
+      errorIssue(
+        'CHARACTER_DISCIPLINE_CREATION_NOT_ALLOWED_FOR_THIN_BLOOD',
+        'disciplines',
+        'Sangre Débil no puede conservar Disciplinas de creación estándar.',
+        { clanKey },
+      ),
+    ]
+  }
+
+  if (affinity.kind === 'caitiff') {
+    return creationContributions
+      .filter(
+        (discipline) =>
+          discipline.disciplineKey === 'thinBloodAlchemy',
+      )
+      .map(
+        (discipline) =>
+          errorIssue(
+            'CHARACTER_DISCIPLINE_NOT_AVAILABLE_FOR_CLAN',
+            'disciplines',
+            'La Disciplina no está disponible para este Clan durante la creación.',
+            {
+              clanKey,
+              disciplineKey:
+                discipline.disciplineKey,
+            },
+          ),
+      )
+  }
+
+  const allowed = new Set(
+    affinity.disciplineKeys,
+  )
+
+  return creationContributions
+    .filter(
+      (discipline) =>
+        !allowed.has(discipline.disciplineKey),
+    )
+    .map(
+      (discipline) =>
+        errorIssue(
+          'CHARACTER_DISCIPLINE_NOT_AVAILABLE_FOR_CLAN',
+          'disciplines',
+          'La Disciplina no pertenece a las afinidades del Clan durante la creación.',
+          {
+            clanKey,
+            disciplineKey:
+              discipline.disciplineKey,
+          },
+        ),
+    )
 }
 
 function validateCatalogDisciplinesAndPowers(
@@ -941,6 +1046,11 @@ function validatePersistedDisciplineState(
   }
 
   return sectionResult([
+    ...validateInitialClanDisciplines(
+      character,
+      index,
+      context,
+    ),
     ...validateCatalogDisciplinesAndPowers(
       character,
       index,

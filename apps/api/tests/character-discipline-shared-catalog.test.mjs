@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
 import {
@@ -123,6 +124,28 @@ test(
         characterDisciplineCatalog.powers[0],
       ),
       true,
+    )
+  },
+)
+
+test(
+  'SPEC-025 deriva las claves backend del catálogo compartido',
+  async () => {
+    const source = await readFile(
+      new URL(
+        '../src/characters/domain/persisted-character.types.ts',
+        import.meta.url,
+      ),
+      'utf8',
+    )
+
+    assert.match(
+      source,
+      /characterDisciplineCatalog\.disciplines\.map/,
+    )
+    assert.doesNotMatch(
+      source,
+      /export const CHARACTER_DISCIPLINE_KEYS = \[\s*'animalism'/,
     )
   },
 )

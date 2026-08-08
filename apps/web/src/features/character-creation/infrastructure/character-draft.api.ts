@@ -2,6 +2,10 @@ import {
   skillKeys,
 } from '../data/skill-definitions.ts'
 
+import {
+  disciplineKeys,
+} from '../data/discipline-definitions.ts'
+
 import type {
   CharacterDraftApiSnapshot,
   CreateCharacterDraftApiRequest,
@@ -26,20 +30,6 @@ const attributeKeys = [
   'resolve',
 ] as const
 
-const disciplineKeys = [
-  'animalism',
-  'auspex',
-  'bloodSorcery',
-  'celerity',
-  'dominate',
-  'fortitude',
-  'obfuscate',
-  'oblivion',
-  'potence',
-  'presence',
-  'protean',
-  'thinBloodAlchemy',
-] as const
 
 const creationSteps = [
   'identity',

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
 import {
@@ -76,6 +77,43 @@ test(
         characterDisciplineCatalog.powers,
       ),
       true,
+    )
+  },
+)
+
+test(
+  'SPEC-025 Web usa el tipo y las claves del catálogo compartido',
+  async () => {
+    const typeSource = await readFile(
+      new URL(
+        '../src/features/character-creation/types/discipline.types.ts',
+        import.meta.url,
+      ),
+      'utf8',
+    )
+    const gatewaySource = await readFile(
+      new URL(
+        '../src/features/character-creation/infrastructure/character-draft.api.ts',
+        import.meta.url,
+      ),
+      'utf8',
+    )
+
+    assert.match(
+      typeSource,
+      /CharacterRulesDisciplineKey/,
+    )
+    assert.doesNotMatch(
+      typeSource,
+      /\|\s*'animalism'/,
+    )
+    assert.match(
+      gatewaySource,
+      /disciplineKeys/,
+    )
+    assert.doesNotMatch(
+      gatewaySource,
+      /const disciplineKeys = \[/,
     )
   },
 )

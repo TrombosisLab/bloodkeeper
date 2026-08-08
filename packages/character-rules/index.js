@@ -16,6 +16,9 @@ import oblivionCeremonies from './catalogs/oblivion-ceremonies.json' with {
 import thinBloodAlchemyFormulas from './catalogs/thin-blood-alchemy-formulas.json' with {
   type: 'json',
 }
+import clanDisciplineAffinities from './catalogs/clan-discipline-affinities.json' with {
+  type: 'json',
+}
 import advantageDefinitions from './catalogs/advantages.json' with {
   type: 'json',
 }
@@ -67,6 +70,8 @@ export const characterDisciplineCatalog =
       clone(oblivionCeremonies),
     thinBloodAlchemyFormulas:
       clone(thinBloodAlchemyFormulas),
+    clanAffinities:
+      clone(clanDisciplineAffinities),
   })
 
 export const characterAdvantageCatalog =

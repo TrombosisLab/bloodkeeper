@@ -1,20 +1,13 @@
 import type {
+  CharacterRulesDisciplineKey,
+} from '@v5r/character-rules'
+
+import type {
   DisciplinePowerKey,
 } from './discipline-power.types'
 
 export type DisciplineKey =
-  | 'animalism'
-  | 'auspex'
-  | 'bloodSorcery'
-  | 'celerity'
-  | 'dominate'
-  | 'fortitude'
-  | 'obfuscate'
-  | 'oblivion'
-  | 'potence'
-  | 'presence'
-  | 'protean'
-  | 'thinBloodAlchemy'
+  CharacterRulesDisciplineKey
 
 export interface DisciplineDefinition {
   key: DisciplineKey

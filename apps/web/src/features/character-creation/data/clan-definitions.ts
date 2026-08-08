@@ -1,163 +1,66 @@
+import {
+  characterDisciplineCatalog,
+} from '@v5r/character-rules'
+
 import type {
   ClanDefinition,
   ClanKey,
 } from '../types/clan.types.ts'
 
-export const clanDefinitions:
-  ClanDefinition[] = [
-    {
-      key: 'banuHaqim',
-      name: 'Banu Haqim',
-      kind: 'clan',
-      inClanDisciplines: [
-        'bloodSorcery',
-        'celerity',
-        'obfuscate',
-      ],
-    },
-    {
-      key: 'brujah',
-      name: 'Brujah',
-      kind: 'clan',
-      inClanDisciplines: [
-        'celerity',
-        'potence',
-        'presence',
-      ],
-    },
-    {
-      key: 'caitiff',
-      name: 'Caitiff',
-      kind: 'caitiff',
-      inClanDisciplines: [],
-    },
-    {
-      key: 'gangrel',
-      name: 'Gangrel',
-      kind: 'clan',
-      inClanDisciplines: [
-        'animalism',
-        'fortitude',
-        'protean',
-      ],
-    },
-    {
-      key: 'hecata',
-      name: 'Hecata',
-      kind: 'clan',
-      inClanDisciplines: [
-        'auspex',
-        'fortitude',
-        'oblivion',
-      ],
-    },
-    {
-      key: 'lasombra',
-      name: 'Lasombra',
-      kind: 'clan',
-      inClanDisciplines: [
-        'dominate',
-        'oblivion',
-        'potence',
-      ],
-    },
-    {
-      key: 'malkavian',
-      name: 'Malkavian',
-      kind: 'clan',
-      inClanDisciplines: [
-        'auspex',
-        'dominate',
-        'obfuscate',
-      ],
-    },
-    {
-      key: 'ministry',
-      name: 'Ministerio',
-      kind: 'clan',
-      inClanDisciplines: [
-        'obfuscate',
-        'presence',
-        'protean',
-      ],
-    },
-    {
-      key: 'nosferatu',
-      name: 'Nosferatu',
-      kind: 'clan',
-      inClanDisciplines: [
-        'animalism',
-        'obfuscate',
-        'potence',
-      ],
-    },
-    {
-      key: 'ravnos',
-      name: 'Ravnos',
-      kind: 'clan',
-      inClanDisciplines: [
-        'animalism',
-        'obfuscate',
-        'presence',
-      ],
-    },
-    {
-      key: 'salubri',
-      name: 'Salubri',
-      kind: 'clan',
-      inClanDisciplines: [
-        'auspex',
-        'dominate',
-        'fortitude',
-      ],
-    },
-    {
-      key: 'thinBlood',
-      name: 'Sangre Débil',
-      kind: 'thinBlood',
-      inClanDisciplines: [],
-    },
-    {
-      key: 'toreador',
-      name: 'Toreador',
-      kind: 'clan',
-      inClanDisciplines: [
-        'auspex',
-        'celerity',
-        'presence',
-      ],
-    },
-    {
-      key: 'tremere',
-      name: 'Tremere',
-      kind: 'clan',
-      inClanDisciplines: [
-        'auspex',
-        'bloodSorcery',
-        'dominate',
-      ],
-    },
-    {
-      key: 'tzimisce',
-      name: 'Tzimisce',
-      kind: 'clan',
-      inClanDisciplines: [
-        'animalism',
-        'dominate',
-        'protean',
-      ],
-    },
-    {
-      key: 'ventrue',
-      name: 'Ventrue',
-      kind: 'clan',
-      inClanDisciplines: [
-        'dominate',
-        'fortitude',
-        'presence',
-      ],
-    },
+const clanIdentityDefinitions:
+  Omit<ClanDefinition, 'inClanDisciplines'>[] = [
+    { key: 'banuHaqim', name: 'Banu Haqim', kind: 'clan' },
+    { key: 'brujah', name: 'Brujah', kind: 'clan' },
+    { key: 'caitiff', name: 'Caitiff', kind: 'caitiff' },
+    { key: 'gangrel', name: 'Gangrel', kind: 'clan' },
+    { key: 'hecata', name: 'Hecata', kind: 'clan' },
+    { key: 'lasombra', name: 'Lasombra', kind: 'clan' },
+    { key: 'malkavian', name: 'Malkavian', kind: 'clan' },
+    { key: 'ministry', name: 'Ministerio', kind: 'clan' },
+    { key: 'nosferatu', name: 'Nosferatu', kind: 'clan' },
+    { key: 'ravnos', name: 'Ravnos', kind: 'clan' },
+    { key: 'salubri', name: 'Salubri', kind: 'clan' },
+    { key: 'thinBlood', name: 'Sangre Débil', kind: 'thinBlood' },
+    { key: 'toreador', name: 'Toreador', kind: 'clan' },
+    { key: 'tremere', name: 'Tremere', kind: 'clan' },
+    { key: 'tzimisce', name: 'Tzimisce', kind: 'clan' },
+    { key: 'ventrue', name: 'Ventrue', kind: 'clan' },
   ]
+
+const affinitiesByClan =
+  new Map(
+    characterDisciplineCatalog.clanAffinities.map(
+      (affinity) => [
+        affinity.clanKey,
+        affinity,
+      ],
+    ),
+  )
+
+export const clanDefinitions:
+  ClanDefinition[] =
+    clanIdentityDefinitions.map(
+      (clan) => {
+        const affinity =
+          affinitiesByClan.get(clan.key)
+
+        if (
+          affinity === undefined ||
+          affinity.kind !== clan.kind
+        ) {
+          throw new Error(
+            `Afinidades de Clan no disponibles para ${clan.key}`,
+          )
+        }
+
+        return {
+          ...clan,
+          inClanDisciplines: [
+            ...affinity.disciplineKeys,
+          ],
+        }
+      },
+    )
 
 export const clanKeys:
   ClanKey[] =

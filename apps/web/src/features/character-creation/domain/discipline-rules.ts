@@ -25,19 +25,19 @@ export interface DisciplineValidationResult {
   errors: string[]
 }
 
-export const caitiffAvailableDisciplines: DisciplineKey[] = [
-  'animalism',
-  'auspex',
-  'bloodSorcery',
-  'celerity',
-  'dominate',
-  'fortitude',
-  'obfuscate',
-  'oblivion',
-  'potence',
-  'presence',
-  'protean',
-]
+export const caitiffAvailableDisciplines:
+  DisciplineKey[] =
+    disciplineDefinitions
+      .filter(
+        (definition) =>
+          definition.active &&
+          definition.key !==
+            'thinBloodAlchemy',
+      )
+      .map(
+        (definition) =>
+          definition.key,
+      )
 
 export function getAvailableDisciplinesForClan(
   clanKey: ClanKey,

@@ -271,3 +271,67 @@ test(
     ])
   },
 )
+
+test(
+  'SPEC-025 rechaza una Disciplina de creación ajena al Clan',
+  () => {
+    const value = character({
+      identity: {
+        clanKey: 'brujah',
+      },
+      disciplines: [
+        {
+          disciplineKey: 'auspex',
+          rating: 1,
+          powerKeys: [
+            'auspex-heightened-senses',
+          ],
+          origin: 'creation',
+        },
+      ],
+    })
+
+    const result = validate(
+      value,
+      'activation',
+    )
+
+    assert.equal(result.state, 'invalid')
+    assert.ok(
+      codes(result).includes(
+        'CHARACTER_DISCIPLINE_NOT_AVAILABLE_FOR_CLAN',
+      ),
+    )
+  },
+)
+
+test(
+  'SPEC-025 no aplica la afinidad inicial a contribuciones de Depredador',
+  () => {
+    const value = character({
+      identity: {
+        clanKey: 'brujah',
+      },
+      disciplines: [
+        {
+          disciplineKey: 'obfuscate',
+          rating: 1,
+          powerKeys: [
+            'obfuscate-silence-of-death',
+          ],
+          origin: 'predatorType',
+        },
+      ],
+    })
+
+    const result =
+      validate(value, 'evolution')
+
+    assert.equal(
+      codes(result).includes(
+        'CHARACTER_DISCIPLINE_NOT_AVAILABLE_FOR_CLAN',
+      ),
+      false,
+    )
+  },
+)

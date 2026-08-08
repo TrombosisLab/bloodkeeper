@@ -6,6 +6,7 @@ const powers = require('./catalogs/discipline-powers.json')
 const bloodSorceryRituals = require('./catalogs/blood-sorcery-rituals.json')
 const oblivionCeremonies = require('./catalogs/oblivion-ceremonies.json')
 const thinBloodAlchemyFormulas = require('./catalogs/thin-blood-alchemy-formulas.json')
+const clanDisciplineAffinities = require('./catalogs/clan-discipline-affinities.json')
 const advantageDefinitions = require('./catalogs/advantages.json')
 const predatorTypes = require('./catalogs/predator-types.json')
 const skills = require('./catalogs/skills.json')
@@ -51,6 +52,8 @@ const characterDisciplineCatalog =
       clone(oblivionCeremonies),
     thinBloodAlchemyFormulas:
       clone(thinBloodAlchemyFormulas),
+    clanAffinities:
+      clone(clanDisciplineAffinities),
   })
 
 const characterAdvantageCatalog =

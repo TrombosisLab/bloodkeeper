@@ -195,6 +195,18 @@ export interface CharacterRulesThinBloodAlchemyFormulaDefinition {
   readonly tags?: readonly string[]
 }
 
+export type CharacterRulesClanKind =
+  | 'clan'
+  | 'caitiff'
+  | 'thinBlood'
+
+export interface CharacterRulesClanDisciplineAffinity {
+  readonly clanKey: string
+  readonly kind: CharacterRulesClanKind
+  readonly disciplineKeys:
+    readonly CharacterRulesDisciplineKey[]
+}
+
 export interface CharacterRulesDisciplineCatalog {
   readonly disciplines:
     readonly CharacterRulesDisciplineDefinition[]
@@ -206,6 +218,8 @@ export interface CharacterRulesDisciplineCatalog {
     readonly CharacterRulesOblivionCeremonyDefinition[]
   readonly thinBloodAlchemyFormulas:
     readonly CharacterRulesThinBloodAlchemyFormulaDefinition[]
+  readonly clanAffinities:
+    readonly CharacterRulesClanDisciplineAffinity[]
 }
 
 

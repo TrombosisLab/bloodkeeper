@@ -1,8 +1,10 @@
 import {
+  characterDisciplineCatalog,
   characterSkillCatalog,
 } from '@v5r/character-rules'
 
 import type {
+  CharacterRulesDisciplineKey,
   CharacterRulesSkillKey,
 } from '@v5r/character-rules'
 
@@ -112,23 +114,14 @@ export interface PersistedCharacterSkillSpecialty {
   origin: SkillSpecialtyOrigin | null
 }
 
-export const CHARACTER_DISCIPLINE_KEYS = [
-  'animalism',
-  'auspex',
-  'bloodSorcery',
-  'celerity',
-  'dominate',
-  'fortitude',
-  'obfuscate',
-  'oblivion',
-  'potence',
-  'presence',
-  'protean',
-  'thinBloodAlchemy',
-] as const
+export const CHARACTER_DISCIPLINE_KEYS:
+  readonly CharacterRulesDisciplineKey[] =
+    characterDisciplineCatalog.disciplines.map(
+      (definition) => definition.key,
+    )
 
 export type CharacterDisciplineKey =
-  typeof CHARACTER_DISCIPLINE_KEYS[number]
+  CharacterRulesDisciplineKey
 
 export type CharacterDisciplineOrigin =
   | 'creation'
