@@ -43,6 +43,20 @@ export type CharacterRulesAttributeKey =
   | 'wits'
   | 'resolve'
 
+export interface CharacterRulesDerivedAttributes {
+  readonly stamina: number
+  readonly composure: number
+  readonly resolve: number
+}
+
+export function deriveCharacterHealthCapacity(
+  attributes: CharacterRulesDerivedAttributes,
+): number
+
+export function deriveCharacterWillpowerCapacity(
+  attributes: CharacterRulesDerivedAttributes,
+): number
+
 export type CharacterRulesSkillKey =
   | 'athletics'
   | 'brawl'

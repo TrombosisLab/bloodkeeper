@@ -41,6 +41,10 @@ import {
 } from './application/update-character-draft.use-case'
 
 import {
+  UpdateCharacterStateUseCase,
+} from './application/update-character-state.use-case'
+
+import {
   UpdateCharacterSecondaryUseCase,
 } from './application/update-character-secondary.use-case'
 
@@ -96,6 +100,10 @@ import {
 import {
   CharacterLifecycleController,
 } from './presentation/character-lifecycle.controller'
+
+import {
+  CharacterStateController,
+} from './presentation/character-state.controller'
 
 import {
   CharacterSecondaryController,
@@ -156,6 +164,13 @@ const useCaseProviders = [
     ) => new UpdateCharacterDraftUseCase(repository),
   },
   {
+    provide: UpdateCharacterStateUseCase,
+    inject: [CHARACTER_DRAFT_REPOSITORY],
+    useFactory: (
+      repository: PrismaCharacterDraftRepository,
+    ) => new UpdateCharacterStateUseCase(repository),
+  },
+  {
     provide: LoadCharacterSecondaryUseCase,
     inject: [CHARACTER_SECONDARY_REPOSITORY],
     useFactory: (
@@ -211,6 +226,7 @@ const useCaseProviders = [
   controllers: [
     CharacterDraftController,
     CharacterLifecycleController,
+    CharacterStateController,
     CharacterSecondaryController,
     CharacterValidationController,
   ],
@@ -260,6 +276,7 @@ const useCaseProviders = [
     ListCharacterDraftsUseCase,
     LoadCharacterSecondaryUseCase,
     UpdateCharacterDraftUseCase,
+    UpdateCharacterStateUseCase,
     UpdateCharacterSecondaryUseCase,
     ValidateCharacterUseCase,
     TransitionCharacterLifecycleUseCase,

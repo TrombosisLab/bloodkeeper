@@ -22,7 +22,7 @@ const headerStyles = await readSource(
 )
 
 test(
-  '006-I mantiene la ficha en solo lectura hasta una acción explícita',
+  '006-I mantiene solo lectura hasta una acción explícita',
   () => {
     assert.match(
       characterSheet,
@@ -45,23 +45,35 @@ test(
 )
 
 test(
-  '006-I conecta daño y Humanidad con sus controles de dominio',
+  'SPEC-024 conecta daño y Humanidad a persistencia sin incluir Hambre',
   () => {
     assert.match(
       characterSheet,
-      /onHealthChange={setHealth}/,
+      /handleHealthChange/,
     )
     assert.match(
       characterSheet,
-      /onWillpowerChange={setWillpower}/,
+      /handleWillpowerChange/,
     )
     assert.match(
       characterSheet,
-      /onHumanityChange={setHumanity}/,
+      /handleHumanityChange/,
     )
     assert.match(
       characterSheet,
-      /onHungerChange={setHunger}/,
+      /damage:\s*\{/,
+    )
+    assert.match(
+      characterSheet,
+      /humanityValue:/,
+    )
+    assert.match(
+      characterSheet,
+      /humanityStains:/,
+    )
+    assert.match(
+      characterSheet,
+      /hungerEditing=\{\s*!persisted && stateEditing\s*\}/,
     )
     assert.match(
       characterTrackers,
@@ -69,13 +81,13 @@ test(
     )
     assert.match(
       characterState,
-      /mode="editable"/,
+      /hungerEditing = stateEditing/,
     )
   },
 )
 
 test(
-  '006-I declara que la edición de demostración no persiste',
+  '006-I conserva la edición local de demostración',
   () => {
     assert.match(
       characterSheet,
@@ -85,6 +97,5 @@ test(
       characterSheet,
       /Los cambios no\s+se guardan/,
     )
-    assert.match(characterSheet, /role="status"/)
   },
 )

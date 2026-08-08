@@ -42,6 +42,18 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value))
 }
 
+export function deriveCharacterHealthCapacity(
+  attributes,
+) {
+  return attributes.stamina + 3
+}
+
+export function deriveCharacterWillpowerCapacity(
+  attributes,
+) {
+  return attributes.composure + attributes.resolve
+}
+
 export const characterRulesCatalogManifest =
   deepFreeze(clone(manifest))
 

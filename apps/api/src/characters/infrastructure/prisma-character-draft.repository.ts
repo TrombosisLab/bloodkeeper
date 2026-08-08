@@ -1,3 +1,11 @@
+import {
+  CharacterStateWriteConflictError,
+} from '../application/character-draft.repository'
+
+import type {
+  UpdateCharacterStateData,
+} from '../domain/character-state.types'
+
 import { Injectable } from '@nestjs/common'
 
 import {
@@ -1737,6 +1745,93 @@ export class PrismaCharacterDraftRepository
             where: { id: data.characterId },
             include: characterRelations,
           })
+
+        return toPersistedDraft(row)
+      },
+    )
+  }
+
+  async updateState(
+    ownerId: string,
+    data: UpdateCharacterStateData,
+  ): Promise<PersistedCharacterDraft> {
+    return this.database.$transaction(
+      async (transaction) => {
+        const claimed =
+          await transaction.character.updateMany({
+            where: {
+              id: data.characterId,
+              ownerId,
+              revision: data.expectedRevision,
+              status: {
+                in: [
+                  PrismaCharacterStatus.DRAFT,
+                  PrismaCharacterStatus.ACTIVE,
+                ],
+              },
+            },
+            data: {
+              revision: { increment: 1 },
+            },
+          })
+
+        if (claimed.count !== 1) {
+          throw new CharacterStateWriteConflictError(
+            data.characterId,
+          )
+        }
+
+        if (data.damage !== undefined) {
+          await transaction.characterDamageState
+            .update({
+              where: {
+                characterId: data.characterId,
+              },
+              data: {
+                healthSuperficial:
+                  data.damage.health.superficial,
+                healthAggravated:
+                  data.damage.health.aggravated,
+                willpowerSuperficial:
+                  data.damage.willpower.superficial,
+                willpowerAggravated:
+                  data.damage.willpower.aggravated,
+              },
+            })
+        }
+
+        if (data.humanityValue !== undefined) {
+          await transaction.characterHumanityState
+            .update({
+              where: {
+                characterId: data.characterId,
+              },
+              data: {
+                value: data.humanityValue,
+              },
+            })
+        }
+
+        if (data.humanityStains !== undefined) {
+          await transaction.characterHumanityState
+            .update({
+              where: {
+                characterId: data.characterId,
+              },
+              data: {
+                stains: data.humanityStains,
+              },
+            })
+        }
+
+        const row =
+          await transaction.character
+            .findUniqueOrThrow({
+              where: {
+                id: data.characterId,
+              },
+              include: characterRelations,
+            })
 
         return toPersistedDraft(row)
       },

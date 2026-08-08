@@ -1,3 +1,8 @@
+import {
+  deriveCharacterHealthCapacity,
+  deriveCharacterWillpowerCapacity,
+} from '@v5r/character-rules'
+
 import type {
   CharacterAttributesDraft,
 } from '../types/character-attributes-draft.types'
@@ -138,11 +143,10 @@ export function deriveCharacterTraits(
 ): CharacterDerivedTraits {
   return {
     health:
-      attributes.stamina + 3,
+      deriveCharacterHealthCapacity(attributes),
 
     willpower:
-      attributes.composure +
-      attributes.resolve,
+      deriveCharacterWillpowerCapacity(attributes),
   }
 }
 

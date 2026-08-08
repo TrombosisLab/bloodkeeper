@@ -1,3 +1,8 @@
+import {
+  deriveCharacterHealthCapacity,
+  deriveCharacterWillpowerCapacity,
+} from '@v5r/character-rules'
+
 import type {
   PersistedCharacterAttributes,
   PersistedCharacterDamageState,
@@ -25,13 +30,13 @@ export class InvalidCharacterDamageStateError
 export function deriveHealthCapacity(
   attributes: PersistedCharacterAttributes,
 ): number {
-  return attributes.stamina + 3
+  return deriveCharacterHealthCapacity(attributes)
 }
 
 export function deriveWillpowerCapacity(
   attributes: PersistedCharacterAttributes,
 ): number {
-  return attributes.composure + attributes.resolve
+  return deriveCharacterWillpowerCapacity(attributes)
 }
 
 function hasInvalidCount(

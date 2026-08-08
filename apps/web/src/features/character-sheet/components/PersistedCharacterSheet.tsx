@@ -23,6 +23,10 @@ import type {
 } from '../domain/persisted-character-sheet.loader'
 
 import type {
+  CharacterOperationalStateSnapshot,
+} from '../types/character-state-persistence.types'
+
+import type {
   CharacterSheetModel,
 } from '../types/character-sheet-model.types'
 
@@ -44,6 +48,32 @@ type LoadState =
   | {
       kind: CharacterSheetLoadFailureState
     }
+
+function withOperationalState(
+  model: CharacterSheetModel,
+  snapshot: CharacterOperationalStateSnapshot,
+): CharacterSheetModel {
+  return {
+    ...model,
+    revision: snapshot.revision,
+    status: snapshot.status,
+    damage: {
+      ...model.damage,
+      health: {
+        ...snapshot.damage.health,
+      },
+      willpower: {
+        ...snapshot.damage.willpower,
+      },
+    },
+    state: {
+      ...model.state,
+      humanity: {
+        ...snapshot.humanity,
+      },
+    },
+  }
+}
 
 export function PersistedCharacterSheet({
   characterId,
@@ -127,6 +157,25 @@ export function PersistedCharacterSheet({
           loadState.model.characterId
         }
         model={loadState.model}
+        onStateSaved={(snapshot) => {
+          setLoadState((current) =>
+            current.kind === 'ready'
+              ? {
+                  kind: 'ready',
+                  model:
+                    withOperationalState(
+                      current.model,
+                      snapshot,
+                    ),
+                }
+              : current,
+          )
+        }}
+        onStateReload={() =>
+          setReloadVersion(
+            (version) => version + 1,
+          )
+        }
       />
     )
   }

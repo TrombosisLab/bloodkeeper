@@ -12,6 +12,7 @@ interface CharacterStateProps {
   hunger: number
   bloodPotency?: number
   stateEditing: boolean
+  hungerEditing?: boolean
   onHumanityChange: (
     state: CharacterHumanityState,
   ) => void
@@ -26,6 +27,7 @@ export function CharacterState({
   bloodPotency =
     demoState.bloodPotency,
   stateEditing,
+  hungerEditing = stateEditing,
   onHumanityChange,
   onHungerChange,
 }: CharacterStateProps) {
@@ -90,7 +92,7 @@ export function CharacterState({
             <small>Máximo 5</small>
           </div>
 
-          {stateEditing ? (
+          {hungerEditing ? (
             <HungerTrack
               value={hunger}
               mode="editable"

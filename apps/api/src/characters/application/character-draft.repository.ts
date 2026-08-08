@@ -1,4 +1,8 @@
 import type {
+  UpdateCharacterStateData,
+} from '../domain/character-state.types'
+
+import type {
   CreateCharacterDraftData,
   PersistedCharacterDraft,
   TransitionCharacterLifecycleData,
@@ -27,6 +31,11 @@ export interface CharacterDraftRepository {
     data: UpdateCharacterDraftData,
   ): Promise<PersistedCharacterDraft>
 
+  updateState(
+    ownerId: string,
+    data: UpdateCharacterStateData,
+  ): Promise<PersistedCharacterDraft>
+
   transitionLifecycle(
     ownerId: string,
     data: TransitionCharacterLifecycleData,
@@ -40,6 +49,16 @@ export class CharacterDraftWriteConflictError
       `Character draft ${characterId} was not found or has changed`,
     )
     this.name = 'CharacterDraftWriteConflictError'
+  }
+}
+
+export class CharacterStateWriteConflictError
+  extends Error {
+  constructor(characterId: string) {
+    super(
+      `Character state ${characterId} was not found or has changed`,
+    )
+    this.name = 'CharacterStateWriteConflictError'
   }
 }
 

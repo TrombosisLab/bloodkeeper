@@ -1,4 +1,8 @@
-import { useState } from 'react'
+import {
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 
 import { demoCharacter } from '../data/demo-character'
 
@@ -8,6 +12,20 @@ import {
 } from '../data/demo-trackers'
 
 import { demoState } from '../data/demo-state'
+
+import {
+  CharacterStateApiError,
+  createCharacterStateGateway,
+} from '../infrastructure/character-state.api'
+
+import type {
+  CharacterStateGateway,
+} from '../infrastructure/character-state.api'
+
+import type {
+  CharacterOperationalStateSnapshot,
+  CharacterOperationalStateUpdate,
+} from '../types/character-state-persistence.types'
 
 import type {
   CharacterSheetModel,
@@ -29,17 +47,81 @@ import { PersistedCharacterValidation } from './PersistedCharacterValidation'
 interface CharacterSheetProps {
   characterId?: string
   model?: CharacterSheetModel
+  stateGateway?: CharacterStateGateway
+  onStateSaved?: (
+    snapshot: CharacterOperationalStateSnapshot,
+  ) => void
+  onStateReload?: () => void
+}
+
+type StatePersistenceState =
+  | 'ready'
+  | 'saving'
+  | 'unauthorized'
+  | 'not-found'
+  | 'conflict'
+  | 'error'
+
+function persistenceStateForError(
+  error: unknown,
+): StatePersistenceState {
+  if (error instanceof CharacterStateApiError) {
+    if (error.status === 401) return 'unauthorized'
+    if (error.status === 404) return 'not-found'
+    if (error.status === 409) return 'conflict'
+  }
+
+  return 'error'
+}
+
+function persistenceMessage(
+  state: StatePersistenceState,
+): string | null {
+  switch (state) {
+    case 'saving':
+      return 'Guardando Salud, Voluntad, Humanidad y Manchas…'
+    case 'unauthorized':
+      return 'La sesión ya no permite guardar estos estados.'
+    case 'not-found':
+      return 'El personaje ya no está disponible para guardar estados.'
+    case 'conflict':
+      return 'La ficha cambió en otra operación. Recárgala antes de continuar.'
+    case 'error':
+      return 'No se pudieron guardar los estados del personaje.'
+    case 'ready':
+      return null
+  }
 }
 
 export function CharacterSheet({
   characterId,
   model,
+  stateGateway,
+  onStateSaved,
+  onStateReload,
 }: CharacterSheetProps) {
   const persisted =
     model !== undefined
 
+  const resolvedStateGateway =
+    useMemo(
+      () =>
+        persisted
+          ? (
+              stateGateway ??
+              createCharacterStateGateway()
+            )
+          : null,
+      [persisted, stateGateway],
+    )
+
   const [stateEditing, setStateEditing] =
     useState(false)
+
+  const [statePersistence, setStatePersistence] =
+    useState<StatePersistenceState>('ready')
+
+  const stateSaving = useRef(false)
 
   const [health, setHealth] = useState(
     () => ({
@@ -77,6 +159,136 @@ export function CharacterSheet({
         demoState.hunger,
     )
 
+  const persistedStateEditable =
+    persisted &&
+    model.status !== 'archived' &&
+    resolvedStateGateway !== null
+
+  async function persistState(
+    changes: CharacterOperationalStateUpdate,
+    rollback: () => void,
+  ): Promise<void> {
+    if (
+      !persistedStateEditable ||
+      resolvedStateGateway === null ||
+      stateSaving.current
+    ) {
+      return
+    }
+
+    stateSaving.current = true
+    setStatePersistence('saving')
+
+    try {
+      const saved =
+        await resolvedStateGateway.update(
+          model.characterId,
+          model.revision,
+          changes,
+        )
+
+      setStatePersistence('ready')
+      setStateEditing(false)
+      onStateSaved?.(saved)
+    } catch (error: unknown) {
+      rollback()
+      setStateEditing(false)
+      setStatePersistence(
+        persistenceStateForError(error),
+      )
+    } finally {
+      stateSaving.current = false
+    }
+  }
+
+  function handleHealthChange(
+    nextHealth: typeof health,
+  ): void {
+    if (!persisted) {
+      setHealth(nextHealth)
+      return
+    }
+
+    if (!stateEditing) return
+
+    const previous = health
+    setHealth(nextHealth)
+
+    void persistState(
+      {
+        damage: {
+          health: nextHealth,
+          willpower,
+        },
+      },
+      () => setHealth(previous),
+    )
+  }
+
+  function handleWillpowerChange(
+    nextWillpower: typeof willpower,
+  ): void {
+    if (!persisted) {
+      setWillpower(nextWillpower)
+      return
+    }
+
+    if (!stateEditing) return
+
+    const previous = willpower
+    setWillpower(nextWillpower)
+
+    void persistState(
+      {
+        damage: {
+          health,
+          willpower: nextWillpower,
+        },
+      },
+      () => setWillpower(previous),
+    )
+  }
+
+  function handleHumanityChange(
+    nextHumanity: typeof humanity,
+  ): void {
+    if (!persisted) {
+      setHumanity(nextHumanity)
+      return
+    }
+
+    if (!stateEditing) return
+
+    const previous = humanity
+    setHumanity(nextHumanity)
+
+    void persistState(
+      {
+        humanityValue:
+          nextHumanity.value,
+        humanityStains:
+          nextHumanity.stains,
+      },
+      () => setHumanity(previous),
+    )
+  }
+
+  function handleHungerChange(
+    nextHunger: number,
+  ): void {
+    if (persisted) return
+    setHunger(nextHunger)
+  }
+
+  const persistenceStatus =
+    persistenceMessage(statePersistence)
+
+  const canRetryPersistence =
+    persisted &&
+    statePersistence !== 'ready' &&
+    statePersistence !== 'saving' &&
+    onStateReload !== undefined
+
   return (
     <article className="character-sheet">
       <header className="sheet-header">
@@ -89,11 +301,17 @@ export function CharacterSheet({
         </div>
 
         <div className="sheet-header__actions">
-          {!persisted ? (
+          {(
+            !persisted ||
+            persistedStateEditable
+          ) ? (
             <button
               type="button"
               className="sheet-header__state-edit"
               aria-pressed={stateEditing}
+              disabled={
+                statePersistence === 'saving'
+              }
               onClick={() =>
                 setStateEditing(
                   (editing) => !editing,
@@ -113,13 +331,41 @@ export function CharacterSheet({
       </header>
 
       {persisted ? (
-        <p
+        <div
           className="sheet-edit-notice"
           role="status"
+          aria-live="polite"
         >
-          Ficha persistida · revisión{' '}
-          {model.revision}
-        </p>
+          <span>
+            {persistenceStatus ??
+              (
+                model.status === 'archived'
+                  ? (
+                      `Ficha persistida · revisión ${model.revision} · archivada · estados en solo lectura`
+                    )
+                  : stateEditing
+                    ? (
+                        'Edición persistida de Salud, Voluntad, Humanidad y Manchas. Hambre permanece en solo lectura.'
+                      )
+                    : (
+                        `Ficha persistida · revisión ${model.revision}`
+                      )
+              )}
+          </span>
+
+          {canRetryPersistence ? (
+            <>
+              {' '}
+              <button
+                type="button"
+                className="sheet-header__state-edit"
+                onClick={onStateReload}
+              >
+                Recargar ficha
+              </button>
+            </>
+          ) : null}
+        </div>
       ) : stateEditing ? (
         <p
           className="sheet-edit-notice"
@@ -147,11 +393,11 @@ export function CharacterSheet({
         willpowerCapacity={
           model?.damage.willpowerCapacity
         }
-        stateEditing={
-          !persisted && stateEditing
+        stateEditing={stateEditing}
+        onHealthChange={handleHealthChange}
+        onWillpowerChange={
+          handleWillpowerChange
         }
-        onHealthChange={setHealth}
-        onWillpowerChange={setWillpower}
       />
 
       <CharacterSkills
@@ -164,11 +410,16 @@ export function CharacterSheet({
         bloodPotency={
           model?.state.bloodPotency
         }
-        stateEditing={
+        stateEditing={stateEditing}
+        hungerEditing={
           !persisted && stateEditing
         }
-        onHumanityChange={setHumanity}
-        onHungerChange={setHunger}
+        onHumanityChange={
+          handleHumanityChange
+        }
+        onHungerChange={
+          handleHungerChange
+        }
       />
 
       <CharacterDisciplines
