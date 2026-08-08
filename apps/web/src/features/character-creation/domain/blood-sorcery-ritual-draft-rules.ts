@@ -3,6 +3,10 @@ import {
 } from '../data/blood-sorcery-ritual-definitions.ts'
 
 import {
+  skillKeys,
+} from '../data/skill-definitions.ts'
+
+import {
   getDisciplineValue,
 } from './discipline-rules.ts'
 
@@ -22,9 +26,17 @@ import {
   normalizeCharacterDraft,
 } from './character-draft-normalization.ts'
 
+import {
+  resolvePredatorTypeCreationSkills,
+} from './predator-type-skill-grant-rules.ts'
+
 import type {
   CharacterDraft,
 } from '../types/character-draft.types'
+
+import type {
+  CharacterSkillsDraft,
+} from '../types/character-skills-draft.types'
 
 import type {
   CharacterBloodSorceryRitualsDraft,
@@ -85,14 +97,42 @@ export type CharacterDraftUpdater =
  * La UI proporciona únicamente la transformación.
  * Las reglas de consistencia permanecen en dominio.
  */
+export interface CharacterDraftUpdateOptions {
+  creationSkills?: CharacterSkillsDraft
+}
+
 export function applyCharacterDraftUpdate(
   current: CharacterDraft,
   updater: CharacterDraftUpdater,
+  options: CharacterDraftUpdateOptions = {},
 ): CharacterDraft {
+  const currentCreationSkills =
+    resolvePredatorTypeCreationSkills(
+      current,
+    )
+
   const updated =
     updater(current)
 
+  const inferredCreationSkills =
+    skillKeys.reduce(
+      (skills, key) => {
+        skills[key] =
+          updated.skills[key] ===
+          current.skills[key]
+            ? currentCreationSkills[key]
+            : updated.skills[key]
+
+        return skills
+      },
+      {
+        ...currentCreationSkills,
+      },
+    )
+
   return normalizeCharacterDraft(
     updated,
+    options.creationSkills ??
+      inferredCreationSkills,
   )
 }

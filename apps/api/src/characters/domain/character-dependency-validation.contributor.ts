@@ -28,6 +28,10 @@ import type {
   PersistedCharacterThinBloodTrait,
 } from './persisted-character.types'
 
+import {
+  resolvePredatorTypeValidationSpecialties,
+} from './predator-type-skill-grant.rules'
+
 import type {
   CharacterValidationContributor,
 } from './character-validator'
@@ -758,21 +762,18 @@ function eligibleChoiceGrants(
   choice: CharacterRulesPredatorTypeChoice,
   clanKey: string | null,
 ): readonly CharacterRulesPredatorTypeChoiceGrant[] {
-  const unconditional = choice.options.filter(
-    (option) => option.when === undefined,
-  )
-
-  if (unconditional.length > 1) {
-    return unconditional.map((option) => option.grant)
-  }
-
-  for (const option of choice.options) {
-    if (optionConditionMatches(option, clanKey)) {
-      return [option.grant]
-    }
-  }
-
-  return []
+  return choice.options
+    .filter(
+      (option) =>
+        optionConditionMatches(
+          option,
+          clanKey,
+        ),
+    )
+    .map(
+      (option) =>
+        option.grant,
+    )
 }
 
 function isInitialMatch(
@@ -1337,7 +1338,10 @@ function validatePredatorEffects(
           discipline.origin === 'predatorType',
       ),
     specialties:
-      character.skillSpecialties.filter(
+      resolvePredatorTypeValidationSpecialties(
+        character,
+        definition,
+      ).filter(
         (specialty) =>
           specialty.origin === 'predatorType',
       ),
@@ -1565,6 +1569,17 @@ function validatePredatorType(
     }
 
     return []
+  }
+
+  if (character.identity.clanKey === 'thinBlood') {
+    return [
+      errorIssue(
+        'CHARACTER_PREDATOR_TYPE_THIN_BLOOD_FORBIDDEN',
+        'identity.predatorTypeKey',
+        'Los Sangre Débil no pueden tener Tipo de Depredador.',
+        { predatorTypeKey },
+      ),
+    ]
   }
 
   const definition = index.predatorTypes.get(predatorTypeKey)

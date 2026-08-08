@@ -16,6 +16,10 @@ import {
 } from '../domain/character-attribute-skill.rules'
 
 import {
+  resolvePredatorTypeCreationSkills,
+} from '../domain/predator-type-skill-grant.rules'
+
+import {
   assertValidCharacterDamageState,
 } from '../domain/character-damage.rules'
 
@@ -45,9 +49,15 @@ export class UpdateCharacterDraftUseCase {
       data.attributes !== undefined ||
       data.skills !== undefined ||
       data.skillSpecialties !== undefined ||
+      data.identity?.predatorTypeKey !==
+        undefined ||
+      data.identity?.clanKey !==
+        undefined ||
       data.creation?.skillDistributionMethod !==
         undefined ||
-      data.creation?.currentStep !== undefined
+      data.creation?.currentStep !== undefined ||
+      data.creation?.predatorTypeChoices !==
+        undefined
 
     const changesDamageState =
       data.damage !== undefined ||
@@ -89,20 +99,48 @@ export class UpdateCharacterDraftUseCase {
       }
 
       if (changesAttributeSkillState) {
+        const skills = {
+          ...current.skills,
+          ...data.skills,
+        }
+
+        const skillSpecialties =
+          data.skillSpecialties ??
+          current.skillSpecialties
+
+        const creation = {
+          ...current.creation,
+          ...data.creation,
+          predatorTypeChoices:
+            data.creation
+              ?.predatorTypeChoices ??
+            current.creation
+              .predatorTypeChoices ??
+            {},
+        }
+
+        const skillGrantState = {
+          identity: {
+            ...current.identity,
+            ...data.identity,
+          },
+          skills,
+          skillSpecialties,
+          creation,
+        }
+
+        const creationSkills =
+          resolvePredatorTypeCreationSkills(
+            skillGrantState,
+          )
+
         assertValidCharacterAttributeSkillState(
           attributes,
-          {
-            ...current.skills,
-            ...data.skills,
-          },
-          data.creation
-            ?.skillDistributionMethod ??
-            current.creation
-              .skillDistributionMethod,
-          data.creation?.currentStep ??
-            current.creation.currentStep,
-          data.skillSpecialties ??
-            current.skillSpecialties,
+          creationSkills,
+          creation.skillDistributionMethod,
+          creation.currentStep,
+          skillSpecialties,
+          skills,
         )
       }
 

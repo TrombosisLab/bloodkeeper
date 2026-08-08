@@ -15,12 +15,8 @@ import {
 } from '../domain/predator-type-rules'
 
 import {
-  PredatorTypeChoiceSelector,
-} from './PredatorTypeChoiceSelector'
-
-import {
-  PredatorTypeAdvantageSummary,
-} from './PredatorTypeAdvantageSummary'
+  PredatorTypeConfiguration,
+} from './PredatorTypeConfiguration'
 
 import type {
   ClanKey,
@@ -34,10 +30,16 @@ import type {
   CharacterIdentityDraft,
 } from '../types/character-identity-draft.types'
 
+import type {
+  CharacterAdvantagesDraft,
+} from '../types/character-advantages-draft.types'
+
 interface IdentityStepProps {
   value: CharacterIdentityDraft
 
   choiceSelections: Record<string, number>
+
+  advantages: CharacterAdvantagesDraft
 
   onChange: (
     value: CharacterIdentityDraft,
@@ -45,6 +47,10 @@ interface IdentityStepProps {
 
   onChoiceSelectionsChange: (
     value: Record<string, number>,
+  ) => void
+
+  onAdvantagesChange: (
+    value: CharacterAdvantagesDraft,
   ) => void
 }
 
@@ -57,11 +63,16 @@ type TextIdentityFieldName =
 export function IdentityStep({
   value,
   choiceSelections,
+  advantages,
   onChange,
   onChoiceSelectionsChange,
+  onAdvantagesChange,
 }: IdentityStepProps) {
   const predatorTypeOptions =
     getPredatorTypeOptions()
+
+  const predatorTypeForbidden =
+    value.clan === 'thinBlood'
 
   function updateField(
     event: ChangeEvent<
@@ -190,9 +201,12 @@ export function IdentityStep({
             name="predatorType"
             value={value.predatorType}
             onChange={updateField}
+            disabled={predatorTypeForbidden}
           >
             <option value="">
-              Selecciona tipo
+              {predatorTypeForbidden
+                ? 'No disponible para Sangre Débil'
+                : 'Selecciona tipo'}
             </option>
 
             {predatorTypeOptions.map(
@@ -206,26 +220,30 @@ export function IdentityStep({
               ),
             )}
           </select>
+
+          {predatorTypeForbidden ? (
+            <small>
+              Los Sangre Débil no tienen Tipo de Depredador.
+            </small>
+          ) : null}
         </label>
 
-        <PredatorTypeChoiceSelector
-          predatorTypeKey={
-            value.predatorType
-          }
-          clanKey={value.clan}
-          value={choiceSelections}
-          onChange={
-            onChoiceSelectionsChange
-          }
-        />
-
-        <PredatorTypeAdvantageSummary
+        <PredatorTypeConfiguration
           predatorTypeKey={
             value.predatorType
           }
           clanKey={value.clan}
           choiceSelections={
             choiceSelections
+          }
+          advantages={
+            advantages
+          }
+          onChoiceSelectionsChange={
+            onChoiceSelectionsChange
+          }
+          onAdvantagesChange={
+            onAdvantagesChange
           }
         />
 

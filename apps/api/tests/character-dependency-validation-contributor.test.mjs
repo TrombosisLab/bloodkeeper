@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
 import {
@@ -700,5 +701,61 @@ test(
     assert.deepEqual(codes(result), [
       'CHARACTER_CATALOG_DEPENDENCY_VALIDATION_PENDING',
     ])
+  },
+)
+
+
+test(
+  'SPEC-021 Sangre Débil no admite Tipo de Depredador',
+  () => {
+    const result = validate(
+      character({
+        identity: {
+          clanKey: 'thinBlood',
+          predatorTypeKey: 'sandman',
+          generation: 14,
+        },
+        blood: {
+          bloodPotency: 0,
+        },
+        disciplines: [],
+        skillSpecialties: [],
+        advantages: {
+          selections: [],
+        },
+      }),
+    )
+
+    assert.equal(result.state, 'invalid')
+    assert.ok(
+      codes(result).includes(
+        'CHARACTER_PREDATOR_TYPE_THIN_BLOOD_FORBIDDEN',
+      ),
+    )
+  },
+)
+
+
+test(
+  'SPEC-021 backend mantiene disponibles las opciones generales compatibles',
+  async () => {
+    const source =
+      await readFile(
+        new URL(
+          '../src/characters/domain/character-dependency-validation.contributor.ts',
+          import.meta.url,
+        ),
+        'utf8',
+      )
+
+    assert.doesNotMatch(
+      source,
+      /const unconditional = choice\.options\.filter/,
+    )
+
+    assert.match(
+      source,
+      /choice\.options[\s\S]*optionConditionMatches[\s\S]*option\.grant/,
+    )
   },
 )

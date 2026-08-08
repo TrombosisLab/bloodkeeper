@@ -286,7 +286,7 @@ test(
 
     assert.match(
       identitySource,
-      /PredatorTypeAdvantageSummary/,
+      /PredatorTypeConfiguration/,
     )
     assert.match(
       summarySource,
@@ -298,9 +298,9 @@ test(
     )
 
     assert.match(
-      wizardSource,
-      /normalizeCharacterDraftPredatorType\(\s*loaded\.draft/,
-    )
+          wizardSource,
+          /normalizeCharacterDraft\(\s*loaded\.draft/,
+        )
     assert.match(
       wizardSource,
       /normalizationChanged/,

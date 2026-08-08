@@ -48,13 +48,23 @@ import {
 } from '../domain/skill-specialty-rules'
 
 import {
-  normalizeCharacterDraftPredatorType,
-} from '../domain/predator-type-draft-rules'
+  normalizeCharacterDraft,
+} from '../domain/character-draft-normalization'
+
+import {
+  resolvePredatorTypeBonusSkillKey,
+  resolvePredatorTypeCreationSkills,
+  resolvePredatorTypeEffectiveSkills,
+} from '../domain/predator-type-skill-grant-rules'
 
 
 import type {
   CharacterDraft,
 } from '../types/character-draft.types'
+
+import type {
+  CharacterSkillsDraft,
+} from '../types/character-skills-draft.types'
 
 import type {
   CreationStepId,
@@ -206,7 +216,7 @@ export function CharacterCreationWizard({
         if (!active) return
 
         const normalizedDraft =
-          normalizeCharacterDraftPredatorType(
+          normalizeCharacterDraft(
             loaded.draft,
           )
 
@@ -331,6 +341,7 @@ export function CharacterCreationWizard({
     updater: (
       current: CharacterDraft,
     ) => CharacterDraft,
+    creationSkills?: CharacterSkillsDraft,
   ) {
     if (persistenceBusy) {
       return
@@ -340,10 +351,18 @@ export function CharacterCreationWizard({
 
     setDraft(
       (current) =>
-        applyCharacterDraftUpdate(
-          current,
-          updater,
-        ),
+        creationSkills === undefined
+          ? applyCharacterDraftUpdate(
+              current,
+              updater,
+            )
+          : applyCharacterDraftUpdate(
+              current,
+              updater,
+              {
+                creationSkills,
+              },
+            ),
     )
   }
 
@@ -567,6 +586,19 @@ export function CharacterCreationWizard({
               choiceSelections={
                 draft.predatorTypeChoices ?? {}
               }
+              advantages={
+                draft.advantages
+              }
+              onAdvantagesChange={(
+                advantages,
+              ) =>
+                updateDraft(
+                  current => ({
+                    ...current,
+                    advantages,
+                  }),
+                )
+              }
               onChange={(
                 identity,
               ) =>
@@ -619,7 +651,19 @@ export function CharacterCreationWizard({
           ) : currentStepId ===
             'skills' ? (
             <SkillsStep
-              value={draft.skills}
+              value={
+                resolvePredatorTypeCreationSkills(
+                  draft,
+                )
+              }
+              effectiveSkills={
+                draft.skills
+              }
+              predatorTypeBonusSkillKey={
+                resolvePredatorTypeBonusSkillKey(
+                  draft,
+                )
+              }
               method={
                 draft.skillDistributionMethod
               }
@@ -628,15 +672,25 @@ export function CharacterCreationWizard({
               }
               onChange={(skills) =>
                 updateDraft(
-                  (current) => ({
-                    ...current,
-                    skills,
-                    skillSpecialties:
-                      removeInvalidSpecialties(
-                        current.skillSpecialties,
+                  (current) => {
+                    const effectiveSkills =
+                      resolvePredatorTypeEffectiveSkills(
+                        current,
                         skills,
-                      ),
-                  }),
+                      )
+
+                    return {
+                      ...current,
+                      skills:
+                        effectiveSkills,
+                      skillSpecialties:
+                        removeInvalidSpecialties(
+                          current.skillSpecialties,
+                          effectiveSkills,
+                        ),
+                    }
+                  },
+                  skills,
                 )
               }
               onMethodChange={(

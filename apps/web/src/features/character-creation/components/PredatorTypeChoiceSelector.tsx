@@ -3,6 +3,10 @@ import {
 } from '../data/discipline-definitions'
 
 import {
+  skillDefinitions,
+} from '../data/skill-definitions'
+
+import {
   getCharacterAdvantageDefinition,
 } from '../data/character-advantage-definitions'
 
@@ -50,8 +54,19 @@ function getGrantLabel(
       ].join(' · ')
     }
 
-    case 'specialty':
-      return `Especialidad: ${grant.name}`
+    case 'specialty': {
+      const skill =
+        skillDefinitions.find(
+          definition =>
+            definition.key ===
+            grant.skillKey,
+        )
+
+      return `${
+        skill?.label ??
+        grant.skillKey
+      } (${grant.name})`
+    }
 
     case 'advantage': {
       const definition =

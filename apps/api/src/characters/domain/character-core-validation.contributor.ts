@@ -18,6 +18,10 @@ import {
   validateCharacterHunger,
 } from './character-hunger.rules'
 
+import {
+  resolvePredatorTypeCreationSkills,
+} from './predator-type-skill-grant.rules'
+
 import type {
   PersistedCharacterDraft,
 } from './persisted-character.types'
@@ -239,21 +243,28 @@ function validateAttributesAndSkills(
   character: PersistedCharacterDraft,
   context: CharacterValidationContext,
 ): CharacterSectionValidation[] {
+  const creationSkills =
+    resolvePredatorTypeCreationSkills(
+      character,
+    )
+
   const structural =
     validateCharacterAttributeSkillState(
       character.attributes,
-      character.skills,
+      creationSkills,
       character.creation.skillDistributionMethod,
       'identity',
       character.skillSpecialties,
+      character.skills,
     )
   const complete =
     validateCharacterAttributeSkillState(
       character.attributes,
-      character.skills,
+      creationSkills,
       character.creation.skillDistributionMethod,
       'review',
       character.skillSpecialties,
+      character.skills,
     )
   const violations =
     context === 'activation'

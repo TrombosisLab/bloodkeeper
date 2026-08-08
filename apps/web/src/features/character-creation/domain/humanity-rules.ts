@@ -19,15 +19,17 @@ function hasDuplicateValues(
 
 export function validateInitialHumanity(
   humanity: CharacterHumanityDraft,
+  expectedValue: number =
+    INITIAL_HUMANITY_VALUE,
 ): HumanityValidationResult {
   const errors: string[] = []
 
   if (
     humanity.value !==
-    INITIAL_HUMANITY_VALUE
+    expectedValue
   ) {
     errors.push(
-      'La Humanidad inicial debe ser 7.',
+      `La Humanidad inicial debe ser ${expectedValue}.`,
     )
   }
 

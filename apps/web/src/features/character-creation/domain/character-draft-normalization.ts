@@ -2,6 +2,10 @@ import type {
   CharacterDraft,
 } from '../types/character-draft.types.ts'
 
+import type {
+  CharacterSkillsDraft,
+} from '../types/character-skills-draft.types.ts'
+
 import {
   normalizeCharacterDraftRituals,
 } from './blood-sorcery-ritual-draft-rules.ts'
@@ -33,6 +37,16 @@ import {
 } from './predator-type-draft-rules.ts'
 
 import {
+  normalizePredatorTypeSkillGrant,
+  resolvePredatorTypeCreationSkills,
+} from './predator-type-skill-grant-rules.ts'
+
+import {
+  getPredatorTypePointDistributionSelections,
+  restorePredatorTypePointDistributionSelections,
+} from './predator-type-point-distribution-draft-rules.ts'
+
+import {
   normalizeCharacterDraftOblivionCeremonies,
 } from './oblivion-ceremony-draft-rules.ts'
 
@@ -47,7 +61,14 @@ import {
  */
 export function normalizeCharacterDraft(
   draft: CharacterDraft,
+  creationSkillsOverride?: CharacterSkillsDraft,
 ): CharacterDraft {
+
+  const creationSkills =
+    creationSkillsOverride ??
+    resolvePredatorTypeCreationSkills(
+      draft,
+    )
 
   let normalized = draft
 
@@ -117,6 +138,12 @@ export function normalizeCharacterDraft(
   }
 
 
+  const normalizedPredatorType =
+    normalizePredatorTypeForCharacter(
+      normalized.identity.predatorType,
+      normalized.identity.clan,
+    )
+
   normalized = {
     ...normalized,
 
@@ -124,17 +151,43 @@ export function normalizeCharacterDraft(
       ...normalized.identity,
 
       predatorType:
-        normalizePredatorTypeForCharacter(
-          normalized.identity.predatorType,
-          normalized.identity.clan,
-        ),
+        normalizedPredatorType,
     },
+
+    predatorTypeChoices:
+      normalizedPredatorType === ''
+        ? {}
+        : normalized.predatorTypeChoices ?? {},
   }
 
+
+  const predatorTypePointDistributionSelections =
+    getPredatorTypePointDistributionSelections(
+      normalized.identity.predatorType,
+      normalized.advantages,
+    )
 
   normalized =
     normalizeCharacterDraftPredatorType(
       normalized,
+    )
+
+  normalized = {
+    ...normalized,
+
+    advantages:
+      restorePredatorTypePointDistributionSelections(
+        normalized.identity.predatorType,
+        normalized.predatorTypeChoices ?? {},
+        predatorTypePointDistributionSelections,
+        normalized.advantages,
+      ),
+  }
+
+  normalized =
+    normalizePredatorTypeSkillGrant(
+      normalized,
+      creationSkills,
     )
 
   normalized = {

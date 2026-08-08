@@ -1,10 +1,19 @@
 import {
+  validatePredatorTypePointDistributionDraft,
+} from './predator-type-point-distribution-draft-rules.ts'
+
+import {
   validateSpecialties,
 } from './skill-specialty-rules.ts'
 
 import {
+  resolvePredatorTypeHumanityModifier,
   validatePredatorTypeChoiceSelections,
 } from './predator-type-rules.ts'
+
+import {
+  resolvePredatorTypeCreationSkills,
+} from './predator-type-skill-grant-rules.ts'
 
 import {
   BLOOD_SORCERY_RITUAL_DEFINITIONS,
@@ -70,6 +79,7 @@ import {
 } from './thin-blood-alchemy-rules.ts'
 
 import {
+  INITIAL_HUMANITY_VALUE,
   validateInitialHumanity,
 } from './humanity-rules.ts'
 
@@ -147,6 +157,15 @@ export function validateIdentityStep(
     )
   }
 
+  if (
+    draft.identity.clan === 'thinBlood' &&
+    draft.identity.predatorType !== ''
+  ) {
+    errors.push(
+      'Los Sangre Débil no pueden tener Tipo de Depredador.',
+    )
+  }
+
   const predatorTypeChoiceValidation =
     validatePredatorTypeChoiceSelections(
       draft.identity.predatorType,
@@ -159,6 +178,17 @@ export function validateIdentityStep(
 
   errors.push(
     ...predatorTypeChoiceValidation.errors,
+  )
+
+  const predatorTypeDistributionValidation =
+    validatePredatorTypePointDistributionDraft(
+      draft.identity.predatorType,
+      draft.predatorTypeChoices ?? {},
+      draft.advantages,
+    )
+
+  errors.push(
+    ...predatorTypeDistributionValidation.errors,
   )
 
   return {
@@ -186,7 +216,9 @@ export function validateSkillsStep(
 ): StepValidationResult {
   const distribution =
     validateSkillDistribution(
-      draft.skills,
+      resolvePredatorTypeCreationSkills(
+        draft,
+      ),
       draft.skillDistributionMethod,
     )
 
@@ -418,9 +450,20 @@ export function validateStep(
     }
 
     case 'humanity': {
+      const expectedHumanity =
+        INITIAL_HUMANITY_VALUE +
+        resolvePredatorTypeHumanityModifier(
+          draft.identity.predatorType,
+          {
+            clan: draft.identity.clan,
+          },
+          draft.predatorTypeChoices ?? {},
+        )
+
       const result =
         validateInitialHumanity(
           draft.humanity,
+          expectedHumanity,
         )
 
       return {

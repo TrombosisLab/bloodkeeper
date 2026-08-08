@@ -12,6 +12,10 @@ import {
 } from '../domain/character-attribute-skill.rules'
 
 import {
+  resolvePredatorTypeCreationSkills,
+} from '../domain/predator-type-skill-grant.rules'
+
+import {
   assertValidCharacterHumanityState,
 } from '../domain/character-humanity-state.rules'
 
@@ -32,12 +36,18 @@ export class CreateCharacterDraftUseCase {
   execute(
     data: CreateCharacterDraftData,
   ): Promise<PersistedCharacterDraft> {
+    const creationSkills =
+      resolvePredatorTypeCreationSkills(
+        data,
+      )
+
     assertValidCharacterAttributeSkillState(
       data.attributes,
-      data.skills,
+      creationSkills,
       data.creation.skillDistributionMethod,
       data.creation.currentStep,
       data.skillSpecialties,
+      data.skills,
     )
 
     assertValidCharacterHumanityState(

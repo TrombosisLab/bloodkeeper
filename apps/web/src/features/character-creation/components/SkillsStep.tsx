@@ -20,6 +20,8 @@ import { SkillSpecialtiesEditor } from './SkillSpecialtiesEditor'
 
 interface SkillsStepProps {
   value: CharacterSkillsDraft
+  effectiveSkills?: CharacterSkillsDraft
+  predatorTypeBonusSkillKey?: SkillKey | null
   method: SkillDistributionMethod
   specialties: SkillSpecialty[]
 
@@ -75,6 +77,8 @@ const methods: {
 
 export function SkillsStep({
   value,
+  effectiveSkills = value,
+  predatorTypeBonusSkillKey = null,
   method,
   specialties,
   onChange,
@@ -236,8 +240,24 @@ export function SkillsStep({
         )}
       </div>
 
+      {predatorTypeBonusSkillKey !== null ? (
+        <p>
+          Tipo de Depredador: +1 en{' '}
+          {
+            skillDefinitions.find(
+              definition =>
+                definition.key ===
+                predatorTypeBonusSkillKey,
+            )?.label ??
+            predatorTypeBonusSkillKey
+          }.
+          {' '}
+          Este punto no consume el reparto inicial.
+        </p>
+      ) : null}
+
       <SkillSpecialtiesEditor
-        skills={value}
+        skills={effectiveSkills}
         value={specialties}
         onChange={onSpecialtiesChange}
       />

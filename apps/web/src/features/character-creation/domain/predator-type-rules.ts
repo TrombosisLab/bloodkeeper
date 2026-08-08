@@ -94,6 +94,10 @@ export function predatorTypeExists(key: string) {
 
 export function clanAllowed(predatorTypeKey: string, clanKey: string) {
 
+    if (clanKey === 'thinBlood') {
+        return false;
+    }
+
     const definition = getPredatorType(predatorTypeKey);
 
     if (!definition) {

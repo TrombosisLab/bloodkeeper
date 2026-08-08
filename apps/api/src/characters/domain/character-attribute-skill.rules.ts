@@ -266,6 +266,8 @@ export function validateCharacterAttributeSkillState(
   currentStep: CharacterCreationStep,
   specialties:
     PersistedCharacterSkillSpecialty[],
+  specialtySkills:
+    PersistedCharacterSkills = skills,
 ): CharacterAttributeSkillViolation[] {
   const steps: CharacterCreationStep[] = [
     'identity',
@@ -295,7 +297,7 @@ export function validateCharacterAttributeSkillState(
       skillsComplete,
     ),
     ...validateSpecialties(
-      skills,
+      specialtySkills,
       specialties,
       skillsComplete,
     ),
@@ -309,6 +311,8 @@ export function assertValidCharacterAttributeSkillState(
   currentStep: CharacterCreationStep,
   specialties:
     PersistedCharacterSkillSpecialty[],
+  specialtySkills:
+    PersistedCharacterSkills = skills,
 ): void {
   const violations =
     validateCharacterAttributeSkillState(
@@ -317,6 +321,7 @@ export function assertValidCharacterAttributeSkillState(
       method,
       currentStep,
       specialties,
+      specialtySkills,
     )
 
   if (violations.length > 0) {

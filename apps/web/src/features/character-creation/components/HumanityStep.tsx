@@ -152,8 +152,8 @@ export function HumanityStep({
             </h3>
 
             <p>
-              La Humanidad inicial del
-              personaje es 7.
+              La Humanidad inicial refleja
+              los modificadores de creación aplicables.
             </p>
           </div>
         </header>

@@ -288,6 +288,15 @@ test(
         'utf8',
       )
 
+    const configurationSource =
+      await readFile(
+        new URL(
+          '../src/features/character-creation/components/PredatorTypeConfiguration.tsx',
+          import.meta.url,
+        ),
+        'utf8',
+      )
+
     const wizardSource =
       await readFile(
         new URL(
@@ -309,6 +318,11 @@ test(
 
     assert.match(
       identitySource,
+      /PredatorTypeConfiguration/,
+    )
+
+    assert.match(
+      configurationSource,
       /PredatorTypeChoiceSelector/,
     )
 
