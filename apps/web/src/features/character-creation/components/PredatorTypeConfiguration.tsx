@@ -27,6 +27,10 @@ import {
   PredatorTypeChoiceSelector,
 } from './PredatorTypeChoiceSelector'
 
+import {
+  AdvantageRatingControl,
+} from './advantages/AdvantageRatingControl'
+
 import type {
   CharacterAdvantagesDraft,
 } from '../types/character-advantages-draft.types'
@@ -223,47 +227,33 @@ export function PredatorTypeConfiguration({
                           }
                         </span>
 
-                        <select
+                        <AdvantageRatingControl
                           value={
                             current?.rating ??
                             0
                           }
+                          min={0}
+                          max={
+                            distribution.points
+                          }
+                          allowedRatings={[
+                            0,
+                            ...allowedRatings,
+                          ]}
                           onChange={
-                            event =>
+                            rating =>
                               onAdvantagesChange(
                                 updatePredatorTypePointDistributionSelection(
                                   predatorTypeKey,
                                   distributionIndex,
                                   advantageDefinition.key,
-                                  Number(
-                                    event.target
-                                      .value,
-                                  ),
+                                  rating,
                                   choiceSelections,
                                   advantages,
                                 ),
                               )
                           }
-                        >
-                          <option value={0}>
-                            0 puntos
-                          </option>
-
-                          {allowedRatings.map(
-                            rating => (
-                              <option
-                                key={rating}
-                                value={rating}
-                              >
-                                {rating}
-                                {' punto'}
-                                {rating === 1
-                                  ? ''
-                                  : 's'}
-                              </option>
-                            ),
-                          )}
-                        </select>
+                        />
                       </label>
                     )
                   },

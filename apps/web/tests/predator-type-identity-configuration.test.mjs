@@ -283,3 +283,43 @@ test(
     )
   },
 )
+
+
+test(
+  'SPEC-021 los repartos del Tipo de Depredador usan dots de Ventajas',
+  async () => {
+    const source =
+      await readFile(
+        new URL(
+          '../src/features/character-creation/components/PredatorTypeConfiguration.tsx',
+          import.meta.url,
+        ),
+        'utf8',
+      )
+
+    assert.match(
+      source,
+      /import \{\s*AdvantageRatingControl,\s*\} from '\.\/advantages\/AdvantageRatingControl'/,
+    )
+
+    assert.match(
+      source,
+      /<AdvantageRatingControl/,
+    )
+
+    assert.match(
+      source,
+      /allowedRatings=\{\[\s*0,\s*\.\.\.allowedRatings,\s*\]\}/,
+    )
+
+    assert.match(
+      source,
+      /max=\{\s*distribution\.points\s*\}/,
+    )
+
+    assert.doesNotMatch(
+      source,
+      /<select[\s\S]*0 puntos[\s\S]*allowedRatings\.map/,
+    )
+  },
+)
