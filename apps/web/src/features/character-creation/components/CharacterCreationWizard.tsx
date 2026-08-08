@@ -58,8 +58,12 @@ import type {
 } from '../domain/character-draft-api.mapper'
 
 import {
-  applyCharacterDraftUpdate,
-} from '../domain/blood-sorcery-ritual-draft-rules'
+  previewCharacterDraftUpdate,
+} from '../domain/character-draft-loss-rules'
+
+import type {
+  CharacterDraftLoss,
+} from '../domain/character-draft-loss-rules'
 
 import {
   normalizeCharacterDraftOblivionCeremonies,
@@ -111,6 +115,11 @@ type ReviewUiState =
   | 'finalizing'
   | 'finalized'
   | 'error'
+
+interface PendingDraftUpdate {
+  draft: CharacterDraft
+  losses: CharacterDraftLoss[]
+}
 
 interface CharacterCreationWizardProps {
   onBackToSheet: () => void
@@ -215,6 +224,13 @@ export function CharacterCreationWizard({
       initialCharacterDraft,
     )
 
+  const [
+    pendingDraftUpdate,
+    setPendingDraftUpdate,
+  ] = useState<PendingDraftUpdate | null>(
+    null,
+  )
+
   const [showValidation, setShowValidation] =
     useState(false)
 
@@ -272,7 +288,8 @@ export function CharacterCreationWizard({
 
   const interactionBusy =
     persistenceBusy ||
-    reviewBusy
+    reviewBusy ||
+    pendingDraftUpdate !== null
 
   const persistenceMessage =
     messageForCharacterDraftPersistenceState(
@@ -462,6 +479,15 @@ export function CharacterCreationWizard({
     setCurrentStepId(stepId)
   }
 
+  function applyDraftCandidate(
+    candidate: CharacterDraft,
+  ) {
+    invalidateReview()
+    setShowValidation(false)
+    setHasUnsavedChanges(true)
+    setDraft(candidate)
+  }
+
   function updateDraft(
     updater: (
       current: CharacterDraft,
@@ -472,24 +498,58 @@ export function CharacterCreationWizard({
       return
     }
 
-    invalidateReview()
-    setHasUnsavedChanges(true)
+    const preview =
+      creationSkills === undefined
+        ? previewCharacterDraftUpdate(
+            draft,
+            updater,
+          )
+        : previewCharacterDraftUpdate(
+            draft,
+            updater,
+            {
+              creationSkills,
+            },
+          )
 
-    setDraft(
-      (current) =>
-        creationSkills === undefined
-          ? applyCharacterDraftUpdate(
-              current,
-              updater,
-            )
-          : applyCharacterDraftUpdate(
-              current,
-              updater,
-              {
-                creationSkills,
-              },
-            ),
+    if (preview.losses.length > 0) {
+      setPendingDraftUpdate({
+        draft: preview.draft,
+        losses: preview.losses,
+      })
+      return
+    }
+
+    applyDraftCandidate(
+      preview.draft,
     )
+  }
+
+  function confirmPendingDraftUpdate() {
+    if (
+      pendingDraftUpdate === null ||
+      persistenceBusy ||
+      reviewBusy
+    ) {
+      return
+    }
+
+    const candidate =
+      pendingDraftUpdate.draft
+
+    setPendingDraftUpdate(null)
+    applyDraftCandidate(candidate)
+  }
+
+  function cancelPendingDraftUpdate() {
+    if (
+      persistenceBusy ||
+      reviewBusy
+    ) {
+      return
+    }
+
+    setPendingDraftUpdate(null)
   }
 
   function navigateTo(
@@ -1155,6 +1215,66 @@ export function CharacterCreationWizard({
               step={currentStep}
             />
           )}
+
+          {pendingDraftUpdate !== null ? (
+            <div
+              className="creation-step-errors"
+              role="alert"
+              aria-live="assertive"
+            >
+              <strong>
+                Este cambio eliminará decisiones posteriores
+              </strong>
+
+              <p>
+                El borrador todavía no se ha modificado.
+                Si continúas, se retirará la información
+                que ya no sea válida con la nueva decisión.
+              </p>
+
+              <ul>
+                {pendingDraftUpdate.losses.map(
+                  loss => (
+                    <li key={loss.key}>
+                      {loss.label}
+                    </li>
+                  ),
+                )}
+              </ul>
+
+              <div className="creation-actions">
+                <button
+                  type="button"
+                  className="creation-button creation-button--secondary"
+                  disabled={
+                    persistenceBusy ||
+                    reviewBusy
+                  }
+                  onClick={
+                    cancelPendingDraftUpdate
+                  }
+                >
+                  Cancelar
+                </button>
+
+                <span aria-hidden="true" />
+
+                <button
+                  type="button"
+                  className="creation-button creation-button--primary"
+                  disabled={
+                    persistenceBusy ||
+                    reviewBusy
+                  }
+                  onClick={
+                    confirmPendingDraftUpdate
+                  }
+                >
+                  Confirmar cambio
+                </button>
+              </div>
+            </div>
+          ) : null}
 
           {showValidation &&
             !currentValidation.valid && (
