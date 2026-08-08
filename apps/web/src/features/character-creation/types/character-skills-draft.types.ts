@@ -1,31 +1,10 @@
+import type {
+  CharacterRulesSkillCategory,
+  CharacterRulesSkillKey,
+} from '@v5r/character-rules'
+
 export type SkillKey =
-  | 'athletics'
-  | 'brawl'
-  | 'craft'
-  | 'drive'
-  | 'firearms'
-  | 'larceny'
-  | 'melee'
-  | 'stealth'
-  | 'survival'
-  | 'animalKen'
-  | 'etiquette'
-  | 'insight'
-  | 'intimidation'
-  | 'leadership'
-  | 'performance'
-  | 'persuasion'
-  | 'streetwise'
-  | 'subterfuge'
-  | 'academics'
-  | 'awareness'
-  | 'finance'
-  | 'investigation'
-  | 'medicine'
-  | 'occult'
-  | 'politics'
-  | 'science'
-  | 'technology'
+  CharacterRulesSkillKey
 
 export type SkillDistributionMethod =
   | 'generalist'
@@ -38,10 +17,8 @@ export type CharacterSkillsDraft =
 export interface SkillDefinition {
   key: SkillKey
   label: string
-  category:
-    | 'physical'
-    | 'social'
-    | 'mental'
+  category: CharacterRulesSkillCategory
+  active: boolean
 }
 
 export type SkillSpecialtyOrigin =
@@ -57,4 +34,3 @@ export interface SkillSpecialty {
 
 export type CharacterSkillSpecialtiesDraft =
   SkillSpecialty[]
-

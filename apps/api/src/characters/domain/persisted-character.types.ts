@@ -1,3 +1,11 @@
+import {
+  characterSkillCatalog,
+} from '@v5r/character-rules'
+
+import type {
+  CharacterRulesSkillKey,
+} from '@v5r/character-rules'
+
 export type CharacterLifecycleStatus =
   | 'draft'
   | 'active'
@@ -81,38 +89,14 @@ export interface PersistedCharacterDamageState {
   willpower: PersistedCharacterDamageTrack
 }
 
-export const CHARACTER_SKILL_KEYS = [
-  'athletics',
-  'brawl',
-  'craft',
-  'drive',
-  'firearms',
-  'larceny',
-  'melee',
-  'stealth',
-  'survival',
-  'animalKen',
-  'etiquette',
-  'insight',
-  'intimidation',
-  'leadership',
-  'performance',
-  'persuasion',
-  'streetwise',
-  'subterfuge',
-  'academics',
-  'awareness',
-  'finance',
-  'investigation',
-  'medicine',
-  'occult',
-  'politics',
-  'science',
-  'technology',
-] as const
+export const CHARACTER_SKILL_KEYS:
+  readonly CharacterRulesSkillKey[] =
+    characterSkillCatalog.definitions.map(
+      (definition) => definition.key,
+    )
 
 export type CharacterSkillKey =
-  typeof CHARACTER_SKILL_KEYS[number]
+  CharacterRulesSkillKey
 
 export type PersistedCharacterSkills =
   Record<CharacterSkillKey, number>

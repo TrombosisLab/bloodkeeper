@@ -72,6 +72,23 @@ export type CharacterRulesSkillKey =
   | 'science'
   | 'technology'
 
+export type CharacterRulesSkillCategory =
+  | 'physical'
+  | 'social'
+  | 'mental'
+
+export interface CharacterRulesSkillDefinition {
+  readonly key: CharacterRulesSkillKey
+  readonly name: string
+  readonly category: CharacterRulesSkillCategory
+  readonly active: boolean
+}
+
+export interface CharacterRulesSkillCatalog {
+  readonly definitions:
+    readonly CharacterRulesSkillDefinition[]
+}
+
 export interface CharacterRulesDisciplineDefinition {
   readonly key: CharacterRulesDisciplineKey
   readonly name: string
@@ -455,3 +472,6 @@ export const characterAdvantageCatalog:
 
 export const characterDependencyCatalog:
   CharacterRulesDependencyCatalog
+
+export const characterSkillCatalog:
+  CharacterRulesSkillCatalog

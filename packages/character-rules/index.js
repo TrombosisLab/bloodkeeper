@@ -22,6 +22,9 @@ import advantageDefinitions from './catalogs/advantages.json' with {
 import predatorTypes from './catalogs/predator-types.json' with {
   type: 'json',
 }
+import skills from './catalogs/skills.json' with {
+  type: 'json',
+}
 
 function deepFreeze(value) {
   if (value === null || typeof value !== 'object') {
@@ -62,4 +65,9 @@ export const characterAdvantageCatalog =
 export const characterDependencyCatalog =
   deepFreeze({
     predatorTypes: clone(predatorTypes),
+  })
+
+export const characterSkillCatalog =
+  deepFreeze({
+    definitions: clone(skills),
   })

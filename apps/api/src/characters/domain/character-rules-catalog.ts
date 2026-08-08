@@ -3,6 +3,7 @@ import {
   characterDependencyCatalog,
   characterDisciplineCatalog,
   characterRulesCatalogManifest,
+  characterSkillCatalog,
 } from '@v5r/character-rules'
 
 import type {
@@ -12,6 +13,7 @@ import type {
   CharacterRulesCatalogManifest,
   CharacterRulesDependencyCatalog,
   CharacterRulesDisciplineCatalog,
+  CharacterRulesSkillCatalog,
 } from '@v5r/character-rules'
 
 export const CHARACTER_RULES_CATALOG = Symbol(
@@ -26,6 +28,8 @@ export interface CharacterRulesCatalog {
     CharacterRulesAdvantageCatalog
   readonly dependencyCatalog:
     CharacterRulesDependencyCatalog
+  readonly skillCatalog:
+    CharacterRulesSkillCatalog
 
   stateOf(
     domain: CharacterRulesCatalogDomain,
@@ -81,6 +85,7 @@ export function createCharacterRulesCatalog(
     disciplineCatalog: characterDisciplineCatalog,
     advantageCatalog: characterAdvantageCatalog,
     dependencyCatalog: characterDependencyCatalog,
+    skillCatalog: characterSkillCatalog,
 
     stateOf(
       domain: CharacterRulesCatalogDomain,

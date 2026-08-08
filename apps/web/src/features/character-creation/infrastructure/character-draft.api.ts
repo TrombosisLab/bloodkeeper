@@ -1,3 +1,7 @@
+import {
+  skillKeys,
+} from '../data/skill-definitions.ts'
+
 import type {
   CharacterDraftApiSnapshot,
   CreateCharacterDraftApiRequest,
@@ -20,36 +24,6 @@ const attributeKeys = [
   'intelligence',
   'wits',
   'resolve',
-] as const
-
-const skillKeys = [
-  'athletics',
-  'brawl',
-  'craft',
-  'drive',
-  'firearms',
-  'larceny',
-  'melee',
-  'stealth',
-  'survival',
-  'animalKen',
-  'etiquette',
-  'insight',
-  'intimidation',
-  'leadership',
-  'performance',
-  'persuasion',
-  'streetwise',
-  'subterfuge',
-  'academics',
-  'awareness',
-  'finance',
-  'investigation',
-  'medicine',
-  'occult',
-  'politics',
-  'science',
-  'technology',
 ] as const
 
 const disciplineKeys = [

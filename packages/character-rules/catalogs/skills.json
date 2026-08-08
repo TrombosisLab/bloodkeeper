@@ -1,0 +1,164 @@
+[
+  {
+    "key": "athletics",
+    "name": "Atletismo",
+    "category": "physical",
+    "active": true
+  },
+  {
+    "key": "brawl",
+    "name": "Pelea",
+    "category": "physical",
+    "active": true
+  },
+  {
+    "key": "craft",
+    "name": "Artesanía",
+    "category": "physical",
+    "active": true
+  },
+  {
+    "key": "drive",
+    "name": "Conducir",
+    "category": "physical",
+    "active": true
+  },
+  {
+    "key": "firearms",
+    "name": "Armas de Fuego",
+    "category": "physical",
+    "active": true
+  },
+  {
+    "key": "larceny",
+    "name": "Latrocinio",
+    "category": "physical",
+    "active": true
+  },
+  {
+    "key": "melee",
+    "name": "Armas Cuerpo a Cuerpo",
+    "category": "physical",
+    "active": true
+  },
+  {
+    "key": "stealth",
+    "name": "Sigilo",
+    "category": "physical",
+    "active": true
+  },
+  {
+    "key": "survival",
+    "name": "Supervivencia",
+    "category": "physical",
+    "active": true
+  },
+  {
+    "key": "animalKen",
+    "name": "Trato con Animales",
+    "category": "social",
+    "active": true
+  },
+  {
+    "key": "etiquette",
+    "name": "Etiqueta",
+    "category": "social",
+    "active": true
+  },
+  {
+    "key": "insight",
+    "name": "Perspicacia",
+    "category": "social",
+    "active": true
+  },
+  {
+    "key": "intimidation",
+    "name": "Intimidación",
+    "category": "social",
+    "active": true
+  },
+  {
+    "key": "leadership",
+    "name": "Liderazgo",
+    "category": "social",
+    "active": true
+  },
+  {
+    "key": "performance",
+    "name": "Interpretación",
+    "category": "social",
+    "active": true
+  },
+  {
+    "key": "persuasion",
+    "name": "Persuasión",
+    "category": "social",
+    "active": true
+  },
+  {
+    "key": "streetwise",
+    "name": "Callejeo",
+    "category": "social",
+    "active": true
+  },
+  {
+    "key": "subterfuge",
+    "name": "Subterfugio",
+    "category": "social",
+    "active": true
+  },
+  {
+    "key": "academics",
+    "name": "Academicismo",
+    "category": "mental",
+    "active": true
+  },
+  {
+    "key": "awareness",
+    "name": "Consciencia",
+    "category": "mental",
+    "active": true
+  },
+  {
+    "key": "finance",
+    "name": "Finanzas",
+    "category": "mental",
+    "active": true
+  },
+  {
+    "key": "investigation",
+    "name": "Investigación",
+    "category": "mental",
+    "active": true
+  },
+  {
+    "key": "medicine",
+    "name": "Medicina",
+    "category": "mental",
+    "active": true
+  },
+  {
+    "key": "occult",
+    "name": "Ocultismo",
+    "category": "mental",
+    "active": true
+  },
+  {
+    "key": "politics",
+    "name": "Política",
+    "category": "mental",
+    "active": true
+  },
+  {
+    "key": "science",
+    "name": "Ciencia",
+    "category": "mental",
+    "active": true
+  },
+  {
+    "key": "technology",
+    "name": "Tecnología",
+    "category": "mental",
+    "active": true
+  }
+]

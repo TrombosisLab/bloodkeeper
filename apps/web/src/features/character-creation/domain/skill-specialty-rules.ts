@@ -1,3 +1,7 @@
+import {
+  skillDefinitions,
+} from '../data/skill-definitions.ts'
+
 import type {
   CharacterSkillsDraft,
   SkillKey,
@@ -11,16 +15,16 @@ export const creationSpecialtySkillKeys = [
   'science',
 ] as const satisfies readonly SkillKey[]
 
-const creationSpecialtySkillLabels:
-  Record<
-    typeof creationSpecialtySkillKeys[number],
-    string
-  > = {
-    academics: 'Academicismo',
-    craft: 'Artesanía',
-    performance: 'Interpretación',
-    science: 'Ciencia',
-  }
+function skillLabel(
+  skillKey: SkillKey,
+): string {
+  return (
+    skillDefinitions.find(
+      (definition) =>
+        definition.key === skillKey,
+    )?.label ?? skillKey
+  )
+}
 
 export interface SpecialtyValidationResult {
   valid: boolean
@@ -259,11 +263,7 @@ export function validateSpecialties(
   ) {
     const labels =
       budget.missingMandatorySkillKeys.map(
-        (skillKey) =>
-          creationSpecialtySkillLabels[
-            skillKey as
-              typeof creationSpecialtySkillKeys[number]
-          ],
+        skillLabel,
       )
 
     errors.push(

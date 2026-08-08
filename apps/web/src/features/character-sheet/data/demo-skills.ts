@@ -1,165 +1,102 @@
+import {
+  skillDefinitions,
+} from '../../character-creation/data/skill-definitions'
+
+import type {
+  SkillKey,
+} from '../../character-creation/types/character-skills-draft.types'
+
 import type {
   CharacterSkillCategory,
 } from '../types/character-skills.types'
 
-export const demoSkills: CharacterSkillCategory[] = [
-  {
-    key: 'physical',
-    label: 'Físicas',
-    skills: [
-      {
-        key: 'athletics',
-        label: 'Atletismo',
-        value: 2,
-      },
-      {
-        key: 'brawl',
-        label: 'Pelea',
-        value: 3,
-        specialties: ['Peleas callejeras'],
-      },
-      {
-        key: 'craft',
-        label: 'Artesanía',
-        value: 1,
-      },
-      {
-        key: 'drive',
-        label: 'Conducir',
-        value: 2,
-        specialties: ['Motocicletas'],
-      },
-      {
-        key: 'firearms',
-        label: 'Armas de Fuego',
-        value: 1,
-      },
-      {
-        key: 'larceny',
-        label: 'Latrocinio',
-        value: 2,
-      },
-      {
-        key: 'melee',
-        label: 'Armas Cuerpo a Cuerpo',
-        value: 2,
-      },
-      {
-        key: 'stealth',
-        label: 'Sigilo',
-        value: 3,
-      },
-      {
-        key: 'survival',
-        label: 'Supervivencia',
-        value: 1,
-      },
-    ],
-  },
-  {
-    key: 'social',
-    label: 'Sociales',
-    skills: [
-      {
-        key: 'animal-ken',
-        label: 'Trato con Animales',
-        value: 1,
-      },
-      {
-        key: 'etiquette',
-        label: 'Etiqueta',
-        value: 2,
-        specialties: ['Camarilla'],
-      },
-      {
-        key: 'insight',
-        label: 'Perspicacia',
-        value: 3,
-      },
-      {
-        key: 'intimidation',
-        label: 'Intimidación',
-        value: 3,
-      },
-      {
-        key: 'leadership',
-        label: 'Liderazgo',
-        value: 2,
-      },
-      {
-        key: 'performance',
-        label: 'Interpretación',
-        value: 1,
-      },
-      {
-        key: 'persuasion',
-        label: 'Persuasión',
-        value: 3,
-        specialties: ['Política'],
-      },
-      {
-        key: 'streetwise',
-        label: 'Callejeo',
-        value: 2,
-      },
-      {
-        key: 'subterfuge',
-        label: 'Subterfugio',
-        value: 2,
-      },
-    ],
-  },
-  {
-    key: 'mental',
-    label: 'Mentales',
-    skills: [
-      {
-        key: 'academics',
-        label: 'Academicismo',
-        value: 2,
-      },
-      {
-        key: 'awareness',
-        label: 'Consciencia',
-        value: 3,
-        specialties: ['Emboscadas'],
-      },
-      {
-        key: 'finance',
-        label: 'Finanzas',
-        value: 1,
-      },
-      {
-        key: 'investigation',
-        label: 'Investigación',
-        value: 2,
-      },
-      {
-        key: 'medicine',
-        label: 'Medicina',
-        value: 1,
-      },
-      {
-        key: 'occult',
-        label: 'Ocultismo',
-        value: 2,
-      },
-      {
-        key: 'politics',
-        label: 'Política',
-        value: 3,
-        specialties: ['Política local'],
-      },
-      {
-        key: 'science',
-        label: 'Ciencia',
-        value: 1,
-      },
-      {
-        key: 'technology',
-        label: 'Tecnología',
-        value: 2,
-      },
-    ],
-  },
-]
+const categoryOrder = [
+  'physical',
+  'social',
+  'mental',
+] as const
+
+const categoryLabels = {
+  physical: 'Físicas',
+  social: 'Sociales',
+  mental: 'Mentales',
+} as const
+
+const demoSkillRatings: Record<SkillKey, number> = {
+  athletics: 2,
+  brawl: 3,
+  craft: 1,
+  drive: 2,
+  firearms: 1,
+  larceny: 2,
+  melee: 2,
+  stealth: 3,
+  survival: 1,
+
+  animalKen: 1,
+  etiquette: 2,
+  insight: 3,
+  intimidation: 3,
+  leadership: 2,
+  performance: 1,
+  persuasion: 3,
+  streetwise: 2,
+  subterfuge: 2,
+
+  academics: 2,
+  awareness: 3,
+  finance: 1,
+  investigation: 2,
+  medicine: 1,
+  occult: 2,
+  politics: 3,
+  science: 1,
+  technology: 2,
+}
+
+const demoSkillSpecialties:
+  Partial<Record<SkillKey, string[]>> = {
+    brawl: ['Peleas callejeras'],
+    drive: ['Motocicletas'],
+    etiquette: ['Camarilla'],
+    persuasion: ['Política'],
+    awareness: ['Emboscadas'],
+    politics: ['Política local'],
+  }
+
+export const demoSkills: CharacterSkillCategory[] =
+  categoryOrder.map(
+    (category) => ({
+      key: category,
+      label: categoryLabels[category],
+      skills:
+        skillDefinitions
+          .filter(
+            (definition) =>
+              definition.category === category,
+          )
+          .map(
+            (definition) => ({
+              key: definition.key,
+              label: definition.label,
+              value:
+                demoSkillRatings[
+                  definition.key
+                ],
+              ...(
+                demoSkillSpecialties[
+                  definition.key
+                ] === undefined
+                  ? {}
+                  : {
+                      specialties: [
+                        ...demoSkillSpecialties[
+                          definition.key
+                        ]!,
+                      ],
+                    }
+              ),
+            }),
+          ),
+    }),
+  )
