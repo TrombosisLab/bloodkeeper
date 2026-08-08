@@ -42,13 +42,8 @@ export function buildCharacterAdvantageEligibilityContext(
     clanKey:
       draft.identity.clan,
 
-    /*
-     * El borrador actual no conserva todavía una categoría etaria.
-     * Mantenerla como desconocida evita inventarla a partir de la
-     * generación y hace que los requisitos etarios fallen de forma
-     * segura hasta que el flujo la determine explícitamente.
-     */
-    ageCategory: null,
+    ageCategory:
+      draft.identity.ageCategory,
 
     selectedAdvantages:
       draft.advantages.selections.map(

@@ -77,6 +77,13 @@ enum AdvantageCategory {
   FLAW
 }
 
+enum CharacterAgeCategory {
+  FLEDGLING
+  NEONATE
+  ANCILLA
+  ELDER
+}
+
 enum AdvantageSelectionOrigin {
   CREATION
   PREDATOR_TYPE
@@ -219,6 +226,7 @@ model CharacterIdentity {
   sire            String?
   desire          String?
   generation      Int?
+  ageCategory     CharacterAgeCategory?
 
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 

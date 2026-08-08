@@ -27,6 +27,10 @@ import type {
 } from '../types/character-generation.types'
 
 import type {
+  CharacterAdvantageAgeCategory,
+} from '../types/character-advantage-definition.types'
+
+import type {
   CharacterIdentityDraft,
 } from '../types/character-identity-draft.types'
 
@@ -57,7 +61,7 @@ interface IdentityStepProps {
 type TextIdentityFieldName =
   Exclude<
     keyof CharacterIdentityDraft,
-    'clan' | 'generation'
+    'clan' | 'generation' | 'ageCategory'
   >
 
 export function IdentityStep({
@@ -126,6 +130,24 @@ export function IdentityStep({
           : Number(
               rawValue,
             ) as CharacterGeneration,
+    })
+  }
+
+  function updateAgeCategory(
+    event: ChangeEvent<
+      HTMLSelectElement
+    >,
+  ) {
+    const rawValue =
+      event.target.value
+
+    onChange({
+      ...value,
+
+      ageCategory:
+        rawValue === ''
+          ? null
+          : rawValue as CharacterAdvantageAgeCategory,
     })
   }
 
@@ -274,6 +296,44 @@ export function IdentityStep({
               ),
             )}
           </select>
+        </label>
+
+        <label className="creation-field">
+          <span>Categoría etaria</span>
+
+          <select
+            name="ageCategory"
+            value={
+              value.ageCategory ?? ''
+            }
+            onChange={
+              updateAgeCategory
+            }
+          >
+            <option value="">
+              Sin determinar
+            </option>
+
+            <option value="fledgling">
+              Retoño (recién creado)
+            </option>
+
+            <option value="neonate">
+              Neonato
+            </option>
+
+            <option value="ancilla">
+              Ancilla
+            </option>
+
+            <option value="elder">
+              Antiguo
+            </option>
+          </select>
+
+          <small>
+            Es independiente de la Generación.
+          </small>
         </label>
 
         <label className="creation-field">

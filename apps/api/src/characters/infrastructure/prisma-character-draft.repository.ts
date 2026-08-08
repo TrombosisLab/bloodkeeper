@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 
 import {
   AdvantageCategory as PrismaAdvantageCategory,
+  CharacterAgeCategory as PrismaCharacterAgeCategory,
   AdvantageDetailsKind as PrismaAdvantageDetailsKind,
   AdvantageMaskBenefit as PrismaAdvantageMaskBenefit,
   AdvantageSelectionOrigin as PrismaAdvantageSelectionOrigin,
@@ -27,6 +28,7 @@ import type {
   AdvantageMaskBenefitKey,
   CharacterAdvantageCategory,
   CharacterAdvantageSelectionOrigin,
+  CharacterAgeCategory,
   CharacterCreationStep,
   CharacterDisciplineKey,
   CharacterDisciplineOrigin,
@@ -175,6 +177,30 @@ const alchemyMethodFromPrisma: Record<
   ATHANOR_CORPORIS: 'athanorCorporis',
   CALCINATIO: 'calcinatio',
   FIXATIO: 'fixatio',
+}
+
+const ageCategoryToPrisma: Record<
+  CharacterAgeCategory,
+  PrismaCharacterAgeCategory
+> = {
+  fledgling:
+    PrismaCharacterAgeCategory.FLEDGLING,
+  neonate:
+    PrismaCharacterAgeCategory.NEONATE,
+  ancilla:
+    PrismaCharacterAgeCategory.ANCILLA,
+  elder:
+    PrismaCharacterAgeCategory.ELDER,
+}
+
+const ageCategoryFromPrisma: Record<
+  PrismaCharacterAgeCategory,
+  CharacterAgeCategory
+> = {
+  FLEDGLING: 'fledgling',
+  NEONATE: 'neonate',
+  ANCILLA: 'ancilla',
+  ELDER: 'elder',
 }
 
 const advantageCategoryToPrisma: Record<
@@ -718,6 +744,36 @@ function toIdentityCreate(
     sire: identity.sire ?? null,
     desire: identity.desire ?? null,
     generation: identity.generation ?? null,
+    ageCategory:
+      identity.ageCategory === undefined ||
+      identity.ageCategory === null
+        ? null
+        : ageCategoryToPrisma[
+            identity.ageCategory
+          ],
+  }
+}
+
+function toIdentityUpdate(
+  identity: Partial<PersistedCharacterIdentity>,
+): Prisma.CharacterIdentityUpdateInput {
+  const {
+    ageCategory,
+    ...other
+  } = identity
+
+  return {
+    ...other,
+    ...(ageCategory === undefined
+      ? {}
+      : {
+          ageCategory:
+            ageCategory === null
+              ? null
+              : ageCategoryToPrisma[
+                  ageCategory
+                ],
+        }),
   }
 }
 
@@ -792,6 +848,12 @@ function toPersistedDraft(
       sire: row.identity.sire,
       desire: row.identity.desire,
       generation: row.identity.generation,
+      ageCategory:
+        row.identity.ageCategory === null
+          ? null
+          : ageCategoryFromPrisma[
+              row.identity.ageCategory
+            ],
     },
     creation: {
       schemaVersion:
@@ -1267,7 +1329,10 @@ export class PrismaCharacterDraftRepository
               characterId: data.characterId,
               ...toIdentityCreate(data.identity),
             },
-            update: data.identity,
+            update:
+              toIdentityUpdate(
+                data.identity,
+              ),
           })
         }
 

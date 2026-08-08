@@ -76,6 +76,7 @@ function richSnapshot() {
       sire: null,
       desire: 'Entrar en el archivo',
       generation: 13,
+      ageCategory: 'ancilla',
     },
     creation: {
       schemaVersion: 1,
@@ -509,6 +510,45 @@ test(
           'sandman-discipline': 0,
         },
       },
+    )
+  },
+)
+
+test(
+  'SPEC-021 transporta la categoría etaria en create y load',
+  () => {
+    const draft =
+      structuredClone(
+        initialCharacterDraft,
+      )
+
+    draft.identity.ageCategory =
+      'fledgling'
+
+    const request =
+      mapCharacterDraftToCreateRequest(
+        draft,
+        {
+          currentStepId: 'identity',
+        },
+      )
+
+    assert.equal(
+      request.identity.ageCategory,
+      'fledgling',
+    )
+
+    const snapshot =
+      richSnapshot()
+
+    const state =
+      mapCharacterDraftApiSnapshotToEditorState(
+        snapshot,
+      )
+
+    assert.equal(
+      state.draft.identity.ageCategory,
+      'ancilla',
     )
   },
 )

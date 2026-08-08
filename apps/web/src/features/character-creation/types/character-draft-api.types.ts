@@ -37,6 +37,12 @@ export type CharacterDraftApiLifecycleStatus =
   | 'active'
   | 'archived'
 
+export type CharacterDraftApiAgeCategory =
+  | 'fledgling'
+  | 'neonate'
+  | 'ancilla'
+  | 'elder'
+
 export interface CharacterDraftApiIdentity {
   name: string
   concept: string | null
@@ -46,6 +52,8 @@ export interface CharacterDraftApiIdentity {
   sire: string | null
   desire: string | null
   generation: number | null
+  ageCategory:
+    CharacterDraftApiAgeCategory | null
 }
 
 export interface CharacterDraftApiCreationState {

@@ -280,3 +280,71 @@ test(
     )
   },
 )
+
+test(
+  'SPEC-021 valida requisito etario de Arcaico en backend',
+  () => {
+    const archaic = {
+      selectionId: 'archaic-age',
+      definitionKey: 'archaic',
+      category: 'flaw',
+      rating: 2,
+      origin: 'creation',
+      parentSelectionId: null,
+      details: null,
+    }
+
+    const validateAge = (
+      ageCategory,
+    ) =>
+      characterAdvantageValidationContributor
+        .validate(
+          {
+            identity: {
+              ageCategory,
+            },
+            advantages: {
+              selections: [
+                archaic,
+              ],
+            },
+          },
+          'editing',
+        )[0]
+
+    const unknown =
+      validateAge(null)
+    const neonate =
+      validateAge('neonate')
+    const ancilla =
+      validateAge('ancilla')
+    const elder =
+      validateAge('elder')
+
+    assert.ok(
+      codes(unknown).includes(
+        'CHARACTER_ADVANTAGE_AGE_CATEGORY_REQUIRED',
+      ),
+    )
+
+    assert.ok(
+      codes(neonate).includes(
+        'CHARACTER_ADVANTAGE_AGE_CATEGORY_TOO_YOUNG',
+      ),
+    )
+
+    assert.equal(
+      codes(ancilla).includes(
+        'CHARACTER_ADVANTAGE_AGE_CATEGORY_TOO_YOUNG',
+      ),
+      false,
+    )
+
+    assert.equal(
+      codes(elder).includes(
+        'CHARACTER_ADVANTAGE_AGE_CATEGORY_TOO_YOUNG',
+      ),
+      false,
+    )
+  },
+)

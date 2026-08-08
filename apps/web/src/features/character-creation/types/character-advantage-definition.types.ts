@@ -47,6 +47,7 @@ export type CharacterAdvantageCharacterKind =
  * Edad y generación son conceptos separados dentro del dominio.
  */
 export type CharacterAdvantageAgeCategory =
+  | 'fledgling'
   | 'neonate'
   | 'ancilla'
   | 'elder'

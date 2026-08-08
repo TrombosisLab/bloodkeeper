@@ -129,3 +129,42 @@ test(
     )
   },
 )
+
+test(
+  'SPEC-021 persiste la categoría etaria sin derivarla de Generación',
+  async () => {
+    const ageMigration =
+      await readFile(
+        new URL(
+          '../prisma/migrations/20260808153000_add_character_age_category/migration.sql',
+          import.meta.url,
+        ),
+        'utf8',
+      )
+
+    assert.match(
+      schema,
+      /enum CharacterAgeCategory\s*{[\s\S]*FLEDGLING[\s\S]*NEONATE[\s\S]*ANCILLA[\s\S]*ELDER[\s\S]*}/,
+    )
+
+    assert.match(
+      schema,
+      /ageCategory\s+CharacterAgeCategory\?/,
+    )
+
+    assert.match(
+      ageMigration,
+      /ADD COLUMN "ageCategory" "CharacterAgeCategory"/,
+    )
+
+    assert.doesNotMatch(
+      ageMigration,
+      /\bUPDATE\s+"character_identities"/i,
+    )
+
+    assert.doesNotMatch(
+      ageMigration,
+      /\b(?:ADD|ALTER)\s+COLUMN\s+"generation"/i,
+    )
+  },
+)

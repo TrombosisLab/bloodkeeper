@@ -10,6 +10,10 @@ import type {
   CharacterGeneration,
 } from './character-generation.types'
 
+import type {
+  CharacterAdvantageAgeCategory,
+} from './character-advantage-definition.types'
+
 export type CharacterIdentityDraft =
   Omit<
     CharacterIdentity,
@@ -21,5 +25,9 @@ export type CharacterIdentityDraft =
 
     generation:
       | CharacterGeneration
+      | null
+
+    ageCategory:
+      | CharacterAdvantageAgeCategory
       | null
   }

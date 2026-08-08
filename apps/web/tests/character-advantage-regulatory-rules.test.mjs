@@ -190,3 +190,65 @@ test(
     )
   },
 )
+
+test(
+  'usa la categoría etaria explícita del borrador para Arcaico',
+  () => {
+    const definitions = [
+      {
+        key: 'archaic',
+        name: 'Arcaico',
+        category: 'flaw',
+        allowedRatings: [2],
+        source: 'core',
+        allowMultiple: false,
+        requiresInstanceDetails: false,
+        requirements: {
+          minimumAgeCategory:
+            'ancilla',
+        },
+      },
+    ]
+
+    const base =
+      draftWithSelection(
+        'archaic',
+        2,
+      )
+
+    base.advantages.selections[0]
+      .category = 'flaw'
+
+    const neonate = {
+      ...base,
+      identity: {
+        ...base.identity,
+        ageCategory: 'neonate',
+      },
+    }
+
+    const ancilla = {
+      ...base,
+      identity: {
+        ...base.identity,
+        ageCategory: 'ancilla',
+      },
+    }
+
+    assert.equal(
+      validateCharacterAdvantageRegulatoryState(
+        neonate,
+        definitions,
+      ).valid,
+      false,
+    )
+
+    assert.equal(
+      validateCharacterAdvantageRegulatoryState(
+        ancilla,
+        definitions,
+      ).valid,
+      true,
+    )
+  },
+)

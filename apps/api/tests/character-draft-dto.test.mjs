@@ -382,3 +382,55 @@ test(
     )
   },
 )
+
+test(
+  'SPEC-021 valida categoría etaria explícita',
+  () => {
+    const created =
+      parseCreateCharacterDraftRequest(
+        ownerId,
+        {
+          ...createBody(),
+          identity: {
+            name: 'Alicia',
+            ageCategory: 'ancilla',
+          },
+        },
+      )
+
+    assert.equal(
+      created.identity.ageCategory,
+      'ancilla',
+    )
+
+    const updated =
+      parseUpdateCharacterDraftRequest(
+        characterId,
+        {
+          expectedRevision: 1,
+          identity: {
+            ageCategory: 'elder',
+          },
+        },
+      )
+
+    assert.equal(
+      updated.identity?.ageCategory,
+      'elder',
+    )
+
+    assert.throws(
+      () =>
+        parseUpdateCharacterDraftRequest(
+          characterId,
+          {
+            expectedRevision: 1,
+            identity: {
+              ageCategory: 'ancient',
+            },
+          },
+        ),
+      /unsupported value/,
+    )
+  },
+)

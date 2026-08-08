@@ -186,3 +186,35 @@ test(
     )
   },
 )
+
+test(
+  'un Retoño tampoco puede adquirir Defectos Arcaicos',
+  () => {
+    for (
+      const key of [
+        'archaic',
+        'living-in-the-past',
+      ]
+    ) {
+      const definition =
+        getCharacterAdvantageDefinition(key)
+
+      assert.ok(definition)
+
+      const result =
+        validateCharacterAdvantageEligibility(
+          definition,
+          {
+            characterKind: 'standard',
+            clanKey: null,
+            ageCategory: 'fledgling',
+          },
+        )
+
+      assert.equal(
+        result.eligible,
+        false,
+      )
+    }
+  },
+)

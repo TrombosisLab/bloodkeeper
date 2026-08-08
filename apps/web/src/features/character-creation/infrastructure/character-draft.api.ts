@@ -90,6 +90,13 @@ const lifecycleStatuses = [
   'archived',
 ] as const
 
+const ageCategories = [
+  'fledgling',
+  'neonate',
+  'ancilla',
+  'elder',
+] as const
+
 const skillSpecialtyOrigins = [
   'creation',
   'predatorType',
@@ -248,6 +255,14 @@ function validIdentity(
     (
       value.generation === null ||
       isInteger(value.generation)
+    ) &&
+    (
+      value.ageCategory === undefined ||
+      value.ageCategory === null ||
+      oneOf(
+        value.ageCategory,
+        ageCategories,
+      )
     )
   )
 }

@@ -53,6 +53,7 @@ const AGE_CATEGORY_RANK:
     CharacterAdvantageAgeCategory,
     number
   > = {
+    fledgling: 0,
     neonate: 1,
     ancilla: 2,
     elder: 3,

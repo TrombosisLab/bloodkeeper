@@ -1,4 +1,5 @@
 import {
+  CHARACTER_AGE_CATEGORIES,
   CHARACTER_ATTRIBUTE_KEYS,
   CHARACTER_DISCIPLINE_KEYS,
   CHARACTER_SKILL_KEYS,
@@ -187,7 +188,15 @@ function validateIdentity(
     'desire',
   ] as const
 
-  onlyKeys(value, [...stringKeys, 'generation'], path)
+  onlyKeys(
+    value,
+    [
+      ...stringKeys,
+      'generation',
+      'ageCategory',
+    ],
+    path,
+  )
 
   for (const key of stringKeys) {
     if (Object.hasOwn(value, key)) {
@@ -203,6 +212,18 @@ function validateIdentity(
     const generation = value.generation
     if (generation !== null) {
       integer(generation, `${path}.generation`)
+    }
+  }
+
+  if (Object.hasOwn(value, 'ageCategory')) {
+    const ageCategory = value.ageCategory
+
+    if (ageCategory !== null) {
+      oneOf(
+        ageCategory,
+        CHARACTER_AGE_CATEGORIES,
+        `${path}.ageCategory`,
+      )
     }
   }
 }

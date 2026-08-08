@@ -13,6 +13,7 @@ export const initialCharacterDraft: CharacterDraft = {
     sire: '',
     desire: '',
     generation: null,
+    ageCategory: null,
   },
 
   predatorTypeChoices: {},

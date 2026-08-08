@@ -750,6 +750,87 @@ function validateCatalogSelections(
   return issues
 }
 
+const AGE_CATEGORY_RANK = {
+  fledgling: 0,
+  neonate: 1,
+  ancilla: 2,
+  elder: 3,
+} as const
+
+function validateAgeRequirements(
+  character: PersistedCharacterDraft,
+  selections:
+    readonly PersistedCharacterAdvantageSelection[],
+  context: CharacterValidationContext,
+  index: AdvantageCatalogIndex,
+): CharacterValidationIssue[] {
+  const issues: CharacterValidationIssue[] = []
+  const checked = new Set<string>()
+
+  for (const selection of selections) {
+    if (checked.has(selection.definitionKey)) {
+      continue
+    }
+
+    checked.add(selection.definitionKey)
+
+    const definition =
+      index.definitions.get(
+        selection.definitionKey,
+      )
+
+    const minimum =
+      definition?.requirements
+        ?.minimumAgeCategory
+
+    if (minimum === undefined) {
+      continue
+    }
+
+    const actual =
+      character.identity.ageCategory
+
+    if (actual === null) {
+      issues.push(
+        issue(
+          'CHARACTER_ADVANTAGE_AGE_CATEGORY_REQUIRED',
+          completionSeverity(context),
+          'identity.ageCategory',
+          'La Ventaja seleccionada requiere una categoría etaria conocida.',
+          {
+            definitionKey:
+              selection.definitionKey,
+            minimumAgeCategory: minimum,
+          },
+        ),
+      )
+      continue
+    }
+
+    if (
+      AGE_CATEGORY_RANK[actual] <
+      AGE_CATEGORY_RANK[minimum]
+    ) {
+      issues.push(
+        issue(
+          'CHARACTER_ADVANTAGE_AGE_CATEGORY_TOO_YOUNG',
+          completionSeverity(context),
+          'identity.ageCategory',
+          'La categoría etaria del personaje no cumple el mínimo de la Ventaja seleccionada.',
+          {
+            definitionKey:
+              selection.definitionKey,
+            ageCategory: actual,
+            minimumAgeCategory: minimum,
+          },
+        ),
+      )
+    }
+  }
+
+  return issues
+}
+
 function validateCreationBudget(
   selections:
     readonly PersistedCharacterAdvantageSelection[],
@@ -842,6 +923,12 @@ function validatePersistedAdvantageState(
 
   return sectionResult([
     ...validateCatalogSelections(
+      selections,
+      context,
+      index,
+    ),
+    ...validateAgeRequirements(
+      character,
       selections,
       context,
       index,

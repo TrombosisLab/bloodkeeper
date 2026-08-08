@@ -18,6 +18,16 @@ export type SkillDistributionMethod =
   | 'balanced'
   | 'specialist'
 
+export const CHARACTER_AGE_CATEGORIES = [
+  'fledgling',
+  'neonate',
+  'ancilla',
+  'elder',
+] as const
+
+export type CharacterAgeCategory =
+  typeof CHARACTER_AGE_CATEGORIES[number]
+
 export interface PersistedCharacterIdentity {
   name: string
   concept: string | null
@@ -27,6 +37,7 @@ export interface PersistedCharacterIdentity {
   sire: string | null
   desire: string | null
   generation: number | null
+  ageCategory: CharacterAgeCategory | null
 }
 
 export interface PersistedCharacterCreationState {

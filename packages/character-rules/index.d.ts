@@ -203,6 +203,7 @@ export type CharacterRulesAdvantageCharacterKind =
   | 'thinBlood'
 
 export type CharacterRulesAdvantageAgeCategory =
+  | 'fledgling'
   | 'neonate'
   | 'ancilla'
   | 'elder'

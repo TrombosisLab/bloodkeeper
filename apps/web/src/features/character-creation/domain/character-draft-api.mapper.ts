@@ -80,6 +80,8 @@ function draftIdentityToApi(
       nullableText(draft.identity.desire),
     generation:
       draft.identity.generation,
+    ageCategory:
+      draft.identity.ageCategory,
   }
 }
 
@@ -369,6 +371,8 @@ export function mapCharacterDraftApiSnapshotToEditorState(
         snapshot.identity
           .generation as
             CharacterGeneration | null,
+      ageCategory:
+        snapshot.identity.ageCategory,
     },
 
     predatorTypeChoices: {
