@@ -43,6 +43,45 @@ No introduce componentes React, reglas de dominio, tablas, diálogos ni una
 biblioteca genérica de controles. La arquitectura de componentes reutilizables
 pertenece a SPEC-014.
 
+## Convención visual de botones de acción
+
+A partir de la consolidación visual realizada durante el desarrollo posterior a
+SPEC-010, los **botones de acción estándar** de nuevas vistas o flujos deberán
+reutilizar el lenguaje visual ya establecido en la interfaz para el botón
+`Cerrar sesión`.
+
+Esto implica, salvo que exista una necesidad funcional distinta:
+
+- usar los tokens oficiales equivalentes para fondo, borde, radio, color de
+  texto, tipografía, peso y estados;
+- mantener una altura y espaciado coherentes con el resto de acciones
+  principales;
+- reutilizar una clase o regla visual existente cuando sea posible, en lugar de
+  duplicar valores o introducir una variante visual innecesaria;
+- conservar estados `disabled`, foco y accesibilidad de forma perceptible;
+- evitar que cada módulo cree su propio aspecto para botones funcionalmente
+  equivalentes.
+
+Esta convención se aplica especialmente a acciones como guardar, continuar,
+volver, abrir, configurar, crear, añadir, navegar entre secciones o ejecutar
+acciones equivalentes.
+
+Quedan fuera de esta uniformidad los controles cuya función requiera una
+representación específica, por ejemplo:
+
+- controles compactos de incremento/decremento (`+` / `−`);
+- botones exclusivamente iconográficos;
+- controles embebidos de puntuación o selección;
+- acciones destructivas, de peligro o estados especiales que necesiten una
+  semántica visual diferenciada;
+- componentes cuya SPEC activa defina explícitamente otra presentación.
+
+La referencia es el **lenguaje visual y los tokens**, no la dependencia entre
+módulos: ningún componente futuro debe importar estilos desde Autenticación
+sólo para obtener este aspecto. Cuando la reutilización crezca, deberá
+centralizarse en el sistema de diseño o en el componente compartido autorizado
+por la SPEC correspondiente.
+
 ## Responsive
 
 Los layouts existentes conservan sus breakpoints actuales. SPEC-010.A no los

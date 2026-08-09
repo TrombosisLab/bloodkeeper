@@ -360,9 +360,42 @@ export interface CharacterRulesAdvantageDefinition {
     readonly string[]
 }
 
+export type CharacterRulesLoresheetLevel =
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5
+
+export interface CharacterRulesLoresheetRequirements {
+  readonly characterKinds?:
+    readonly CharacterRulesAdvantageCharacterKind[]
+  readonly clanKeys?: readonly string[]
+  readonly excludedClanKeys?: readonly string[]
+}
+
+export interface CharacterRulesLoresheetBenefitDefinition {
+  readonly key: string
+  readonly name: string
+  readonly level: CharacterRulesLoresheetLevel
+}
+
+export interface CharacterRulesLoresheetDefinition {
+  readonly key: string
+  readonly name: string
+  readonly source: CharacterRulesAdvantageSource
+  readonly sourcePage?: number
+  readonly requirements?:
+    CharacterRulesLoresheetRequirements
+  readonly benefits:
+    readonly CharacterRulesLoresheetBenefitDefinition[]
+}
+
 export interface CharacterRulesAdvantageCatalog {
   readonly definitions:
     readonly CharacterRulesAdvantageDefinition[]
+  readonly loresheets:
+    readonly CharacterRulesLoresheetDefinition[]
 }
 
 export interface CharacterRulesPredatorTypeRestriction {

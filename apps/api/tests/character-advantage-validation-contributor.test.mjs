@@ -348,3 +348,420 @@ test(
     )
   },
 )
+
+test(
+  'SPEC-026 backend aplica la Generación máxima declarada por Custodio de la Historia',
+  () => {
+    const custodian = selection({
+      selectionId: 'custodian-generation',
+      definitionKey: 'custodian-of-history',
+      category: 'merit',
+      rating: 1,
+      details: null,
+    })
+
+    const validateGeneration = (
+      generation,
+      context = 'editing',
+    ) =>
+      characterAdvantageValidationContributor
+        .validate(
+          {
+            identity: {
+              generation,
+            },
+            advantages: {
+              selections: [
+                custodian,
+              ],
+            },
+          },
+          context,
+        )[0]
+
+    const unknown =
+      validateGeneration(
+        null,
+        'draftSave',
+      )
+    const tooHigh =
+      validateGeneration(12)
+    const allowed =
+      validateGeneration(11)
+
+    assert.equal(
+      unknown.state,
+      'pending',
+    )
+    assert.ok(
+      codes(unknown).includes(
+        'CHARACTER_ADVANTAGE_GENERATION_REQUIRED',
+      ),
+    )
+
+    assert.equal(
+      tooHigh.state,
+      'invalid',
+    )
+    assert.ok(
+      codes(tooHigh).includes(
+        'CHARACTER_ADVANTAGE_GENERATION_TOO_HIGH',
+      ),
+    )
+
+    assert.equal(
+      codes(allowed).includes(
+        'CHARACTER_ADVANTAGE_GENERATION_TOO_HIGH',
+      ),
+      false,
+    )
+    assert.equal(
+      codes(allowed).includes(
+        'CHARACTER_ADVANTAGE_GENERATION_REQUIRED',
+      ),
+      false,
+    )
+  },
+)
+
+test(
+  'SPEC-026 backend aplica excludedClanKeys de Vegano',
+  () => {
+    const vegan = selection({
+      selectionId: 'vegan-clan',
+      definitionKey: 'vegan',
+      category: 'flaw',
+      rating: 2,
+      details: null,
+    })
+
+    const validateClan = (
+      clanKey,
+      context = 'editing',
+    ) =>
+      characterAdvantageValidationContributor
+        .validate(
+          {
+            identity: {
+              clanKey,
+            },
+            advantages: {
+              selections: [
+                vegan,
+              ],
+            },
+          },
+          context,
+        )[0]
+
+    const ventrue =
+      validateClan('ventrue')
+    const brujah =
+      validateClan('brujah')
+    const unknown =
+      validateClan(null)
+
+    assert.equal(
+      ventrue.state,
+      'invalid',
+    )
+    assert.ok(
+      codes(ventrue).includes(
+        'CHARACTER_ADVANTAGE_CLAN_EXCLUDED',
+      ),
+    )
+
+    assert.equal(
+      codes(brujah).includes(
+        'CHARACTER_ADVANTAGE_CLAN_EXCLUDED',
+      ),
+      false,
+    )
+
+    assert.equal(
+      codes(unknown).includes(
+        'CHARACTER_ADVANTAGE_CLAN_EXCLUDED',
+      ),
+      false,
+    )
+  },
+)
+
+function loresheetSelection(
+  overrides = {},
+) {
+  return selection({
+    selectionId: 'loresheet-l3',
+    definitionKey: 'loresheet-benefit',
+    category: 'merit',
+    rating: 1,
+    origin: 'creation',
+    parentSelectionId: null,
+    details: {
+      kind: 'loresheet',
+      loresheetKey:
+        'descendant-of-helena',
+      benefitKey:
+        'helena-skin-deep',
+    },
+    ...overrides,
+  })
+}
+
+function validateLoresheets(
+  selections,
+  clanKey = 'toreador',
+  context = 'editing',
+) {
+  return characterAdvantageValidationContributor
+    .validate(
+      {
+        identity: {
+          clanKey,
+        },
+        advantages: {
+          selections,
+        },
+      },
+      context,
+    )[0]
+}
+
+test(
+  'SPEC-026.L3 backend acepta una Ventaja válida de Loresheet',
+  () => {
+    const result =
+      validateLoresheets([
+        loresheetSelection(),
+      ])
+
+    assert.equal(
+      result.state,
+      'complete',
+    )
+
+    assert.deepEqual(
+      codes(result),
+      [],
+    )
+  },
+)
+
+test(
+  'SPEC-026.L3 backend rechaza una Ficha inexistente',
+  () => {
+    const result =
+      validateLoresheets([
+        loresheetSelection({
+          details: {
+            kind: 'loresheet',
+            loresheetKey:
+              'unknown-loresheet',
+            benefitKey:
+              'unknown-benefit',
+          },
+        }),
+      ])
+
+    assert.equal(
+      result.state,
+      'invalid',
+    )
+
+    assert.ok(
+      codes(result).includes(
+        'CHARACTER_LORESHEET_NOT_FOUND',
+      ),
+    )
+  },
+)
+
+test(
+  'SPEC-026.L3 backend rechaza un beneficio ajeno a la Ficha',
+  () => {
+    const result =
+      validateLoresheets([
+        loresheetSelection({
+          details: {
+            kind: 'loresheet',
+            loresheetKey:
+              'descendant-of-helena',
+            benefitKey:
+              'hardestadt-voice',
+          },
+        }),
+      ])
+
+    assert.ok(
+      codes(result).includes(
+        'CHARACTER_LORESHEET_BENEFIT_NOT_FOUND',
+      ),
+    )
+  },
+)
+
+test(
+  'SPEC-026.L3 backend exige que rating coincida con el nivel del beneficio',
+  () => {
+    const result =
+      validateLoresheets([
+        loresheetSelection({
+          rating: 2,
+        }),
+      ])
+
+    assert.ok(
+      codes(result).includes(
+        'CHARACTER_LORESHEET_RATING_MISMATCH',
+      ),
+    )
+  },
+)
+
+test(
+  'SPEC-026.L3 backend rechaza seleccionar dos veces el mismo beneficio',
+  () => {
+    const result =
+      validateLoresheets([
+        loresheetSelection(),
+        loresheetSelection({
+          selectionId:
+            'loresheet-l3-duplicate',
+        }),
+      ])
+
+    assert.ok(
+      codes(result).includes(
+        'CHARACTER_LORESHEET_BENEFIT_DUPLICATE',
+      ),
+    )
+  },
+)
+
+test(
+  'SPEC-026.L3 backend permite varios beneficios de una misma Ficha',
+  () => {
+    const result =
+      validateLoresheets([
+        loresheetSelection(),
+        loresheetSelection({
+          selectionId:
+            'loresheet-l3-second',
+          rating: 2,
+          details: {
+            kind: 'loresheet',
+            loresheetKey:
+              'descendant-of-helena',
+            benefitKey:
+              'helena-true-talent',
+          },
+        }),
+      ])
+
+    assert.equal(
+      codes(result).includes(
+        'CHARACTER_LORESHEET_MULTIPLE_SHEETS_NOT_ALLOWED',
+      ),
+      false,
+    )
+
+    assert.equal(
+      codes(result).includes(
+        'CHARACTER_LORESHEET_RATING_MISMATCH',
+      ),
+      false,
+    )
+  },
+)
+
+test(
+  'SPEC-026.L3 backend rechaza beneficios de dos Fichas distintas',
+  () => {
+    const result =
+      validateLoresheets([
+        loresheetSelection(),
+        loresheetSelection({
+          selectionId:
+            'loresheet-l3-bahari',
+          details: {
+            kind: 'loresheet',
+            loresheetKey:
+              'bahari',
+            benefitKey:
+              'bahari-dangerous-reputation',
+          },
+        }),
+      ])
+
+    assert.ok(
+      codes(result).includes(
+        'CHARACTER_LORESHEET_MULTIPLE_SHEETS_NOT_ALLOWED',
+      ),
+    )
+  },
+)
+
+test(
+  'SPEC-026.L3 backend revalida el requisito de Clan de la Loresheet',
+  () => {
+    const hardestadt =
+      loresheetSelection({
+        selectionId:
+          'loresheet-l3-hardestadt',
+        details: {
+          kind: 'loresheet',
+          loresheetKey:
+            'descendant-of-hardestadt',
+          benefitKey:
+            'hardestadt-voice',
+        },
+      })
+
+    const wrongClan =
+      validateLoresheets(
+        [hardestadt],
+        'toreador',
+      )
+
+    const allowedClan =
+      validateLoresheets(
+        [hardestadt],
+        'ventrue',
+      )
+
+    const missingClan =
+      validateLoresheets(
+        [hardestadt],
+        null,
+        'draftSave',
+      )
+
+    assert.ok(
+      codes(wrongClan).includes(
+        'CHARACTER_LORESHEET_CLAN_REQUIRED',
+      ),
+    )
+
+    assert.equal(
+      codes(allowedClan).includes(
+        'CHARACTER_LORESHEET_CLAN_REQUIRED',
+      ),
+      false,
+    )
+
+    assert.ok(
+      codes(missingClan).includes(
+        'CHARACTER_LORESHEET_CLAN_REQUIRED',
+      ),
+    )
+
+    assert.equal(
+      missingClan.issues.find(
+        (item) =>
+          item.code ===
+          'CHARACTER_LORESHEET_CLAN_REQUIRED',
+      )?.severity,
+      'warning',
+    )
+  },
+)

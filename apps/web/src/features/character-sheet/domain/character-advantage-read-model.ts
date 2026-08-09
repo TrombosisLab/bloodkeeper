@@ -1,3 +1,7 @@
+import {
+  characterAdvantageCatalog,
+} from '@v5r/character-rules'
+
 import type {
   CharacterAdvantageDefinition,
   CharacterAdvantageSource,
@@ -149,11 +153,28 @@ function getCharacterAdvantageDetail(
         details.taboo,
       )
 
-    case 'loresheet':
+    case 'loresheet': {
+      const loresheet =
+        characterAdvantageCatalog.loresheets.find(
+          (definition) =>
+            definition.key ===
+            details.loresheetKey,
+        )
+
+      const benefit =
+        loresheet?.benefits.find(
+          (definition) =>
+            definition.key ===
+            details.benefitKey,
+        )
+
       return [
-        details.loresheetKey,
-        details.benefitKey,
+        loresheet?.name ??
+          details.loresheetKey,
+        benefit?.name ??
+          details.benefitKey,
       ].filter(Boolean).join(' · ') || undefined
+    }
 
     case 'linguistics':
       return (

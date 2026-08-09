@@ -35,7 +35,7 @@ test('SPEC-010.C.2L limita la migración al bloque final Sangre Débil', () => {
 
   assert.equal(
     prefixHash,
-    '941188f32bf2d9a275375f40b3a5a27396fd4dafbf4064e4be1c5210a20452ec',
+    '4c9e19813cb10b533854f5396ba29055190ae845c7585c68089fcef0c6dbcdf3',
   )
   assert.equal(
     creationStyles.endsWith(thinBloodBlock),

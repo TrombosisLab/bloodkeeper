@@ -854,7 +854,7 @@ export function CharacterCreationWizard({
           <div className="creation-actions">
             <button
               type="button"
-              className="creation-button creation-button--primary"
+              className="creation-button creation-button--primary creation-session-style-button"
               disabled={
                 persistenceState !== 'ready' ||
                 reviewBusy
@@ -882,7 +882,7 @@ export function CharacterCreationWizard({
 
             <button
               type="button"
-              className="creation-header__back"
+              className="creation-header__back creation-session-style-button"
               onClick={onBackToSheet}
               disabled={interactionBusy}
             >
@@ -1302,7 +1302,7 @@ export function CharacterCreationWizard({
           <footer className="creation-actions">
             <button
               type="button"
-              className="creation-button creation-button--secondary"
+              className="creation-button creation-button--secondary creation-session-style-button"
               onClick={goPrevious}
               disabled={
                 isFirst ||
@@ -1320,7 +1320,7 @@ export function CharacterCreationWizard({
 
             <button
               type="button"
-              className="creation-button creation-button--primary"
+              className="creation-button creation-button--primary creation-session-style-button"
               onClick={goNext}
               disabled={
                 isLast ||

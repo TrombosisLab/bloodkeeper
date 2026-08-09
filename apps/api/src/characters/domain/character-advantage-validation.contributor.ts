@@ -2,6 +2,7 @@ import type {
   CharacterRulesAdvantageCatalog,
   CharacterRulesAdvantageDefinition,
   CharacterRulesAdvantageSelectionOrigin,
+  CharacterRulesLoresheetDefinition,
 } from '@v5r/character-rules'
 
 import {
@@ -32,6 +33,11 @@ interface AdvantageCatalogIndex {
   readonly definitions: ReadonlyMap<
     string,
     CharacterRulesAdvantageDefinition
+  >
+
+  readonly loresheets: ReadonlyMap<
+    string,
+    CharacterRulesLoresheetDefinition
   >
 }
 
@@ -150,7 +156,28 @@ function buildCatalogIndex(
     definitions.set(definition.key, definition)
   }
 
-  return Object.freeze({ definitions })
+  const loresheets = new Map<
+    string,
+    CharacterRulesLoresheetDefinition
+  >()
+
+  for (const definition of catalog.loresheets) {
+    if (loresheets.has(definition.key)) {
+      throw new Error(
+        `Duplicate loresheet definition: ${definition.key}`,
+      )
+    }
+
+    loresheets.set(
+      definition.key,
+      definition,
+    )
+  }
+
+  return Object.freeze({
+    definitions,
+    loresheets,
+  })
 }
 
 function validateStructure(
@@ -831,6 +858,395 @@ function validateAgeRequirements(
   return issues
 }
 
+/*
+ * SPEC-026:
+ * Paridad backend de los requisitos reglamentarios que
+ * actualmente declara el catálogo canónico y que la Web
+ * ya evalúa:
+ *
+ * - requirementRules: generation.max
+ * - requirements: excludedClanKeys
+ *
+ * minimumAgeCategory permanece en validateAgeRequirements.
+ *
+ * Los requisitos sólo se evalúan para definiciones realmente
+ * seleccionadas. Un borrador puede conservar información aún
+ * incompleta como warning; los demás contextos la tratan como
+ * error reglamentario mediante completionSeverity().
+ */
+function validateDeclaredRequirements(
+  character: PersistedCharacterDraft,
+  selections:
+    readonly PersistedCharacterAdvantageSelection[],
+  context: CharacterValidationContext,
+  index: AdvantageCatalogIndex,
+): CharacterValidationIssue[] {
+  const issues: CharacterValidationIssue[] = []
+  const checked = new Set<string>()
+
+  for (const selection of selections) {
+    if (checked.has(selection.definitionKey)) {
+      continue
+    }
+
+    checked.add(selection.definitionKey)
+
+    const definition =
+      index.definitions.get(
+        selection.definitionKey,
+      )
+
+    if (definition === undefined) {
+      continue
+    }
+
+    const clanKey =
+      character.identity?.clanKey ?? null
+
+    if (
+      clanKey !== null &&
+      definition.requirements
+        ?.excludedClanKeys
+        ?.includes(clanKey)
+    ) {
+      issues.push(
+        issue(
+          'CHARACTER_ADVANTAGE_CLAN_EXCLUDED',
+          completionSeverity(context),
+          'identity.clanKey',
+          'La Ventaja seleccionada excluye el Clan del personaje.',
+          {
+            definitionKey: definition.key,
+            clanKey,
+          },
+        ),
+      )
+    }
+
+    for (
+      const requirement of
+        definition.requirementRules ?? []
+    ) {
+      if (requirement.type !== 'generation') {
+        continue
+      }
+
+      const generation =
+        character.identity?.generation ?? null
+
+      if (generation === null) {
+        issues.push(
+          issue(
+            'CHARACTER_ADVANTAGE_GENERATION_REQUIRED',
+            completionSeverity(context),
+            'identity.generation',
+            'La Ventaja seleccionada requiere una Generación conocida.',
+            {
+              definitionKey: definition.key,
+              maximumGeneration:
+                requirement.max,
+            },
+          ),
+        )
+        continue
+      }
+
+      if (generation > requirement.max) {
+        issues.push(
+          issue(
+            'CHARACTER_ADVANTAGE_GENERATION_TOO_HIGH',
+            completionSeverity(context),
+            'identity.generation',
+            'La Generación del personaje no cumple el máximo de la Ventaja seleccionada.',
+            {
+              definitionKey: definition.key,
+              generation,
+              maximumGeneration:
+                requirement.max,
+            },
+          ),
+        )
+      }
+    }
+  }
+
+  return issues
+}
+
+/*
+ * SPEC-026.L3
+ *
+ * Contrasta las referencias persistidas de Fichas de
+ * Conocimientos contra el catálogo canónico compartido.
+ *
+ * La selección sigue usando la definición contenedora
+ * "loresheet-benefit"; la identidad concreta se conserva
+ * en details.loresheetKey + details.benefitKey.
+ *
+ * Reglas:
+ * - la Ficha debe existir;
+ * - el beneficio debe pertenecer a esa Ficha;
+ * - rating debe coincidir con el nivel del beneficio;
+ * - un beneficio no puede repetirse;
+ * - un personaje sólo puede adquirir beneficios de una Ficha;
+ * - los requisitos declarados por la Ficha se revalidan
+ *   contra el estado actual del personaje.
+ */
+function validateLoresheetSelections(
+  character: PersistedCharacterDraft,
+  selections:
+    readonly PersistedCharacterAdvantageSelection[],
+  context: CharacterValidationContext,
+  index: AdvantageCatalogIndex,
+): CharacterValidationIssue[] {
+  const issues: CharacterValidationIssue[] = []
+
+  const selectedLoresheetKeys =
+    new Set<string>()
+
+  const selectedBenefits =
+    new Set<string>()
+
+  const checkedEligibility =
+    new Set<string>()
+
+  for (const selection of selections) {
+    const details = selection.details
+
+    if (
+      details?.kind !==
+      'loresheet'
+    ) {
+      continue
+    }
+
+    const loresheetKey =
+      details.loresheetKey
+
+    const benefitKey =
+      details.benefitKey
+
+    selectedLoresheetKeys.add(
+      loresheetKey,
+    )
+
+    const loresheet =
+      index.loresheets.get(
+        loresheetKey,
+      )
+
+    if (loresheet === undefined) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_LORESHEET_NOT_FOUND',
+          'advantages',
+          'La Ficha de Conocimientos seleccionada no existe en el catálogo canónico.',
+          {
+            selectionId:
+              selection.selectionId,
+            loresheetKey,
+          },
+        ),
+      )
+
+      continue
+    }
+
+    const benefit =
+      loresheet.benefits.find(
+        (candidate) =>
+          candidate.key ===
+          benefitKey,
+      )
+
+    if (benefit === undefined) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_LORESHEET_BENEFIT_NOT_FOUND',
+          'advantages',
+          'La Ventaja seleccionada no pertenece a la Ficha de Conocimientos indicada.',
+          {
+            selectionId:
+              selection.selectionId,
+            loresheetKey,
+            benefitKey,
+          },
+        ),
+      )
+    } else if (
+      selection.rating !==
+      benefit.level
+    ) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_LORESHEET_RATING_MISMATCH',
+          'advantages',
+          'La puntuación de la Ventaja debe coincidir con su nivel en la Ficha de Conocimientos.',
+          {
+            selectionId:
+              selection.selectionId,
+            loresheetKey,
+            benefitKey,
+            rating:
+              selection.rating,
+            expectedRating:
+              benefit.level,
+          },
+        ),
+      )
+    }
+
+    const uniqueBenefitKey =
+      `${loresheetKey}:${benefitKey}`
+
+    if (
+      selectedBenefits.has(
+        uniqueBenefitKey,
+      )
+    ) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_LORESHEET_BENEFIT_DUPLICATE',
+          'advantages',
+          'La misma Ventaja de Ficha de Conocimientos no puede seleccionarse más de una vez.',
+          {
+            loresheetKey,
+            benefitKey,
+          },
+        ),
+      )
+    }
+
+    selectedBenefits.add(
+      uniqueBenefitKey,
+    )
+
+    if (
+      checkedEligibility.has(
+        loresheetKey,
+      )
+    ) {
+      continue
+    }
+
+    checkedEligibility.add(
+      loresheetKey,
+    )
+
+    const requirements =
+      loresheet.requirements
+
+    if (requirements === undefined) {
+      continue
+    }
+
+    const clanKey =
+      character.identity?.clanKey ??
+      null
+
+    const characterKind =
+      clanKey === 'thinBlood'
+        ? 'thinBlood'
+        : clanKey === 'caitiff'
+          ? 'caitiff'
+          : 'standard'
+
+    if (
+      requirements.characterKinds !==
+        undefined &&
+      !requirements.characterKinds.includes(
+        characterKind,
+      )
+    ) {
+      issues.push(
+        issue(
+          'CHARACTER_LORESHEET_CHARACTER_KIND_NOT_ALLOWED',
+          completionSeverity(context),
+          'identity.clanKey',
+          'La Ficha de Conocimientos no está disponible para este tipo de personaje.',
+          {
+            loresheetKey,
+            characterKind,
+          },
+        ),
+      )
+    }
+
+    if (
+      requirements.clanKeys !==
+      undefined
+    ) {
+      if (clanKey === null) {
+        issues.push(
+          issue(
+            'CHARACTER_LORESHEET_CLAN_REQUIRED',
+            completionSeverity(context),
+            'identity.clanKey',
+            'La Ficha de Conocimientos requiere un Clan permitido.',
+            {
+              loresheetKey,
+            },
+          ),
+        )
+      } else if (
+        !requirements.clanKeys.includes(
+          clanKey,
+        )
+      ) {
+        issues.push(
+          issue(
+            'CHARACTER_LORESHEET_CLAN_REQUIRED',
+            completionSeverity(context),
+            'identity.clanKey',
+            'El Clan del personaje no cumple el requisito de la Ficha de Conocimientos.',
+            {
+              loresheetKey,
+              clanKey,
+            },
+          ),
+        )
+      }
+    }
+
+    if (
+      clanKey !== null &&
+      requirements.excludedClanKeys
+        ?.includes(clanKey)
+    ) {
+      issues.push(
+        issue(
+          'CHARACTER_LORESHEET_CLAN_EXCLUDED',
+          completionSeverity(context),
+          'identity.clanKey',
+          'La Ficha de Conocimientos excluye el Clan del personaje.',
+          {
+            loresheetKey,
+            clanKey,
+          },
+        ),
+      )
+    }
+  }
+
+  if (
+    selectedLoresheetKeys.size > 1
+  ) {
+    issues.push(
+      errorIssue(
+        'CHARACTER_LORESHEET_MULTIPLE_SHEETS_NOT_ALLOWED',
+        'advantages',
+        'Un personaje sólo puede adquirir Ventajas de una única Ficha de Conocimientos.',
+        {
+          loresheetCount:
+            selectedLoresheetKeys.size,
+        },
+      ),
+    )
+  }
+
+  return issues
+}
+
 function validateCreationBudget(
   selections:
     readonly PersistedCharacterAdvantageSelection[],
@@ -928,6 +1344,18 @@ function validatePersistedAdvantageState(
       index,
     ),
     ...validateAgeRequirements(
+      character,
+      selections,
+      context,
+      index,
+    ),
+    ...validateDeclaredRequirements(
+      character,
+      selections,
+      context,
+      index,
+    ),
+    ...validateLoresheetSelections(
       character,
       selections,
       context,

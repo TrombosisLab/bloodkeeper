@@ -1,0 +1,507 @@
+[
+  {
+    "key": "bahari",
+    "name": "Los Bahari",
+    "source": "core",
+    "sourcePage": 382,
+    "benefits": [
+      {
+        "key": "bahari-dangerous-reputation",
+        "name": "Reputación Peligrosa",
+        "level": 1
+      },
+      {
+        "key": "bahari-ritual-scarification",
+        "name": "Escarificación Ritual",
+        "level": 2
+      },
+      {
+        "key": "bahari-sacrifice-the-children",
+        "name": "Sacrificar a los Niños",
+        "level": 3
+      },
+      {
+        "key": "bahari-blood-of-the-womb",
+        "name": "La Sangre del Útero",
+        "level": 4
+      },
+      {
+        "key": "bahari-first-cursed",
+        "name": "Primera Maldita",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "key": "circulatory-system",
+    "name": "El Sistema Circulatorio",
+    "source": "core",
+    "sourcePage": 386,
+    "benefits": [
+      {
+        "key": "circulatory-system-access-the-system",
+        "name": "Acceder al Sistema",
+        "level": 1
+      },
+      {
+        "key": "circulatory-system-little-black-book",
+        "name": "Pequeño Libro Negro",
+        "level": 2
+      },
+      {
+        "key": "circulatory-system-remote-farm",
+        "name": "Granja Remota",
+        "level": 3
+      },
+      {
+        "key": "circulatory-system-safe-passage",
+        "name": "Tránsito Seguro",
+        "level": 4
+      },
+      {
+        "key": "circulatory-system-blood-sommelier",
+        "name": "Sumiller de Sangre",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "key": "convention-of-thorns",
+    "name": "Convención de Thorns",
+    "source": "core",
+    "sourcePage": 387,
+    "benefits": [
+      {
+        "key": "convention-of-thorns-historian",
+        "name": "Historiador de Thorns",
+        "level": 1
+      },
+      {
+        "key": "convention-of-thorns-master-of-traditions",
+        "name": "Maestro de Tradiciones",
+        "level": 2
+      },
+      {
+        "key": "convention-of-thorns-secrets",
+        "name": "Secretos de la Convención",
+        "level": 3
+      },
+      {
+        "key": "convention-of-thorns-justicar-candidate",
+        "name": "Candidato a Justicar",
+        "level": 4
+      },
+      {
+        "key": "convention-of-thorns-new-traditions",
+        "name": "Nuevas Tradiciones",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "key": "cainite-heresy",
+    "name": "Herejía Cainita",
+    "source": "core",
+    "sourcePage": 384,
+    "benefits": [
+      {
+        "key": "cainite-heresy-understanding",
+        "name": "El que Tenga Entendimiento",
+        "level": 1
+      },
+      {
+        "key": "cainite-heresy-hand",
+        "name": "Mano de la Herejía",
+        "level": 2
+      },
+      {
+        "key": "cainite-heresy-counter-inquisition",
+        "name": "Contra-Inquisición",
+        "level": 3
+      },
+      {
+        "key": "cainite-heresy-red-celebrant",
+        "name": "Celebrante Rojo",
+        "level": 4
+      },
+      {
+        "key": "cainite-heresy-mentioned-in-prophecy",
+        "name": "El Mencionado en la Profecía",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "key": "carna",
+    "name": "Carna",
+    "source": "core",
+    "sourcePage": 385,
+    "benefits": [
+      {
+        "key": "carna-embrace-the-vision",
+        "name": "Abrazar la Visión",
+        "level": 1
+      },
+      {
+        "key": "carna-rebel-trail",
+        "name": "El Rastro Rebelde",
+        "level": 2
+      },
+      {
+        "key": "carna-unorthodox-rituals",
+        "name": "Rituales Poco Ortodoxos",
+        "level": 3
+      },
+      {
+        "key": "carna-bond-reimagined",
+        "name": "Vínculo Reimaginado",
+        "level": 4
+      },
+      {
+        "key": "carna-book-of-the-grave-war",
+        "name": "Libro de la Guerra de las Tumbas",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "key": "descendant-of-helena",
+    "name": "Descendiente de Helena",
+    "source": "core",
+    "sourcePage": 391,
+    "requirements": {
+      "clanKeys": [
+        "toreador"
+      ]
+    },
+    "benefits": [
+      {
+        "key": "helena-skin-deep",
+        "name": "A Flor de Piel",
+        "level": 1
+      },
+      {
+        "key": "helena-true-talent",
+        "name": "Talento Real",
+        "level": 2
+      },
+      {
+        "key": "helena-embrace-the-stereotype",
+        "name": "Abraza el Estereotipo",
+        "level": 3
+      },
+      {
+        "key": "helena-divine-purity",
+        "name": "Pureza Divina",
+        "level": 4
+      },
+      {
+        "key": "helena-succubus-club-franchise",
+        "name": "Franquicia del Succubus Club",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "key": "descendant-of-hardestadt",
+    "name": "Descendiente de Hardestadt",
+    "source": "core",
+    "sourcePage": 390,
+    "requirements": {
+      "clanKeys": [
+        "ventrue"
+      ]
+    },
+    "benefits": [
+      {
+        "key": "hardestadt-voice",
+        "name": "Voz de Hardestadt",
+        "level": 1
+      },
+      {
+        "key": "hardestadt-supreme-leader",
+        "name": "Líder Supremo",
+        "level": 2
+      },
+      {
+        "key": "hardestadt-ventrue-pillar",
+        "name": "Pilar Ventrue",
+        "level": 3
+      },
+      {
+        "key": "hardestadt-line-to-the-founders",
+        "name": "Línea con los Fundadores",
+        "level": 4
+      },
+      {
+        "key": "hardestadt-heir",
+        "name": "Heredero de Hardestadt",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "key": "theo-bell",
+    "name": "Theo Bell",
+    "source": "core",
+    "sourcePage": 383,
+    "benefits": [
+      {
+        "key": "theo-bell-rebels-to-the-cause",
+        "name": "Rebeldes a la Causa",
+        "level": 1
+      },
+      {
+        "key": "theo-bell-true-anarch",
+        "name": "Verdadero Anarquista",
+        "level": 2
+      },
+      {
+        "key": "theo-bell-contact-information",
+        "name": "Información de Contacto",
+        "level": 3
+      },
+      {
+        "key": "theo-bell-bells-circle",
+        "name": "Círculo de Bell",
+        "level": 4
+      },
+      {
+        "key": "theo-bell-sect-neutrality",
+        "name": "Neutralidad de Secta",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "key": "sect-war-veteran",
+    "name": "Veterano de la Guerra de Sectas",
+    "source": "core",
+    "sourcePage": 392,
+    "benefits": [
+      {
+        "key": "sect-war-veteran-survivor",
+        "name": "Superviviente",
+        "level": 1
+      },
+      {
+        "key": "sect-war-veteran-active-participant",
+        "name": "Participante Activo",
+        "level": 2
+      },
+      {
+        "key": "sect-war-veteran-trophy",
+        "name": "Trofeo",
+        "level": 3
+      },
+      {
+        "key": "sect-war-veteran-no-vampires-land",
+        "name": "Tierra de Ningún Vampiro",
+        "level": 4
+      },
+      {
+        "key": "sect-war-veteran-sect-agitator",
+        "name": "Agitador de Secta",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "key": "the-trinity",
+    "name": "La Trinidad",
+    "source": "core",
+    "sourcePage": 393,
+    "benefits": [
+      {
+        "key": "the-trinity-constantinople-knowledge",
+        "name": "Conocimiento Constantinopla",
+        "level": 1
+      },
+      {
+        "key": "the-trinity-antonius-architecture",
+        "name": "Arquitectura de Antonius",
+        "level": 2
+      },
+      {
+        "key": "the-trinity-the-dream",
+        "name": "El Sueño",
+        "level": 3
+      },
+      {
+        "key": "the-trinity-the-dracon",
+        "name": "El Dracon",
+        "level": 4
+      },
+      {
+        "key": "the-trinity-new-trinity",
+        "name": "La Nueva Trinidad",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "key": "jeanette-therese-voerman",
+    "name": "Jeanette / Therese Voerman",
+    "source": "core",
+    "sourcePage": 394,
+    "benefits": [
+      {
+        "key": "voerman-asylum-member",
+        "name": "Miembro del Asylum",
+        "level": 1
+      },
+      {
+        "key": "voerman-performing-monkey",
+        "name": "Mono de feria",
+        "level": 2
+      },
+      {
+        "key": "voerman-jeanettes-favorite",
+        "name": "El Preferido de Jeanette",
+        "level": 3
+      },
+      {
+        "key": "voerman-thereses-favorite",
+        "name": "El Preferido de Therese",
+        "level": 4
+      },
+      {
+        "key": "voerman-asylum-director",
+        "name": "Director de Asylum",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "key": "week-of-nightmares",
+    "name": "La Semana de las Pesadillas",
+    "source": "core",
+    "sourcePage": 395,
+    "benefits": [
+      {
+        "key": "week-of-nightmares-oral-history",
+        "name": "Historia Oral",
+        "level": 1
+      },
+      {
+        "key": "week-of-nightmares-ravnos-remnants",
+        "name": "Remanentes Ravnos",
+        "level": 2
+      },
+      {
+        "key": "week-of-nightmares-i-was-there",
+        "name": "Estuve Allí",
+        "level": 3
+      },
+      {
+        "key": "week-of-nightmares-red-star",
+        "name": "La Estrella Roja",
+        "level": 4
+      },
+      {
+        "key": "week-of-nightmares-blood-of-zapathasura",
+        "name": "Sangre de Zapathasura",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "key": "rudi",
+    "name": "Rudi",
+    "source": "core",
+    "sourcePage": 396,
+    "benefits": [
+      {
+        "key": "rudi-new-rights",
+        "name": "Nuevos Derechos",
+        "level": 1
+      },
+      {
+        "key": "rudi-them-and-theirs",
+        "name": "Ellos y lo Suyo",
+        "level": 2
+      },
+      {
+        "key": "rudi-gangrel-advocate",
+        "name": "Abogado Gangrel",
+        "level": 3
+      },
+      {
+        "key": "rudi-bear-pack",
+        "name": "La Manada del Oso",
+        "level": 4
+      },
+      {
+        "key": "rudi-army",
+        "name": "Ejército de Rudi",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "key": "first-inquisition",
+    "name": "La Primera Inquisición",
+    "source": "core",
+    "sourcePage": 388,
+    "benefits": [
+      {
+        "key": "first-inquisition-mistakes-of-the-past",
+        "name": "Errores del Pasado",
+        "level": 1
+      },
+      {
+        "key": "first-inquisition-names-of-the-guilty",
+        "name": "Nombres de los Culpables",
+        "level": 2
+      },
+      {
+        "key": "first-inquisition-sect-of-santiago",
+        "name": "La Secta de Santiago",
+        "level": 3
+      },
+      {
+        "key": "first-inquisition-second-act",
+        "name": "El Segundo Acto",
+        "level": 4
+      },
+      {
+        "key": "first-inquisition-black-site",
+        "name": "Punto Negro",
+        "level": 5
+      }
+    ]
+  },
+  {
+    "key": "golconda",
+    "name": "Golconda",
+    "source": "core",
+    "sourcePage": 389,
+    "benefits": [
+      {
+        "key": "golconda-seeds",
+        "name": "Semillas de Golconda",
+        "level": 1
+      },
+      {
+        "key": "one-true-way",
+        "name": "El Único Camino Verdadero",
+        "level": 2
+      },
+      {
+        "key": "saulot-disciple",
+        "name": "Discípulo de Saulot",
+        "level": 3
+      },
+      {
+        "key": "satisfy-the-hunger",
+        "name": "Satisfacer el Ansia",
+        "level": 4
+      },
+      {
+        "key": "greet-the-sun",
+        "name": "Recibir al Sol",
+        "level": 5
+      }
+    ]
+  }
+]

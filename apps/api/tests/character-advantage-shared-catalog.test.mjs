@@ -24,7 +24,7 @@ test(
     const definitions =
       characterAdvantageCatalog.definitions
 
-    assert.equal(definitions.length, 108)
+    assert.equal(definitions.length, 109)
     assert.equal(
       definitions.filter(
         ({ category }) => category === 'background',
@@ -35,7 +35,7 @@ test(
       definitions.filter(
         ({ category }) => category === 'merit',
       ).length,
-      52,
+      53,
     )
     assert.equal(
       definitions.filter(

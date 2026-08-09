@@ -183,7 +183,7 @@ test('SPEC-012 convierte el creador en contenido interno', () => {
   )
   assert.match(
     wizardSource,
-    /aria-busy=\{persistenceBusy\}/,
+    /aria-busy=\{interactionBusy\}/,
   )
   assert.match(wizardSource, /<\/section>/)
 })

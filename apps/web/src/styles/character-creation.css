@@ -2795,6 +2795,377 @@
   font-weight: 700;
 }
 
+/* SPEC-026 — Jerarquía visual de Ventajas y Trasfondos */
+
+.advantages-step {
+  display: flex;
+  flex-direction: column;
+}
+
+.advantages-step > .advantages-category--background {
+  order: 10;
+}
+
+.advantages-step > .advantages-background-configurations {
+  order: 11;
+}
+
+.advantages-step > .advantages-haven-configuration-toggle {
+  order: 12;
+}
+
+.advantages-step > .advantages-category--haven-merits {
+  order: 13;
+}
+
+.advantages-step > .advantages-category--haven-flaws {
+  order: 14;
+}
+
+.advantages-step > .advantages-category--loresheet {
+  order: 20;
+}
+
+.advantages-step > .advantages-category--merit {
+  order: 30;
+}
+
+.advantages-step > .advantages-category--flaw {
+  order: 40;
+}
+
+.advantages-category--background .advantages-catalog-grid,
+.advantages-category--loresheet .advantages-catalog-grid,
+.advantages-category--merit .advantages-catalog-grid,
+.advantages-category--flaw .advantages-catalog-grid,
+.advantages-category--haven-merits .advantages-catalog-grid,
+.advantages-category--haven-flaws .advantages-catalog-grid {
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-option-border);
+  background: var(--color-surface-option);
+}
+
+.advantages-category--background .advantage-sheet-entry,
+.advantages-category--loresheet .advantage-sheet-entry,
+.advantages-category--merit .advantage-sheet-entry,
+.advantages-category--flaw .advantage-sheet-entry,
+.advantages-category--haven-merits .advantage-sheet-entry,
+.advantages-category--haven-flaws .advantage-sheet-entry {
+  min-width: 0;
+  border: 0;
+  border-right:
+    1px solid var(--color-border-section-subtle);
+  border-bottom:
+    1px solid var(--color-border-section-subtle);
+  border-radius: 0;
+  background: transparent;
+}
+
+.advantages-category--background
+  .advantage-sheet-entry {
+  align-self: stretch;
+}
+
+.advantages-background-configurations {
+  margin-top: var(--space-4);
+}
+
+.advantages-background-configurations__grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.advantages-background-configuration {
+  min-width: 0;
+  border:
+    1px solid
+    var(--color-border-section-subtle);
+  background: var(--color-surface-option);
+}
+
+.advantages-background-configuration > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding:
+    var(--space-2)
+    var(--space-3);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.advantages-background-configuration > summary strong {
+  flex: 0 0 auto;
+}
+
+.advantages-background-configuration__body {
+  padding:
+    var(--space-2)
+    var(--space-3)
+    var(--space-3);
+  border-top:
+    1px solid
+    var(--color-border-section-subtle);
+}
+
+.advantages-background-configuration
+  .advantage-instance-editor {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.advantages-background-configuration
+  .advantage-instance-editor h5 {
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+.advantages-background-configuration
+  .advantage-instance-editor input {
+  width: 100%;
+  min-width: 0;
+}
+
+.advantages-background-configuration
+  .advantage-instance-block__narrative-pending {
+  display: block;
+  margin-top: var(--space-2);
+  line-height: 1.3;
+}
+
+.advantages-haven-configuration-toggle {
+  margin-top: var(--space-4);
+}
+
+.advantages-haven-configuration-toggle
+  .advantages-category__heading {
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.advantages-haven-configuration-toggle button {
+  flex: 0 0 auto;
+}
+
+.advantages-haven-configuration-toggle__button {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-emphasis);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.advantages-haven-configuration-toggle__button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.advantages-step .advantage-action-button {
+  min-height: 2rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-emphasis);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.advantages-step .advantage-action-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+
+.creation-session-style-button {
+  min-width: auto;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-emphasis);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.loresheet-selector-control {
+  display: block;
+}
+
+.loresheet-selector-menu {
+  position: relative;
+  margin-top: var(--space-2);
+}
+
+.loresheet-selector-menu__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 2.5rem;
+  padding:
+    var(--space-2)
+    var(--space-3);
+  border:
+    1px solid
+    var(--color-border-control-translucent);
+  border-radius: 0;
+  background:
+    var(--color-surface-input-soft);
+  color: inherit;
+  cursor: pointer;
+  list-style: none;
+}
+
+.loresheet-selector-menu__trigger::-webkit-details-marker {
+  display: none;
+}
+
+.loresheet-selector-menu__trigger::after {
+  content: '▾';
+  margin-left: auto;
+}
+
+.loresheet-selector-menu[open]
+  .loresheet-selector-menu__trigger {
+  border-color:
+    var(--color-border-emphasis-translucent);
+}
+
+.loresheet-selector-menu__options {
+  position: absolute;
+  z-index: 20;
+  isolation: isolate;
+  top: calc(100% + var(--space-1));
+  right: 0;
+  left: 0;
+  max-height: 20rem;
+  overflow-y: auto;
+  border:
+    1px solid
+    var(--color-border-emphasis-translucent);
+  background:
+    var(--color-surface-option);
+}
+
+.loresheet-selector-menu__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 2.5rem;
+  padding:
+    var(--space-2)
+    var(--space-3);
+  border: 0;
+  border-bottom:
+    1px solid
+    var(--color-border-section-subtle);
+  border-radius: 0;
+  background:
+    var(--color-surface-option);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.loresheet-selector-menu__option:last-child {
+  border-bottom: 0;
+}
+
+.loresheet-selector-menu__option:hover,
+.loresheet-selector-menu__option--selected {
+  background:
+    var(--color-surface-control-emphasis);
+}
+
+.loresheet-selector-menu__option:focus-visible {
+  outline:
+    1px solid
+    var(--color-border-high-contrast);
+  outline-offset: -2px;
+}
+
+.loresheet-selector-menu__option:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.loresheet-selector-menu__option small {
+  flex: 0 0 auto;
+}
+
+.advantages-category--haven-merits,
+.advantages-category--haven-flaws {
+  margin-left: var(--space-4);
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--color-accent);
+}
+
+.advantages-category--haven-merits
+  .advantages-category__heading,
+.advantages-category--haven-flaws
+  .advantages-category__heading {
+  margin-bottom: var(--space-2);
+}
+
+.advantages-category--haven-merits
+  .advantages-category__heading h3,
+.advantages-category--haven-flaws
+  .advantages-category__heading h3 {
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 900px) {
+  .advantages-background-configurations__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .advantages-category--background .advantages-catalog-grid,
+  .advantages-category--loresheet .advantages-catalog-grid,
+  .advantages-category--merit .advantages-catalog-grid,
+  .advantages-category--flaw .advantages-catalog-grid,
+  .advantages-category--haven-merits .advantages-catalog-grid,
+  .advantages-category--haven-flaws .advantages-catalog-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .advantages-category--background .advantages-catalog-grid,
+  .advantages-category--loresheet .advantages-catalog-grid,
+  .advantages-category--merit .advantages-catalog-grid,
+  .advantages-category--flaw .advantages-catalog-grid,
+  .advantages-category--haven-merits .advantages-catalog-grid,
+  .advantages-category--haven-flaws .advantages-catalog-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .advantages-category--haven-merits,
+  .advantages-category--haven-flaws {
+    margin-left: 0;
+    padding-left: var(--space-3);
+  }
+}
+
 /* ==========================================================
    003-H.5B.2B — Selector de rasgos Sangre Débil
    ========================================================== */

@@ -131,7 +131,7 @@ test('Creación usa live regions según severidad', () => {
   )
   assert.match(
     wizardSource,
-    /aria-busy=\{persistenceBusy\}/,
+    /aria-busy=\{interactionBusy\}/,
   )
 })
 

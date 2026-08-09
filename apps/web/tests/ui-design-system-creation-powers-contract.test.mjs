@@ -40,7 +40,7 @@ test('SPEC-010.C.2H limita la migración al bloque Poderes', () => {
 
   assert.equal(
     suffixHash,
-    '7d4aeb23e97e38945499bc70ffa786086bf110ba6112fccbecd37eceb50506f7',
+    '64cb0fb1b9f10b6d2b05f5d757e4c4b27e8c2d2d55f7b664fe46bab6e4dc9bdd',
   )
   assert.equal(
     laterStyles.includes(

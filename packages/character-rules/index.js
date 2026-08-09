@@ -22,6 +22,9 @@ import clanDisciplineAffinities from './catalogs/clan-discipline-affinities.json
 import advantageDefinitions from './catalogs/advantages.json' with {
   type: 'json',
 }
+import loresheets from './catalogs/loresheets.json' with {
+  type: 'json',
+}
 import predatorTypes from './catalogs/predator-types.json' with {
   type: 'json',
 }
@@ -77,6 +80,7 @@ export const characterDisciplineCatalog =
 export const characterAdvantageCatalog =
   deepFreeze({
     definitions: clone(advantageDefinitions),
+    loresheets: clone(loresheets),
   })
 
 export const characterDependencyCatalog =

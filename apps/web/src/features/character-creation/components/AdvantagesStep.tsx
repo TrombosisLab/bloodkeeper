@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import {
   characterAdvantageDefinitions,
 } from '../data/character-advantage-definitions'
@@ -41,6 +43,10 @@ import {
 import {
   AdvantageRatingControl,
 } from './advantages/AdvantageRatingControl'
+
+import {
+  LoresheetSelector,
+} from './advantages/LoresheetSelector'
 
 import type {
   CharacterAdvantageDefinition,
@@ -177,6 +183,11 @@ export function AdvantagesStep({
   thinBloodAlchemy,
   onThinBloodAlchemyChange,
 }: AdvantagesStepProps) {
+  const [
+    havenConfigurationOpen,
+    setHavenConfigurationOpen,
+  ] = useState(true)
+
   const budget =
     getCharacterAdvantagesBudget(value)
 
@@ -547,12 +558,26 @@ export function AdvantagesStep({
         />
       )}
 
+      <LoresheetSelector
+        clanKey={clanKey}
+        value={value}
+        onChange={onChange}
+      />
+
       {categories.map(
         (category) => {
           const definitions =
             getActiveCharacterAdvantageDefinitions(
               characterAdvantageDefinitions,
               category,
+            ).filter(
+              (definition) =>
+                definition.instanceDetailsKind !==
+                'loresheet',
+            ).filter(
+              (definition) =>
+                !definition.allowedParentDefinitionKeys
+                  ?.length,
             ).filter(
               (definition) =>
                 (
@@ -580,7 +605,9 @@ export function AdvantagesStep({
           return (
             <section
               key={category}
-              className="advantages-category"
+              className={
+                `advantages-category advantages-category--${category}`
+              }
             >
               <header className="advantages-category__heading">
                 <div>
@@ -679,6 +706,7 @@ export function AdvantagesStep({
                                         0,
                                       )
                                     }
+                                  className="advantage-action-button"
                                   >
                                     Configurar
                                   </button>
@@ -714,6 +742,7 @@ export function AdvantagesStep({
                                         1,
                                       )
                                     }
+                                  className="advantage-action-button"
                                   >
                                     Configurar
                                   </button>
@@ -759,6 +788,7 @@ export function AdvantagesStep({
                                         1,
                                       )
                                     }
+                                  className="advantage-action-button"
                                   >
                                     Configurar
                                   </button>
@@ -829,6 +859,7 @@ export function AdvantagesStep({
                                         1,
                                       )
                                     }
+                                  className="advantage-action-button"
                                   >
                                     Añadir Rebaño
                                   </button>
@@ -876,6 +907,7 @@ export function AdvantagesStep({
                                         1,
                                       )
                                     }
+                                  className="advantage-action-button"
                                   >
                                     Añadir Recursos
                                   </button>
@@ -923,6 +955,7 @@ export function AdvantagesStep({
                                         1,
                                       )
                                     }
+                                  className="advantage-action-button"
                                   >
                                     Añadir Estatus
                                   </button>
@@ -945,6 +978,7 @@ export function AdvantagesStep({
                                         1,
                                       )
                                     }
+                                  className="advantage-action-button"
                                   >
                                     Configurar
                                   </button>
@@ -990,6 +1024,7 @@ export function AdvantagesStep({
                                         1,
                                       )
                                     }
+                                  className="advantage-action-button"
                                   >
                                     Configurar
                                   </button>
@@ -1093,7 +1128,8 @@ export function AdvantagesStep({
                           )}
                         </div>
 
-                        {!simple &&
+                        {category !== 'background' &&
+                          !simple &&
                           selections.map(
                             (selection) => {
                               const narrativeState =
@@ -1158,23 +1194,204 @@ export function AdvantagesStep({
           )
         },
       )}
+      {(() => {
+        const configurableBackgroundSelections =
+          value.selections.filter(
+            (selection) => {
+              if (
+                selection.category !==
+                  'background' ||
+                selection.origin !==
+                  'creation'
+              ) {
+                return false
+              }
+
+              const definition =
+                characterAdvantageDefinitions.find(
+                  (candidate) =>
+                    candidate.key ===
+                    selection.definitionKey,
+                )
+
+              return (
+                definition
+                  ?.requiresInstanceDetails ===
+                true
+              )
+            },
+          )
+
+        if (
+          configurableBackgroundSelections.length ===
+          0
+        ) {
+          return null
+        }
+
+        return (
+          <section className="advantages-background-configurations">
+            <header className="advantages-category__heading">
+              <div>
+                <span>
+                  Trasfondos seleccionados
+                </span>
+
+                <h3>
+                  Configuración de Trasfondos
+                </h3>
+
+                <p>
+                  Completa aquí los datos propios de
+                  cada Trasfondo sin alterar el
+                  catálogo de selección.
+                </p>
+              </div>
+
+              <strong>
+                {
+                  configurableBackgroundSelections
+                    .length
+                }
+              </strong>
+            </header>
+
+            <div className="advantages-background-configurations__grid">
+              {configurableBackgroundSelections.map(
+                (selection) => {
+                  const definition =
+                    characterAdvantageDefinitions.find(
+                      (candidate) =>
+                        candidate.key ===
+                        selection.definitionKey,
+                    )
+
+                  if (!definition) {
+                    return null
+                  }
+
+                  const narrativeState =
+                    getCharacterAdvantageNarrativeState(
+                      definition,
+                      selection.details,
+                    )
+
+                  return (
+                    <details
+                      key={
+                        selection.selectionId
+                      }
+                      className="advantages-background-configuration"
+                      open
+                    >
+                      <summary>
+                        <span>
+                          {definition.name}
+                        </span>
+
+                        <strong>
+                          {'•'.repeat(
+                            selection.rating,
+                          )}
+                        </strong>
+                      </summary>
+
+                      <div className="advantages-background-configuration__body">
+                        <AdvantageInstanceDetailsEditor
+                          selection={
+                            selection
+                          }
+                          onChange={(
+                            updated,
+                          ) =>
+                            onChange({
+                              selections:
+                                value.selections.map(
+                                  (current) =>
+                                    current.selectionId ===
+                                    updated.selectionId
+                                      ? updated
+                                      : current,
+                                ),
+                            })
+                          }
+                        />
+
+                        {narrativeState.status ===
+                          'pending' ? (
+                          <small className="advantage-instance-block__narrative-pending">
+                            Puedes completar la información narrativa más adelante.
+                          </small>
+                        ) : null}
+                      </div>
+                    </details>
+                  )
+                },
+              )}
+            </div>
+          </section>
+        )
+      })()}
+
+      {value.selections.some(
+        (selection) =>
+          selection.definitionKey === 'haven',
+      ) && (
+        <section className="advantages-haven-configuration-toggle">
+          <header className="advantages-category__heading">
+            <div>
+              <span>
+                Configuración del Trasfondo
+              </span>
+
+              <h3>
+                Refugio
+              </h3>
+
+              <p>
+                Mejoras y Defectos asociados
+                exclusivamente a este Trasfondo.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className="advantages-haven-configuration-toggle__button"
+              aria-expanded={
+                havenConfigurationOpen
+              }
+              onClick={() =>
+                setHavenConfigurationOpen(
+                  (current) => !current,
+                )
+              }
+            >
+              {havenConfigurationOpen
+                ? 'Contraer'
+                : 'Desplegar'}
+            </button>
+          </header>
+        </section>
+      )}
+
       {value.selections
         .filter(
           (selection) =>
             selection.definitionKey === 'haven',
         )
-        .length > 0 && (
+        .length > 0 &&
+        havenConfigurationOpen && (
           <section
-            className="advantages-category"
+            className="advantages-category advantages-category--haven-merits"
           >
             <header className="advantages-category__heading">
               <div>
                 <span>
-                  Catálogo CORE
+                  Configuración del Trasfondo
                 </span>
 
                 <h3>
-                  Méritos de Refugio
+                  Mejoras de Refugio
                 </h3>
               </div>
             </header>
@@ -1241,6 +1458,7 @@ export function AdvantagesStep({
                                         haven.selectionId,
                                       )
                                     }
+                                  className="advantage-action-button"
                                   >
                                     Configurar
                                   </button>
@@ -1291,14 +1509,15 @@ export function AdvantagesStep({
             (selection) =>
               selection.definitionKey === 'haven',
           )
-          .length > 0 && (
+          .length > 0 &&
+        havenConfigurationOpen && (
             <section
-              className="advantages-category"
+              className="advantages-category advantages-category--haven-flaws"
             >
               <header className="advantages-category__heading">
                 <div>
                   <span>
-                    Catálogo CORE
+                    Configuración del Trasfondo
                   </span>
 
                   <h3>
@@ -1358,6 +1577,7 @@ export function AdvantagesStep({
                                             haven.selectionId,
                                           )
                                         }
+                                      className="advantage-action-button"
                                       >
                                         Configurar
                                       </button>

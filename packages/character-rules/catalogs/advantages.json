@@ -1561,5 +1561,22 @@
     "allowMultiple": false,
     "requiresInstanceDetails": false,
     "active": true
+  },
+  {
+    "key": "loresheet-benefit",
+    "name": "Ficha de Conocimientos",
+    "category": "merit",
+    "allowedRatings": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source": "core",
+    "allowMultiple": true,
+    "requiresInstanceDetails": true,
+    "instanceDetailsKind": "loresheet",
+    "active": true
   }
 ]

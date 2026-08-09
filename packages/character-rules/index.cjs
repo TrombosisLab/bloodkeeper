@@ -8,6 +8,7 @@ const oblivionCeremonies = require('./catalogs/oblivion-ceremonies.json')
 const thinBloodAlchemyFormulas = require('./catalogs/thin-blood-alchemy-formulas.json')
 const clanDisciplineAffinities = require('./catalogs/clan-discipline-affinities.json')
 const advantageDefinitions = require('./catalogs/advantages.json')
+const loresheets = require('./catalogs/loresheets.json')
 const predatorTypes = require('./catalogs/predator-types.json')
 const skills = require('./catalogs/skills.json')
 
@@ -59,6 +60,7 @@ const characterDisciplineCatalog =
 const characterAdvantageCatalog =
   deepFreeze({
     definitions: clone(advantageDefinitions),
+    loresheets: clone(loresheets),
   })
 
 const characterDependencyCatalog =

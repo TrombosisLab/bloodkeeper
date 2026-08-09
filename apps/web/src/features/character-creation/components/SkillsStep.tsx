@@ -182,7 +182,7 @@ export function SkillsStep({
 
         <button
           type="button"
-          className="creation-button creation-button--secondary"
+          className="creation-button creation-button--secondary creation-session-style-button"
           onClick={randomize}
         >
           Reparto aleatorio válido

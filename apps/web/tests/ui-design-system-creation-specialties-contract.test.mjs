@@ -35,7 +35,7 @@ test('SPEC-010.C.2E limita la migración al bloque Especialidades', () => {
 
   assert.equal(
     suffixHash,
-    '35d857a2e0b6384d3189c5b4e6c392e9b51255ed784f5b8a6157b22a34e4fefa',
+    'a6310f4e51169e7d64c8da0deec2b2393a0cf8118fbedc64c95123151dfd9c45',
   )
 })
 

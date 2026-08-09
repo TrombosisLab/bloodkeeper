@@ -10,6 +10,18 @@ import {
   validateCharacterAdvantageEligibility,
 } from './advantage-eligibility-rules.ts'
 
+import {
+  characterCoreLoresheetDefinitions,
+} from '../data/core-loresheet-definitions.ts'
+
+import {
+  validateCharacterLoresheetSelections,
+} from './loresheet-selection-rules.ts'
+
+import {
+  validateCharacterLoresheetEligibility,
+} from './loresheet-eligibility-rules.ts'
+
 import type {
   CharacterAdvantageDefinition,
 } from '../types/character-advantage-definition.types.ts'
@@ -131,10 +143,77 @@ export function validateCharacterAdvantageRegulatoryState(
     )
   }
 
+  const loresheetSelectionValidation =
+    validateCharacterLoresheetSelections(
+      draft.advantages.selections,
+      characterCoreLoresheetDefinitions,
+    )
+
+  const loresheetDefinitionsByKey =
+    new Map(
+      characterCoreLoresheetDefinitions.map(
+        (definition) => [
+          definition.key,
+          definition,
+        ] as const),
+    )
+
+  const selectedLoresheetKeys =
+    new Set(
+      draft.advantages.selections
+        .filter(
+          (selection) =>
+            selection.details?.kind ===
+            'loresheet',
+        )
+        .map(
+          (selection) =>
+            selection.details?.kind ===
+            'loresheet'
+              ? selection.details.loresheetKey
+              : '',
+        )
+        .filter(Boolean),
+    )
+
+  const loresheetEligibilityErrors:
+    string[] = []
+
+  for (
+    const loresheetKey of
+    selectedLoresheetKeys
+  ) {
+    const loresheet =
+      loresheetDefinitionsByKey.get(
+        loresheetKey,
+      )
+
+    if (!loresheet) {
+      continue
+    }
+
+    const eligibility =
+      validateCharacterLoresheetEligibility(
+        loresheet,
+        {
+          characterKind:
+            context.characterKind,
+          clanKey:
+            context.clanKey,
+        },
+      )
+
+    loresheetEligibilityErrors.push(
+      ...eligibility.errors,
+    )
+  }
+
   const errors = [
     ...new Set([
       ...definitionValidation.errors,
       ...eligibilityErrors,
+      ...loresheetSelectionValidation.errors,
+      ...loresheetEligibilityErrors,
     ]),
   ]
 

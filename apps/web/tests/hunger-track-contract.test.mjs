@@ -86,7 +86,7 @@ test(
     )
     assert.match(
       characterSheet,
-      /onHungerChange={setHunger}/,
+      /onHungerChange=\{\s*handleHungerChange\s*\}/,
     )
     assert.doesNotMatch(
       characterState,
