@@ -263,6 +263,29 @@ export function setInventoryItemArchived(
   })
 }
 
+export function removeInventoryItem(
+  data: CharacterSecondaryData,
+  itemId: string,
+): CharacterSecondaryData {
+  if (
+    !data.inventory.some(
+      (candidate) => candidate.id === itemId,
+    )
+  ) {
+    return entryNotFound()
+  }
+
+  const next = {
+    ...data,
+    inventory: data.inventory.filter(
+      (candidate) => candidate.id !== itemId,
+    ),
+  }
+
+  assertValidCharacterSecondaryData(next)
+  return next
+}
+
 export function addCharacterNote(
   data: CharacterSecondaryData,
   note: CharacterNote,

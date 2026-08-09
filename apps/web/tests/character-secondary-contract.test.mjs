@@ -83,3 +83,72 @@ test(
     )
   },
 )
+test(
+  '028-G permite ordenar el inventario por categoría sin mutar sus datos',
+  () => {
+    assert.match(
+      componentSource,
+      /Ordenar por categoría/,
+    )
+    assert.match(
+      componentSource,
+      /Orden original/,
+    )
+    assert.match(
+      componentSource,
+      /aria-pressed=\{\s*inventoryOrderedByCategory\s*\}/,
+    )
+    assert.match(
+      componentSource,
+      /return \[\.\.\.inventory\]\.sort/,
+    )
+    assert.match(
+      componentSource,
+      /inventoryForDisplay\.map/,
+    )
+  },
+)
+
+test(
+  '028-I genera UUID también cuando randomUUID no está disponible en HTTP local',
+  () => {
+    assert.match(
+      componentSource,
+      /typeof crypto\.randomUUID === 'function'/,
+    )
+    assert.match(
+      componentSource,
+      /crypto\.getRandomValues/,
+    )
+    assert.match(
+      componentSource,
+      /new Uint8Array\(16\)/,
+    )
+    assert.match(
+      componentSource,
+      /\(bytes\[6\] & 0x0f\) \| 0x40/,
+    )
+    assert.match(
+      componentSource,
+      /\(bytes\[8\] & 0x3f\) \| 0x80/,
+    )
+  },
+)
+
+test(
+  '028-J permite eliminar objetos de inventario con confirmación explícita',
+  () => {
+    assert.match(
+      componentSource,
+      /removeInventoryItem/,
+    )
+    assert.match(
+      componentSource,
+      /¿Eliminar este objeto definitivamente\?/,
+    )
+    assert.match(
+      componentSource,
+      /confirmRemoveInventory\(item\.id\)/,
+    )
+  },
+)

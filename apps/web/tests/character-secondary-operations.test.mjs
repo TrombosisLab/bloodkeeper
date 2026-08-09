@@ -9,6 +9,7 @@ import {
   InvalidCharacterSecondaryDataError,
   removeCharacterNote,
   removeHistoryEntry,
+  removeInventoryItem,
   setInventoryItemArchived,
   updateCharacterNote,
   updateHistoryEntry,
@@ -61,12 +62,18 @@ test(
         item.id,
         false,
       )
+    const removed =
+      removeInventoryItem(
+        restored,
+        item.id,
+      )
 
     assert.equal(empty.inventory.length, 0)
     assert.equal(added.inventory[0].quantity, 1)
     assert.equal(updated.inventory[0].quantity, 2)
     assert.equal(archived.inventory[0].status, 'archived')
     assert.equal(restored.inventory[0].status, 'active')
+    assert.deepEqual(removed.inventory, [])
   },
 )
 
@@ -160,6 +167,7 @@ test(
     for (const operation of [
       () => updateInventoryItem(empty, item),
       () => setInventoryItemArchived(empty, item.id, true),
+      () => removeInventoryItem(empty, item.id),
       () => updateCharacterNote(empty, note),
       () => removeCharacterNote(empty, note.id),
       () => updateHistoryEntry(empty, historyEntry),

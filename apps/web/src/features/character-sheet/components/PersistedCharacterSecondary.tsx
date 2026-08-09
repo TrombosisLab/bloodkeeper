@@ -163,6 +163,7 @@ export function PersistedCharacterSecondary({
 
   return (
     <CharacterSecondary
+      persisted
       busy={
         state === 'loading' || state === 'saving'
       }

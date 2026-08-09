@@ -88,3 +88,25 @@ test(
     )
   },
 )
+
+test(
+  '028-H distingue edición persistida de edición local en la sección secundaria',
+  () => {
+    assert.match(
+      persistedComponent,
+      /<CharacterSecondary[\s\S]*persisted/,
+    )
+    assert.match(
+      secondaryComponent,
+      /persisted = false/,
+    )
+    assert.match(
+      secondaryComponent,
+      /Edición persistida de Inventario, Notas e Historial/,
+    )
+    assert.match(
+      secondaryComponent,
+      /Edición local de demostración\. Los cambios aún/,
+    )
+  },
+)

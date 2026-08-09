@@ -12,6 +12,7 @@ import {
   addInventoryItem,
   removeCharacterNote,
   removeHistoryEntry,
+  removeInventoryItem,
   setInventoryItemArchived,
   updateCharacterNote,
   updateHistoryEntry,
@@ -28,6 +29,7 @@ import type {
 interface CharacterSecondaryProps {
   busy?: boolean
   data?: CharacterSecondaryData
+  persisted?: boolean
   interactionDisabled?: boolean
   onChange?: (
     section: CharacterSecondarySection,
@@ -82,7 +84,32 @@ const emptyHistoryDraft: HistoryDraft = {
 }
 
 function createLocalId(): string {
-  return crypto.randomUUID()
+  if (typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+
+  const bytes = crypto.getRandomValues(
+    new Uint8Array(16),
+  )
+
+  bytes[6] =
+    (bytes[6] & 0x0f) | 0x40
+  bytes[8] =
+    (bytes[8] & 0x3f) | 0x80
+
+  const hex = Array.from(
+    bytes,
+    (byte) =>
+      byte.toString(16).padStart(2, '0'),
+  )
+
+  return [
+    hex.slice(0, 4).join(''),
+    hex.slice(4, 6).join(''),
+    hex.slice(6, 8).join(''),
+    hex.slice(8, 10).join(''),
+    hex.slice(10, 16).join(''),
+  ].join('-')
 }
 
 function optionalText(value: string): string | null {
@@ -90,6 +117,36 @@ function optionalText(value: string): string | null {
   return trimmed.length > 0
     ? trimmed
     : null
+}
+
+function orderInventoryByCategory(
+  inventory: readonly InventoryItem[],
+): readonly InventoryItem[] {
+  return [...inventory].sort(
+    (left, right) => {
+      const leftCategory =
+        left.category ?? 'Sin categoría'
+      const rightCategory =
+        right.category ?? 'Sin categoría'
+
+      const categoryOrder =
+        leftCategory.localeCompare(
+          rightCategory,
+          'es',
+          { sensitivity: 'base' },
+        )
+
+      if (categoryOrder !== 0) {
+        return categoryOrder
+      }
+
+      return left.name.localeCompare(
+        right.name,
+        'es',
+        { sensitivity: 'base' },
+      )
+    },
+  )
 }
 
 function cloneSecondaryData(
@@ -111,6 +168,7 @@ function cloneSecondaryData(
 export function CharacterSecondary({
   busy = false,
   data,
+  persisted = false,
   interactionDisabled = false,
   onChange,
   status,
@@ -133,6 +191,17 @@ export function CharacterSecondary({
     useState<NoteDraft>(emptyNoteDraft)
   const [historyDraft, setHistoryDraft] =
     useState<HistoryDraft>(emptyHistoryDraft)
+  const [
+    inventoryOrderedByCategory,
+    setInventoryOrderedByCategory,
+  ] = useState(false)
+
+  const inventoryForDisplay =
+    inventoryOrderedByCategory
+      ? orderInventoryByCategory(
+          secondary.inventory,
+        )
+      : secondary.inventory
 
   function commit(
     section: CharacterSecondarySection,
@@ -262,6 +331,19 @@ export function CharacterSecondary({
     setHistoryDraft(emptyHistoryDraft)
   }
 
+  function confirmRemoveInventory(itemId: string) {
+    if (
+      window.confirm(
+        '¿Eliminar este objeto definitivamente?',
+      )
+    ) {
+      commit(
+        'inventory',
+        removeInventoryItem(secondary, itemId),
+      )
+    }
+  }
+
   function confirmRemoveNote(noteId: string) {
     if (
       window.confirm(
@@ -344,8 +426,14 @@ export function CharacterSecondary({
           className="secondary-edit-notice"
           role="status"
         >
-          Edición local de demostración. Los cambios aún
-          no se guardan.
+          {persisted
+            ? 'Edición persistida de Inventario, Notas e Historial.'
+            : (
+                <>
+                  Edición local de demostración. Los cambios aún
+                  no se guardan.
+                </>
+              )}
         </p>
       ) : null}
 
@@ -354,6 +442,24 @@ export function CharacterSecondary({
           <header>
             <span>Posesiones</span>
             <h3>Inventario</h3>
+
+            <div className="secondary-item-actions">
+              <button
+                type="button"
+                aria-pressed={
+                  inventoryOrderedByCategory
+                }
+                onClick={() =>
+                  setInventoryOrderedByCategory(
+                    (ordered) => !ordered,
+                  )
+                }
+              >
+                {inventoryOrderedByCategory
+                  ? 'Orden original'
+                  : 'Ordenar por categoría'}
+              </button>
+            </div>
           </header>
 
           {editing ? (
@@ -464,7 +570,7 @@ export function CharacterSecondary({
               <p className="secondary-empty">
                 No hay objetos registrados.
               </p>
-            ) : secondary.inventory.map((item) => (
+            ) : inventoryForDisplay.map((item) => (
               <div
                 className="inventory-item"
                 key={item.id}
@@ -518,6 +624,16 @@ export function CharacterSecondary({
                       {item.status === 'active'
                         ? 'Archivar'
                         : 'Restaurar'}
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={interactionDisabled}
+                      onClick={() =>
+                        confirmRemoveInventory(item.id)
+                      }
+                    >
+                      Eliminar
                     </button>
                   </div>
                 ) : null}
