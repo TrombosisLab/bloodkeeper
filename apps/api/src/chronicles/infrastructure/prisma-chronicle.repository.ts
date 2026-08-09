@@ -14,8 +14,13 @@ import {
   DatabaseService,
 } from '../../database/database.service'
 
+import {
+  ChronicleLifecycleWriteConflictError,
+} from '../application/chronicle.repository'
+
 import type {
   ChronicleRepository,
+  TransitionChronicleLifecycleData,
 } from '../application/chronicle.repository'
 
 import type {
@@ -34,6 +39,18 @@ const statusFromPrisma = {
 } as const satisfies Record<
   PrismaChronicleStatus,
   ChronicleStatus
+>
+
+const statusToPrisma = {
+  preparation:
+    PrismaChronicleStatus.PREPARATION,
+  active:
+    PrismaChronicleStatus.ACTIVE,
+  archived:
+    PrismaChronicleStatus.ARCHIVED,
+} as const satisfies Record<
+  ChronicleStatus,
+  PrismaChronicleStatus
 >
 
 function toDomain(
@@ -92,5 +109,65 @@ export class PrismaChronicleRepository
       })
 
     return rows.map(toDomain)
+  }
+
+  async findById(
+    narratorId: string,
+    chronicleId: string,
+  ): Promise<Chronicle | null> {
+    const row =
+      await this.database.chronicle.findFirst({
+        where: {
+          id: chronicleId,
+          narratorId,
+        },
+      })
+
+    return row === null
+      ? null
+      : toDomain(row)
+  }
+
+  async transitionLifecycle(
+    narratorId: string,
+    data: TransitionChronicleLifecycleData,
+  ): Promise<Chronicle> {
+    const updated =
+      await this.database.chronicle.updateMany({
+        where: {
+          id: data.chronicleId,
+          narratorId,
+          status:
+            statusToPrisma[
+              data.expectedStatus
+            ],
+        },
+        data: {
+          status:
+            statusToPrisma[data.nextStatus],
+        },
+      })
+
+    if (updated.count !== 1) {
+      throw new ChronicleLifecycleWriteConflictError(
+        data.chronicleId,
+      )
+    }
+
+    const row =
+      await this.database.chronicle.findFirst({
+        where: {
+          id: data.chronicleId,
+          narratorId,
+        },
+      })
+
+    if (row === null) {
+      throw new ChronicleLifecycleWriteConflictError(
+        data.chronicleId,
+      )
+    }
+
+    return toDomain(row)
   }
 }

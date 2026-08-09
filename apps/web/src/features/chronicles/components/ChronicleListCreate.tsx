@@ -20,6 +20,8 @@ import type {
 import './chronicle-list-create.css'
 import { ViewStateStatus } from '../../../components/ui/ViewStateStatus'
 
+import { ChronicleDetail } from './ChronicleDetail'
+
 const gateway =
   createChronicleGateway()
 
@@ -39,8 +41,12 @@ function stateForChronicleError(
 ): ChronicleFailureState {
   if (
     error instanceof ChronicleApiError &&
-    error.code ===
-      'AUTHENTICATION_REQUIRED'
+    (
+      error.code ===
+        'AUTHENTICATION_REQUIRED' ||
+      error.code ===
+        'CHRONICLE_PERMISSION_DENIED'
+    )
   ) {
     return 'permission'
   }
@@ -56,20 +62,69 @@ function errorMessage(
   ) {
     if (
       error.code ===
-      'AUTHENTICATION_REQUIRED'
+        'AUTHENTICATION_REQUIRED'
     ) {
       return 'Necesitas una sesión válida para gestionar crónicas.'
     }
 
     if (
       error.code ===
-      'CHRONICLE_RULE_VIOLATION'
+        'CHRONICLE_PERMISSION_DENIED'
+    ) {
+      return 'No tienes permiso para gestionar crónicas.'
+    }
+
+    if (
+      error.code ===
+        'CHRONICLE_RULE_VIOLATION'
     ) {
       return 'Revisa los datos de la crónica.'
+    }
+
+    if (
+      error.code ===
+        'CHRONICLE_LIFECYCLE_TRANSITION_REJECTED'
+    ) {
+      return 'El cambio de estado solicitado no está permitido.'
+    }
+
+    if (
+      error.code ===
+        'CHRONICLE_LIFECYCLE_WRITE_CONFLICT'
+    ) {
+      return 'La crónica cambió mientras la estabas editando. Actualiza el listado.'
     }
   }
 
   return 'No se pudo completar la operación.'
+}
+
+function lifecycleAction(
+  status: ChronicleApiStatus,
+): {
+  readonly label: string
+  readonly nextStatus:
+    | 'active'
+    | 'archived'
+} {
+  if (status === 'preparation') {
+    return {
+      label: 'Activar',
+      nextStatus: 'active',
+    }
+  }
+
+  if (status === 'active') {
+    return {
+      label: 'Archivar',
+      nextStatus: 'archived',
+    }
+  }
+
+  return {
+    label: 'Reactivar',
+    nextStatus: 'active',
+  }
 }
 
 export function ChronicleListCreate() {
@@ -91,6 +146,14 @@ export function ChronicleListCreate() {
     submitting,
     setSubmitting,
   ] = useState(false)
+  const [
+    transitioningId,
+    setTransitioningId,
+  ] = useState<string | null>(null)
+  const [
+    selectedChronicleId,
+    setSelectedChronicleId,
+  ] = useState<string | null>(null)
   const [
     error,
     setError,
@@ -171,6 +234,64 @@ export function ChronicleListCreate() {
     }
   }
 
+  async function transition(
+    chronicle: ChronicleApiSnapshot,
+  ) {
+    const action =
+      lifecycleAction(
+        chronicle.status,
+      )
+
+    setTransitioningId(
+      chronicle.id,
+    )
+    setError(null)
+    setFailureState(null)
+
+    try {
+      const updated =
+        await gateway.transition(
+          chronicle.id,
+          {
+            nextStatus:
+              action.nextStatus,
+          },
+        )
+
+      setChronicles((current) =>
+        current.map((item) =>
+          item.id === updated.id
+            ? updated
+            : item,
+        ),
+      )
+    } catch (transitionError: unknown) {
+      setFailureState(
+        stateForChronicleError(
+          transitionError,
+        ),
+      )
+      setError(
+        errorMessage(
+          transitionError,
+        ),
+      )
+    } finally {
+      setTransitioningId(null)
+    }
+  }
+
+  const habitualChronicles =
+    chronicles.filter(
+      (chronicle) =>
+        chronicle.status !== 'archived',
+    )
+  const archivedChronicles =
+    chronicles.filter(
+      (chronicle) =>
+        chronicle.status === 'archived',
+    )
+
   const viewState =
     loading
       ? 'loading'
@@ -179,6 +300,89 @@ export function ChronicleListCreate() {
         : chronicles.length === 0
           ? 'empty'
           : 'content'
+
+  function renderChronicle(
+    chronicle: ChronicleApiSnapshot,
+  ) {
+    const action =
+      lifecycleAction(
+        chronicle.status,
+      )
+
+    return (
+      <li key={chronicle.id}>
+        <article className="chronicle-card">
+          <div className="chronicle-card__heading">
+            <h3>
+              {chronicle.name}
+            </h3>
+            <span>
+              {
+                statusLabels[
+                  chronicle.status
+                ]
+              }
+            </span>
+          </div>
+
+          {chronicle.description !==
+          null ? (
+            <p>
+              {
+                chronicle.description
+              }
+            </p>
+          ) : (
+            <p className="chronicle-card__empty">
+              Sin descripción.
+            </p>
+          )}
+
+          <div className="chronicle-card__actions">
+            <button
+              type="button"
+              onClick={() =>
+                setSelectedChronicleId(
+                  chronicle.id,
+                )
+              }
+            >
+              Abrir crónica
+            </button>
+
+            <button
+              type="button"
+              disabled={
+                transitioningId ===
+                chronicle.id
+              }
+              onClick={() =>
+                void transition(
+                  chronicle,
+                )
+              }
+            >
+              {transitioningId ===
+              chronicle.id
+                ? 'Actualizando…'
+                : action.label}
+            </button>
+          </div>
+        </article>
+      </li>
+    )
+  }
+
+  if (selectedChronicleId !== null) {
+    return (
+      <ChronicleDetail
+        chronicleId={selectedChronicleId}
+        onBack={() =>
+          setSelectedChronicleId(null)
+        }
+      />
+    )
+  }
 
   return (
     <section className="chronicle-workspace">
@@ -283,55 +487,49 @@ export function ChronicleListCreate() {
 
           {loading ? (
             <ViewStateStatus
-                state="loading"
-                className="chronicle-message"
-              >
-                Cargando crónicas…
-              </ViewStateStatus>
+              state="loading"
+              className="chronicle-message"
+            >
+              Cargando crónicas…
+            </ViewStateStatus>
           ) : chronicles.length === 0 ? (
             <ViewStateStatus
-                state="empty"
-                className="chronicle-message"
-              >
-                Todavía no has creado ninguna crónica.
-              </ViewStateStatus>
+              state="empty"
+              className="chronicle-message"
+            >
+              Todavía no has creado ninguna crónica.
+            </ViewStateStatus>
+          ) : habitualChronicles.length === 0 ? (
+            <ViewStateStatus
+              state="empty"
+              className="chronicle-message"
+            >
+              No hay crónicas activas o en preparación.
+            </ViewStateStatus>
           ) : (
             <ul className="chronicle-cards">
-              {chronicles.map(
-                (chronicle) => (
-                  <li key={chronicle.id}>
-                    <article className="chronicle-card">
-                      <div className="chronicle-card__heading">
-                        <h3>
-                          {chronicle.name}
-                        </h3>
-                        <span>
-                          {
-                            statusLabels[
-                              chronicle.status
-                            ]
-                          }
-                        </span>
-                      </div>
-
-                      {chronicle.description !==
-                      null ? (
-                        <p>
-                          {
-                            chronicle.description
-                          }
-                        </p>
-                      ) : (
-                        <p className="chronicle-card__empty">
-                          Sin descripción.
-                        </p>
-                      )}
-                    </article>
-                  </li>
-                ),
+              {habitualChronicles.map(
+                renderChronicle,
               )}
             </ul>
           )}
+
+          {!loading &&
+          archivedChronicles.length > 0 ? (
+            <section
+              aria-labelledby="chronicle-archived-title"
+            >
+              <h2 id="chronicle-archived-title">
+                Archivadas
+              </h2>
+
+              <ul className="chronicle-cards">
+                {archivedChronicles.map(
+                  renderChronicle,
+                )}
+              </ul>
+            </section>
+          ) : null}
         </section>
       </div>
     </section>

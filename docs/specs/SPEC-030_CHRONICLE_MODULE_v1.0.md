@@ -218,3 +218,36 @@ Se incluirán pruebas para:
 - Permisos validados en backend.
 - Archivado sin pérdida de información.
 - Crecimiento modular sin convertir el módulo en un monolito.
+
+## Cierre de implementación
+
+SPEC-030 queda cerrada operativamente tras completar y validar el módulo base de Crónicas.
+
+Alcance materializado:
+
+- Entidad y persistencia de Crónica.
+- Creación, listado y consulta individual.
+- Estados Preparación, Activa y Archivada.
+- Transiciones explícitas de ciclo de vida con validación y persistencia.
+- Archivado sin pérdida de relaciones históricas.
+- Permisos de backend y aislamiento por Narrador.
+- Panel individual de Crónica con Resumen.
+- Navegación real desde el listado y retorno al mismo.
+- Arquitectura modular preparada para los incrementos posteriores.
+
+Quedan deliberadamente fuera de SPEC-030 y continúan en sus SPEC propias:
+
+- SPEC-031: participantes, roles contextuales y asociación funcional de personajes.
+- SPEC-032: PNJ.
+- SPEC-033: localizaciones.
+- SPEC-034: eventos y línea temporal.
+- SPEC-035: sesiones.
+
+Validación de cierre:
+
+- Auditoría final: 6/6 criterios de aceptación.
+- API: 37/37 tests SPEC-030 enfocados OK.
+- Web: 34/34 tests SPEC-030 enfocados OK.
+- Web typecheck: OK.
+- API y Web reconstruidos y healthy.
+- Prueba manual de creación, lifecycle, archivado, persistencia, apertura del panel y retorno: OK.

@@ -1,5 +1,6 @@
 import type {
   Chronicle,
+  ChronicleStatus,
   CreateChronicleData,
 } from '../domain/chronicle.types'
 
@@ -9,6 +10,12 @@ type UnknownRecord =
 export interface CreateChronicleRequestDto {
   readonly name: string
   readonly description?: string | null
+}
+
+export interface ChronicleLifecycleRequestDto {
+  readonly nextStatus:
+    | 'active'
+    | 'archived'
 }
 
 export interface ChronicleResponseDto {
@@ -128,6 +135,15 @@ export function parseChronicleNarratorId(
   )
 }
 
+export function parseChronicleIdParam(
+  input: unknown,
+): string {
+  return uuid(
+    input,
+    'params.chronicleId',
+  )
+}
+
 export function parseCreateChronicleRequest(
   narratorIdInput: unknown,
   input: unknown,
@@ -169,6 +185,40 @@ export function parseCreateChronicleRequest(
     name,
     description: descriptionInput,
   }
+}
+
+export function parseChronicleLifecycleRequest(
+  input: unknown,
+): Extract<
+  ChronicleStatus,
+  'active' | 'archived'
+> {
+  const body = record(input, 'body')
+
+  onlyKeys(
+    body,
+    ['nextStatus'],
+    'body',
+  )
+
+  const nextStatus =
+    required(
+      body,
+      'nextStatus',
+      'body',
+    )
+
+  if (
+    nextStatus !== 'active' &&
+    nextStatus !== 'archived'
+  ) {
+    throw new InvalidChronicleRequestError(
+      'body.nextStatus',
+      'must be active or archived',
+    )
+  }
+
+  return nextStatus
 }
 
 export function toChronicleResponse(

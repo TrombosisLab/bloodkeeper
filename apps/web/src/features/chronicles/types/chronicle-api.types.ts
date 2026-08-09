@@ -17,3 +17,9 @@ export interface CreateChronicleApiRequest {
   readonly name: string
   readonly description: string | null
 }
+
+export interface TransitionChronicleLifecycleApiRequest {
+  readonly nextStatus:
+    | 'active'
+    | 'archived'
+}

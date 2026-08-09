@@ -1,14 +1,22 @@
 import {
   BadRequestException,
   Body,
+  ConflictException,
   Controller,
   ForbiddenException,
   Get,
+  NotFoundException,
+  Param,
+  Patch,
   Post,
   Req,
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common'
+
+import {
+  ChronicleLifecycleWriteConflictError,
+} from '../application/chronicle.repository'
 
 import {
   CreateChronicleUseCase,
@@ -19,11 +27,25 @@ import {
 } from '../application/list-chronicles.use-case'
 
 import {
+  LoadChronicleUseCase,
+} from '../application/load-chronicle.use-case'
+
+import {
+  TransitionChronicleLifecycleUseCase,
+} from '../application/transition-chronicle-lifecycle.use-case'
+
+import {
   InvalidChronicleCreationError,
 } from '../domain/chronicle-creation.rules'
 
 import {
+  InvalidChronicleLifecycleTransitionError,
+} from '../domain/chronicle-lifecycle.rules'
+
+import {
   InvalidChronicleRequestError,
+  parseChronicleIdParam,
+  parseChronicleLifecycleRequest,
   parseChronicleNarratorId,
   parseCreateChronicleRequest,
   toChronicleResponse,
@@ -92,6 +114,27 @@ function throwChronicleHttpError(
     })
   }
 
+  if (
+    error instanceof
+      InvalidChronicleLifecycleTransitionError
+  ) {
+    throw new UnprocessableEntityException({
+      code:
+        'CHRONICLE_LIFECYCLE_TRANSITION_REJECTED',
+      issues: error.issues,
+    })
+  }
+
+  if (
+    error instanceof
+      ChronicleLifecycleWriteConflictError
+  ) {
+    throw new ConflictException({
+      code:
+        'CHRONICLE_LIFECYCLE_WRITE_CONFLICT',
+    })
+  }
+
   throw error
 }
 
@@ -102,6 +145,10 @@ export class ChronicleController {
       CreateChronicleUseCase,
     private readonly listChronicles:
       ListChroniclesUseCase,
+    private readonly loadChronicle:
+      LoadChronicleUseCase,
+    private readonly transitionLifecycle:
+      TransitionChronicleLifecycleUseCase,
   ) {}
 
   @Post()
@@ -150,5 +197,81 @@ export class ChronicleController {
     return chronicles.map(
       toChronicleResponse,
     )
+  }
+
+  @Get(':chronicleId')
+  async detail(
+    @Req() request:
+      AuthenticatedChronicleRequest,
+    @Param('chronicleId')
+    chronicleIdInput: unknown,
+  ): Promise<ChronicleResponseDto> {
+    const narratorId =
+      authenticatedNarratorId(request)
+
+    try {
+      const chronicleId =
+        parseChronicleIdParam(
+          chronicleIdInput,
+        )
+      const chronicle =
+        await this.loadChronicle.execute(
+          narratorId,
+          chronicleId,
+        )
+
+      if (chronicle === null) {
+        throw new NotFoundException({
+          code: 'CHRONICLE_NOT_FOUND',
+        })
+      }
+
+      return toChronicleResponse(
+        chronicle,
+      )
+    } catch (error: unknown) {
+      throwChronicleHttpError(error)
+    }
+  }
+
+  @Patch(':chronicleId/lifecycle')
+  async transition(
+    @Req() request:
+      AuthenticatedChronicleRequest,
+    @Param('chronicleId')
+    chronicleIdInput: unknown,
+    @Body() body: unknown,
+  ): Promise<ChronicleResponseDto> {
+    const narratorId =
+      authenticatedNarratorId(request)
+
+    try {
+      const chronicleId =
+        parseChronicleIdParam(
+          chronicleIdInput,
+        )
+      const nextStatus =
+        parseChronicleLifecycleRequest(
+          body,
+        )
+      const chronicle =
+        await this.transitionLifecycle.execute(
+          narratorId,
+          chronicleId,
+          nextStatus,
+        )
+
+      if (chronicle === null) {
+        throw new NotFoundException({
+          code: 'CHRONICLE_NOT_FOUND',
+        })
+      }
+
+      return toChronicleResponse(
+        chronicle,
+      )
+    } catch (error: unknown) {
+      throwChronicleHttpError(error)
+    }
   }
 }

@@ -19,6 +19,14 @@ import {
 } from './application/list-chronicles.use-case'
 
 import {
+  LoadChronicleUseCase,
+} from './application/load-chronicle.use-case'
+
+import {
+  TransitionChronicleLifecycleUseCase,
+} from './application/transition-chronicle-lifecycle.use-case'
+
+import {
   PrismaChronicleRepository,
 } from './infrastructure/prisma-chronicle.repository'
 
@@ -57,10 +65,33 @@ import {
           repository,
         ),
     },
+    {
+      provide: LoadChronicleUseCase,
+      inject: [CHRONICLE_REPOSITORY],
+      useFactory: (
+        repository: ChronicleRepository,
+      ) =>
+        new LoadChronicleUseCase(
+          repository,
+        ),
+    },
+    {
+      provide:
+        TransitionChronicleLifecycleUseCase,
+      inject: [CHRONICLE_REPOSITORY],
+      useFactory: (
+        repository: ChronicleRepository,
+      ) =>
+        new TransitionChronicleLifecycleUseCase(
+          repository,
+        ),
+    },
   ],
   exports: [
     CreateChronicleUseCase,
     ListChroniclesUseCase,
+    LoadChronicleUseCase,
+    TransitionChronicleLifecycleUseCase,
   ],
 })
 export class ChroniclesModule {}

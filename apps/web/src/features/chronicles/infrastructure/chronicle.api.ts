@@ -2,6 +2,7 @@ import type {
   ChronicleApiSnapshot,
   ChronicleApiStatus,
   CreateChronicleApiRequest,
+  TransitionChronicleLifecycleApiRequest,
 } from '../types/chronicle-api.types.ts'
 
 type FetchImplementation =
@@ -39,6 +40,19 @@ export interface ChronicleGateway {
 
   create(
     request: CreateChronicleApiRequest,
+  ): Promise<ChronicleApiSnapshot>
+}
+
+export interface ChronicleLifecycleGateway
+  extends ChronicleGateway {
+  get(
+    chronicleId: string,
+  ): Promise<ChronicleApiSnapshot>
+
+  transition(
+    chronicleId: string,
+    request:
+      TransitionChronicleLifecycleApiRequest,
   ): Promise<ChronicleApiSnapshot>
 }
 
@@ -171,7 +185,7 @@ async function jsonResponse(
 export function createChronicleGateway(
   fetchImplementation: FetchImplementation =
     globalThis.fetch,
-): ChronicleGateway {
+): ChronicleLifecycleGateway {
   return {
     async list() {
       const response =
@@ -196,6 +210,47 @@ export function createChronicleGateway(
           '/api/chronicles',
           {
             method: 'POST',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(request),
+          },
+        )
+
+      return parseChronicleApiSnapshotResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async get(chronicleId) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseChronicleApiSnapshotResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async transition(
+      chronicleId,
+      request,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/lifecycle`,
+          {
+            method: 'PATCH',
             credentials: 'include',
             headers: {
               Accept: 'application/json',
