@@ -1781,6 +1781,18 @@ export class PrismaCharacterDraftRepository
           )
         }
 
+        if (data.hunger !== undefined) {
+          await transaction.characterBloodState
+            .update({
+              where: {
+                characterId: data.characterId,
+              },
+              data: {
+                hunger: data.hunger,
+              },
+            })
+        }
+
         if (data.damage !== undefined) {
           await transaction.characterDamageState
             .update({

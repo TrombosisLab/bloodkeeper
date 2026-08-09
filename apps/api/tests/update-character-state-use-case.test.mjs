@@ -14,6 +14,9 @@ function character(overrides = {}) {
     characterId: 'character-024-b1',
     status: 'active',
     revision: 4,
+    blood: {
+      hunger: 2,
+    },
     attributes: {
       stamina: 3,
       composure: 2,
@@ -59,6 +62,12 @@ function setup(current = character()) {
         ...current,
         revision:
           data.expectedRevision + 1,
+        blood: {
+          ...current.blood,
+          ...(data.hunger === undefined
+            ? {}
+            : { hunger: data.hunger }),
+        },
         damage:
           data.damage ?? current.damage,
         humanity: {
@@ -247,5 +256,51 @@ test(
     )
 
     assert.equal(humanity.calls.length, 1)
+  },
+)
+
+test(
+  '027-E persiste Hambre mediante el estado operacional',
+  async () => {
+    const { calls, useCase } = setup()
+
+    const result = await useCase.execute(
+      'owner-027',
+      {
+        characterId: 'character-024-b1',
+        expectedRevision: 4,
+        hunger: 3,
+      },
+    )
+
+    assert.equal(result?.blood.hunger, 3)
+    assert.equal(calls[1][0], 'updateState')
+    assert.equal(calls[1][2].hunger, 3)
+  },
+)
+
+test(
+  '027-E rechaza Hambre fuera de rango antes de escribir',
+  async () => {
+    const { calls, useCase } = setup()
+
+    await assert.rejects(
+      useCase.execute(
+        'owner-027',
+        {
+          characterId: 'character-024-b1',
+          expectedRevision: 4,
+          hunger: 6,
+        },
+      ),
+      {
+        name: 'InvalidCharacterHungerError',
+        violations: [
+          'HUNGER_VALUE_INVALID',
+        ],
+      },
+    )
+
+    assert.equal(calls.length, 1)
   },
 )

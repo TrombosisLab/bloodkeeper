@@ -51,7 +51,7 @@ test(
     )
     assert.match(
       sheet,
-      /Guardando Salud, Voluntad, Humanidad y Manchas/,
+      /Guardando Salud, Voluntad, Humanidad, Manchas y Hambre/,
     )
   },
 )
@@ -94,23 +94,27 @@ test(
 )
 
 test(
-  'SPEC-024 mantiene Hambre fuera de la escritura persistida',
+  'SPEC-027.E incluye Hambre en la escritura persistida',
   () => {
     assert.match(
       sheet,
-      /hungerEditing=\{\s*!persisted && stateEditing\s*\}/,
+      /hungerEditing=\{\s*stateEditing\s*\}/,
     )
     assert.match(
-      stateComponent,
-      /hungerEditing \? \(/,
+      sheet,
+      /hunger:\s*nextHunger/,
     )
-    assert.doesNotMatch(
+    assert.match(
+      api,
+      /validateCharacterHunger/,
+    )
+    assert.match(
       api,
       /\bhunger\b/,
     )
-    assert.doesNotMatch(
-      api,
-      /characterBloodState/,
+    assert.match(
+      persisted,
+      /snapshot\.hunger/,
     )
   },
 )

@@ -15,6 +15,10 @@ import {
 } from '../domain/character-humanity-state.rules'
 
 import {
+  assertValidCharacterHunger,
+} from '../domain/character-hunger.rules'
+
+import {
   assertCharacterStateEditable,
 } from '../domain/character-state.rules'
 
@@ -72,6 +76,12 @@ export class UpdateCharacterStateUseCase {
           current.humanity.value,
         data.humanityStains ??
           current.humanity.stains,
+      )
+    }
+
+    if (data.hunger !== undefined) {
+      assertValidCharacterHunger(
+        data.hunger,
       )
     }
 

@@ -15,6 +15,10 @@ import {
 } from '../dist/characters/domain/character-damage.rules.js'
 
 import {
+  InvalidCharacterHungerError,
+} from '../dist/characters/domain/character-hunger.rules.js'
+
+import {
   CharacterStateController,
 } from '../dist/characters/presentation/character-state.controller.js'
 
@@ -28,6 +32,9 @@ function persisted() {
     characterId,
     revision: 2,
     status: 'active',
+    blood: {
+      hunger: 2,
+    },
     damage: {
       health: {
         superficial: 1,
@@ -146,20 +153,7 @@ test(
           return null
         },
       })
-
-    await assert.rejects(
-      controller.update(
-        { user: { id: ownerId } },
-        characterId,
-        {
-          expectedRevision: 1,
-          hunger: 2,
-        },
-      ),
-      hasStatus(400),
-    )
-
-    await assert.rejects(
+await assert.rejects(
       controller.update(
         { user: { id: ownerId } },
         characterId,
@@ -213,6 +207,64 @@ test(
         {
           expectedRevision: 1,
           humanityValue: 6,
+        },
+      ),
+      hasStatus(422),
+    )
+  },
+)
+
+test(
+  '027-E acepta Hambre y la devuelve en el estado operativo',
+  async () => {
+    let command
+
+    const controller =
+      new CharacterStateController({
+        async execute(_ownerId, data) {
+          command = data
+          return {
+            ...persisted(),
+            blood: {
+              hunger: data.hunger,
+            },
+          }
+        },
+      })
+
+    const response = await controller.update(
+      { user: { id: ownerId } },
+      characterId,
+      {
+        expectedRevision: 2,
+        hunger: 3,
+      },
+    )
+
+    assert.equal(command.hunger, 3)
+    assert.equal(response.hunger, 3)
+  },
+)
+
+test(
+  '027-E traduce la infracción de Hambre a 422',
+  async () => {
+    const controller =
+      new CharacterStateController({
+        async execute() {
+          throw new InvalidCharacterHungerError([
+            'HUNGER_VALUE_INVALID',
+          ])
+        },
+      })
+
+    await assert.rejects(
+      controller.update(
+        { user: { id: ownerId } },
+        characterId,
+        {
+          expectedRevision: 2,
+          hunger: 6,
         },
       ),
       hasStatus(422),

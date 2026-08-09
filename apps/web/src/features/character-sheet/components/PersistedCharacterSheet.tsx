@@ -71,6 +71,7 @@ function withOperationalState(
       humanity: {
         ...snapshot.humanity,
       },
+      hunger: snapshot.hunger,
     },
   }
 }

@@ -2,6 +2,10 @@ import {
   validateCharacterHumanityState,
 } from '../domain/humanity-state-rules.ts'
 
+import {
+  validateCharacterHunger,
+} from '../../character/domain/hunger-rules.ts'
+
 import type {
   CharacterOperationalStateSnapshot,
   CharacterOperationalStateUpdate,
@@ -82,6 +86,7 @@ export function parseCharacterStateResponse(
     !['draft', 'active', 'archived'].includes(
       value.status as string,
     ) ||
+    !isInteger(value.hunger) ||
     !isRecord(value.damage) ||
     !isRecord(value.humanity)
   ) {
@@ -107,7 +112,10 @@ export function parseCharacterStateResponse(
 
   if (
     validateCharacterHumanityState(humanity)
-      .length > 0
+      .length > 0 ||
+    !validateCharacterHunger(
+      value.hunger,
+    ).valid
   ) {
     return invalidResponse()
   }
@@ -127,6 +135,7 @@ export function parseCharacterStateResponse(
     revision: value.revision,
     status:
       value.status as CharacterOperationalStateSnapshot['status'],
+    hunger: value.hunger,
     damage: {
       health: {
         superficial:

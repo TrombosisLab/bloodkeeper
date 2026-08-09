@@ -60,7 +60,7 @@ test(
 )
 
 test(
-  'SPEC-024 limita la escritura a daño y Humanidad/Manchas',
+  'SPEC-027.E amplía la escritura operativa con Hambre',
   () => {
     assert.match(
       updateStateSource,
@@ -70,7 +70,7 @@ test(
       updateStateSource,
       /characterHumanityState/,
     )
-    assert.doesNotMatch(
+    assert.match(
       updateStateSource,
       /characterBloodState/,
     )
@@ -81,6 +81,24 @@ test(
     assert.doesNotMatch(
       updateStateSource,
       /characterIdentity/,
+    )
+  },
+)
+
+test(
+  '027-E persiste Hambre en la fila de sangre existente',
+  () => {
+    assert.match(
+      updateStateSource,
+      /data\.hunger !== undefined/,
+    )
+    assert.match(
+      updateStateSource,
+      /characterBloodState/,
+    )
+    assert.match(
+      updateStateSource,
+      /hunger:\s*data\.hunger/,
     )
   },
 )

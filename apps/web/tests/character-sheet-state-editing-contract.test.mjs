@@ -45,7 +45,7 @@ test(
 )
 
 test(
-  'SPEC-024 conecta daño y Humanidad a persistencia sin incluir Hambre',
+  'SPEC-027.E conecta daño, Humanidad y Hambre a persistencia',
   () => {
     assert.match(
       characterSheet,
@@ -61,6 +61,10 @@ test(
     )
     assert.match(
       characterSheet,
+      /handleHungerChange/,
+    )
+    assert.match(
+      characterSheet,
       /damage:\s*\{/,
     )
     assert.match(
@@ -73,7 +77,11 @@ test(
     )
     assert.match(
       characterSheet,
-      /hungerEditing=\{\s*!persisted && stateEditing\s*\}/,
+      /hunger:\s*nextHunger/,
+    )
+    assert.match(
+      characterSheet,
+      /hungerEditing=\{\s*stateEditing\s*\}/,
     )
     assert.match(
       characterTrackers,

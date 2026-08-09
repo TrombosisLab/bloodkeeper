@@ -165,6 +165,7 @@ export function parseUpdateCharacterStateRequest(
       'damage',
       'humanityValue',
       'humanityStains',
+      'hunger',
     ],
     'body',
   )
@@ -181,11 +182,14 @@ export function parseUpdateCharacterStateRequest(
     Object.hasOwn(body, 'humanityValue')
   const hasHumanityStains =
     Object.hasOwn(body, 'humanityStains')
+  const hasHunger =
+    Object.hasOwn(body, 'hunger')
 
   if (
     !hasDamage &&
     !hasHumanityValue &&
-    !hasHumanityStains
+    !hasHumanityStains &&
+    !hasHunger
   ) {
     throw new InvalidCharacterStateRequestError(
       'body must contain a state change',
@@ -225,6 +229,15 @@ export function parseUpdateCharacterStateRequest(
             ),
         }
       : {}),
+    ...(hasHunger
+      ? {
+          hunger:
+            integer(
+              body.hunger,
+              'body.hunger',
+            ),
+        }
+      : {}),
   }
 }
 
@@ -232,6 +245,7 @@ export interface CharacterStateResponseDto {
   characterId: string
   revision: number
   status: 'draft' | 'active' | 'archived'
+  hunger: number
   damage: {
     health: {
       superficial: number
@@ -255,6 +269,7 @@ export function toCharacterStateResponse(
     characterId: character.characterId,
     revision: character.revision,
     status: character.status,
+    hunger: character.blood.hunger,
     damage: {
       health: {
         ...character.damage.health,

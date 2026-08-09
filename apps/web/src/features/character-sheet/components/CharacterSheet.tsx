@@ -79,7 +79,7 @@ function persistenceMessage(
 ): string | null {
   switch (state) {
     case 'saving':
-      return 'Guardando Salud, Voluntad, Humanidad y Manchas…'
+      return 'Guardando Salud, Voluntad, Humanidad, Manchas y Hambre…'
     case 'unauthorized':
       return 'La sesión ya no permite guardar estos estados.'
     case 'not-found':
@@ -276,8 +276,20 @@ export function CharacterSheet({
   function handleHungerChange(
     nextHunger: number,
   ): void {
-    if (persisted) return
+    if (!persisted) {
+      setHunger(nextHunger)
+      return
+    }
+
+    if (!stateEditing) return
+
+    const previous = hunger
     setHunger(nextHunger)
+
+    void persistState(
+      { hunger: nextHunger },
+      () => setHunger(previous),
+    )
   }
 
   const persistenceStatus =
@@ -345,7 +357,7 @@ export function CharacterSheet({
                     )
                   : stateEditing
                     ? (
-                        'Edición persistida de Salud, Voluntad, Humanidad y Manchas. Hambre permanece en solo lectura.'
+                        'Edición persistida de Salud, Voluntad, Humanidad, Manchas y Hambre.'
                       )
                     : (
                         `Ficha persistida · revisión ${model.revision}`
@@ -412,7 +424,7 @@ export function CharacterSheet({
         }
         stateEditing={stateEditing}
         hungerEditing={
-          !persisted && stateEditing
+          stateEditing
         }
         onHumanityChange={
           handleHumanityChange

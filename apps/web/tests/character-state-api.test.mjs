@@ -15,6 +15,7 @@ function snapshot() {
     characterId,
     revision: 5,
     status: 'active',
+    hunger: 3,
     damage: {
       health: {
         superficial: 2,
@@ -85,6 +86,7 @@ test(
       {
         humanityValue: 6,
         humanityStains: 2,
+        hunger: 3,
       },
     )
 
@@ -104,10 +106,11 @@ test(
       expectedRevision: 4,
       humanityValue: 6,
       humanityStains: 2,
+      hunger: 3,
     })
     assert.equal(
       Object.hasOwn(body, 'hunger'),
-      false,
+      true,
     )
   },
 )
@@ -153,6 +156,20 @@ test(
         )
         return true
       },
+    )
+  },
+)
+
+test(
+  '027-E rechaza snapshots con Hambre fuera de rango',
+  () => {
+    assert.throws(
+      () =>
+        parseCharacterStateResponse({
+          ...snapshot(),
+          hunger: 6,
+        }),
+      CharacterStateApiError,
     )
   },
 )

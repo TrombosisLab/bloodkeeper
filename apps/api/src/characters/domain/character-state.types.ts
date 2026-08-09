@@ -8,4 +8,5 @@ export interface UpdateCharacterStateData {
   readonly damage?: PersistedCharacterDamageState
   readonly humanityValue?: number
   readonly humanityStains?: number
+  readonly hunger?: number
 }

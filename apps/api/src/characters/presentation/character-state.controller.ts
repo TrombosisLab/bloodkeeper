@@ -28,6 +28,10 @@ import {
 } from '../domain/character-humanity-state.rules'
 
 import {
+  InvalidCharacterHungerError,
+} from '../domain/character-hunger.rules'
+
+import {
   InvalidCharacterStateUpdateError,
 } from '../domain/character-state.rules'
 
@@ -92,6 +96,8 @@ function throwCharacterStateHttpError(
       InvalidCharacterDamageStateError ||
     error instanceof
       InvalidCharacterHumanityStateError ||
+    error instanceof
+      InvalidCharacterHungerError ||
     error instanceof
       InvalidCharacterStateUpdateError
   ) {
