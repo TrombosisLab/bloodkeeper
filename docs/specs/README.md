@@ -74,6 +74,7 @@ confirmadas.
 | SPEC-053 | [SPEC-053 – PERFORMANCE_AND_SCALABILITY](SPEC-053_PERFORMANCE_AND_SCALABILITY_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-054 | [SPEC-054 – ACCESSIBILITY_RESPONSIVE_AND_COMPATIBILITY](SPEC-054_ACCESSIBILITY_RESPONSIVE_AND_COMPATIBILITY_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-055 | [SPEC-055 – PROJECT_COMPLETION_CRITERIA](SPEC-055_PROJECT_COMPLETION_CRITERIA_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
+| SPEC-056 | [SPEC-056 – CHARACTER_EXPERIENCE_AND_ADVANCEMENT](SPEC-056_CHARACTER_EXPERIENCE_AND_ADVANCEMENT_v1.0.md) | 1.0 | Aprobado | Planificada | Experiencia y evolución de personajes; ejecutar después de SPEC-035 y antes de SPEC-036 para reutilizar roles de crónica y sesiones. |
 
 ## Versiones archivadas
 
