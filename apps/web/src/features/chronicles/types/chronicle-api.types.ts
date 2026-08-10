@@ -134,3 +134,41 @@ export interface UpdateChronicleLocationApiRequest {
   readonly narratorNotes?: string | null
   readonly parentLocationId?: string | null
 }
+
+export type ChronicleEventApiStatus =
+  | 'active'
+  | 'archived'
+
+export interface ChronicleEventApiSnapshot {
+  readonly id: string
+  readonly chronicleId: string
+  readonly title: string
+  readonly description: string | null
+  readonly narratorNotes: string | null
+  readonly narrativeTimeLabel: string | null
+  readonly realDate: string | null
+  readonly timelineOrder: number
+  readonly status: ChronicleEventApiStatus
+  readonly createdAt: string
+  readonly updatedAt: string
+}
+
+export interface CreateChronicleEventApiRequest {
+  readonly title: string
+  readonly description: string | null
+  readonly narratorNotes: string | null
+  readonly narrativeTimeLabel: string | null
+  readonly realDate: string | null
+}
+
+export interface UpdateChronicleEventApiRequest {
+  readonly title?: string
+  readonly description?: string | null
+  readonly narratorNotes?: string | null
+  readonly narrativeTimeLabel?: string | null
+  readonly realDate?: string | null
+}
+
+export interface ReorderChronicleEventsApiRequest {
+  readonly eventIds: readonly string[]
+}

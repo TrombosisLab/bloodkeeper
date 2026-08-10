@@ -3,6 +3,7 @@ import type {
   ChronicleApiSnapshot,
   ChronicleApiStatus,
   ChronicleCharacterApiSummary,
+  ChronicleEventApiSnapshot,
   ChronicleLocationApiSnapshot,
   ChronicleNpcApiSnapshot,
   ChronicleParticipantApiRole,
@@ -10,9 +11,12 @@ import type {
   ChronicleParticipantApiStatus,
   ChronicleParticipantCandidateApiSnapshot,
   CreateChronicleApiRequest,
+  CreateChronicleEventApiRequest,
   CreateChronicleLocationApiRequest,
   CreateChronicleNpcApiRequest,
+  ReorderChronicleEventsApiRequest,
   TransitionChronicleLifecycleApiRequest,
+  UpdateChronicleEventApiRequest,
   UpdateChronicleLocationApiRequest,
   UpdateChronicleNpcApiRequest,
 } from '../types/chronicle-api.types.ts'
@@ -151,6 +155,43 @@ export interface ChronicleLifecycleGateway
     chronicleId: string,
     locationId: string,
   ): Promise<ChronicleLocationApiSnapshot>
+
+  events(
+    chronicleId: string,
+  ): Promise<
+    readonly ChronicleEventApiSnapshot[]
+  >
+
+  event(
+    chronicleId: string,
+    eventId: string,
+  ): Promise<ChronicleEventApiSnapshot>
+
+  createEvent(
+    chronicleId: string,
+    request:
+      CreateChronicleEventApiRequest,
+  ): Promise<ChronicleEventApiSnapshot>
+
+  updateEvent(
+    chronicleId: string,
+    eventId: string,
+    request:
+      UpdateChronicleEventApiRequest,
+  ): Promise<ChronicleEventApiSnapshot>
+
+  reorderEvents(
+    chronicleId: string,
+    request:
+      ReorderChronicleEventsApiRequest,
+  ): Promise<
+    readonly ChronicleEventApiSnapshot[]
+  >
+
+  archiveEvent(
+    chronicleId: string,
+    eventId: string,
+  ): Promise<ChronicleEventApiSnapshot>
 }
 
 function isRecord(
@@ -324,6 +365,50 @@ export function parseChronicleLocationResponse(
     description: value.description,
     narratorNotes:
       value.narratorNotes,
+    status: value.status,
+    createdAt: value.createdAt,
+    updatedAt: value.updatedAt,
+  }
+}
+
+export function parseChronicleEventResponse(
+  value: unknown,
+): ChronicleEventApiSnapshot {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'string' ||
+    typeof value.chronicleId !== 'string' ||
+    typeof value.title !== 'string' ||
+    !isStringOrNull(value.description) ||
+    !isStringOrNull(value.narratorNotes) ||
+    !isStringOrNull(value.narrativeTimeLabel) ||
+    !(
+      value.realDate === null ||
+      validTimestamp(value.realDate)
+    ) ||
+    typeof value.timelineOrder !== 'number' ||
+    !Number.isInteger(value.timelineOrder) ||
+    value.timelineOrder < 0 ||
+    !(
+      value.status === 'active' ||
+      value.status === 'archived'
+    ) ||
+    !validTimestamp(value.createdAt) ||
+    !validTimestamp(value.updatedAt)
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    id: value.id,
+    chronicleId: value.chronicleId,
+    title: value.title,
+    description: value.description,
+    narratorNotes: value.narratorNotes,
+    narrativeTimeLabel:
+      value.narrativeTimeLabel,
+    realDate: value.realDate,
+    timelineOrder: value.timelineOrder,
     status: value.status,
     createdAt: value.createdAt,
     updatedAt: value.updatedAt,
@@ -862,6 +947,139 @@ export function createChronicleGateway(
         )
 
       return parseChronicleLocationResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async events(chronicleId) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/events`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseList(
+        await jsonResponse(response),
+        parseChronicleEventResponse,
+      )
+    },
+
+    async event(
+      chronicleId,
+      eventId,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/events/${eventId}`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseChronicleEventResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async createEvent(
+      chronicleId,
+      request,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/events`,
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(request),
+          },
+        )
+
+      return parseChronicleEventResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async updateEvent(
+      chronicleId,
+      eventId,
+      request,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/events/${eventId}`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(request),
+          },
+        )
+
+      return parseChronicleEventResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async reorderEvents(
+      chronicleId,
+      request,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/events/reorder`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(request),
+          },
+        )
+
+      return parseList(
+        await jsonResponse(response),
+        parseChronicleEventResponse,
+      )
+    },
+
+    async archiveEvent(
+      chronicleId,
+      eventId,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/events/${eventId}/archive`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseChronicleEventResponse(
         await jsonResponse(response),
       )
     },

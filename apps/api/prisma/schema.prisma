@@ -181,6 +181,7 @@ model Chronicle {
   participants ChronicleParticipant[] @relation("ChronicleParticipantChronicle")
   npcs         ChronicleNpc[]          @relation("ChronicleNpcChronicle")
   locations    ChronicleLocation[]     @relation("ChronicleLocationChronicle")
+  events       ChronicleEvent[]        @relation("ChronicleEventChronicle")
 
   @@index([narratorId])
   @@index([status])
@@ -270,6 +271,32 @@ model ChronicleLocation {
   @@index([chronicleId, parentLocationId])
   @@index([parentLocationId])
   @@map("chronicle_locations")
+}
+
+enum ChronicleEventStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model ChronicleEvent {
+  id                 String               @id @default(uuid()) @db.Uuid
+  chronicleId        String               @db.Uuid
+  title              String
+  description        String?
+  narratorNotes      String?
+  narrativeTimeLabel String?
+  realDate           DateTime?            @db.Timestamptz(3)
+  timelineOrder      Int
+  status             ChronicleEventStatus @default(ACTIVE)
+  createdAt          DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime             @updatedAt @db.Timestamptz(3)
+
+  chronicle Chronicle @relation("ChronicleEventChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([chronicleId, status])
+  @@index([chronicleId, timelineOrder])
+  @@index([chronicleId, realDate])
+  @@map("chronicle_events")
 }
 
 model Character {

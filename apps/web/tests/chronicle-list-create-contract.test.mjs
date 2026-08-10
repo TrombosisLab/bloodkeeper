@@ -51,7 +51,7 @@ test(
     )
     assert.doesNotMatch(
       component,
-      /Participantes|PNJ|Localizaciones|Línea temporal|Sesiones/,
+      /Participantes|PNJ|Localizaciones|Eventos|Línea temporal|Sesiones/,
     )
   },
 )

@@ -20,11 +20,19 @@ const types = await readFile(
   'utf8',
 )
 
+const locationTypesStart =
+  types.indexOf(
+    'export type ChronicleLocationApiStatus',
+  )
+const locationTypesEnd =
+  types.indexOf(
+    'export type ChronicleEventApiStatus',
+    locationTypesStart,
+  )
 const locationTypes =
   types.slice(
-    types.indexOf(
-      'export type ChronicleLocationApiStatus',
-    ),
+    locationTypesStart,
+    locationTypesEnd,
   )
 
 test(

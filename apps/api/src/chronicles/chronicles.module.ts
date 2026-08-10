@@ -143,6 +143,42 @@ import {
 } from './presentation/chronicle-location.controller'
 
 import {
+  CHRONICLE_EVENT_REPOSITORY,
+} from './application/chronicle-event.repository'
+
+import {
+  ArchiveChronicleEventUseCase,
+} from './application/archive-chronicle-event.use-case'
+
+import {
+  CreateChronicleEventUseCase,
+} from './application/create-chronicle-event.use-case'
+
+import {
+  ListChronicleEventsUseCase,
+} from './application/list-chronicle-events.use-case'
+
+import {
+  LoadChronicleEventUseCase,
+} from './application/load-chronicle-event.use-case'
+
+import {
+  ReorderChronicleEventsUseCase,
+} from './application/reorder-chronicle-events.use-case'
+
+import {
+  UpdateChronicleEventUseCase,
+} from './application/update-chronicle-event.use-case'
+
+import {
+  PrismaChronicleEventRepository,
+} from './infrastructure/prisma-chronicle-event.repository'
+
+import {
+  ChronicleEventController,
+} from './presentation/chronicle-event.controller'
+
+import {
   ChronicleController,
 } from './presentation/chronicle.controller'
 
@@ -154,6 +190,7 @@ import {
     ChronicleController,
     ChronicleNpcController,
     ChronicleLocationController,
+    ChronicleEventController,
   ],
   providers: [
     PrismaChronicleRepository,
@@ -234,6 +271,19 @@ import {
     CreateChronicleLocationUseCase,
     UpdateChronicleLocationUseCase,
     ArchiveChronicleLocationUseCase,
+    PrismaChronicleEventRepository,
+    {
+      provide:
+        CHRONICLE_EVENT_REPOSITORY,
+      useExisting:
+        PrismaChronicleEventRepository,
+    },
+    ListChronicleEventsUseCase,
+    LoadChronicleEventUseCase,
+    CreateChronicleEventUseCase,
+    UpdateChronicleEventUseCase,
+    ReorderChronicleEventsUseCase,
+    ArchiveChronicleEventUseCase,
     PrismaChronicleParticipantRelations,
     {
       provide:
