@@ -4,6 +4,7 @@ import type {
   ChronicleApiStatus,
   ChronicleCharacterApiSummary,
   ChronicleEventApiSnapshot,
+  ChronicleSessionApiSnapshot,
   ChronicleLocationApiSnapshot,
   ChronicleNpcApiSnapshot,
   ChronicleParticipantApiRole,
@@ -12,11 +13,13 @@ import type {
   ChronicleParticipantCandidateApiSnapshot,
   CreateChronicleApiRequest,
   CreateChronicleEventApiRequest,
+  CreateChronicleSessionApiRequest,
   CreateChronicleLocationApiRequest,
   CreateChronicleNpcApiRequest,
   ReorderChronicleEventsApiRequest,
   TransitionChronicleLifecycleApiRequest,
   UpdateChronicleEventApiRequest,
+  UpdateChronicleSessionApiRequest,
   UpdateChronicleLocationApiRequest,
   UpdateChronicleNpcApiRequest,
 } from '../types/chronicle-api.types.ts'
@@ -192,6 +195,41 @@ export interface ChronicleLifecycleGateway
     chronicleId: string,
     eventId: string,
   ): Promise<ChronicleEventApiSnapshot>
+
+
+  sessions(
+    chronicleId: string,
+  ): Promise<
+    readonly ChronicleSessionApiSnapshot[]
+  >
+
+  session(
+    chronicleId: string,
+    sessionId: string,
+  ): Promise<ChronicleSessionApiSnapshot>
+
+  createSession(
+    chronicleId: string,
+    request:
+      CreateChronicleSessionApiRequest,
+  ): Promise<ChronicleSessionApiSnapshot>
+
+  updateSession(
+    chronicleId: string,
+    sessionId: string,
+    request:
+      UpdateChronicleSessionApiRequest,
+  ): Promise<ChronicleSessionApiSnapshot>
+
+  completeSession(
+    chronicleId: string,
+    sessionId: string,
+  ): Promise<ChronicleSessionApiSnapshot>
+
+  archiveSession(
+    chronicleId: string,
+    sessionId: string,
+  ): Promise<ChronicleSessionApiSnapshot>
 }
 
 function isRecord(
@@ -410,6 +448,53 @@ export function parseChronicleEventResponse(
     realDate: value.realDate,
     timelineOrder: value.timelineOrder,
     status: value.status,
+    createdAt: value.createdAt,
+    updatedAt: value.updatedAt,
+  }
+}
+
+export function parseChronicleSessionResponse(
+  value: unknown,
+): ChronicleSessionApiSnapshot {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'string' ||
+    typeof value.chronicleId !== 'string' ||
+    !(
+      value.sessionNumber === null ||
+      (
+        typeof value.sessionNumber === 'number' &&
+        Number.isInteger(value.sessionNumber) &&
+        value.sessionNumber >= 0
+      )
+    ) ||
+    !isStringOrNull(value.title) ||
+    !(
+      value.realDate === null ||
+      validTimestamp(value.realDate)
+    ) ||
+    !(
+      value.status === 'preparation' ||
+      value.status === 'completed' ||
+      value.status === 'archived'
+    ) ||
+    !isStringOrNull(value.summary) ||
+    !isStringOrNull(value.narratorNotes) ||
+    !validTimestamp(value.createdAt) ||
+    !validTimestamp(value.updatedAt)
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    id: value.id,
+    chronicleId: value.chronicleId,
+    sessionNumber: value.sessionNumber,
+    title: value.title,
+    realDate: value.realDate,
+    status: value.status,
+    summary: value.summary,
+    narratorNotes: value.narratorNotes,
     createdAt: value.createdAt,
     updatedAt: value.updatedAt,
   }
@@ -1080,6 +1165,136 @@ export function createChronicleGateway(
         )
 
       return parseChronicleEventResponse(
+        await jsonResponse(response),
+      )
+    },
+
+
+    async sessions(chronicleId) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/sessions`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseList(
+        await jsonResponse(response),
+        parseChronicleSessionResponse,
+      )
+    },
+
+    async session(
+      chronicleId,
+      sessionId,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/sessions/${sessionId}`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseChronicleSessionResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async createSession(
+      chronicleId,
+      request,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/sessions`,
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(request),
+          },
+        )
+
+      return parseChronicleSessionResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async updateSession(
+      chronicleId,
+      sessionId,
+      request,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/sessions/${sessionId}`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(request),
+          },
+        )
+
+      return parseChronicleSessionResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async completeSession(
+      chronicleId,
+      sessionId,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/sessions/${sessionId}/complete`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseChronicleSessionResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async archiveSession(
+      chronicleId,
+      sessionId,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/sessions/${sessionId}/archive`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseChronicleSessionResponse(
         await jsonResponse(response),
       )
     },

@@ -115,16 +115,16 @@ test(
 )
 
 test(
-  '034-A permite Eventos sin adelantar SPEC-035',
+  '034-A mantiene Eventos sin relaciones narrativas futuras',
   () => {
-    const chronicle = block(
+    const event = block(
       schema,
-      /model Chronicle\s*\{/,
+      /model ChronicleEvent\s*\{/,
     )
 
     assert.doesNotMatch(
-      chronicle,
-      /session/i,
+      event,
+      /characterId|npcId|locationId|sessionId|sessionIds/i,
     )
     assert.doesNotMatch(
       migration,

@@ -179,6 +179,42 @@ import {
 } from './presentation/chronicle-event.controller'
 
 import {
+  CHRONICLE_SESSION_REPOSITORY,
+} from './application/chronicle-session.repository'
+
+import {
+  ArchiveChronicleSessionUseCase,
+} from './application/archive-chronicle-session.use-case'
+
+import {
+  CompleteChronicleSessionUseCase,
+} from './application/complete-chronicle-session.use-case'
+
+import {
+  CreateChronicleSessionUseCase,
+} from './application/create-chronicle-session.use-case'
+
+import {
+  ListChronicleSessionsUseCase,
+} from './application/list-chronicle-sessions.use-case'
+
+import {
+  LoadChronicleSessionUseCase,
+} from './application/load-chronicle-session.use-case'
+
+import {
+  UpdateChronicleSessionUseCase,
+} from './application/update-chronicle-session.use-case'
+
+import {
+  PrismaChronicleSessionRepository,
+} from './infrastructure/prisma-chronicle-session.repository'
+
+import {
+  ChronicleSessionController,
+} from './presentation/chronicle-session.controller'
+
+import {
   ChronicleController,
 } from './presentation/chronicle.controller'
 
@@ -191,6 +227,7 @@ import {
     ChronicleNpcController,
     ChronicleLocationController,
     ChronicleEventController,
+    ChronicleSessionController,
   ],
   providers: [
     PrismaChronicleRepository,
@@ -284,6 +321,19 @@ import {
     UpdateChronicleEventUseCase,
     ReorderChronicleEventsUseCase,
     ArchiveChronicleEventUseCase,
+    PrismaChronicleSessionRepository,
+    {
+      provide:
+        CHRONICLE_SESSION_REPOSITORY,
+      useExisting:
+        PrismaChronicleSessionRepository,
+    },
+    ListChronicleSessionsUseCase,
+    LoadChronicleSessionUseCase,
+    CreateChronicleSessionUseCase,
+    UpdateChronicleSessionUseCase,
+    CompleteChronicleSessionUseCase,
+    ArchiveChronicleSessionUseCase,
     PrismaChronicleParticipantRelations,
     {
       provide:

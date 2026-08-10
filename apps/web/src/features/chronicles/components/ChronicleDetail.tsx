@@ -43,6 +43,10 @@ import {
 } from './ChronicleEventPanel'
 
 import {
+  ChronicleSessionPanel,
+} from './ChronicleSessionPanel'
+
+import {
   ChronicleLocationPanel,
 } from './ChronicleLocationPanel'
 
@@ -390,6 +394,10 @@ export function ChronicleDetail({
     'narrator'
 
   const canManageEvents =
+    currentMembership?.role ===
+    'narrator'
+
+  const canManageSessions =
     currentMembership?.role ===
     'narrator'
 
@@ -1057,6 +1065,12 @@ export function ChronicleDetail({
 
       {canManageEvents ? (
         <ChronicleEventPanel
+          chronicleId={chronicleId}
+        />
+      ) : null}
+
+      {canManageSessions ? (
+        <ChronicleSessionPanel
           chronicleId={chronicleId}
         />
       ) : null}

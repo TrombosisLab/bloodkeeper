@@ -168,6 +168,12 @@ model AuthSession {
   @@map("auth_sessions")
 }
 
+enum ChronicleSessionStatus {
+  PREPARATION
+  COMPLETED
+  ARCHIVED
+}
+
 model Chronicle {
   id          String          @id @default(uuid()) @db.Uuid
   narratorId  String          @db.Uuid
@@ -182,6 +188,7 @@ model Chronicle {
   npcs         ChronicleNpc[]          @relation("ChronicleNpcChronicle")
   locations    ChronicleLocation[]     @relation("ChronicleLocationChronicle")
   events       ChronicleEvent[]        @relation("ChronicleEventChronicle")
+  sessions     ChronicleSession[]      @relation("ChronicleSessionChronicle")
 
   @@index([narratorId])
   @@index([status])
@@ -297,6 +304,26 @@ model ChronicleEvent {
   @@index([chronicleId, timelineOrder])
   @@index([chronicleId, realDate])
   @@map("chronicle_events")
+}
+
+model ChronicleSession {
+    id            String                 @id @default(uuid()) @db.Uuid
+    chronicleId   String                 @db.Uuid
+    sessionNumber Int?
+    title         String?
+    realDate      DateTime?              @db.Timestamptz(3)
+    status        ChronicleSessionStatus @default(PREPARATION)
+    summary       String?
+    narratorNotes String?
+    createdAt     DateTime               @default(now()) @db.Timestamptz(3)
+    updatedAt     DateTime               @updatedAt @db.Timestamptz(3)
+
+    chronicle Chronicle @relation("ChronicleSessionChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+    @@index([chronicleId, status])
+    @@index([chronicleId, sessionNumber])
+    @@index([chronicleId, realDate])
+    @@map("chronicle_sessions")
 }
 
 model Character {

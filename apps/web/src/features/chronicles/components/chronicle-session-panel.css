@@ -1,0 +1,237 @@
+.chronicle-session-panel {
+  margin-top: var(--space-4);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-translucent);
+  box-shadow: var(--shadow-raised);
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.chronicle-session-panel__heading,
+.chronicle-session-panel__item-heading,
+.chronicle-session-panel__detail-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.chronicle-session-panel__heading > div > span,
+.chronicle-session-panel__detail-heading > div > span {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.chronicle-session-panel h2,
+.chronicle-session-panel h3 {
+  margin: 0;
+}
+
+.chronicle-session-panel__count,
+.chronicle-session-panel__state {
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-emphasis);
+  font-size: var(--font-size-sm);
+  padding: 0.35rem 0.65rem;
+  white-space: nowrap;
+}
+
+.chronicle-session-panel__create,
+.chronicle-session-panel__detail {
+  margin-top: var(--space-5);
+  border-top:
+    1px solid
+    var(--color-border-subtle);
+  padding-top: var(--space-4);
+}
+
+.chronicle-session-panel__fields {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.chronicle-session-panel__fields label {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  font-weight: 700;
+}
+
+.chronicle-session-panel__wide-field {
+  grid-column: span 3;
+}
+
+.chronicle-session-panel input,
+.chronicle-session-panel textarea {
+  width: 100%;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-emphasis);
+  color: var(--color-text-primary);
+  font: inherit;
+  padding: 0.55rem 0.7rem;
+}
+
+.chronicle-session-panel textarea {
+  resize: vertical;
+}
+
+.chronicle-session-panel button {
+  min-height: 2.5rem;
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-emphasis);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.55rem 0.9rem;
+}
+
+.chronicle-session-panel__create > button {
+  margin-top: var(--space-4);
+}
+
+.chronicle-session-panel button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.chronicle-session-panel__compact-action {
+  min-height: 2rem !important;
+  padding: 0.35rem 0.65rem !important;
+  font-size: 0.78rem !important;
+}
+
+.chronicle-session-panel__list {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chronicle-session-panel__item {
+  border-top:
+    1px solid
+    var(--color-border-subtle);
+  padding-top: var(--space-3);
+}
+
+.chronicle-session-panel__item--archived {
+  opacity: 0.72;
+}
+
+.chronicle-session-panel__item-heading > div {
+  min-width: 0;
+}
+
+.chronicle-session-panel__item-heading strong,
+.chronicle-session-panel__item-heading > div > span {
+  display: block;
+}
+
+.chronicle-session-panel__item-heading > div > span {
+  margin-top: 0.25rem;
+  font-size: var(--font-size-sm);
+  opacity: 0.72;
+}
+
+.chronicle-session-panel__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.chronicle-session-panel__edit {
+  margin-top: var(--space-3);
+}
+
+.chronicle-session-panel__detail-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-4) 0 0;
+}
+
+.chronicle-session-panel__detail-grid div {
+  border-top:
+    1px solid
+    var(--color-border-subtle);
+  padding-top: var(--space-3);
+}
+
+.chronicle-session-panel__detail-grid dt {
+  font-size: var(--font-size-sm);
+  opacity: 0.72;
+}
+
+.chronicle-session-panel__detail-grid dd {
+  margin: 0.35rem 0 0;
+  white-space: pre-wrap;
+}
+
+.chronicle-session-panel__detail-wide {
+  grid-column: span 2;
+}
+
+.chronicle-session-panel__empty,
+.chronicle-session-panel__message {
+  margin: var(--space-4) 0 0;
+  opacity: 0.72;
+}
+
+.chronicle-session-panel__error {
+  margin: var(--space-4) 0 0;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-translucent);
+  color: var(--color-danger);
+  padding: var(--space-3);
+}
+
+@media (max-width: 900px) {
+  .chronicle-session-panel__fields {
+    grid-template-columns: 1fr;
+  }
+
+  .chronicle-session-panel__wide-field {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .chronicle-session-panel__heading,
+  .chronicle-session-panel__item-heading,
+  .chronicle-session-panel__detail-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .chronicle-session-panel__detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chronicle-session-panel__detail-wide {
+    grid-column: auto;
+  }
+
+  .chronicle-session-panel__actions {
+    width: 100%;
+  }
+
+  .chronicle-session-panel__actions button,
+  .chronicle-session-panel__create > button {
+    width: 100%;
+  }
+}

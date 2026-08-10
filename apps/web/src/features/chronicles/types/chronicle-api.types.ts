@@ -172,3 +172,37 @@ export interface UpdateChronicleEventApiRequest {
 export interface ReorderChronicleEventsApiRequest {
   readonly eventIds: readonly string[]
 }
+
+export type ChronicleSessionApiStatus =
+  | 'preparation'
+  | 'completed'
+  | 'archived'
+
+export interface ChronicleSessionApiSnapshot {
+  readonly id: string
+  readonly chronicleId: string
+  readonly sessionNumber: number | null
+  readonly title: string | null
+  readonly realDate: string | null
+  readonly status: ChronicleSessionApiStatus
+  readonly summary: string | null
+  readonly narratorNotes: string | null
+  readonly createdAt: string
+  readonly updatedAt: string
+}
+
+export interface CreateChronicleSessionApiRequest {
+  readonly sessionNumber: number | null
+  readonly title: string | null
+  readonly realDate: string | null
+  readonly summary: string | null
+  readonly narratorNotes: string | null
+}
+
+export interface UpdateChronicleSessionApiRequest {
+  readonly sessionNumber?: number | null
+  readonly title?: string | null
+  readonly realDate?: string | null
+  readonly summary?: string | null
+  readonly narratorNotes?: string | null
+}

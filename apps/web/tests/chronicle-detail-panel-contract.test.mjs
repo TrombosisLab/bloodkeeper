@@ -99,7 +99,7 @@ test(
 )
 
 test(
-  '034-C materializa Eventos sin adelantar SPEC-035',
+  '035-C materializa Sesiones tras Eventos sin adelantar relaciones futuras',
   () => {
     const combined =
       detail + list + npcPanel
@@ -120,9 +120,9 @@ test(
       detail,
       /ChronicleEventPanel/,
     )
-    assert.doesNotMatch(
-      combined,
-      />\s*Sesiones\s*</,
+    assert.match(
+      detail,
+      /ChronicleSessionPanel/,
     )
   },
 )
