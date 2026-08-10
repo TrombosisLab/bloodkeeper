@@ -39,6 +39,10 @@ import {
 } from '../../../components/ui/ViewStateStatus'
 
 import {
+  ChronicleLocationPanel,
+} from './ChronicleLocationPanel'
+
+import {
   ChronicleNpcPanel,
 } from './ChronicleNpcPanel'
 
@@ -374,6 +378,10 @@ export function ChronicleDetail({
     'narrator'
 
   const canManageNpcs =
+    currentMembership?.role ===
+    'narrator'
+
+  const canManageLocations =
     currentMembership?.role ===
     'narrator'
 
@@ -1029,6 +1037,12 @@ export function ChronicleDetail({
 
       {canManageNpcs ? (
         <ChronicleNpcPanel
+          chronicleId={chronicleId}
+        />
+      ) : null}
+
+      {canManageLocations ? (
+        <ChronicleLocationPanel
           chronicleId={chronicleId}
         />
       ) : null}

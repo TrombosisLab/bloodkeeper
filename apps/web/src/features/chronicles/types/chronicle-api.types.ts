@@ -101,3 +101,36 @@ export interface UpdateChronicleNpcApiRequest {
   readonly narrativeRole?: string | null
   readonly notes?: string | null
 }
+
+export type ChronicleLocationApiStatus =
+  | 'active'
+  | 'archived'
+
+export interface ChronicleLocationApiSnapshot {
+  readonly id: string
+  readonly chronicleId: string
+  readonly parentLocationId: string | null
+  readonly name: string
+  readonly category: string | null
+  readonly description: string | null
+  readonly narratorNotes: string | null
+  readonly status: ChronicleLocationApiStatus
+  readonly createdAt: string
+  readonly updatedAt: string
+}
+
+export interface CreateChronicleLocationApiRequest {
+  readonly name: string
+  readonly category: string | null
+  readonly description: string | null
+  readonly narratorNotes: string | null
+  readonly parentLocationId: string | null
+}
+
+export interface UpdateChronicleLocationApiRequest {
+  readonly name?: string
+  readonly category?: string | null
+  readonly description?: string | null
+  readonly narratorNotes?: string | null
+  readonly parentLocationId?: string | null
+}

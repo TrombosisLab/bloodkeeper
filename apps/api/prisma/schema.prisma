@@ -180,6 +180,7 @@ model Chronicle {
   characters   Character[]            @relation("CharacterChronicle")
   participants ChronicleParticipant[] @relation("ChronicleParticipantChronicle")
   npcs         ChronicleNpc[]          @relation("ChronicleNpcChronicle")
+  locations    ChronicleLocation[]     @relation("ChronicleLocationChronicle")
 
   @@index([narratorId])
   @@index([status])
@@ -241,6 +242,34 @@ model ChronicleNpc {
   @@index([chronicleId, status])
   @@index([chronicleId, detailLevel])
   @@map("chronicle_npcs")
+}
+
+enum ChronicleLocationStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model ChronicleLocation {
+  id               String                  @id @default(uuid()) @db.Uuid
+  chronicleId      String                  @db.Uuid
+  parentLocationId String?                 @db.Uuid
+  name             String
+  category         String?
+  description      String?
+  narratorNotes    String?
+  status           ChronicleLocationStatus @default(ACTIVE)
+  createdAt        DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime                @updatedAt @db.Timestamptz(3)
+
+  chronicle Chronicle @relation("ChronicleLocationChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  parentLocation ChronicleLocation?  @relation("ChronicleLocationHierarchy", fields: [parentLocationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  childLocations ChronicleLocation[] @relation("ChronicleLocationHierarchy")
+
+  @@index([chronicleId, status])
+  @@index([chronicleId, parentLocationId])
+  @@index([parentLocationId])
+  @@map("chronicle_locations")
 }
 
 model Character {

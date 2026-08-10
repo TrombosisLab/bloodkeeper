@@ -3,14 +3,17 @@ import type {
   ChronicleApiSnapshot,
   ChronicleApiStatus,
   ChronicleCharacterApiSummary,
+  ChronicleLocationApiSnapshot,
   ChronicleNpcApiSnapshot,
   ChronicleParticipantApiRole,
   ChronicleParticipantApiSnapshot,
   ChronicleParticipantApiStatus,
   ChronicleParticipantCandidateApiSnapshot,
   CreateChronicleApiRequest,
+  CreateChronicleLocationApiRequest,
   CreateChronicleNpcApiRequest,
   TransitionChronicleLifecycleApiRequest,
+  UpdateChronicleLocationApiRequest,
   UpdateChronicleNpcApiRequest,
 } from '../types/chronicle-api.types.ts'
 
@@ -119,6 +122,35 @@ export interface ChronicleLifecycleGateway
     chronicleId: string,
     npcId: string,
   ): Promise<ChronicleNpcApiSnapshot>
+
+  locations(
+    chronicleId: string,
+  ): Promise<
+    readonly ChronicleLocationApiSnapshot[]
+  >
+
+  location(
+    chronicleId: string,
+    locationId: string,
+  ): Promise<ChronicleLocationApiSnapshot>
+
+  createLocation(
+    chronicleId: string,
+    request:
+      CreateChronicleLocationApiRequest,
+  ): Promise<ChronicleLocationApiSnapshot>
+
+  updateLocation(
+    chronicleId: string,
+    locationId: string,
+    request:
+      UpdateChronicleLocationApiRequest,
+  ): Promise<ChronicleLocationApiSnapshot>
+
+  archiveLocation(
+    chronicleId: string,
+    locationId: string,
+  ): Promise<ChronicleLocationApiSnapshot>
 }
 
 function isRecord(
@@ -256,6 +288,44 @@ export function parseChronicleCharacterSummaryResponse(
     status: value.status,
     name: value.name,
     concept: value.concept,
+    updatedAt: value.updatedAt,
+  }
+}
+
+export function parseChronicleLocationResponse(
+  value: unknown,
+): ChronicleLocationApiSnapshot {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'string' ||
+    typeof value.chronicleId !== 'string' ||
+    !isStringOrNull(value.parentLocationId) ||
+    typeof value.name !== 'string' ||
+    !isStringOrNull(value.category) ||
+    !isStringOrNull(value.description) ||
+    !isStringOrNull(value.narratorNotes) ||
+    !(
+      value.status === 'active' ||
+      value.status === 'archived'
+    ) ||
+    !validTimestamp(value.createdAt) ||
+    !validTimestamp(value.updatedAt)
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    id: value.id,
+    chronicleId: value.chronicleId,
+    parentLocationId:
+      value.parentLocationId,
+    name: value.name,
+    category: value.category,
+    description: value.description,
+    narratorNotes:
+      value.narratorNotes,
+    status: value.status,
+    createdAt: value.createdAt,
     updatedAt: value.updatedAt,
   }
 }
@@ -684,6 +754,114 @@ export function createChronicleGateway(
         )
 
       return parseChronicleNpcResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async locations(chronicleId) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/locations`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseList(
+        await jsonResponse(response),
+        parseChronicleLocationResponse,
+      )
+    },
+
+    async location(
+      chronicleId,
+      locationId,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/locations/${locationId}`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseChronicleLocationResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async createLocation(
+      chronicleId,
+      request,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/locations`,
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(request),
+          },
+        )
+
+      return parseChronicleLocationResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async updateLocation(
+      chronicleId,
+      locationId,
+      request,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/locations/${locationId}`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(request),
+          },
+        )
+
+      return parseChronicleLocationResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async archiveLocation(
+      chronicleId,
+      locationId,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/locations/${locationId}/archive`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseChronicleLocationResponse(
         await jsonResponse(response),
       )
     },

@@ -111,6 +111,38 @@ import {
 } from './presentation/chronicle-npc.controller'
 
 import {
+  CHRONICLE_LOCATION_REPOSITORY,
+} from './application/chronicle-location.repository'
+
+import {
+  ArchiveChronicleLocationUseCase,
+} from './application/archive-chronicle-location.use-case'
+
+import {
+  CreateChronicleLocationUseCase,
+} from './application/create-chronicle-location.use-case'
+
+import {
+  ListChronicleLocationsUseCase,
+} from './application/list-chronicle-locations.use-case'
+
+import {
+  LoadChronicleLocationUseCase,
+} from './application/load-chronicle-location.use-case'
+
+import {
+  UpdateChronicleLocationUseCase,
+} from './application/update-chronicle-location.use-case'
+
+import {
+  PrismaChronicleLocationRepository,
+} from './infrastructure/prisma-chronicle-location.repository'
+
+import {
+  ChronicleLocationController,
+} from './presentation/chronicle-location.controller'
+
+import {
   ChronicleController,
 } from './presentation/chronicle.controller'
 
@@ -121,6 +153,7 @@ import {
   controllers: [
     ChronicleController,
     ChronicleNpcController,
+    ChronicleLocationController,
   ],
   providers: [
     PrismaChronicleRepository,
@@ -189,6 +222,18 @@ import {
     CreateChronicleNpcUseCase,
     UpdateChronicleNpcUseCase,
     ArchiveChronicleNpcUseCase,
+    PrismaChronicleLocationRepository,
+    {
+      provide:
+        CHRONICLE_LOCATION_REPOSITORY,
+      useExisting:
+        PrismaChronicleLocationRepository,
+    },
+    ListChronicleLocationsUseCase,
+    LoadChronicleLocationUseCase,
+    CreateChronicleLocationUseCase,
+    UpdateChronicleLocationUseCase,
+    ArchiveChronicleLocationUseCase,
     PrismaChronicleParticipantRelations,
     {
       provide:

@@ -99,7 +99,7 @@ test(
 )
 
 test(
-  '032-C materializa PNJ sin adelantar SPEC-033–035',
+  '033-C materializa PNJ y Localizaciones sin adelantar SPEC-034–035',
   () => {
     const combined =
       detail + list + npcPanel
@@ -112,9 +112,13 @@ test(
       combined,
       />\s*PNJ\s*</,
     )
+    assert.match(
+      detail,
+      /ChronicleLocationPanel/,
+    )
     assert.doesNotMatch(
       combined,
-      />\s*(?:Localizaciones|Eventos|Línea temporal|Sesiones)\s*</,
+      />\s*(?:Eventos|Línea temporal|Sesiones)\s*</,
     )
   },
 )

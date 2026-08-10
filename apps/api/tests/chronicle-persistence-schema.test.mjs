@@ -115,7 +115,7 @@ test(
 )
 
 test(
-  '030-A no adelanta recursos propios de SPEC-033–035',
+  '033-A permite Localizaciones sin adelantar SPEC-034–035',
   () => {
     const chronicle = block(
       schema,
@@ -124,7 +124,7 @@ test(
 
     assert.doesNotMatch(
       chronicle,
-      /session|event|location/i,
+      /session|event/i,
     )
     assert.doesNotMatch(
       migration,
