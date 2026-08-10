@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { readFile } from 'node:fs/promises'
 
-const component =
+const list =
   await readFile(
     new URL(
       '../src/features/chronicles/components/ChronicleListCreate.tsx',
@@ -11,41 +11,67 @@ const component =
     'utf8',
   )
 
+const detail =
+  await readFile(
+    new URL(
+      '../src/features/chronicles/components/ChronicleDetail.tsx',
+      import.meta.url,
+    ),
+    'utf8',
+  )
+
 test(
-  '030-C ofrece acciones explícitas de activar archivar y reactivar',
+  '031-D ofrece lifecycle sólo desde detalle con Narrador contextual',
   () => {
     assert.match(
-      component,
-      /label: 'Activar'/,
+      detail,
+      /label: 'Activar crónica'/,
     )
     assert.match(
-      component,
-      /label: 'Archivar'/,
+      detail,
+      /label: 'Archivar crónica'/,
     )
     assert.match(
-      component,
-      /label: 'Reactivar'/,
+      detail,
+      /label: 'Reactivar crónica'/,
     )
     assert.match(
-      component,
+      detail,
+      /canManageParticipants/,
+    )
+    assert.match(
+      detail,
+      /currentMembership/,
+    )
+    assert.match(
+      detail,
       /gateway\.transition/,
+    )
+
+    assert.doesNotMatch(
+      list,
+      /gateway\.transition/,
+    )
+    assert.doesNotMatch(
+      list,
+      /transitioningId/,
     )
   },
 )
 
 test(
-  '030-C retira archivadas del flujo habitual sin ocultarlas históricamente',
+  '030-C mantiene archivadas fuera del flujo habitual sin ocultarlas',
   () => {
     assert.match(
-      component,
+      list,
       /habitualChronicles[\s\S]*status !== 'archived'/,
     )
     assert.match(
-      component,
+      list,
       /archivedChronicles[\s\S]*status === 'archived'/,
     )
     assert.match(
-      component,
+      list,
       />\s*Archivadas\s*</,
     )
   },

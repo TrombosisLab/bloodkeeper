@@ -115,7 +115,7 @@ test(
 )
 
 test(
-  '030-A no adelanta participantes ni recursos propios de SPEC-031–035',
+  '030-A no adelanta recursos propios de SPEC-032–035',
   () => {
     const chronicle = block(
       schema,
@@ -124,7 +124,7 @@ test(
 
     assert.doesNotMatch(
       chronicle,
-      /participant|player|session|event|location|npc|pnj/i,
+      /session|event|location|npc|pnj/i,
     )
     assert.doesNotMatch(
       migration,

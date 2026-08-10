@@ -52,6 +52,7 @@ import type {
   SkillSpecialtyOrigin,
   ThinBloodAlchemyMethod,
   TransitionCharacterLifecycleData,
+  UpdateCharacterChronicleAssociationData,
   UpdateCharacterDraftData,
 } from '../domain/persisted-character.types'
 
@@ -1277,6 +1278,26 @@ export class PrismaCharacterDraftRepository
     return rows.map(toPersistedDraft)
   }
 
+  async listByChronicle(
+    chronicleId: string,
+  ): Promise<
+    readonly PersistedCharacterDraft[]
+  > {
+    const rows =
+      await this.database.character.findMany({
+        where: {
+          chronicleId,
+        },
+        include: characterRelations,
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      })
+
+    return rows.map(toPersistedDraft)
+  }
+
+
   async findById(
     ownerId: string,
     characterId: string,
@@ -1293,6 +1314,77 @@ export class PrismaCharacterDraftRepository
     return row === null
       ? null
       : toPersistedDraft(row)
+  }
+
+  async hasHistoryEntries(
+    ownerId: string,
+    characterId: string,
+  ): Promise<boolean> {
+    const row =
+      await this.database.character.findFirst({
+        where: {
+          id: characterId,
+          ownerId,
+        },
+        select: {
+          _count: {
+            select: {
+              historyEntries: true,
+            },
+          },
+        },
+      })
+
+    return (
+      row !== null &&
+      row._count.historyEntries > 0
+    )
+  }
+
+  async updateChronicleAssociation(
+    ownerId: string,
+    data:
+      UpdateCharacterChronicleAssociationData,
+  ): Promise<PersistedCharacterDraft> {
+    const updated =
+      await this.database.character.updateMany({
+        where: {
+          id: data.characterId,
+          ownerId,
+          revision:
+            data.expectedRevision,
+        },
+        data: {
+          chronicleId: data.chronicleId,
+          revision: {
+            increment: 1,
+          },
+        },
+      })
+
+    if (updated.count !== 1) {
+      throw new CharacterDraftWriteConflictError(
+        data.characterId,
+      )
+    }
+
+    const row =
+      await this.database.character
+        .findFirst({
+          where: {
+            id: data.characterId,
+            ownerId,
+          },
+          include: characterRelations,
+        })
+
+    if (row === null) {
+      throw new CharacterDraftWriteConflictError(
+        data.characterId,
+      )
+    }
+
+    return toPersistedDraft(row)
   }
 
   async update(

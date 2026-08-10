@@ -10,5 +10,5 @@ export type AppSection =
   | 'chronicles'
 
 export interface AppNavigationPermissions {
-  readonly canManageChronicles: boolean
+  readonly canAccessChronicles: boolean
 }

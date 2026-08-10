@@ -13,11 +13,11 @@ export class LoadChronicleUseCase {
   ) {}
 
   execute(
-    narratorId: string,
+    userId: string,
     chronicleId: string,
   ): Promise<Chronicle | null> {
     return this.repository.findById(
-      narratorId,
+      userId,
       chronicleId,
     )
   }

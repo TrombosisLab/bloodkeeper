@@ -99,35 +99,13 @@ function errorMessage(
   return 'No se pudo completar la operación.'
 }
 
-function lifecycleAction(
-  status: ChronicleApiStatus,
-): {
-  readonly label: string
-  readonly nextStatus:
-    | 'active'
-    | 'archived'
-} {
-  if (status === 'preparation') {
-    return {
-      label: 'Activar',
-      nextStatus: 'active',
-    }
-  }
-
-  if (status === 'active') {
-    return {
-      label: 'Archivar',
-      nextStatus: 'archived',
-    }
-  }
-
-  return {
-    label: 'Reactivar',
-    nextStatus: 'active',
-  }
+interface ChronicleListCreateProps {
+  readonly canCreateChronicles: boolean
 }
 
-export function ChronicleListCreate() {
+export function ChronicleListCreate({
+  canCreateChronicles,
+}: ChronicleListCreateProps) {
   const [
     chronicles,
     setChronicles,
@@ -146,10 +124,6 @@ export function ChronicleListCreate() {
     submitting,
     setSubmitting,
   ] = useState(false)
-  const [
-    transitioningId,
-    setTransitioningId,
-  ] = useState<string | null>(null)
   const [
     selectedChronicleId,
     setSelectedChronicleId,
@@ -234,53 +208,6 @@ export function ChronicleListCreate() {
     }
   }
 
-  async function transition(
-    chronicle: ChronicleApiSnapshot,
-  ) {
-    const action =
-      lifecycleAction(
-        chronicle.status,
-      )
-
-    setTransitioningId(
-      chronicle.id,
-    )
-    setError(null)
-    setFailureState(null)
-
-    try {
-      const updated =
-        await gateway.transition(
-          chronicle.id,
-          {
-            nextStatus:
-              action.nextStatus,
-          },
-        )
-
-      setChronicles((current) =>
-        current.map((item) =>
-          item.id === updated.id
-            ? updated
-            : item,
-        ),
-      )
-    } catch (transitionError: unknown) {
-      setFailureState(
-        stateForChronicleError(
-          transitionError,
-        ),
-      )
-      setError(
-        errorMessage(
-          transitionError,
-        ),
-      )
-    } finally {
-      setTransitioningId(null)
-    }
-  }
-
   const habitualChronicles =
     chronicles.filter(
       (chronicle) =>
@@ -304,10 +231,6 @@ export function ChronicleListCreate() {
   function renderChronicle(
     chronicle: ChronicleApiSnapshot,
   ) {
-    const action =
-      lifecycleAction(
-        chronicle.status,
-      )
 
     return (
       <li key={chronicle.id}>
@@ -350,23 +273,6 @@ export function ChronicleListCreate() {
               Abrir crónica
             </button>
 
-            <button
-              type="button"
-              disabled={
-                transitioningId ===
-                chronicle.id
-              }
-              onClick={() =>
-                void transition(
-                  chronicle,
-                )
-              }
-            >
-              {transitioningId ===
-              chronicle.id
-                ? 'Actualizando…'
-                : action.label}
-            </button>
           </div>
         </article>
       </li>
@@ -380,6 +286,20 @@ export function ChronicleListCreate() {
         onBack={() =>
           setSelectedChronicleId(null)
         }
+        onChronicleUpdated={(
+          updated,
+        ) =>
+          setChronicles(
+            (current) =>
+              current.map(
+                (chronicle) =>
+                  chronicle.id ===
+                  updated.id
+                    ? updated
+                    : chronicle,
+              ),
+          )
+        }
       />
     )
   }
@@ -391,15 +311,17 @@ export function ChronicleListCreate() {
           <span className="chronicle-workspace__eyebrow">
             Crónicas
           </span>
-          <h1>Gestión inicial</h1>
+          <h1>Crónicas</h1>
           <p>
-            Crea una crónica y consulta las que
-            gestionas como narrador.
+            Consulta las crónicas en las que
+            participas y gestiona únicamente
+            las acciones permitidas por tu rol.
           </p>
         </div>
       </header>
 
       <div className="chronicle-workspace__grid">
+        {canCreateChronicles ? (
         <section
           className="chronicle-create"
           aria-labelledby="chronicle-create-title"
@@ -464,6 +386,7 @@ export function ChronicleListCreate() {
             </p>
           ) : null}
         </section>
+        ) : null}
 
         <section
           className="chronicle-list"

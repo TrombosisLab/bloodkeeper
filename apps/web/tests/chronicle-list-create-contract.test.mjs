@@ -31,7 +31,7 @@ const navigationTypes = await readFile(
 )
 
 test(
-  '030-B ofrece creación y listado sin construir un panel completo',
+  '031-D conserva creación condicionada y listado que abre el panel real',
   () => {
     assert.match(
       component,
@@ -65,7 +65,7 @@ test(
     )
     assert.match(
       main,
-      /<ChronicleListCreate \/>/,
+      /<ChronicleListCreate/,
     )
     assert.match(
       main,

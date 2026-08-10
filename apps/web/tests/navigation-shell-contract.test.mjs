@@ -58,21 +58,21 @@ test('SPEC-011 reconoce las ubicaciones reales de Personajes y Crónicas', () =>
   assert.equal(
     appViewFromHash(
       '#/characters',
-      { canManageChronicles: true },
+      { canAccessChronicles: true },
     ),
     'characters',
   )
   assert.equal(
     appViewFromHash(
       '#/characters/create',
-      { canManageChronicles: true },
+      { canAccessChronicles: true },
     ),
     'character-creation',
   )
   assert.equal(
     appViewFromHash(
       '#/chronicles',
-      { canManageChronicles: true },
+      { canAccessChronicles: true },
     ),
     'chronicles',
   )
@@ -82,28 +82,28 @@ test('SPEC-013 normaliza la entrada inicial y ubicaciones desconocidas a Inicio'
   assert.equal(
     appViewFromHash(
       '#/unknown',
-      { canManageChronicles: true },
+      { canAccessChronicles: true },
     ),
     'dashboard',
   )
   assert.equal(
     appViewFromHash(
       '',
-      { canManageChronicles: true },
+      { canAccessChronicles: true },
     ),
     'dashboard',
   )
   assert.equal(
     appViewFromHash(
       '#',
-      { canManageChronicles: true },
+      { canAccessChronicles: true },
     ),
     'dashboard',
   )
   assert.equal(
     appViewFromHash(
       '#/dashboard',
-      { canManageChronicles: true },
+      { canAccessChronicles: true },
     ),
     'dashboard',
   )
@@ -113,7 +113,7 @@ test('SPEC-011 impide abrir Crónicas sin el permiso ya existente', () => {
   assert.equal(
     appViewFromHash(
       '#/chronicles',
-      { canManageChronicles: false },
+      { canAccessChronicles: false },
     ),
     'dashboard',
   )
@@ -187,7 +187,7 @@ test('SPEC-011 ofrece menú semántico persistente y sección activa', () => {
 test('SPEC-011 conserva Crónicas condicionada por permisos', () => {
   assert.match(
     componentSource,
-    /canManageChronicles\s*\?\s*\(/,
+    /canAccessChronicles\s*\?\s*\(/,
   )
   assert.match(
     mainSource,

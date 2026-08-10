@@ -803,7 +803,10 @@ function validateCreateBody(input: unknown): void {
 
   const chronicleId = value.chronicleId
   if (chronicleId !== null) {
-    uuid(chronicleId, 'body.chronicleId')
+    throw new InvalidCharacterDraftRequestError(
+      'body.chronicleId',
+      'must be null; use the dedicated chronicle association operation',
+    )
   }
   validateIdentity(value.identity, 'body.identity')
   validateIntegerRecord(value.attributes, CHARACTER_ATTRIBUTE_KEYS, 'body.attributes', true)
@@ -844,6 +847,92 @@ export function parseCharacterDraftIdParam(
   characterIdInput: unknown,
 ): string {
   return uuid(characterIdInput, 'characterId')
+}
+
+export interface UpdateCharacterChronicleAssociationRequest {
+  readonly expectedRevision: number
+  readonly chronicleId: string | null
+  readonly confirmChange: boolean
+}
+
+export function parseUpdateCharacterChronicleAssociationRequest(
+  characterIdInput: unknown,
+  input: unknown,
+): {
+  readonly characterId: string
+  readonly expectedRevision: number
+  readonly chronicleId: string | null
+  readonly confirmChange: boolean
+} {
+  const characterId =
+    uuid(
+      characterIdInput,
+      'characterId',
+    )
+  const value =
+    record(input, 'body')
+
+  onlyKeys(
+    value,
+    [
+      'expectedRevision',
+      'chronicleId',
+      'confirmChange',
+    ],
+    'body',
+  )
+
+  const expectedRevisionInput =
+    required(
+      value,
+      'expectedRevision',
+      'body',
+    )
+
+  integer(
+    expectedRevisionInput,
+    'body.expectedRevision',
+  )
+
+  const expectedRevision =
+    expectedRevisionInput as number
+
+  const chronicleId =
+    required(
+      value,
+      'chronicleId',
+      'body',
+    )
+
+  if (chronicleId !== null) {
+    uuid(
+      chronicleId,
+      'body.chronicleId',
+    )
+  }
+
+  if (
+    Object.hasOwn(
+      value,
+      'confirmChange',
+    ) &&
+    typeof value.confirmChange !==
+      'boolean'
+  ) {
+    throw new InvalidCharacterDraftRequestError(
+      'body.confirmChange',
+      'must be a boolean',
+    )
+  }
+
+  return {
+    characterId,
+    expectedRevision,
+    chronicleId:
+      chronicleId as string | null,
+    confirmChange:
+      value.confirmChange === true,
+  }
 }
 
 export function parseUpdateCharacterDraftRequest(

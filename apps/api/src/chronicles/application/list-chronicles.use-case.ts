@@ -13,10 +13,10 @@ export class ListChroniclesUseCase {
   ) {}
 
   execute(
-    narratorId: string,
+    userId: string,
   ): Promise<readonly Chronicle[]> {
     return this.repository.findByNarratorId(
-      narratorId,
+      userId,
     )
   }
 }

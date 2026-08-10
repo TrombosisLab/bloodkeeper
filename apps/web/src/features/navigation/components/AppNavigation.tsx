@@ -12,7 +12,7 @@ import './app-navigation.css'
 interface AppNavigationProps {
   readonly 'aria-label': string
   readonly activeSection: AppSection
-  readonly canManageChronicles: boolean
+  readonly canAccessChronicles: boolean
   readonly onNavigate: (
     section: AppSection,
   ) => void
@@ -24,7 +24,7 @@ const compactNavigationQuery =
 export function AppNavigation({
   'aria-label': navigationLabel,
   activeSection,
-  canManageChronicles,
+  canAccessChronicles,
   onNavigate,
 }: AppNavigationProps) {
   const [
@@ -150,7 +150,7 @@ export function AppNavigation({
           <small>Ficha y creación</small>
         </button>
 
-        {canManageChronicles ? (
+        {canAccessChronicles ? (
           <button
             type="button"
             aria-current={
@@ -163,7 +163,7 @@ export function AppNavigation({
             }
           >
             <span>Crónicas</span>
-            <small>Gestión del narrador</small>
+            <small>Participación y gestión</small>
           </button>
         ) : null}
       </nav>

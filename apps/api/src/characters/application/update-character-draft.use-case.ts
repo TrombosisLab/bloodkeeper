@@ -31,6 +31,18 @@ import {
   assertValidCharacterHunger,
 } from '../domain/character-hunger.rules'
 
+
+export class CharacterChronicleAssociationRequiredError
+  extends Error {
+  constructor(characterId: string) {
+    super(
+      `Character chronicle association must use its dedicated operation: ${characterId}`,
+    )
+    this.name =
+      'CharacterChronicleAssociationRequiredError'
+  }
+}
+
 export class UpdateCharacterDraftUseCase {
   private readonly repository:
     CharacterDraftRepository
@@ -72,11 +84,15 @@ export class UpdateCharacterDraftUseCase {
     const changesHungerState =
       data.blood?.hunger !== undefined
 
+    const checksChronicleAssociation =
+      data.chronicleId !== undefined
+
     if (
       changesAttributeSkillState ||
       changesDamageState ||
       changesHumanityState ||
-      changesHungerState
+      changesHungerState ||
+      checksChronicleAssociation
     ) {
       const current =
         await this.repository.findById(
@@ -89,6 +105,16 @@ export class UpdateCharacterDraftUseCase {
         current.revision !== data.expectedRevision
       ) {
         throw new CharacterDraftWriteConflictError(
+          data.characterId,
+        )
+      }
+
+      if (
+        checksChronicleAssociation &&
+        data.chronicleId !==
+          current.chronicleId
+      ) {
+        throw new CharacterChronicleAssociationRequiredError(
           data.characterId,
         )
       }

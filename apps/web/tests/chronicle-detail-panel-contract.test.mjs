@@ -90,14 +90,18 @@ test(
 )
 
 test(
-  '030-D no adelanta áreas de SPEC-031–035',
+  '031-D materializa Participantes sin adelantar SPEC-032–035',
   () => {
     const combined =
       detail + list
 
+    assert.match(
+      combined,
+      /Participantes/,
+    )
     assert.doesNotMatch(
       combined,
-      />\s*(?:Participantes|PNJ|Localizaciones|Eventos|Línea temporal|Sesiones)\s*</,
+      />\s*(?:PNJ|Localizaciones|Eventos|Línea temporal|Sesiones)\s*</,
     )
   },
 )

@@ -10,6 +10,7 @@ import type {
   CharacterDraftApiSnapshot,
   CreateCharacterDraftApiRequest,
   UpdateCharacterDraftApiRequest,
+  UpdateCharacterChronicleAssociationApiRequest,
 } from '../types/character-draft-api.types.ts'
 
 type FetchImplementation =
@@ -125,6 +126,12 @@ export interface CharacterDraftGateway {
   update(
     characterId: string,
     request: UpdateCharacterDraftApiRequest,
+  ): Promise<CharacterDraftApiSnapshot>
+
+  updateChronicleAssociation(
+    characterId: string,
+    request:
+      UpdateCharacterChronicleAssociationApiRequest,
   ): Promise<CharacterDraftApiSnapshot>
 }
 
@@ -798,6 +805,28 @@ export function createCharacterDraftGateway(
       const response =
         await fetchImplementation(
           `/api/characters/drafts/${encodeURIComponent(characterId)}`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(request),
+          },
+        )
+
+      return snapshotFromResponse(response)
+    },
+
+    async updateChronicleAssociation(
+      characterId,
+      request,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/characters/drafts/${encodeURIComponent(characterId)}/chronicle`,
           {
             method: 'PATCH',
             credentials: 'include',

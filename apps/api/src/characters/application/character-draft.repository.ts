@@ -6,6 +6,7 @@ import type {
   CreateCharacterDraftData,
   PersistedCharacterDraft,
   TransitionCharacterLifecycleData,
+  UpdateCharacterChronicleAssociationData,
   UpdateCharacterDraftData,
 } from '../domain/persisted-character.types'
 
@@ -21,6 +22,10 @@ export interface CharacterDraftRepository {
     ownerId: string,
   ): Promise<readonly PersistedCharacterDraft[]>
 
+  listByChronicle(
+    chronicleId: string,
+  ): Promise<readonly PersistedCharacterDraft[]>
+
   findById(
     ownerId: string,
     characterId: string,
@@ -29,6 +34,16 @@ export interface CharacterDraftRepository {
   update(
     ownerId: string,
     data: UpdateCharacterDraftData,
+  ): Promise<PersistedCharacterDraft>
+
+  hasHistoryEntries(
+    ownerId: string,
+    characterId: string,
+  ): Promise<boolean>
+
+  updateChronicleAssociation(
+    ownerId: string,
+    data: UpdateCharacterChronicleAssociationData,
   ): Promise<PersistedCharacterDraft>
 
   updateState(

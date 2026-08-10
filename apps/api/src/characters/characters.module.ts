@@ -1,6 +1,18 @@
 import { Module } from '@nestjs/common'
 
 import {
+  ChroniclesModule,
+} from '../chronicles/chronicles.module'
+
+import {
+  CHRONICLE_PARTICIPANT_REPOSITORY,
+} from '../chronicles/application/chronicle-participant.repository'
+
+import type {
+  ChronicleParticipantRepository,
+} from '../chronicles/application/chronicle-participant.repository'
+
+import {
   CHARACTER_DRAFT_REPOSITORY,
 } from './application/character-draft.repository'
 
@@ -25,6 +37,10 @@ import {
 } from './application/list-character-drafts.use-case'
 
 import {
+  ListChronicleCharactersUseCase,
+} from './application/list-chronicle-characters.use-case'
+
+import {
   LoadCharacterAttributeSkillRatingsUseCase,
 } from './application/load-character-attribute-skill-ratings.use-case'
 
@@ -39,6 +55,10 @@ import {
 import {
   UpdateCharacterDraftUseCase,
 } from './application/update-character-draft.use-case'
+
+import {
+  UpdateCharacterChronicleAssociationUseCase,
+} from './application/update-character-chronicle-association.use-case'
 
 import {
   UpdateCharacterStateUseCase,
@@ -98,6 +118,10 @@ import {
 } from './presentation/character-draft.controller'
 
 import {
+  ChronicleCharacterController,
+} from './presentation/chronicle-character.controller'
+
+import {
   CharacterLifecycleController,
 } from './presentation/character-lifecycle.controller'
 
@@ -127,6 +151,23 @@ const useCaseProviders = [
     useFactory: (
       repository: PrismaCharacterDraftRepository,
     ) => new LoadCharacterDraftUseCase(repository),
+  },
+  {
+    provide: ListChronicleCharactersUseCase,
+    inject: [
+      CHARACTER_DRAFT_REPOSITORY,
+      CHRONICLE_PARTICIPANT_REPOSITORY,
+    ],
+    useFactory: (
+      repository:
+        PrismaCharacterDraftRepository,
+      participants:
+        ChronicleParticipantRepository,
+    ) =>
+      new ListChronicleCharactersUseCase(
+        repository,
+        participants,
+      ),
   },
   {
     provide: ListCharacterDraftsUseCase,
@@ -162,6 +203,23 @@ const useCaseProviders = [
     useFactory: (
       repository: PrismaCharacterDraftRepository,
     ) => new UpdateCharacterDraftUseCase(repository),
+  },
+  {
+    provide:
+      UpdateCharacterChronicleAssociationUseCase,
+    inject: [
+      CHARACTER_DRAFT_REPOSITORY,
+      CHRONICLE_PARTICIPANT_REPOSITORY,
+    ],
+    useFactory: (
+      repository: PrismaCharacterDraftRepository,
+      participantRepository:
+        ChronicleParticipantRepository,
+    ) =>
+      new UpdateCharacterChronicleAssociationUseCase(
+        repository,
+        participantRepository,
+      ),
   },
   {
     provide: UpdateCharacterStateUseCase,
@@ -223,8 +281,12 @@ const useCaseProviders = [
 ]
 
 @Module({
+  imports: [
+    ChroniclesModule,
+  ],
   controllers: [
     CharacterDraftController,
+    ChronicleCharacterController,
     CharacterLifecycleController,
     CharacterStateController,
     CharacterSecondaryController,
@@ -276,6 +338,7 @@ const useCaseProviders = [
     ListCharacterDraftsUseCase,
     LoadCharacterSecondaryUseCase,
     UpdateCharacterDraftUseCase,
+    UpdateCharacterChronicleAssociationUseCase,
     UpdateCharacterStateUseCase,
     UpdateCharacterSecondaryUseCase,
     ValidateCharacterUseCase,

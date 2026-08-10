@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   ConflictException,
+  ForbiddenException,
   Controller,
   Get,
   NotFoundException,
@@ -30,14 +31,23 @@ import {
 } from '../application/list-character-drafts.use-case'
 
 import {
+  CharacterChronicleAssociationRequiredError,
   UpdateCharacterDraftUseCase,
 } from '../application/update-character-draft.use-case'
+
+import {
+  CharacterChronicleAssociationNotFoundError,
+  CharacterChronicleChangeConfirmationRequiredError,
+  CharacterChronicleMembershipRequiredError,
+  UpdateCharacterChronicleAssociationUseCase,
+} from '../application/update-character-chronicle-association.use-case'
 
 import {
   InvalidCharacterDraftRequestError,
   parseCharacterDraftIdParam,
   parseCharacterDraftOwnerId,
   parseCreateCharacterDraftRequest,
+  parseUpdateCharacterChronicleAssociationRequest,
   parseUpdateCharacterDraftRequest,
   toCharacterDraftResponse,
 } from './character-draft.dto'
@@ -106,6 +116,45 @@ function throwCharacterDraftHttpError(
 
   if (
     error instanceof
+      CharacterChronicleAssociationRequiredError
+  ) {
+    throw new ConflictException({
+      code:
+        'CHARACTER_CHRONICLE_ASSOCIATION_REQUIRED',
+    })
+  }
+
+  if (
+    error instanceof
+      CharacterChronicleAssociationNotFoundError
+  ) {
+    throw new NotFoundException({
+      code: 'CHARACTER_NOT_FOUND',
+    })
+  }
+
+  if (
+    error instanceof
+      CharacterChronicleMembershipRequiredError
+  ) {
+    throw new ForbiddenException({
+      code:
+        'CHARACTER_CHRONICLE_MEMBERSHIP_REQUIRED',
+    })
+  }
+
+  if (
+    error instanceof
+      CharacterChronicleChangeConfirmationRequiredError
+  ) {
+    throw new ConflictException({
+      code:
+        'CHARACTER_CHRONICLE_CONFIRMATION_REQUIRED',
+    })
+  }
+
+  if (
+    error instanceof
       InvalidCharacterAttributeSkillStateError ||
     error instanceof
       InvalidCharacterDamageStateError ||
@@ -134,6 +183,8 @@ export class CharacterDraftController {
       ListCharacterDraftsUseCase,
     private readonly updateDraft:
       UpdateCharacterDraftUseCase,
+    private readonly updateChronicleAssociation:
+      UpdateCharacterChronicleAssociationUseCase,
   ) {}
 
   @Post()
@@ -227,4 +278,37 @@ export class CharacterDraftController {
       throwCharacterDraftHttpError(error)
     }
   }
+  @Patch(':characterId/chronicle')
+  async updateChronicle(
+    @Req() request:
+      AuthenticatedCharacterRequest,
+    @Param('characterId')
+    characterIdInput: unknown,
+    @Body() body: unknown,
+  ): Promise<CharacterDraftResponseDto> {
+    const ownerId =
+      authenticatedOwnerId(request)
+
+    try {
+      const command =
+        parseUpdateCharacterChronicleAssociationRequest(
+          characterIdInput,
+          body,
+        )
+
+      const draft =
+        await this.updateChronicleAssociation
+          .execute(
+            ownerId,
+            command,
+          )
+
+      return toCharacterDraftResponse(
+        draft,
+      )
+    } catch (error: unknown) {
+      throwCharacterDraftHttpError(error)
+    }
+  }
+
 }

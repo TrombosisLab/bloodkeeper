@@ -31,7 +31,7 @@ export function appViewFromHash(
       return 'character-creation'
 
     case '#/chronicles':
-      return permissions.canManageChronicles
+      return permissions.canAccessChronicles
         ? 'chronicles'
         : 'dashboard'
 

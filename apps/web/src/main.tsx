@@ -33,7 +33,9 @@ function App() {
   const authenticatedUser =
     useAuthenticatedUser()
 
-  const canManageChronicles =
+  const canAccessChronicles = true
+
+  const canCreateChronicles =
     authenticatedUser.roles.includes(
       'narrator',
     )
@@ -43,7 +45,7 @@ function App() {
       appViewFromHash(
         window.location.hash,
         {
-          canManageChronicles,
+          canAccessChronicles,
         },
       ),
     )
@@ -64,8 +66,8 @@ function App() {
         appViewFromHash(
           window.location.hash,
           {
-            canManageChronicles,
-          },
+          canAccessChronicles,
+        },
         )
 
       const canonicalHash =
@@ -100,7 +102,7 @@ function App() {
         synchronizeLocation,
       )
     }
-  }, [canManageChronicles])
+  }, [canAccessChronicles])
 
   function navigateTo(
     nextView: AppView,
@@ -109,7 +111,7 @@ function App() {
       appViewFromHash(
         hashForAppView(nextView),
         {
-          canManageChronicles,
+          canAccessChronicles,
         },
       )
 
@@ -167,8 +169,8 @@ function App() {
           activeSection={
             sectionForAppView(view)
           }
-          canManageChronicles={
-            canManageChronicles
+          canAccessChronicles={
+            canAccessChronicles
           }
           onNavigate={
             navigateToSection
@@ -181,8 +183,11 @@ function App() {
           displayName={
             authenticatedUser.displayName
           }
-          canManageChronicles={
-            canManageChronicles
+          canAccessChronicles={
+            canAccessChronicles
+          }
+          canCreateChronicles={
+            canCreateChronicles
           }
           onNavigateCharacters={() =>
             navigateTo('characters')
@@ -192,8 +197,12 @@ function App() {
           }
         />
       ) : view === 'chronicles' &&
-        canManageChronicles ? (
-        <ChronicleListCreate />
+        canAccessChronicles ? (
+        <ChronicleListCreate
+          canCreateChronicles={
+            canCreateChronicles
+          }
+        />
       ) : view === 'characters' ? (
         creationCharacterId === null &&
         !showDemoSheet ? (

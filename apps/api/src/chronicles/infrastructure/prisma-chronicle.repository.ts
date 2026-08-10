@@ -3,6 +3,8 @@ import {
 } from '@nestjs/common'
 
 import {
+  ChronicleParticipantRole as PrismaChronicleParticipantRole,
+  ChronicleParticipantStatus as PrismaChronicleParticipantStatus,
   ChronicleStatus as PrismaChronicleStatus,
 } from '@prisma/client'
 
@@ -84,6 +86,15 @@ export class PrismaChronicleRepository
           narratorId: data.narratorId,
           name: data.name,
           description: data.description,
+          participants: {
+            create: {
+              userId: data.narratorId,
+              role:
+                PrismaChronicleParticipantRole.NARRATOR,
+              status:
+                PrismaChronicleParticipantStatus.ACTIVE,
+            },
+          },
         },
       })
 
@@ -96,7 +107,13 @@ export class PrismaChronicleRepository
     const rows =
       await this.database.chronicle.findMany({
         where: {
-          narratorId,
+          participants: {
+            some: {
+              userId: narratorId,
+              status:
+                PrismaChronicleParticipantStatus.ACTIVE,
+            },
+          },
         },
         orderBy: [
           {
@@ -119,7 +136,13 @@ export class PrismaChronicleRepository
       await this.database.chronicle.findFirst({
         where: {
           id: chronicleId,
-          narratorId,
+          participants: {
+            some: {
+              userId: narratorId,
+              status:
+                PrismaChronicleParticipantStatus.ACTIVE,
+            },
+          },
         },
       })
 
@@ -136,11 +159,19 @@ export class PrismaChronicleRepository
       await this.database.chronicle.updateMany({
         where: {
           id: data.chronicleId,
-          narratorId,
           status:
             statusToPrisma[
               data.expectedStatus
             ],
+          participants: {
+            some: {
+              userId: narratorId,
+              role:
+                PrismaChronicleParticipantRole.NARRATOR,
+              status:
+                PrismaChronicleParticipantStatus.ACTIVE,
+            },
+          },
         },
         data: {
           status:
@@ -158,7 +189,15 @@ export class PrismaChronicleRepository
       await this.database.chronicle.findFirst({
         where: {
           id: data.chronicleId,
-          narratorId,
+          participants: {
+            some: {
+              userId: narratorId,
+              role:
+                PrismaChronicleParticipantRole.NARRATOR,
+              status:
+                PrismaChronicleParticipantStatus.ACTIVE,
+            },
+          },
         },
       })
 

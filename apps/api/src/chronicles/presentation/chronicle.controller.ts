@@ -19,6 +19,32 @@ import {
 } from '../application/chronicle.repository'
 
 import {
+  ChronicleParticipantDuplicateError,
+  ChronicleParticipantWriteConflictError,
+} from '../application/chronicle-participant.repository'
+
+import {
+  AddChronicleParticipantUseCase,
+  ChronicleParticipantUserNotFoundError,
+} from '../application/add-chronicle-participant.use-case'
+
+import {
+  ChronicleParticipantPermissionError,
+  ListChronicleParticipantsUseCase,
+} from '../application/list-chronicle-participants.use-case'
+
+import {
+  ListChronicleParticipantCandidatesUseCase,
+} from '../application/list-chronicle-participant-candidates.use-case'
+
+import {
+  ChronicleLastNarratorRequiredError,
+  ChronicleParticipantActiveCharacterRelationError,
+  ChronicleParticipantNotFoundError,
+  RetireChronicleParticipantUseCase,
+} from '../application/retire-chronicle-participant.use-case'
+
+import {
   CreateChronicleUseCase,
 } from '../application/create-chronicle.use-case'
 
@@ -51,6 +77,17 @@ import {
   toChronicleResponse,
 } from './chronicle.dto'
 
+import {
+  InvalidChronicleParticipantRequestError,
+  parseAddChronicleParticipantRequest,
+  parseParticipantIdParam,
+  toChronicleParticipantResponse,
+} from './chronicle-participant.dto'
+
+import type {
+  ChronicleParticipantResponseDto,
+} from './chronicle-participant.dto'
+
 import type {
   ChronicleResponseDto,
 } from './chronicle.dto'
@@ -59,6 +96,20 @@ export interface AuthenticatedChronicleRequest {
   readonly user?: {
     readonly id?: unknown
     readonly roles?: unknown
+  }
+}
+
+function authenticatedChronicleUserId(
+  request: AuthenticatedChronicleRequest,
+): string {
+  try {
+    return parseChronicleNarratorId(
+      request.user?.id,
+    )
+  } catch {
+    throw new UnauthorizedException({
+      code: 'AUTHENTICATION_REQUIRED',
+    })
   }
 }
 
@@ -135,6 +186,87 @@ function throwChronicleHttpError(
     })
   }
 
+  if (
+    error instanceof
+      InvalidChronicleParticipantRequestError
+  ) {
+    throw new BadRequestException({
+      code:
+        'INVALID_CHRONICLE_PARTICIPANT_REQUEST',
+      message: error.message,
+    })
+  }
+
+  if (
+    error instanceof
+      ChronicleParticipantPermissionError
+  ) {
+    throw new ForbiddenException({
+      code:
+        'CHRONICLE_PARTICIPANT_PERMISSION_DENIED',
+    })
+  }
+
+  if (
+    error instanceof
+      ChronicleParticipantUserNotFoundError
+  ) {
+    throw new NotFoundException({
+      code:
+        'CHRONICLE_PARTICIPANT_USER_NOT_FOUND',
+    })
+  }
+
+  if (
+    error instanceof
+      ChronicleParticipantNotFoundError
+  ) {
+    throw new NotFoundException({
+      code:
+        'CHRONICLE_PARTICIPANT_NOT_FOUND',
+    })
+  }
+
+  if (
+    error instanceof
+      ChronicleParticipantDuplicateError
+  ) {
+    throw new ConflictException({
+      code:
+        'CHRONICLE_PARTICIPANT_DUPLICATE',
+    })
+  }
+
+  if (
+    error instanceof
+      ChronicleLastNarratorRequiredError
+  ) {
+    throw new ConflictException({
+      code:
+        'CHRONICLE_LAST_NARRATOR_REQUIRED',
+    })
+  }
+
+  if (
+    error instanceof
+      ChronicleParticipantActiveCharacterRelationError
+  ) {
+    throw new ConflictException({
+      code:
+        'CHRONICLE_PARTICIPANT_ACTIVE_CHARACTER_RELATION',
+    })
+  }
+
+  if (
+    error instanceof
+      ChronicleParticipantWriteConflictError
+  ) {
+    throw new ConflictException({
+      code:
+        'CHRONICLE_PARTICIPANT_WRITE_CONFLICT',
+    })
+  }
+
   throw error
 }
 
@@ -149,6 +281,14 @@ export class ChronicleController {
       LoadChronicleUseCase,
     private readonly transitionLifecycle:
       TransitionChronicleLifecycleUseCase,
+    private readonly listParticipants:
+      ListChronicleParticipantsUseCase,
+    private readonly listParticipantCandidates:
+      ListChronicleParticipantCandidatesUseCase,
+    private readonly addParticipant:
+      AddChronicleParticipantUseCase,
+    private readonly retireParticipant:
+      RetireChronicleParticipantUseCase,
   ) {}
 
   @Post()
@@ -187,7 +327,7 @@ export class ChronicleController {
     readonly ChronicleResponseDto[]
   > {
     const narratorId =
-      authenticatedNarratorId(request)
+      authenticatedChronicleUserId(request)
 
     const chronicles =
       await this.listChronicles.execute(
@@ -207,7 +347,7 @@ export class ChronicleController {
     chronicleIdInput: unknown,
   ): Promise<ChronicleResponseDto> {
     const narratorId =
-      authenticatedNarratorId(request)
+      authenticatedChronicleUserId(request)
 
     try {
       const chronicleId =
@@ -243,7 +383,7 @@ export class ChronicleController {
     @Body() body: unknown,
   ): Promise<ChronicleResponseDto> {
     const narratorId =
-      authenticatedNarratorId(request)
+      authenticatedChronicleUserId(request)
 
     try {
       const chronicleId =
@@ -274,4 +414,134 @@ export class ChronicleController {
       throwChronicleHttpError(error)
     }
   }
+  @Get(':chronicleId/participants')
+  async participants(
+    @Req() request:
+      AuthenticatedChronicleRequest,
+    @Param('chronicleId')
+    chronicleIdInput: unknown,
+  ): Promise<
+    readonly ChronicleParticipantResponseDto[]
+  > {
+    const actorUserId =
+      authenticatedChronicleUserId(request)
+
+    try {
+      const chronicleId =
+        parseChronicleIdParam(
+          chronicleIdInput,
+        )
+      const participants =
+        await this.listParticipants.execute(
+          actorUserId,
+          chronicleId,
+        )
+
+      return participants.map(
+        toChronicleParticipantResponse,
+      )
+    } catch (error: unknown) {
+      throwChronicleHttpError(error)
+    }
+  }
+
+  @Get(':chronicleId/participant-candidates')
+  async participantCandidates(
+    @Req() request:
+      AuthenticatedChronicleRequest,
+    @Param('chronicleId')
+    chronicleIdInput: unknown,
+  ) {
+    const actorUserId =
+      authenticatedChronicleUserId(request)
+
+    try {
+      const chronicleId =
+        parseChronicleIdParam(
+          chronicleIdInput,
+        )
+
+      return await this.listParticipantCandidates
+        .execute(
+          actorUserId,
+          chronicleId,
+        )
+    } catch (error: unknown) {
+      throwChronicleHttpError(error)
+    }
+  }
+
+  @Post(':chronicleId/participants')
+  async addChronicleParticipant(
+    @Req() request:
+      AuthenticatedChronicleRequest,
+    @Param('chronicleId')
+    chronicleIdInput: unknown,
+    @Body() body: unknown,
+  ): Promise<ChronicleParticipantResponseDto> {
+    const actorUserId =
+      authenticatedChronicleUserId(request)
+
+    try {
+      const chronicleId =
+        parseChronicleIdParam(
+          chronicleIdInput,
+        )
+      const command =
+        parseAddChronicleParticipantRequest(
+          chronicleId,
+          body,
+        )
+      const participant =
+        await this.addParticipant.execute(
+          actorUserId,
+          command,
+        )
+
+      return toChronicleParticipantResponse(
+        participant,
+      )
+    } catch (error: unknown) {
+      throwChronicleHttpError(error)
+    }
+  }
+
+  @Patch(
+    ':chronicleId/participants/:participantId/retire',
+  )
+  async retireChronicleParticipant(
+    @Req() request:
+      AuthenticatedChronicleRequest,
+    @Param('chronicleId')
+    chronicleIdInput: unknown,
+    @Param('participantId')
+    participantIdInput: unknown,
+  ): Promise<ChronicleParticipantResponseDto> {
+    const actorUserId =
+      authenticatedChronicleUserId(request)
+
+    try {
+      const chronicleId =
+        parseChronicleIdParam(
+          chronicleIdInput,
+        )
+      const participantId =
+        parseParticipantIdParam(
+          participantIdInput,
+        )
+      const participant =
+        await this.retireParticipant.execute(
+          actorUserId,
+          chronicleId,
+          participantId,
+        )
+
+      return toChronicleParticipantResponse(
+        participant,
+      )
+    } catch (error: unknown) {
+      throwChronicleHttpError(error)
+    }
+  }
+
 }

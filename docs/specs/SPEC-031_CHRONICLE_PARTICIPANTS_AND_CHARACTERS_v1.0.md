@@ -189,3 +189,35 @@ Se incluirán pruebas para:
 - Retirada sin pérdida de historial.
 - Preparado para múltiples narradores.
 - Permisos comprobados en backend.
+
+## Cierre de implementación
+
+SPEC-031 queda cerrada operativamente tras completar y validar la gestión de participantes y personajes asociados a Crónicas.
+
+El cierre incluye:
+
+- Relación explícita Usuario ↔ Crónica con roles contextuales Narrador y Jugador.
+- Estados de participación Activo y Retirado con preservación histórica.
+- Soporte para múltiples Narradores y protección del último Narrador activo.
+- Incorporación administrativa simple sin adelantar invitaciones, códigos de acceso ni solicitudes de participación.
+- Autorización backend basada en participación contextual, diferenciada de los roles globales.
+- Asociación y desasociación explícita de personajes sin transferir propiedad ni borrar historial.
+- Concurrencia optimista mediante revisión esperada en cambios de asociación.
+- Confirmación explícita cuando un cambio de Crónica afecta a un personaje con historial.
+- Bloqueo de retirada de participantes mientras mantengan personajes no archivados asociados.
+- Panel funcional de Crónica con Narradores, Jugadores, Personajes asociados y acciones según permisos contextuales.
+- Acceso de jugadores participantes a sus Crónicas sin concederles capacidades de Narrador.
+
+La auditoría de cierre `SPEC-031.E` finalizó con **8/8 criterios PASS**.
+
+Validación técnica final:
+
+- Prisma schema válido y migraciones al día.
+- API build correcto.
+- **47/47** tests enfocados de API superados.
+- Web build correcto.
+- **39/39** tests enfocados de Web superados.
+- API, Web y PostgreSQL en estado healthy.
+- Comprobación funcional y visual validada manualmente.
+
+El campo `Estado` de esta SPEC permanece en `Aprobado` como estado normativo del documento, siguiendo la convención utilizada por las SPEC cerradas del repositorio. El cierre operativo se refleja en esta sección y en el índice de SPEC.

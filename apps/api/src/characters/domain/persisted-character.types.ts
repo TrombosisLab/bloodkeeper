@@ -346,6 +346,12 @@ export interface TransitionCharacterLifecycleData {
   nextStatus: CharacterLifecycleStatus
 }
 
+export interface UpdateCharacterChronicleAssociationData {
+  characterId: string
+  expectedRevision: number
+  chronicleId: string | null
+}
+
 export interface UpdateCharacterDraftData {
   characterId: string
   expectedRevision: number

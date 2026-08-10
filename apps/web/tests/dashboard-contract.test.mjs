@@ -65,14 +65,14 @@ test('SPEC-013 materializa Inicio como vista y sección real', () => {
   assert.equal(
     appViewFromHash(
       '',
-      { canManageChronicles: false },
+      { canAccessChronicles: false },
     ),
     'dashboard',
   )
   assert.equal(
     appViewFromHash(
       '#/dashboard',
-      { canManageChronicles: false },
+      { canAccessChronicles: false },
     ),
     'dashboard',
   )
@@ -135,10 +135,10 @@ test('SPEC-013 muestra acceso real a Personajes sin fingir un listado', () => {
   )
 })
 
-test('SPEC-013 limita el resumen de Crónicas al rol existente', () => {
+test('SPEC-013 muestra el resumen de Crónicas a participantes autenticados', () => {
   assert.match(
     dashboardSource,
-    /canManageChronicles\s*\?\s*\(/,
+    /canAccessChronicles\s*\?\s*\(/,
   )
   assert.match(
     dashboardSource,
@@ -146,7 +146,7 @@ test('SPEC-013 limita el resumen de Crónicas al rol existente', () => {
   )
   assert.match(
     mainSource,
-    /canManageChronicles=\{[\s\S]*canManageChronicles/,
+    /canAccessChronicles=\{[\s\S]*canAccessChronicles/,
   )
   assert.match(
     mainSource,
@@ -161,7 +161,7 @@ test('SPEC-013 resume Crónicas sin duplicar su módulo completo', () => {
   )
   assert.match(
     dashboardSource,
-    /Crónicas relevantes/,
+    /Tus crónicas/,
   )
   assert.doesNotMatch(
     dashboardSource,

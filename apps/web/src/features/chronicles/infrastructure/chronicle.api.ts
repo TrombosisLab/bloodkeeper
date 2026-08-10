@@ -1,6 +1,12 @@
 import type {
+  AddChronicleParticipantApiRequest,
   ChronicleApiSnapshot,
   ChronicleApiStatus,
+  ChronicleCharacterApiSummary,
+  ChronicleParticipantApiRole,
+  ChronicleParticipantApiSnapshot,
+  ChronicleParticipantApiStatus,
+  ChronicleParticipantCandidateApiSnapshot,
   CreateChronicleApiRequest,
   TransitionChronicleLifecycleApiRequest,
 } from '../types/chronicle-api.types.ts'
@@ -54,6 +60,35 @@ export interface ChronicleLifecycleGateway
     request:
       TransitionChronicleLifecycleApiRequest,
   ): Promise<ChronicleApiSnapshot>
+
+  participants(
+    chronicleId: string,
+  ): Promise<
+    readonly ChronicleParticipantApiSnapshot[]
+  >
+
+  participantCandidates(
+    chronicleId: string,
+  ): Promise<
+    readonly ChronicleParticipantCandidateApiSnapshot[]
+  >
+
+  addParticipant(
+    chronicleId: string,
+    request:
+      AddChronicleParticipantApiRequest,
+  ): Promise<ChronicleParticipantApiSnapshot>
+
+  retireParticipant(
+    chronicleId: string,
+    participantId: string,
+  ): Promise<ChronicleParticipantApiSnapshot>
+
+  characters(
+    chronicleId: string,
+  ): Promise<
+    readonly ChronicleCharacterApiSummary[]
+  >
 }
 
 function isRecord(
@@ -94,6 +129,116 @@ function validStatus(
       value as ChronicleApiStatus,
     )
   )
+}
+
+function validParticipantRole(
+  value: unknown,
+): value is ChronicleParticipantApiRole {
+  return (
+    value === 'narrator' ||
+    value === 'player'
+  )
+}
+
+function validParticipantStatus(
+  value: unknown,
+): value is ChronicleParticipantApiStatus {
+  return (
+    value === 'active' ||
+    value === 'retired'
+  )
+}
+
+export function parseChronicleParticipantResponse(
+  value: unknown,
+): ChronicleParticipantApiSnapshot {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'string' ||
+    typeof value.chronicleId !== 'string' ||
+    typeof value.userId !== 'string' ||
+    typeof value.username !== 'string' ||
+    typeof value.displayName !== 'string' ||
+    !validParticipantRole(value.role) ||
+    !validParticipantStatus(value.status) ||
+    !validTimestamp(value.createdAt) ||
+    !validTimestamp(value.updatedAt)
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    id: value.id,
+    chronicleId: value.chronicleId,
+    userId: value.userId,
+    username: value.username,
+    displayName: value.displayName,
+    role: value.role,
+    status: value.status,
+    createdAt: value.createdAt,
+    updatedAt: value.updatedAt,
+  }
+}
+
+export function parseChronicleParticipantCandidateResponse(
+  value: unknown,
+): ChronicleParticipantCandidateApiSnapshot {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'string' ||
+    typeof value.username !== 'string' ||
+    typeof value.displayName !== 'string'
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    id: value.id,
+    username: value.username,
+    displayName: value.displayName,
+  }
+}
+
+export function parseChronicleCharacterSummaryResponse(
+  value: unknown,
+): ChronicleCharacterApiSummary {
+  if (
+    !isRecord(value) ||
+    typeof value.characterId !== 'string' ||
+    typeof value.ownerId !== 'string' ||
+    typeof value.chronicleId !== 'string' ||
+    !(
+      value.status === 'draft' ||
+      value.status === 'active' ||
+      value.status === 'archived'
+    ) ||
+    typeof value.name !== 'string' ||
+    !isStringOrNull(value.concept) ||
+    !validTimestamp(value.updatedAt)
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    characterId: value.characterId,
+    ownerId: value.ownerId,
+    chronicleId: value.chronicleId,
+    status: value.status,
+    name: value.name,
+    concept: value.concept,
+    updatedAt: value.updatedAt,
+  }
+}
+
+function parseList<T>(
+  value: unknown,
+  parser: (item: unknown) => T,
+): readonly T[] {
+  if (!Array.isArray(value)) {
+    return invalidResponse()
+  }
+
+  return value.map(parser)
 }
 
 function invalidResponse(): never {
@@ -263,6 +408,107 @@ export function createChronicleGateway(
 
       return parseChronicleApiSnapshotResponse(
         await jsonResponse(response),
+      )
+    },
+
+    async participants(chronicleId) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/participants`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseList(
+        await jsonResponse(response),
+        parseChronicleParticipantResponse,
+      )
+    },
+
+    async participantCandidates(
+      chronicleId,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/participant-candidates`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseList(
+        await jsonResponse(response),
+        parseChronicleParticipantCandidateResponse,
+      )
+    },
+
+    async addParticipant(
+      chronicleId,
+      request,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/participants`,
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(request),
+          },
+        )
+
+      return parseChronicleParticipantResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async retireParticipant(
+      chronicleId,
+      participantId,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/participants/${participantId}/retire`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseChronicleParticipantResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async characters(chronicleId) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/characters`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseList(
+        await jsonResponse(response),
+        parseChronicleCharacterSummaryResponse,
       )
     },
   }

@@ -248,3 +248,9 @@ export interface UpdateCharacterDraftApiRequest {
       Record<string, number>
   }>
 }
+
+export interface UpdateCharacterChronicleAssociationApiRequest {
+  readonly expectedRevision: number
+  readonly chronicleId: string | null
+  readonly confirmChange: boolean
+}

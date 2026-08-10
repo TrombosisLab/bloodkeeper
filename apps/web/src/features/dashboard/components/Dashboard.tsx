@@ -22,7 +22,8 @@ import { ViewStateStatus } from '../../../components/ui/ViewStateStatus'
 
 interface DashboardProps {
   readonly displayName: string
-  readonly canManageChronicles: boolean
+  readonly canAccessChronicles: boolean
+  readonly canCreateChronicles: boolean
   readonly onNavigateCharacters: () => void
   readonly onNavigateChronicles: () => void
   readonly gateway?: ChronicleGateway
@@ -86,7 +87,8 @@ function chronicleErrorMessage(
 
 export function Dashboard({
   displayName,
-  canManageChronicles,
+  canAccessChronicles,
+  canCreateChronicles,
   onNavigateCharacters,
   onNavigateChronicles,
   gateway = defaultGateway,
@@ -99,7 +101,7 @@ export function Dashboard({
   >([])
 
   const [loading, setLoading] =
-    useState(canManageChronicles)
+    useState(canAccessChronicles)
 
   const [
     error,
@@ -112,7 +114,7 @@ export function Dashboard({
   ] = useState(0)
 
   useEffect(() => {
-    if (!canManageChronicles) {
+    if (!canAccessChronicles) {
       setChronicles([])
       setLoading(false)
       setError(null)
@@ -155,7 +157,7 @@ export function Dashboard({
       cancelled = true
     }
   }, [
-    canManageChronicles,
+    canAccessChronicles,
     gateway,
     requestVersion,
   ])
@@ -219,7 +221,7 @@ export function Dashboard({
           </button>
         </section>
 
-        {canManageChronicles ? (
+        {canAccessChronicles ? (
           <section
             className="dashboard-panel"
             aria-labelledby="dashboard-chronicles-title"
@@ -227,9 +229,9 @@ export function Dashboard({
           >
             <div className="dashboard-panel__heading">
               <div>
-                <span>Resumen del narrador</span>
+                <span>Tu participación</span>
                 <h2 id="dashboard-chronicles-title">
-                  Crónicas relevantes
+                  Tus crónicas
                 </h2>
               </div>
 
@@ -237,7 +239,9 @@ export function Dashboard({
                 type="button"
                 onClick={onNavigateChronicles}
               >
-                Gestionar
+                {canCreateChronicles
+                  ? 'Gestionar'
+                  : 'Abrir'}
               </button>
             </div>
 
@@ -277,7 +281,7 @@ export function Dashboard({
                     state="empty"
                     className="dashboard-message"
                   >
-                    Todavía no has creado ninguna
+                    Todavía no participas en ninguna
                     crónica.
                   </ViewStateStatus>
             ) : (
