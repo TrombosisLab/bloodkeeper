@@ -3,12 +3,15 @@ import type {
   ChronicleApiSnapshot,
   ChronicleApiStatus,
   ChronicleCharacterApiSummary,
+  ChronicleNpcApiSnapshot,
   ChronicleParticipantApiRole,
   ChronicleParticipantApiSnapshot,
   ChronicleParticipantApiStatus,
   ChronicleParticipantCandidateApiSnapshot,
   CreateChronicleApiRequest,
+  CreateChronicleNpcApiRequest,
   TransitionChronicleLifecycleApiRequest,
+  UpdateChronicleNpcApiRequest,
 } from '../types/chronicle-api.types.ts'
 
 type FetchImplementation =
@@ -89,6 +92,33 @@ export interface ChronicleLifecycleGateway
   ): Promise<
     readonly ChronicleCharacterApiSummary[]
   >
+
+  npcs(
+    chronicleId: string,
+  ): Promise<
+    readonly ChronicleNpcApiSnapshot[]
+  >
+
+  npc(
+    chronicleId: string,
+    npcId: string,
+  ): Promise<ChronicleNpcApiSnapshot>
+
+  createNpc(
+    chronicleId: string,
+    request: CreateChronicleNpcApiRequest,
+  ): Promise<ChronicleNpcApiSnapshot>
+
+  updateNpc(
+    chronicleId: string,
+    npcId: string,
+    request: UpdateChronicleNpcApiRequest,
+  ): Promise<ChronicleNpcApiSnapshot>
+
+  archiveNpc(
+    chronicleId: string,
+    npcId: string,
+  ): Promise<ChronicleNpcApiSnapshot>
 }
 
 function isRecord(
@@ -226,6 +256,44 @@ export function parseChronicleCharacterSummaryResponse(
     status: value.status,
     name: value.name,
     concept: value.concept,
+    updatedAt: value.updatedAt,
+  }
+}
+
+export function parseChronicleNpcResponse(
+  value: unknown,
+): ChronicleNpcApiSnapshot {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'string' ||
+    typeof value.chronicleId !== 'string' ||
+    typeof value.name !== 'string' ||
+    !isStringOrNull(value.category) ||
+    !isStringOrNull(value.description) ||
+    !isStringOrNull(value.narrativeRole) ||
+    !isStringOrNull(value.notes) ||
+    !(
+      value.status === 'active' ||
+      value.status === 'archived'
+    ) ||
+    value.detailLevel !== 'simple' ||
+    !validTimestamp(value.createdAt) ||
+    !validTimestamp(value.updatedAt)
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    id: value.id,
+    chronicleId: value.chronicleId,
+    name: value.name,
+    category: value.category,
+    description: value.description,
+    narrativeRole: value.narrativeRole,
+    notes: value.notes,
+    status: value.status,
+    detailLevel: value.detailLevel,
+    createdAt: value.createdAt,
     updatedAt: value.updatedAt,
   }
 }
@@ -509,6 +577,114 @@ export function createChronicleGateway(
       return parseList(
         await jsonResponse(response),
         parseChronicleCharacterSummaryResponse,
+      )
+    },
+
+    async npcs(chronicleId) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/npcs`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseList(
+        await jsonResponse(response),
+        parseChronicleNpcResponse,
+      )
+    },
+
+    async npc(
+      chronicleId,
+      npcId,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/npcs/${npcId}`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseChronicleNpcResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async createNpc(
+      chronicleId,
+      request,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/npcs`,
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(request),
+          },
+        )
+
+      return parseChronicleNpcResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async updateNpc(
+      chronicleId,
+      npcId,
+      request,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/npcs/${npcId}`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(request),
+          },
+        )
+
+      return parseChronicleNpcResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async archiveNpc(
+      chronicleId,
+      npcId,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/npcs/${npcId}/archive`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseChronicleNpcResponse(
+        await jsonResponse(response),
       )
     },
   }

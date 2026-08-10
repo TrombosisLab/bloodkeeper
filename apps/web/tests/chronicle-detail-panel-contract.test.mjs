@@ -29,6 +29,15 @@ const styles =
     'utf8',
   )
 
+const npcPanel =
+  await readFile(
+    new URL(
+      '../src/features/chronicles/components/ChronicleNpcPanel.tsx',
+      import.meta.url,
+    ),
+    'utf8',
+  )
+
 test(
   '030-D abre una crónica real desde el listado y permite volver',
   () => {
@@ -90,18 +99,22 @@ test(
 )
 
 test(
-  '031-D materializa Participantes sin adelantar SPEC-032–035',
+  '032-C materializa PNJ sin adelantar SPEC-033–035',
   () => {
     const combined =
-      detail + list
+      detail + list + npcPanel
 
     assert.match(
       combined,
       /Participantes/,
     )
+    assert.match(
+      combined,
+      />\s*PNJ\s*</,
+    )
     assert.doesNotMatch(
       combined,
-      />\s*(?:PNJ|Localizaciones|Eventos|Línea temporal|Sesiones)\s*</,
+      />\s*(?:Localizaciones|Eventos|Línea temporal|Sesiones)\s*</,
     )
   },
 )

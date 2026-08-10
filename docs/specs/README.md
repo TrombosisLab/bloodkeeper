@@ -50,7 +50,7 @@ confirmadas.
 | SPEC-029 | [SPEC-029 – CHARACTER_VALIDATION_AND_LIFECYCLE](SPEC-029_CHARACTER_VALIDATION_AND_LIFECYCLE_v1.0.md) | 1.0 | Aprobado | Cerrada | Validación global contextual, estados Borrador/Activo/Archivado, activación validada, archivado seguro, reactivación, dependencias, permisos y concurrencia validados. |
 | SPEC-030 | [SPEC-030 – CHRONICLE_MODULE](SPEC-030_CHRONICLE_MODULE_v1.0.md) | 1.0 | Aprobado | Cerrada | Módulo base de Crónicas con entidad, creación/listado, lifecycle, archivado seguro, permisos y panel individual de Resumen validados. |
 | SPEC-031 | [SPEC-031 – CHRONICLE_PARTICIPANTS_AND_CHARACTERS](SPEC-031_CHRONICLE_PARTICIPANTS_AND_CHARACTERS_v1.0.md) | 1.0 | Aprobado | Cerrada | Participación contextual, múltiples narradores, asociación de personajes, permisos y preservación histórica validados. |
-| SPEC-032 | [SPEC-032 – CHRONICLE_NPCS](SPEC-032_CHRONICLE_NPCS_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
+| SPEC-032 | [SPEC-032 – CHRONICLE_NPCS](SPEC-032_CHRONICLE_NPCS_v1.0.md) | 1.0 | Aprobado | Cerrada | Pendiente de auditoría contra código y tests. |
 | SPEC-033 | [SPEC-033 – CHRONICLE_LOCATIONS](SPEC-033_CHRONICLE_LOCATIONS_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-034 | [SPEC-034 – CHRONICLE_EVENTS_AND_TIMELINE](SPEC-034_CHRONICLE_EVENTS_AND_TIMELINE_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-035 | [SPEC-035 – CHRONICLE_SESSIONS](SPEC-035_CHRONICLE_SESSIONS_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |

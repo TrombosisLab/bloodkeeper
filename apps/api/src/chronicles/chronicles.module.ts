@@ -79,6 +79,38 @@ import {
 } from './infrastructure/prisma-chronicle.repository'
 
 import {
+  CHRONICLE_NPC_REPOSITORY,
+} from './application/chronicle-npc.repository'
+
+import {
+  ListChronicleNpcsUseCase,
+} from './application/list-chronicle-npcs.use-case'
+
+import {
+  LoadChronicleNpcUseCase,
+} from './application/load-chronicle-npc.use-case'
+
+import {
+  CreateChronicleNpcUseCase,
+} from './application/create-chronicle-npc.use-case'
+
+import {
+  UpdateChronicleNpcUseCase,
+} from './application/update-chronicle-npc.use-case'
+
+import {
+  ArchiveChronicleNpcUseCase,
+} from './application/archive-chronicle-npc.use-case'
+
+import {
+  PrismaChronicleNpcRepository,
+} from './infrastructure/prisma-chronicle-npc.repository'
+
+import {
+  ChronicleNpcController,
+} from './presentation/chronicle-npc.controller'
+
+import {
   ChronicleController,
 } from './presentation/chronicle.controller'
 
@@ -88,6 +120,7 @@ import {
   ],
   controllers: [
     ChronicleController,
+    ChronicleNpcController,
   ],
   providers: [
     PrismaChronicleRepository,
@@ -144,6 +177,18 @@ import {
       useExisting:
         PrismaChronicleParticipantRepository,
     },
+    PrismaChronicleNpcRepository,
+    {
+      provide:
+        CHRONICLE_NPC_REPOSITORY,
+      useExisting:
+        PrismaChronicleNpcRepository,
+    },
+    ListChronicleNpcsUseCase,
+    LoadChronicleNpcUseCase,
+    CreateChronicleNpcUseCase,
+    UpdateChronicleNpcUseCase,
+    ArchiveChronicleNpcUseCase,
     PrismaChronicleParticipantRelations,
     {
       provide:

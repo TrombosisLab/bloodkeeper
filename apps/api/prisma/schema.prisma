@@ -179,6 +179,7 @@ model Chronicle {
 
   characters   Character[]            @relation("CharacterChronicle")
   participants ChronicleParticipant[] @relation("ChronicleParticipantChronicle")
+  npcs         ChronicleNpc[]          @relation("ChronicleNpcChronicle")
 
   @@index([narratorId])
   @@index([status])
@@ -211,6 +212,35 @@ model ChronicleParticipant {
   @@index([chronicleId, role, status])
   @@index([userId, status])
   @@map("chronicle_participants")
+}
+
+enum ChronicleNpcStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum ChronicleNpcDetailLevel {
+  SIMPLE
+}
+
+model ChronicleNpc {
+  id            String                  @id @default(uuid()) @db.Uuid
+  chronicleId   String                  @db.Uuid
+  name          String
+  category      String?
+  description   String?
+  narrativeRole String?
+  notes         String?
+  status        ChronicleNpcStatus       @default(ACTIVE)
+  detailLevel   ChronicleNpcDetailLevel  @default(SIMPLE)
+  createdAt     DateTime                 @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime                 @updatedAt @db.Timestamptz(3)
+
+  chronicle Chronicle @relation("ChronicleNpcChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([chronicleId, status])
+  @@index([chronicleId, detailLevel])
+  @@map("chronicle_npcs")
 }
 
 model Character {

@@ -38,6 +38,10 @@ import {
   ViewStateStatus,
 } from '../../../components/ui/ViewStateStatus'
 
+import {
+  ChronicleNpcPanel,
+} from './ChronicleNpcPanel'
+
 import './chronicle-detail.css'
 
 const gateway =
@@ -366,6 +370,10 @@ export function ChronicleDetail({
     )
 
   const canManageParticipants =
+    currentMembership?.role ===
+    'narrator'
+
+  const canManageNpcs =
     currentMembership?.role ===
     'narrator'
 
@@ -1017,6 +1025,12 @@ export function ChronicleDetail({
             </form>
           )}
         </section>
+      ) : null}
+
+      {canManageNpcs ? (
+        <ChronicleNpcPanel
+          chronicleId={chronicleId}
+        />
       ) : null}
 
       <section

@@ -67,3 +67,37 @@ export interface AddChronicleParticipantApiRequest {
   readonly userId: string
   readonly role: ChronicleParticipantApiRole
 }
+
+export type ChronicleNpcApiStatus =
+  | 'active'
+  | 'archived'
+
+export interface ChronicleNpcApiSnapshot {
+  readonly id: string
+  readonly chronicleId: string
+  readonly name: string
+  readonly category: string | null
+  readonly description: string | null
+  readonly narrativeRole: string | null
+  readonly notes: string | null
+  readonly status: ChronicleNpcApiStatus
+  readonly detailLevel: 'simple'
+  readonly createdAt: string
+  readonly updatedAt: string
+}
+
+export interface CreateChronicleNpcApiRequest {
+  readonly name: string
+  readonly category: string | null
+  readonly description: string | null
+  readonly narrativeRole: string | null
+  readonly notes: string | null
+}
+
+export interface UpdateChronicleNpcApiRequest {
+  readonly name?: string
+  readonly category?: string | null
+  readonly description?: string | null
+  readonly narrativeRole?: string | null
+  readonly notes?: string | null
+}
