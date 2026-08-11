@@ -1,0 +1,94 @@
+/* SPEC-UI-MODULAR-CHRONICLE-BUTTONS-20260811
+ * Extensión visual exclusiva del agregado Crónicas.
+ * Conserva layout, permisos, estados y tamaños compactos de cada submódulo.
+ */
+
+/* Acciones primarias: creación de recursos dentro de la crónica. */
+.chronicle-create form button:not([class]),
+.chronicle-npc-panel__create button:not([class]),
+.chronicle-location-panel__create button:not([class]),
+.chronicle-event-panel__create button:not([class]),
+.chronicle-session-panel__create button:not([class]) {
+  min-height: var(--ui-button-height);
+  padding: 0.62rem 1rem;
+  border: 1px solid var(--ui-button-primary-border);
+  border-radius: var(--ui-button-radius);
+  background: linear-gradient(180deg, var(--ui-button-primary-bg-hover), var(--ui-button-primary-bg));
+  color: var(--ui-button-text);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+/* Navegación, consulta y mantenimiento: jerarquía secundaria. */
+.chronicle-list__heading button:not([class]),
+.chronicle-card__actions button:not([class]),
+.chronicle-detail__header button:not([class]),
+.chronicle-detail button.chronicle-detail__primary-action,
+.chronicle-detail button.chronicle-detail__compact-action,
+.chronicle-detail button.chronicle-npc-panel__compact-action,
+.chronicle-detail button.chronicle-location-panel__compact-action,
+.chronicle-detail button.chronicle-event-panel__compact-action,
+.chronicle-detail button.chronicle-session-panel__compact-action {
+  border: 1px solid var(--ui-button-secondary-border);
+  border-radius: var(--ui-button-radius);
+  background: var(--ui-button-secondary-bg);
+  color: var(--ui-button-text);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.chronicle-list__heading button:not([class]),
+.chronicle-card__actions button:not([class]),
+.chronicle-detail__header button:not([class]),
+.chronicle-detail button.chronicle-detail__primary-action {
+  min-height: var(--ui-button-height);
+  padding: 0.62rem 1rem;
+}
+
+/* Las acciones densas conservan su escala propia. */
+.chronicle-detail button.chronicle-detail__compact-action,
+.chronicle-detail button.chronicle-npc-panel__compact-action,
+.chronicle-detail button.chronicle-location-panel__compact-action,
+.chronicle-detail button.chronicle-event-panel__compact-action,
+.chronicle-detail button.chronicle-session-panel__compact-action {
+  min-height: 32px;
+  padding: 0.38rem 0.65rem;
+  border-radius: 8px;
+}
+
+.chronicle-workspace button:hover:not(:disabled),
+.chronicle-detail button:hover:not(:disabled) {
+  border-color: var(--color-accent-border);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.chronicle-list__heading button:hover:not(:disabled),
+.chronicle-card__actions button:hover:not(:disabled),
+.chronicle-detail__header button:hover:not(:disabled),
+.chronicle-detail button.chronicle-detail__primary-action:hover:not(:disabled),
+.chronicle-detail button.chronicle-detail__compact-action:hover:not(:disabled),
+.chronicle-detail button.chronicle-npc-panel__compact-action:hover:not(:disabled),
+.chronicle-detail button.chronicle-location-panel__compact-action:hover:not(:disabled),
+.chronicle-detail button.chronicle-event-panel__compact-action:hover:not(:disabled),
+.chronicle-detail button.chronicle-session-panel__compact-action:hover:not(:disabled) {
+  background: var(--ui-button-secondary-bg-hover);
+}
+
+.chronicle-workspace button:focus-visible,
+.chronicle-detail button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--ui-focus-ring);
+}
+
+.chronicle-workspace button:disabled,
+.chronicle-detail button:disabled {
+  border-color: var(--ui-button-disabled-border);
+  background: var(--ui-button-disabled-bg);
+  filter: saturate(0.45);
+  opacity: 0.48;
+  transform: none;
+}

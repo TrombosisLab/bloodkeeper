@@ -1,0 +1,8 @@
+/* SPEC-UI-MODULAR-DASHBOARD-SURFACES-20260811
+ * Superficies locales de Inicio sobre tokens compartidos.
+ * No altera datos, navegación, permisos ni estructura del panel.
+ */
+.dashboard-panel {
+  border-color: var(--ui-surface-panel-border);
+  background: var(--ui-surface-panel-gradient);
+}

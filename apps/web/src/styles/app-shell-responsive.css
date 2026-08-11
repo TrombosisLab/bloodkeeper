@@ -1,0 +1,16 @@
+/* SPEC-UI-FINAL-APP-SHELL-RESPONSIVE-20260811
+ * Corrección local del shell en pantallas estrechas.
+ * Evita que el ancho mínimo visual genere desplazamiento horizontal residual.
+ */
+@media (max-width: 899px) {
+  .application {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+
+  body {
+    min-width: 0;
+  }
+}

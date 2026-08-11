@@ -1,0 +1,21 @@
+/* SPEC-UI-FINAL-CHARACTER-LIST-ACTIONS-20260811
+ * Jerarquía local de la lista de Personajes sobre la foundation compartida.
+ * Crear y continuar permanecen como acciones principales; abrir y actualizar
+ * son acciones de consulta, por ello usan la variante secundaria.
+ */
+.character-list-workspace__actions > button:not(.character-list-workspace__primary),
+.character-list__heading > button,
+.character-list-card__actions > button:only-child,
+.character-list-card__actions > button:first-child:not(:last-child) {
+  border-color: var(--ui-button-secondary-border);
+  background: var(--ui-button-secondary-bg);
+}
+
+.character-list-workspace__actions > button:not(.character-list-workspace__primary):hover,
+.character-list__heading > button:hover,
+.character-list-card__actions > button:only-child:hover,
+.character-list-card__actions > button:first-child:not(:last-child):hover {
+  border-color: var(--ui-button-secondary-border);
+  background: var(--ui-button-secondary-bg-hover);
+  filter: none;
+}

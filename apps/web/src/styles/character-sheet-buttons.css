@@ -1,0 +1,33 @@
+/* SPEC-UI-MODULAR-CHARACTER-SHEET-BUTTONS-20260811
+ * Extensión visual exclusiva de la ficha de personaje.
+ * No modifica ratings, estados, validación ni composición del módulo.
+ */
+button.sheet-toolbar__action,
+.sheet-header__state-edit {
+  min-height: var(--ui-button-height);
+  padding: 0.62rem 1rem;
+  border: 1px solid var(--ui-button-secondary-border);
+  border-radius: var(--ui-button-radius);
+  background: var(--ui-button-secondary-bg);
+  color: var(--ui-button-text);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.1;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease,
+    filter 160ms ease, transform 160ms ease;
+}
+
+button.sheet-toolbar__action:hover,
+.sheet-header__state-edit:hover {
+  border-color: var(--color-accent-border);
+  background: var(--ui-button-secondary-bg-hover);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+button.sheet-toolbar__action:focus-visible,
+.sheet-header__state-edit:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--ui-focus-ring);
+}

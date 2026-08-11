@@ -28,6 +28,12 @@ import type {
 } from './features/navigation/types/app-navigation.types'
 
 import './styles.css'
+import './styles/ui-foundations.css';
+import './styles/chronicle-buttons.css';
+import './styles/chronicle-surfaces.css';
+import './styles/dashboard-surfaces.css';
+import './styles/character-list-buttons.css';
+import './styles/app-shell-responsive.css';
 
 function App() {
   const authenticatedUser =

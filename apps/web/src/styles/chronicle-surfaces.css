@@ -1,0 +1,25 @@
+/* SPEC-UI-MODULAR-CHRONICLE-SURFACES-20260811
+ * Superficies locales de Crónicas sobre tokens compartidos.
+ * No modifica la estructura, permisos ni espaciados de los submódulos.
+ */
+.chronicle-card,
+.chronicle-detail__summary,
+.chronicle-detail__panel,
+.chronicle-npc-panel,
+.chronicle-location-panel,
+.chronicle-event-panel,
+.chronicle-session-panel {
+  border-color: var(--ui-surface-panel-border);
+  background: var(--ui-surface-panel-gradient);
+}
+
+.chronicle-card:hover {
+  border-color: var(--color-accent-border);
+  background: var(--ui-surface-panel-gradient-hover);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .chronicle-card {
+    transition: border-color 160ms ease, background 160ms ease;
+  }
+}

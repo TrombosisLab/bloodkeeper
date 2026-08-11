@@ -1,0 +1,78 @@
+/* SPEC-UI-MODULAR-CHARACTER-CREATION-BUTTONS-SPLIT-20260811
+ * Extensión visual exclusiva del módulo de creación.
+ * El layout, los estados y la lógica siguen siendo propios de la feature.
+ */
+.creation-button,
+.creation-header__back,
+.creation-session-style-button {
+  min-height: var(--ui-button-height);
+  border-radius: var(--ui-button-radius);
+  border: 1px solid var(--ui-button-secondary-border);
+  color: var(--ui-button-text);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.1;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease,
+    filter 160ms ease, transform 160ms ease;
+}
+
+.creation-button--primary {
+  border-color: var(--ui-button-primary-border);
+  background: linear-gradient(180deg, var(--ui-button-primary-bg-hover), var(--ui-button-primary-bg));
+}
+
+.creation-button--secondary,
+.creation-header__back {
+  border-color: var(--ui-button-secondary-border);
+  background: var(--ui-button-secondary-bg);
+}
+
+.creation-button--primary:hover,
+.creation-button--secondary:hover,
+.creation-header__back:hover {
+  border-color: var(--color-accent-border);
+  background: var(--ui-button-secondary-bg-hover);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.creation-button--primary:hover {
+  background: linear-gradient(180deg, var(--ui-button-primary-bg-hover), var(--ui-button-primary-bg));
+}
+
+.creation-button:focus-visible,
+.creation-header__back:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--ui-focus-ring);
+}
+
+.creation-button:disabled,
+.creation-header__back:disabled {
+  border-color: var(--ui-button-disabled-border);
+  background: var(--ui-button-disabled-bg);
+  filter: saturate(0.45);
+  opacity: 0.48;
+  transform: none;
+}
+
+.creation-progress__step {
+  min-height: 45px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ui-button-text-muted);
+  box-shadow: none;
+  transform: none;
+}
+
+.creation-progress__step--active {
+  border-bottom-color: var(--color-accent-rule);
+  background: linear-gradient(90deg, var(--ui-accent-soft), transparent);
+  color: var(--ui-button-text);
+}
+
+.creation-progress__step--locked {
+  cursor: not-allowed;
+  color: var(--color-text-disabled);
+}

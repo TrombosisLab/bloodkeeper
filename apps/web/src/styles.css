@@ -1,5 +1,182 @@
 @import './styles/design-system.css';
 @import './styles/base-and-sheet-header.css';
 @import './styles/character-sheet.css';
+@import './styles/character-sheet-buttons.css';
 @import './styles/character-experience.css';
+@import './styles/character-experience-buttons.css';
 @import './styles/character-creation.css';
+@import './styles/character-creation-buttons.css';
+
+
+/* SPEC-UI-VISUAL-NORMALIZATION-20260811
+ * Primera pasada de coherencia visual.
+ * Alcance: controles, navegación, listados, formularios de crónica y sesión.
+ * No sustituye todavía la migración completa a componentes visuales.
+ */
+:root {
+  --ui-bg: #0b0a0a;
+  --ui-surface: #141112;
+  --ui-surface-raised: #1b1617;
+  --ui-control: #0f0d0d;
+  --ui-border: #3a2c2f;
+  --ui-border-accent: #733943;
+  --ui-accent: #742e39;
+  --ui-accent-hover: #8e3f4a;
+  --ui-accent-soft: rgb(117 39 51 / 0.18);
+  --ui-text: #e9e3de;
+  --ui-text-muted: #9b8e89;
+  --ui-success: #72b783;
+  --ui-radius: 10px;
+  --ui-control-height: 42px;
+}
+
+/* Navegación: eliminar estilos nativos y reservar el acento para la sección activa. */
+.app-navigation-shell nav button,
+.app-navigation__toggle {
+  appearance: none;
+  font: inherit;
+  border-radius: var(--ui-radius);
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease,
+    transform 160ms ease;
+}
+
+.app-navigation-shell nav button {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ui-text-muted);
+}
+
+.app-navigation-shell nav button:hover,
+.app-navigation-shell nav button:focus-visible {
+  border-color: var(--ui-border);
+  background: rgb(255 255 255 / 0.035);
+  color: var(--ui-text);
+}
+
+.app-navigation-shell nav button[aria-current='page'] {
+  border-color: var(--ui-border-accent);
+  background: linear-gradient(90deg, rgb(117 39 51 / 0.42), rgb(76 32 39 / 0.55));
+  box-shadow: inset 3px 0 0 var(--color-accent-rule);
+  color: var(--ui-text);
+}
+
+.app-navigation__toggle {
+  border: 1px solid var(--ui-border);
+  background: var(--ui-surface-raised);
+  color: var(--ui-text);
+}
+
+/* Botones de las pantallas antiguas: todos comparten altura, radio y jerarquía. */
+.dashboard button,
+.character-list-workspace button,
+.chronicle-list-create button,
+.chronicle-detail button {
+  min-height: var(--ui-control-height);
+  padding: 0.62rem 1rem;
+  border: 1px solid var(--ui-border-accent);
+  border-radius: var(--ui-radius);
+  background: linear-gradient(180deg, var(--ui-accent-hover), var(--ui-accent));
+  color: var(--ui-text);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.1;
+  box-shadow: 0 5px 16px rgb(0 0 0 / 0.16);
+}
+
+.dashboard button:hover,
+.character-list-workspace button:hover,
+.chronicle-list-create button:hover,
+.chronicle-detail button:hover {
+  border-color: var(--color-accent-border);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.dashboard button:focus-visible,
+.character-list-workspace button:focus-visible,
+.chronicle-list-create button:focus-visible,
+.chronicle-detail button:focus-visible,
+.app-navigation__toggle:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.dashboard button:disabled,
+.character-list-workspace button:disabled,
+.chronicle-list-create button:disabled,
+.chronicle-detail button:disabled {
+  cursor: not-allowed;
+  filter: saturate(0.45);
+  opacity: 0.48;
+  transform: none;
+}
+
+/* Campos administrativos: superficie neutra; el rojo queda para foco y acción. */
+.chronicle-detail input,
+.chronicle-detail textarea,
+.chronicle-detail select {
+  min-height: var(--ui-control-height);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+  background: var(--ui-control);
+  color: var(--ui-text);
+  font: inherit;
+}
+
+.chronicle-detail input,
+.chronicle-detail textarea {
+  padding: 0.68rem 0.8rem;
+}
+
+.chronicle-detail select {
+  padding: 0.55rem 2.25rem 0.55rem 0.8rem;
+}
+
+.chronicle-detail input::placeholder,
+.chronicle-detail textarea::placeholder {
+  color: var(--ui-text-muted);
+}
+
+.chronicle-detail input:focus,
+.chronicle-detail textarea:focus,
+.chronicle-detail select:focus {
+  border-color: var(--color-accent-border);
+  box-shadow: 0 0 0 3px var(--color-focus-soft);
+  outline: none;
+}
+
+/* Tarjetas de listado: una superficie compartida y estados más legibles. */
+.character-list-card,
+.chronicle-list-create article {
+  border-color: var(--ui-border);
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.025), var(--ui-accent-soft));
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.13);
+}
+
+/* La cuenta no debe tapar acciones ni texto. En escritorio vive en la navegación; en
+ * móvil conserva una banda inferior y deja espacio para que el contenido no quede oculto. */
+.authentication-session {
+  z-index: 20;
+}
+
+@media (min-width: 900px) {
+  .authentication-session {
+    right: auto;
+    bottom: 1rem;
+    left: 1rem;
+    width: min(15rem, calc(100% - 2rem));
+  }
+}
+
+@media (max-width: 899px) {
+  body {
+    padding-bottom: 6rem;
+  }
+
+  .authentication-session {
+    right: 0.75rem;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    width: auto;
+  }
+}

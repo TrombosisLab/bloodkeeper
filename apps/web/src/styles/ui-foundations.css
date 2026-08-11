@@ -1,0 +1,189 @@
+/* SPEC-UI-MODULAR-BUTTON-FOUNDATION-20260811
+ * Primitives visuales compartidas. No contiene reglas de dominio ni layout de módulos.
+ * Cada feature puede añadir variantes locales sin importar CSS de otra feature.
+ */
+:root {
+  --ui-button-primary-bg: #742e39;
+  --ui-button-primary-bg-hover: #8e3f4a;
+  --ui-button-primary-border: #733943;
+  --ui-button-secondary-bg: #1b1617;
+  --ui-button-secondary-bg-hover: #2d1c20;
+  --ui-button-secondary-border: #4d3b3e;
+  --ui-button-ghost-bg: transparent;
+  --ui-button-ghost-border: #3a2c2f;
+  --ui-button-danger-bg: #693d45;
+  --ui-button-danger-bg-hover: #824c56;
+  --ui-button-danger-border: #8c515b;
+  --ui-button-disabled-bg: #2a2525;
+  --ui-button-disabled-border: #3a3434;
+  --ui-button-text: #e9e3de;
+  --ui-button-text-muted: #9b8e89;
+  --ui-button-radius: 10px;
+  --ui-button-height: 42px;
+  --ui-control-bg: #0f0d0d;
+  --ui-control-border: #3a2c2f;
+  --ui-control-border-focus: #b2636e;
+  --ui-focus-ring: rgb(220 160 168 / 0.28);
+  --ui-surface-panel-gradient: linear-gradient(112deg, rgb(68 29 35 / 0.52), rgb(23 14 16 / 0.94));
+  --ui-surface-panel-gradient-hover: linear-gradient(112deg, rgb(79 34 41 / 0.58), rgb(29 17 20 / 0.96));
+  --ui-surface-panel-border: #44282d;
+}
+
+/* Puente para botones legacy sin clase: permite migrarlos sin acoplar módulos. */
+button:not([class]) {
+  appearance: none;
+  min-height: var(--ui-button-height);
+  padding: 0.62rem 1rem;
+  border: 1px solid var(--ui-button-primary-border);
+  border-radius: var(--ui-button-radius);
+  background: linear-gradient(180deg, var(--ui-button-primary-bg-hover), var(--ui-button-primary-bg));
+  color: var(--ui-button-text);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.1;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease,
+    filter 160ms ease, transform 160ms ease;
+}
+
+button:not([class]):hover {
+  border-color: var(--color-accent-border);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+button:not([class]):focus-visible,
+.ui-button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--ui-focus-ring);
+}
+
+button:not([class]):disabled,
+.ui-button:disabled {
+  cursor: not-allowed;
+  filter: saturate(0.45);
+  opacity: 0.48;
+  transform: none;
+}
+
+/* API visual compartida para la migración progresiva de cada módulo. */
+.ui-button,
+button[data-ui-variant] {
+  appearance: none;
+  min-height: var(--ui-button-height);
+  padding: 0.62rem 1rem;
+  border: 1px solid var(--ui-button-secondary-border);
+  border-radius: var(--ui-button-radius);
+  background: var(--ui-button-secondary-bg);
+  color: var(--ui-button-text);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.1;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease,
+    filter 160ms ease, transform 160ms ease;
+}
+
+.ui-button:hover,
+button[data-ui-variant]:hover {
+  border-color: var(--ui-button-secondary-border);
+  background: var(--ui-button-secondary-bg-hover);
+  transform: translateY(-1px);
+}
+
+.ui-button--primary,
+button[data-ui-variant='primary'] {
+  border-color: var(--ui-button-primary-border);
+  background: linear-gradient(180deg, var(--ui-button-primary-bg-hover), var(--ui-button-primary-bg));
+}
+
+.ui-button--primary:hover,
+button[data-ui-variant='primary']:hover {
+  border-color: var(--color-accent-border);
+  filter: brightness(1.08);
+}
+
+.ui-button--ghost,
+button[data-ui-variant='ghost'] {
+  border-color: var(--ui-button-ghost-border);
+  background: var(--ui-button-ghost-bg);
+  color: var(--ui-button-text-muted);
+}
+
+.ui-button--danger,
+button[data-ui-variant='danger'] {
+  border-color: var(--ui-button-danger-border);
+  background: var(--ui-button-danger-bg);
+}
+
+.ui-button--danger:hover,
+button[data-ui-variant='danger']:hover {
+  background: var(--ui-button-danger-bg-hover);
+}
+
+.ui-button:disabled,
+button[data-ui-variant]:disabled {
+  border-color: var(--ui-button-disabled-border);
+  background: var(--ui-button-disabled-bg);
+}
+
+/* Controles básicos compartidos; layouts y agrupaciones siguen siendo de cada feature. */
+input:not([class]),
+textarea:not([class]),
+select:not([class]) {
+  min-height: var(--ui-button-height);
+  border: 1px solid var(--ui-control-border);
+  border-radius: var(--ui-button-radius);
+  background: var(--ui-control-bg);
+  color: var(--ui-button-text);
+  font: inherit;
+}
+
+input:not([class]),
+textarea:not([class]) {
+  padding: 0.68rem 0.8rem;
+}
+
+select:not([class]) {
+  padding: 0.55rem 2.25rem 0.55rem 0.8rem;
+}
+
+input:not([class]):focus,
+textarea:not([class]):focus,
+select:not([class]):focus {
+  border-color: var(--ui-control-border-focus);
+  box-shadow: 0 0 0 3px var(--ui-focus-ring);
+  outline: none;
+}
+
+/* La navegación mantiene su semántica propia, pero usa la misma paleta y foco. */
+.app-navigation-shell nav button:not([class]) {
+  min-height: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--ui-button-text-muted);
+  font-weight: 600;
+  transform: none;
+}
+
+.app-navigation-shell nav button:not([class]):hover,
+.app-navigation-shell nav button:not([class]):focus-visible {
+  border-color: var(--ui-button-secondary-border);
+  background: rgb(255 255 255 / 0.035);
+  color: var(--ui-button-text);
+  filter: none;
+}
+
+.app-navigation-shell nav button[aria-current='page'] {
+  border-color: var(--ui-button-primary-border);
+  background: linear-gradient(90deg, rgb(117 39 51 / 0.42), rgb(76 32 39 / 0.55));
+  box-shadow: inset 3px 0 0 var(--color-accent-rule);
+  color: var(--ui-button-text);
+}
+
+@media (max-width: 899px) {
+  button:not([class]),
+  .ui-button,
+  button[data-ui-variant] {
+    min-height: 44px;
+  }
+}
