@@ -43,7 +43,7 @@ test('036-A conserva el tipo de dado y reconoce crítico conflictivo', () => {
   assert.equal(result.meetsDifficulty, true)
 })
 
-test('036-A reconoce fallo bestial solo si no hay éxitos', () => {
+test('036-A reconoce fallo bestial cuando la tirada fracasa', () => {
   const bestial = resolveDiceRoll({
     dice: [
       { value: 1, type: 'hunger' },
@@ -73,7 +73,7 @@ test('036-A aplica dificultad sin exigirla', () => {
   })
 
   assert.equal(result.totalSuccesses, 2)
-  assert.equal(result.outcome, 'success')
+  assert.equal(result.outcome, 'failure')
   assert.equal(result.meetsDifficulty, false)
 })
 

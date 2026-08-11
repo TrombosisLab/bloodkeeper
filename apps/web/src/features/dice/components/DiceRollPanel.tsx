@@ -16,7 +16,7 @@ import type {
   CharacterDiceRollCommand,
   DiceGateway,
   DicePoolSnapshot,
-  DiceRollOutcome,
+  DiceRollSpecialResult,
   DiceTraitOption,
   ExecutedDiceRoll,
   ManualDiceRollCommand,
@@ -44,19 +44,44 @@ type PreparedCommand =
 
 const defaultGateway = createDiceGateway()
 
-const outcomeLabels: Readonly<Record<DiceRollOutcome, string>> = {
-  success: 'Éxito',
-  failure: 'Fallo',
+const specialResultLabels: Readonly<
+  Record<Exclude<DiceRollSpecialResult, 'none'>, string>
+> = {
   critical: 'Crítico',
   messy_critical: 'Crítico conflictivo',
   bestial_failure: 'Fallo bestial',
 }
 
 function presentedOutcome(result: ExecutedDiceRoll): string {
-  if (result.roll.meetsDifficulty === false) {
-    return 'Fallo'
+  return result.roll.isSuccessful ? 'Éxito' : 'Fallo'
+}
+
+function specialResultLabel(
+  result: ExecutedDiceRoll,
+): string | null {
+  return result.roll.specialResult === 'none'
+    ? null
+    : specialResultLabels[result.roll.specialResult]
+}
+
+function specialEvidenceLabel(
+  result: ExecutedDiceRoll,
+): string | null {
+  if (result.roll.specialResult === 'critical') {
+    return result.roll.specialEvidence.criticalPairs.length === 1
+      ? '1 pareja crítica'
+      : `${result.roll.specialEvidence.criticalPairs.length} parejas críticas`
   }
-  return outcomeLabels[result.roll.outcome]
+  if (result.roll.specialResult === 'messy_critical') {
+    return 'Un Dado de Hambre participa en el crítico'
+  }
+  if (result.roll.specialResult === 'bestial_failure') {
+    const count = result.roll.specialEvidence.bestialFailureDieIndices.length
+    return count === 1
+      ? '1 Dado de Hambre obtuvo un 1'
+      : `${count} Dados de Hambre obtuvieron un 1`
+  }
+  return null
 }
 
 function successCountLabel(totalSuccesses: number): string {
@@ -444,6 +469,11 @@ export function DiceRollPanel({
         >
           <div className="dice-roll-result__summary">
             <strong>{presentedOutcome(result)}</strong>
+            {specialResultLabel(result) !== null ? (
+              <mark className={`dice-roll-result__special dice-roll-result__special--${result.roll.specialResult}`}>
+                {specialResultLabel(result)}
+              </mark>
+            ) : null}
             <span>{successCountLabel(result.roll.totalSuccesses)}</span>
             <small>
               Reserva {result.pool.basePool}
@@ -452,15 +482,23 @@ export function DiceRollPanel({
             </small>
           </div>
 
+          {specialEvidenceLabel(result) !== null ? (
+            <p className="dice-roll-result__evidence">
+              {specialEvidenceLabel(result)}
+            </p>
+          ) : null}
+
           <ol className="dice-roll-result__dice">
             {result.roll.dice.map((die, index) => (
               <li
                 key={`${die.type}-${index}`}
-                className={`dice-roll-result__die dice-roll-result__die--${die.type}`}
+                className={`dice-roll-result__die dice-roll-result__die--${die.type}${die.isCriticalTen ? ' dice-roll-result__die--critical-ten' : ''}${die.isBestialFailureDie ? ' dice-roll-result__die--bestial-one' : ''}`}
                 aria-label={`${die.type === 'hunger' ? 'Dado de Hambre' : 'Dado normal'}: ${die.value}`}
               >
                 <span>{die.value}</span>
                 <small>{die.type === 'hunger' ? 'Hambre' : 'Normal'}</small>
+                {die.isCriticalTen ? <em>Diez crítico</em> : null}
+                {die.isBestialFailureDie ? <em>Uno de Hambre</em> : null}
               </li>
             ))}
           </ol>

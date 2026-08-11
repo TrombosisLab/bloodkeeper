@@ -7,6 +7,25 @@ export type DiceRollOutcome =
   | 'messy_critical'
   | 'bestial_failure'
 
+export type DiceRollSpecialResult =
+  | 'none'
+  | 'critical'
+  | 'messy_critical'
+  | 'bestial_failure'
+
+export interface DiceCriticalPairEvidence {
+  readonly firstDieIndex: number
+  readonly secondDieIndex: number
+  readonly involvesHunger: boolean
+}
+
+export interface DiceRollSpecialEvidence {
+  readonly criticalTenIndices: readonly number[]
+  readonly hungerCriticalTenIndices: readonly number[]
+  readonly criticalPairs: readonly DiceCriticalPairEvidence[]
+  readonly bestialFailureDieIndices: readonly number[]
+}
+
 export interface DicePoolComponent {
   readonly key: string
   readonly label: string
@@ -56,6 +75,9 @@ export interface DiceRollSnapshot {
   readonly criticalPairs: number
   readonly criticalBonusSuccesses: number
   readonly totalSuccesses: number
+  readonly isSuccessful: boolean
+  readonly specialResult: DiceRollSpecialResult
+  readonly specialEvidence: DiceRollSpecialEvidence
   readonly outcome: DiceRollOutcome
   readonly meetsDifficulty: boolean | null
 }

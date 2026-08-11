@@ -1,5 +1,6 @@
 import type {
   CharacterDiceRollCommand,
+  DiceCriticalPairEvidence,
   DiceGateway,
   DicePoolComponent,
   DicePoolContext,
@@ -7,6 +8,8 @@ import type {
   DicePoolSnapshot,
   DiceRollOutcome,
   DiceRollSnapshot,
+  DiceRollSpecialEvidence,
+  DiceRollSpecialResult,
   ExecutedDiceRoll,
   ManualDiceRollCommand,
   ResolvedDice,
@@ -154,11 +157,100 @@ function die(value: unknown): ResolvedDice {
   }
 }
 
+function nonNegativeInteger(value: unknown): number {
+  const parsed = integer(value)
+  if (parsed < 0) {
+    throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
+  }
+  return parsed
+}
+
+function evidenceIndices(
+  value: unknown,
+  diceCount: number,
+): readonly number[] {
+  if (!Array.isArray(value)) {
+    throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
+  }
+  return value.map((entry) => {
+    const index = nonNegativeInteger(entry)
+    if (index >= diceCount) {
+      throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
+    }
+    return index
+  })
+}
+
+function criticalPair(
+  value: unknown,
+  diceCount: number,
+): DiceCriticalPairEvidence {
+  const item = record(value)
+  const firstDieIndex = nonNegativeInteger(item.firstDieIndex)
+  const secondDieIndex = nonNegativeInteger(item.secondDieIndex)
+  if (
+    firstDieIndex >= diceCount ||
+    secondDieIndex >= diceCount ||
+    firstDieIndex === secondDieIndex
+  ) {
+    throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
+  }
+  return {
+    firstDieIndex,
+    secondDieIndex,
+    involvesHunger: boolean(item.involvesHunger),
+  }
+}
+
+function specialEvidence(
+  value: unknown,
+  diceCount: number,
+): DiceRollSpecialEvidence {
+  const item = record(value)
+  if (!Array.isArray(item.criticalPairs)) {
+    throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
+  }
+  return {
+    criticalTenIndices: evidenceIndices(
+      item.criticalTenIndices,
+      diceCount,
+    ),
+    hungerCriticalTenIndices: evidenceIndices(
+      item.hungerCriticalTenIndices,
+      diceCount,
+    ),
+    criticalPairs: item.criticalPairs.map(
+      (pair) => criticalPair(pair, diceCount),
+    ),
+    bestialFailureDieIndices: evidenceIndices(
+      item.bestialFailureDieIndices,
+      diceCount,
+    ),
+  }
+}
+
+function parsedSpecialResult(
+  value: unknown,
+): DiceRollSpecialResult {
+  const result = string(value)
+  const results: readonly DiceRollSpecialResult[] = [
+    'none',
+    'critical',
+    'messy_critical',
+    'bestial_failure',
+  ]
+  if (!results.includes(result as DiceRollSpecialResult)) {
+    throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
+  }
+  return result as DiceRollSpecialResult
+}
+
 function roll(value: unknown): DiceRollSnapshot {
   const item = record(value)
   if (!Array.isArray(item.dice)) {
     throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
   }
+  const parsedDice = item.dice.map(die)
   const outcome = string(item.outcome)
   const outcomes: readonly DiceRollOutcome[] = [
     'success',
@@ -171,12 +263,18 @@ function roll(value: unknown): DiceRollSnapshot {
     throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
   }
   return {
-    dice: item.dice.map(die),
+    dice: parsedDice,
     difficulty: nullableInteger(item.difficulty),
     regularSuccesses: integer(item.regularSuccesses),
     criticalPairs: integer(item.criticalPairs),
     criticalBonusSuccesses: integer(item.criticalBonusSuccesses),
     totalSuccesses: integer(item.totalSuccesses),
+    isSuccessful: boolean(item.isSuccessful),
+    specialResult: parsedSpecialResult(item.specialResult),
+    specialEvidence: specialEvidence(
+      item.specialEvidence,
+      parsedDice.length,
+    ),
     outcome: outcome as DiceRollOutcome,
     meetsDifficulty: nullableBoolean(item.meetsDifficulty),
   }

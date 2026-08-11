@@ -40,6 +40,10 @@ test('036-C ejecuta una tirada manual con aleatoriedad inyectable', () => {
     ],
   )
   assert.equal(result.roll.outcome, 'critical')
+  assert.equal(result.roll.isSuccessful, true)
+  assert.equal(result.roll.specialResult, 'critical')
+  assert.deepEqual(result.roll.specialEvidence.criticalTenIndices, [0, 1])
+  assert.deepEqual(result.roll.specialEvidence.bestialFailureDieIndices, [2])
   assert.equal(result.roll.meetsDifficulty, true)
 })
 

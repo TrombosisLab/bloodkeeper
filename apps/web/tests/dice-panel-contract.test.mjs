@@ -53,7 +53,7 @@ test('036-D conserva controles accesibles y resultado anunciado', () => {
 
 
 test('036-D presenta fallo cuando no supera dificultad y pluraliza exitos', () => {
-  assert.match(panel, /meetsDifficulty === false/)
+  assert.match(panel, /result\.roll\.isSuccessful/)
   assert.match(panel, /presentedOutcome\(result\)/)
   assert.match(panel, /totalSuccesses === 1/)
   assert.match(panel, /successCountLabel\(result\.roll\.totalSuccesses\)/)
