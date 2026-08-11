@@ -14,6 +14,9 @@ import { CharacterSheet } from './features/character-sheet/components/CharacterS
 import { PersistedCharacterSheet } from './features/character-sheet/components/PersistedCharacterSheet'
 import { ChronicleListCreate } from './features/chronicles/components/ChronicleListCreate'
 import { Dashboard } from './features/dashboard/components/Dashboard'
+import { DiceRollPanel } from './features/dice/components/DiceRollPanel'
+import { attributeDefinitions } from './features/character-creation/data/attribute-definitions'
+import { skillDefinitions } from './features/character-creation/data/skill-definitions'
 import { AppBreadcrumbs } from './features/navigation/components/AppBreadcrumbs'
 import { AppNavigation } from './features/navigation/components/AppNavigation'
 import {
@@ -185,6 +188,7 @@ function App() {
       }
     >
       {view === 'dashboard' ? (
+        <>
         <Dashboard
           displayName={
             authenticatedUser.displayName
@@ -202,6 +206,8 @@ function App() {
             navigateTo('chronicles')
           }
         />
+        <DiceRollPanel mode="manual" />
+        </>
       ) : view === 'chronicles' &&
         canAccessChronicles ? (
         <ChronicleListCreate
@@ -275,11 +281,19 @@ function App() {
               <CharacterSheet />
             ) : creationCharacterId !==
               null ? (
+              <>
               <PersistedCharacterSheet
                 characterId={
                   creationCharacterId
                 }
               />
+              <DiceRollPanel
+                mode="character"
+                characterId={creationCharacterId}
+                attributes={attributeDefinitions}
+                skills={skillDefinitions}
+              />
+              </>
             ) : null}
           </>
         )

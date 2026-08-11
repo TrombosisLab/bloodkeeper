@@ -1,0 +1,136 @@
+/* SPEC-036.D — panel modular de Dados */
+.dice-roll-panel {
+  width: min(100%, 72rem);
+  margin: 1.25rem auto 0;
+  padding: 1.25rem;
+  border: 1px solid var(--ui-surface-panel-border);
+  border-radius: 14px;
+  background: var(--ui-surface-panel-gradient);
+}
+
+.dice-roll-panel__header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dice-roll-panel__header span,
+.dice-roll-result__die small {
+  color: var(--ui-button-text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dice-roll-panel__header h2,
+.dice-roll-panel__header p {
+  margin: 0.25rem 0 0;
+}
+
+.dice-roll-panel__form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+  align-items: end;
+}
+
+.dice-roll-panel__form label {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--ui-button-text-muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.dice-roll-panel__form button {
+  min-height: var(--ui-button-height);
+  border-color: var(--ui-button-primary-border);
+  background: linear-gradient(180deg, var(--ui-button-primary-bg-hover), var(--ui-button-primary-bg));
+}
+
+.dice-roll-panel__error {
+  margin: 1rem 0 0;
+  color: #efb6bd;
+}
+
+.dice-roll-result {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ui-surface-panel-border);
+}
+
+.dice-roll-result__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+}
+
+.dice-roll-result__summary strong {
+  color: #f4d9dc;
+  font-size: 1.15rem;
+}
+
+.dice-roll-result__summary small {
+  color: var(--ui-button-text-muted);
+}
+
+.dice-roll-result__dice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dice-roll-result__die {
+  display: grid;
+  place-items: center;
+  width: 3.35rem;
+  min-height: 3.65rem;
+  border: 1px solid #66575a;
+  border-radius: 10px;
+  background: #eee8e2;
+  color: #211b1c;
+}
+
+.dice-roll-result__die span {
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.dice-roll-result__die--hunger {
+  border-color: #a64b58;
+  background: linear-gradient(145deg, #8d3442, #43171f);
+  color: #fff2f2;
+}
+
+.dice-roll-result__die--hunger small {
+  color: #f1c4c9;
+}
+
+.dice-roll-result__difficulty {
+  margin: 0.8rem 0 0;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .dice-roll-panel__header {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .dice-roll-panel__form {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 460px) {
+  .dice-roll-panel__form {
+    grid-template-columns: 1fr;
+  }
+}
