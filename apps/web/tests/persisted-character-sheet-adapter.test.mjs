@@ -422,7 +422,7 @@ test(
 
     assert.equal(
       model.availability.bloodExperience,
-      false,
+      true,
     )
   },
 )

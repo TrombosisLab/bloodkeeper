@@ -79,6 +79,7 @@ function countRating(
 function validateAttributes(
   attributes: PersistedCharacterAttributes,
   requireCompleteDistribution: boolean,
+  maximumRating: number,
 ): CharacterAttributeSkillViolation[] {
   const values = CHARACTER_ATTRIBUTE_KEYS.map(
     (key) => attributes[key],
@@ -91,7 +92,7 @@ function validateAttributes(
       (value) =>
         !Number.isInteger(value) ||
         value < 1 ||
-        value > 4,
+        value > maximumRating,
     )
   ) {
     violations.push(
@@ -122,6 +123,7 @@ function validateSkills(
   skills: PersistedCharacterSkills,
   method: SkillDistributionMethod,
   requireCompleteDistribution: boolean,
+  maximumRating: number,
 ): CharacterAttributeSkillViolation[] {
   const values = CHARACTER_SKILL_KEYS.map(
     (key) => skills[key],
@@ -134,7 +136,7 @@ function validateSkills(
       (value) =>
         !Number.isInteger(value) ||
         value < 0 ||
-        value > 4,
+        value > maximumRating,
     )
   ) {
     violations.push(
@@ -211,7 +213,8 @@ function validateSpecialties(
   const creationSpecialties =
     specialties.filter(
       (specialty) =>
-        specialty.origin !== 'predatorType',
+        specialty.origin === 'creation' ||
+        specialty.origin === null,
     )
 
   const mandatorySkillKeys =
@@ -268,6 +271,7 @@ export function validateCharacterAttributeSkillState(
     PersistedCharacterSkillSpecialty[],
   specialtySkills:
     PersistedCharacterSkills = skills,
+  maximumRating = 4,
 ): CharacterAttributeSkillViolation[] {
   const steps: CharacterCreationStep[] = [
     'identity',
@@ -290,11 +294,13 @@ export function validateCharacterAttributeSkillState(
     ...validateAttributes(
       attributes,
       attributesComplete,
+      maximumRating,
     ),
     ...validateSkills(
       skills,
       method,
       skillsComplete,
+      maximumRating,
     ),
     ...validateSpecialties(
       specialtySkills,

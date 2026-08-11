@@ -38,18 +38,9 @@ import type {
   CharacterValidationSeverity,
 } from './character-validation.types'
 
-const bloodPotencyRanges: Record<
-  number,
-  { min: number; max: number }
-> = {
-  10: { min: 1, max: 4 },
-  11: { min: 1, max: 3 },
-  12: { min: 1, max: 3 },
-  13: { min: 1, max: 3 },
-  14: { min: 0, max: 2 },
-  15: { min: 0, max: 1 },
-  16: { min: 0, max: 0 },
-}
+import {
+  characterBloodPotencyRanges as bloodPotencyRanges,
+} from './character-blood-potency.rules'
 
 const attributeSkillMessages: Record<
   CharacterAttributeSkillViolation,
@@ -247,6 +238,10 @@ function validateAttributesAndSkills(
     resolvePredatorTypeCreationSkills(
       character,
     )
+  const maximumRating =
+    context === 'draftSave' || context === 'activation'
+      ? 4
+      : 5
 
   const structural =
     validateCharacterAttributeSkillState(
@@ -256,6 +251,7 @@ function validateAttributesAndSkills(
       'identity',
       character.skillSpecialties,
       character.skills,
+      maximumRating,
     )
   const complete =
     validateCharacterAttributeSkillState(
@@ -265,6 +261,7 @@ function validateAttributesAndSkills(
       'review',
       character.skillSpecialties,
       character.skills,
+      maximumRating,
     )
   const violations =
     context === 'activation'

@@ -1,7 +1,6 @@
 import type {
   CharacterRulesAdvantageCatalog,
   CharacterRulesAdvantageDefinition,
-  CharacterRulesAdvantageSelectionOrigin,
   CharacterRulesLoresheetDefinition,
 } from '@v5r/character-rules'
 
@@ -14,6 +13,7 @@ import type {
 } from './character-rules-catalog'
 
 import type {
+  CharacterAdvantageSelectionOrigin,
   PersistedCharacterAdvantageSelection,
   PersistedCharacterDraft,
 } from './persisted-character.types'
@@ -443,8 +443,13 @@ function validateDetails(
 
 function allowedRatingsFor(
   definition: CharacterRulesAdvantageDefinition,
-  origin: CharacterRulesAdvantageSelectionOrigin,
+  origin: CharacterAdvantageSelectionOrigin,
+  context: CharacterValidationContext,
 ): readonly number[] {
+  if (context === 'evolution' || origin === 'evolution') {
+    return definition.allowedRatings
+  }
+
   return (
     definition.originRatingConstraints?.find(
       (constraint) => constraint.origin === origin,
@@ -529,6 +534,7 @@ function validateCatalogSelections(
       !allowedRatingsFor(
         definition,
         selection.origin,
+        context,
       ).includes(selection.rating)
     ) {
       issues.push(

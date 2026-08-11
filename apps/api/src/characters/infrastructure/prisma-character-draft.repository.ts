@@ -134,6 +134,7 @@ const specialtyOriginToPrisma: Record<
   creation: PrismaSkillSpecialtyOrigin.CREATION,
   predatorType:
     PrismaSkillSpecialtyOrigin.PREDATOR_TYPE,
+  evolution: PrismaSkillSpecialtyOrigin.EVOLUTION,
 }
 
 const specialtyOriginFromPrisma: Record<
@@ -142,6 +143,7 @@ const specialtyOriginFromPrisma: Record<
 > = {
   CREATION: 'creation',
   PREDATOR_TYPE: 'predatorType',
+  EVOLUTION: 'evolution',
 }
 
 const disciplineOriginToPrisma: Record<
@@ -152,6 +154,7 @@ const disciplineOriginToPrisma: Record<
   predatorType:
     PrismaDisciplineOrigin.PREDATOR_TYPE,
   thinBlood: PrismaDisciplineOrigin.THIN_BLOOD,
+  evolution: PrismaDisciplineOrigin.EVOLUTION,
 }
 
 const disciplineOriginFromPrisma: Record<
@@ -161,6 +164,7 @@ const disciplineOriginFromPrisma: Record<
   CREATION: 'creation',
   PREDATOR_TYPE: 'predatorType',
   THIN_BLOOD: 'thinBlood',
+  EVOLUTION: 'evolution',
 }
 
 function disciplineContributionKey(
@@ -239,6 +243,8 @@ const advantageOriginToPrisma: Record<
     PrismaAdvantageSelectionOrigin.PREDATOR_TYPE,
   thinBlood:
     PrismaAdvantageSelectionOrigin.THIN_BLOOD,
+  evolution:
+    PrismaAdvantageSelectionOrigin.EVOLUTION,
 }
 
 const advantageOriginFromPrisma: Record<
@@ -248,6 +254,7 @@ const advantageOriginFromPrisma: Record<
   CREATION: 'creation',
   PREDATOR_TYPE: 'predatorType',
   THIN_BLOOD: 'thinBlood',
+  EVOLUTION: 'evolution',
 }
 
 const maskBenefitToPrisma: Record<
@@ -448,7 +455,7 @@ function requiredStored<T>(
   return value
 }
 
-function toAdvantageDetailsCreate(
+export function toAdvantageDetailsCreate(
   characterId: string,
   selectionId: string,
   details: PersistedCharacterAdvantageDetails,

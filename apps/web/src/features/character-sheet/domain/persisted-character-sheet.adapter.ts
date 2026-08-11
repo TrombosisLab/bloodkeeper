@@ -425,7 +425,7 @@ export function adaptPersistedCharacterToSheetModel(
 
     availability: {
       chronicleName: false,
-      bloodExperience: false,
+      bloodExperience: true,
     },
   }
 }

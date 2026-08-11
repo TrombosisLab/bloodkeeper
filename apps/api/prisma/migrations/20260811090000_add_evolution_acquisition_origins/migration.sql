@@ -1,0 +1,3 @@
+ALTER TYPE "SkillSpecialtyOrigin" ADD VALUE 'EVOLUTION';
+ALTER TYPE "DisciplineOrigin" ADD VALUE 'EVOLUTION';
+ALTER TYPE "AdvantageSelectionOrigin" ADD VALUE 'EVOLUTION';

@@ -24,6 +24,7 @@ export interface SkillDefinition {
 export type SkillSpecialtyOrigin =
   | 'creation'
   | 'predatorType'
+  | 'evolution'
 
 export interface SkillSpecialty {
   id: string

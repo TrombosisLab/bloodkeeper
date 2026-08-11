@@ -137,6 +137,130 @@ import {
   CharacterValidationController,
 } from './presentation/character-validation.controller'
 
+import {
+  CHARACTER_EXPERIENCE_REPOSITORY,
+} from './application/character-experience.repository'
+
+import type {
+  CharacterExperienceRepository,
+} from './application/character-experience.repository'
+
+import {
+  CorrectCharacterExperienceUseCase,
+  GrantCharacterExperienceUseCase,
+  LoadCharacterExperienceUseCase,
+} from './application/character-experience.use-cases'
+
+import {
+  PrismaCharacterExperienceRepository,
+} from './infrastructure/prisma-character-experience.repository'
+
+import {
+  CharacterExperienceController,
+} from './presentation/character-experience.controller'
+
+import {
+  PreviewCharacterAdvancementUseCase,
+} from './application/preview-character-advancement.use-case'
+import {
+  PurchaseCharacterAdvancementUseCase,
+} from './application/purchase-character-advancement.use-case'
+
+import {
+  CharacterAdvancementController,
+} from './presentation/character-advancement.controller'
+
+const advancementUseCaseProviders = [
+  {
+    provide: PreviewCharacterAdvancementUseCase,
+    inject: [
+      CHARACTER_DRAFT_REPOSITORY,
+      CHARACTER_EXPERIENCE_REPOSITORY,
+      CHARACTER_RULES_CATALOG,
+      CharacterValidator,
+    ],
+    useFactory: (
+      drafts: PrismaCharacterDraftRepository,
+      experience: CharacterExperienceRepository,
+      catalog: CharacterRulesCatalog,
+      validator: CharacterValidator,
+    ) => new PreviewCharacterAdvancementUseCase(
+      drafts,
+      experience,
+      catalog,
+      validator,
+    ),
+  },
+  {
+    provide: PurchaseCharacterAdvancementUseCase,
+    inject: [
+      CHARACTER_DRAFT_REPOSITORY,
+      CHARACTER_EXPERIENCE_REPOSITORY,
+      CHARACTER_RULES_CATALOG,
+      CharacterValidator,
+    ],
+    useFactory: (
+      drafts: PrismaCharacterDraftRepository,
+      experience: CharacterExperienceRepository,
+      catalog: CharacterRulesCatalog,
+      validator: CharacterValidator,
+    ) => new PurchaseCharacterAdvancementUseCase(
+      drafts,
+      experience,
+      catalog,
+      validator,
+    ),
+  },
+]
+
+const experienceUseCaseProviders = [
+  {
+    provide: LoadCharacterExperienceUseCase,
+    inject: [
+      CHARACTER_EXPERIENCE_REPOSITORY,
+      CHRONICLE_PARTICIPANT_REPOSITORY,
+    ],
+    useFactory: (
+      experience: CharacterExperienceRepository,
+      participants: ChronicleParticipantRepository,
+    ) =>
+      new LoadCharacterExperienceUseCase(
+        experience,
+        participants,
+      ),
+  },
+  {
+    provide: GrantCharacterExperienceUseCase,
+    inject: [
+      CHARACTER_EXPERIENCE_REPOSITORY,
+      CHRONICLE_PARTICIPANT_REPOSITORY,
+    ],
+    useFactory: (
+      experience: CharacterExperienceRepository,
+      participants: ChronicleParticipantRepository,
+    ) =>
+      new GrantCharacterExperienceUseCase(
+        experience,
+        participants,
+      ),
+  },
+  {
+    provide: CorrectCharacterExperienceUseCase,
+    inject: [
+      CHARACTER_EXPERIENCE_REPOSITORY,
+      CHRONICLE_PARTICIPANT_REPOSITORY,
+    ],
+    useFactory: (
+      experience: CharacterExperienceRepository,
+      participants: ChronicleParticipantRepository,
+    ) =>
+      new CorrectCharacterExperienceUseCase(
+        experience,
+        participants,
+      ),
+  },
+]
+
 const useCaseProviders = [
   {
     provide: CreateCharacterDraftUseCase,
@@ -291,10 +415,13 @@ const useCaseProviders = [
     CharacterStateController,
     CharacterSecondaryController,
     CharacterValidationController,
+    CharacterExperienceController,
+    CharacterAdvancementController,
   ],
   providers: [
     PrismaCharacterDraftRepository,
     PrismaCharacterSecondaryRepository,
+    PrismaCharacterExperienceRepository,
     {
       provide: CHARACTER_RULES_CATALOG,
       useValue: characterRulesCatalog,
@@ -327,6 +454,13 @@ const useCaseProviders = [
       useExisting:
         PrismaCharacterSecondaryRepository,
     },
+    {
+      provide: CHARACTER_EXPERIENCE_REPOSITORY,
+      useExisting:
+        PrismaCharacterExperienceRepository,
+    },
+    ...experienceUseCaseProviders,
+    ...advancementUseCaseProviders,
     ...useCaseProviders,
   ],
   exports: [

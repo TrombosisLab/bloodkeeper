@@ -65,12 +65,14 @@ const ageCategories = [
 const skillSpecialtyOrigins = [
   'creation',
   'predatorType',
+  'evolution',
 ] as const
 
 const disciplineOrigins = [
   'creation',
   'predatorType',
   'thinBlood',
+  'evolution',
 ] as const
 
 const advantageCategories = [
@@ -83,6 +85,7 @@ const advantageOrigins = [
   'creation',
   'predatorType',
   'thinBlood',
+  'evolution',
 ] as const
 
 const alchemyMethods = [

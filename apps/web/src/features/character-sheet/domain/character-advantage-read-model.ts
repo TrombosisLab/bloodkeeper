@@ -47,6 +47,7 @@ const ORIGIN_LABELS:
     creation: 'Creación',
     predatorType: 'Tipo de Depredador',
     thinBlood: 'Sangre Débil',
+    evolution: 'Evolución',
   }
 
 const SOURCE_LABELS:

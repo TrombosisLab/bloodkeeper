@@ -41,7 +41,7 @@ test(
     assert.equal(
       characterRulesCatalog.advantageCatalog
         .definitions.length,
-      108,
+      109,
     )
     assert.equal(
       Object.isFrozen(

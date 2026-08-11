@@ -19,6 +19,7 @@ export type CharacterDisciplineOrigin =
   | 'creation'
   | 'predatorType'
   | 'thinBlood'
+  | 'evolution'
 
 export interface CharacterDisciplineDraft {
   key: DisciplineKey

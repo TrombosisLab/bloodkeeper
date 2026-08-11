@@ -50,8 +50,8 @@ export interface CharacterSheetAvailability {
   chronicleName: boolean
 
   /*
-   * Resonancia, temperamento y experiencia todavía no forman
-   * parte del contrato persistente de Fase 004.
+   * SPEC-056 expone la Experiencia mediante un ledger propio.
+   * Resonancia y temperamento continúan fuera de este contrato.
    */
   bloodExperience: boolean
 }

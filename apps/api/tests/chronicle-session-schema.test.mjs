@@ -53,7 +53,10 @@ test(
     assert.match(session, /narratorNotes\s+String\?/)
     assert.match(session, /chronicle Chronicle @relation\("ChronicleSessionChronicle"/)
     assert.match(session, /@@map\("chronicle_sessions"\)/)
-    assert.doesNotMatch(session, /event|character|npc|location|dice/i)
+    assert.doesNotMatch(
+      session,
+      /^\s*(?:events?|characters?|npcs?|locations?|dice)\s+/im,
+    )
   },
 )
 

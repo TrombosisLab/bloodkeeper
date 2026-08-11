@@ -39,7 +39,7 @@ test(
   () => {
     assert.match(
       repository,
-      /updateMany\(\{[\s\S]*id: data\.chronicleId,[\s\S]*narratorId,[\s\S]*status:[\s\S]*data\.expectedStatus/,
+      /updateMany\(\{[\s\S]*id: data\.chronicleId,[\s\S]*status:[\s\S]*data\.expectedStatus[\s\S]*participants:[\s\S]*userId: narratorId,[\s\S]*PrismaChronicleParticipantRole\.NARRATOR[\s\S]*PrismaChronicleParticipantStatus\.ACTIVE/,
     )
     assert.match(
       repository,

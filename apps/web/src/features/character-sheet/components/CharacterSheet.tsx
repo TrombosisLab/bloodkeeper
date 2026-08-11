@@ -31,6 +31,10 @@ import type {
   CharacterSheetModel,
 } from '../types/character-sheet-model.types'
 
+import type {
+  CharacterExperienceGateway,
+} from '../types/character-experience.types'
+
 import { CharacterAttributes } from './CharacterAttributes'
 import { CharacterIdentity } from './CharacterIdentity'
 import { CharacterSkills } from './CharacterSkills'
@@ -39,6 +43,7 @@ import { CharacterDisciplines } from './CharacterDisciplines'
 import { CharacterAdvantages } from './CharacterAdvantages'
 import { CharacterNarrative } from './CharacterNarrative'
 import { CharacterBloodExperience } from './CharacterBloodExperience'
+import { PersistedCharacterExperience } from './PersistedCharacterExperience'
 import { CharacterSecondary } from './CharacterSecondary'
 import { PersistedCharacterSecondary } from './PersistedCharacterSecondary'
 import { PersistedCharacterLifecycle } from './PersistedCharacterLifecycle'
@@ -48,6 +53,7 @@ interface CharacterSheetProps {
   characterId?: string
   model?: CharacterSheetModel
   stateGateway?: CharacterStateGateway
+  experienceGateway?: CharacterExperienceGateway
   onStateSaved?: (
     snapshot: CharacterOperationalStateSnapshot,
   ) => void
@@ -97,6 +103,7 @@ export function CharacterSheet({
   characterId,
   model,
   stateGateway,
+  experienceGateway,
   onStateSaved,
   onStateReload,
 }: CharacterSheetProps) {
@@ -446,13 +453,26 @@ export function CharacterSheet({
         narrative={model?.narrative}
       />
 
-      <CharacterBloodExperience
-        available={
-          model?.availability
-            .bloodExperience ??
-          true
-        }
-      />
+      {persisted &&
+      characterId !== undefined &&
+      model.availability.bloodExperience ? (
+        <PersistedCharacterExperience
+          characterId={characterId}
+          revision={model.revision}
+          status={model.status}
+          advantages={model.advantages}
+          gateway={experienceGateway}
+          onPurchased={onStateReload}
+        />
+      ) : (
+        <CharacterBloodExperience
+          available={
+            model?.availability
+              .bloodExperience ??
+            true
+          }
+        />
+      )}
 
       {characterId ? (
         <>

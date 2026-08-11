@@ -146,22 +146,32 @@ test(
 )
 
 test(
-  '030-B deniega la gestión a un jugador autenticado',
+  '030-B permite listar al jugador pero mantiene la creacion reservada',
   async () => {
     const { instance, calls } =
       controller()
+    const request = {
+      user: {
+        id: narratorId,
+        roles: ['player'],
+      },
+    }
+
+    const listed =
+      await instance.list(request)
 
     await assert.rejects(
-      instance.list({
-        user: {
-          id: narratorId,
-          roles: ['player'],
-        },
-      }),
+      instance.create(
+        request,
+        { name: 'Cronica' },
+      ),
       hasStatus(403),
     )
 
-    assert.deepEqual(calls, [])
+    assert.equal(listed.length, 1)
+    assert.deepEqual(calls, [
+      ['list', narratorId],
+    ])
   },
 )
 

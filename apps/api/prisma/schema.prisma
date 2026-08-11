@@ -57,12 +57,14 @@ enum SkillDistributionMethod {
 enum SkillSpecialtyOrigin {
   CREATION
   PREDATOR_TYPE
+  EVOLUTION
 }
 
 enum DisciplineOrigin {
   CREATION
   PREDATOR_TYPE
   THIN_BLOOD
+  EVOLUTION
 }
 
 enum ThinBloodAlchemyMethod {
@@ -88,6 +90,7 @@ enum AdvantageSelectionOrigin {
   CREATION
   PREDATOR_TYPE
   THIN_BLOOD
+  EVOLUTION
 }
 
 enum AdvantageDetailsKind {
@@ -146,6 +149,7 @@ model User {
   sessions                AuthSession[]
   ownedCharacters         Character[]            @relation("CharacterOwner")
   chronicleParticipations ChronicleParticipant[] @relation("ChronicleParticipantUser")
+  experienceMovements     CharacterExperienceMovement[] @relation("CharacterExperienceActor")
 
   @@index([status])
   @@map("users")
@@ -319,11 +323,52 @@ model ChronicleSession {
     updatedAt     DateTime               @updatedAt @db.Timestamptz(3)
 
     chronicle Chronicle @relation("ChronicleSessionChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+    experienceMovements CharacterExperienceMovement[] @relation("CharacterExperienceSession")
 
     @@index([chronicleId, status])
     @@index([chronicleId, sessionNumber])
     @@index([chronicleId, realDate])
     @@map("chronicle_sessions")
+}
+
+enum CharacterExperienceMovementType {
+  GRANT
+  SPEND
+  CORRECTION
+}
+
+enum CharacterExperienceComponent {
+  EARNED
+  SPENT
+}
+
+model CharacterExperienceMovement {
+  id                 String                       @id @default(uuid()) @db.Uuid
+  characterId        String                       @db.Uuid
+  actorId            String                       @db.Uuid
+  sessionId          String?                      @db.Uuid
+  type               CharacterExperienceMovementType
+  component          CharacterExperienceComponent
+  amount             Int
+  reason             String
+  deduplicationKey   String?
+  acquisitionType    String?
+  acquisitionKey     String?
+  correctsMovementId String?                      @db.Uuid
+  createdAt          DateTime                     @default(now()) @db.Timestamptz(3)
+
+  character Character @relation("CharacterExperienceCharacter", fields: [characterId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  actor     User      @relation("CharacterExperienceActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  session   ChronicleSession? @relation("CharacterExperienceSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  corrects  CharacterExperienceMovement? @relation("CharacterExperienceCorrection", fields: [correctsMovementId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  corrections CharacterExperienceMovement[] @relation("CharacterExperienceCorrection")
+
+  @@unique([characterId, deduplicationKey])
+  @@index([characterId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([sessionId])
+  @@index([correctsMovementId])
+  @@map("character_experience_movements")
 }
 
 model Character {
@@ -357,6 +402,7 @@ model Character {
   inventoryItems CharacterInventoryItem[]
   notes          CharacterNote[]
   historyEntries CharacterHistoryEntry[]
+  experienceMovements CharacterExperienceMovement[] @relation("CharacterExperienceCharacter")
 
   @@index([ownerId])
   @@index([chronicleId])

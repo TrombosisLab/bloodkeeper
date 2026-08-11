@@ -128,7 +128,7 @@ test('SPEC-012 integra el layout sin cambiar los consumidores', () => {
   )
   assert.match(
     mainSource,
-    /<ChronicleListCreate \/>/,
+    /<ChronicleListCreate[\s\S]*canCreateChronicles=\{[\s\S]*canCreateChronicles[\s\S]*\/>/,
   )
   assert.match(
     mainSource,
@@ -147,7 +147,11 @@ test('SPEC-012 preserva navegación activa y permisos', () => {
   )
   assert.match(
     mainSource,
-    /canManageChronicles=\{[\s\S]*canManageChronicles/,
+    /canAccessChronicles=\{[\s\S]*canAccessChronicles/,
+  )
+  assert.match(
+    mainSource,
+    /canCreateChronicles=\{[\s\S]*canCreateChronicles/,
   )
   assert.match(
     navigationSource,
@@ -155,7 +159,7 @@ test('SPEC-012 preserva navegación activa y permisos', () => {
   )
   assert.match(
     navigationSource,
-    /canManageChronicles\s*\?\s*\(/,
+    /canAccessChronicles\s*\?\s*\(/,
   )
 })
 

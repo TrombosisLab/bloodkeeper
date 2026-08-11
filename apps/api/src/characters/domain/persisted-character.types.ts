@@ -106,6 +106,7 @@ export type PersistedCharacterSkills =
 export type SkillSpecialtyOrigin =
   | 'creation'
   | 'predatorType'
+  | 'evolution'
 
 export interface PersistedCharacterSkillSpecialty {
   id: string
@@ -127,6 +128,7 @@ export type CharacterDisciplineOrigin =
   | 'creation'
   | 'predatorType'
   | 'thinBlood'
+  | 'evolution'
 
 export interface PersistedCharacterDiscipline {
   disciplineKey: CharacterDisciplineKey
@@ -174,6 +176,7 @@ export type CharacterAdvantageSelectionOrigin =
   | 'creation'
   | 'predatorType'
   | 'thinBlood'
+  | 'evolution'
 
 export type AdvantageMaskBenefitKey =
   | 'erased'

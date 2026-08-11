@@ -70,7 +70,7 @@ const npcModel =
   block(
     schema,
     'model ChronicleNpc {',
-    'model Character {',
+    'enum ChronicleLocationStatus {',
   )
 
 const detailLevelEnum =

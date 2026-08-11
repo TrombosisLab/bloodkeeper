@@ -32,7 +32,7 @@ test(
 )
 
 test(
-  '030-B lista exclusivamente por narratorId',
+  '030-B lista por participacion activa del usuario',
   () => {
     assert.match(
       repository,
@@ -40,7 +40,7 @@ test(
     )
     assert.match(
       repository,
-      /chronicle\.findMany\(\{\s*where: \{\s*narratorId,/,
+      /chronicle\.findMany\(\{[\s\S]*participants:[\s\S]*some:[\s\S]*userId: narratorId,[\s\S]*PrismaChronicleParticipantStatus\.ACTIVE/,
     )
     assert.match(
       repository,

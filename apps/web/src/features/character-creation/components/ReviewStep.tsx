@@ -107,12 +107,14 @@ const advantageOriginLabels = {
   creation: 'Creación',
   predatorType: 'Tipo de Depredador',
   thinBlood: 'Sangre Débil',
+  evolution: 'Evolución',
 } as const
 
 const disciplineOriginLabels = {
   creation: 'Creación',
   predatorType: 'Tipo de Depredador',
   thinBlood: 'Sangre Débil',
+  evolution: 'Evolución',
 } as const
 
 const alchemyMethodLabels = {
