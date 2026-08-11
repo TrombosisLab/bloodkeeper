@@ -14,11 +14,18 @@ import {
   buildDicePool,
 } from '../domain/dice-pool.rules'
 
+import type {
+  BuiltDicePool,
+  DicePoolModifier,
+} from '../domain/dice-pool.types'
+
 export interface ExecuteManualDiceRollCommand {
   readonly pool: number
   readonly hunger: number
   readonly modifier?: number
+  readonly modifiers?: readonly DicePoolModifier[]
   readonly difficulty?: number | null
+  readonly description?: string | null
 }
 
 export class ExecuteManualDiceRollUseCase {
@@ -26,20 +33,32 @@ export class ExecuteManualDiceRollUseCase {
     private readonly random: DiceRandomSource,
   ) {}
 
-  execute(
+  preview(
     command: ExecuteManualDiceRollCommand,
-  ): ExecutedDiceRoll {
-    const pool = buildDicePool({
+  ): BuiltDicePool {
+    return buildDicePool({
       components: [{
         key: 'manual_pool',
         label: 'Reserva manual',
         value: command.pool,
       }],
       modifier: command.modifier,
+      modifiers: command.modifiers,
       hunger: command.hunger,
       difficulty: command.difficulty,
+      context: {
+        source: 'manual',
+        description: command.description,
+      },
     })
+  }
 
-    return executeDicePool(pool, this.random)
+  execute(
+    command: ExecuteManualDiceRollCommand,
+  ): ExecutedDiceRoll {
+    return executeDicePool(
+      this.preview(command),
+      this.random,
+    )
   }
 }

@@ -2,6 +2,8 @@ import type {
   CharacterDiceRollCommand,
   DiceGateway,
   DicePoolComponent,
+  DicePoolContext,
+  DicePoolModifier,
   DicePoolSnapshot,
   DiceRollOutcome,
   DiceRollSnapshot,
@@ -12,6 +14,9 @@ import type {
 
 type FetchImplementation = typeof globalThis.fetch
 type UnknownRecord = Record<string, unknown>
+type DiceCommand =
+  | ManualDiceRollCommand
+  | CharacterDiceRollCommand
 
 export class DiceApiError extends Error {
   readonly status: number
@@ -70,6 +75,10 @@ function nullableBoolean(value: unknown): boolean | null {
   return value === null ? null : boolean(value)
 }
 
+function nullableString(value: unknown): string | null {
+  return value === null ? null : string(value)
+}
+
 function component(value: unknown): DicePoolComponent {
   const item = record(value)
   return {
@@ -79,19 +88,54 @@ function component(value: unknown): DicePoolComponent {
   }
 }
 
-function pool(value: unknown): DicePoolSnapshot {
+function modifier(value: unknown): DicePoolModifier {
   const item = record(value)
-  if (!Array.isArray(item.components)) {
+  return {
+    key: string(item.key),
+    label: string(item.label),
+    value: integer(item.value),
+  }
+}
+
+function context(value: unknown): DicePoolContext | null {
+  if (value === null) {
+    return null
+  }
+  const item = record(value)
+  const source = string(item.source)
+  if (
+    source !== 'manual' &&
+    source !== 'character' &&
+    source !== 'action'
+  ) {
+    throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
+  }
+  return {
+    source,
+    description: nullableString(item.description),
+  }
+}
+
+export function parseDicePool(
+  value: unknown,
+): DicePoolSnapshot {
+  const item = record(value)
+  if (
+    !Array.isArray(item.components) ||
+    !Array.isArray(item.modifiers)
+  ) {
     throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
   }
   return {
     components: item.components.map(component),
+    modifiers: item.modifiers.map(modifier),
     basePool: integer(item.basePool),
     modifier: integer(item.modifier),
     finalPool: integer(item.finalPool),
     normalDice: integer(item.normalDice),
     hungerDice: integer(item.hungerDice),
     difficulty: nullableInteger(item.difficulty),
+    context: context(item.context),
   }
 }
 
@@ -143,7 +187,7 @@ export function parseExecutedDiceRoll(
 ): ExecutedDiceRoll {
   const item = record(value)
   return {
-    pool: pool(item.pool),
+    pool: parseDicePool(item.pool),
     roll: roll(item.roll),
   }
 }
@@ -178,8 +222,8 @@ export function createDiceGateway(
 ): DiceGateway {
   async function post(
     endpoint: string,
-    command: ManualDiceRollCommand | CharacterDiceRollCommand,
-  ): Promise<ExecutedDiceRoll> {
+    command: DiceCommand,
+  ): Promise<unknown> {
     const response = await fetchImplementation(endpoint, {
       method: 'POST',
       credentials: 'include',
@@ -189,19 +233,34 @@ export function createDiceGateway(
       },
       body: JSON.stringify(command),
     })
-    return parseExecutedDiceRoll(
-      await successfulPayload(response),
-    )
+    return successfulPayload(response)
   }
 
   return {
-    manual(command) {
-      return post('/api/dice/manual', command)
+    async previewManual(command) {
+      return parseDicePool(
+        await post('/api/dice/manual/preview', command),
+      )
     },
-    character(characterId, command) {
-      return post(
-        `/api/dice/characters/${encodeURIComponent(characterId)}`,
-        command,
+    async manual(command) {
+      return parseExecutedDiceRoll(
+        await post('/api/dice/manual', command),
+      )
+    },
+    async previewCharacter(characterId, command) {
+      return parseDicePool(
+        await post(
+          `/api/dice/characters/${encodeURIComponent(characterId)}/preview`,
+          command,
+        ),
+      )
+    },
+    async character(characterId, command) {
+      return parseExecutedDiceRoll(
+        await post(
+          `/api/dice/characters/${encodeURIComponent(characterId)}`,
+          command,
+        ),
       )
     },
   }

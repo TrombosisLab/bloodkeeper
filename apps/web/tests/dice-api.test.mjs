@@ -10,12 +10,14 @@ function response() {
   return {
     pool: {
       components: [{ key: 'manual_pool', label: 'Reserva manual', value: 3 }],
+      modifiers: [],
       basePool: 3,
       modifier: 0,
       finalPool: 3,
       normalDice: 2,
       hungerDice: 1,
       difficulty: 2,
+      context: { source: 'manual', description: null },
     },
     roll: {
       dice: [

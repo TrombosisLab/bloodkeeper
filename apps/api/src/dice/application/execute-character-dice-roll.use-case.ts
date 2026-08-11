@@ -14,6 +14,11 @@ import {
   buildDicePool,
 } from '../domain/dice-pool.rules'
 
+import type {
+  BuiltDicePool,
+  DicePoolModifier,
+} from '../domain/dice-pool.types'
+
 interface CharacterRatingsSnapshot {
   readonly attributes: object
   readonly skills: object
@@ -40,7 +45,9 @@ export interface ExecuteCharacterDiceRollCommand {
   readonly attribute: string
   readonly skill?: string
   readonly modifier?: number
+  readonly modifiers?: readonly DicePoolModifier[]
   readonly difficulty?: number | null
+  readonly description?: string | null
 }
 
 export class DicePoolSelectionError extends Error {
@@ -80,10 +87,10 @@ export class ExecuteCharacterDiceRollUseCase {
       DiceRandomSource,
   ) {}
 
-  async execute(
+  async preview(
     ownerId: string,
     command: ExecuteCharacterDiceRollCommand,
-  ): Promise<ExecutedDiceRoll | null> {
+  ): Promise<BuiltDicePool | null> {
     const [ratings, hunger] = await Promise.all([
       this.ratings.execute(
         ownerId,
@@ -119,13 +126,26 @@ export class ExecuteCharacterDiceRollUseCase {
       })
     }
 
-    const pool = buildDicePool({
+    return buildDicePool({
       components,
       modifier: command.modifier,
+      modifiers: command.modifiers,
       hunger: hunger.hunger,
       difficulty: command.difficulty,
+      context: {
+        source: 'character',
+        description: command.description,
+      },
     })
+  }
 
-    return executeDicePool(pool, this.random)
+  async execute(
+    ownerId: string,
+    command: ExecuteCharacterDiceRollCommand,
+  ): Promise<ExecutedDiceRoll | null> {
+    const pool = await this.preview(ownerId, command)
+    return pool === null
+      ? null
+      : executeDicePool(pool, this.random)
   }
 }

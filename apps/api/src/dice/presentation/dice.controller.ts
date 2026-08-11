@@ -31,10 +31,12 @@ import {
   InvalidDiceRollRequestError,
   parseCharacterDiceRollRequest,
   parseManualDiceRollRequest,
+  toDicePoolResponse,
   toDiceRollResponse,
 } from './dice.dto'
 
 import type {
+  DicePoolResponseDto,
   DiceRollResponseDto,
 } from './dice.dto'
 
@@ -89,6 +91,24 @@ export class DiceController {
       ExecuteCharacterDiceRollUseCase,
   ) {}
 
+  @Post('manual/preview')
+  manualPreview(
+    @Req() request: AuthenticatedDiceRequest,
+    @Body() body: unknown,
+  ): DicePoolResponseDto {
+    authenticatedUserId(request)
+
+    try {
+      return toDicePoolResponse(
+        this.executeManual.preview(
+          parseManualDiceRollRequest(body),
+        ),
+      )
+    } catch (error: unknown) {
+      throwDiceHttpError(error)
+    }
+  }
+
   @Post('manual')
   manual(
     @Req() request: AuthenticatedDiceRequest,
@@ -102,6 +122,35 @@ export class DiceController {
           parseManualDiceRollRequest(body),
         ),
       )
+    } catch (error: unknown) {
+      throwDiceHttpError(error)
+    }
+  }
+
+  @Post('characters/:characterId/preview')
+  async characterPreview(
+    @Req() request: AuthenticatedDiceRequest,
+    @Param('characterId') characterId: unknown,
+    @Body() body: unknown,
+  ): Promise<DicePoolResponseDto> {
+    const ownerId = authenticatedUserId(request)
+
+    try {
+      const pool = await this.executeCharacter.preview(
+        ownerId,
+        parseCharacterDiceRollRequest(
+          characterId,
+          body,
+        ),
+      )
+
+      if (pool === null) {
+        throw new NotFoundException({
+          code: 'CHARACTER_NOT_FOUND',
+        })
+      }
+
+      return toDicePoolResponse(pool)
     } catch (error: unknown) {
       throwDiceHttpError(error)
     }

@@ -10,7 +10,13 @@ import type {
   ExecutedDiceRoll,
 } from '../application/dice-execution'
 
+import type {
+  BuiltDicePool,
+  DicePoolModifier,
+} from '../domain/dice-pool.types'
+
 export type DiceRollResponseDto = ExecutedDiceRoll
+export type DicePoolResponseDto = BuiltDicePool
 
 export class InvalidDiceRollRequestError
   extends Error {
@@ -94,6 +100,53 @@ function selection(
   return value
 }
 
+function text(
+  value: unknown,
+  field: string,
+): string {
+  if (typeof value !== 'string') {
+    throw new InvalidDiceRollRequestError(
+      `${field} must be text`,
+    )
+  }
+  return value
+}
+
+function optionalDescription(
+  value: unknown,
+): string | null | undefined {
+  return value === null || value === undefined
+    ? value
+    : text(value, 'description')
+}
+
+function modifier(
+  input: unknown,
+  index: number,
+): DicePoolModifier {
+  const body = record(input)
+  exactKeys(body, ['key', 'label', 'value'])
+  return {
+    key: selection(body.key, `modifiers[${index}].key`),
+    label: text(body.label, `modifiers[${index}].label`),
+    value: integer(body.value, `modifiers[${index}].value`),
+  }
+}
+
+function optionalModifiers(
+  value: unknown,
+): readonly DicePoolModifier[] | undefined {
+  if (value === undefined) {
+    return undefined
+  }
+  if (!Array.isArray(value)) {
+    throw new InvalidDiceRollRequestError(
+      'modifiers must be an array',
+    )
+  }
+  return value.map(modifier)
+}
+
 export function parseManualDiceRollRequest(
   input: unknown,
 ): ExecuteManualDiceRollCommand {
@@ -102,8 +155,12 @@ export function parseManualDiceRollRequest(
     'pool',
     'hunger',
     'modifier',
+    'modifiers',
     'difficulty',
+    'description',
   ])
+  const modifiers = optionalModifiers(body.modifiers)
+  const description = optionalDescription(body.description)
 
   return {
     pool: integer(body.pool, 'pool'),
@@ -112,7 +169,9 @@ export function parseManualDiceRollRequest(
       body.modifier,
       'modifier',
     ),
+    ...(modifiers === undefined ? {} : { modifiers }),
     difficulty: difficulty(body.difficulty),
+    ...(description === undefined ? {} : { description }),
   }
 }
 
@@ -136,8 +195,12 @@ export function parseCharacterDiceRollRequest(
     'attribute',
     'skill',
     'modifier',
+    'modifiers',
     'difficulty',
+    'description',
   ])
+  const modifiers = optionalModifiers(body.modifiers)
+  const description = optionalDescription(body.description)
 
   return {
     characterId: characterIdInput,
@@ -153,8 +216,16 @@ export function parseCharacterDiceRollRequest(
       body.modifier,
       'modifier',
     ),
+    ...(modifiers === undefined ? {} : { modifiers }),
     difficulty: difficulty(body.difficulty),
+    ...(description === undefined ? {} : { description }),
   }
+}
+
+export function toDicePoolResponse(
+  pool: BuiltDicePool,
+): DicePoolResponseDto {
+  return pool
 }
 
 export function toDiceRollResponse(

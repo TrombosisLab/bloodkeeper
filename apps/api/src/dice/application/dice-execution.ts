@@ -19,6 +19,18 @@ export interface ExecutedDiceRoll {
   readonly roll: DiceRollResolution
 }
 
+function frozenResolution(
+  resolution: DiceRollResolution,
+): DiceRollResolution {
+  return Object.freeze({
+    ...resolution,
+    dice: Object.freeze(
+      resolution.dice.map((die) =>
+        Object.freeze({ ...die })),
+    ),
+  })
+}
+
 export function executeDicePool(
   pool: BuiltDicePool,
   random: DiceRandomSource,
@@ -37,12 +49,15 @@ export function executeDicePool(
       type: 'hunger' as const,
     }),
   )
-
-  return {
-    pool,
-    roll: resolveDiceRoll({
+  const roll = frozenResolution(
+    resolveDiceRoll({
       dice: [...normalDice, ...hungerDice],
       difficulty: pool.difficulty,
     }),
-  }
+  )
+
+  return Object.freeze({
+    pool,
+    roll,
+  })
 }

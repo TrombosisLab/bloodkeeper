@@ -13,10 +13,13 @@ import {
 } from '../infrastructure/dice.api.ts'
 
 import type {
+  CharacterDiceRollCommand,
   DiceGateway,
+  DicePoolSnapshot,
   DiceRollOutcome,
   DiceTraitOption,
   ExecutedDiceRoll,
+  ManualDiceRollCommand,
 } from '../types/dice.types.ts'
 
 import './dice-roll-panel.css'
@@ -28,6 +31,16 @@ interface DiceRollPanelProps {
   readonly skills?: readonly DiceTraitOption[]
   readonly gateway?: DiceGateway
 }
+
+type PreparedCommand =
+  | {
+      readonly mode: 'manual'
+      readonly command: ManualDiceRollCommand
+    }
+  | {
+      readonly mode: 'character'
+      readonly command: CharacterDiceRollCommand
+    }
 
 const defaultGateway = createDiceGateway()
 
@@ -43,7 +56,6 @@ function presentedOutcome(result: ExecutedDiceRoll): string {
   if (result.roll.meetsDifficulty === false) {
     return 'Fallo'
   }
-
   return outcomeLabels[result.roll.outcome]
 }
 
@@ -80,14 +92,21 @@ export function DiceRollPanel({
   const [pool, setPool] = useState('3')
   const [hunger, setHunger] = useState('1')
   const [modifier, setModifier] = useState('0')
+  const [modifierLabel, setModifierLabel] = useState('Modificador general')
   const [difficulty, setDifficulty] = useState('')
+  const [description, setDescription] = useState('')
   const [attribute, setAttribute] = useState(
     attributes[0]?.key ?? '',
   )
   const [skill, setSkill] = useState('')
+  const [preview, setPreview] =
+    useState<DicePoolSnapshot | null>(null)
+  const [prepared, setPrepared] =
+    useState<PreparedCommand | null>(null)
   const [result, setResult] =
     useState<ExecutedDiceRoll | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [preparing, setPreparing] = useState(false)
   const [rolling, setRolling] = useState(false)
 
   const titleId = useMemo(
@@ -95,29 +114,101 @@ export function DiceRollPanel({
     [mode],
   )
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
+  function invalidatePrepared(): void {
+    setPreview(null)
+    setPrepared(null)
+    setResult(null)
+    setError(null)
+  }
+
+  function presentedComponentLabel(
+    key: string,
+    fallback: string,
+  ): string {
+    const separator = key.lastIndexOf(':')
+    const traitKey = separator === -1
+      ? key
+      : key.slice(separator + 1)
+    return attributes.find((option) => option.key === traitKey)?.label
+      ?? skills.find((option) => option.key === traitKey)?.label
+      ?? fallback
+  }
+
+  function commandOptions() {
+    const parsedModifier = optionalInteger(modifier)
+    const parsedDifficulty = optionalInteger(difficulty)
+    const normalizedDescription = description.trim()
+    const normalizedLabel = modifierLabel.trim()
+    return {
+      ...(parsedModifier === undefined || parsedModifier === 0
+        ? {}
+        : {
+            modifiers: [{
+              key: 'userModifier',
+              label: normalizedLabel || 'Modificador general',
+              value: parsedModifier,
+            }],
+          }),
+      ...(parsedDifficulty === undefined
+        ? {}
+        : { difficulty: parsedDifficulty }),
+      ...(normalizedDescription === ''
+        ? {}
+        : { description: normalizedDescription }),
+    }
+  }
+
+  async function prepare(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setPreparing(true)
+    setError(null)
+    setResult(null)
+
+    try {
+      if (mode === 'manual') {
+        const command: ManualDiceRollCommand = {
+          pool: Number(pool),
+          hunger: Number(hunger),
+          ...commandOptions(),
+        }
+        const snapshot = await gateway.previewManual(command)
+        setPrepared(Object.freeze({ mode, command: Object.freeze(command) }))
+        setPreview(snapshot)
+      } else {
+        const command: CharacterDiceRollCommand = {
+          attribute,
+          ...(skill === '' ? {} : { skill }),
+          ...commandOptions(),
+        }
+        const snapshot = await gateway.previewCharacter(
+          characterId ?? '',
+          command,
+        )
+        setPrepared(Object.freeze({ mode, command: Object.freeze(command) }))
+        setPreview(snapshot)
+      }
+    } catch (previewError: unknown) {
+      setPreview(null)
+      setPrepared(null)
+      setError(errorMessage(previewError))
+    } finally {
+      setPreparing(false)
+    }
+  }
+
+  async function rollPrepared() {
+    if (prepared === null) {
+      return
+    }
     setRolling(true)
     setError(null)
 
     try {
-      const parsedModifier = optionalInteger(modifier)
-      const parsedDifficulty = optionalInteger(difficulty)
-      const executed = mode === 'manual'
-        ? await gateway.manual({
-            pool: Number(pool),
-            hunger: Number(hunger),
-            modifier: parsedModifier,
-            difficulty: parsedDifficulty,
-          })
+      const executed = prepared.mode === 'manual'
+        ? await gateway.manual(prepared.command)
         : await gateway.character(
             characterId ?? '',
-            {
-              attribute,
-              skill: skill === '' ? undefined : skill,
-              modifier: parsedModifier,
-              difficulty: parsedDifficulty,
-            },
+            prepared.command,
           )
       setResult(executed)
     } catch (rollError: unknown) {
@@ -143,12 +234,10 @@ export function DiceRollPanel({
               : 'Tirada del personaje'}
           </h2>
         </div>
-        <p>
-          La reserva y el resultado se resuelven en el servidor.
-        </p>
+        <p>Prepara la reserva en el servidor antes de lanzar.</p>
       </header>
 
-      <form className="dice-roll-panel__form" onSubmit={submit}>
+      <form className="dice-roll-panel__form" onSubmit={prepare}>
         {mode === 'manual' ? (
           <>
             <label>
@@ -159,7 +248,10 @@ export function DiceRollPanel({
                 step="1"
                 required
                 value={pool}
-                onChange={(event) => setPool(event.target.value)}
+                onChange={(event) => {
+                  invalidatePrepared()
+                  setPool(event.target.value)
+                }}
               />
             </label>
             <label>
@@ -171,7 +263,10 @@ export function DiceRollPanel({
                 step="1"
                 required
                 value={hunger}
-                onChange={(event) => setHunger(event.target.value)}
+                onChange={(event) => {
+                  invalidatePrepared()
+                  setHunger(event.target.value)
+                }}
               />
             </label>
           </>
@@ -182,7 +277,10 @@ export function DiceRollPanel({
               <select
                 required
                 value={attribute}
-                onChange={(event) => setAttribute(event.target.value)}
+                onChange={(event) => {
+                  invalidatePrepared()
+                  setAttribute(event.target.value)
+                }}
               >
                 {attributes.map((option) => (
                   <option key={option.key} value={option.key}>
@@ -195,7 +293,10 @@ export function DiceRollPanel({
               Habilidad
               <select
                 value={skill}
-                onChange={(event) => setSkill(event.target.value)}
+                onChange={(event) => {
+                  invalidatePrepared()
+                  setSkill(event.target.value)
+                }}
               >
                 <option value="">Sin habilidad</option>
                 {skills.map((option) => (
@@ -214,7 +315,23 @@ export function DiceRollPanel({
             type="number"
             step="1"
             value={modifier}
-            onChange={(event) => setModifier(event.target.value)}
+            onChange={(event) => {
+              invalidatePrepared()
+              setModifier(event.target.value)
+            }}
+          />
+        </label>
+
+        <label>
+          Origen del modificador
+          <input
+            type="text"
+            maxLength={80}
+            value={modifierLabel}
+            onChange={(event) => {
+              invalidatePrepared()
+              setModifierLabel(event.target.value)
+            }}
           />
         </label>
 
@@ -225,12 +342,31 @@ export function DiceRollPanel({
             min="1"
             step="1"
             value={difficulty}
-            onChange={(event) => setDifficulty(event.target.value)}
+            onChange={(event) => {
+              invalidatePrepared()
+              setDifficulty(event.target.value)
+            }}
           />
         </label>
 
-        <button type="submit" disabled={rolling || (mode === 'character' && attribute === '')}>
-          {rolling ? 'Lanzando…' : 'Lanzar dados'}
+        <label className="dice-roll-panel__description">
+          Descripción opcional
+          <input
+            type="text"
+            maxLength={160}
+            value={description}
+            onChange={(event) => {
+              invalidatePrepared()
+              setDescription(event.target.value)
+            }}
+          />
+        </label>
+
+        <button
+          type="submit"
+          disabled={preparing || rolling || (mode === 'character' && attribute === '')}
+        >
+          {preparing ? 'Preparando…' : 'Preparar reserva'}
         </button>
       </form>
 
@@ -238,6 +374,66 @@ export function DiceRollPanel({
         <p className="dice-roll-panel__error" role="alert">
           {error}
         </p>
+      ) : null}
+
+      {preview !== null && prepared !== null ? (
+        <section
+          className="dice-pool-preview"
+          aria-label="Reserva preparada"
+          aria-live="polite"
+        >
+          <div className="dice-pool-preview__heading">
+            <div>
+              <span>Confirmación previa</span>
+              <strong>Reserva final: {preview.finalPool}</strong>
+            </div>
+            <button
+              type="button"
+              onClick={rollPrepared}
+              disabled={rolling}
+            >
+              {rolling
+                ? 'Lanzando…'
+                : result === null
+                  ? 'Lanzar dados'
+                  : 'Lanzar de nuevo'}
+            </button>
+          </div>
+
+          {preview.context?.description !== null &&
+          preview.context?.description !== undefined ? (
+            <p>{preview.context.description}</p>
+          ) : null}
+
+          <ul className="dice-pool-preview__parts">
+            {preview.components.map((component) => (
+              <li key={component.key}>
+                <span>
+                  {presentedComponentLabel(
+                    component.key,
+                    component.label,
+                  )}
+                </span>
+                <strong>{component.value}</strong>
+              </li>
+            ))}
+            {preview.modifiers.map((item) => (
+              <li key={item.key}>
+                <span>{item.label}</span>
+                <strong>{item.value >= 0 ? '+' : ''}{item.value}</strong>
+              </li>
+            ))}
+          </ul>
+
+          <dl className="dice-pool-preview__totals">
+            <div><dt>Base</dt><dd>{preview.basePool}</dd></div>
+            <div><dt>Modificadores</dt><dd>{preview.modifier >= 0 ? '+' : ''}{preview.modifier}</dd></div>
+            <div><dt>Final</dt><dd>{preview.finalPool}</dd></div>
+            <div><dt>Normales</dt><dd>{preview.normalDice}</dd></div>
+            <div><dt>Hambre</dt><dd>{preview.hungerDice}</dd></div>
+            <div><dt>Dificultad</dt><dd>{preview.difficulty ?? '—'}</dd></div>
+          </dl>
+        </section>
       ) : null}
 
       {result !== null ? (

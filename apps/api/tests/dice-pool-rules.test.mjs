@@ -21,12 +21,16 @@ test('036-B construye reserva base modificador y reparto de Hambre', () => {
       { key: 'attribute', label: 'Destreza', value: 3 },
       { key: 'skill', label: 'Sigilo', value: 2 },
     ],
+    modifiers: [
+      { key: 'general', label: 'Modificador general', value: 2 },
+    ],
     basePool: 5,
     modifier: 2,
     finalPool: 7,
     normalDice: 5,
     hungerDice: 2,
     difficulty: 3,
+    context: null,
   })
 })
 
