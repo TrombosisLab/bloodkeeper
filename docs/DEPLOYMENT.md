@@ -96,12 +96,12 @@ mediante `/api`.
 
 ```bash
 ./scripts/start.sh
-./scripts/restart.sh
+./scripts/restart.sh --confirm
 ./scripts/status.sh
 ./scripts/check.sh
 ./scripts/logs.sh
 ./scripts/prepare-update.sh --check --target HEAD
-./scripts/stop.sh
+./scripts/stop.sh --confirm
 ```
 
 El catálogo completo de mantenimiento está en

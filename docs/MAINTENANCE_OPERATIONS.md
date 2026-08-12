@@ -19,21 +19,25 @@ Inicia los servicios definidos por Docker Compose y muestra su estado.
 ## Detener la plataforma
 
 ```bash
-./scripts/stop.sh
+./scripts/stop.sh --confirm
 ```
 
 Detiene y elimina los contenedores sin borrar el volumen PostgreSQL.
+
+La parada es una acción de impacto y requiere `--confirm`.
 
 No usar `docker compose down --volumes` durante la operación habitual.
 
 ## Reiniciar la plataforma
 
 ```bash
-./scripts/restart.sh
+./scripts/restart.sh --confirm
 ```
 
 Reinicia primero PostgreSQL y después API y web, espera los health
 checks y ejecuta la comprobación funcional mínima.
+
+El reinicio es una acción de impacto y requiere `--confirm`.
 
 ## Estado
 

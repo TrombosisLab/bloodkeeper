@@ -59,7 +59,7 @@ confirmadas.
 | SPEC-038 | [SPEC-038 – DICE_HUNGER_AND_SPECIAL_RESULTS](SPEC-038_DICE_HUNGER_AND_SPECIAL_RESULTS_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-039 | [SPEC-039 – DICE_HISTORY_AND_CONTEXT](SPEC-039_DICE_HISTORY_AND_CONTEXT_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-040 | [SPEC-040 – ADMINISTRATION_MODULE](SPEC-040_ADMINISTRATION_MODULE_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
-| SPEC-041 | [SPEC-041 – ADMIN_SYSTEM_OPERATIONS](SPEC-041_ADMIN_SYSTEM_OPERATIONS_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
+| SPEC-041 | [SPEC-041 – ADMIN_SYSTEM_OPERATIONS](SPEC-041_ADMIN_SYSTEM_OPERATIONS_v1.0.md) | 1.0 | Aprobado | Cerrada | Diagnóstico administrativo, estado técnico por SSH, logs y recursos, versión, permisos y confirmación de parada/reinicio validados sin terminal web arbitraria. |
 | SPEC-042 | [SPEC-042 – ADMIN_BACKUP_RECOVERY](SPEC-042_ADMIN_BACKUP_RECOVERY_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-043 | [SPEC-043 – ADMIN_LOGS_AUDIT](SPEC-043_ADMIN_LOGS_AUDIT_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-044 | [SPEC-044 – TESTING_AND_QUALITY](SPEC-044_TESTING_AND_QUALITY_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |

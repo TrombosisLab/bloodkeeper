@@ -133,6 +133,10 @@ then
   die "stop.sh elimina volúmenes."
 fi
 
+grep -Fq -- '--confirm' \
+  scripts/stop.sh ||
+  die "stop.sh no exige confirmación explícita."
+
 grep -Fq 'docker compose restart postgres' \
   scripts/restart.sh ||
   die "restart.sh no reinicia PostgreSQL."
@@ -140,6 +144,11 @@ grep -Fq 'docker compose restart postgres' \
 grep -Fq './scripts/check.sh' \
   scripts/restart.sh ||
   die "restart.sh no valida el resultado."
+
+
+grep -Fq -- '--confirm' \
+  scripts/restart.sh ||
+  die "restart.sh no exige confirmación explícita."
 
 grep -Fq './scripts/backup-full.sh' \
   scripts/prepare-update.sh ||
@@ -224,7 +233,7 @@ if [ "$WITH_RESTART" = "true" ]; then
   echo
   echo "== Reinicio real controlado =="
 
-  ./scripts/restart.sh
+  ./scripts/restart.sh --confirm
 fi
 
 echo

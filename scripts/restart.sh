@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -Eeuo pipefail
 
 ROOT="$(
   cd "$(dirname "${BASH_SOURCE[0]}")/.."
@@ -9,16 +8,18 @@ ROOT="$(
 usage() {
   cat <<'EOF'
 Uso:
-  ./scripts/restart.sh
+  ./scripts/restart.sh --confirm
   ./scripts/restart.sh --help
 
 Reinicia PostgreSQL, API y web de forma controlada, espera sus health
 checks y ejecuta la comprobación operativa final.
+
+El reinicio es una acción de impacto y requiere --confirm.
 EOF
 }
 
-die() {
-  echo "ERROR: $*" >&2
+fail() {
+  printf 'ERROR: %s\n' "$*" >&2
   return 1
 }
 
@@ -32,7 +33,7 @@ wait_for_health() {
       docker inspect \
         --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
         "$container" \
-        2>/dev/null || true
+        2>/dev/null
     )"
 
     case "$state" in
@@ -41,7 +42,8 @@ wait_for_health() {
         return 0
         ;;
       unhealthy|exited|dead)
-        die "$container está en estado $state."
+        fail "$container está en estado $state."
+        return 1
         ;;
     esac
 
@@ -49,50 +51,87 @@ wait_for_health() {
     attempts=$((attempts - 1))
   done
 
-  die "$container no alcanzó estado healthy."
+  fail "$container no alcanzó estado healthy."
+  return 1
 }
 
-case "${1:-}" in
-  "")
-    ;;
-  --help|-h)
+main() {
+  case "${1:-}" in
+    --confirm)
+      ;;
+    --help|-h)
+      usage
+      return 0
+      ;;
+    "")
+      usage
+      fail "Reinicio no confirmado. Usa --confirm para ejecutarlo."
+      return 1
+      ;;
+    *)
+      usage
+      fail "Argumento no reconocido: $1"
+      return 1
+      ;;
+  esac
+
+  if [ "$#" -ne 1 ]; then
     usage
-    exit 0
-    ;;
-  *)
-    usage
-    die "Argumento no reconocido: $1"
-    ;;
-esac
-
-cd "$ROOT"
-
-docker compose config --quiet
-
-echo "============================================================"
-echo "BLOODKEEPER — REINICIO CONTROLADO"
-echo "============================================================"
-
-for service in postgres api web; do
-  if [ -z "$(docker compose ps -a -q "$service")" ]; then
-    echo "Creando el contenedor ausente: $service"
-    docker compose up -d "$service"
+    fail "restart.sh acepta únicamente --confirm."
+    return 1
   fi
-done
 
-echo
-echo "Reiniciando PostgreSQL..."
-docker compose restart postgres
-wait_for_health v5r-postgres
+  cd "$ROOT" || {
+    fail "No se puede acceder al repositorio."
+    return 1
+  }
 
-echo
-echo "Reiniciando API y web..."
-docker compose restart api web
-wait_for_health v5r-api
-wait_for_health v5r-web
+  docker compose config --quiet || {
+    fail "La configuración Docker Compose no es válida."
+    return 1
+  }
 
-echo
-./scripts/check.sh
+  echo "============================================================"
+  echo "BLOODKEEPER — REINICIO CONTROLADO CONFIRMADO"
+  echo "============================================================"
 
-echo
-echo "REINICIO COMPLETADO CORRECTAMENTE"
+  local service
+  for service in postgres api web; do
+    if [ -z "$(docker compose ps -a -q "$service")" ]; then
+      echo "Creando el contenedor ausente: $service"
+      docker compose up -d "$service" || {
+        fail "No se pudo crear el servicio $service."
+        return 1
+      }
+    fi
+  done
+
+  echo
+  echo "Reiniciando PostgreSQL..."
+  docker compose restart postgres || {
+    fail "No se pudo reiniciar PostgreSQL."
+    return 1
+  }
+  wait_for_health v5r-postgres || return 1
+
+  echo
+  echo "Reiniciando API y web..."
+  docker compose restart api web || {
+    fail "No se pudieron reiniciar API y web."
+    return 1
+  }
+  wait_for_health v5r-api || return 1
+  wait_for_health v5r-web || return 1
+
+  echo
+  ./scripts/check.sh || {
+    fail "La comprobación funcional posterior al reinicio falló."
+    return 1
+  }
+
+  echo
+  echo "REINICIO COMPLETADO CORRECTAMENTE"
+  return 0
+}
+
+main "$@"
