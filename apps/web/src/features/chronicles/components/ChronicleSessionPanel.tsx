@@ -22,6 +22,14 @@ import {
   ViewStateStatus,
 } from '../../../components/ui/ViewStateStatus'
 
+import {
+  DiceHistoryPanel,
+} from '../../dice/components/DiceHistoryPanel'
+
+import {
+  DiceRollPanel,
+} from '../../dice/components/DiceRollPanel'
+
 import './chronicle-session-panel.css'
 
 const gateway =
@@ -935,6 +943,22 @@ export function ChronicleSessionPanel({
           </dl>
         </section>
       ) : null}
+
+      {selectedSession !== null ? (
+        <div className="chronicle-session-panel__dice-context">
+          <DiceRollPanel
+            mode="manual"
+            chronicleId={chronicleId}
+            sessionId={selectedSession.id}
+          />
+          <DiceHistoryPanel
+            chronicleId={chronicleId}
+            sessionId={selectedSession.id}
+            contextLabel="Historial de la sesión seleccionada"
+          />
+        </div>
+      ) : null}
+
     </section>
   )
 }

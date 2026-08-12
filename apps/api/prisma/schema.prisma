@@ -150,6 +150,7 @@ model User {
   ownedCharacters         Character[]            @relation("CharacterOwner")
   chronicleParticipations ChronicleParticipant[] @relation("ChronicleParticipantUser")
   experienceMovements     CharacterExperienceMovement[] @relation("CharacterExperienceActor")
+  executedDiceRolls       DiceRollRecord[] @relation("DiceRollActor")
 
   @@index([status])
   @@map("users")
@@ -193,6 +194,7 @@ model Chronicle {
   locations    ChronicleLocation[]     @relation("ChronicleLocationChronicle")
   events       ChronicleEvent[]        @relation("ChronicleEventChronicle")
   sessions     ChronicleSession[]      @relation("ChronicleSessionChronicle")
+  diceRolls    DiceRollRecord[]         @relation("DiceRollChronicle")
 
   @@index([narratorId])
   @@index([status])
@@ -324,11 +326,53 @@ model ChronicleSession {
 
     chronicle Chronicle @relation("ChronicleSessionChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
     experienceMovements CharacterExperienceMovement[] @relation("CharacterExperienceSession")
+    diceRolls           DiceRollRecord[] @relation("DiceRollSession")
 
     @@index([chronicleId, status])
     @@index([chronicleId, sessionNumber])
     @@index([chronicleId, realDate])
     @@map("chronicle_sessions")
+}
+
+enum DiceRollSource {
+  MANUAL
+  CHARACTER
+  ACTION
+}
+
+enum DiceRollVisibility {
+  CONTEXTUAL
+  PRIVATE
+}
+
+model DiceRollRecord {
+  id             String             @id @default(uuid()) @db.Uuid
+  actorId        String             @db.Uuid
+  characterId    String?            @db.Uuid
+  chronicleId    String?            @db.Uuid
+  sessionId      String?            @db.Uuid
+  rerollParentId String?            @db.Uuid
+  source         DiceRollSource
+  visibility     DiceRollVisibility @default(CONTEXTUAL)
+  description    String?
+  rulesVersion   String
+  poolSnapshot   Json
+  rollSnapshot   Json
+  createdAt      DateTime           @default(now()) @db.Timestamptz(3)
+
+  actor        User              @relation("DiceRollActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  character    Character?        @relation("DiceRollCharacter", fields: [characterId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  chronicle    Chronicle?        @relation("DiceRollChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  session      ChronicleSession? @relation("DiceRollSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  rerollParent DiceRollRecord?   @relation("DiceRollRerolls", fields: [rerollParentId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  rerolls      DiceRollRecord[]  @relation("DiceRollRerolls")
+
+  @@index([actorId, createdAt, id])
+  @@index([characterId, createdAt, id])
+  @@index([chronicleId, visibility, createdAt, id])
+  @@index([sessionId, createdAt, id])
+  @@index([rerollParentId])
+  @@map("dice_roll_records")
 }
 
 enum CharacterExperienceMovementType {
@@ -403,6 +447,7 @@ model Character {
   notes          CharacterNote[]
   historyEntries CharacterHistoryEntry[]
   experienceMovements CharacterExperienceMovement[] @relation("CharacterExperienceCharacter")
+  diceRolls           DiceRollRecord[] @relation("DiceRollCharacter")
 
   @@index([ownerId])
   @@index([chronicleId])

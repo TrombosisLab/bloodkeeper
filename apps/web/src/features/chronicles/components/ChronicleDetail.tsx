@@ -47,6 +47,14 @@ import {
 } from './ChronicleSessionPanel'
 
 import {
+  DiceHistoryPanel,
+} from '../../dice/components/DiceHistoryPanel'
+
+import {
+  DiceRollPanel,
+} from '../../dice/components/DiceRollPanel'
+
+import {
   ChronicleLocationPanel,
 } from './ChronicleLocationPanel'
 
@@ -1070,9 +1078,22 @@ export function ChronicleDetail({
       ) : null}
 
       {canManageSessions ? (
-        <ChronicleSessionPanel
-          chronicleId={chronicleId}
-        />
+        <>
+          <ChronicleSessionPanel
+            chronicleId={chronicleId}
+          />
+
+          <div className="chronicle-detail__dice-context">
+            <DiceRollPanel
+              mode="manual"
+              chronicleId={chronicleId}
+            />
+            <DiceHistoryPanel
+              chronicleId={chronicleId}
+              contextLabel="Historial de la crónica"
+            />
+          </div>
+        </>
       ) : null}
 
       <section

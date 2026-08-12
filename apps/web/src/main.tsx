@@ -14,6 +14,7 @@ import { CharacterSheet } from './features/character-sheet/components/CharacterS
 import { PersistedCharacterSheet } from './features/character-sheet/components/PersistedCharacterSheet'
 import { ChronicleListCreate } from './features/chronicles/components/ChronicleListCreate'
 import { Dashboard } from './features/dashboard/components/Dashboard'
+import { DiceHistoryPanel } from './features/dice/components/DiceHistoryPanel'
 import { DiceRollPanel } from './features/dice/components/DiceRollPanel'
 import { attributeDefinitions } from './features/character-creation/data/attribute-definitions'
 import { skillDefinitions } from './features/character-creation/data/skill-definitions'
@@ -207,6 +208,7 @@ function App() {
           }
         />
         <DiceRollPanel mode="manual" />
+        <DiceHistoryPanel />
         </>
       ) : view === 'chronicles' &&
         canAccessChronicles ? (
@@ -292,6 +294,10 @@ function App() {
                 characterId={creationCharacterId}
                 attributes={attributeDefinitions}
                 skills={skillDefinitions}
+              />
+              <DiceHistoryPanel
+                characterId={creationCharacterId}
+                contextLabel="Historial del personaje"
               />
               </>
             ) : null}

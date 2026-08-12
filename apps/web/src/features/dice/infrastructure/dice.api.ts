@@ -6,6 +6,9 @@ import type {
   DicePoolContext,
   DicePoolModifier,
   DicePoolSnapshot,
+  DiceRollHistoryItem,
+  DiceRollHistoryPage,
+  DiceRollHistoryQuery,
   DiceRollOutcome,
   DiceRollSnapshot,
   DiceRollSpecialEvidence,
@@ -290,6 +293,102 @@ export function parseExecutedDiceRoll(
   }
 }
 
+function historySource(
+  value: unknown,
+): DiceRollHistoryItem['source'] {
+  const source = string(value)
+  if (
+    source !== 'manual' &&
+    source !== 'character' &&
+    source !== 'action'
+  ) {
+    throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
+  }
+  return source
+}
+
+function historyVisibility(
+  value: unknown,
+): DiceRollHistoryItem['visibility'] {
+  const visibility = string(value)
+  if (
+    visibility !== 'contextual' &&
+    visibility !== 'private'
+  ) {
+    throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
+  }
+  return visibility
+}
+
+function timestamp(value: unknown): string {
+  const parsed = string(value)
+  if (Number.isNaN(Date.parse(parsed))) {
+    throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
+  }
+  return parsed
+}
+
+export function parseDiceRollHistoryItem(
+  value: unknown,
+): DiceRollHistoryItem {
+  const item = record(value)
+  const executed = parseExecutedDiceRoll(item)
+  return {
+    id: string(item.id),
+    actorId: string(item.actorId),
+    actorDisplayName: string(item.actorDisplayName),
+    characterId: nullableString(item.characterId),
+    chronicleId: nullableString(item.chronicleId),
+    sessionId: nullableString(item.sessionId),
+    rerollParentId: nullableString(item.rerollParentId),
+    source: historySource(item.source),
+    visibility: historyVisibility(item.visibility),
+    description: nullableString(item.description),
+    rulesVersion: string(item.rulesVersion),
+    createdAt: timestamp(item.createdAt),
+    pool: executed.pool,
+    roll: executed.roll,
+  }
+}
+
+export function parseDiceRollHistoryPage(
+  value: unknown,
+): DiceRollHistoryPage {
+  const page = record(value)
+  if (!Array.isArray(page.items)) {
+    throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
+  }
+  return {
+    items: page.items.map(parseDiceRollHistoryItem),
+    nextCursor: nullableString(page.nextCursor),
+  }
+}
+
+export function diceHistoryEndpoint(
+  query: DiceRollHistoryQuery,
+): string {
+  const parameters = new URLSearchParams()
+  const textFields = [
+    ['actorId', query.actorId],
+    ['characterId', query.characterId],
+    ['chronicleId', query.chronicleId],
+    ['sessionId', query.sessionId],
+    ['source', query.source],
+    ['description', query.description],
+    ['cursor', query.cursor],
+  ] as const
+  for (const [key, value] of textFields) {
+    if (value !== undefined) parameters.set(key, value)
+  }
+  if (query.limit !== undefined) {
+    parameters.set('limit', String(query.limit))
+  }
+  const serialized = parameters.toString()
+  return serialized.length === 0
+    ? '/api/dice/history'
+    : `/api/dice/history?${serialized}`
+}
+
 async function successfulPayload(
   response: Response,
 ): Promise<unknown> {
@@ -359,6 +458,32 @@ export function createDiceGateway(
           `/api/dice/characters/${encodeURIComponent(characterId)}`,
           command,
         ),
+      )
+    },
+    async history(query) {
+      const response = await fetchImplementation(
+        diceHistoryEndpoint(query),
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: { Accept: 'application/json' },
+        },
+      )
+      return parseDiceRollHistoryPage(
+        await successfulPayload(response),
+      )
+    },
+    async historyDetail(rollId) {
+      const response = await fetchImplementation(
+        `/api/dice/history/${encodeURIComponent(rollId)}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: { Accept: 'application/json' },
+        },
+      )
+      return parseDiceRollHistoryItem(
+        await successfulPayload(response),
       )
     },
   }

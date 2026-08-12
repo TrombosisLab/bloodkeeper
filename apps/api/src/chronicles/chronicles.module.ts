@@ -388,6 +388,7 @@ import {
   ],
   exports: [
     CHRONICLE_PARTICIPANT_REPOSITORY,
+    CHRONICLE_SESSION_REPOSITORY,
     CreateChronicleUseCase,
     ListChroniclesUseCase,
     LoadChronicleUseCase,

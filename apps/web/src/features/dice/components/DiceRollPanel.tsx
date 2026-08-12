@@ -27,6 +27,8 @@ import './dice-roll-panel.css'
 interface DiceRollPanelProps {
   readonly mode: 'manual' | 'character'
   readonly characterId?: string
+  readonly chronicleId?: string
+  readonly sessionId?: string
   readonly attributes?: readonly DiceTraitOption[]
   readonly skills?: readonly DiceTraitOption[]
   readonly gateway?: DiceGateway
@@ -110,6 +112,8 @@ function errorMessage(error: unknown): string {
 export function DiceRollPanel({
   mode,
   characterId,
+  chronicleId,
+  sessionId,
   attributes = [],
   skills = [],
   gateway = defaultGateway,
@@ -120,6 +124,8 @@ export function DiceRollPanel({
   const [modifierLabel, setModifierLabel] = useState('Modificador general')
   const [difficulty, setDifficulty] = useState('')
   const [description, setDescription] = useState('')
+  const [visibility, setVisibility] =
+    useState<'contextual' | 'private'>('contextual')
   const [attribute, setAttribute] = useState(
     attributes[0]?.key ?? '',
   )
@@ -180,6 +186,13 @@ export function DiceRollPanel({
       ...(normalizedDescription === ''
         ? {}
         : { description: normalizedDescription }),
+      ...(chronicleId === undefined ? {} : { chronicleId }),
+      ...(sessionId === undefined ? {} : { sessionId }),
+      ...(
+        chronicleId === undefined && mode === 'manual'
+          ? {}
+          : { visibility }
+      ),
     }
   }
 
@@ -386,6 +399,24 @@ export function DiceRollPanel({
             }}
           />
         </label>
+
+        {chronicleId !== undefined || mode === 'character' ? (
+          <label>
+            Visibilidad
+            <select
+              value={visibility}
+              onChange={(event) => {
+                invalidatePrepared()
+                setVisibility(
+                  event.target.value as 'contextual' | 'private',
+                )
+              }}
+            >
+              <option value="contextual">Contextual</option>
+              <option value="private">Privada</option>
+            </select>
+          </label>
+        ) : null}
 
         <button
           type="submit"

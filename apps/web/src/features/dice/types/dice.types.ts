@@ -87,7 +87,47 @@ export interface ExecutedDiceRoll {
   readonly roll: DiceRollSnapshot
 }
 
+export type DiceHistoryVisibility =
+  | 'contextual'
+  | 'private'
+
+export interface DiceRollHistoryItem
+  extends ExecutedDiceRoll {
+  readonly id: string
+  readonly actorId: string
+  readonly actorDisplayName: string
+  readonly characterId: string | null
+  readonly chronicleId: string | null
+  readonly sessionId: string | null
+  readonly rerollParentId: string | null
+  readonly source: DicePoolContextSource
+  readonly visibility: DiceHistoryVisibility
+  readonly description: string | null
+  readonly rulesVersion: string
+  readonly createdAt: string
+}
+
+export interface DiceRollHistoryQuery {
+  readonly actorId?: string
+  readonly characterId?: string
+  readonly chronicleId?: string
+  readonly sessionId?: string
+  readonly source?: DicePoolContextSource
+  readonly description?: string
+  readonly limit?: number
+  readonly cursor?: string
+}
+
+export interface DiceRollHistoryPage {
+  readonly items: readonly DiceRollHistoryItem[]
+  readonly nextCursor: string | null
+}
+
 interface DicePoolCommandOptions {
+  readonly chronicleId?: string
+  readonly sessionId?: string
+  readonly visibility?: DiceHistoryVisibility
+  readonly rerollParentId?: string
   readonly modifier?: number
   readonly modifiers?: readonly DicePoolModifier[]
   readonly difficulty?: number | null
@@ -121,6 +161,12 @@ export interface DiceGateway {
     characterId: string,
     command: CharacterDiceRollCommand,
   ): Promise<ExecutedDiceRoll>
+  history(
+    query: DiceRollHistoryQuery,
+  ): Promise<DiceRollHistoryPage>
+  historyDetail(
+    rollId: string,
+  ): Promise<DiceRollHistoryItem>
 }
 
 export interface DiceTraitOption {

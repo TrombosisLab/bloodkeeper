@@ -1,0 +1,199 @@
+/* SPEC-039-C — superficie modular del historial de Dados. */
+.dice-history-panel {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  padding: clamp(1rem, 2.2vw, 1.5rem);
+  border: 1px solid rgba(151, 74, 87, 0.42);
+  border-radius: 0.8rem;
+  background:
+    linear-gradient(135deg, rgba(116, 46, 57, 0.13), transparent 54%),
+    #100c0d;
+  box-shadow: 0 1rem 2.4rem rgba(0, 0, 0, 0.18);
+}
+
+.dice-history-panel__heading,
+.dice-history-panel__summary,
+.dice-history-panel__filters,
+.dice-history-panel__detail dl,
+.dice-history-panel__dice {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.dice-history-panel__heading {
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.dice-history-panel__heading span {
+  color: #d79aa4;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dice-history-panel__heading h2,
+.dice-history-panel__heading p {
+  margin: 0.18rem 0 0;
+}
+
+.dice-history-panel__heading p,
+.dice-history-panel__summary small,
+.dice-history-panel__detail small,
+.dice-history-panel__state {
+  color: #bdaeb1;
+}
+
+.dice-history-panel__filters {
+  align-items: end;
+  flex-wrap: wrap;
+  padding: 0.85rem;
+  border-radius: 0.65rem;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.dice-history-panel__filters label {
+  display: grid;
+  flex: 1 1 12rem;
+  gap: 0.35rem;
+  color: #ded4d6;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.dice-history-panel__filters input,
+.dice-history-panel__filters select {
+  min-width: 0;
+  border: 1px solid #4e353a;
+  border-radius: 0.45rem;
+  background: #151112;
+  color: #fff7f8;
+  padding: 0.62rem 0.7rem;
+}
+
+.dice-history-panel__list,
+.dice-history-panel__dice {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dice-history-panel__list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.dice-history-panel__item {
+  overflow: hidden;
+  border: 1px solid #3d2b2f;
+  border-radius: 0.65rem;
+  background: linear-gradient(105deg, #151011, #1d0f12);
+}
+
+.dice-history-panel__summary {
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0.85rem 1rem;
+  text-align: left;
+}
+
+.dice-history-panel__summary:hover {
+  background: rgba(142, 63, 74, 0.13);
+}
+
+.dice-history-panel__identity,
+.dice-history-panel__result {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.dice-history-panel__result {
+  margin-left: auto;
+  text-align: right;
+}
+
+.dice-history-panel__summary time {
+  min-width: 7rem;
+  color: #cabdc0;
+  font-size: 0.78rem;
+  text-align: right;
+}
+
+.dice-history-panel__detail {
+  display: grid;
+  gap: 0.8rem;
+  padding: 0.2rem 1rem 1rem;
+  border-top: 1px solid rgba(116, 46, 57, 0.32);
+}
+
+.dice-history-panel__detail dl {
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.dice-history-panel__detail dl div {
+  min-width: 8rem;
+}
+
+.dice-history-panel__detail dt {
+  color: #bdaeb1;
+  font-size: 0.74rem;
+}
+
+.dice-history-panel__detail dd {
+  margin: 0.18rem 0 0;
+  font-weight: 700;
+}
+
+.dice-history-panel__dice {
+  flex-wrap: wrap;
+}
+
+.dice-history-panel__die {
+  display: grid;
+  min-width: 3.1rem;
+  place-items: center;
+  padding: 0.45rem;
+  border: 1px solid #65565a;
+  border-radius: 0.48rem;
+  background: #201a1b;
+}
+
+.dice-history-panel__die--hunger {
+  border-color: #a33a49;
+  background: #43151c;
+}
+
+.dice-history-panel__error {
+  color: #ffadb9;
+}
+
+.dice-history-panel__more {
+  justify-self: center;
+}
+
+.dice-history-panel__relation,
+.dice-history-panel__detail-state {
+  color: #d79aa4;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 700px) {
+  .dice-history-panel__summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dice-history-panel__result,
+  .dice-history-panel__summary time {
+    margin-left: 0;
+    text-align: left;
+  }
+}
