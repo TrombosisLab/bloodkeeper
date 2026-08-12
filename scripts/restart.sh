@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+AUDIT_STARTED="false"
+AUDIT_SUCCESS="false"
+
 ROOT="$(
   cd "$(dirname "${BASH_SOURCE[0]}")/.."
   pwd
@@ -21,6 +24,25 @@ EOF
 fail() {
   printf 'ERROR: %s\n' "$*" >&2
   return 1
+}
+
+audit() {
+  local line
+  line="AUDIT action=$1 outcome=$2 channel=$3"
+  printf '%s\n' "$line"
+  if command -v logger >/dev/null 2>&1; then
+    logger -t bloodkeeper-audit -- "$line" 2>/dev/null || true
+  fi
+}
+
+audit_on_exit() {
+  local code="$?"
+  if [ "$AUDIT_STARTED" = "true" ] &&
+     [ "$AUDIT_SUCCESS" != "true" ] &&
+     [ "$code" -ne 0 ]; then
+    audit "maintenance.restart" "failure" "ssh"
+  fi
+  return "$code"
 }
 
 wait_for_health() {
@@ -91,6 +113,10 @@ main() {
     return 1
   }
 
+  AUDIT_STARTED="true"
+  trap audit_on_exit EXIT
+  audit "maintenance.restart" "start" "ssh"
+
   echo "============================================================"
   echo "BLOODKEEPER — REINICIO CONTROLADO CONFIRMADO"
   echo "============================================================"
@@ -128,6 +154,10 @@ main() {
     fail "La comprobación funcional posterior al reinicio falló."
     return 1
   }
+
+  audit "maintenance.restart" "success" "ssh"
+  AUDIT_SUCCESS="true"
+  trap - EXIT
 
   echo
   echo "REINICIO COMPLETADO CORRECTAMENTE"

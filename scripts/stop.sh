@@ -21,6 +21,14 @@ fail() {
   return 1
 }
 
+audit() {
+  audit_line="AUDIT action=$1 outcome=$2 channel=$3"
+  printf '%s\n' "$audit_line"
+  if command -v logger >/dev/null 2>&1; then
+    logger -t bloodkeeper-audit -- "$audit_line" 2>/dev/null || true
+  fi
+}
+
 main() {
   case "${1:-}" in
     --confirm)
@@ -62,10 +70,15 @@ main() {
   echo "============================================================"
   echo "Deteniendo Vampiro V5 Revolution..."
 
+  audit "maintenance.stop" "start" "ssh"
+
   docker compose down || {
+    audit "maintenance.stop" "failure" "ssh"
     fail "Docker Compose no pudo detener la plataforma."
     return 1
   }
+
+  audit "maintenance.stop" "success" "ssh"
 
   echo
   echo "PARADA COMPLETADA"

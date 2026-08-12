@@ -41,6 +41,10 @@ import {
 } from '../../auth/domain/auth-user.rules'
 
 import {
+  writeAdministrationAuditEvent,
+} from '../../administration/audit-log'
+
+import {
   InvalidUserAdministrationError,
 } from '../domain/user-administration.rules'
 
@@ -71,11 +75,14 @@ export interface AuthenticatedUserAdministrationRequest {
 function assertAdministrator(
   request:
     AuthenticatedUserAdministrationRequest,
-): void {
+): string {
+  let administratorId: string
+
   try {
-    parseAuthenticatedAdministratorId(
-      request.user?.id,
-    )
+    administratorId =
+      parseAuthenticatedAdministratorId(
+        request.user?.id,
+      )
   } catch {
     throw new UnauthorizedException({
       code: 'AUTHENTICATION_REQUIRED',
@@ -93,6 +100,8 @@ function assertAdministrator(
         'USER_ADMINISTRATION_PERMISSION_DENIED',
     })
   }
+
+  return administratorId
 }
 
 function throwUserAdministrationHttpError(
@@ -198,7 +207,8 @@ export class UserAdministrationController {
       AuthenticatedUserAdministrationRequest,
     @Body() body: unknown,
   ): Promise<UserAdministrationResponseDto> {
-    assertAdministrator(request)
+    const administratorId =
+      assertAdministrator(request)
 
     try {
       const command =
@@ -210,6 +220,12 @@ export class UserAdministrationController {
         await this.createUser.execute(
           command,
         )
+
+      writeAdministrationAuditEvent({
+        action: 'user.admin.create',
+        actorId: administratorId,
+        targetId: user.id,
+      })
 
       return toUserAdministrationResponse(
         user,
@@ -245,7 +261,8 @@ export class UserAdministrationController {
     @Param('userId') userIdInput: unknown,
     @Body() body: unknown,
   ): Promise<UserAdministrationResponseDto> {
-    assertAdministrator(request)
+    const administratorId =
+      assertAdministrator(request)
 
     try {
       const command =
@@ -258,6 +275,12 @@ export class UserAdministrationController {
         await this.updateUser.execute(
           command,
         )
+
+      writeAdministrationAuditEvent({
+        action: 'user.admin.update',
+        actorId: administratorId,
+        targetId: user.id,
+      })
 
       return toUserAdministrationResponse(
         user,
@@ -276,7 +299,8 @@ export class UserAdministrationController {
     @Param('userId') userIdInput: unknown,
     @Body() body: unknown,
   ): Promise<UserAdministrationResponseDto> {
-    assertAdministrator(request)
+    const administratorId =
+      assertAdministrator(request)
 
     try {
       const command =
@@ -289,6 +313,13 @@ export class UserAdministrationController {
         await this.updateUserRoles.execute(
           command,
         )
+
+      writeAdministrationAuditEvent({
+        action:
+          'user.admin.roles.update',
+        actorId: administratorId,
+        targetId: user.id,
+      })
 
       return toUserAdministrationResponse(
         user,
@@ -307,7 +338,8 @@ export class UserAdministrationController {
     @Param('userId') userIdInput: unknown,
     @Body() body: unknown,
   ): Promise<UserAdministrationResponseDto> {
-    assertAdministrator(request)
+    const administratorId =
+      assertAdministrator(request)
 
     try {
       const command =
@@ -320,6 +352,13 @@ export class UserAdministrationController {
         await this.resetUserCredentials.execute(
           command,
         )
+
+      writeAdministrationAuditEvent({
+        action:
+          'user.admin.credentials.reset',
+        actorId: administratorId,
+        targetId: user.id,
+      })
 
       return toUserAdministrationResponse(
         user,

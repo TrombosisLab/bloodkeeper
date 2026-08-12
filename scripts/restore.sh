@@ -9,6 +9,9 @@ ROOT="$(
 MODE=""
 ARCHIVE=""
 CONFIRMED="false"
+AUDIT_ACTION=""
+AUDIT_STARTED="false"
+AUDIT_SUCCESS="false"
 
 usage() {
   cat <<'EOF'
@@ -26,6 +29,25 @@ EOF
 die() {
   echo "ERROR: $*" >&2
   return 1
+}
+
+audit() {
+  local line
+  line="AUDIT action=$1 outcome=$2 channel=$3"
+  printf '%s\n' "$line"
+  if command -v logger >/dev/null 2>&1; then
+    logger -t bloodkeeper-audit -- "$line" 2>/dev/null || true
+  fi
+}
+
+audit_on_exit() {
+  local code="$?"
+  if [ "$AUDIT_STARTED" = "true" ] &&
+     [ "$AUDIT_SUCCESS" != "true" ] &&
+     [ "$code" -ne 0 ]; then
+    audit "$AUDIT_ACTION" "failure" "ssh"
+  fi
+  return "$code"
 }
 
 container_environment_value() {
@@ -366,6 +388,15 @@ case "$MODE" in
     verify_backup
     ;;
   apply)
+    AUDIT_ACTION="restore.apply"
+    AUDIT_STARTED="true"
+    trap audit_on_exit EXIT
+    audit "$AUDIT_ACTION" "start" "ssh"
+
     apply_backup
+
+    audit "$AUDIT_ACTION" "success" "ssh"
+    AUDIT_SUCCESS="true"
+    trap - EXIT
     ;;
 esac

@@ -11,6 +11,9 @@ ARCHIVE=""
 TARGET_DIR=""
 CONFIRMED="false"
 TEMP_DIR=""
+AUDIT_ACTION=""
+AUDIT_STARTED="false"
+AUDIT_SUCCESS="false"
 
 usage() {
   cat <<'EOF'
@@ -35,10 +38,29 @@ die() {
   return 1
 }
 
+audit() {
+  local line
+  line="AUDIT action=$1 outcome=$2 channel=$3"
+  printf '%s\n' "$line"
+  if command -v logger >/dev/null 2>&1; then
+    logger -t bloodkeeper-audit -- "$line" 2>/dev/null || true
+  fi
+}
+
 cleanup() {
+  local code="$?"
+
   if [ -n "$TEMP_DIR" ] && [ -d "$TEMP_DIR" ]; then
     rm -rf "$TEMP_DIR"
   fi
+
+  if [ "$AUDIT_STARTED" = "true" ] &&
+     [ "$AUDIT_SUCCESS" != "true" ] &&
+     [ "$code" -ne 0 ]; then
+    audit "$AUDIT_ACTION" "failure" "ssh"
+  fi
+
+  return "$code"
 }
 
 trap cleanup EXIT
@@ -188,6 +210,10 @@ case "$MODE" in
     test ! -e "$TARGET_DIR" ||
       die "La ruta ya existe: $TARGET_DIR"
 
+    AUDIT_ACTION="restore-full.extract"
+    AUDIT_STARTED="true"
+    audit "$AUDIT_ACTION" "start" "ssh"
+
     git clone \
       "$TEMP_DIR/repository/repository.bundle" \
       "$TARGET_DIR"
@@ -229,5 +255,8 @@ case "$MODE" in
     echo "  ./scripts/bootstrap-server.sh"
     echo "  ./scripts/restore.sh --verify backups/full-recovery/$(basename "$database_archive")"
     echo "  ./scripts/restore.sh --apply backups/full-recovery/$(basename "$database_archive") --confirm"
+
+    audit "$AUDIT_ACTION" "success" "ssh"
+    AUDIT_SUCCESS="true"
     ;;
 esac

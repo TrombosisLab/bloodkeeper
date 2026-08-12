@@ -16,12 +16,15 @@ import {
   BackupRequestService,
   BackupRequestUnavailableError,
 } from './backup-request.service'
+import {
+  writeAdministrationAuditEvent,
+} from './audit-log'
 
 interface RequestContext {
   readonly user?: { readonly id?: unknown; readonly roles?: unknown }
 }
 
-function assertAdmin(request: RequestContext): void {
+function assertAdmin(request: RequestContext): string {
   if (typeof request.user?.id !== 'string' || request.user.id.length === 0) {
     throw new UnauthorizedException({ code: 'AUTHENTICATION_REQUIRED' })
   }
@@ -29,6 +32,7 @@ function assertAdmin(request: RequestContext): void {
   if (!Array.isArray(roles) || !roles.includes('admin')) {
     throw new ForbiddenException({ code: 'BACKUP_REQUEST_PERMISSION_DENIED' })
   }
+  return request.user.id
 }
 
 function assertConfirmed(body: unknown): void {
@@ -51,7 +55,7 @@ export class BackupRequestController {
     @Req() request: RequestContext,
     @Body() body: unknown,
   ): Promise<{ readonly status: 'accepted' }> {
-    assertAdmin(request)
+    const administratorId = assertAdmin(request)
     assertConfirmed(body)
     try {
       await this.backupRequest.request()
@@ -64,6 +68,12 @@ export class BackupRequestController {
       }
       throw error
     }
+
+    writeAdministrationAuditEvent({
+      action: 'backup.manual.request',
+      actorId: administratorId,
+    })
+
     return { status: 'accepted' }
   }
 }
