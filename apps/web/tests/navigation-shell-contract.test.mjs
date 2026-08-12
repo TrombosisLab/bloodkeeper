@@ -198,7 +198,7 @@ test('SPEC-011 conserva Crónicas condicionada por permisos', () => {
 test('SPEC-011 no inventa destinos sin consumidores reales', () => {
   assert.doesNotMatch(
     componentSource,
-    />\s*(?:Dados|Administración|Configuración|Ayuda)\s*</,
+    />\s*(?:Dados|Configuración|Ayuda)\s*</,
   )
 })
 

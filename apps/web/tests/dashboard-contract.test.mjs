@@ -206,7 +206,7 @@ test('SPEC-013 representa carga vacío error contenido y reintento', () => {
   )
 })
 
-test('SPEC-013 no crea actividad administración ni destinos ficticios', () => {
+test('SPEC-013 no crea actividad ni destinos todavía ficticios', () => {
   const combined =
     dashboardSource
     + navigationSource
@@ -218,7 +218,7 @@ test('SPEC-013 no crea actividad administración ni destinos ficticios', () => {
   )
   assert.doesNotMatch(
     combined,
-    />\s*(?:Dados|Administración|Configuración|Ayuda)\s*</,
+    />\s*(?:Dados|Configuración|Ayuda)\s*</,
   )
 })
 

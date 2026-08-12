@@ -216,6 +216,6 @@ test('SPEC-012 preserva autenticación y no crea estados genéricos', () => {
   )
   assert.doesNotMatch(
     navigationSource,
-    />\s*(?:Dados|Administración|Configuración|Ayuda)\s*</,
+    />\s*(?:Dados|Configuración|Ayuda)\s*</,
   )
 })

@@ -13,6 +13,7 @@ interface AppNavigationProps {
   readonly 'aria-label': string
   readonly activeSection: AppSection
   readonly canAccessChronicles: boolean
+  readonly canAccessAdministration: boolean
   readonly onNavigate: (
     section: AppSection,
   ) => void
@@ -25,6 +26,7 @@ export function AppNavigation({
   'aria-label': navigationLabel,
   activeSection,
   canAccessChronicles,
+  canAccessAdministration,
   onNavigate,
 }: AppNavigationProps) {
   const [
@@ -149,6 +151,23 @@ export function AppNavigation({
           <span>Personajes</span>
           <small>Ficha y creación</small>
         </button>
+
+        {canAccessAdministration ? (
+          <button
+            type="button"
+            aria-current={
+              activeSection === 'administration'
+                ? 'page'
+                : undefined
+            }
+            onClick={() =>
+              selectSection('administration')
+            }
+          >
+            <span>Administración</span>
+            <small>Usuarios y accesos</small>
+          </button>
+        ) : null}
 
         {canAccessChronicles ? (
           <button

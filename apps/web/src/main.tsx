@@ -4,6 +4,7 @@ import React, {
 } from 'react'
 import ReactDOM from 'react-dom/client'
 
+import { AdministrationHub } from './features/administration/components/AdministrationHub'
 import { AppLayout } from './components/layout/AppLayout'
 import { AppHeader } from './components/layout/AppHeader'
 import { AuthenticationGate } from './features/authentication/components/AuthenticationGate'
@@ -43,6 +44,7 @@ function App() {
   const authenticatedUser =
     useAuthenticatedUser()
 
+  const canAccessAdministration = authenticatedUser?.roles.includes('admin') ?? false
   const canAccessChronicles = true
 
   const canCreateChronicles =
@@ -56,6 +58,7 @@ function App() {
         window.location.hash,
         {
           canAccessChronicles,
+          canAccessAdministration,
         },
       ),
     )
@@ -76,8 +79,9 @@ function App() {
         appViewFromHash(
           window.location.hash,
           {
-          canAccessChronicles,
-        },
+            canAccessChronicles,
+            canAccessAdministration,
+          },
         )
 
       const canonicalHash =
@@ -112,7 +116,7 @@ function App() {
         synchronizeLocation,
       )
     }
-  }, [canAccessChronicles])
+  }, [canAccessChronicles, canAccessAdministration])
 
   function navigateTo(
     nextView: AppView,
@@ -122,6 +126,7 @@ function App() {
         hashForAppView(nextView),
         {
           canAccessChronicles,
+          canAccessAdministration,
         },
       )
 
@@ -145,6 +150,10 @@ function App() {
     switch (section) {
       case 'dashboard':
         navigateTo('dashboard')
+        return
+
+      case 'administration':
+        navigateTo('administration')
         return
 
       case 'chronicles':
@@ -182,13 +191,19 @@ function App() {
           canAccessChronicles={
             canAccessChronicles
           }
+          canAccessAdministration={
+            canAccessAdministration
+          }
           onNavigate={
             navigateToSection
           }
         />
       }
     >
-      {view === 'dashboard' ? (
+      {view === 'administration' &&
+      canAccessAdministration ? (
+        <AdministrationHub />
+      ) : view === 'dashboard' ? (
         <>
         <Dashboard
           displayName={
@@ -303,7 +318,7 @@ function App() {
             ) : null}
           </>
         )
-      ) : (
+      ) : view === 'character-creation' ? (
         <CharacterCreationWizard
           characterId={creationCharacterId}
           onCharacterPersisted={setCreationCharacterId}
@@ -311,7 +326,7 @@ function App() {
             navigateTo('characters')
           }
         />
-      )}
+      ) : null}
     </AppLayout>
   )
 }
