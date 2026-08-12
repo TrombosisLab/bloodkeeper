@@ -5,12 +5,24 @@ import {
 } from 'react'
 
 import {
+  createBackupRequestGateway,
+} from '../infrastructure/backup-request.api'
+
+import {
+  createBackupStatusGateway,
+} from '../infrastructure/backup-status.api'
+
+import {
   createSystemOperationsGateway,
 } from '../infrastructure/system-operations.api'
 
 import {
   createUserAdministrationGateway,
 } from '../infrastructure/user-administration.api'
+
+import type {
+  AdministrationBackupStatus,
+} from '../types/backup-status.types'
 
 import type {
   SystemOperationsDiagnostics,
@@ -27,6 +39,10 @@ const userApi =
   createUserAdministrationGateway()
 const systemApi =
   createSystemOperationsGateway()
+const backupApi =
+  createBackupStatusGateway()
+const backupRequestApi =
+  createBackupRequestGateway()
 
 const roles:
   readonly AdministrationRole[] = [
@@ -41,6 +57,26 @@ function diagnosticLabel(
   return state === 'ok'
     ? 'Disponible'
     : 'No disponible'
+}
+
+function backupStatusLabel(state: AdministrationBackupStatus['status']): string {
+  if (state === 'ok') return 'Correcta'
+  if (state === 'error') return 'Con errores'
+  return 'Sin información'
+}
+
+function integrityLabel(state: AdministrationBackupStatus['integrity']): string {
+  if (state === 'ok') return 'Verificada'
+  if (state === 'failed') return 'Fallida'
+  return 'Sin verificar'
+}
+
+function dateLabel(value: string | null): string {
+  return value === null ? 'No disponible' : new Date(value).toLocaleString('es-ES')
+}
+
+function sizeLabel(bytes: number): string {
+  return bytes <= 0 ? 'No disponible' : `${(bytes / 1024 / 1024).toFixed(1)} MB`
 }
 
 export function AdministrationHub() {
@@ -58,6 +94,14 @@ export function AdministrationHub() {
     useState<SystemOperationsDiagnostics | null>(
       null,
     )
+  const [backupStatusLoading, setBackupStatusLoading] =
+    useState(true)
+  const [backupStatus, setBackupStatus] =
+    useState<AdministrationBackupStatus | null>(null)
+
+  const [backupRequestPending,
+    setBackupRequestPending] =
+    useState(false)
 
   const loadUsers = async () => {
     setLoading(true)
@@ -90,9 +134,47 @@ export function AdministrationHub() {
     }
   }
 
+  const loadBackupStatus = async () => {
+    setBackupStatusLoading(true)
+    try {
+      setBackupStatus(await backupApi.status())
+    } catch {
+      setBackupStatus(null)
+      setMessage('No se pudo obtener el estado de las copias.')
+    } finally {
+      setBackupStatusLoading(false)
+    }
+  }
+
+  const requestManualBackup = async () => {
+    const confirmed = window.confirm(
+      'La copia completa puede detener temporalmente la aplicación. ¿Crear una copia ahora?',
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    setBackupRequestPending(true)
+
+    try {
+      await backupRequestApi.create()
+      setMessage(
+        'Copia solicitada. La aplicación puede quedar temporalmente no disponible mientras se genera.',
+      )
+    } catch {
+      setMessage(
+        'No se pudo solicitar la copia de seguridad.',
+      )
+    } finally {
+      setBackupRequestPending(false)
+    }
+  }
+
   const refresh = () => {
     void loadUsers()
     void loadDiagnostics()
+    void loadBackupStatus()
   }
 
   useEffect(() => {
@@ -403,6 +485,46 @@ export function AdministrationHub() {
           Contenedores, recursos del host, logs Docker y
           reinicios continúan gestionándose mediante los
           scripts SSH existentes.
+        </p>
+      </article>
+
+      <article className="administration-hub__card">
+        <h2>Copias de seguridad</h2>
+        {backupStatusLoading ? (
+          <p>Comprobando copias…</p>
+        ) : backupStatus === null ? (
+          <p>El estado de las copias no está disponible.</p>
+        ) : (
+          <>
+            <dl className="administration-hub__diagnostics">
+              <div><dt>Última ejecución</dt><dd>{backupStatusLabel(backupStatus.status)}</dd></div>
+              <div><dt>Fecha de ejecución</dt><dd>{dateLabel(backupStatus.lastRunAt)}</dd></div>
+              <div><dt>Última copia correcta</dt><dd>{dateLabel(backupStatus.lastSuccessfulBackupAt)}</dd></div>
+              <div><dt>Integridad</dt><dd>{integrityLabel(backupStatus.integrity)}</dd></div>
+              <div><dt>Archivo</dt><dd>{backupStatus.archiveName ?? 'No disponible'}</dd></div>
+              <div><dt>Tamaño</dt><dd>{sizeLabel(backupStatus.sizeBytes)}</dd></div>
+            </dl>
+            {backupStatus.error !== null && (
+              <p className="administration-hub__notice" role="status">{backupStatus.error}</p>
+            )}
+          </>
+        )}
+        <button
+          type="button"
+          onClick={() => {
+            void requestManualBackup()
+          }}
+          disabled={backupRequestPending}
+        >
+          {backupRequestPending
+            ? 'Solicitando copia…'
+            : 'Crear copia ahora'}
+        </button>
+
+        <p className="administration-hub__system-note">
+          La copia manual usa el mismo procedimiento
+          controlado del servidor. La restauración
+          continúa realizándose exclusivamente por SSH.
         </p>
       </article>
     </section>

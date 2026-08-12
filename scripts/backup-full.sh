@@ -14,6 +14,9 @@ STAGE=""
 PARTIAL=""
 SERVICES_STOPPED="false"
 LOCK_FD=""
+STATUS_FILE="${BLOODKEEPER_BACKUP_STATUS_FILE:-$HOME/bloodkeeper_backups/status/backup-status.json}"
+STATUS_TRACKING="false"
+STATUS_SUCCESS="false"
 
 usage() {
   cat <<'EOF'
@@ -21,6 +24,7 @@ Uso:
   ./scripts/backup-full.sh
   ./scripts/backup-full.sh --output-dir RUTA --keep 7
   ./scripts/backup-full.sh --mirror-dir RUTA
+  ./scripts/backup-full.sh --status-file RUTA
   ./scripts/backup-full.sh --quiet
 
 Crea una copia completa con:
@@ -80,6 +84,83 @@ restart_services() {
   SERVICES_STOPPED="false"
 }
 
+write_backup_status() {
+  local result="$1"
+  local status_dir=""
+  local temporary=""
+  local run_at=""
+  local latest=""
+  local created=""
+  local success_at_json="null"
+  local archive_name_json="null"
+  local size_bytes="0"
+  local integrity="unknown"
+  local error_json="null"
+
+  status_dir="$(dirname "$STATUS_FILE")"
+  mkdir -p "$status_dir" || return 1
+  chmod 755 "$status_dir" 2>/dev/null || true
+  run_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+  if [ "$result" = "ok" ] && [ -s "${archive:-}" ]; then
+    latest="$archive"
+  else
+    latest="$(
+      find "$OUTPUT_DIR" -maxdepth 1 -type f -name 'bloodkeeper_full_*.tar.gz' -printf '%T@ %p\n' 2>/dev/null |
+      sort -nr | head -1 | cut -d' ' -f2-
+    )"
+  fi
+
+  if [ -n "$latest" ] && [ -s "$latest" ]; then
+    local archive_name=""
+    archive_name="$(basename "$latest")"
+    case "$archive_name" in
+      bloodkeeper_full_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]T[0-9][0-9][0-9][0-9][0-9][0-9]Z.tar.gz)
+        archive_name_json="\"$archive_name\""
+        size_bytes="$(stat -c '%s' "$latest" 2>/dev/null || printf '0')"
+        ;;
+      *) latest="" ;;
+    esac
+  fi
+
+  if [ -n "$latest" ] && [ -f "$latest.meta" ]; then
+    created="$(sed -n 's/^created_utc=//p' "$latest.meta" | head -1)"
+    case "$created" in
+      [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]T[0-9][0-9][0-9][0-9][0-9][0-9]Z)
+        success_at_json="\"${created:0:4}-${created:4:2}-${created:6:2}T${created:9:2}:${created:11:2}:${created:13:2}Z\""
+        ;;
+    esac
+  fi
+
+  if [ -n "$latest" ] && [ -f "$latest.sha256" ]; then
+    if (cd "$(dirname "$latest")" && sha256sum -c "$(basename "$latest.sha256")" >/dev/null 2>&1); then
+      integrity="ok"
+    else
+      integrity="failed"
+    fi
+  fi
+
+  if [ "$result" = "error" ]; then
+    error_json='"La última ejecución de backup no terminó correctamente."'
+  fi
+
+  temporary="$STATUS_FILE.tmp.$$"
+  cat > "$temporary" <<EOF
+{
+  "status": "$result",
+  "lastRunAt": "$run_at",
+  "lastSuccessfulBackupAt": $success_at_json,
+  "archiveName": $archive_name_json,
+  "sizeBytes": $size_bytes,
+  "integrity": "$integrity",
+  "error": $error_json
+}
+EOF
+  chmod 644 "$temporary" || { rm -f "$temporary"; return 1; }
+  mv -f "$temporary" "$STATUS_FILE" || { rm -f "$temporary"; return 1; }
+  return 0
+}
+
 cleanup() {
   local code="$?"
 
@@ -96,6 +177,10 @@ cleanup() {
 
   if [ -n "$PARTIAL" ]; then
     rm -f "$PARTIAL"
+  fi
+
+  if [ "$STATUS_TRACKING" = "true" ] && [ "$STATUS_SUCCESS" != "true" ] && [ "$code" -ne 0 ]; then
+    write_backup_status "error" >/dev/null 2>&1 || true
   fi
 
   return "$code"
@@ -153,6 +238,11 @@ while [ "$#" -gt 0 ]; do
       KEEP="$2"
       shift 2
       ;;
+    --status-file)
+      test "$#" -ge 2 || die "Falta la ruta del estado."
+      STATUS_FILE="$2"
+      shift 2
+      ;;
     --quiet)
       QUIET="true"
       shift
@@ -177,6 +267,10 @@ esac
 test "$KEEP" -ge 1 ||
   die "--keep debe ser al menos 1."
 
+case "$STATUS_FILE" in
+  *[[:space:]]*) die "La ruta de estado no puede contener espacios." ;;
+esac
+
 cd "$ROOT"
 
 docker compose config --quiet
@@ -200,6 +294,8 @@ exec {LOCK_FD}>"$OUTPUT_DIR/.backup-full.lock"
 
 flock -n "$LOCK_FD" ||
   die "Ya existe otra copia completa en ejecución."
+
+STATUS_TRACKING="true"
 
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
 base="bloodkeeper_full_${stamp}"
@@ -406,6 +502,9 @@ if [ -n "$MIRROR_DIR" ]; then
 
   rotate_sets "$MIRROR_DIR" "$KEEP"
 fi
+
+write_backup_status "ok"
+STATUS_SUCCESS="true"
 
 if [ "$QUIET" != "true" ]; then
   echo "✓ Dump PostgreSQL"

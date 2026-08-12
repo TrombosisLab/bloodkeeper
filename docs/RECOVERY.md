@@ -114,6 +114,61 @@ Prueba completa real:
 La prueba completa crea un paquete, restaura el dump en una base temporal
 y no sustituye la base activa.
 
+## Estado administrativo de las copias
+
+SPEC-042 añade una proyección de sólo lectura para Administración.
+
+`scripts/backup-full.sh` publica al terminar un manifiesto sanitizado en:
+
+```text
+$HOME/bloodkeeper_backups/status/backup-status.json
+```
+
+El manifiesto contiene únicamente estado de ejecución, fechas, nombre
+base de la última copia válida, tamaño, integridad y un error sanitizado.
+No contiene rutas absolutas, credenciales ni variables de entorno.
+
+La API recibe exclusivamente ese directorio mediante un bind mount de
+sólo lectura en `/run/bloodkeeper-backup`. Los paquetes reales de
+`scheduled/`, los dumps y Docker continúan fuera del alcance de la API.
+
+La interfaz administrativa consulta:
+
+```text
+GET /administration/backups/status
+```
+
+SPEC-042-B permite además solicitar una copia manual mediante:
+
+```text
+POST /administration/backups/requests
+```
+
+La petición exige sesión administrativa y confirmación explícita. La API
+no ejecuta Docker ni scripts del host: escribe únicamente el marcador fijo
+`manual-backup.request` en un spool dedicado. `systemd.path` detecta ese
+marcador y un servicio del host ejecuta exclusivamente
+`scripts/run-manual-backup-request.sh`, que llama a `backup-full.sh` con
+ruta y retención fijas.
+
+Instalación del watcher:
+
+```bash
+./scripts/install-manual-backup-request-service.sh --install
+./scripts/install-manual-backup-request-service.sh --status
+```
+
+La restauración continúa siendo exclusivamente por SSH. La Web no puede
+elegir comandos, rutas ni parámetros de backup y nunca recibe acceso a
+Docker, `scheduled/` o los paquetes reales.
+
+Validación reutilizable:
+
+```bash
+./scripts/check-admin-backup-status.sh
+./scripts/check-manual-backup-request.sh
+```
+
 ## Verificar un paquete completo
 
 ```bash
