@@ -217,6 +217,17 @@ test(
         'CHRONICLE_PERMISSION_DENIED',
       )
     } finally {
+      await database.chronicleParticipant.deleteMany({
+        where: {
+          userId: {
+            in: [
+              narrator.id,
+              player.id,
+            ],
+          },
+        },
+      })
+
       await database.chronicle.deleteMany({
         where: {
           narratorId: {

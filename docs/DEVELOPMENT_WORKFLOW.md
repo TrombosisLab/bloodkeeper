@@ -56,10 +56,12 @@ Definir antes de implementar:
    varios archivos o pasos.
 5. Revisar el diff y ejecutar `git diff --check`.
 6. Ejecutar validación técnica y funcional.
-7. Actualizar documentación en el mismo incremento.
-8. Revisar el conjunto exacto de archivos.
-9. Crear un commit coherente únicamente tras validación.
-10. Integrar en `main` únicamente tras validar el bloque completo.
+7. Comprobar regresiones mediante las suites afectadas y la validación
+   completa antes del commit.
+8. Actualizar documentación en el mismo incremento.
+9. Revisar el conjunto exacto de archivos.
+10. Crear un commit coherente únicamente tras validación.
+11. Integrar en `main` únicamente tras validar el bloque completo.
 
 ## Automatización de desarrollo
 
@@ -100,7 +102,8 @@ Cuando aparezca un error:
 3. identificar la causa sin adivinar;
 4. corregir únicamente el origen demostrado;
 5. repetir la validación afectada;
-6. repetir la validación completa antes del commit.
+6. incorporar una prueba de regresión cuando sea razonable;
+7. repetir la validación completa antes del commit.
 
 No se sustituye una prueba por una afirmación de que debería funcionar.
 

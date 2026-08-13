@@ -27,6 +27,29 @@ test(
 
     await database.$connect()
 
+    await database.user.createMany({
+      data: [
+        {
+          id: narratorId,
+          username:
+            `chronicle-repository-${narratorId}`,
+          displayName:
+            'Narrador de repositorio',
+          passwordHash:
+            'integration-not-used',
+        },
+        {
+          id: otherNarratorId,
+          username:
+            `chronicle-repository-${otherNarratorId}`,
+          displayName:
+            'Otro narrador de repositorio',
+          passwordHash:
+            'integration-not-used',
+        },
+      ],
+    })
+
     try {
       const created =
         await repository.create({
@@ -62,6 +85,17 @@ test(
         'preparation',
       )
     } finally {
+      await database.chronicleParticipant.deleteMany({
+        where: {
+          userId: {
+            in: [
+              narratorId,
+              otherNarratorId,
+            ],
+          },
+        },
+      })
+
       await database.chronicle.deleteMany({
         where: {
           narratorId: {
@@ -72,6 +106,18 @@ test(
           },
         },
       })
+
+      await database.user.deleteMany({
+        where: {
+          id: {
+            in: [
+              narratorId,
+              otherNarratorId,
+            ],
+          },
+        },
+      })
+
       await database.$disconnect()
     }
   },
