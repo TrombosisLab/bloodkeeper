@@ -192,3 +192,17 @@ Cuando el plan contiene migraciones, se exige además `--restore-data` y
 
 Tras volver a la versión previa se reconstruyen API/Web, se esperan los
 health checks y se ejecuta `./scripts/check.sh`.
+
+## Validación de configuración obligatoria
+
+Docker Compose valida antes del arranque las variables obligatorias
+`DATABASE_URL`, `POSTGRES_DB`, `POSTGRES_USER` y `POSTGRES_PASSWORD`.
+
+Si falta cualquiera de ellas o su valor está vacío, `docker compose config`
+y los comandos de arranque fallan de forma inmediata con un mensaje que
+identifica la variable ausente. Los valores reales deben mantenerse en
+`.env`, fuera de Git; `.env.example` conserva únicamente valores de ejemplo
+y marcadores seguros.
+
+Esta validación no introduce entornos adicionales: el mismo contrato se
+aplica al desarrollo y al despliegue local o servidor estable.
