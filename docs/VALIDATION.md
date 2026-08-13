@@ -268,3 +268,20 @@ comprometido en Git.
 Valida el contrato, usa un backup completo real para ejecutar un precheck
 no destructivo y comprueba que operaciones de impacto requieren confirmación.
 No cambia HEAD ni restaura la base durante esta validación.
+
+## Actualización controlada de dependencias y seguridad
+
+Toda actualización de seguridad o dependencias debe ser controlada,
+revisable y validada como un incremento independiente. API y Web
+mantendrán sus `package-lock.json` versionados y las construcciones
+seguirán usando `npm ci`.
+
+No se aplicarán actualizaciones masivas de dependencias sin revisar su
+alcance. Tras cualquier cambio de versiones se ejecutará, como mínimo:
+
+```bash
+bash scripts/dev/check.sh
+```
+
+La actualización no se considerará válida mientras typecheck, tests,
+build, Docker Compose y health checks no permanezcan correctos.

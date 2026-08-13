@@ -42,7 +42,7 @@ Los tres servicios comparten exclusivamente la red Docker
 - Publica el puerto `5173`.
 - Actúa como punto de entrada web y proxy de `/api`.
 - Aplica `no-new-privileges`.
-- Usa `npm install` porque el frontend todavía no dispone de lockfile.
+- Usa `npm ci` con el `package-lock.json` versionado.
 
 El proxy de Vite cumple actualmente la función de reverse proxy. No se
 añade Nginx mientras no exista una necesidad formal de empaquetado de
@@ -53,7 +53,7 @@ producción.
 - Imagen oficial `node:22-alpine`.
 - Ejecuta NestJS como usuario `node`.
 - Usa `npm ci` con su lockfile existente.
-- Publica el puerto `3000` para diagnóstico e integración local.
+- Publica el puerto `3000` sólo en `127.0.0.1` del host para diagnóstico y operación local; la LAN accede a la API mediante el proxy `/api` de la Web.
 - Accede a PostgreSQL únicamente mediante la red Docker.
 - Aplica `no-new-privileges`.
 
@@ -79,6 +79,21 @@ No existe caché porque todavía no ha sido incorporada formalmente.
 - `.env` usa permisos `600`.
 - Las credenciales se inyectan durante la creación de los contenedores.
 - `.env.example` documenta únicamente nombres y valores de desarrollo.
+
+## Superficie de red y exposición
+
+La superficie publicada del despliegue local se limita a lo necesario:
+
+- la Web publica `5173` en la LAN y actúa como punto de entrada;
+- la API publica `3000` únicamente en `127.0.0.1` del host para
+  diagnóstico y scripts operativos locales;
+- PostgreSQL no publica `5432` en el host;
+- Web, API y PostgreSQL se comunican internamente por la red Docker
+  `application`.
+
+La instalación base está orientada a red local. Cualquier exposición a
+Internet requiere una revisión específica de seguridad antes de abrir
+puertos, publicar servicios o incorporar infraestructura perimetral.
 
 ## Persistencia
 

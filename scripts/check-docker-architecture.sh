@@ -146,6 +146,16 @@ echo "$published_postgres" |
 
 echo "✓ PostgreSQL aislado del host"
 
+api_binding="$(
+  docker compose port api 3000 2>/dev/null |
+    head -n 1
+)"
+
+test "$api_binding" = "127.0.0.1:3000" ||
+  die "API debe publicar 3000 sólo en 127.0.0.1; actual: ${api_binding:-no publicado}."
+
+echo "✓ API 3000 limitada al loopback del host"
+
 if [ -f .env ]; then
   permissions="$(
     stat -c '%a' .env
