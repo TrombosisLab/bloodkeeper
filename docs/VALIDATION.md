@@ -28,14 +28,30 @@ La comprobación valida:
 ./scripts/dev/check.sh
 ```
 
-Ejecuta revisión de diff y shell, Compose, estructura, arquitectura
-Docker, typecheck, pruebas, integración, Prisma, builds y smoke tests.
+Ejecuta revisión de diff y shell, formato, lint, Compose, estructura,
+arquitectura Docker, typecheck, pruebas, integración, Prisma, builds y
+smoke tests.
 
 El resultado esperado termina con:
 
 ```text
 VALIDACIÓN DE DESARROLLO COMPLETA
 ```
+
+### Builds reproducibles
+
+API y Web mantienen `package-lock.json` versionados. Sus Dockerfiles copian
+`package*.json` antes del código y usan `npm ci`, por lo que una construcción
+parte del grafo de dependencias fijado por el repositorio.
+
+`./scripts/dev/build.sh` valida este contrato antes de Prisma y de los builds
+de API y Web. El paquete `packages/character-rules` no instala dependencias de
+forma independiente y no necesita un lockfile propio mientras mantenga ese
+contrato.
+
+La detección de servicios de `scripts/dev/common.sh` captura primero el listado
+de Compose y lo valida después. Esto evita falsos negativos de `grep -q` bajo
+`pipefail` durante las validaciones automatizadas.
 
 El flujo y las evidencias obligatorias están definidos en
 `docs/DEVELOPMENT_WORKFLOW.md`.
@@ -219,3 +235,15 @@ Conservar:
 La aceptación definitiva de instalación desde servidor limpio requiere
 ejecutar el procedimiento en una VM Ubuntu Server 24.04 recién creada o
 restaurada a un snapshot limpio.
+
+### Versiones de release
+
+La validación estándar comprueba que API, Web y el paquete compartido de
+reglas mantienen una versión `MAJOR.MINOR.PATCH` sincronizada.
+
+```bash
+./scripts/dev/release-check.sh --candidate vMAJOR.MINOR.PATCH
+./scripts/dev/release-check.sh --tag vMAJOR.MINOR.PATCH
+```
+
+El proceso completo está documentado en `docs/RELEASES.md`.

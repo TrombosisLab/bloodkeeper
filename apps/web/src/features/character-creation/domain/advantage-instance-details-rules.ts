@@ -81,7 +81,7 @@ export function createInitialAdvantageInstanceDetails(
       return {
         kind: 'darkSecret',
       }
-      
+
     case 'herd':
       return {
         kind: 'herd',
@@ -120,7 +120,7 @@ export function createInitialAdvantageInstanceDetails(
       return {
         kind: 'exiled',
       }
-      
+
     case 'suspect':
       return {
         kind: 'suspect',
@@ -135,7 +135,7 @@ export function createInitialAdvantageInstanceDetails(
       return {
         kind: 'mortalPretender',
       }
-            
+
     /*
      * Lingüística necesita conservar la lista
      * de idiomas escogidos por el personaje.

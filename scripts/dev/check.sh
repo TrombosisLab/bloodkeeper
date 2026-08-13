@@ -30,6 +30,15 @@ docker compose config --quiet
 ./scripts/check-docker-architecture.sh
 
 echo
+"$SCRIPT_DIR/format.sh"
+
+echo
+"$SCRIPT_DIR/lint.sh"
+
+echo
+"$SCRIPT_DIR/release-check.sh" --version-only
+
+echo
 "$SCRIPT_DIR/typecheck.sh"
 
 echo

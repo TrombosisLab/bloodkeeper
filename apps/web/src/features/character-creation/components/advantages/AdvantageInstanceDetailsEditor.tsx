@@ -114,10 +114,10 @@ export function AdvantageInstanceDetailsEditor({
             }
           />
         </div>
-        
+
         <label>
           Identidad
-                
+
           <input
             value={
               details.identity ?? ''
@@ -175,7 +175,7 @@ export function AdvantageInstanceDetailsEditor({
     )
   }
 
-  
+
   if (
     details.kind === 'enemy'
   ) {
@@ -352,7 +352,7 @@ export function AdvantageInstanceDetailsEditor({
       </div>
     )
   }
-  
+
 
   /*
    * Expulsado.

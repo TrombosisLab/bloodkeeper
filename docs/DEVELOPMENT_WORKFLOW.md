@@ -74,6 +74,8 @@ Validación estándar completa:
 Comprobaciones parciales:
 
 ```bash
+./scripts/dev/format.sh
+./scripts/dev/lint.sh
 ./scripts/dev/typecheck.sh
 ./scripts/dev/test.sh
 ./scripts/dev/build.sh
@@ -88,10 +90,11 @@ Comprobación del propio workflow:
 Todos estos comandos usan Docker y `npm`. Node no es un requisito del
 host.
 
-El proyecto no tiene actualmente comandos propios de lint o format. No
-deben añadirse herramientas nuevas de forma implícita; `git diff
---check`, TypeScript, las pruebas y los builds forman la validación
-vigente.
+SPEC-045 materializa comandos propios de formato y lint sin incorporar
+dependencias externas nuevas. `format.sh` comprueba whitespace, finales de
+línea y newline final sobre archivos versionados; `lint.sh` valida sintaxis
+shell y defectos estáticos conservadores. TypeScript continúa validándose
+mediante `typecheck.sh`.
 
 ## Errores
 
@@ -149,3 +152,19 @@ Resultado obligatorio antes de continuar:
 - añadir CI, dependencias o capas preventivas sin SPEC aprobada;
 - integrar en `main` antes de validar;
 - mezclar un stash suspendido con el incremento actual.
+
+## Versiones y releases
+
+SPEC-045 exige que las entregas estables sean identificables. API, Web y el
+paquete compartido de reglas mantienen una versión `MAJOR.MINOR.PATCH`
+sincronizada y las releases estables usan `vMAJOR.MINOR.PATCH`.
+
+La validación estándar ejecuta:
+
+```bash
+./scripts/dev/release-check.sh --version-only
+```
+
+La preparación y comprobación de una release se documentan en
+`docs/RELEASES.md`. Crear tags o hacer push sigue siendo una acción Git
+explícita.

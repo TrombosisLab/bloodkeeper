@@ -20,9 +20,13 @@ die() {
 
 require_service() {
   local service="$1"
+  local services=""
 
-  docker compose config --services |
-    grep -Fxq "$service" ||
+  services="$(
+    docker compose config --services
+  )"
+
+  grep -Fxq "$service" <<< "$services" ||
     die "El servicio Docker Compose '$service' no existe."
 }
 

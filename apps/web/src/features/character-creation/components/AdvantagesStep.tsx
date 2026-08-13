@@ -65,7 +65,7 @@ import type {
   CharacterThinBloodAlchemyDraft,
 } from '../types/thin-blood-alchemy.types'
 
-    
+
 import type {
   CharacterGeneration,
 } from '../types/character-generation.types'
