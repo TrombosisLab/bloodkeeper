@@ -47,6 +47,8 @@ Después del primer despliegue:
 - `docs/RECOVERY.md`: copias y recuperación.
 - `docs/MAINTENANCE_OPERATIONS.md`: mantenimiento por SSH.
 - `docs/UI_DESIGN_SYSTEM.md`: fundamentos visuales de SPEC-010.
+- `docs/USER_MANUAL.md`: manual de usuario basado en funciones reales.
+- `docs/ADMINISTRATOR_MANUAL.md`: manual de administración Web y SSH.
 - `scripts/README.md`: catálogo de scripts.
 
 ## Estado
