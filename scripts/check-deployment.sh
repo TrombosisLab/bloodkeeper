@@ -144,9 +144,35 @@ grep -Fq './scripts/restore.sh --verify' \
   docs/DEPLOYMENT.md ||
   die "La verificación de backup no está documentada."
 
-grep -Fq 'Recuperación completa del servidor' \
+grep -Fq '## Recuperación desde servidor limpio' \
   docs/RECOVERY.md ||
-  die "La recuperación completa no está documentada."
+  die "Falta el procedimiento de recuperación desde servidor limpio."
+
+grep -Fq 'Ubuntu Server 24.04 LTS.' \
+  docs/RECOVERY.md ||
+  die "La recuperación no identifica el servidor Ubuntu LTS."
+
+grep -Fq './scripts/restore-full.sh' \
+  docs/RECOVERY.md ||
+  die "La recuperación completa no documenta restore-full.sh."
+
+grep -Fq './scripts/bootstrap-server.sh' \
+  docs/RECOVERY.md ||
+  die "La recuperación completa no documenta bootstrap-server.sh."
+
+grep -Fq 'restore.sh --apply' \
+  docs/RECOVERY.md ||
+  die "La recuperación completa no documenta la restauración de base."
+
+grep -Fq './scripts/check.sh' \
+  docs/RECOVERY.md ||
+  die "La recuperación completa no documenta la validación final."
+
+test -x scripts/restore-full.sh ||
+  die "restore-full.sh no está disponible o no es ejecutable."
+
+test -x scripts/restore.sh ||
+  die "restore.sh no está disponible o no es ejecutable."
 
 grep -Fq 'SPEC-006' \
   docs/DEPLOYMENT.md ||

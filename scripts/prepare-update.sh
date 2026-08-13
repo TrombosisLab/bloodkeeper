@@ -115,15 +115,14 @@ current_branch="$(git branch --show-current)"
 current_head="$(git rev-parse HEAD)"
 target_head="$(git rev-parse "${TARGET}^{commit}")"
 
-test -n "$current_branch" ||
-  die "No existe una rama Git activa."
+current_ref="${current_branch:-DETACHED:$current_head}"
 
 ./scripts/check.sh >/dev/null
 
 echo "============================================================"
 echo "BLOODKEEPER — PREPARACIÓN DE ACTUALIZACIÓN"
 echo "============================================================"
-echo "Rama actual: $current_branch"
+echo "Referencia actual: $current_ref"
 echo "Versión actual: $current_head"
 echo "Objetivo: $TARGET"
 echo "Commit objetivo: $target_head"
@@ -227,7 +226,8 @@ plan="$OUTPUT_DIR/update_plan_${stamp}.txt"
 {
   echo "format=bloodkeeper_update_preparation_v1"
   echo "created_utc=$stamp"
-  echo "branch=$current_branch"
+  echo "branch=${current_branch:-DETACHED}"
+  echo "current_ref=$current_ref"
   echo "current_head=$current_head"
   echo "target_ref=$TARGET"
   echo "target_head=$target_head"

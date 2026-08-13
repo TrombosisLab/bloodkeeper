@@ -247,3 +247,24 @@ reglas mantienen una versión `MAJOR.MINOR.PATCH` sincronizada.
 ```
 
 El proceso completo está documentado en `docs/RELEASES.md`.
+
+## Validación de actualización — SPEC-046-B
+
+```bash
+./scripts/check-update-workflow.sh
+```
+
+Comprueba el contrato del flujo de actualización y ejecuta un precheck real
+no destructivo contra `HEAD`. El modo `--apply` exige un working tree limpio
+y confirmación explícita; no se ejecuta durante un incremento aún no
+comprometido en Git.
+
+## Validación de rollback — SPEC-046-C
+
+```bash
+./scripts/check-rollback-workflow.sh
+```
+
+Valida el contrato, usa un backup completo real para ejecutar un precheck
+no destructivo y comprueba que operaciones de impacto requieren confirmación.
+No cambia HEAD ni restaura la base durante esta validación.

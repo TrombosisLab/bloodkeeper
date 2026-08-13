@@ -167,3 +167,86 @@ Resultado esperado:
 ```text
 MANTENIMIENTO SPEC-009 CORRECTO
 ```
+
+## Aplicación de actualizaciones — SPEC-046
+
+SPEC-046 materializa la aplicación efectiva que SPEC-009 dejó
+deliberadamente fuera de alcance.
+
+Precomprobación no destructiva:
+
+```bash
+./scripts/apply-update.sh \
+  --check \
+  --target REFERENCIA_GIT_LOCAL
+```
+
+Aplicación confirmada:
+
+```bash
+./scripts/apply-update.sh \
+  --apply \
+  --target REFERENCIA_GIT_LOCAL \
+  --confirm
+```
+
+El flujo ejecuta, en este orden:
+
+1. validación previa del host, Compose y servicios actuales;
+2. preparación y verificación de un backup completo;
+3. instalación de la referencia Git local como `HEAD` detached;
+4. build reproducible de API y Web;
+5. arranque de PostgreSQL y espera de health;
+6. `prisma migrate deploy`;
+7. arranque de API y Web;
+8. health checks y `./scripts/check.sh`.
+
+El comando no ejecuta `git fetch`, `git pull` ni obtiene código desde un
+remoto. La referencia debe existir ya en el repositorio local.
+
+Ante un fallo el update se detiene y conserva el plan y el backup. La base
+de datos no se restaura automáticamente porque hacerlo sin comprobar la
+compatibilidad del esquema puede destruir datos válidos. La orquestación
+segura de rollback se completa en SPEC-046-C.
+
+## Rollback de una actualización — SPEC-046-C
+
+Cada `update_plan_*.txt` generado antes de una actualización conserva el
+commit previo y el backup completo verificado.
+
+Precheck no destructivo:
+
+```bash
+./scripts/rollback-update.sh \
+  --check \
+  --plan RUTA/update_plan_*.txt
+```
+
+Rollback de código cuando no hubo migraciones:
+
+```bash
+./scripts/rollback-update.sh \
+  --apply \
+  --plan RUTA/update_plan_*.txt \
+  --confirm
+```
+
+Si el plan contiene migraciones, el script no intenta SQL inverso ni permite
+volver sólo el código. La restauración del estado previo exige una decisión
+explícita:
+
+```bash
+./scripts/rollback-update.sh \
+  --apply \
+  --plan RUTA/update_plan_*.txt \
+  --restore-data \
+  --confirm-data-restore \
+  --confirm
+```
+
+La restauración de datos puede descartar cambios posteriores al backup. Antes
+de ejecutarla debe evaluarse ese impacto. El script verifica el paquete,
+vuelve al commit previo, reconstruye las imágenes y valida health y smoke.
+
+Para cambios de infraestructura de alto riesgo, el snapshot de VirtualBox
+sigue siendo una medida manual desde el host y no se automatiza desde la VM.

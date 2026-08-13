@@ -52,3 +52,23 @@ El procedimiento y las evidencias de cierre están documentados en
 - No editar archivos manualmente durante un despliegue.
 - No usar `docker compose down --volumes` en operación habitual.
 - Validar después de cada cambio.
+
+## Actualización controlada — SPEC-046
+
+| Script | Función |
+|---|---|
+| `apply-update.sh` | Aplica una referencia Git local con backup, build, migraciones, health y smoke |
+| `check-update-workflow.sh` | Valida el contrato y precheck no destructivo del update |
+
+`apply-update.sh` no hace fetch/pull remoto y su modo `--apply` requiere
+working tree limpio y `--confirm`.
+
+## Rollback controlado — SPEC-046
+
+| Script | Función |
+|---|---|
+| `rollback-update.sh` | Vuelve al commit previo de un plan y restaura datos sólo con confirmación adicional |
+| `check-rollback-workflow.sh` | Valida el rollback mediante un precheck no destructivo con backup real |
+
+No se automatizan `git fetch/pull`, migraciones SQL inversas ni snapshots de
+VirtualBox.

@@ -153,3 +153,42 @@ eliminar los datos.
 - `v5r-web`: healthy.
 - Frontend accesible por LAN.
 - `/health` responde con API y base de datos en estado `ok`.
+
+## Actualización de una instalación existente
+
+La preparación de riesgo se mantiene en `prepare-update.sh`. La ejecución
+efectiva definida por SPEC-046 usa una referencia Git que ya exista
+localmente:
+
+```bash
+./scripts/apply-update.sh --check --target REFERENCIA_GIT_LOCAL
+
+./scripts/apply-update.sh \
+  --apply \
+  --target REFERENCIA_GIT_LOCAL \
+  --confirm
+```
+
+El procedimiento crea y verifica un backup completo antes de cambiar de
+versión, reconstruye las imágenes, aplica migraciones con
+`prisma migrate deploy`, espera los health checks y termina con
+`./scripts/check.sh`.
+
+No se consultan remotos Git durante la operación.
+
+## Rollback de actualización
+
+El plan creado antes de cada update es también la entrada del rollback:
+
+```bash
+./scripts/rollback-update.sh \
+  --check \
+  --plan RUTA/update_plan_*.txt
+```
+
+Sin migraciones, la vuelta a código anterior se aplica con `--apply --confirm`.
+Cuando el plan contiene migraciones, se exige además `--restore-data` y
+`--confirm-data-restore`; no existe reversión SQL genérica automática.
+
+Tras volver a la versión previa se reconstruyen API/Web, se esperan los
+health checks y se ejecuta `./scripts/check.sh`.
