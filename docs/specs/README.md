@@ -30,7 +30,7 @@ confirmadas.
 | SPEC-009 | [SPEC-009 – MAINTENANCE_OPERATIONS](SPEC-009_MAINTENANCE_OPERATIONS_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-010 | [SPEC-010 -- UI_DESIGN_SYSTEM](SPEC-010_UI_DESIGN_SYSTEM_v1.0.md) | 1.0 | Aprobado | Cerrada | Cerrada y validada antes de la importación del pack. |
 | SPEC-011 | [SPEC-011 -- NAVIGATION](SPEC-011_NAVIGATION_v1.0.md) | 1.0 | Aprobado | Cerrada incrementalmente | Personajes y Crónicas implementados; otras áreas aplazadas hasta disponer de consumidores reales. |
-| SPEC-012 | [SPEC-012 – MAIN_LAYOUT](SPEC-012_MAIN_LAYOUT_v1.0.md) | 1.0 | Aprobado | Activa | Siguiente SPEC autorizada para auditoría e implementación. |
+| SPEC-012 | [SPEC-012 – MAIN_LAYOUT](SPEC-012_MAIN_LAYOUT_v1.0.md) | 1.0 | Aprobado | Cerrada | Layout principal reutilizable, navegación coherente, responsive y estados uniformes validados sin duplicación estructural entre módulos. |
 | SPEC-013 | [SPEC-013 – DASHBOARD](SPEC-013_DASHBOARD_v1.0.md) | 1.0 | Aprobado | No iniciada | No iniciar mientras SPEC-012 no autorice el avance. |
 | SPEC-014 | [SPEC-014 – COMPONENT_LIBRARY](SPEC-014_COMPONENT_LIBRARY_v1.0.md) | 1.0 | Aprobado | No iniciada | No iniciar mientras SPEC-012 no autorice el avance. |
 | SPEC-015 | [SPEC-015 – AUTHENTICATION](SPEC-015_AUTHENTICATION_v1.0.md) | 1.0 | Aprobado | Cerrada | Autenticación completada y validada. |
