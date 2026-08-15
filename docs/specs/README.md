@@ -32,7 +32,7 @@ confirmadas.
 | SPEC-011 | [SPEC-011 -- NAVIGATION](SPEC-011_NAVIGATION_v1.0.md) | 1.0 | Aprobado | Cerrada incrementalmente | Personajes y Crónicas implementados; otras áreas aplazadas hasta disponer de consumidores reales. |
 | SPEC-012 | [SPEC-012 – MAIN_LAYOUT](SPEC-012_MAIN_LAYOUT_v1.0.md) | 1.0 | Aprobado | Cerrada | Layout principal reutilizable, navegación coherente, responsive y estados uniformes validados sin duplicación estructural entre módulos. |
 | SPEC-013 | [SPEC-013 – DASHBOARD](SPEC-013_DASHBOARD_v1.0.md) | 1.0 | Aprobado | Cerrada | Dashboard inicial real con contenido según permisos, accesos principales, estados claros, resúmenes acotados y diseño responsive sin información redundante. |
-| SPEC-014 | [SPEC-014 – COMPONENT_LIBRARY](SPEC-014_COMPONENT_LIBRARY_v1.0.md) | 1.0 | Aprobado | No iniciada | No iniciar mientras SPEC-012 no autorice el avance. |
+| SPEC-014 | [SPEC-014 – COMPONENT_LIBRARY](SPEC-014_COMPONENT_LIBRARY_v1.0.md) | 1.0 | Aprobado | Cerrada | Biblioteca modular consolidada con componentes reutilizables solo donde aportan valor, APIs pequenas, comportamiento consistente, accesibilidad y responsive validados sin abstracciones genericas anticipadas. |
 | SPEC-015 | [SPEC-015 – AUTHENTICATION](SPEC-015_AUTHENTICATION_v1.0.md) | 1.0 | Aprobado | Cerrada | Autenticación completada y validada. |
 | SPEC-016 | [SPEC-016 – USERS](SPEC-016_USERS_v1.0.md) | 1.1 | Aprobado | Cerrada | Gestión de usuarios y autorregistro player completados y validados; stash histórico preservado. |
 | SPEC-017 | [SPEC-017 – ROLES](SPEC-017_ROLES_v1.0.md) | 1.0 | Aprobado | Cerrada | Roles globales y responsabilidades validados contra consumidores reales. |
