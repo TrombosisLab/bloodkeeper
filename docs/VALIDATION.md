@@ -285,3 +285,21 @@ bash scripts/dev/check.sh
 
 La actualización no se considerará válida mientras typecheck, tests,
 build, Docker Compose y health checks no permanezcan correctos.
+
+## SPEC-054 — Accesibilidad, responsive y compatibilidad
+
+La Web prioriza navegadores modernos mantenidos. El objetivo operativo es la versión estable actual de Chrome/Chromium, Microsoft Edge, Firefox y Safari. No se mantiene compatibilidad específica con navegadores obsoletos ni se incorporan polyfills o capas legacy salvo necesidad explícita y documentada.
+
+La validación transversal de SPEC-054 combina comprobaciones automáticas y un smoke test manual en navegador. Las comprobaciones automáticas deben conservar el `lang="es"`, el `viewport` responsive, controles HTML nativos o semánticos, foco visible, nombres accesibles en formularios, estados que no dependan únicamente del color, media queries responsive y un toolchain moderno (`ES2022` + Vite).
+
+Antes del cierre de un cambio que afecte a superficies Web críticas se comprobarán tamaños representativos:
+
+- móvil: aproximadamente 360 × 800 CSS px;
+- tablet: aproximadamente 768 × 1024 CSS px;
+- escritorio: aproximadamente 1440 × 900 CSS px.
+
+El smoke test cubrirá, según los permisos disponibles, autenticación, navegación principal/Inicio, Personajes (listado, creador y ficha), Crónicas y sus paneles principales, Dados y Administración. Se verificará que no exista desplazamiento horizontal injustificado, que los controles táctiles principales sean utilizables y que la reorganización responsive preserve la funcionalidad.
+
+La navegación básica por teclado se comprobará con `Tab` y `Shift+Tab`, activación con `Enter` o `Espacio` cuando corresponda, foco visible durante el recorrido y ausencia de trampas de teclado. También se comprobará visualmente que textos, controles, mensajes y estados críticos mantengan contraste legible y que la información relevante no se comunique únicamente mediante color.
+
+Estas comprobaciones no exigen que las vistas sean idénticas entre escritorio, tablet y móvil; la reorganización es válida mientras conserve funcionalidad y comprensión.
