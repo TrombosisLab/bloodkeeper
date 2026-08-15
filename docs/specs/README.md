@@ -74,7 +74,7 @@ confirmadas.
 | SPEC-053 | [SPEC-053 – PERFORMANCE_AND_SCALABILITY](SPEC-053_PERFORMANCE_AND_SCALABILITY_v1.0.md) | 1.0 | Aprobado | Cerrada | Paginación acotada y determinista en listados públicos, casos especiales preservados y rendimiento local validado sin sobrearquitectura. |
 | SPEC-054 | [SPEC-054 – ACCESSIBILITY_RESPONSIVE_AND_COMPATIBILITY](SPEC-054_ACCESSIBILITY_RESPONSIVE_AND_COMPATIBILITY_v1.0.md) | 1.0 | Aprobado | Cerrada | Accesibilidad por teclado, responsive móvil/tablet/escritorio, controles táctiles y compatibilidad moderna validados y documentados. |
 | SPEC-055 | [SPEC-055 – PROJECT_COMPLETION_CRITERIA](SPEC-055_PROJECT_COMPLETION_CRITERIA_v1.0.md) | 1.0 | Aprobado | Cerrada | Definition of Done, integración modular E2E, release, health/smoke, backup/rollback y validación continua acreditados. |
-| SPEC-056 | [SPEC-056 – CHARACTER_EXPERIENCE_AND_ADVANCEMENT](SPEC-056_CHARACTER_EXPERIENCE_AND_ADVANCEMENT_v1.0.md) | 1.0 | Aprobado | Planificada | Experiencia y evolución de personajes; ejecutar después de SPEC-035 y antes de SPEC-036 para reutilizar roles de crónica y sesiones. |
+| SPEC-056 | [SPEC-056 – CHARACTER_EXPERIENCE_AND_ADVANCEMENT](SPEC-056_CHARACTER_EXPERIENCE_AND_ADVANCEMENT_v1.0.md) | 1.0 | Aprobado | Cerrada | Experiencia y evolución completas: ledger trazable, concesiones y correcciones autorizadas, costes V5, compra atómica, validación `evolution` e integración Web verificadas. |
 
 ## Versiones archivadas
 
