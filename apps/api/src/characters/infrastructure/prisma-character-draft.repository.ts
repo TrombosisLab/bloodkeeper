@@ -1,4 +1,14 @@
 import {
+  MAX_OFFSET_PAGE_LIMIT,
+  offsetPageFromRows,
+} from '../../common/offset-pagination'
+
+import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import {
   CharacterStateWriteConflictError,
 } from '../application/character-draft.repository'
 
@@ -1263,9 +1273,61 @@ export class PrismaCharacterDraftRepository
     )
   }
 
+  listByOwner(
+    ownerId: string,
+  ): Promise<
+    readonly PersistedCharacterDraft[]
+  >
+
+  listByOwner(
+    ownerId: string,
+    query: OffsetPaginationQuery,
+  ): Promise<
+    OffsetPage<PersistedCharacterDraft>
+  >
+
   async listByOwner(
     ownerId: string,
-  ): Promise<readonly PersistedCharacterDraft[]> {
+    query?: OffsetPaginationQuery,
+  ): Promise<
+    | readonly PersistedCharacterDraft[]
+    | OffsetPage<PersistedCharacterDraft>
+  > {
+    if (query !== undefined) {
+      return this.listByOwnerPage(
+        ownerId,
+        query,
+      )
+    }
+
+    const items:
+      PersistedCharacterDraft[] = []
+
+    let nextOffset: number | null = 0
+
+    while (nextOffset !== null) {
+      const page =
+        await this.listByOwnerPage(
+          ownerId,
+          {
+            limit: MAX_OFFSET_PAGE_LIMIT,
+            offset: nextOffset,
+          },
+        )
+
+      items.push(...page.items)
+      nextOffset = page.nextOffset
+    }
+
+    return items
+  }
+
+  private async listByOwnerPage(
+    ownerId: string,
+    query: OffsetPaginationQuery,
+  ): Promise<
+    OffsetPage<PersistedCharacterDraft>
+  > {
     const rows =
       await this.database.character.findMany({
         where: {
@@ -1280,15 +1342,80 @@ export class PrismaCharacterDraftRepository
             id: 'asc',
           },
         ],
+        skip: query.offset,
+        take: query.limit + 1,
       })
 
-    return rows.map(toPersistedDraft)
+    const page =
+      offsetPageFromRows(
+        rows,
+        query,
+      )
+
+    return {
+      items: page.items.map(
+        toPersistedDraft,
+      ),
+      nextOffset:
+        page.nextOffset,
+    }
   }
 
-  async listByChronicle(
+  listByChronicle(
     chronicleId: string,
   ): Promise<
     readonly PersistedCharacterDraft[]
+  >
+
+  listByChronicle(
+    chronicleId: string,
+    query: OffsetPaginationQuery,
+  ): Promise<
+    OffsetPage<PersistedCharacterDraft>
+  >
+
+  async listByChronicle(
+    chronicleId: string,
+    query?: OffsetPaginationQuery,
+  ): Promise<
+    | readonly PersistedCharacterDraft[]
+    | OffsetPage<PersistedCharacterDraft>
+  > {
+    if (query !== undefined) {
+      return this.listByChroniclePage(
+        chronicleId,
+        query,
+      )
+    }
+
+    const items:
+      PersistedCharacterDraft[] = []
+
+    let nextOffset: number | null = 0
+
+    while (nextOffset !== null) {
+      const page =
+        await this.listByChroniclePage(
+          chronicleId,
+          {
+            limit:
+              MAX_OFFSET_PAGE_LIMIT,
+            offset: nextOffset,
+          },
+        )
+
+      items.push(...page.items)
+      nextOffset = page.nextOffset
+    }
+
+    return items
+  }
+
+  private async listByChroniclePage(
+    chronicleId: string,
+    query: OffsetPaginationQuery,
+  ): Promise<
+    OffsetPage<PersistedCharacterDraft>
   > {
     const rows =
       await this.database.character.findMany({
@@ -1296,14 +1423,23 @@ export class PrismaCharacterDraftRepository
           chronicleId,
         },
         include: characterRelations,
-        orderBy: {
-          updatedAt: 'desc',
-        },
+        orderBy: [
+          {
+            updatedAt: 'desc',
+          },
+          {
+            id: 'asc',
+          },
+        ],
+        skip: query.offset,
+        take: query.limit + 1,
       })
 
-    return rows.map(toPersistedDraft)
+    return offsetPageFromRows(
+      rows.map(toPersistedDraft),
+      query,
+    )
   }
-
 
   async findById(
     ownerId: string,

@@ -3,6 +3,11 @@ import {
   Injectable,
 } from '@nestjs/common'
 
+import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
 import {
   CHRONICLE_NPC_REPOSITORY,
 } from './chronicle-npc.repository'
@@ -41,7 +46,8 @@ export class ListChronicleNpcsUseCase {
   async execute(
     actorUserId: string,
     chronicleId: string,
-  ): Promise<readonly ChronicleNpc[]> {
+    query: OffsetPaginationQuery,
+  ): Promise<OffsetPage<ChronicleNpc>> {
     await assertChronicleNpcNarrator(
       this.participants,
       actorUserId,
@@ -50,6 +56,7 @@ export class ListChronicleNpcsUseCase {
 
     return this.npcs.listByChronicleId(
       chronicleId,
+      query,
     )
   }
 }

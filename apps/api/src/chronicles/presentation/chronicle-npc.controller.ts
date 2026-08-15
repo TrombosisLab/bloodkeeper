@@ -8,9 +8,14 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UnauthorizedException,
 } from '@nestjs/common'
+
+import {
+  parseOffsetPaginationQuery,
+} from '../../common/offset-pagination'
 
 import {
   CreateChronicleNpcUseCase,
@@ -141,9 +146,9 @@ export class ChronicleNpcController {
       AuthenticatedChronicleNpcRequest,
     @Param('chronicleId')
     chronicleIdInput: unknown,
-  ): Promise<
-    readonly ChronicleNpcResponseDto[]
-  > {
+    @Query() queryInput?:
+      Record<string, unknown>,
+  ) {
     const actorUserId =
       authenticatedUserId(request)
 
@@ -153,12 +158,41 @@ export class ChronicleNpcController {
           chronicleIdInput,
         )
 
-      return (
+      let query
+
+      try {
+        query =
+          parseOffsetPaginationQuery({
+            limit:
+              queryInput?.limit,
+            offset:
+              queryInput?.offset,
+          })
+      } catch (error: unknown) {
+        throw new BadRequestException({
+          code:
+            'INVALID_PAGINATION_QUERY',
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Invalid pagination query',
+        })
+      }
+
+      const page =
         await this.listNpcs.execute(
           actorUserId,
           chronicleId,
+          query,
         )
-      ).map(toChronicleNpcResponse)
+
+      return {
+        items: page.items.map(
+          toChronicleNpcResponse,
+        ),
+        nextOffset:
+          page.nextOffset,
+      }
     } catch (error: unknown) {
       throwChronicleNpcHttpError(error)
     }

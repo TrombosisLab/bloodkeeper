@@ -79,6 +79,16 @@ export function CharacterList({
     readonly CharacterDraftApiSnapshot[]
   >([])
 
+  const [
+    charactersNextOffset,
+    setCharactersNextOffset,
+  ] = useState<number | null>(null)
+
+  const [
+    loadingMore,
+    setLoadingMore,
+  ] = useState(false)
+
   const [loading, setLoading] =
     useState(true)
 
@@ -90,8 +100,17 @@ export function CharacterList({
     setError(null)
 
     try {
+      const page =
+        await gateway.listPage({
+          limit: 25,
+          offset: 0,
+        })
+
       setCharacters(
-        await gateway.list(),
+        page.items,
+      )
+      setCharactersNextOffset(
+        page.nextOffset,
       )
     } catch (loadError: unknown) {
       setError(
@@ -99,6 +118,43 @@ export function CharacterList({
       )
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function loadMoreCharacters() {
+    if (
+      charactersNextOffset === null ||
+      loadingMore
+    ) {
+      return
+    }
+
+    setLoadingMore(true)
+    setError(null)
+
+    try {
+      const page =
+        await gateway.listPage({
+          limit: 25,
+          offset:
+            charactersNextOffset,
+        })
+
+      setCharacters(
+        (current) => [
+          ...current,
+          ...page.items,
+        ],
+      )
+      setCharactersNextOffset(
+        page.nextOffset,
+      )
+    } catch (loadError: unknown) {
+      setError(
+        errorMessage(loadError),
+      )
+    } finally {
+      setLoadingMore(false)
     }
   }
 
@@ -253,6 +309,23 @@ export function CharacterList({
             )}
           </ul>
         )}
+
+        {!loading &&
+        error === null &&
+        characters.length > 0 &&
+        charactersNextOffset !== null ? (
+          <button
+            type="button"
+            onClick={() =>
+              void loadMoreCharacters()
+            }
+            disabled={loadingMore}
+          >
+            {loadingMore
+              ? 'Cargando más…'
+              : 'Cargar más personajes'}
+          </button>
+        ) : null}
       </section>
     </section>
   )

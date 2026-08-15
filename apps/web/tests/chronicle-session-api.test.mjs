@@ -99,7 +99,10 @@ test(
 test(
   '035-C gateway usa endpoints backend exactos',
   () => {
-    assert.match(gateway, /\/sessions`/)
+    assert.match(
+      gateway,
+      /\/sessions\?limit=\$\{limit\}&offset=\$\{offset\}`/,
+    )
     assert.match(
       gateway,
       /\/sessions\/\$\{sessionId\}`/,

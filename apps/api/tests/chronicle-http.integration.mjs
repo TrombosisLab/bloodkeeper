@@ -170,7 +170,14 @@ test(
         await listed.json()
 
       assert.equal(
-        listedBody.some(
+        Array.isArray(
+          listedBody.items,
+        ),
+        true,
+      )
+
+      assert.equal(
+        listedBody.items.some(
           (chronicle) =>
             chronicle.id ===
               createdBody.id &&

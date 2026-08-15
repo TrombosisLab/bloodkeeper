@@ -251,6 +251,14 @@ export function ChronicleSessionPanel({
   const [loading, setLoading] =
     useState(true)
   const [
+    sessionsNextOffset,
+    setSessionsNextOffset,
+  ] = useState<number | null>(null)
+  const [
+    loadingMoreSessions,
+    setLoadingMoreSessions,
+  ] = useState(false)
+  const [
     operationError,
     setOperationError,
   ] = useState<string | null>(null)
@@ -286,10 +294,18 @@ export function ChronicleSessionPanel({
     setOperationError(null)
 
     try {
-      setSessions(
+      const page =
         await gateway.sessions(
           chronicleId,
-        ),
+          {
+            limit: 25,
+            offset: 0,
+          },
+        )
+
+      setSessions(page.items)
+      setSessionsNextOffset(
+        page.nextOffset,
       )
     } catch (error: unknown) {
       setOperationError(
@@ -297,6 +313,46 @@ export function ChronicleSessionPanel({
       )
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function loadMoreSessions() {
+    if (
+      sessionsNextOffset === null ||
+      loadingMoreSessions
+    ) {
+      return
+    }
+
+    setLoadingMoreSessions(true)
+    setOperationError(null)
+
+    try {
+      const page =
+        await gateway.sessions(
+          chronicleId,
+          {
+            limit: 25,
+            offset:
+              sessionsNextOffset,
+          },
+        )
+
+      setSessions(
+        (current) => [
+          ...current,
+          ...page.items,
+        ],
+      )
+      setSessionsNextOffset(
+        page.nextOffset,
+      )
+    } catch (error: unknown) {
+      setOperationError(
+        operationErrorMessage(error),
+      )
+    } finally {
+      setLoadingMoreSessions(false)
     }
   }
 
@@ -331,12 +387,19 @@ export function ChronicleSessionPanel({
   async function refreshAfterWrite(
     sessionId?: string,
   ) {
-    const updated =
+    const page =
       await gateway.sessions(
         chronicleId,
+        {
+          limit: 25,
+          offset: 0,
+        },
       )
 
-    setSessions(updated)
+    setSessions(page.items)
+    setSessionsNextOffset(
+      page.nextOffset,
+    )
 
     if (
       selectedSession !== null &&
@@ -346,11 +409,10 @@ export function ChronicleSessionPanel({
       )
     ) {
       setSelectedSession(
-        updated.find(
-          (session) =>
-            session.id ===
-            selectedSession.id,
-        ) ?? null,
+        await gateway.session(
+          chronicleId,
+          selectedSession.id,
+        ),
       )
     }
   }
@@ -853,6 +915,20 @@ export function ChronicleSessionPanel({
           )}
         </ul>
       )}
+
+      {sessionsNextOffset !== null ? (
+        <button
+          type="button"
+          onClick={() => {
+            void loadMoreSessions()
+          }}
+          disabled={loadingMoreSessions}
+        >
+          {loadingMoreSessions
+            ? 'Cargando más sesiones…'
+            : 'Cargar más sesiones'}
+        </button>
+      ) : null}
 
       {selectedSession !== null ? (
         <section className="chronicle-session-panel__detail">

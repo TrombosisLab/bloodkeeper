@@ -1,4 +1,9 @@
 import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import type {
   ChronicleEvent,
   CreateChronicleEventData,
   UpdateChronicleEventData,
@@ -21,7 +26,8 @@ export class ChronicleEventReorderMismatchError
 export interface ChronicleEventRepository {
   listByChronicleId(
     chronicleId: string,
-  ): Promise<readonly ChronicleEvent[]>
+    query: OffsetPaginationQuery,
+  ): Promise<OffsetPage<ChronicleEvent>>
 
   findById(
     chronicleId: string,

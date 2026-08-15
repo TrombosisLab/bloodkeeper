@@ -1,4 +1,13 @@
 import {
+  offsetPageFromRows,
+} from '../../common/offset-pagination'
+
+import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import {
   Injectable,
 } from '@nestjs/common'
 
@@ -76,7 +85,8 @@ export class PrismaChronicleNpcRepository
 
   async listByChronicleId(
     chronicleId: string,
-  ): Promise<readonly ChronicleNpc[]> {
+    query: OffsetPaginationQuery,
+  ): Promise<OffsetPage<ChronicleNpc>> {
     const rows =
       await this.database.chronicleNpc.findMany({
         where: {
@@ -96,9 +106,14 @@ export class PrismaChronicleNpcRepository
             id: 'asc',
           },
         ],
+        skip: query.offset,
+        take: query.limit + 1,
       })
 
-    return rows.map(toDomain)
+    return offsetPageFromRows(
+      rows.map(toDomain),
+      query,
+    )
   }
 
   async findById(

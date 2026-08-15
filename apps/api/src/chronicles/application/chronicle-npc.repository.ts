@@ -1,4 +1,9 @@
 import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import type {
   ChronicleNpc,
   CreateChronicleNpcData,
   UpdateChronicleNpcData,
@@ -10,7 +15,8 @@ export const CHRONICLE_NPC_REPOSITORY =
 export interface ChronicleNpcRepository {
   listByChronicleId(
     chronicleId: string,
-  ): Promise<readonly ChronicleNpc[]>
+    query: OffsetPaginationQuery,
+  ): Promise<OffsetPage<ChronicleNpc>>
 
   findById(
     chronicleId: string,

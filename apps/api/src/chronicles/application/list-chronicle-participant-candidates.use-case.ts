@@ -1,3 +1,12 @@
+import {
+  MAX_OFFSET_PAGE_LIMIT,
+} from '../../common/offset-pagination'
+
+import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
 import type {
   ChronicleParticipantRepository,
 } from './chronicle-participant.repository'
@@ -22,8 +31,9 @@ export class ListChronicleParticipantCandidatesUseCase {
   async execute(
     requesterId: string,
     chronicleId: string,
+    query: OffsetPaginationQuery,
   ): Promise<
-    readonly ChronicleUserDirectoryEntry[]
+    OffsetPage<ChronicleUserDirectoryEntry>
   > {
     const membership =
       await this.participants
@@ -39,16 +49,11 @@ export class ListChronicleParticipantCandidatesUseCase {
       throw new ChronicleParticipantPermissionError()
     }
 
-    const [
-      users,
-      existingParticipants,
-    ] = await Promise.all([
-      this.users.list(),
-      this.participants
+    const existingParticipants =
+      await this.participants
         .listByChronicleId(
           chronicleId,
-        ),
-    ])
+        )
 
     const existingUserIds =
       new Set(
@@ -58,9 +63,73 @@ export class ListChronicleParticipantCandidatesUseCase {
         ),
       )
 
-    return users.filter(
-      (user) =>
-        !existingUserIds.has(user.id),
-    )
+    const candidates:
+      ChronicleUserDirectoryEntry[] = []
+
+    let sourceOffset:
+      number | null = 0
+
+    let candidateIndex = 0
+
+    while (
+      sourceOffset !== null &&
+      candidates.length <= query.limit
+    ) {
+      const page:
+        OffsetPage<ChronicleUserDirectoryEntry> =
+        await this.users.list({
+          limit:
+            MAX_OFFSET_PAGE_LIMIT,
+          offset:
+            sourceOffset,
+        })
+
+      for (const user of page.items) {
+        if (
+          existingUserIds.has(
+            user.id,
+          )
+        ) {
+          continue
+        }
+
+        if (
+          candidateIndex <
+          query.offset
+        ) {
+          candidateIndex += 1
+          continue
+        }
+
+        candidates.push(user)
+        candidateIndex += 1
+
+        if (
+          candidates.length >
+          query.limit
+        ) {
+          break
+        }
+      }
+
+      sourceOffset =
+        page.nextOffset
+    }
+
+    const hasNext =
+      candidates.length >
+      query.limit
+
+    return {
+      items: candidates.slice(
+        0,
+        query.limit,
+      ),
+      nextOffset:
+        hasNext
+          ? query.offset +
+            query.limit
+          : null,
+    }
   }
 }

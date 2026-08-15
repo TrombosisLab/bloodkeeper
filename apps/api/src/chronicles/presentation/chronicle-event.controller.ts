@@ -9,9 +9,15 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UnauthorizedException,
 } from '@nestjs/common'
+
+import {
+  InvalidOffsetPaginationQueryError,
+  parseOffsetPaginationQuery,
+} from '../../common/offset-pagination'
 import {
   ArchiveChronicleEventUseCase,
 } from '../application/archive-chronicle-event.use-case'
@@ -148,9 +154,9 @@ export class ChronicleEventController {
       AuthenticatedChronicleEventRequest,
     @Param('chronicleId')
     chronicleIdInput: unknown,
-  ): Promise<
-    readonly ChronicleEventResponseDto[]
-  > {
+    @Query() queryInput?:
+      Record<string, unknown>,
+  ) {
     const actorUserId =
       authenticatedUserId(request)
 
@@ -160,15 +166,40 @@ export class ChronicleEventController {
           chronicleIdInput,
         )
 
-      return (
+      const query =
+        parseOffsetPaginationQuery({
+          limit:
+            queryInput?.limit,
+          offset:
+            queryInput?.offset,
+        })
+
+      const page =
         await this.listEvents.execute(
           actorUserId,
           chronicleId,
+          query,
         )
-      ).map(
-        toChronicleEventResponse,
-      )
+
+      return {
+        items: page.items.map(
+          toChronicleEventResponse,
+        ),
+        nextOffset:
+          page.nextOffset,
+      }
     } catch (error: unknown) {
+      if (
+        error instanceof
+          InvalidOffsetPaginationQueryError
+      ) {
+        throw new BadRequestException({
+          code:
+            'INVALID_PAGINATION_QUERY',
+          field: error.field,
+        })
+      }
+
       throwChronicleEventHttpError(error)
     }
   }

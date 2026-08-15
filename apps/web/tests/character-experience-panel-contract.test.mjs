@@ -70,3 +70,46 @@ test('056-E incorpora estados visuales y adaptación móvil', () => {
   assert.match(css, /persisted-experience__preview-card--eligible/)
   assert.match(css, /persisted-experience__preview-card--rejected/)
 })
+
+test('SPEC-053 pagina el historial de Experiencia con Cargar más', () => {
+  assert.match(
+    panel,
+    /resolvedGateway\.load\([\s\S]*limit:\s*25[\s\S]*offset:\s*0/,
+  )
+  assert.match(
+    panel,
+    /ledger\?\.nextOffset/,
+  )
+  assert.match(
+    panel,
+    /loadMoreExperience/,
+  )
+  assert.match(
+    panel,
+    /offset:[\s\S]*nextOffset/,
+  )
+  assert.match(
+    panel,
+    /\.\.\.current\.movements[\s\S]*\.\.\.page\.movements/,
+  )
+  assert.match(
+    panel,
+    /Cargar más/,
+  )
+  assert.match(
+    panel,
+    /ledger\.available/,
+  )
+  assert.match(
+    panel,
+    /ledger\.spent/,
+  )
+  assert.match(
+    panel,
+    /ledger\.total/,
+  )
+  assert.doesNotMatch(
+    api,
+    /while\s*\(\s*nextOffset\s*!==\s*null\s*\)/,
+  )
+})

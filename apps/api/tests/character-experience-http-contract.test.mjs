@@ -129,3 +129,26 @@ test('056-B serializa saldo derivado e historial mecanico', () => {
     createdAt.toISOString(),
   )
 })
+
+test('SPEC-053 GET Experience pagina movements y conserva writes full', () => {
+  assert.match(
+    controller,
+    /@Get\(\)[\s\S]*@Query\(\)[\s\S]*parseOffsetPaginationQuery/,
+  )
+  assert.match(
+    controller,
+    /toCharacterExperiencePageResponse/,
+  )
+  assert.match(
+    controller,
+    /INVALID_PAGINATION_QUERY/,
+  )
+  assert.match(
+    controller,
+    /@Post\('grants'\)[\s\S]*toCharacterExperienceResponse/,
+  )
+  assert.match(
+    controller,
+    /@Post\('corrections'\)[\s\S]*toCharacterExperienceResponse/,
+  )
+})

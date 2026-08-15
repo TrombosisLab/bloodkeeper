@@ -8,10 +8,15 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
   Req,
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common'
+import {
+  InvalidOffsetPaginationQueryError,
+  parseOffsetPaginationQuery,
+} from '../../common/offset-pagination'
 import {
   CorrectCharacterExperienceUseCase,
   CharacterExperienceCharacterNotFoundError,
@@ -39,9 +44,11 @@ import {
   parseCharacterExperienceUserId,
   parseCorrectCharacterExperienceRequest,
   parseGrantCharacterExperienceRequest,
+  toCharacterExperiencePageResponse,
   toCharacterExperienceResponse,
 } from './character-experience.dto'
 import type {
+  CharacterExperiencePageResponseDto,
   CharacterExperienceResponseDto,
 } from './character-experience.dto'
 
@@ -162,7 +169,9 @@ export class CharacterExperienceController {
       AuthenticatedCharacterExperienceRequest,
     @Param('characterId')
     characterIdInput: unknown,
-  ): Promise<CharacterExperienceResponseDto> {
+    @Query() queryInput?:
+      Record<string, unknown>,
+  ): Promise<CharacterExperiencePageResponseDto> {
     const actorUserId =
       authenticatedUserId(request)
 
@@ -171,13 +180,34 @@ export class CharacterExperienceController {
         parseCharacterExperienceIdParam(
           characterIdInput,
         )
-      return toCharacterExperienceResponse(
+
+      const query =
+        parseOffsetPaginationQuery({
+          limit:
+            queryInput?.limit,
+          offset:
+            queryInput?.offset,
+        })
+
+      return toCharacterExperiencePageResponse(
         await this.loadExperience.execute(
           actorUserId,
           characterId,
+          query,
         ),
       )
     } catch (error: unknown) {
+      if (
+        error instanceof
+          InvalidOffsetPaginationQueryError
+      ) {
+        throw new BadRequestException({
+          code:
+            'INVALID_PAGINATION_QUERY',
+          field: error.field,
+        })
+      }
+
       throwCharacterExperienceHttpError(error)
     }
   }

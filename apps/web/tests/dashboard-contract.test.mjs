@@ -142,7 +142,7 @@ test('SPEC-013 muestra el resumen de Crónicas a participantes autenticados', ()
   )
   assert.match(
     dashboardSource,
-    /await gateway\.list\(\)/,
+    /await gateway\.listPage\(\{/,
   )
   assert.match(
     mainSource,

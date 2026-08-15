@@ -39,7 +39,7 @@ test(
     )
     assert.match(
       component,
-      /gateway\.list/,
+      /gateway\.listPage/,
     )
     assert.match(
       component,

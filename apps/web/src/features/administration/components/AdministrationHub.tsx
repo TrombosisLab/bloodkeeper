@@ -83,6 +83,12 @@ export function AdministrationHub() {
   const [users, setUsers] = useState<
     readonly AdministrationUser[]
   >([])
+  const [usersNextOffset,
+    setUsersNextOffset] =
+    useState<number | null>(null)
+  const [usersLoadingMore,
+    setUsersLoadingMore] =
+    useState(false)
   const [message, setMessage] =
     useState('')
   const [loading, setLoading] =
@@ -107,13 +113,58 @@ export function AdministrationHub() {
     setLoading(true)
 
     try {
-      setUsers(await userApi.list())
+      const page =
+        await userApi.list({
+          limit: 25,
+          offset: 0,
+        })
+
+      setUsers(page.items)
+      setUsersNextOffset(
+        page.nextOffset,
+      )
     } catch {
       setMessage(
         'No se pudieron cargar las cuentas.',
       )
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadMoreUsers = async () => {
+    if (
+      usersNextOffset === null ||
+      usersLoadingMore
+    ) {
+      return
+    }
+
+    setUsersLoadingMore(true)
+
+    try {
+      const page =
+        await userApi.list({
+          limit: 25,
+          offset: usersNextOffset,
+        })
+
+      setUsers(
+        (current) => [
+          ...current,
+          ...page.items,
+        ],
+      )
+
+      setUsersNextOffset(
+        page.nextOffset,
+      )
+    } catch {
+      setMessage(
+        'No se pudieron cargar más cuentas.',
+      )
+    } finally {
+      setUsersLoadingMore(false)
     }
   }
 
@@ -436,6 +487,20 @@ export function AdministrationHub() {
               </div>
             ))
           )}
+          {!loading &&
+          usersNextOffset !== null ? (
+            <button
+              type="button"
+              disabled={usersLoadingMore}
+              onClick={() =>
+                void loadMoreUsers()
+              }
+            >
+              {usersLoadingMore
+                ? 'Cargando más…'
+                : 'Cargar más usuarios'}
+            </button>
+          ) : null}
         </article>
       </div>
 

@@ -8,9 +8,15 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UnauthorizedException,
 } from '@nestjs/common'
+
+import {
+  InvalidOffsetPaginationQueryError,
+  parseOffsetPaginationQuery,
+} from '../../common/offset-pagination'
 
 import {
   ArchiveChronicleLocationUseCase,
@@ -162,9 +168,9 @@ export class ChronicleLocationController {
       AuthenticatedChronicleLocationRequest,
     @Param('chronicleId')
     chronicleIdInput: unknown,
-  ): Promise<
-    readonly ChronicleLocationResponseDto[]
-  > {
+    @Query() queryInput?:
+      Record<string, unknown>,
+  ) {
     const actorUserId =
       authenticatedUserId(request)
 
@@ -174,14 +180,45 @@ export class ChronicleLocationController {
           chronicleIdInput,
         )
 
-      return (
+      let query
+
+      try {
+        query =
+          parseOffsetPaginationQuery({
+            limit:
+              queryInput?.limit,
+            offset:
+              queryInput?.offset,
+          })
+      } catch (error: unknown) {
+        if (
+          error instanceof
+            InvalidOffsetPaginationQueryError
+        ) {
+          throw new BadRequestException({
+            code:
+              'INVALID_PAGINATION_QUERY',
+            field: error.field,
+          })
+        }
+
+        throw error
+      }
+
+      const page =
         await this.listLocations.execute(
           actorUserId,
           chronicleId,
+          query,
         )
-      ).map(
-        toChronicleLocationResponse,
-      )
+
+      return {
+        items: page.items.map(
+          toChronicleLocationResponse,
+        ),
+        nextOffset:
+          page.nextOffset,
+      }
     } catch (error: unknown) {
       throwChronicleLocationHttpError(error)
     }

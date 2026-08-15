@@ -20,7 +20,7 @@ test(
   () => {
     assert.match(
       component,
-      /await gateway\.list\(\)/,
+      /await gateway\.listPage\(\{/,
     )
     assert.match(
       component,

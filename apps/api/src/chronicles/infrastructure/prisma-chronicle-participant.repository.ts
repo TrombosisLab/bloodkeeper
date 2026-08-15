@@ -1,4 +1,14 @@
 import {
+  MAX_OFFSET_PAGE_LIMIT,
+  offsetPageFromRows,
+} from '../../common/offset-pagination'
+
+import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import {
   Injectable,
 } from '@nestjs/common'
 
@@ -165,9 +175,62 @@ export class PrismaChronicleParticipantRepository
       : toDomain(row)
   }
 
+  listByChronicleId(
+    chronicleId: string,
+  ): Promise<
+    readonly ChronicleParticipant[]
+  >
+
+  listByChronicleId(
+    chronicleId: string,
+    query: OffsetPaginationQuery,
+  ): Promise<
+    OffsetPage<ChronicleParticipant>
+  >
+
   async listByChronicleId(
     chronicleId: string,
-  ): Promise<readonly ChronicleParticipant[]> {
+    query?: OffsetPaginationQuery,
+  ): Promise<
+    | readonly ChronicleParticipant[]
+    | OffsetPage<ChronicleParticipant>
+  > {
+    if (query !== undefined) {
+      return this.listByChronicleIdPage(
+        chronicleId,
+        query,
+      )
+    }
+
+    const items:
+      ChronicleParticipant[] = []
+
+    let nextOffset: number | null = 0
+
+    while (nextOffset !== null) {
+      const page =
+        await this.listByChronicleIdPage(
+          chronicleId,
+          {
+            limit:
+              MAX_OFFSET_PAGE_LIMIT,
+            offset: nextOffset,
+          },
+        )
+
+      items.push(...page.items)
+      nextOffset = page.nextOffset
+    }
+
+    return items
+  }
+
+  private async listByChronicleIdPage(
+    chronicleId: string,
+    query: OffsetPaginationQuery,
+  ): Promise<
+    OffsetPage<ChronicleParticipant>
+  > {
     const rows =
       await this.database.chronicleParticipant.findMany({
         where: {
@@ -188,9 +251,14 @@ export class PrismaChronicleParticipantRepository
             id: 'asc',
           },
         ],
+        skip: query.offset,
+        take: query.limit + 1,
       })
 
-    return rows.map(toDomain)
+    return offsetPageFromRows(
+      rows.map(toDomain),
+      query,
+    )
   }
 
   async userExists(

@@ -1,4 +1,9 @@
 import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import type {
   UserAdministrationRepository,
 } from './user-administration.repository'
 
@@ -14,7 +19,22 @@ export class ListUsersUseCase {
 
   execute(): Promise<
     readonly UserAdministrationRecord[]
+  >
+
+  execute(
+    query: OffsetPaginationQuery,
+  ): Promise<
+    OffsetPage<UserAdministrationRecord>
+  >
+
+  execute(
+    query?: OffsetPaginationQuery,
+  ): Promise<
+    | readonly UserAdministrationRecord[]
+    | OffsetPage<UserAdministrationRecord>
   > {
-    return this.users.list()
+    return query === undefined
+      ? this.users.list()
+      : this.users.list(query)
   }
 }

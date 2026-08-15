@@ -118,6 +118,16 @@ export function ChronicleListCreate({
     description,
     setDescription,
   ] = useState('')
+  const [
+    chroniclesNextOffset,
+    setChroniclesNextOffset,
+  ] = useState<number | null>(null)
+
+  const [
+    loadingMore,
+    setLoadingMore,
+  ] = useState(false)
+
   const [loading, setLoading] =
     useState(true)
   const [
@@ -146,8 +156,15 @@ export function ChronicleListCreate({
     setFailureState(null)
 
     try {
-      setChronicles(
-        await gateway.list(),
+      const page =
+        await gateway.listPage({
+          limit: 25,
+          offset: 0,
+        })
+
+      setChronicles(page.items)
+      setChroniclesNextOffset(
+        page.nextOffset,
       )
     } catch (loadError: unknown) {
       setFailureState(
@@ -160,6 +177,49 @@ export function ChronicleListCreate({
       )
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function loadMoreChronicles() {
+    if (
+      chroniclesNextOffset === null ||
+      loadingMore
+    ) {
+      return
+    }
+
+    setLoadingMore(true)
+    setError(null)
+    setFailureState(null)
+
+    try {
+      const page =
+        await gateway.listPage({
+          limit: 25,
+          offset:
+            chroniclesNextOffset,
+        })
+
+      setChronicles(
+        (current) => [
+          ...current,
+          ...page.items,
+        ],
+      )
+      setChroniclesNextOffset(
+        page.nextOffset,
+      )
+    } catch (loadError: unknown) {
+      setFailureState(
+        stateForChronicleError(
+          loadError,
+        ),
+      )
+      setError(
+        errorMessage(loadError),
+      )
+    } finally {
+      setLoadingMore(false)
     }
   }
 
@@ -176,24 +236,17 @@ export function ChronicleListCreate({
     setFailureState(null)
 
     try {
-      const created =
-        await gateway.create({
-          name,
-          description:
-            description.trim().length === 0
-              ? null
-              : description,
-        })
+      await gateway.create({
+        name,
+        description:
+          description.trim().length === 0
+            ? null
+            : description,
+      })
 
-      setChronicles((current) => [
-        created,
-        ...current.filter(
-          (chronicle) =>
-            chronicle.id !== created.id,
-        ),
-      ])
       setName('')
       setDescription('')
+      await loadChronicles()
     } catch (creationError: unknown) {
       setFailureState(
         stateForChronicleError(
@@ -455,6 +508,23 @@ export function ChronicleListCreate({
           ) : null}
         </section>
       </div>
-    </section>
+
+        {!loading &&
+        error === null &&
+        chronicles.length > 0 &&
+        chroniclesNextOffset !== null ? (
+          <button
+            type="button"
+            onClick={() =>
+              void loadMoreChronicles()
+            }
+            disabled={loadingMore}
+          >
+            {loadingMore
+              ? 'Cargando más…'
+              : 'Cargar más crónicas'}
+          </button>
+        ) : null}
+</section>
   )
 }

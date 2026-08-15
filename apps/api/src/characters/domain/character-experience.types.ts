@@ -41,6 +41,16 @@ export interface CharacterExperienceLedger {
     readonly CharacterExperienceMovement[]
 }
 
+export interface CharacterExperienceLedgerPage {
+  readonly characterId: string
+  readonly total: number
+  readonly spent: number
+  readonly available: number
+  readonly movements:
+    readonly CharacterExperienceMovement[]
+  readonly nextOffset: number | null
+}
+
 export interface CharacterExperienceCharacter {
   readonly id: string
   readonly ownerId: string

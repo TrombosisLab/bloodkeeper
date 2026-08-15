@@ -43,41 +43,50 @@ test(
           calls.push([url, init])
 
           if (
-            url.endsWith(
-              '/participant-candidates',
+            url.includes(
+              '/participant-candidates?',
             )
           ) {
-            return response([
-              {
-                id: 'user-2',
-                username: 'otro',
-                displayName: 'Otro',
-              },
-            ])
+            return response({
+              items: [
+                {
+                  id: 'user-2',
+                  username: 'otro',
+                  displayName: 'Otro',
+                },
+              ],
+              nextOffset: null,
+            })
           }
 
           if (
-            url.endsWith('/characters')
+            url.includes('/characters?')
           ) {
-            return response([
-              {
-                characterId:
-                  'character-1',
-                ownerId: 'user-1',
-                chronicleId:
-                  'chronicle-1',
-                status: 'active',
-                name: 'Alicia',
-                concept: null,
-                updatedAt:
-                  '2026-08-09T20:00:00.000Z',
-              },
-            ])
+            return response({
+              items: [
+                {
+                  characterId:
+                    'character-1',
+                  ownerId: 'user-1',
+                  chronicleId:
+                    'chronicle-1',
+                  status: 'active',
+                  name: 'Alicia',
+                  concept: null,
+                  updatedAt:
+                    '2026-08-09T20:00:00.000Z',
+                },
+              ],
+              nextOffset: null,
+            })
           }
 
-          return response([
-            participant,
-          ])
+          return response({
+            items: [
+              participant,
+            ],
+            nextOffset: null,
+          })
         },
       )
 
@@ -111,9 +120,9 @@ test(
     assert.deepEqual(
       calls.map(([url]) => url),
       [
-        '/api/chronicles/chronicle-1/participants',
-        '/api/chronicles/chronicle-1/participant-candidates',
-        '/api/chronicles/chronicle-1/characters',
+        '/api/chronicles/chronicle-1/participants?limit=50&offset=0',
+        '/api/chronicles/chronicle-1/participant-candidates?limit=50&offset=0',
+        '/api/chronicles/chronicle-1/characters?limit=50&offset=0',
       ],
     )
   },

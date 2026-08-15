@@ -1,4 +1,8 @@
 import type {
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import type {
   ChronicleParticipantRepository,
 } from '../../chronicles/application/chronicle-participant.repository'
 import {
@@ -8,6 +12,7 @@ import {
 } from '../domain/character-experience.rules'
 import type {
   CharacterExperienceLedger,
+  CharacterExperienceLedgerPage,
   CorrectCharacterExperienceCommand,
   GrantCharacterExperienceCommand,
 } from '../domain/character-experience.types'
@@ -75,7 +80,8 @@ export class LoadCharacterExperienceUseCase {
   async execute(
     actorUserId: string,
     characterId: string,
-  ): Promise<CharacterExperienceLedger> {
+    query: OffsetPaginationQuery,
+  ): Promise<CharacterExperienceLedgerPage> {
     const character =
       await this.experience.findCharacter(
         characterId,
@@ -93,8 +99,9 @@ export class LoadCharacterExperienceUseCase {
       character,
     )
 
-    return this.experience.loadLedger(
+    return this.experience.loadLedgerPage(
       characterId,
+      query,
     )
   }
 }

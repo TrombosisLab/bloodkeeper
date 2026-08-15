@@ -90,17 +90,137 @@ function participants(role = 'narrator') {
 }
 
 test('056-B permite al propietario leer su ledger sin auto-conceder', async () => {
-  const repo = repository({
-    async loadLedger() {
-      return ledger(0)
+  const queries = []
+  const experience = {
+    async findCharacter() {
+      return {
+        id: 'character-1',
+        ownerId: 'owner-1',
+        chronicleId: null,
+        status: 'active',
+      }
     },
-  })
-  const result = await new LoadCharacterExperienceUseCase(
-    repo,
-    participants(null),
-  ).execute(ownerId, characterId)
+    async loadLedgerPage(
+      _characterId,
+      query,
+    ) {
+      queries.push(query)
+      return {
+        ...ledger(0),
+        nextOffset: null,
+      }
+    },
+  }
+
+  const result =
+    await new LoadCharacterExperienceUseCase(
+      experience,
+      participants(null),
+    ).execute(
+      'owner-1',
+      'character-1',
+      {
+        limit: 25,
+        offset: 0,
+      },
+    )
+
   assert.equal(result.available, 0)
-  assert.deepEqual(repo.calls, [])
+  assert.equal(result.nextOffset, null)
+  assert.deepEqual(
+    queries,
+    [
+      {
+        limit: 25,
+        offset: 0,
+      },
+    ],
+  )
+})
+
+test('SPEC-053 conserva totales globales aunque movements sea una pagina', async () => {
+  const pageMovements =
+    Array.from(
+      { length: 25 },
+      (_, index) => ({
+        id: `movement-${index + 1}`,
+        characterId: 'character-1',
+        actorId: 'owner-1',
+        sessionId: null,
+        type: 'grant',
+        component: 'earned',
+        amount: 1,
+        reason: 'story_end',
+        acquisitionType: null,
+        acquisitionKey: null,
+        correctsMovementId: null,
+        createdAt:
+          new Date(
+            2026,
+            0,
+            index + 1,
+          ),
+      }),
+    )
+
+  let observedQuery = null
+
+  const experience = {
+    async findCharacter() {
+      return {
+        id: 'character-1',
+        ownerId: 'owner-1',
+        chronicleId: null,
+        status: 'active',
+      }
+    },
+    async loadLedgerPage(
+      _characterId,
+      query,
+    ) {
+      observedQuery = query
+
+      return {
+        characterId:
+          'character-1',
+        total: 40,
+        spent: 10,
+        available: 30,
+        movements:
+          pageMovements,
+        nextOffset: 25,
+      }
+    },
+  }
+
+  const result =
+    await new LoadCharacterExperienceUseCase(
+      experience,
+      participants(null),
+    ).execute(
+      'owner-1',
+      'character-1',
+      {
+        limit: 25,
+        offset: 0,
+      },
+    )
+
+  assert.equal(
+    result.movements.length,
+    25,
+  )
+  assert.equal(result.total, 40)
+  assert.equal(result.spent, 10)
+  assert.equal(result.available, 30)
+  assert.equal(result.nextOffset, 25)
+  assert.deepEqual(
+    observedQuery,
+    {
+      limit: 25,
+      offset: 0,
+    },
+  )
 })
 
 test('056-B concede 1 XP por sesion mediante Narrador contextual', async () => {

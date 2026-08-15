@@ -97,12 +97,32 @@ function repository(rows = []) {
   return {
     async listByChronicleId(
       chronicleId,
+      query,
     ) {
-      return records.filter(
-        (row) =>
-          row.chronicleId ===
-          chronicleId,
-      )
+      const matching =
+        records.filter(
+          (row) =>
+            row.chronicleId ===
+            chronicleId,
+        )
+
+      const items =
+        matching.slice(
+          query.offset,
+          query.offset +
+            query.limit,
+        )
+
+      return {
+        items,
+        nextOffset:
+          query.offset +
+            query.limit <
+          matching.length
+            ? query.offset +
+              query.limit
+            : null,
+      }
     },
 
     async findById(
@@ -283,9 +303,16 @@ test(
       ).execute(
         randomUUID(),
         current.chronicleId,
+        {
+          limit: 25,
+          offset: 0,
+        },
       )
 
-    assert.equal(listed.length, 1)
+    assert.equal(
+      listed.items.length,
+      1,
+    )
 
     const loaded =
       await new LoadChronicleEventUseCase(
@@ -321,6 +348,10 @@ test(
       ).execute(
         randomUUID(),
         current.chronicleId,
+        {
+          limit: 25,
+          offset: 0,
+        },
       ),
       ChronicleEventPermissionError,
     )

@@ -2,21 +2,32 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common'
+
+import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
 import {
   CHRONICLE_EVENT_REPOSITORY,
 } from './chronicle-event.repository'
+
 import {
   CHRONICLE_PARTICIPANT_REPOSITORY,
 } from './chronicle-participant.repository'
+
 import {
   assertChronicleEventNarrator,
 } from './chronicle-event-permission'
+
 import type {
   ChronicleEventRepository,
 } from './chronicle-event.repository'
+
 import type {
   ChronicleParticipantRepository,
 } from './chronicle-participant.repository'
+
 import type {
   ChronicleEvent,
 } from '../domain/chronicle-event.types'
@@ -35,7 +46,8 @@ export class ListChronicleEventsUseCase {
   async execute(
     actorUserId: string,
     chronicleId: string,
-  ): Promise<readonly ChronicleEvent[]> {
+    query: OffsetPaginationQuery,
+  ): Promise<OffsetPage<ChronicleEvent>> {
     await assertChronicleEventNarrator(
       this.participants,
       actorUserId,
@@ -44,6 +56,7 @@ export class ListChronicleEventsUseCase {
 
     return this.events.listByChronicleId(
       chronicleId,
+      query,
     )
   }
 }

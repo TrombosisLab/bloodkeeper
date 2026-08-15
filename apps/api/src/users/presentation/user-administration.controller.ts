@@ -9,10 +9,20 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common'
+
+import {
+  InvalidOffsetPaginationQueryError,
+  parseOffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import type {
+  OffsetPage,
+} from '../../common/offset-pagination'
 
 import {
   CreateUserUseCase,
@@ -107,6 +117,16 @@ function assertAdministrator(
 function throwUserAdministrationHttpError(
   error: unknown,
 ): never {
+  if (
+    error instanceof
+      InvalidOffsetPaginationQueryError
+  ) {
+    throw new BadRequestException({
+      code: 'INVALID_PAGINATION_QUERY',
+      field: error.field,
+    })
+  }
+
   if (
     error instanceof
       InvalidUserAdministrationRequestError
@@ -241,17 +261,37 @@ export class UserAdministrationController {
   async list(
     @Req() request:
       AuthenticatedUserAdministrationRequest,
+    @Query() queryInput:
+      Record<string, unknown> = {},
   ): Promise<
-    readonly UserAdministrationResponseDto[]
+    OffsetPage<UserAdministrationResponseDto>
   > {
     assertAdministrator(request)
 
-    const users =
-      await this.listUsers.execute()
+    try {
+      const query =
+        parseOffsetPaginationQuery({
+          limit: queryInput.limit,
+          offset: queryInput.offset,
+        })
 
-    return users.map(
-      toUserAdministrationResponse,
-    )
+      const page =
+        await this.listUsers.execute(
+          query,
+        )
+
+      return {
+        items: page.items.map(
+          toUserAdministrationResponse,
+        ),
+        nextOffset:
+          page.nextOffset,
+      }
+    } catch (error: unknown) {
+      throwUserAdministrationHttpError(
+        error,
+      )
+    }
   }
 
   @Patch(':userId')

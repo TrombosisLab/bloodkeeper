@@ -28,6 +28,7 @@ function ledger() {
       correctsMovementId: null,
       createdAt: '2026-08-11T09:00:00.000Z',
     }],
+    nextOffset: null,
   }
 }
 
@@ -56,7 +57,11 @@ test('056-E carga saldo e historial mecánico autenticado', async () => {
   const result = await gateway.load(characterId)
   assert.equal(result.available, 10)
   assert.equal(result.movements.length, 1)
-  assert.equal(calls[0].url, `/api/characters/${characterId}/experience`)
+  assert.equal(
+    calls[0].url,
+    `/api/characters/${characterId}/experience?limit=25&offset=0`,
+  )
+  assert.equal(result.nextOffset, null)
   assert.equal(calls[0].init.credentials, 'include')
 })
 

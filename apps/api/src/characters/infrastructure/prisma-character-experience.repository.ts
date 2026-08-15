@@ -2,6 +2,13 @@ import {
   Injectable,
 } from '@nestjs/common'
 import {
+  offsetPageFromRows,
+} from '../../common/offset-pagination'
+import type {
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import {
   AdvantageCategory as PrismaAdvantageCategory,
   AdvantageSelectionOrigin as PrismaAdvantageSelectionOrigin,
   CharacterExperienceComponent as PrismaCharacterExperienceComponent,
@@ -45,6 +52,7 @@ import type {
   CharacterExperienceCharacter,
   CharacterExperienceComponent,
   CharacterExperienceLedger,
+  CharacterExperienceLedgerPage,
   CharacterExperienceMovement,
   CharacterExperienceMovementType,
   CharacterExperienceSession,
@@ -252,6 +260,78 @@ export class PrismaCharacterExperienceRepository
       })
 
     return toLedger(characterId, rows)
+  }
+
+  async loadLedgerPage(
+    characterId: string,
+    query: OffsetPaginationQuery,
+  ): Promise<CharacterExperienceLedgerPage> {
+    const [
+      rows,
+      totalsByComponent,
+    ] = await Promise.all([
+      this.database.characterExperienceMovement.findMany({
+        where: {
+          characterId,
+        },
+        orderBy: [
+          { createdAt: 'asc' },
+          { id: 'asc' },
+        ],
+        skip: query.offset,
+        take: query.limit + 1,
+      }),
+      this.database.characterExperienceMovement.groupBy({
+        by: ['component'],
+        where: {
+          characterId,
+        },
+        _sum: {
+          amount: true,
+        },
+      }),
+    ])
+
+    let total = 0
+    let spent = 0
+
+    for (
+      const componentTotal
+      of totalsByComponent
+    ) {
+      const amount =
+        componentTotal._sum.amount ?? 0
+
+      if (
+        componentTotal.component ===
+        PrismaCharacterExperienceComponent.EARNED
+      ) {
+        total = amount
+      } else if (
+        componentTotal.component ===
+        PrismaCharacterExperienceComponent.SPENT
+      ) {
+        spent = amount
+      }
+    }
+
+    const movementPage =
+      offsetPageFromRows(
+        rows.map(toMovement),
+        query,
+      )
+
+    return {
+      characterId,
+      total,
+      spent,
+      available:
+        total - spent,
+      movements:
+        movementPage.items,
+      nextOffset:
+        movementPage.nextOffset,
+    }
   }
 
   private async lockCharacter(

@@ -9,10 +9,20 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common'
+
+import {
+  InvalidOffsetPaginationQueryError,
+  parseOffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import type {
+  OffsetPage,
+} from '../../common/offset-pagination'
 
 import {
   CharacterDraftWriteConflictError,
@@ -95,6 +105,16 @@ function authenticatedOwnerId(
 function throwCharacterDraftHttpError(
   error: unknown,
 ): never {
+  if (
+    error instanceof
+      InvalidOffsetPaginationQueryError
+  ) {
+    throw new BadRequestException({
+      code: 'INVALID_PAGINATION_QUERY',
+      field: error.field,
+    })
+  }
+
   if (
     error instanceof
       InvalidCharacterDraftRequestError
@@ -212,16 +232,53 @@ export class CharacterDraftController {
 
   @Get()
   async list(
-    @Req() request: AuthenticatedCharacterRequest,
-  ): Promise<readonly CharacterDraftResponseDto[]> {
-    const ownerId = authenticatedOwnerId(request)
+    @Req() request:
+      AuthenticatedCharacterRequest,
+    @Query() queryInput?:
+      Record<string, unknown>,
+  ): Promise<
+    | readonly CharacterDraftResponseDto[]
+    | OffsetPage<CharacterDraftResponseDto>
+  > {
+    const ownerId =
+      authenticatedOwnerId(request)
 
-    const drafts =
-      await this.listDrafts.execute(ownerId)
+    if (queryInput === undefined) {
+      const drafts =
+        await this.listDrafts.execute(
+          ownerId,
+        )
 
-    return drafts.map(
-      toCharacterDraftResponse,
-    )
+      return drafts.map(
+        toCharacterDraftResponse,
+      )
+    }
+
+    try {
+      const query =
+        parseOffsetPaginationQuery({
+          limit: queryInput.limit,
+          offset: queryInput.offset,
+        })
+
+      const page =
+        await this.listDrafts.execute(
+          ownerId,
+          query,
+        )
+
+      return {
+        items: page.items.map(
+          toCharacterDraftResponse,
+        ),
+        nextOffset:
+          page.nextOffset,
+      }
+    } catch (error: unknown) {
+      throwCharacterDraftHttpError(
+        error,
+      )
+    }
   }
 
   @Get(':characterId')

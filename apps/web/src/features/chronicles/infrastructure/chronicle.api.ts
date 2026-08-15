@@ -1,4 +1,31 @@
 import type {
+  ChronicleParticipantCandidateApiPage,
+} from '../types/chronicle-api.types'
+
+import type {
+  ChronicleEventApiPage,
+} from '../types/chronicle-api.types'
+
+import type {
+  ChronicleLocationApiPage,
+} from '../types/chronicle-api.types'
+
+import type {
+  ChronicleNpcApiPage,
+  ChronicleSessionApiPage,
+} from '../types/chronicle-api.types'
+
+import type {
+  ChronicleCharacterApiPage,
+  ChronicleParticipantApiPage,
+} from '../types/chronicle-api.types'
+
+import type {
+  ChronicleApiPage,
+  ChronicleListQuery,
+} from '../types/chronicle-api.types'
+
+import type {
   AddChronicleParticipantApiRequest,
   ChronicleApiSnapshot,
   ChronicleApiStatus,
@@ -53,6 +80,10 @@ export class ChronicleApiError
 }
 
 export interface ChronicleGateway {
+  listPage(
+    query?: ChronicleListQuery,
+  ): Promise<ChronicleApiPage>
+
   list(): Promise<
     readonly ChronicleApiSnapshot[]
   >
@@ -74,11 +105,21 @@ export interface ChronicleLifecycleGateway
       TransitionChronicleLifecycleApiRequest,
   ): Promise<ChronicleApiSnapshot>
 
+  participantsPage(
+    chronicleId: string,
+    query?: ChronicleListQuery,
+  ): Promise<ChronicleParticipantApiPage>
+
   participants(
     chronicleId: string,
   ): Promise<
     readonly ChronicleParticipantApiSnapshot[]
   >
+
+  participantCandidatesPage(
+    chronicleId: string,
+    query?: ChronicleListQuery,
+  ): Promise<ChronicleParticipantCandidateApiPage>
 
   participantCandidates(
     chronicleId: string,
@@ -97,6 +138,11 @@ export interface ChronicleLifecycleGateway
     participantId: string,
   ): Promise<ChronicleParticipantApiSnapshot>
 
+  charactersPage(
+    chronicleId: string,
+    query?: ChronicleListQuery,
+  ): Promise<ChronicleCharacterApiPage>
+
   characters(
     chronicleId: string,
   ): Promise<
@@ -105,9 +151,8 @@ export interface ChronicleLifecycleGateway
 
   npcs(
     chronicleId: string,
-  ): Promise<
-    readonly ChronicleNpcApiSnapshot[]
-  >
+    query?: ChronicleListQuery,
+  ): Promise<ChronicleNpcApiPage>
 
   npc(
     chronicleId: string,
@@ -129,6 +174,11 @@ export interface ChronicleLifecycleGateway
     chronicleId: string,
     npcId: string,
   ): Promise<ChronicleNpcApiSnapshot>
+
+  locationsPage(
+    chronicleId: string,
+    query?: ChronicleListQuery,
+  ): Promise<ChronicleLocationApiPage>
 
   locations(
     chronicleId: string,
@@ -158,6 +208,11 @@ export interface ChronicleLifecycleGateway
     chronicleId: string,
     locationId: string,
   ): Promise<ChronicleLocationApiSnapshot>
+
+  eventsPage(
+    chronicleId: string,
+    query?: ChronicleListQuery,
+  ): Promise<ChronicleEventApiPage>
 
   events(
     chronicleId: string,
@@ -199,9 +254,8 @@ export interface ChronicleLifecycleGateway
 
   sessions(
     chronicleId: string,
-  ): Promise<
-    readonly ChronicleSessionApiSnapshot[]
-  >
+    query?: ChronicleListQuery,
+  ): Promise<ChronicleSessionApiPage>
 
   session(
     chronicleId: string,
@@ -595,6 +649,35 @@ export function parseChronicleApiListResponse(
   )
 }
 
+export function parseChronicleApiPageResponse(
+  value: unknown,
+): ChronicleApiPage {
+  if (
+    !isRecord(value) ||
+    !Array.isArray(value.items) ||
+    !(
+      value.nextOffset === null ||
+      (
+        Number.isInteger(
+          value.nextOffset,
+        ) &&
+        (value.nextOffset as number) >= 0
+      )
+    )
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    items:
+      parseChronicleApiListResponse(
+        value.items,
+      ),
+    nextOffset:
+      value.nextOffset as number | null,
+  }
+}
+
 async function responseError(
   response: Response,
 ): Promise<ChronicleApiError> {
@@ -635,6 +718,86 @@ async function jsonResponse(
   }
 }
 
+async function chroniclePageFromResponse(
+  fetchImplementation:
+    FetchImplementation,
+  query: ChronicleListQuery = {},
+): Promise<ChronicleApiPage> {
+  const limit =
+    query.limit ?? 25
+  const offset =
+    query.offset ?? 0
+
+  const response =
+    await fetchImplementation(
+      `/api/chronicles?limit=${encodeURIComponent(
+        String(limit),
+      )}&offset=${encodeURIComponent(
+        String(offset),
+      )}`,
+      {
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json',
+        },
+      },
+    )
+
+  return parseChronicleApiPageResponse(
+    await jsonResponse(response),
+  )
+}
+
+function parseNestedOffsetPage<T>(
+  value: unknown,
+  itemParser: (value: unknown) => T,
+): {
+  readonly items: readonly T[]
+  readonly nextOffset: number | null
+} {
+  if (
+    typeof value !== 'object' ||
+    value === null ||
+    Array.isArray(value)
+  ) {
+    throw new TypeError(
+      'Invalid paginated chronicle response',
+    )
+  }
+
+  const record =
+    value as Record<string, unknown>
+
+  if (!Array.isArray(record.items)) {
+    throw new TypeError(
+      'Paginated chronicle items must be an array',
+    )
+  }
+
+  const nextOffset =
+    record.nextOffset
+
+  if (
+    nextOffset !== null &&
+    (
+      typeof nextOffset !== 'number' ||
+      !Number.isInteger(nextOffset) ||
+      nextOffset < 0
+    )
+  ) {
+    throw new TypeError(
+      'Paginated chronicle nextOffset is invalid',
+    )
+  }
+
+  return {
+    items: record.items.map(
+      itemParser,
+    ),
+    nextOffset,
+  }
+}
+
 export function createChronicleGateway(
   fetchImplementation: FetchImplementation =
     globalThis.fetch,
@@ -652,8 +815,48 @@ export function createChronicleGateway(
           },
         )
 
-      return parseChronicleApiListResponse(
-        await jsonResponse(response),
+      const body =
+        await jsonResponse(response)
+
+      if (Array.isArray(body)) {
+        return parseChronicleApiListResponse(
+          body,
+        )
+      }
+
+      const first =
+        parseChronicleApiPageResponse(
+          body,
+        )
+
+      const items = [
+        ...first.items,
+      ]
+      let nextOffset =
+        first.nextOffset
+
+      while (nextOffset !== null) {
+        const page =
+          await chroniclePageFromResponse(
+            fetchImplementation,
+            {
+              limit: 50,
+              offset: nextOffset,
+            },
+          )
+
+        items.push(...page.items)
+        nextOffset =
+          page.nextOffset
+      }
+
+      return items
+    },
+
+    async listPage(query = {}) {
+      return chroniclePageFromResponse(
+        fetchImplementation,
+        query,
       )
     },
 
@@ -719,10 +922,18 @@ export function createChronicleGateway(
       )
     },
 
-    async participants(chronicleId) {
+    async participantsPage(
+      chronicleId,
+      query = {},
+    ) {
+      const limit =
+        query.limit ?? 25
+      const offset =
+        query.offset ?? 0
+
       const response =
         await fetchImplementation(
-          `/api/chronicles/${chronicleId}/participants`,
+          `/api/chronicles/${chronicleId}/participants?limit=${limit}&offset=${offset}`,
           {
             credentials: 'include',
             headers: {
@@ -731,30 +942,90 @@ export function createChronicleGateway(
           },
         )
 
-      return parseList(
+      return parseNestedOffsetPage(
         await jsonResponse(response),
         parseChronicleParticipantResponse,
+      )
+    },
+
+    async participants(chronicleId) {
+      const items:
+        ChronicleParticipantApiSnapshot[] = []
+
+      let nextOffset: number | null = 0
+
+      while (nextOffset !== null) {
+        const page =
+          await this.participantsPage(
+            chronicleId,
+            {
+              limit: 50,
+              offset: nextOffset,
+            },
+          )
+
+        items.push(...page.items)
+        nextOffset = page.nextOffset
+      }
+
+      return items
+    },
+
+    async participantCandidatesPage(
+      chronicleId,
+      query = {},
+    ) {
+      const limit =
+        query.limit ?? 25
+      const offset =
+        query.offset ?? 0
+
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/participant-candidates?limit=${limit}&offset=${offset}`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseNestedOffsetPage(
+        await jsonResponse(response),
+        parseChronicleParticipantCandidateResponse,
       )
     },
 
     async participantCandidates(
       chronicleId,
     ) {
-      const response =
-        await fetchImplementation(
-          `/api/chronicles/${chronicleId}/participant-candidates`,
-          {
-            credentials: 'include',
-            headers: {
-              Accept: 'application/json',
+      const items:
+        ChronicleParticipantCandidateApiSnapshot[] = []
+
+      let nextOffset:
+        number | null = 0
+
+      while (nextOffset !== null) {
+        const page =
+          await this.participantCandidatesPage(
+            chronicleId,
+            {
+              limit: 50,
+              offset:
+                nextOffset,
             },
-          },
+          )
+
+        items.push(
+          ...page.items,
         )
 
-      return parseList(
-        await jsonResponse(response),
-        parseChronicleParticipantCandidateResponse,
-      )
+        nextOffset =
+          page.nextOffset
+      }
+
+      return items
     },
 
     async addParticipant(
@@ -802,10 +1073,18 @@ export function createChronicleGateway(
       )
     },
 
-    async characters(chronicleId) {
+    async charactersPage(
+      chronicleId,
+      query = {},
+    ) {
+      const limit =
+        query.limit ?? 25
+      const offset =
+        query.offset ?? 0
+
       const response =
         await fetchImplementation(
-          `/api/chronicles/${chronicleId}/characters`,
+          `/api/chronicles/${chronicleId}/characters?limit=${limit}&offset=${offset}`,
           {
             credentials: 'include',
             headers: {
@@ -814,16 +1093,47 @@ export function createChronicleGateway(
           },
         )
 
-      return parseList(
+      return parseNestedOffsetPage(
         await jsonResponse(response),
         parseChronicleCharacterSummaryResponse,
       )
     },
 
-    async npcs(chronicleId) {
+    async characters(chronicleId) {
+      const items:
+        ChronicleCharacterApiSummary[] = []
+
+      let nextOffset: number | null = 0
+
+      while (nextOffset !== null) {
+        const page =
+          await this.charactersPage(
+            chronicleId,
+            {
+              limit: 50,
+              offset: nextOffset,
+            },
+          )
+
+        items.push(...page.items)
+        nextOffset = page.nextOffset
+      }
+
+      return items
+    },
+
+    async npcs(
+      chronicleId,
+      query = {},
+    ) {
+      const limit =
+        query.limit ?? 25
+      const offset =
+        query.offset ?? 0
+
       const response =
         await fetchImplementation(
-          `/api/chronicles/${chronicleId}/npcs`,
+          `/api/chronicles/${chronicleId}/npcs?limit=${limit}&offset=${offset}`,
           {
             credentials: 'include',
             headers: {
@@ -832,7 +1142,7 @@ export function createChronicleGateway(
           },
         )
 
-      return parseList(
+      return parseNestedOffsetPage(
         await jsonResponse(response),
         parseChronicleNpcResponse,
       )
@@ -928,10 +1238,18 @@ export function createChronicleGateway(
       )
     },
 
-    async locations(chronicleId) {
+    async locationsPage(
+      chronicleId,
+      query = {},
+    ) {
+      const limit =
+        query.limit ?? 25
+      const offset =
+        query.offset ?? 0
+
       const response =
         await fetchImplementation(
-          `/api/chronicles/${chronicleId}/locations`,
+          `/api/chronicles/${chronicleId}/locations?limit=${limit}&offset=${offset}`,
           {
             credentials: 'include',
             headers: {
@@ -940,10 +1258,39 @@ export function createChronicleGateway(
           },
         )
 
-      return parseList(
+      return parseNestedOffsetPage(
         await jsonResponse(response),
         parseChronicleLocationResponse,
       )
+    },
+
+    async locations(chronicleId) {
+      const items:
+        ChronicleLocationApiSnapshot[] = []
+
+      let nextOffset:
+        number | null = 0
+
+      while (nextOffset !== null) {
+        const page =
+          await this.locationsPage(
+            chronicleId,
+            {
+              limit: 50,
+              offset:
+                nextOffset,
+            },
+          )
+
+        items.push(
+          ...page.items,
+        )
+
+        nextOffset =
+          page.nextOffset
+      }
+
+      return items
     },
 
     async location(
@@ -1036,10 +1383,18 @@ export function createChronicleGateway(
       )
     },
 
-    async events(chronicleId) {
+    async eventsPage(
+      chronicleId,
+      query = {},
+    ) {
+      const limit =
+        query.limit ?? 25
+      const offset =
+        query.offset ?? 0
+
       const response =
         await fetchImplementation(
-          `/api/chronicles/${chronicleId}/events`,
+          `/api/chronicles/${chronicleId}/events?limit=${limit}&offset=${offset}`,
           {
             credentials: 'include',
             headers: {
@@ -1048,10 +1403,39 @@ export function createChronicleGateway(
           },
         )
 
-      return parseList(
+      return parseNestedOffsetPage(
         await jsonResponse(response),
         parseChronicleEventResponse,
       )
+    },
+
+    async events(chronicleId) {
+      const items:
+        ChronicleEventApiSnapshot[] = []
+
+      let nextOffset:
+        number | null = 0
+
+      while (nextOffset !== null) {
+        const page =
+          await this.eventsPage(
+            chronicleId,
+            {
+              limit: 50,
+              offset:
+                nextOffset,
+            },
+          )
+
+        items.push(
+          ...page.items,
+        )
+
+        nextOffset =
+          page.nextOffset
+      }
+
+      return items
     },
 
     async event(
@@ -1170,10 +1554,18 @@ export function createChronicleGateway(
     },
 
 
-    async sessions(chronicleId) {
+    async sessions(
+      chronicleId,
+      query = {},
+    ) {
+      const limit =
+        query.limit ?? 25
+      const offset =
+        query.offset ?? 0
+
       const response =
         await fetchImplementation(
-          `/api/chronicles/${chronicleId}/sessions`,
+          `/api/chronicles/${chronicleId}/sessions?limit=${limit}&offset=${offset}`,
           {
             credentials: 'include',
             headers: {
@@ -1182,7 +1574,7 @@ export function createChronicleGateway(
           },
         )
 
-      return parseList(
+      return parseNestedOffsetPage(
         await jsonResponse(response),
         parseChronicleSessionResponse,
       )

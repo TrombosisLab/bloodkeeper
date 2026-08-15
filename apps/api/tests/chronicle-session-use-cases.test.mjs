@@ -55,7 +55,10 @@ function participants(role = 'narrator') {
 function repository(current = snapshot()) {
   return {
     async listByChronicleId() {
-      return [current]
+      return {
+        items: [current],
+        nextOffset: null,
+      }
     },
     async findById() {
       return current
@@ -122,14 +125,22 @@ test(
       await new ListChronicleSessionsUseCase(
         repository(),
         participants(),
-      ).execute(narratorId, chronicleId)
-    assert.equal(listed.length, 1)
+      ).execute(
+        narratorId,
+        chronicleId,
+        { limit: 25, offset: 0 },
+      )
+    assert.equal(listed.items.length, 1)
 
     await assert.rejects(
       new ListChronicleSessionsUseCase(
         repository(),
         participants(null),
-      ).execute(narratorId, chronicleId),
+      ).execute(
+        narratorId,
+        chronicleId,
+        { limit: 25, offset: 0 },
+      ),
       ChronicleSessionPermissionError,
     )
   },

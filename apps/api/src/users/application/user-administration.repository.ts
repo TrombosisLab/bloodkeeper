@@ -1,4 +1,9 @@
 import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import type {
   UserRole,
 } from '../../auth/domain/auth.types'
 
@@ -26,6 +31,12 @@ export interface UserAdministrationRepository {
 
   list(): Promise<
     readonly UserAdministrationRecord[]
+  >
+
+  list(
+    query: OffsetPaginationQuery,
+  ): Promise<
+    OffsetPage<UserAdministrationRecord>
   >
 
   update(

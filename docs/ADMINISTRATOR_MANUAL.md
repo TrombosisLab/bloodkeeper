@@ -37,6 +37,10 @@ la única barrera de autorización.
 
 La sección administrativa permite trabajar con las cuentas existentes.
 
+El listado se carga por páginas. La primera página muestra hasta 25 cuentas y,
+cuando existen más, **Cargar más usuarios** añade el siguiente bloque sin
+sustituir las cuentas ya visibles.
+
 Las operaciones materializadas incluyen:
 
 - listar usuarios;

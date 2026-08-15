@@ -113,10 +113,25 @@ export class CharacterDraftApiError
   }
 }
 
+export interface CharacterDraftListQuery {
+  readonly limit?: number
+  readonly offset?: number
+}
+
+export interface CharacterDraftApiPage {
+  readonly items:
+    readonly CharacterDraftApiSnapshot[]
+  readonly nextOffset: number | null
+}
+
 export interface CharacterDraftGateway {
   list(): Promise<
     readonly CharacterDraftApiSnapshot[]
   >
+
+  listPage(
+    query?: CharacterDraftListQuery,
+  ): Promise<CharacterDraftApiPage>
 
   create(
     request: CreateCharacterDraftApiRequest,
@@ -678,6 +693,33 @@ export function parseCharacterDraftApiListResponse(
   )
 }
 
+export function parseCharacterDraftApiPageResponse(
+  value: unknown,
+): CharacterDraftApiPage {
+  if (
+    !isRecord(value) ||
+    !Array.isArray(value.items) ||
+    !(
+      value.nextOffset === null ||
+      (
+        isInteger(value.nextOffset) &&
+        value.nextOffset >= 0
+      )
+    )
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    items:
+      parseCharacterDraftApiListResponse(
+        value.items,
+      ),
+    nextOffset:
+      value.nextOffset,
+  }
+}
+
 async function responseError(
   response: Response,
 ): Promise<CharacterDraftApiError> {
@@ -707,6 +749,53 @@ async function responseError(
     code,
     violations,
   )
+}
+
+async function pageFromResponse(
+  fetchImplementation:
+    FetchImplementation,
+  query: CharacterDraftListQuery = {},
+): Promise<CharacterDraftApiPage> {
+  const limit =
+    query.limit ?? 25
+  const offset =
+    query.offset ?? 0
+
+  const response =
+    await fetchImplementation(
+      `/api/characters/drafts?limit=${encodeURIComponent(
+        String(limit),
+      )}&offset=${encodeURIComponent(
+        String(offset),
+      )}`,
+      {
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json',
+        },
+      },
+    )
+
+  if (!response.ok) {
+    throw await responseError(
+      response,
+    )
+  }
+
+  try {
+    return parseCharacterDraftApiPageResponse(
+      await response.json(),
+    )
+  } catch (error: unknown) {
+    if (
+      error instanceof
+        CharacterDraftApiError
+    ) {
+      throw error
+    }
+
+    return invalidResponse()
+  }
 }
 
 async function snapshotFromResponse(
@@ -749,22 +838,66 @@ export function createCharacterDraftGateway(
         )
 
       if (!response.ok) {
-        throw await responseError(response)
+        throw await responseError(
+          response,
+        )
       }
 
       try {
-        return parseCharacterDraftApiListResponse(
-          await response.json(),
-        )
+        const body: unknown =
+          await response.json()
+
+        if (Array.isArray(body)) {
+          return parseCharacterDraftApiListResponse(
+            body,
+          )
+        }
+
+        const first =
+          parseCharacterDraftApiPageResponse(
+            body,
+          )
+
+        const items = [
+          ...first.items,
+        ]
+
+        let nextOffset =
+          first.nextOffset
+
+        while (nextOffset !== null) {
+          const page =
+            await pageFromResponse(
+              fetchImplementation,
+              {
+                limit: 50,
+                offset: nextOffset,
+              },
+            )
+
+          items.push(...page.items)
+          nextOffset =
+            page.nextOffset
+        }
+
+        return items
       } catch (error: unknown) {
         if (
-          error instanceof CharacterDraftApiError
+          error instanceof
+            CharacterDraftApiError
         ) {
           throw error
         }
 
         return invalidResponse()
       }
+    },
+
+    async listPage(query = {}) {
+      return pageFromResponse(
+        fetchImplementation,
+        query,
+      )
     },
 
     async create(request) {

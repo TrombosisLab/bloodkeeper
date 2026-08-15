@@ -4,9 +4,14 @@ import {
   ForbiddenException,
   Get,
   Param,
+  Query,
   Req,
   UnauthorizedException,
 } from '@nestjs/common'
+
+import {
+  parseOffsetPaginationQuery,
+} from '../../common/offset-pagination'
 
 import {
   ChronicleCharacterListPermissionError,
@@ -56,6 +61,27 @@ function chronicleId(
   return value
 }
 
+function serializeCharacter(
+  character: {
+    readonly characterId: string
+    readonly ownerId: string
+    readonly chronicleId: string
+    readonly status:
+      | 'draft'
+      | 'active'
+      | 'archived'
+    readonly name: string
+    readonly concept: string | null
+    readonly updatedAt: Date
+  },
+) {
+  return {
+    ...character,
+    updatedAt:
+      character.updatedAt.toISOString(),
+  }
+}
+
 @Controller('chronicles')
 export class ChronicleCharacterController {
   constructor(
@@ -70,6 +96,8 @@ export class ChronicleCharacterController {
       AuthenticatedChronicleCharacterRequest,
     @Param('chronicleId')
     chronicleIdInput: unknown,
+    @Query() queryInput?:
+      Record<string, unknown>,
   ) {
     const requesterId =
       authenticatedUserId(request)
@@ -78,19 +106,51 @@ export class ChronicleCharacterController {
       chronicleId(chronicleIdInput)
 
     try {
-      const characters =
+      if (queryInput === undefined) {
+        const characters =
+          await this.listCharacters.execute(
+            requesterId,
+            targetChronicleId,
+          )
+
+        return characters.map(
+          serializeCharacter,
+        )
+      }
+
+      let query
+
+      try {
+        query =
+          parseOffsetPaginationQuery({
+            limit: queryInput.limit,
+            offset: queryInput.offset,
+          })
+      } catch (error: unknown) {
+        throw new BadRequestException({
+          code:
+            'INVALID_PAGINATION_QUERY',
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Invalid pagination query',
+        })
+      }
+
+      const page =
         await this.listCharacters.execute(
           requesterId,
           targetChronicleId,
+          query,
         )
 
-      return characters.map(
-        (character) => ({
-          ...character,
-          updatedAt:
-            character.updatedAt.toISOString(),
-        }),
-      )
+      return {
+        items: page.items.map(
+          serializeCharacter,
+        ),
+        nextOffset:
+          page.nextOffset,
+      }
     } catch (error: unknown) {
       if (
         error instanceof

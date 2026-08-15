@@ -1,6 +1,7 @@
 import type {
   CharacterExperienceGrantReason,
   CharacterExperienceLedger,
+  CharacterExperienceLedgerPage,
   CharacterExperienceMovement,
   CorrectCharacterExperienceCommand,
   GrantCharacterExperienceCommand,
@@ -30,6 +31,16 @@ export interface CharacterExperienceResponseDto {
   readonly available: number
   readonly movements:
     readonly CharacterExperienceMovementResponseDto[]
+}
+
+export interface CharacterExperiencePageResponseDto {
+  readonly characterId: string
+  readonly total: number
+  readonly spent: number
+  readonly available: number
+  readonly movements:
+    readonly CharacterExperienceMovementResponseDto[]
+  readonly nextOffset: number | null
 }
 
 export class InvalidCharacterExperienceRequestError
@@ -280,5 +291,22 @@ export function toCharacterExperienceResponse(
     movements: ledger.movements.map(
       toMovementResponse,
     ),
+  }
+}
+
+
+export function toCharacterExperiencePageResponse(
+  ledger: CharacterExperienceLedgerPage,
+): CharacterExperiencePageResponseDto {
+  return {
+    characterId: ledger.characterId,
+    total: ledger.total,
+    spent: ledger.spent,
+    available: ledger.available,
+    movements: ledger.movements.map(
+      toMovementResponse,
+    ),
+    nextOffset:
+      ledger.nextOffset,
   }
 }

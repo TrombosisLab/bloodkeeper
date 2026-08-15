@@ -190,7 +190,7 @@ test(
 
       const listed =
         await fetch(
-          `${api}/users`,
+          `${api}/users?limit=50&offset=0`,
           {
             headers: {
               Cookie: adminCookie,
@@ -207,7 +207,7 @@ test(
         await listed.json()
 
       assert.equal(
-        listedBody.some(
+        listedBody.items.some(
           (user) =>
             user.id ===
               createdBody.id &&
@@ -215,6 +215,45 @@ test(
               createdUsername,
         ),
         true,
+      )
+
+      assert.ok(
+        Array.isArray(
+          listedBody.items,
+        ),
+      )
+      assert.equal(
+        listedBody.items.length <= 50,
+        true,
+      )
+      assert.equal(
+        listedBody.nextOffset === null ||
+          Number.isSafeInteger(
+            listedBody.nextOffset,
+          ),
+        true,
+      )
+
+      const invalidPagination =
+        await fetch(
+          `${api}/users?limit=51`,
+          {
+            headers: {
+              Cookie: adminCookie,
+            },
+          },
+        )
+
+      assert.equal(
+        invalidPagination.status,
+        400,
+      )
+
+      assert.equal(
+        (
+          await invalidPagination.json()
+        ).code,
+        'INVALID_PAGINATION_QUERY',
       )
 
       const playerCookie =

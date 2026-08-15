@@ -5,6 +5,7 @@ import type {
   CharacterAdvancementRequest,
   CharacterExperienceGateway,
   CharacterExperienceLedger,
+  CharacterExperienceLedgerPage,
   CharacterExperienceMovement,
 } from '../types/character-experience.types.ts'
 
@@ -97,6 +98,48 @@ export function parseCharacterExperienceLedger(value: unknown): CharacterExperie
   }
 }
 
+export function parseCharacterExperienceLedgerPage(
+  value: unknown,
+): CharacterExperienceLedgerPage {
+  const item = record(value)
+
+  if (!Array.isArray(item.movements)) {
+    throw new CharacterExperienceApiError(
+      502,
+      'INVALID_CHARACTER_EXPERIENCE_RESPONSE',
+    )
+  }
+
+  const nextOffset =
+    item.nextOffset === null
+      ? null
+      : integer(item.nextOffset)
+
+  if (
+    nextOffset !== null &&
+    nextOffset < 0
+  ) {
+    throw new CharacterExperienceApiError(
+      502,
+      'INVALID_CHARACTER_EXPERIENCE_RESPONSE',
+    )
+  }
+
+  return {
+    characterId:
+      string(item.characterId),
+    total:
+      integer(item.total),
+    spent:
+      integer(item.spent),
+    available:
+      integer(item.available),
+    movements:
+      item.movements.map(movement),
+    nextOffset,
+  }
+}
+
 export function parseCharacterAdvancementPreview(value: unknown): CharacterAdvancementPreview {
   const item = record(value)
   const kind = string(item.kind)
@@ -158,12 +201,29 @@ export function createCharacterExperienceGateway(
     `/api/characters/${encodeURIComponent(characterId)}/experience${suffix}`
 
   return {
-    async load(characterId) {
-      const response = await fetchImplementation(endpoint(characterId), {
-        credentials: 'include',
-        headers: { Accept: 'application/json' },
-      })
-      return parseCharacterExperienceLedger(await successfulPayload(response))
+    async load(
+      characterId,
+      query = {},
+    ) {
+      const limit =
+        query.limit ?? 25
+      const offset =
+        query.offset ?? 0
+
+      const response =
+        await fetchImplementation(
+          `${endpoint(characterId)}?limit=${limit}&offset=${offset}`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseCharacterExperienceLedgerPage(
+        await successfulPayload(response),
+      )
     },
 
     async preview(characterId, advancement) {

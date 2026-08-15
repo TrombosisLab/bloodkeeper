@@ -22,7 +22,7 @@ import type {
   CharacterAdvancementPreview,
   CharacterAdvancementRequest,
   CharacterExperienceGateway,
-  CharacterExperienceLedger,
+  CharacterExperienceLedgerPage,
   CharacterExperienceMovement,
 } from '../types/character-experience.types.ts'
 
@@ -157,8 +157,9 @@ export function PersistedCharacterExperience({
     () => gateway ?? createCharacterExperienceGateway(),
     [gateway],
   )
-  const [ledger, setLedger] = useState<CharacterExperienceLedger | null>(null)
+  const [ledger, setLedger] = useState<CharacterExperienceLedgerPage | null>(null)
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [working, setWorking] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [showEvolution, setShowEvolution] = useState(false)
@@ -186,7 +187,13 @@ export function PersistedCharacterExperience({
     let cancelled = false
     setLoading(true)
     setMessage(null)
-    void resolvedGateway.load(characterId)
+    void resolvedGateway.load(
+      characterId,
+      {
+        limit: 25,
+        offset: 0,
+      },
+    )
       .then((nextLedger) => {
         if (!cancelled) setLedger(nextLedger)
       })
@@ -198,6 +205,67 @@ export function PersistedCharacterExperience({
       })
     return () => { cancelled = true }
   }, [characterId, resolvedGateway])
+
+  async function loadMoreExperience(): Promise<void> {
+    const nextOffset =
+      ledger?.nextOffset
+
+    if (
+      nextOffset === null ||
+      nextOffset === undefined ||
+      loadingMore
+    ) {
+      return
+    }
+
+    setLoadingMore(true)
+    setMessage(null)
+
+    try {
+      const page =
+        await resolvedGateway.load(
+          characterId,
+          {
+            limit: 25,
+            offset:
+              nextOffset,
+          },
+        )
+
+      setLedger((current) => {
+        if (
+          current === null ||
+          current.characterId !==
+            page.characterId
+        ) {
+          return page
+        }
+
+        return {
+          characterId:
+            page.characterId,
+          total:
+            page.total,
+          spent:
+            page.spent,
+          available:
+            page.available,
+          movements: [
+            ...current.movements,
+            ...page.movements,
+          ],
+          nextOffset:
+            page.nextOffset,
+        }
+      })
+    } catch (error: unknown) {
+      setMessage(
+        errorMessage(error),
+      )
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   function resetPreview(): void {
     setPreview(null)
@@ -275,7 +343,35 @@ export function PersistedCharacterExperience({
         createEvolutionOperationId(),
         request,
       )
-      setLedger(result.experience)
+
+      const visibleMovementCount =
+        Math.max(
+          25,
+          ledger?.movements.length ??
+            25,
+        )
+
+      setLedger({
+        characterId:
+          result.experience.characterId,
+        total:
+          result.experience.total,
+        spent:
+          result.experience.spent,
+        available:
+          result.experience.available,
+        movements:
+          result.experience.movements.slice(
+            0,
+            visibleMovementCount,
+          ),
+        nextOffset:
+          result.experience.movements.length >
+          visibleMovementCount
+            ? visibleMovementCount
+            : null,
+      })
+
       setPreview(null)
       setShowEvolution(false)
       setMessage('Compra aplicada. La ficha y el saldo ya están actualizados.')
@@ -493,6 +589,16 @@ export function PersistedCharacterExperience({
                 ))}
               </ol>
             )}
+            {ledger.nextOffset !== null ? (
+              <button
+                type="button"
+                className="persisted-experience__preview"
+                disabled={loadingMore}
+                onClick={() => void loadMoreExperience()}
+              >
+                {loadingMore ? 'Cargando…' : 'Cargar más'}
+              </button>
+            ) : null}
           </details>
         </>
       ) : null}

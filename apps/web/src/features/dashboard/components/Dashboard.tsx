@@ -128,12 +128,17 @@ export function Dashboard({
       setError(null)
 
       try {
-        const loaded =
-          await gateway.list()
+        const page =
+          await gateway.listPage({
+            limit: 3,
+            offset: 0,
+          })
 
         if (!cancelled) {
           setChronicles(
-            relevantChronicles(loaded),
+            relevantChronicles(
+              page.items,
+            ),
           )
         }
       } catch (loadError: unknown) {

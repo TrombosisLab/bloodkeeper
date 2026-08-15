@@ -1,4 +1,9 @@
 import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import type {
   Chronicle,
   ChronicleStatus,
   CreateChronicleData,
@@ -32,6 +37,11 @@ export interface ChronicleRepository {
   findByNarratorId(
     narratorId: string,
   ): Promise<readonly Chronicle[]>
+
+  findByNarratorId(
+    narratorId: string,
+    query: OffsetPaginationQuery,
+  ): Promise<OffsetPage<Chronicle>>
 
   findById(
     narratorId: string,

@@ -80,6 +80,7 @@ test(
   '034-C gateway expone list detail create update reorder archive',
   () => {
     for (const method of [
+      'eventsPage(',
       'events(',
       'event(',
       'createEvent(',
@@ -105,7 +106,7 @@ test(
   () => {
     assert.match(
       gateway,
-      /\/events`/,
+      /\/events\?limit=\$\{limit\}&offset=\$\{offset\}`/,
     )
     assert.match(
       gateway,

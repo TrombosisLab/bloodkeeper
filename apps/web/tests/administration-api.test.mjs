@@ -21,11 +21,23 @@ const user = {
 
 test('040-A lista usuarios con sesion y sin transformar el contrato', async () => {
   globalThis.fetch = async (url, init) => {
-    assert.equal(url, '/api/users')
+    assert.equal(
+      url,
+      '/api/users?limit=25&offset=0',
+    )
     assert.equal(init.credentials, 'include')
-    return Response.json([user])
+    return Response.json({
+      items: [user],
+      nextOffset: null,
+    })
   }
-  assert.deepEqual(await createUserAdministrationGateway().list(), [user])
+  assert.deepEqual(
+    await createUserAdministrationGateway().list(),
+    {
+      items: [user],
+      nextOffset: null,
+    },
+  )
 })
 
 test('040-A crea cuentas mediante la API administrativa existente', async () => {

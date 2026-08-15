@@ -52,7 +52,10 @@ test(
             return response(npc)
           }
 
-          return response([npc])
+          return response({
+            items: [npc],
+            nextOffset: null,
+          })
         },
       )
 
@@ -61,7 +64,7 @@ test(
         await gateway.npcs(
           'chronicle-1',
         )
-      ).length,
+      ).items.length,
       1,
     )
 
@@ -78,7 +81,7 @@ test(
     assert.deepEqual(
       calls.map(([url]) => url),
       [
-        '/api/chronicles/chronicle-1/npcs',
+        '/api/chronicles/chronicle-1/npcs?limit=25&offset=0',
         '/api/chronicles/chronicle-1/npcs/npc-1',
       ],
     )

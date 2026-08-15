@@ -1,3 +1,8 @@
+import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
 export const CHRONICLE_USER_DIRECTORY =
   Symbol('CHRONICLE_USER_DIRECTORY')
 
@@ -10,5 +15,11 @@ export interface ChronicleUserDirectoryEntry {
 export interface ChronicleUserDirectory {
   list(): Promise<
     readonly ChronicleUserDirectoryEntry[]
+  >
+
+  list(
+    query: OffsetPaginationQuery,
+  ): Promise<
+    OffsetPage<ChronicleUserDirectoryEntry>
   >
 }

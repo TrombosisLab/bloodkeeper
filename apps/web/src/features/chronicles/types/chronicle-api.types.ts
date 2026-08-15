@@ -206,3 +206,58 @@ export interface UpdateChronicleSessionApiRequest {
   readonly summary?: string | null
   readonly narratorNotes?: string | null
 }
+
+export interface ChronicleListQuery {
+  readonly limit?: number
+  readonly offset?: number
+}
+
+export interface ChronicleApiPage {
+  readonly items:
+    readonly ChronicleApiSnapshot[]
+  readonly nextOffset: number | null
+}
+
+export interface ChronicleParticipantApiPage {
+  readonly items:
+    readonly ChronicleParticipantApiSnapshot[]
+  readonly nextOffset: number | null
+}
+
+export interface ChronicleCharacterApiPage {
+  readonly items:
+    readonly ChronicleCharacterApiSummary[]
+  readonly nextOffset: number | null
+}
+
+export interface ChronicleNpcApiPage {
+  readonly items:
+    readonly ChronicleNpcApiSnapshot[]
+  readonly nextOffset: number | null
+}
+
+export interface ChronicleLocationApiPage {
+  readonly items:
+    readonly ChronicleLocationApiSnapshot[]
+  readonly nextOffset: number | null
+}
+
+export interface ChronicleSessionApiPage {
+  readonly items:
+    readonly ChronicleSessionApiSnapshot[]
+  readonly nextOffset: number | null
+}
+
+
+export interface ChronicleEventApiPage {
+  readonly items:
+    readonly ChronicleEventApiSnapshot[]
+  readonly nextOffset: number | null
+}
+
+
+export interface ChronicleParticipantCandidateApiPage {
+  readonly items:
+    readonly ChronicleParticipantCandidateApiSnapshot[]
+  readonly nextOffset: number | null
+}

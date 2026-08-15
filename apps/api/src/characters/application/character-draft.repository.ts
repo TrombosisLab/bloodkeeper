@@ -1,4 +1,9 @@
 import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import type {
   UpdateCharacterStateData,
 } from '../domain/character-state.types'
 
@@ -22,9 +27,21 @@ export interface CharacterDraftRepository {
     ownerId: string,
   ): Promise<readonly PersistedCharacterDraft[]>
 
+  listByOwner(
+    ownerId: string,
+    query: OffsetPaginationQuery,
+  ): Promise<
+    OffsetPage<PersistedCharacterDraft>
+  >
+
   listByChronicle(
     chronicleId: string,
   ): Promise<readonly PersistedCharacterDraft[]>
+
+  listByChronicle(
+    chronicleId: string,
+    query: OffsetPaginationQuery,
+  ): Promise<OffsetPage<PersistedCharacterDraft>>
 
   findById(
     ownerId: string,

@@ -15,6 +15,16 @@ import {
   DatabaseService,
 } from '../../database/database.service'
 
+import {
+  MAX_OFFSET_PAGE_LIMIT,
+  offsetPageFromRows,
+} from '../../common/offset-pagination'
+
+import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
 import type {
   UserAdministrationRepository,
 } from '../application/user-administration.repository'
@@ -138,8 +148,49 @@ export class PrismaUserAdministrationRepository
       : toDomain(row)
   }
 
-  async list(): Promise<
+  list(): Promise<
     readonly UserAdministrationRecord[]
+  >
+
+  list(
+    query: OffsetPaginationQuery,
+  ): Promise<
+    OffsetPage<UserAdministrationRecord>
+  >
+
+  async list(
+    query?: OffsetPaginationQuery,
+  ): Promise<
+    | readonly UserAdministrationRecord[]
+    | OffsetPage<UserAdministrationRecord>
+  > {
+    if (query !== undefined) {
+      return this.listPage(query)
+    }
+
+    const items:
+      UserAdministrationRecord[] = []
+
+    let nextOffset: number | null = 0
+
+    while (nextOffset !== null) {
+      const page =
+        await this.listPage({
+          limit: MAX_OFFSET_PAGE_LIMIT,
+          offset: nextOffset,
+        })
+
+      items.push(...page.items)
+      nextOffset = page.nextOffset
+    }
+
+    return items
+  }
+
+  private async listPage(
+    query: OffsetPaginationQuery,
+  ): Promise<
+    OffsetPage<UserAdministrationRecord>
   > {
     const rows =
       await this.database.user.findMany({
@@ -151,9 +202,17 @@ export class PrismaUserAdministrationRepository
             id: 'asc',
           },
         ],
+        skip: query.offset,
+        take: query.limit + 1,
       })
 
-    return rows.map(toDomain)
+    const page =
+      offsetPageFromRows(rows, query)
+
+    return {
+      items: page.items.map(toDomain),
+      nextOffset: page.nextOffset,
+    }
   }
 
   async update(

@@ -90,12 +90,33 @@ function repository(rows = []) {
   return {
     async listByChronicleId(
       chronicleId,
+      query,
     ) {
-      return records.filter(
-        (row) =>
-          row.chronicleId ===
-          chronicleId,
-      )
+      const matching =
+        records.filter(
+          (row) =>
+            row.chronicleId ===
+            chronicleId,
+        )
+
+      const pageItems =
+        matching.slice(
+          query.offset,
+          query.offset + query.limit,
+        )
+
+      const nextOffset =
+        query.offset +
+          query.limit <
+        matching.length
+          ? query.offset +
+            query.limit
+          : null
+
+      return {
+        items: pageItems,
+        nextOffset,
+      }
     },
 
     async findById(
@@ -193,10 +214,14 @@ test(
       ).execute(
         randomUUID(),
         current.chronicleId,
+        {
+          limit: 25,
+          offset: 0,
+        },
       )
 
     assert.equal(
-      listed.length,
+      listed.items.length,
       1,
     )
 
@@ -233,6 +258,10 @@ test(
       ).execute(
         randomUUID(),
         current.chronicleId,
+        {
+          limit: 25,
+          offset: 0,
+        },
       ),
       ChronicleLocationPermissionError,
     )

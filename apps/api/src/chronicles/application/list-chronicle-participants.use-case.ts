@@ -3,6 +3,11 @@ import {
   Injectable,
 } from '@nestjs/common'
 
+import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
 import {
   CHRONICLE_PARTICIPANT_REPOSITORY,
 } from './chronicle-participant.repository'
@@ -36,11 +41,28 @@ export class ListChronicleParticipantsUseCase {
       ChronicleParticipantRepository,
   ) {}
 
-  async execute(
+  execute(
     actorUserId: string,
     chronicleId: string,
   ): Promise<
     readonly ChronicleParticipant[]
+  >
+
+  execute(
+    actorUserId: string,
+    chronicleId: string,
+    query: OffsetPaginationQuery,
+  ): Promise<
+    OffsetPage<ChronicleParticipant>
+  >
+
+  async execute(
+    actorUserId: string,
+    chronicleId: string,
+    query?: OffsetPaginationQuery,
+  ): Promise<
+    | readonly ChronicleParticipant[]
+    | OffsetPage<ChronicleParticipant>
   > {
     const membership =
       await this.repository.findActiveMembership(
@@ -52,8 +74,15 @@ export class ListChronicleParticipantsUseCase {
       throw new ChronicleParticipantPermissionError()
     }
 
+    if (query === undefined) {
+      return this.repository.listByChronicleId(
+        chronicleId,
+      )
+    }
+
     return this.repository.listByChronicleId(
       chronicleId,
+      query,
     )
   }
 }

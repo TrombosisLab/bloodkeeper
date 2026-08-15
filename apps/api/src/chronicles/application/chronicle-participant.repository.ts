@@ -1,4 +1,9 @@
 import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import type {
   AddChronicleParticipantData,
   ChronicleParticipant,
 } from '../domain/chronicle-participant.types'
@@ -50,6 +55,11 @@ export interface ChronicleParticipantRepository {
   listByChronicleId(
     chronicleId: string,
   ): Promise<readonly ChronicleParticipant[]>
+
+  listByChronicleId(
+    chronicleId: string,
+    query: OffsetPaginationQuery,
+  ): Promise<OffsetPage<ChronicleParticipant>>
 
   userExists(
     userId: string,

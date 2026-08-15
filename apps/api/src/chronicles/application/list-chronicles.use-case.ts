@@ -1,4 +1,9 @@
 import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import type {
   ChronicleRepository,
 } from './chronicle.repository'
 
@@ -13,10 +18,28 @@ export class ListChroniclesUseCase {
   ) {}
 
   execute(
-    userId: string,
-  ): Promise<readonly Chronicle[]> {
-    return this.repository.findByNarratorId(
-      userId,
-    )
+    narratorId: string,
+  ): Promise<readonly Chronicle[]>
+
+  execute(
+    narratorId: string,
+    query: OffsetPaginationQuery,
+  ): Promise<OffsetPage<Chronicle>>
+
+  execute(
+    narratorId: string,
+    query?: OffsetPaginationQuery,
+  ): Promise<
+    | readonly Chronicle[]
+    | OffsetPage<Chronicle>
+  > {
+    return query === undefined
+      ? this.repository.findByNarratorId(
+          narratorId,
+        )
+      : this.repository.findByNarratorId(
+          narratorId,
+          query,
+        )
   }
 }

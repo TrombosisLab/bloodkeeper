@@ -30,6 +30,20 @@ export interface CharacterExperienceLedger {
   movements: readonly CharacterExperienceMovement[]
 }
 
+export interface CharacterExperienceLedgerPage {
+  characterId: string
+  total: number
+  spent: number
+  available: number
+  movements: readonly CharacterExperienceMovement[]
+  nextOffset: number | null
+}
+
+export interface CharacterExperienceListQuery {
+  limit?: number
+  offset?: number
+}
+
 export type CharacterAdvancementKind =
   | 'attribute'
   | 'skill'
@@ -84,7 +98,10 @@ export interface CharacterAdvancementPurchaseResult {
 }
 
 export interface CharacterExperienceGateway {
-  load(characterId: string): Promise<CharacterExperienceLedger>
+  load(
+    characterId: string,
+    query?: CharacterExperienceListQuery,
+  ): Promise<CharacterExperienceLedgerPage>
   preview(
     characterId: string,
     advancement: CharacterAdvancementRequest,

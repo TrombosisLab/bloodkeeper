@@ -1,4 +1,13 @@
 import {
+  InvalidOffsetPaginationQueryError,
+  parseOffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import type {
+  OffsetPage,
+} from '../../common/offset-pagination'
+
+import {
   BadRequestException,
   Body,
   ConflictException,
@@ -12,6 +21,7 @@ import {
   Req,
   UnauthorizedException,
   UnprocessableEntityException,
+  Query,
 } from '@nestjs/common'
 
 import {
@@ -323,20 +333,60 @@ export class ChronicleController {
   async list(
     @Req() request:
       AuthenticatedChronicleRequest,
+    @Query() queryInput?:
+      Record<string, unknown>,
   ): Promise<
-    readonly ChronicleResponseDto[]
+    | readonly ChronicleResponseDto[]
+    | OffsetPage<ChronicleResponseDto>
   > {
     const narratorId =
       authenticatedChronicleUserId(request)
 
-    const chronicles =
-      await this.listChronicles.execute(
-        narratorId,
-      )
+    if (queryInput === undefined) {
+      const chronicles =
+        await this.listChronicles.execute(
+          narratorId,
+        )
 
-    return chronicles.map(
-      toChronicleResponse,
-    )
+      return chronicles.map(
+        toChronicleResponse,
+      )
+    }
+
+    try {
+      const query =
+        parseOffsetPaginationQuery({
+          limit: queryInput.limit,
+          offset: queryInput.offset,
+        })
+
+      const page =
+        await this.listChronicles.execute(
+          narratorId,
+          query,
+        )
+
+      return {
+        items: page.items.map(
+          toChronicleResponse,
+        ),
+        nextOffset:
+          page.nextOffset,
+      }
+    } catch (error: unknown) {
+      if (
+        error instanceof
+          InvalidOffsetPaginationQueryError
+      ) {
+        throw new BadRequestException({
+          code:
+            'INVALID_PAGINATION_QUERY',
+          field: error.field,
+        })
+      }
+
+      throw error
+    }
   }
 
   @Get(':chronicleId')
@@ -420,9 +470,9 @@ export class ChronicleController {
       AuthenticatedChronicleRequest,
     @Param('chronicleId')
     chronicleIdInput: unknown,
-  ): Promise<
-    readonly ChronicleParticipantResponseDto[]
-  > {
+    @Query() queryInput?:
+      Record<string, unknown>,
+  ) {
     const actorUserId =
       authenticatedChronicleUserId(request)
 
@@ -431,15 +481,39 @@ export class ChronicleController {
         parseChronicleIdParam(
           chronicleIdInput,
         )
-      const participants =
+
+      if (queryInput === undefined) {
+        const participants =
+          await this.listParticipants.execute(
+            actorUserId,
+            chronicleId,
+          )
+
+        return participants.map(
+          toChronicleParticipantResponse,
+        )
+      }
+
+      const query =
+        parseOffsetPaginationQuery({
+          limit: queryInput.limit,
+          offset: queryInput.offset,
+        })
+
+      const page =
         await this.listParticipants.execute(
           actorUserId,
           chronicleId,
+          query,
         )
 
-      return participants.map(
-        toChronicleParticipantResponse,
-      )
+      return {
+        items: page.items.map(
+          toChronicleParticipantResponse,
+        ),
+        nextOffset:
+          page.nextOffset,
+      }
     } catch (error: unknown) {
       throwChronicleHttpError(error)
     }
@@ -451,6 +525,8 @@ export class ChronicleController {
       AuthenticatedChronicleRequest,
     @Param('chronicleId')
     chronicleIdInput: unknown,
+    @Query() queryInput?:
+      Record<string, unknown>,
   ) {
     const actorUserId =
       authenticatedChronicleUserId(request)
@@ -461,12 +537,39 @@ export class ChronicleController {
           chronicleIdInput,
         )
 
-      return await this.listParticipantCandidates
-        .execute(
-          actorUserId,
-          chronicleId,
-        )
+      const query =
+        parseOffsetPaginationQuery({
+          limit:
+            queryInput?.limit,
+          offset:
+            queryInput?.offset,
+        })
+
+      const page =
+        await this.listParticipantCandidates
+          .execute(
+            actorUserId,
+            chronicleId,
+            query,
+          )
+
+      return {
+        items: page.items,
+        nextOffset:
+          page.nextOffset,
+      }
     } catch (error: unknown) {
+      if (
+        error instanceof
+          InvalidOffsetPaginationQueryError
+      ) {
+        throw new BadRequestException({
+          code:
+            'INVALID_PAGINATION_QUERY',
+          field: error.field,
+        })
+      }
+
       throwChronicleHttpError(error)
     }
   }

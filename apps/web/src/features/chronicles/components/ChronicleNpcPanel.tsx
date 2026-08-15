@@ -134,6 +134,16 @@ export function ChronicleNpcPanel({
     useState(true)
 
   const [
+    npcsNextOffset,
+    setNpcsNextOffset,
+  ] = useState<number | null>(null)
+
+  const [
+    loadingMoreNpcs,
+    setLoadingMoreNpcs,
+  ] = useState(false)
+
+  const [
     operationError,
     setOperationError,
   ] = useState<string | null>(null)
@@ -176,10 +186,18 @@ export function ChronicleNpcPanel({
     setOperationError(null)
 
     try {
-      setNpcs(
+      const page =
         await gateway.npcs(
           chronicleId,
-        ),
+          {
+            limit: 25,
+            offset: 0,
+          },
+        )
+
+      setNpcs(page.items)
+      setNpcsNextOffset(
+        page.nextOffset,
       )
     } catch (error: unknown) {
       setOperationError(
@@ -187,6 +205,46 @@ export function ChronicleNpcPanel({
       )
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function loadMoreNpcs() {
+    if (
+      npcsNextOffset === null ||
+      loadingMoreNpcs
+    ) {
+      return
+    }
+
+    setLoadingMoreNpcs(true)
+    setOperationError(null)
+
+    try {
+      const page =
+        await gateway.npcs(
+          chronicleId,
+          {
+            limit: 25,
+            offset:
+              npcsNextOffset,
+          },
+        )
+
+      setNpcs(
+        (current) => [
+          ...current,
+          ...page.items,
+        ],
+      )
+      setNpcsNextOffset(
+        page.nextOffset,
+      )
+    } catch (error: unknown) {
+      setOperationError(
+        operationErrorMessage(error),
+      )
+    } finally {
+      setLoadingMoreNpcs(false)
     }
   }
 
@@ -221,12 +279,19 @@ export function ChronicleNpcPanel({
   async function refreshAfterWrite(
     npcId?: string,
   ) {
-    const updated =
+    const page =
       await gateway.npcs(
         chronicleId,
+        {
+          limit: 25,
+          offset: 0,
+        },
       )
 
-    setNpcs(updated)
+    setNpcs(page.items)
+    setNpcsNextOffset(
+      page.nextOffset,
+    )
 
     if (
       selectedNpc !== null &&
@@ -235,14 +300,11 @@ export function ChronicleNpcPanel({
         selectedNpc.id === npcId
       )
     ) {
-      const refreshed =
-        updated.find(
-          (npc) =>
-            npc.id === selectedNpc.id,
-        )
-
       setSelectedNpc(
-        refreshed ?? null,
+        await gateway.npc(
+          chronicleId,
+          selectedNpc.id,
+        ),
       )
     }
   }
@@ -680,6 +742,20 @@ export function ChronicleNpcPanel({
           })}
         </ul>
       )}
+
+      {npcsNextOffset !== null ? (
+        <button
+          type="button"
+          onClick={() => {
+            void loadMoreNpcs()
+          }}
+          disabled={loadingMoreNpcs}
+        >
+          {loadingMoreNpcs
+            ? 'Cargando más PNJ…'
+            : 'Cargar más PNJ'}
+        </button>
+      ) : null}
 
       {selectedNpc !== null ? (
         <section

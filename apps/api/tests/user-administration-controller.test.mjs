@@ -46,9 +46,15 @@ function controller() {
           },
         },
         {
-          async execute() {
-            calls.push(['list'])
-            return [user()]
+          async execute(query) {
+            calls.push([
+              'list',
+              query,
+            ])
+            return {
+              items: [user()],
+              nextOffset: null,
+            }
           },
         },
       ),
@@ -172,7 +178,8 @@ test(
       'passwordHash' in created,
       false,
     )
-    assert.equal(listed.length, 1)
+    assert.equal(listed.items.length, 1)
+    assert.equal(listed.nextOffset, null)
     assert.deepEqual(calls, [
       [
         'create',
@@ -184,7 +191,33 @@ test(
           roles: ['player'],
         },
       ],
-      ['list'],
+      [
+        'list',
+        {
+          limit: 25,
+          offset: 0,
+        },
+      ],
     ])
+  },
+)
+
+test(
+  'SPEC-053-A rechaza paginación inválida antes del caso de uso',
+  async () => {
+    const { instance, calls } =
+      controller()
+
+    await assert.rejects(
+      instance.list(
+        adminRequest(),
+        {
+          limit: '51',
+        },
+      ),
+      hasStatus(400),
+    )
+
+    assert.deepEqual(calls, [])
   },
 )

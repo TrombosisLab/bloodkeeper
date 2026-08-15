@@ -1,4 +1,8 @@
 import type {
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import type {
   PurchaseCharacterAdvancementData,
 } from '../domain/character-advancement.types'
 import type {
@@ -6,6 +10,7 @@ import type {
   AppendCharacterExperienceGrantData,
   CharacterExperienceCharacter,
   CharacterExperienceLedger,
+  CharacterExperienceLedgerPage,
   CharacterExperienceMovement,
   CharacterExperienceSession,
 } from '../domain/character-experience.types'
@@ -95,6 +100,11 @@ export interface CharacterExperienceRepository {
   loadLedger(
     characterId: string,
   ): Promise<CharacterExperienceLedger>
+
+  loadLedgerPage(
+    characterId: string,
+    query: OffsetPaginationQuery,
+  ): Promise<CharacterExperienceLedgerPage>
 
   appendGrant(
     data: AppendCharacterExperienceGrantData,

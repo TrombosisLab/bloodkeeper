@@ -84,7 +84,10 @@ function repository(current = null) {
 
   return {
     async listByChronicleId() {
-      return rows
+      return {
+        items: rows,
+        nextOffset: null,
+      }
     },
 
     async findById() {
@@ -146,7 +149,7 @@ test(
         current.chronicleId,
       )
 
-    assert.equal(listed.length, 1)
+    assert.equal(listed.items.length, 1)
 
     const loaded =
       await new LoadChronicleNpcUseCase(

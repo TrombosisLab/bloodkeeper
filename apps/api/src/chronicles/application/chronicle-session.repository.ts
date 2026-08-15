@@ -1,4 +1,9 @@
 import type {
+  OffsetPage,
+  OffsetPaginationQuery,
+} from '../../common/offset-pagination'
+
+import type {
   ChronicleSession,
   CreateChronicleSessionData,
   UpdateChronicleSessionData,
@@ -10,7 +15,8 @@ export const CHRONICLE_SESSION_REPOSITORY =
 export interface ChronicleSessionRepository {
   listByChronicleId(
     chronicleId: string,
-  ): Promise<readonly ChronicleSession[]>
+    query: OffsetPaginationQuery,
+  ): Promise<OffsetPage<ChronicleSession>>
 
   findById(
     chronicleId: string,
