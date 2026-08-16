@@ -1,19 +1,39 @@
 #!/usr/bin/env bash
+set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-REQUEST_DIR="/home/trombosis/bloodkeeper_backups/requests"
 fail(){ printf 'ERROR: %s\n' "$*" >&2; return 1; }
 main(){
-  cd "$ROOT" || return 1
-  for f in scripts/run-manual-backup-request.sh scripts/install-manual-backup-request-service.sh; do [[ -x "$f" ]] || return 1; bash -n "$f" || return 1; done
-  if grep -E 'eval|source[[:space:]]|sh -c|bash -c' scripts/run-manual-backup-request.sh >/dev/null 2>&1; then fail "Runner evalúa comandos."; return 1; fi
-  grep -F './scripts/backup-full.sh' scripts/run-manual-backup-request.sh >/dev/null 2>&1 || return 1
-  [[ "$(stat -c '%a' "$REQUEST_DIR")" == "700" ]] || { fail "Spool no es 700."; return 1; }
-  systemctl is-enabled bloodkeeper-manual-backup.path >/dev/null 2>&1 || return 1
-  systemctl is-active bloodkeeper-manual-backup.path >/dev/null 2>&1 || return 1
-  grep -F 'PathExists=/home/trombosis/bloodkeeper_backups/requests/manual-backup.request' /etc/systemd/system/bloodkeeper-manual-backup.path >/dev/null 2>&1 || return 1
-  grep -F 'ExecStart=/home/trombosis/vampiro-v5-revolution/scripts/run-manual-backup-request.sh' /etc/systemd/system/bloodkeeper-manual-backup.service >/dev/null 2>&1 || return 1
-  docker compose config --quiet || return 1
-  grep -F '/var/run/docker.sock' compose.yaml >/dev/null 2>&1 && { fail "Docker socket no permitido."; return 1; }
-  printf '%s\n' "VALIDACIÓN 042-B CORRECTA"
+  cd "$ROOT"
+  sh -n apps/backup/worker.sh
+  docker compose config --quiet
+  if grep -RE '(systemctl|systemd[.]path|/home/trombosis|/var/run/docker[.]sock|/run/docker[.]sock)' apps/backup compose.yaml >/dev/null 2>&1; then
+    fail 'El trabajador portable depende del anfitrion o del socket Docker.'
+    return 1
+  fi
+  docker compose config --format json | python3 -c '
+import json, sys
+c=json.load(sys.stdin); s=c["services"]
+assert "backup-init" in s and "backup-worker" in s
+def mount(service, target):
+    return next(v for v in s[service].get("volumes", []) if v.get("target") == target)
+assert mount("api", "/run/bloodkeeper-backup")["type"] == "volume"
+assert mount("api", "/run/bloodkeeper-backup").get("read_only") is True
+assert mount("api", "/run/bloodkeeper-backup-requests")["type"] == "volume"
+assert mount("api", "/run/bloodkeeper-backup-requests").get("read_only") is not True
+for target in ("/status", "/requests", "/backups"):
+    assert mount("backup-worker", target)["type"] == "volume"
+assert not any(v.get("type") == "bind" for x in s.values() for v in x.get("volumes", []))
+' || { fail 'Contrato de volumenes portable incorrecto.'; return 1; }
+  if [ -n "$(docker compose ps -q backup-worker 2>/dev/null || true)" ]; then
+    [ "$(docker inspect --format='{{.State.Health.Status}}' v5r-backup-worker)" = 'healthy' ] || return 1
+    if docker compose exec -T api sh -c 'touch /run/bloodkeeper-backup/.write-test' >/dev/null 2>&1; then
+      docker compose exec -T api rm -f /run/bloodkeeper-backup/.write-test >/dev/null 2>&1 || true
+      fail 'El volumen de estado permite escritura desde la API.'
+      return 1
+    fi
+    docker compose exec -T api sh -c 'test -w /run/bloodkeeper-backup-requests'
+    docker compose exec -T backup-worker sh -c 'test -w /status && test -w /requests && test -w /backups'
+  fi
+  printf '%s\n' 'VALIDACION 042-B PORTABLE CORRECTA'
 }
 main

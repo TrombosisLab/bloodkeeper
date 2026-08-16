@@ -1,54 +1,56 @@
 #!/usr/bin/env bash
-PATH_UNIT="/etc/systemd/system/bloodkeeper-manual-backup.path"
-SERVICE_UNIT="/etc/systemd/system/bloodkeeper-manual-backup.service"
-REQUEST_DIR="/home/trombosis/bloodkeeper_backups/requests"
-usage(){ printf '%s\n' 'Uso: --install | --status | --remove'; }
-fail(){ printf 'ERROR: %s\n' "$*" >&2; return 1; }
-install_units(){
-  sudo -v || return 1
-  mkdir -p "$REQUEST_DIR" && chmod 700 "$REQUEST_DIR" || return 1
-  local p s
-  p="$(mktemp)"; s="$(mktemp)"
-  cat > "$p" <<'UNIT'
-[Unit]
-Description=BloodKeeper manual backup request watcher
-After=local-fs.target
+set -Eeuo pipefail
 
-[Path]
-PathExists=/home/trombosis/bloodkeeper_backups/requests/manual-backup.request
-Unit=bloodkeeper-manual-backup.service
+ROOT="$(
+  cd "$(dirname "${BASH_SOURCE[0]}")/.."
+  pwd
+)"
+PATH_UNIT='/etc/systemd/system/bloodkeeper-manual-backup.path'
+SERVICE_UNIT='/etc/systemd/system/bloodkeeper-manual-backup.service'
 
-[Install]
-WantedBy=multi-user.target
-UNIT
-  cat > "$s" <<'UNIT'
-[Unit]
-Description=BloodKeeper controlled manual backup
-Requires=docker.service
-After=docker.service
+usage() {
+  cat <<'EOF'
+Uso:
+  ./scripts/install-manual-backup-request-service.sh --status
+  ./scripts/install-manual-backup-request-service.sh --remove
 
-[Service]
-Type=oneshot
-User=trombosis
-Group=trombosis
-WorkingDirectory=/home/trombosis/vampiro-v5-revolution
-ExecStart=/home/trombosis/vampiro-v5-revolution/scripts/run-manual-backup-request.sh
-UNIT
-  sudo install -m 0644 "$p" "$PATH_UNIT" || { rm -f "$p" "$s"; return 1; }
-  sudo install -m 0644 "$s" "$SERVICE_UNIT" || { rm -f "$p" "$s"; return 1; }
-  rm -f "$p" "$s"
-  sudo systemctl daemon-reload || return 1
-  sudo systemctl enable --now bloodkeeper-manual-backup.path || return 1
-  printf '%s\n' "Watcher manual instalado."
+La instalación del watcher del host está retirada. BloodKeeper utiliza
+el servicio Docker backup-worker incluido en compose.deploy.yaml.
+EOF
 }
-show_status(){ systemctl status bloodkeeper-manual-backup.path --no-pager 2>&1 || true; systemctl status bloodkeeper-manual-backup.service --no-pager 2>&1 || true; }
-remove_units(){
-  sudo -v || return 1
+
+show_status() {
+  "$ROOT/scripts/portable-compose.sh" ps backup-worker || true
+  if command -v systemctl >/dev/null 2>&1; then
+    systemctl status bloodkeeper-manual-backup.path --no-pager 2>&1 || true
+    systemctl status bloodkeeper-manual-backup.service --no-pager 2>&1 || true
+  fi
+}
+
+remove_legacy() {
+  command -v systemctl >/dev/null 2>&1 || {
+    printf 'No hay systemd en este host; no existe watcher que retirar.\n'
+    return
+  }
+  command -v sudo >/dev/null 2>&1 || {
+    printf 'ERROR: se necesita sudo para retirar las unidades heredadas.\n' >&2
+    return 1
+  }
+
   sudo systemctl disable --now bloodkeeper-manual-backup.path >/dev/null 2>&1 || true
   sudo systemctl stop bloodkeeper-manual-backup.service >/dev/null 2>&1 || true
-  sudo rm -f "$PATH_UNIT" "$SERVICE_UNIT" || return 1
-  sudo systemctl daemon-reload || return 1
-  printf '%s\n' "Watcher manual retirado."
+  sudo rm -f -- "$PATH_UNIT" "$SERVICE_UNIT"
+  sudo systemctl daemon-reload
+  printf 'Watcher heredado retirado. backup-worker permanece como único consumidor.\n'
 }
-main(){ case "${1:-}" in --install) install_units;; --status) show_status;; --remove) remove_units;; --help|-h) usage;; *) usage; fail "Operación no reconocida."; return 2;; esac; }
-main "$@"
+
+case "${1:-}" in
+  --status) show_status ;;
+  --remove) remove_legacy ;;
+  --install)
+    printf 'ERROR: --install está retirado; el worker ya forma parte de Docker Compose.\n' >&2
+    exit 2
+    ;;
+  --help|-h|'') usage ;;
+  *) usage; exit 2 ;;
+esac

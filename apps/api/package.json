@@ -13,18 +13,18 @@
     "admin:reset-password": "npm run build --silent && node dist/auth/tools/reset-user-password.js"
   },
   "dependencies": {
-    "@v5r/character-rules": "file:../../packages/character-rules",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/client": "^6.19.0",
+    "@v5r/character-rules": "file:../../packages/character-rules",
+    "prisma": "^6.19.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.0",
     "@types/node": "^22.10.5",
-    "prisma": "^6.19.0",
     "typescript": "^5.7.3"
   }
 }

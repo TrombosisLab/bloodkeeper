@@ -5,6 +5,13 @@
 Este documento materializa SPEC-007 y define la estrategia oficial de
 copias y recuperación de BloodKeeper.
 
+
+Existen dos formatos diferenciados. La distribución portable crea dumps
+y paquetes de base de datos mediante `backup-worker` dentro de volúmenes
+Docker. El paquete completo de repositorio, configuración y snapshot que
+se describe a continuación pertenece al adaptador source-build heredado
+y sirve para recuperar instalaciones históricas.
+
 Una copia completa protege:
 
 - Base de datos PostgreSQL mediante dump lógico;
@@ -63,6 +70,12 @@ Destino y espejo explícitos:
 
 ## Programación
 
+
+La programación con `crontab` de esta sección pertenece al adaptador
+source-build y no es instalada por `install.sh`. En la distribución
+portable, las solicitudes manuales se procesan dentro de Docker; no se
+crea ninguna tarea dependiente del sistema operativo anfitrión.
+
 La política inicial es:
 
 - una copia completa diaria a las 03:00, hora local;
@@ -114,53 +127,37 @@ Prueba completa real:
 La prueba completa crea un paquete, restaura el dump en una base temporal
 y no sustituye la base activa.
 
-## Estado administrativo de las copias
+## Estado administrativo y copias manuales
 
-SPEC-042 añade una proyección de sólo lectura para Administración.
+SPEC-042 expone a Administración un estado sanitizado y una solicitud
+manual confirmada. La API sólo puede leer el volumen de estado y escribir
+el marcador fijo `manual-backup.request` en el volumen de solicitudes.
 
-`scripts/backup-full.sh` publica al terminar un manifiesto sanitizado en:
+El servicio Docker `backup-worker` es el único consumidor. Genera el dump
+PostgreSQL, su checksum y el paquete `bloodkeeper_full_FECHA.tar.gz` en el
+volumen `backup_archives`; publica después el manifiesto sanitizado en
+`backup_status`. No monta el socket Docker ni una carpeta personal del
+host.
 
-```text
-$HOME/bloodkeeper_backups/status/backup-status.json
-```
-
-El manifiesto contiene únicamente estado de ejecución, fechas, nombre
-base de la última copia válida, tamaño, integridad y un error sanitizado.
-No contiene rutas absolutas, credenciales ni variables de entorno.
-
-La API recibe exclusivamente ese directorio mediante un bind mount de
-sólo lectura en `/run/bloodkeeper-backup`. Los paquetes reales de
-`scheduled/`, los dumps y Docker continúan fuera del alcance de la API.
-
-La interfaz administrativa consulta:
+Los endpoints siguen siendo:
 
 ```text
-GET /administration/backups/status
-```
-
-SPEC-042-B permite además solicitar una copia manual mediante:
-
-```text
+GET  /administration/backups/status
 POST /administration/backups/requests
 ```
 
-La petición exige sesión administrativa y confirmación explícita. La API
-no ejecuta Docker ni scripts del host: escribe únicamente el marcador fijo
-`manual-backup.request` en un spool dedicado. `systemd.path` detecta ese
-marcador y un servicio del host ejecuta exclusivamente
-`scripts/run-manual-backup-request.sh`, que llama a `backup-full.sh` con
-ruta y retención fijas.
-
-Instalación del watcher:
+El watcher `systemd.path` anterior está retirado para evitar dos
+consumidores. En una máquina que lo hubiese instalado puede comprobarse y
+retirarse con:
 
 ```bash
-./scripts/install-manual-backup-request-service.sh --install
 ./scripts/install-manual-backup-request-service.sh --status
+./scripts/install-manual-backup-request-service.sh --remove
 ```
 
-La restauración continúa siendo exclusivamente por SSH. La Web no puede
-elegir comandos, rutas ni parámetros de backup y nunca recibe acceso a
-Docker, `scheduled/` o los paquetes reales.
+La restauración sigue siendo una operación local deliberada. La web no
+elige comandos, rutas ni parámetros y nunca recibe acceso a Docker o a
+los paquetes reales.
 
 Validación reutilizable:
 
@@ -193,30 +190,27 @@ La operación crea una copia previa, restaura en una base de preparación,
 intercambia las bases y revierte automáticamente si los health checks
 fallan.
 
-## Recuperación desde servidor limpio
+## Recuperación desde una máquina limpia
 
-1. Instalar Ubuntu Server 24.04 LTS.
-2. Copiar el paquete completo y verificar su SHA-256.
-3. Extraer o reconstruir el proyecto:
+1. Instalar Docker y Git en cualquier sistema compatible.
+2. Clonar el repositorio autorizado y ejecutar `./install.sh`.
+3. Durante el alta inicial, omitir la creación de administrador si se va
+   a restaurar una base que ya contiene usuarios.
+4. Copiar y verificar el paquete de recuperación desde almacenamiento
+   externo.
+5. Detener temporalmente web, API y worker mediante
+   `scripts/portable-compose.sh` antes de sustituir datos.
+6. Restaurar el dump lógico validado en PostgreSQL.
+7. Volver a iniciar los servicios y comprobar `/api/health` desde la web.
 
-```bash
-./scripts/restore-full.sh \
-  --extract /ruta/bloodkeeper_full_FECHA.tar.gz \
-  --target-dir "$HOME/vampiro-v5-revolution-recuperado" \
-  --confirm
-```
+El checkout Git y las imágenes se recuperan desde GitHub/GHCR; no deben
+transportar datos de aplicación. Los paquetes y sus checksums se guardan
+fuera del repositorio y, al menos, una copia reciente debe permanecer
+fuera de la máquina Docker.
 
-4. Entrar en el directorio recuperado.
-5. Ejecutar `./scripts/bootstrap-server.sh`.
-6. Verificar el dump de `backups/full-recovery/`.
-7. Aplicarlo con `restore.sh --apply ... --confirm`.
-8. Ejecutar `./scripts/check.sh`.
-9. Confirmar el acceso desde otro equipo de la red.
-
-El snapshot del volumen se conserva como segunda vía de recuperación y
-evidencia del estado persistente. La restauración ordinaria usa el dump
-lógico validado porque es portable entre instalaciones PostgreSQL
-compatibles.
+El snapshot histórico del volumen continúa siendo una segunda vía para
+paquetes antiguos. La restauración ordinaria usa el dump lógico porque es
+portable entre instalaciones PostgreSQL compatibles.
 
 ## Evidencia
 

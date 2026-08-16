@@ -3,28 +3,27 @@
 Plataforma web modular para la gestión de partidas de
 Vampiro: La Mascarada V5.
 
-## Entorno
+## Distribución portátil
 
-- Ubuntu Server 24.04 LTS.
-- Docker Engine y Docker Compose.
-- React + Vite + TypeScript.
-- NestJS + TypeScript.
-- PostgreSQL + Prisma.
-- Operación mediante SSH.
+- Docker Engine o Docker Desktop con Docker Compose.
+- Imágenes release para `linux/amd64` y `linux/arm64`.
+- Sin dependencia de Ubuntu, ruta personal o IP fija.
 
-## Despliegue
+Instalación desde el repositorio privado:
 
 ```bash
-./scripts/bootstrap-server.sh
+git clone https://github.com/TrombosisLab/bloodkeeper.git && cd bloodkeeper && ./install.sh
 ```
 
-Después del primer despliegue:
+La guía completa está en `docs/PORTABLE_INSTALLATION.md`.
 
-```bash
-./scripts/create-initial-admin.sh
-```
+## Desarrollo y adaptadores heredados
 
-## Operación
+`compose.yaml` y `scripts/bootstrap-server.sh` se conservan para el flujo
+source-build y la preparación opcional de Ubuntu. La distribución usa
+`compose.deploy.yaml`, `install.sh` y `scripts/portable-compose.sh`.
+
+## Operación source-build heredada
 
 ```bash
 ./scripts/start.sh
@@ -39,6 +38,7 @@ Después del primer despliegue:
 
 ## Documentación
 
+- `docs/PORTABLE_INSTALLATION.md`: instalación desde GitHub y GHCR.
 - `docs/DEPLOYMENT.md`: instalación y despliegue.
 - `docs/DOCKER_ARCHITECTURE.md`: arquitectura Docker oficial.
 - `docs/PROJECT_STRUCTURE.md`: estructura oficial del repositorio.

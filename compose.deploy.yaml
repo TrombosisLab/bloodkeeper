@@ -1,20 +1,17 @@
+# BloodKeeper — despliegue desde imágenes publicadas
+# Generado a partir del contrato de compose.yaml. No contiene secretos ni datos.
 services:
 
   web:
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
+    image: ${BLOODKEEPER_WEB_IMAGE:-ghcr.io/trombosislab/bloodkeeper-web}:${BLOODKEEPER_VERSION:-latest}
 
-    container_name: v5r-web
     init: true
-    user: "node"
-
+    user: "101:101"
     security_opt:
       - no-new-privileges:true
 
     ports:
-      - "5173:5173"
-
+      - "${BLOODKEEPER_WEB_PORT:-5173}:5173"
     networks:
       - application
 
@@ -44,11 +41,8 @@ services:
         max-size: "10m"
         max-file: "5"
   api:
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
+    image: ${BLOODKEEPER_API_IMAGE:-ghcr.io/trombosislab/bloodkeeper-api}:${BLOODKEEPER_VERSION:-latest}
 
-    container_name: v5r-api
     init: true
     user: "node"
 
@@ -70,8 +64,7 @@ services:
         read_only: false
 
     ports:
-      - "127.0.0.1:3000:3000"
-
+      - "127.0.0.1:${BLOODKEEPER_API_PORT:-3000}:3000"
     networks:
       - application
 
@@ -104,7 +97,6 @@ services:
         max-file: "5"
   backup-init:
     image: alpine:3.22
-    container_name: v5r-backup-init
     user: "0:0"
     network_mode: none
     security_opt:
@@ -129,10 +121,7 @@ services:
     restart: "no"
 
   backup-worker:
-    build:
-      context: .
-      dockerfile: apps/backup/Dockerfile
-    container_name: v5r-backup-worker
+    image: ${BLOODKEEPER_BACKUP_IMAGE:-ghcr.io/trombosislab/bloodkeeper-backup}:${BLOODKEEPER_VERSION:-latest}
     init: true
     user: "1000:1000"
     read_only: true
@@ -176,7 +165,6 @@ services:
   postgres:
     image: postgres:17-alpine
 
-    container_name: v5r-postgres
 
     environment:
       POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB es obligatoria; defínela en .env}

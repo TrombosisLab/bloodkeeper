@@ -1,37 +1,37 @@
 #!/usr/bin/env bash
+set -Eeuo pipefail
 
-ROOT="$HOME/vampiro-v5-revolution"
+ROOT="$(
+  cd "$(dirname "${BASH_SOURCE[0]}")/.."
+  pwd
+)"
+COMPOSE="$ROOT/scripts/portable-compose.sh"
 
-main() {
-  cd "$ROOT" || return 1
+username="${BLOODKEEPER_RECOVERY_USERNAME:-}"
+password="${BLOODKEEPER_RECOVERY_PASSWORD:-}"
 
-  local username
-  local password
-  local password_repeat
-  local result
-
-  read -r -p "Nombre de usuario existente: " username
-  read -r -s -p "Nueva contraseña (mínimo 12 caracteres): " password
-  echo
-  read -r -s -p "Repite la nueva contraseña: " password_repeat
-  echo
-
-  if [ "$password" != "$password_repeat" ]; then
-    echo "Las contraseñas no coinciden."
+if [ -z "$username$password" ]; then
+  read -r -p 'Nombre de usuario existente: ' username
+  read -r -s -p 'Nueva contraseña (mínimo 12 caracteres): ' password
+  printf '\n'
+  read -r -s -p 'Repite la nueva contraseña: ' password_repeat
+  printf '\n'
+  [ "$password" = "$password_repeat" ] || {
     unset password password_repeat
-    return 1
-  fi
+    printf 'ERROR: las contraseñas no coinciden.\n' >&2
+    exit 1
+  }
+  unset password_repeat
+elif [ -z "$username" ] || [ -z "$password" ]; then
+  printf 'ERROR: BLOODKEEPER_RECOVERY_USERNAME y PASSWORD son obligatorias en conjunto.\n' >&2
+  exit 2
+fi
 
-  docker compose run     --rm     -T     -e RECOVERY_USERNAME="$username"     -e RECOVERY_PASSWORD="$password"     api     npm run admin:reset-password
+RECOVERY_USERNAME="$username" \
+RECOVERY_PASSWORD="$password" \
+  "$COMPOSE" run --rm -T \
+    -e RECOVERY_USERNAME \
+    -e RECOVERY_PASSWORD \
+    api node dist/auth/tools/reset-user-password.js
 
-  result="$?"
-
-  unset password password_repeat
-
-  return "$result"
-}
-
-main
-RESULT="$?"
-
-[ "$RESULT" -eq 0 ]
+unset username password

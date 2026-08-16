@@ -6,3 +6,16 @@
 .env
 .env.*
 !.env.example
+
+# BLOODKEEPER-PORTABLE-RUNTIME-20260815
+.env
+.env.*
+!.env.example
+backups/
+**/backups/
+runtime/
+**/runtime/
+*.dump
+*.dump.*
+*.tar.gz
+*.tar.gz.*

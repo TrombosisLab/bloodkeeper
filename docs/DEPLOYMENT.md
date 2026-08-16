@@ -1,208 +1,121 @@
-# Despliegue en Ubuntu Server
+# Despliegue portátil de BloodKeeper
 
 ## Alcance
 
-Este documento materializa SPEC-006 y define el procedimiento oficial
-para instalar y desplegar BloodKeeper en Ubuntu Server 24.04 LTS
-mediante Docker Engine y Docker Compose.
+El procedimiento oficial de distribución utiliza Docker y Docker
+Compose. No depende de Ubuntu, de una máquina virtual, de una ruta
+personal ni de una dirección IP fija.
 
-La topología, el aislamiento y la persistencia se describen en
-`docs/DOCKER_ARCHITECTURE.md`.
-
-El servidor puede permanecer sin acceso a Internet después de construir
-las imágenes. La preparación inicial necesita acceso a los repositorios
-de Ubuntu, Docker y npm, o un espejo local equivalente.
+La arquitectura se detalla en `docs/DOCKER_ARCHITECTURE.md` y el contrato
+de instalación en `docs/PORTABLE_INSTALLATION.md`.
 
 ## Requisitos
 
-- Ubuntu Server 24.04 LTS de 64 bits.
-- Usuario con acceso SSH y permiso `sudo`.
-- Copia del repositorio en el servidor.
-- Puertos LAN 5173 y 3000 disponibles.
+- Docker Engine o Docker Desktop;
+- Docker Compose integrado (`docker compose`);
+- Git con acceso al repositorio privado;
+- permiso para descargar los paquetes privados de GHCR.
 
-El repositorio puede copiarse desde otra máquina o recuperarse desde un
-origen Git cuando exista. El proyecto no depende de una ruta absoluta.
+Docker resuelve la arquitectura compatible de las imágenes publicadas.
+El host puede ser Linux, macOS o Windows siempre que permita ejecutar
+contenedores Linux mediante Docker.
 
-## Despliegue completo
+## Instalación nueva
 
-Desde la raíz del repositorio:
-
-```bash
-chmod +x scripts/*.sh scripts/dev/*.sh
-./scripts/bootstrap-server.sh
-```
-
-El script:
-
-1. valida Ubuntu Server 24.04;
-2. instala Git si falta;
-3. instala Docker Engine y el plugin Docker Compose si faltan;
-4. crea `.env` con permisos `600` y contraseña aleatoria si no existe;
-5. construye las imágenes;
-6. inicia PostgreSQL;
-7. aplica las migraciones Prisma;
-8. inicia API y web;
-9. espera los health checks;
-10. valida frontend, API, base de datos y proxy.
-
-No sobrescribe un `.env` existente.
-
-## Preparación separada
-
-Solo preparar herramientas del servidor:
+Una cuenta autorizada puede descargar y desplegar en una sola línea:
 
 ```bash
-./scripts/bootstrap-server.sh --prepare-host
+git clone https://github.com/TrombosisLab/bloodkeeper.git && cd bloodkeeper && ./install.sh
 ```
 
-Comprobar requisitos sin modificar el sistema:
+La autenticación de Git y GHCR pertenece a cada persona y no se almacena
+en el repositorio. Si GHCR necesita autenticación, el instalador ofrece
+`docker login ghcr.io` y reintenta la descarga.
 
-```bash
-./scripts/bootstrap-server.sh --check-host
-```
+`install.sh` crea una configuración local protegida, descarga las
+imágenes correspondientes al commit, crea volúmenes vacíos, aplica las
+migraciones, inicia los servicios, valida los health checks y permite
+crear el primer administrador.
 
-Tras añadir el usuario al grupo `docker`, una nueva sesión SSH aplica
-completamente la pertenencia. El primer despliegue usa `sudo` cuando sea
-necesario.
-
-## Primera cuenta
-
-La aplicación actual exige autenticación. Después del despliegue:
-
-```bash
-./scripts/create-initial-admin.sh
-```
-
-La contraseña se solicita sin mostrarla y se almacena hasheada.
+Una instalación nueva no contiene previamente usuarios, personajes,
+crónicas, copias ni datos de otra máquina.
 
 ## Acceso
 
-Consultar la dirección LAN:
-
-```bash
-hostname -I
-```
-
-Abrir desde otro equipo de la red:
+Acceso desde el propio host:
 
 ```text
-http://DIRECCION_LAN:5173
+http://localhost:5173
 ```
 
-La API queda disponible en el puerto `3000`. La web se comunica con ella
-mediante `/api`.
+Desde otro equipo se usa el nombre o la dirección actual de la máquina
+Docker. Esa dirección no forma parte de la configuración de BloodKeeper.
+El puerto web puede elegirse con `BLOODKEEPER_WEB_PORT`.
 
-## Operación habitual
+La API se publica solamente en la interfaz local del host y la web se
+comunica con ella mediante `/api`.
+
+## Operación portable
+
+Todas las órdenes de distribución usan el mismo Compose y nombre de
+proyecto mediante el wrapper:
 
 ```bash
-./scripts/start.sh
-./scripts/restart.sh --confirm
-./scripts/status.sh
-./scripts/check.sh
-./scripts/logs.sh
-./scripts/prepare-update.sh --check --target HEAD
-./scripts/stop.sh --confirm
+./scripts/portable-compose.sh ps
+./scripts/portable-compose.sh logs --tail=100
+./scripts/portable-compose.sh pull
+./scripts/portable-compose.sh up -d
+./scripts/portable-compose.sh down
 ```
 
-El catálogo completo de mantenimiento está en
-`docs/MAINTENANCE_OPERATIONS.md`.
+`down` conserva los volúmenes. No se debe ejecutar `down --volumes` salvo
+que se pretenda borrar de forma irreversible la base y las copias locales.
 
-## Validación del despliegue
+## Administración local
 
-Comprobación operativa y contractual:
+El instalador ofrece crear la primera cuenta. También puede ejecutarse:
 
 ```bash
-./scripts/check-deployment.sh
+./scripts/create-initial-admin.sh
+./scripts/reset-user-password.sh
 ```
 
-Validación adicional de backup y restauración temporal:
+Las contraseñas se solicitan sin mostrarlas y sólo se entregan al
+contenedor administrativo durante esa ejecución.
+
+## Actualización
+
+Después de actualizar el checkout Git y una vez publicadas las imágenes
+del nuevo commit:
 
 ```bash
-./scripts/check-deployment.sh --with-backup
+./install.sh
 ```
 
-La segunda opción no sustituye la base activa. Ambas terminan con:
+El instalador conserva `.env` y los volúmenes, descarga la versión
+correspondiente, aplica únicamente las migraciones pendientes y vuelve a
+validar los servicios.
 
-```text
-DESPLIEGUE SPEC-006 CORRECTO
-```
+## Copias
 
-## Copia previa a actualizaciones
+El servicio `backup-worker` consume las solicitudes administrativas y
+guarda los paquetes en volúmenes Docker. No usa el socket Docker ni rutas
+personales del host. La extracción a almacenamiento externo y la
+recuperación se describen en `docs/RECOVERY.md`.
 
-Antes de una actualización relevante:
+## Adaptador Ubuntu heredado
 
-```bash
-./scripts/backup.sh
-./scripts/restore.sh --verify backups/ARCHIVO.dump
-```
+`scripts/bootstrap-server.sh` se conserva para preparar Ubuntu Server
+24.04 y para las comprobaciones históricas de SPEC-006. Construye desde
+fuentes con `compose.yaml`; no es el punto de entrada de distribución.
 
-El procedimiento completo está en `docs/RECOVERY.md`.
+Los scripts clásicos de start, stop, update y backup completo pertenecen
+también a ese entorno source-build mientras se completa su migración. En
+una instalación release se usa `install.sh` y `portable-compose.sh`.
 
-## Datos
+## Configuración obligatoria
 
-PostgreSQL usa el volumen Docker `postgres_data`. `docker compose down`
-detiene los servicios sin borrar el volumen.
-
-No ejecutar `docker compose down --volumes` salvo que se pretenda
-eliminar los datos.
-
-## Resultado esperado
-
-- `v5r-postgres`: healthy.
-- `v5r-api`: healthy.
-- `v5r-web`: healthy.
-- Frontend accesible por LAN.
-- `/health` responde con API y base de datos en estado `ok`.
-
-## Actualización de una instalación existente
-
-La preparación de riesgo se mantiene en `prepare-update.sh`. La ejecución
-efectiva definida por SPEC-046 usa una referencia Git que ya exista
-localmente:
-
-```bash
-./scripts/apply-update.sh --check --target REFERENCIA_GIT_LOCAL
-
-./scripts/apply-update.sh \
-  --apply \
-  --target REFERENCIA_GIT_LOCAL \
-  --confirm
-```
-
-El procedimiento crea y verifica un backup completo antes de cambiar de
-versión, reconstruye las imágenes, aplica migraciones con
-`prisma migrate deploy`, espera los health checks y termina con
-`./scripts/check.sh`.
-
-No se consultan remotos Git durante la operación.
-
-## Rollback de actualización
-
-El plan creado antes de cada update es también la entrada del rollback:
-
-```bash
-./scripts/rollback-update.sh \
-  --check \
-  --plan RUTA/update_plan_*.txt
-```
-
-Sin migraciones, la vuelta a código anterior se aplica con `--apply --confirm`.
-Cuando el plan contiene migraciones, se exige además `--restore-data` y
-`--confirm-data-restore`; no existe reversión SQL genérica automática.
-
-Tras volver a la versión previa se reconstruyen API/Web, se esperan los
-health checks y se ejecuta `./scripts/check.sh`.
-
-## Validación de configuración obligatoria
-
-Docker Compose valida antes del arranque las variables obligatorias
-`DATABASE_URL`, `POSTGRES_DB`, `POSTGRES_USER` y `POSTGRES_PASSWORD`.
-
-Si falta cualquiera de ellas o su valor está vacío, `docker compose config`
-y los comandos de arranque fallan de forma inmediata con un mensaje que
-identifica la variable ausente. Los valores reales deben mantenerse en
-`.env`, fuera de Git; `.env.example` conserva únicamente valores de ejemplo
-y marcadores seguros.
-
-Esta validación no introduce entornos adicionales: el mismo contrato se
-aplica al desarrollo y al despliegue local o servidor estable.
+Los secretos permanecen en `.env`, ignorado por Git. Docker Compose exige
+`DATABASE_URL`, `POSTGRES_DB`, `POSTGRES_USER` y `POSTGRES_PASSWORD`. Las
+variables de versión y puertos tienen valores seguros por defecto y
+pueden personalizarse localmente.
