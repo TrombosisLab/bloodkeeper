@@ -850,13 +850,23 @@ function toPersistedDraft(
     row.identity === null ||
     row.creationState === null ||
     row.attributes === null ||
-    row.blood === null ||
     row.damage === null ||
-    row.thinBloodAlchemy === null ||
     row.humanity === null
   ) {
     throw new Error(
       `Character ${row.id} has incomplete persistence relations`,
+    )
+  }
+
+  if (
+    row.nature === PrismaCharacterNature.VAMPIRE &&
+    (
+      row.blood === null ||
+      row.thinBloodAlchemy === null
+    )
+  ) {
+    throw new Error(
+      `Character ${row.id} has incomplete vampire persistence relations`,
     )
   }
 
@@ -938,10 +948,14 @@ function toPersistedDraft(
       wits: row.attributes.wits,
       resolve: row.attributes.resolve,
     },
-    blood: {
-      bloodPotency: row.blood.bloodPotency,
-      hunger: row.blood.hunger,
-    },
+    blood:
+      row.blood === null
+        ? null
+        : {
+            bloodPotency:
+              row.blood.bloodPotency,
+            hunger: row.blood.hunger,
+          },
     damage: {
       health: {
         superficial:
@@ -1017,18 +1031,25 @@ function toPersistedDraft(
         (ceremony) => ceremony.ceremonyKey,
       ),
     },
-    thinBloodAlchemy: {
-      rating: row.thinBloodAlchemy.rating,
-      method:
-        row.thinBloodAlchemy.method === null
-          ? null
-          : alchemyMethodFromPrisma[
-              row.thinBloodAlchemy.method
-            ],
-      formulaKeys: row.thinBloodFormulas.map(
-        (formula) => formula.formulaKey,
-      ),
-    },
+    thinBloodAlchemy:
+      row.thinBloodAlchemy === null
+        ? null
+        : {
+            rating:
+              row.thinBloodAlchemy.rating,
+            method:
+              row.thinBloodAlchemy.method ===
+                null
+                ? null
+                : alchemyMethodFromPrisma[
+                    row.thinBloodAlchemy.method
+                  ],
+            formulaKeys:
+              row.thinBloodFormulas.map(
+                (formula) =>
+                  formula.formulaKey,
+              ),
+          },
     thinBloodTraits: row.thinBloodTraits.map(
       (trait) => {
         const disciplineKey =

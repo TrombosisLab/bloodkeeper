@@ -1,3 +1,8 @@
+import {
+  requireCharacterBlood,
+  requireCharacterThinBloodAlchemy,
+} from './character-vampire-state.rules'
+
 import type {
   CharacterRulesCatalog,
 } from './character-rules-catalog'
@@ -151,11 +156,19 @@ export function applyCharacterAdvancement(
   }
 
   if (mutation.kind === 'formula') {
+    const alchemy =
+      requireCharacterThinBloodAlchemy(
+        character,
+      )
+
     return {
       ...base,
       thinBloodAlchemy: {
-        ...character.thinBloodAlchemy,
-        formulaKeys: [...character.thinBloodAlchemy.formulaKeys, mutation.key],
+        ...alchemy,
+        formulaKeys: [
+          ...alchemy.formulaKeys,
+          mutation.key,
+        ],
       },
     }
   }
@@ -196,11 +209,15 @@ export function applyCharacterAdvancement(
     return { ...base, advantages: { selections } }
   }
 
+  const blood =
+    requireCharacterBlood(character)
+
   return {
     ...base,
     blood: {
-      ...character.blood,
-      bloodPotency: character.blood.bloodPotency + 1,
+      ...blood,
+      bloodPotency:
+        blood.bloodPotency + 1,
     },
   }
 }

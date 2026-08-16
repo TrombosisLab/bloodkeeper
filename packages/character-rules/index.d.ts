@@ -536,3 +536,16 @@ export const characterDependencyCatalog:
 
 export const characterSkillCatalog:
   CharacterRulesSkillCatalog
+
+export interface CharacterRulesMortalAdvantageExclusionCatalog {
+  readonly feeding: readonly string[]
+  readonly archaic: readonly string[]
+  readonly domain: readonly string[]
+  readonly status: readonly string[]
+  readonly mythic: readonly string[]
+  readonly herd: readonly string[]
+  readonly thinBlood: readonly string[]
+}
+
+export const characterMortalAdvantageExclusionCatalog:
+  CharacterRulesMortalAdvantageExclusionCatalog

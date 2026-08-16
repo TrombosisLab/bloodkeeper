@@ -2,6 +2,10 @@ import {
   parseCharacterDraftIdParam,
 } from './character-draft.dto'
 
+import {
+  requireCharacterBlood,
+} from '../domain/character-vampire-state.rules'
+
 import type {
   PersistedCharacterDraft,
 } from '../domain/persisted-character.types'
@@ -265,11 +269,14 @@ export interface CharacterStateResponseDto {
 export function toCharacterStateResponse(
   character: PersistedCharacterDraft,
 ): CharacterStateResponseDto {
+  const blood =
+    requireCharacterBlood(character)
+
   return {
     characterId: character.characterId,
     revision: character.revision,
     status: character.status,
-    hunger: character.blood.hunger,
+    hunger: blood.hunger,
     damage: {
       health: {
         ...character.damage.health,

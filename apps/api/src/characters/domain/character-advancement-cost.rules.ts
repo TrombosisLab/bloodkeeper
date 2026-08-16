@@ -1,3 +1,8 @@
+import {
+  requireCharacterBlood,
+  requireCharacterThinBloodAlchemy,
+} from './character-vampire-state.rules'
+
 import type {
   CharacterRulesCatalog,
 } from './character-rules-catalog'
@@ -237,8 +242,12 @@ export function previewCharacterAdvancement(
     const definition = catalog.disciplineCatalog.thinBloodAlchemyFormulas.find(({ key }) => key === request.key)
     if (definition === undefined) return finish(character, available, request, request.key, null, null, null,
       [{ code: 'FORMULA_UNKNOWN', message: 'La Formula no existe en el catalogo.' }])
-    if (character.thinBloodAlchemy.formulaKeys.includes(request.key)) issue(issues, 'FORMULA_DUPLICATE', 'La Formula ya esta adquirida.')
-    if (character.thinBloodAlchemy.rating < definition.level) issue(issues, 'FORMULA_LEVEL_UNMET', 'Alquimia no alcanza el nivel de la Formula.')
+    const alchemy =
+      requireCharacterThinBloodAlchemy(
+        character,
+      )
+    if (alchemy.formulaKeys.includes(request.key)) issue(issues, 'FORMULA_DUPLICATE', 'La Formula ya esta adquirida.')
+    if (alchemy.rating < definition.level) issue(issues, 'FORMULA_LEVEL_UNMET', 'Alquimia no alcanza el nivel de la Formula.')
     return finish(character, available, request, request.key, null, definition.level,
       calculateCharacterAdvancementCost({ kind: 'formula', level: definition.level }), issues)
   }
@@ -281,7 +290,10 @@ export function previewCharacterAdvancement(
     return finish(character, available, request, request.definitionKey, current, request.targetRating, cost, issues, consequences)
   }
 
-  const current = character.blood.bloodPotency
+  const current =
+    requireCharacterBlood(
+      character,
+    ).bloodPotency
   const next = current + 1
   const generation = character.identity.generation
   const range = generation === null ? undefined : characterBloodPotencyRanges[generation]

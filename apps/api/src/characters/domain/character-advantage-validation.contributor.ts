@@ -1,3 +1,7 @@
+import {
+  characterMortalAdvantageExclusionCatalog,
+} from '@v5r/character-rules'
+
 import type {
   CharacterRulesAdvantageCatalog,
   CharacterRulesAdvantageDefinition,
@@ -1311,6 +1315,86 @@ function validateCreationBudget(
   return issues
 }
 
+const mortalAdvantageExcludedKeys =
+  new Set<string>(
+    Object.values(
+      characterMortalAdvantageExclusionCatalog,
+    ).flat(),
+  )
+
+function validateMortalEligibility(
+  character: PersistedCharacterDraft,
+  selections:
+    readonly PersistedCharacterAdvantageSelection[],
+  context: CharacterValidationContext,
+  index: AdvantageCatalogIndex,
+): CharacterValidationIssue[] {
+  if (
+    character.nature !== 'human' ||
+    character.creation.creationMode !==
+      'sessionZero'
+  ) {
+    return []
+  }
+
+  const severity =
+    completionSeverity(context)
+  const issues:
+    CharacterValidationIssue[] = []
+
+  for (const selection of selections) {
+    const definition =
+      index.definitions.get(
+        selection.definitionKey,
+      )
+
+    if (
+      definition !== undefined &&
+      mortalAdvantageExcludedKeys.has(
+        definition.key,
+      )
+    ) {
+      issues.push(
+        issue(
+          'CHARACTER_HUMAN_ADVANTAGE_NOT_ALLOWED',
+          severity,
+          'advantages',
+          'La Ventaja o Defecto seleccionado no está disponible para personajes mortales.',
+          {
+            definitionKey:
+              selection.definitionKey,
+          },
+        ),
+      )
+    }
+
+    if (
+      definition?.requirementRules?.some(
+        ({ type }) =>
+          type === 'generation' ||
+          type === 'thinBlood' ||
+          type === 'clan' ||
+          type === 'predatorType',
+      )
+    ) {
+      issues.push(
+        issue(
+          'CHARACTER_HUMAN_ADVANTAGE_VAMPIRE_REQUIREMENT',
+          severity,
+          'advantages',
+          'La Ventaja seleccionada depende de un requisito vampírico no aplicable al humano.',
+          {
+            definitionKey:
+              selection.definitionKey,
+          },
+        ),
+      )
+    }
+  }
+
+  return issues
+}
+
 function validatePersistedAdvantageState(
   character: PersistedCharacterDraft,
   context: CharacterValidationContext,
@@ -1367,7 +1451,16 @@ function validatePersistedAdvantageState(
       context,
       index,
     ),
-    ...validateCreationBudget(selections, context),
+    ...validateMortalEligibility(
+      character,
+      selections,
+      context,
+      index,
+    ),
+    ...validateCreationBudget(
+      selections,
+      context,
+    ),
   ])
 }
 

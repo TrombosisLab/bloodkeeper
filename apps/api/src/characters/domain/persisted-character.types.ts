@@ -307,7 +307,7 @@ export interface PersistedCharacterDraft {
   identity: PersistedCharacterIdentity
   creation: PersistedCharacterCreationState
   attributes: PersistedCharacterAttributes
-  blood: PersistedCharacterBlood
+  blood: PersistedCharacterBlood | null
   damage: PersistedCharacterDamageState
   skills: PersistedCharacterSkills
   skillSpecialties:
@@ -318,7 +318,7 @@ export interface PersistedCharacterDraft {
   oblivionCeremonies:
     PersistedCharacterOblivionCeremonies
   thinBloodAlchemy:
-    PersistedCharacterThinBloodAlchemy
+    PersistedCharacterThinBloodAlchemy | null
   thinBloodTraits:
     PersistedCharacterThinBloodTrait[]
   advantages: PersistedCharacterAdvantages

@@ -28,6 +28,9 @@ import loresheets from './catalogs/loresheets.json' with {
 import predatorTypes from './catalogs/predator-types.json' with {
   type: 'json',
 }
+import mortalAdvantageExclusions from './catalogs/mortal-advantage-exclusions.json' with {
+  type: 'json',
+}
 import skills from './catalogs/skills.json' with {
   type: 'json',
 }
@@ -87,6 +90,11 @@ export const characterDependencyCatalog =
   deepFreeze({
     predatorTypes: clone(predatorTypes),
   })
+
+export const characterMortalAdvantageExclusionCatalog =
+  deepFreeze(
+    clone(mortalAdvantageExclusions),
+  )
 
 export const characterSkillCatalog =
   deepFreeze({

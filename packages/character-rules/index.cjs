@@ -10,6 +10,7 @@ const clanDisciplineAffinities = require('./catalogs/clan-discipline-affinities.
 const advantageDefinitions = require('./catalogs/advantages.json')
 const loresheets = require('./catalogs/loresheets.json')
 const predatorTypes = require('./catalogs/predator-types.json')
+const mortalAdvantageExclusions = require('./catalogs/mortal-advantage-exclusions.json')
 const skills = require('./catalogs/skills.json')
 
 function deepFreeze(value) {
@@ -73,6 +74,11 @@ const characterSkillCatalog =
     definitions: clone(skills),
   })
 
+const characterMortalAdvantageExclusionCatalog =
+  deepFreeze(
+    clone(mortalAdvantageExclusions),
+  )
+
 module.exports = {
   deriveCharacterHealthCapacity,
   deriveCharacterWillpowerCapacity,
@@ -81,4 +87,5 @@ module.exports = {
   characterAdvantageCatalog,
   characterDependencyCatalog,
   characterSkillCatalog,
+  characterMortalAdvantageExclusionCatalog,
 }

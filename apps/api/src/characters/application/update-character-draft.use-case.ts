@@ -31,6 +31,10 @@ import {
   assertValidCharacterHunger,
 } from '../domain/character-hunger.rules'
 
+import {
+  requireCharacterBlood,
+} from '../domain/character-vampire-state.rules'
+
 
 export class CharacterChronicleAssociationRequiredError
   extends Error {
@@ -41,6 +45,64 @@ export class CharacterChronicleAssociationRequiredError
     this.name =
       'CharacterChronicleAssociationRequiredError'
   }
+}
+
+export class HumanCharacterVampireStateMutationError
+  extends Error {
+  constructor(characterId: string) {
+    super(
+      `Human character ${characterId} cannot receive vampire-only draft state`,
+    )
+    this.name =
+      'HumanCharacterVampireStateMutationError'
+  }
+}
+
+function changesHumanVampireState(
+  data: UpdateCharacterDraftData,
+): boolean {
+  return (
+    data.blood !== undefined ||
+    (
+      data.identity?.clanKey !== undefined &&
+      data.identity.clanKey !== null
+    ) ||
+    (
+      data.identity?.generation !== undefined &&
+      data.identity.generation !== null
+    ) ||
+    (
+      data.identity?.predatorTypeKey !==
+        undefined &&
+      data.identity.predatorTypeKey !== null
+    ) ||
+    (
+      data.disciplines !== undefined &&
+      data.disciplines.length > 0
+    ) ||
+    (
+      data.bloodSorceryRituals !== undefined &&
+      data.bloodSorceryRituals.ritualKeys
+        .length > 0
+    ) ||
+    (
+      data.oblivionCeremonies !== undefined &&
+      data.oblivionCeremonies.ceremonyKeys
+        .length > 0
+    ) ||
+    data.thinBloodAlchemy !== undefined ||
+    (
+      data.thinBloodTraits !== undefined &&
+      data.thinBloodTraits.length > 0
+    ) ||
+    (
+      data.creation?.predatorTypeChoices !==
+        undefined &&
+      Object.keys(
+        data.creation.predatorTypeChoices,
+      ).length > 0
+    )
+  )
 }
 
 export class UpdateCharacterDraftUseCase {
@@ -92,7 +154,8 @@ export class UpdateCharacterDraftUseCase {
       changesDamageState ||
       changesHumanityState ||
       changesHungerState ||
-      checksChronicleAssociation
+      checksChronicleAssociation ||
+      changesHumanVampireState(data)
     ) {
       const current =
         await this.repository.findById(
@@ -105,6 +168,15 @@ export class UpdateCharacterDraftUseCase {
         current.revision !== data.expectedRevision
       ) {
         throw new CharacterDraftWriteConflictError(
+          data.characterId,
+        )
+      }
+
+      if (
+        current.nature === 'human' &&
+        changesHumanVampireState(data)
+      ) {
+        throw new HumanCharacterVampireStateMutationError(
           data.characterId,
         )
       }
@@ -187,9 +259,12 @@ export class UpdateCharacterDraftUseCase {
       }
 
       if (changesHungerState) {
+        const blood =
+          requireCharacterBlood(current)
+
         assertValidCharacterHunger(
           data.blood?.hunger ??
-            current.blood.hunger,
+            blood.hunger,
         )
       }
     }

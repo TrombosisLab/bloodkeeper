@@ -140,11 +140,15 @@ function validateIdentity(
       character.identity.concept,
       'CHARACTER_CONCEPT_REQUIRED',
     ],
-    [
-      'clanKey',
-      character.identity.clanKey,
-      'CHARACTER_CLAN_REQUIRED',
-    ],
+    ...(character.nature === 'human'
+      ? []
+      : [
+          [
+            'clanKey',
+            character.identity.clanKey,
+            'CHARACTER_CLAN_REQUIRED',
+          ] as const,
+        ]),
   ] as const
 
   for (const [field, value, code] of requiredText) {
@@ -161,47 +165,52 @@ function validateIdentity(
     }
   }
 
-  const generation = character.identity.generation
+  const generation =
+    character.identity.generation
 
-  if (generation === null) {
-    issues.push(
-      issue(
-        'CHARACTER_GENERATION_REQUIRED',
-        severity,
-        'identity',
-        'generation',
-        'La Generación es obligatoria.',
-      ),
-    )
-  } else if (
-    !Number.isInteger(generation) ||
-    bloodPotencyRanges[generation] === undefined
-  ) {
-    issues.push(
-      issue(
-        'CHARACTER_GENERATION_INVALID',
-        'error',
-        'identity',
-        'generation',
-        'La Generación no está admitida por las reglas implementadas.',
-      ),
-    )
-  }
+  if (character.nature !== 'human') {
+    if (generation === null) {
+      issues.push(
+        issue(
+          'CHARACTER_GENERATION_REQUIRED',
+          severity,
+          'identity',
+          'generation',
+          'La Generación es obligatoria.',
+        ),
+      )
+    } else if (
+      !Number.isInteger(generation) ||
+      bloodPotencyRanges[generation] ===
+        undefined
+    ) {
+      issues.push(
+        issue(
+          'CHARACTER_GENERATION_INVALID',
+          'error',
+          'identity',
+          'generation',
+          'La Generación no está admitida por las reglas implementadas.',
+        ),
+      )
+    }
 
-  if (
-    character.identity.clanKey === 'thinBlood' &&
-    generation !== null &&
-    ![14, 15, 16].includes(generation)
-  ) {
-    issues.push(
-      issue(
-        'THIN_BLOOD_GENERATION_INVALID',
-        'error',
-        'identity',
-        'generation',
-        'Un Sangre Débil debe ser de generación 14, 15 o 16.',
-      ),
-    )
+    if (
+      character.identity.clanKey ===
+        'thinBlood' &&
+      generation !== null &&
+      ![14, 15, 16].includes(generation)
+    ) {
+      issues.push(
+        issue(
+          'THIN_BLOOD_GENERATION_INVALID',
+          'error',
+          'identity',
+          'generation',
+          'Un Sangre Débil debe ser de generación 14, 15 o 16.',
+        ),
+      )
+    }
   }
 
   return sectionResult('identity', issues)
@@ -315,11 +324,49 @@ function validateBlood(
   context: CharacterValidationContext,
 ): CharacterSectionValidation {
   const issues: CharacterValidationIssue[] = []
-  const generation = character.identity.generation
+
+  if (character.nature === 'human') {
+    if (character.blood !== null) {
+      issues.push(
+        issue(
+          'CHARACTER_HUMAN_BLOOD_STATE_FORBIDDEN',
+          'error',
+          'blood',
+          null,
+          'Un humano no puede conservar estado de Sangre vampírico.',
+        ),
+      )
+    }
+
+    return sectionResult(
+      'blood',
+      issues,
+    )
+  }
+
+  if (character.blood === null) {
+    return sectionResult(
+      'blood',
+      [
+        issue(
+          'CHARACTER_VAMPIRE_BLOOD_STATE_REQUIRED',
+          requiredSeverity(context),
+          'blood',
+          null,
+          'El estado de Sangre es obligatorio para un vampiro establecido.',
+        ),
+      ],
+    )
+  }
+
+  const blood = character.blood
+  const generation =
+    character.identity.generation
 
   if (
     generation === null ||
-    bloodPotencyRanges[generation] === undefined
+    bloodPotencyRanges[generation] ===
+      undefined
   ) {
     issues.push(
       issue(
@@ -331,14 +378,15 @@ function validateBlood(
       ),
     )
   } else {
-    const range = bloodPotencyRanges[generation]
+    const range =
+      bloodPotencyRanges[generation]
 
     if (
       !Number.isInteger(
-        character.blood.bloodPotency,
+        blood.bloodPotency,
       ) ||
-      character.blood.bloodPotency < range.min ||
-      character.blood.bloodPotency > range.max
+      blood.bloodPotency < range.min ||
+      blood.bloodPotency > range.max
     ) {
       issues.push(
         issue(
@@ -354,7 +402,7 @@ function validateBlood(
 
   for (
     const violation of
-    validateCharacterHunger(character.blood.hunger)
+    validateCharacterHunger(blood.hunger)
   ) {
     issues.push(
       issue(
@@ -367,7 +415,10 @@ function validateBlood(
     )
   }
 
-  return sectionResult('blood', issues)
+  return sectionResult(
+    'blood',
+    issues,
+  )
 }
 
 function humanityCreationIssues(
@@ -498,7 +549,29 @@ function validateHumanity(
     )
   }
 
-  return sectionResult('humanity', issues)
+  if (
+    character.nature === 'human' &&
+    character.creation.creationMode ===
+      'sessionZero' &&
+    character.status === 'draft' &&
+    context === 'activation' &&
+    character.humanity.value !== 7
+  ) {
+    issues.push(
+      issue(
+        'CHARACTER_HUMAN_INITIAL_HUMANITY_INVALID',
+        'error',
+        'humanity',
+        'value',
+        'Un humano de Sesión 0 debe tener Humanidad 7 en su primera activación.',
+      ),
+    )
+  }
+
+  return sectionResult(
+    'humanity',
+    issues,
+  )
 }
 
 function validateDerived(

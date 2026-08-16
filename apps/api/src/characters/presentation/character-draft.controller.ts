@@ -42,6 +42,7 @@ import {
 
 import {
   CharacterChronicleAssociationRequiredError,
+  HumanCharacterVampireStateMutationError,
   UpdateCharacterDraftUseCase,
 } from '../application/update-character-draft.use-case'
 
@@ -131,6 +132,16 @@ function throwCharacterDraftHttpError(
   ) {
     throw new ConflictException({
       code: 'CHARACTER_DRAFT_WRITE_CONFLICT',
+    })
+  }
+
+  if (
+    error instanceof
+      HumanCharacterVampireStateMutationError
+  ) {
+    throw new UnprocessableEntityException({
+      code:
+        'CHARACTER_HUMAN_VAMPIRE_STATE_FORBIDDEN',
     })
   }
 

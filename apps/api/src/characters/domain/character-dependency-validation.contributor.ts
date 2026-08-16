@@ -272,9 +272,14 @@ function validateThinBloodOwnership(
   }
 
   if (
-    character.thinBloodAlchemy.rating > 0 ||
-    character.thinBloodAlchemy.method !== null ||
-    character.thinBloodAlchemy.formulaKeys.length > 0
+    character.thinBloodAlchemy !== null &&
+    (
+      character.thinBloodAlchemy.rating > 0 ||
+      character.thinBloodAlchemy.method !==
+        null ||
+      character.thinBloodAlchemy.formulaKeys
+        .length > 0
+    )
   ) {
     issues.push(
       errorIssue(
@@ -1161,6 +1166,7 @@ function validatePredatorRestrictions(
 
   if (
     restrictions.minimumBloodPotency !== undefined &&
+    character.blood !== null &&
     character.blood.bloodPotency <
       restrictions.minimumBloodPotency
   ) {
@@ -1173,7 +1179,7 @@ function validatePredatorRestrictions(
           predatorTypeKey: definition.key,
           minimumBloodPotency:
             restrictions.minimumBloodPotency,
-          bloodPotency: character.blood.bloodPotency,
+          bloodPotency: character.blood?.bloodPotency ?? null,
         },
       ),
     )
@@ -1181,6 +1187,7 @@ function validatePredatorRestrictions(
 
   if (
     restrictions.maximumBloodPotency !== undefined &&
+    character.blood !== null &&
     character.blood.bloodPotency >
       restrictions.maximumBloodPotency
   ) {
@@ -1193,7 +1200,7 @@ function validatePredatorRestrictions(
           predatorTypeKey: definition.key,
           maximumBloodPotency:
             restrictions.maximumBloodPotency,
-          bloodPotency: character.blood.bloodPotency,
+          bloodPotency: character.blood?.bloodPotency ?? null,
         },
       ),
     )
@@ -1285,6 +1292,7 @@ function validatePredatorScalarEffects(
     const satisfies = modifiers.some((modifier) => {
       if (modifier > 0) {
         return (
+          character.blood !== null &&
           character.blood.bloodPotency >=
           range.min + modifier
         )
@@ -1292,6 +1300,7 @@ function validatePredatorScalarEffects(
 
       if (modifier < 0) {
         return (
+          character.blood !== null &&
           character.blood.bloodPotency <=
           range.max + modifier
         )
@@ -1309,7 +1318,7 @@ function validatePredatorScalarEffects(
           'La Potencia de Sangre inicial no incorpora el modificador del Tipo de Depredador.',
           {
             predatorTypeKey: definition.key,
-            bloodPotency: character.blood.bloodPotency,
+            bloodPotency: character.blood?.bloodPotency ?? null,
           },
         ),
       )
@@ -1621,6 +1630,130 @@ function validatePersistedDependencies(
   catalog: CharacterRulesCatalog,
   index: DependencyCatalogIndex,
 ): CharacterSectionValidation {
+  if (character.nature === 'human') {
+    const issues:
+      CharacterValidationIssue[] = []
+
+    if (
+      character.creation.creationMode !==
+      'sessionZero'
+    ) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_HUMAN_CREATION_MODE_INVALID',
+          'creation.creationMode',
+          'La naturaleza humana sólo es válida con el modo Sesión 0.',
+        ),
+      )
+    }
+
+    if (character.identity.clanKey !== null) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_HUMAN_CLAN_FORBIDDEN',
+          'identity.clanKey',
+          'Un humano no puede tener Clan vampírico.',
+        ),
+      )
+    }
+
+    if (
+      character.identity.generation !== null
+    ) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_HUMAN_GENERATION_FORBIDDEN',
+          'identity.generation',
+          'Un humano no puede tener Generación vampírica.',
+        ),
+      )
+    }
+
+    if (
+      character.identity.predatorTypeKey !==
+      null
+    ) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_HUMAN_PREDATOR_TYPE_FORBIDDEN',
+          'identity.predatorTypeKey',
+          'A un humano no se le aplica Tipo de Depredador.',
+        ),
+      )
+    }
+
+    if (
+      Object.keys(
+        character.creation
+          .predatorTypeChoices ?? {},
+      ).length > 0
+    ) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_HUMAN_PREDATOR_CHOICES_FORBIDDEN',
+          'creation.predatorTypeChoices',
+          'Un humano no puede conservar elecciones de Tipo de Depredador.',
+        ),
+      )
+    }
+
+    if (character.thinBloodTraits.length > 0) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_HUMAN_THIN_BLOOD_TRAITS_FORBIDDEN',
+          'thinBloodTraits',
+          'Un humano no puede conservar rasgos de Sangre Débil.',
+        ),
+      )
+    }
+
+    if (
+      character.skillSpecialties.some(
+        ({ origin }) =>
+          origin === 'predatorType',
+      )
+    ) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_HUMAN_PREDATOR_SPECIALTY_FORBIDDEN',
+          'skillSpecialties',
+          'Un humano no puede conservar Especialidades de Tipo de Depredador.',
+        ),
+      )
+    }
+
+    if (
+      character.advantages.selections.some(
+        ({ origin }) =>
+          origin === 'predatorType' ||
+          origin === 'thinBlood',
+      )
+    ) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_HUMAN_VAMPIRE_ADVANTAGE_ORIGIN_FORBIDDEN',
+          'advantages',
+          'Un humano no puede conservar Ventajas originadas por Tipo de Depredador o Sangre Débil.',
+        ),
+      )
+    }
+
+    return sectionResult(issues)
+  }
+
+  if (
+    character.blood === null ||
+    character.thinBloodAlchemy === null
+  ) {
+    return sectionResult([
+      errorIssue(
+        'CHARACTER_VAMPIRE_STATE_INCOMPLETE',
+        null,
+        'Faltan relaciones persistentes requeridas por el perfil vampírico establecido.',
+      ),
+    ])
+  }
+
   const structuralIssues = [
     ...validateOrigins(character),
     ...validateThinBloodOwnership(character),

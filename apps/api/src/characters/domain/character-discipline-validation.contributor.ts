@@ -343,6 +343,20 @@ function validateDisciplines(
   return issues
 }
 
+function requiredAlchemy(
+  character: PersistedCharacterDraft,
+) {
+  if (
+    character.thinBloodAlchemy === null
+  ) {
+    throw new Error(
+      `Character ${character.characterId} has no Thin-Blood Alchemy state`,
+    )
+  }
+
+  return character.thinBloodAlchemy
+}
+
 function disciplineRating(
   character: PersistedCharacterDraft,
   disciplineKey: string,
@@ -378,7 +392,7 @@ function validateRelatedAcquisitionStructure(
   const ceremonyKeys =
     character.oblivionCeremonies.ceremonyKeys
   const formulaKeys =
-    character.thinBloodAlchemy.formulaKeys
+    requiredAlchemy(character).formulaKeys
 
   for (const [code, field, values] of [
     [
@@ -435,7 +449,7 @@ function validateRelatedAcquisitionStructure(
     )
   }
 
-  const alchemy = character.thinBloodAlchemy
+  const alchemy = requiredAlchemy(character)
 
   if (
     !Number.isInteger(alchemy.rating) ||
@@ -784,7 +798,7 @@ function validateCatalogRelatedAcquisitions(
     'oblivion',
   )
   const alchemyLevel =
-    character.thinBloodAlchemy.rating
+    requiredAlchemy(character).rating
 
   for (
     const ritualKey of
@@ -877,7 +891,7 @@ function validateCatalogRelatedAcquisitions(
 
   for (
     const formulaKey of
-    character.thinBloodAlchemy.formulaKeys
+    requiredAlchemy(character).formulaKeys
   ) {
     const formula = index.formulas.get(formulaKey)
 
@@ -916,7 +930,7 @@ function validateCatalogRelatedAcquisitions(
     const ceremonyKeys =
       character.oblivionCeremonies.ceremonyKeys
     const formulaKeys =
-      character.thinBloodAlchemy.formulaKeys
+      requiredAlchemy(character).formulaKeys
 
     if (
       bloodSorceryLevel > 0 &&
@@ -1021,6 +1035,73 @@ function validatePersistedDisciplineState(
   catalog: CharacterRulesCatalog,
   index: DisciplineCatalogIndex,
 ): CharacterSectionValidation {
+  if (character.nature === 'human') {
+    const issues:
+      CharacterValidationIssue[] = []
+
+    if (character.disciplines.length > 0) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_HUMAN_DISCIPLINES_FORBIDDEN',
+          'disciplines',
+          'Un humano no puede conservar Disciplinas vampíricas.',
+        ),
+      )
+    }
+
+    if (
+      character.bloodSorceryRituals
+        .ritualKeys.length > 0
+    ) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_HUMAN_RITUALS_FORBIDDEN',
+          'bloodSorceryRituals',
+          'Un humano no puede conservar Rituales de Hechicería de Sangre.',
+        ),
+      )
+    }
+
+    if (
+      character.oblivionCeremonies
+        .ceremonyKeys.length > 0
+    ) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_HUMAN_CEREMONIES_FORBIDDEN',
+          'oblivionCeremonies',
+          'Un humano no puede conservar Ceremonias de Olvido.',
+        ),
+      )
+    }
+
+    if (
+      character.thinBloodAlchemy !== null
+    ) {
+      issues.push(
+        errorIssue(
+          'CHARACTER_HUMAN_THIN_BLOOD_ALCHEMY_FORBIDDEN',
+          'thinBloodAlchemy',
+          'Un humano no puede conservar Alquimia de Sangre Débil.',
+        ),
+      )
+    }
+
+    return sectionResult(issues)
+  }
+
+  if (
+    character.thinBloodAlchemy === null
+  ) {
+    return sectionResult([
+      errorIssue(
+        'CHARACTER_VAMPIRE_THIN_BLOOD_ALCHEMY_STATE_REQUIRED',
+        'thinBloodAlchemy',
+        'Falta el estado persistente de Alquimia requerido por el perfil vampírico actual.',
+      ),
+    ])
+  }
+
   const structuralIssues = [
     ...validateDisciplines(character),
     ...validateRelatedAcquisitionStructure(character),

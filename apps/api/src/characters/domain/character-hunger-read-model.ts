@@ -1,3 +1,7 @@
+import {
+  requireCharacterBlood,
+} from './character-vampire-state.rules'
+
 import type {
   PersistedCharacterDraft,
 } from './persisted-character.types'
@@ -18,13 +22,16 @@ export function toCharacterHungerReadModel(
     'characterId' | 'revision' | 'blood'
   >,
 ): CharacterHungerReadModel {
+  const blood =
+    requireCharacterBlood(draft)
+
   assertValidCharacterHunger(
-    draft.blood.hunger,
+    blood.hunger,
   )
 
   return Object.freeze({
     characterId: draft.characterId,
     revision: draft.revision,
-    hunger: draft.blood.hunger,
+    hunger: blood.hunger,
   })
 }
