@@ -227,3 +227,53 @@ test(
     )
   },
 )
+
+
+test(
+  'SPEC-057-A añade naturaleza y modo de creación con defaults compatibles',
+  async () => {
+    const spec057Migration =
+      await readFile(
+        new URL(
+          '../prisma/migrations/20260816185000_add_character_nature_creation_mode/migration.sql',
+          import.meta.url,
+        ),
+        'utf8',
+      )
+
+    assert.match(
+      schema,
+      /enum CharacterNature\s*{[\s\S]*HUMAN[\s\S]*VAMPIRE[\s\S]*}/,
+    )
+
+    assert.match(
+      schema,
+      /enum CharacterCreationMode\s*{[\s\S]*STANDARD[\s\S]*SESSION_ZERO[\s\S]*}/,
+    )
+
+    assert.match(
+      schema,
+      /nature\s+CharacterNature\s+@default\(VAMPIRE\)/,
+    )
+
+    assert.match(
+      schema,
+      /creationMode\s+CharacterCreationMode\s+@default\(STANDARD\)/,
+    )
+
+    assert.match(
+      spec057Migration,
+      /ADD COLUMN "nature" "CharacterNature" NOT NULL[\s\S]*DEFAULT 'VAMPIRE'/,
+    )
+
+    assert.match(
+      spec057Migration,
+      /ADD COLUMN "creationMode" "CharacterCreationMode" NOT NULL[\s\S]*DEFAULT 'STANDARD'/,
+    )
+
+    assert.doesNotMatch(
+      spec057Migration,
+      /\b(?:DROP|DELETE|TRUNCATE|UPDATE)\b/i,
+    )
+  },
+)

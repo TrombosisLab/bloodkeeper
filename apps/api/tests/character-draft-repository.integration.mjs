@@ -183,6 +183,11 @@ test(
       characterId = created.characterId
 
       assert.equal(created.status, 'draft')
+      assert.equal(created.nature, 'vampire')
+      assert.equal(
+        created.creation.creationMode,
+        'standard',
+      )
       assert.equal(created.revision, 1)
       assert.equal(created.attributes.intelligence, 4)
       assert.equal(created.blood.hunger, 1)

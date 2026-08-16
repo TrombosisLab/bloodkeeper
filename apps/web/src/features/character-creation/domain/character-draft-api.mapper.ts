@@ -15,8 +15,10 @@ import type {
 } from '../types/character-generation.types.ts'
 
 import type {
+  CharacterDraftApiCreationMode,
   CharacterDraftApiDamage,
   CharacterDraftApiLifecycleStatus,
+  CharacterDraftApiNature,
   CharacterDraftApiSnapshot,
   CreateCharacterDraftApiRequest,
   UpdateCharacterDraftApiRequest,
@@ -27,10 +29,12 @@ export interface CharacterDraftApiEditorState {
   ownerId: string
   chronicleId: string | null
   status: CharacterDraftApiLifecycleStatus
+  nature: CharacterDraftApiNature
   revision: number
   createdAt: string
   updatedAt: string
   creationSchemaVersion: number
+  creationMode: CharacterDraftApiCreationMode
   creationUpdatedAt: string
   currentStepId: CreationStepId
   damage: CharacterDraftApiDamage
@@ -551,6 +555,8 @@ export function mapCharacterDraftApiSnapshotToEditorState(
       snapshot.chronicleId,
     status:
       snapshot.status,
+    nature:
+      snapshot.nature,
     revision:
       snapshot.revision,
     createdAt:
@@ -559,6 +565,8 @@ export function mapCharacterDraftApiSnapshotToEditorState(
       snapshot.updatedAt,
     creationSchemaVersion:
       snapshot.creation.schemaVersion,
+    creationMode:
+      snapshot.creation.creationMode,
     creationUpdatedAt:
       snapshot.creation.updatedAt,
     currentStepId:

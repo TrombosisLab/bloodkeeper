@@ -239,12 +239,14 @@ test(
       characterId,
       ownerId,
       status: 'draft',
+      nature: 'vampire',
       revision: 1,
       createdAt: now,
       updatedAt: now,
       creation: {
         ...body.creation,
         schemaVersion: 1,
+        creationMode: 'standard',
         updatedAt: now,
       },
     }
@@ -258,6 +260,11 @@ test(
     assert.equal(
       response.creation.updatedAt,
       '2026-08-03T00:30:00.000Z',
+    )
+    assert.equal(response.nature, 'vampire')
+    assert.equal(
+      response.creation.creationMode,
+      'standard',
     )
   },
 )
@@ -431,6 +438,65 @@ test(
           },
         ),
       /unsupported value/,
+    )
+  },
+)
+
+
+test(
+  'SPEC-057-A no expone naturaleza ni modo de creación como edición libre',
+  () => {
+    assert.throws(
+      () =>
+        parseCreateCharacterDraftRequest(
+          ownerId,
+          {
+            ...createBody(),
+            nature: 'human',
+          },
+        ),
+      /body\.nature is not allowed/,
+    )
+
+    assert.throws(
+      () =>
+        parseCreateCharacterDraftRequest(
+          ownerId,
+          {
+            ...createBody(),
+            creation: {
+              ...createBody().creation,
+              creationMode: 'sessionZero',
+            },
+          },
+        ),
+      /body\.creation\.creationMode is not allowed/,
+    )
+
+    assert.throws(
+      () =>
+        parseUpdateCharacterDraftRequest(
+          characterId,
+          {
+            expectedRevision: 1,
+            nature: 'human',
+          },
+        ),
+      /body\.nature is not allowed/,
+    )
+
+    assert.throws(
+      () =>
+        parseUpdateCharacterDraftRequest(
+          characterId,
+          {
+            expectedRevision: 1,
+            creation: {
+              creationMode: 'sessionZero',
+            },
+          },
+        ),
+      /body\.creation\.creationMode is not allowed/,
     )
   },
 )

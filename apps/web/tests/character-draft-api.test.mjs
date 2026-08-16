@@ -514,3 +514,57 @@ test(
     )
   },
 )
+
+
+test(
+  'SPEC-057-A representa naturaleza y modo y normaliza snapshots legacy',
+  () => {
+    const legacy =
+      parseCharacterDraftApiSnapshotResponse(
+        snapshot(),
+      )
+
+    assert.equal(legacy.nature, 'vampire')
+    assert.equal(
+      legacy.creation.creationMode,
+      'standard',
+    )
+
+    const sessionZero =
+      parseCharacterDraftApiSnapshotResponse({
+        ...snapshot(),
+        nature: 'human',
+        creation: {
+          ...snapshot().creation,
+          creationMode: 'sessionZero',
+        },
+      })
+
+    assert.equal(sessionZero.nature, 'human')
+    assert.equal(
+      sessionZero.creation.creationMode,
+      'sessionZero',
+    )
+
+    assert.throws(
+      () =>
+        parseCharacterDraftApiSnapshotResponse({
+          ...snapshot(),
+          nature: 'ghoul',
+        }),
+      CharacterDraftApiError,
+    )
+
+    assert.throws(
+      () =>
+        parseCharacterDraftApiSnapshotResponse({
+          ...snapshot(),
+          creation: {
+            ...snapshot().creation,
+            creationMode: 'legacy',
+          },
+        }),
+      CharacterDraftApiError,
+    )
+  },
+)

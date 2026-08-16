@@ -21,6 +21,8 @@ import { Injectable } from '@nestjs/common'
 import {
   AdvantageCategory as PrismaAdvantageCategory,
   CharacterAgeCategory as PrismaCharacterAgeCategory,
+  CharacterCreationMode as PrismaCharacterCreationMode,
+  CharacterNature as PrismaCharacterNature,
   AdvantageDetailsKind as PrismaAdvantageDetailsKind,
   AdvantageMaskBenefit as PrismaAdvantageMaskBenefit,
   AdvantageSelectionOrigin as PrismaAdvantageSelectionOrigin,
@@ -47,10 +49,12 @@ import type {
   CharacterAdvantageCategory,
   CharacterAdvantageSelectionOrigin,
   CharacterAgeCategory,
+  CharacterCreationMode,
   CharacterCreationStep,
   CharacterDisciplineKey,
   CharacterDisciplineOrigin,
   CharacterLifecycleStatus,
+  CharacterNature,
   CharacterSkillKey,
   CreateCharacterDraftData,
   PersistedCharacterDraft,
@@ -135,6 +139,22 @@ const statusToPrisma: Record<
   draft: PrismaCharacterStatus.DRAFT,
   active: PrismaCharacterStatus.ACTIVE,
   archived: PrismaCharacterStatus.ARCHIVED,
+}
+
+const natureFromPrisma: Record<
+  PrismaCharacterNature,
+  CharacterNature
+> = {
+  HUMAN: 'human',
+  VAMPIRE: 'vampire',
+}
+
+const creationModeFromPrisma: Record<
+  PrismaCharacterCreationMode,
+  CharacterCreationMode
+> = {
+  STANDARD: 'standard',
+  SESSION_ZERO: 'sessionZero',
 }
 
 const specialtyOriginToPrisma: Record<
@@ -861,6 +881,7 @@ function toPersistedDraft(
     ownerId: row.ownerId,
     chronicleId: row.chronicleId,
     status: statusFromPrisma[row.status],
+    nature: natureFromPrisma[row.nature],
     revision: row.revision,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
@@ -887,6 +908,10 @@ function toPersistedDraft(
       currentStep:
         stepFromPrisma[
           row.creationState.currentStep
+        ],
+      creationMode:
+        creationModeFromPrisma[
+          row.creationState.creationMode
         ],
       skillDistributionMethod:
         methodFromPrisma[
@@ -1102,6 +1127,7 @@ export class PrismaCharacterDraftRepository
               ownerId: data.ownerId,
               chronicleId: data.chronicleId,
               status: PrismaCharacterStatus.DRAFT,
+              nature: PrismaCharacterNature.VAMPIRE,
               identity: {
                 create: toIdentityCreate(
                   data.identity,
@@ -1110,6 +1136,8 @@ export class PrismaCharacterDraftRepository
               creationState: {
                 create: {
                   schemaVersion: 1,
+                  creationMode:
+                    PrismaCharacterCreationMode.STANDARD,
                   currentStep:
                     stepToPrisma[
                       data.creation.currentStep

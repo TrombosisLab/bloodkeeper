@@ -55,6 +55,16 @@ const lifecycleStatuses = [
   'archived',
 ] as const
 
+const characterNatures = [
+  'human',
+  'vampire',
+] as const
+
+const creationModes = [
+  'standard',
+  'sessionZero',
+] as const
+
 const ageCategories = [
   'fledgling',
   'neonate',
@@ -277,6 +287,10 @@ function validCreation(
     isInteger(value.schemaVersion) &&
     value.schemaVersion >= 1 &&
     oneOf(value.currentStep, creationSteps) &&
+    (
+      value.creationMode === undefined ||
+      oneOf(value.creationMode, creationModes)
+    ) &&
     oneOf(
       value.skillDistributionMethod,
       skillDistributionMethods,
@@ -636,6 +650,10 @@ export function parseCharacterDraftApiSnapshotResponse(
     typeof value.ownerId !== 'string' ||
     !isStringOrNull(value.chronicleId) ||
     !oneOf(value.status, lifecycleStatuses) ||
+    !(
+      value.nature === undefined ||
+      oneOf(value.nature, characterNatures)
+    ) ||
     !isInteger(value.revision) ||
     value.revision < 1 ||
     !validTimestamp(value.createdAt) ||
@@ -676,9 +694,22 @@ export function parseCharacterDraftApiSnapshotResponse(
     return invalidResponse()
   }
 
-  return structuredClone(
-    value,
-  ) as unknown as CharacterDraftApiSnapshot
+  const normalized =
+    structuredClone(value)
+
+  if (normalized.nature === undefined) {
+    normalized.nature = 'vampire'
+  }
+
+  if (
+    isRecord(normalized.creation) &&
+    normalized.creation.creationMode === undefined
+  ) {
+    normalized.creation.creationMode =
+      'standard'
+  }
+
+  return normalized as unknown as CharacterDraftApiSnapshot
 }
 
 export function parseCharacterDraftApiListResponse(

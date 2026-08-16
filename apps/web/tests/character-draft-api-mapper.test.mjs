@@ -62,6 +62,7 @@ function richSnapshot() {
     chronicleId:
       '2fc3fe58-c087-4473-b315-f072aa65efb1',
     status: 'draft',
+    nature: 'vampire',
     revision: 7,
     createdAt:
       '2026-08-04T09:00:00.000Z',
@@ -81,6 +82,7 @@ function richSnapshot() {
     creation: {
       schemaVersion: 1,
       currentStep: 'disciplines',
+      creationMode: 'standard',
       skillDistributionMethod:
         'balanced',
       predatorTypeChoices: {
@@ -337,6 +339,11 @@ test(
       snapshot.characterId,
     )
     assert.equal(state.revision, 7)
+    assert.equal(state.nature, 'vampire')
+    assert.equal(
+      state.creationMode,
+      'standard',
+    )
     assert.equal(
       state.currentStepId,
       'disciplines',

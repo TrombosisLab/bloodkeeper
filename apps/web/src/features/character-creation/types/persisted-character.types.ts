@@ -15,6 +15,14 @@ export type CharacterLifecycleStatus =
   | 'active'
   | 'archived'
 
+export type CharacterNature =
+  | 'human'
+  | 'vampire'
+
+export type CharacterCreationMode =
+  | 'standard'
+  | 'sessionZero'
+
 export type PersistedCharacterIdentity =
   Omit<CharacterIdentityDraft, 'chronicle'>
 
@@ -28,6 +36,7 @@ export interface PersistedCharacterData
 
 export interface PersistedCharacterCreationState {
   currentStepId: CreationStepId
+  creationMode: CharacterCreationMode
   skillDistributionMethod:
     CharacterDraft['skillDistributionMethod']
 }
@@ -38,6 +47,7 @@ export interface PersistedCharacter {
   ownerId: string
   chronicleId: string | null
   status: CharacterLifecycleStatus
+  nature: CharacterNature
   revision: number
   createdAt: string
   updatedAt: string

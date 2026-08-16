@@ -31,6 +31,16 @@ enum CharacterStatus {
   ARCHIVED
 }
 
+enum CharacterNature {
+  HUMAN
+  VAMPIRE
+}
+
+enum CharacterCreationMode {
+  STANDARD
+  SESSION_ZERO
+}
+
 enum ChronicleStatus {
   PREPARATION
   ACTIVE
@@ -420,6 +430,7 @@ model Character {
   ownerId     String          @db.Uuid
   chronicleId String?         @db.Uuid
   status      CharacterStatus @default(DRAFT)
+  nature      CharacterNature @default(VAMPIRE)
   revision    Int             @default(1)
   createdAt   DateTime        @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime        @updatedAt @db.Timestamptz(3)
@@ -477,6 +488,7 @@ model CharacterCreationState {
   characterId            String                  @id @db.Uuid
   schemaVersion          Int                     @default(1)
   currentStep            CharacterCreationStep   @default(IDENTITY)
+  creationMode           CharacterCreationMode   @default(STANDARD)
   skillDistributionMethod SkillDistributionMethod @default(BALANCED)
   predatorTypeChoices    Json                    @default("{}")
   updatedAt              DateTime                @updatedAt @db.Timestamptz(3)

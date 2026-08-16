@@ -93,11 +93,13 @@ export function createPersistedCharacterSnapshot(
     ownerId: input.ownerId,
     chronicleId: input.chronicleId,
     status: input.status,
+    nature: 'vampire',
     revision: input.revision,
     createdAt: input.createdAt,
     updatedAt: input.updatedAt,
     creation: {
       currentStepId: input.currentStepId,
+      creationMode: 'standard',
       skillDistributionMethod,
     },
     data: {

@@ -37,6 +37,14 @@ export type CharacterDraftApiLifecycleStatus =
   | 'active'
   | 'archived'
 
+export type CharacterDraftApiNature =
+  | 'human'
+  | 'vampire'
+
+export type CharacterDraftApiCreationMode =
+  | 'standard'
+  | 'sessionZero'
+
 export type CharacterDraftApiAgeCategory =
   | 'fledgling'
   | 'neonate'
@@ -59,6 +67,7 @@ export interface CharacterDraftApiIdentity {
 export interface CharacterDraftApiCreationState {
   schemaVersion: number
   currentStep: CreationStepId
+  creationMode: CharacterDraftApiCreationMode
   skillDistributionMethod:
     SkillDistributionMethod
   predatorTypeChoices:
@@ -134,6 +143,7 @@ export interface CharacterDraftApiSnapshot {
   ownerId: string
   chronicleId: string | null
   status: CharacterDraftApiLifecycleStatus
+  nature: CharacterDraftApiNature
   revision: number
   createdAt: string
   updatedAt: string

@@ -40,6 +40,7 @@ test(
     )
     assert.equal(snapshot.ownerId, 'user-001')
     assert.equal(snapshot.status, 'draft')
+    assert.equal(snapshot.nature, 'vampire')
     assert.equal(snapshot.revision, 1)
   },
 )
@@ -81,6 +82,7 @@ test(
 
     assert.deepEqual(snapshot.creation, {
       currentStepId: 'advantages',
+      creationMode: 'standard',
       skillDistributionMethod: 'balanced',
     })
     assert.equal(
