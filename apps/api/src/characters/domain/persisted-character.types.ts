@@ -330,7 +330,7 @@ export interface CreateCharacterDraftData {
   chronicleId: string | null
   identity: Partial<PersistedCharacterIdentity>
   attributes: PersistedCharacterAttributes
-  blood: PersistedCharacterBlood
+  blood: PersistedCharacterBlood | null
   skills: PersistedCharacterSkills
   skillSpecialties:
     PersistedCharacterSkillSpecialty[]
@@ -340,12 +340,13 @@ export interface CreateCharacterDraftData {
   oblivionCeremonies:
     PersistedCharacterOblivionCeremonies
   thinBloodAlchemy:
-    PersistedCharacterThinBloodAlchemy
+    PersistedCharacterThinBloodAlchemy | null
   thinBloodTraits:
     PersistedCharacterThinBloodTrait[]
   advantages: PersistedCharacterAdvantages
   humanity: PersistedCharacterHumanity
   creation: {
+    creationMode?: CharacterCreationMode
     currentStep: CharacterCreationStep
     skillDistributionMethod: SkillDistributionMethod
     predatorTypeChoices: Record<string, number>

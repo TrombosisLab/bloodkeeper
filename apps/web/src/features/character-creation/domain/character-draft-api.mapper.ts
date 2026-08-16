@@ -1,3 +1,7 @@
+import {
+  initialCharacterDraft,
+} from '../data/initial-character-draft.ts'
+
 import type {
   CharacterDraft,
 } from '../types/character-draft.types.ts'
@@ -44,12 +48,14 @@ export interface CharacterDraftApiEditorState {
 
 export interface CharacterDraftCreateMappingOptions {
   currentStepId: CreationStepId
+  creationMode?: CharacterDraftApiCreationMode
   chronicleId?: string | null
   humanityStains?: number
 }
 
 export interface CharacterDraftUpdateMappingOptions {
   expectedRevision: number
+  creationMode?: CharacterDraftApiCreationMode
   currentStepId: CreationStepId
   chronicleId: string | null
   humanityStains: number
@@ -194,48 +200,68 @@ export function mapCharacterDraftToCreateRequest(
   draft: CharacterDraft,
   options: CharacterDraftCreateMappingOptions,
 ): CreateCharacterDraftApiRequest {
+  const creationMode =
+    options.creationMode ?? 'standard'
+  const sessionZero =
+    creationMode === 'sessionZero'
+  const identity =
+    draftIdentityToApi(draft)
+
   return {
-    chronicleId:
-      options.chronicleId ?? null,
+    chronicleId: options.chronicleId ?? null,
     identity:
-      draftIdentityToApi(draft),
+      sessionZero
+        ? {
+            ...identity,
+            predatorTypeKey: null,
+            clanKey: null,
+            sire: null,
+            generation: null,
+            ageCategory: null,
+          }
+        : identity,
     attributes: {
       ...draft.attributes,
     },
-    blood: {
-      ...draft.blood,
-    },
+    blood:
+      sessionZero
+        ? null
+        : {
+            ...draft.blood,
+          },
     skills: {
       ...draft.skills,
     },
     skillSpecialties:
       draftSpecialtiesToApi(draft),
     disciplines:
-      draftDisciplinesToApi(draft),
+      sessionZero
+        ? []
+        : draftDisciplinesToApi(draft),
     bloodSorceryRituals: {
-      ritualKeys: [
-        ...draft.bloodSorceryRituals
-          .ritualKeys,
-      ],
+      ritualKeys:
+        sessionZero
+          ? []
+          : [...draft.bloodSorceryRituals.ritualKeys],
     },
     oblivionCeremonies: {
-      ceremonyKeys: [
-        ...draft.oblivionCeremonies
-          .ceremonyKeys,
-      ],
+      ceremonyKeys:
+        sessionZero
+          ? []
+          : [...draft.oblivionCeremonies.ceremonyKeys],
     },
-    thinBloodAlchemy: {
-      rating:
-        draft.thinBloodAlchemy.rating,
-      method:
-        draft.thinBloodAlchemy.method,
-      formulaKeys: [
-        ...draft.thinBloodAlchemy
-          .formulaKeys,
-      ],
-    },
+    thinBloodAlchemy:
+      sessionZero
+        ? null
+        : {
+            rating: draft.thinBloodAlchemy.rating,
+            method: draft.thinBloodAlchemy.method,
+            formulaKeys: [...draft.thinBloodAlchemy.formulaKeys],
+          },
     thinBloodTraits:
-      draftThinBloodTraitsToApi(draft),
+      sessionZero
+        ? []
+        : draftThinBloodTraitsToApi(draft),
     advantages:
       draftAdvantagesToApi(draft),
     humanity:
@@ -244,16 +270,13 @@ export function mapCharacterDraftToCreateRequest(
         options.humanityStains ?? 0,
       ),
     creation: {
-      currentStep:
-        options.currentStepId,
-      skillDistributionMethod:
-        draft.skillDistributionMethod,
-      predatorTypeChoices: {
-        ...(
-          draft.predatorTypeChoices ??
-          {}
-        ),
-      },
+      creationMode,
+      currentStep: options.currentStepId,
+      skillDistributionMethod: draft.skillDistributionMethod,
+      predatorTypeChoices:
+        sessionZero
+          ? {}
+          : {...(draft.predatorTypeChoices ?? {})},
     },
   }
 }
@@ -262,70 +285,61 @@ export function mapCharacterDraftToUpdateRequest(
   draft: CharacterDraft,
   options: CharacterDraftUpdateMappingOptions,
 ): UpdateCharacterDraftApiRequest {
+  const creationMode =
+    options.creationMode ?? 'standard'
+  const sessionZero =
+    creationMode === 'sessionZero'
+
   const createRequest =
     mapCharacterDraftToCreateRequest(
       draft,
       {
-        currentStepId:
-          options.currentStepId,
-        chronicleId:
-          options.chronicleId,
-        humanityStains:
-          options.humanityStains,
+        currentStepId: options.currentStepId,
+        creationMode,
+        chronicleId: options.chronicleId,
+        humanityStains: options.humanityStains,
       },
     )
 
+  const vampireFields =
+    !sessionZero &&
+    createRequest.blood !== null &&
+    createRequest.thinBloodAlchemy !== null
+      ? {
+          blood: createRequest.blood,
+          disciplines: createRequest.disciplines,
+          bloodSorceryRituals: createRequest.bloodSorceryRituals,
+          oblivionCeremonies: createRequest.oblivionCeremonies,
+          thinBloodAlchemy: createRequest.thinBloodAlchemy,
+          thinBloodTraits: createRequest.thinBloodTraits,
+        }
+      : {}
+
   return {
-    expectedRevision:
-      options.expectedRevision,
-    chronicleId:
-      createRequest.chronicleId,
-    identity:
-      createRequest.identity,
-    attributes:
-      createRequest.attributes,
-    blood:
-      createRequest.blood,
+    expectedRevision: options.expectedRevision,
+    chronicleId: createRequest.chronicleId,
+    identity: createRequest.identity,
+    attributes: createRequest.attributes,
+    ...vampireFields,
     ...(options.damage === undefined
       ? {}
-      : {
-          damage:
-            structuredClone(
-              options.damage,
-            ),
-        }),
-    skills:
-      createRequest.skills,
-    skillSpecialties:
-      createRequest.skillSpecialties,
-    disciplines:
-      createRequest.disciplines,
-    bloodSorceryRituals:
-      createRequest
-        .bloodSorceryRituals,
-    oblivionCeremonies:
-      createRequest
-        .oblivionCeremonies,
-    thinBloodAlchemy:
-      createRequest.thinBloodAlchemy,
-    thinBloodTraits:
-      createRequest.thinBloodTraits,
-    advantages:
-      createRequest.advantages,
-    humanityValue:
-      createRequest.humanity.value,
-    humanityStains:
-      createRequest.humanity.stains,
+      : {damage: structuredClone(options.damage)}),
+    skills: createRequest.skills,
+    skillSpecialties: createRequest.skillSpecialties,
+    advantages: createRequest.advantages,
+    humanityValue: createRequest.humanity.value,
+    humanityStains: createRequest.humanity.stains,
     humanityNarrative: {
-      convictions:
-        createRequest.humanity
-          .convictions,
-      touchstones:
-        createRequest.humanity
-          .touchstones,
+      convictions: createRequest.humanity.convictions,
+      touchstones: createRequest.humanity.touchstones,
     },
-    creation:
-      createRequest.creation,
+    creation: {
+      currentStep: createRequest.creation.currentStep,
+      skillDistributionMethod:
+        createRequest.creation.skillDistributionMethod,
+      predatorTypeChoices:
+        createRequest.creation.predatorTypeChoices,
+    },
   }
 }
 
@@ -388,9 +402,12 @@ export function mapCharacterDraftApiSnapshotToEditorState(
       ...snapshot.attributes,
     },
 
-    blood: {
-      ...snapshot.blood,
-    },
+    blood:
+      snapshot.blood === null
+        ? structuredClone(initialCharacterDraft.blood)
+        : {
+            ...snapshot.blood,
+          },
 
     skills: {
       ...snapshot.skills,
@@ -446,18 +463,14 @@ export function mapCharacterDraftApiSnapshotToEditorState(
       ],
     },
 
-    thinBloodAlchemy: {
-      rating:
-        snapshot.thinBloodAlchemy
-          .rating,
-      method:
-        snapshot.thinBloodAlchemy
-          .method,
-      formulaKeys: [
-        ...snapshot.thinBloodAlchemy
-          .formulaKeys,
-      ],
-    },
+    thinBloodAlchemy:
+      snapshot.thinBloodAlchemy === null
+        ? structuredClone(initialCharacterDraft.thinBloodAlchemy)
+        : {
+            rating: snapshot.thinBloodAlchemy.rating,
+            method: snapshot.thinBloodAlchemy.method,
+            formulaKeys: [...snapshot.thinBloodAlchemy.formulaKeys],
+          },
 
     thinBloodTraits: {
       selections:

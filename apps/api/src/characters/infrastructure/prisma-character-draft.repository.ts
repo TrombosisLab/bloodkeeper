@@ -1142,13 +1142,21 @@ export class PrismaCharacterDraftRepository
   ): Promise<PersistedCharacterDraft> {
     return this.database.$transaction(
       async (transaction) => {
+        const creationMode =
+          data.creation.creationMode ?? 'standard'
+        const sessionZero =
+          creationMode === 'sessionZero'
+
         const character =
           await transaction.character.create({
             data: {
               ownerId: data.ownerId,
               chronicleId: data.chronicleId,
               status: PrismaCharacterStatus.DRAFT,
-              nature: PrismaCharacterNature.VAMPIRE,
+              nature:
+                sessionZero
+                  ? PrismaCharacterNature.HUMAN
+                  : PrismaCharacterNature.VAMPIRE,
               identity: {
                 create: toIdentityCreate(
                   data.identity,
@@ -1158,7 +1166,9 @@ export class PrismaCharacterDraftRepository
                 create: {
                   schemaVersion: 1,
                   creationMode:
-                    PrismaCharacterCreationMode.STANDARD,
+                    sessionZero
+                      ? PrismaCharacterCreationMode.SESSION_ZERO
+                      : PrismaCharacterCreationMode.STANDARD,
                   currentStep:
                     stepToPrisma[
                       data.creation.currentStep
@@ -1178,9 +1188,13 @@ export class PrismaCharacterDraftRepository
               attributes: {
                 create: data.attributes,
               },
-              blood: {
-                create: data.blood,
-              },
+              ...(data.blood === null
+                ? {}
+                : {
+                    blood: {
+                      create: data.blood,
+                    },
+                  }),
               damage: {
                 create: {},
               },
@@ -1247,24 +1261,30 @@ export class PrismaCharacterDraftRepository
                       ceremonyKey,
                     })),
               },
-              thinBloodAlchemy: {
-                create: {
-                  rating: data.thinBloodAlchemy.rating,
-                  method:
-                    data.thinBloodAlchemy.method === null
-                      ? null
-                      : alchemyMethodToPrisma[
-                          data.thinBloodAlchemy.method
-                        ],
-                },
-              },
-              thinBloodFormulas: {
-                create:
-                  data.thinBloodAlchemy.formulaKeys
-                    .map((formulaKey) => ({
-                      formulaKey,
-                    })),
-              },
+              ...(data.thinBloodAlchemy === null
+                ? {}
+                : {
+                    thinBloodAlchemy: {
+                      create: {
+                        rating:
+                          data.thinBloodAlchemy.rating,
+                        method:
+                          data.thinBloodAlchemy.method === null
+                            ? null
+                            : alchemyMethodToPrisma[
+                                data.thinBloodAlchemy.method
+                              ],
+                      },
+                    },
+                    thinBloodFormulas: {
+                      create:
+                        data.thinBloodAlchemy.formulaKeys.map(
+                          (formulaKey) => ({
+                            formulaKey,
+                          }),
+                        ),
+                    },
+                  }),
               thinBloodTraits: {
                 create: data.thinBloodTraits.map(
                   (trait) => ({

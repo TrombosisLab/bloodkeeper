@@ -150,7 +150,7 @@ export interface CharacterDraftApiSnapshot {
   identity: CharacterDraftApiIdentity
   creation: CharacterDraftApiCreationState
   attributes: CharacterAttributesDraft
-  blood: CharacterDraftApiBlood
+  blood: CharacterDraftApiBlood | null
   damage: CharacterDraftApiDamage
   skills: CharacterSkillsDraft
   skillSpecialties:
@@ -166,7 +166,7 @@ export interface CharacterDraftApiSnapshot {
     rating: number
     method: ThinBloodAlchemyMethod | null
     formulaKeys: string[]
-  }
+  } | null
   thinBloodTraits:
     CharacterDraftApiThinBloodTrait[]
   advantages: {
@@ -180,7 +180,7 @@ export interface CreateCharacterDraftApiRequest {
   chronicleId: string | null
   identity: Partial<CharacterDraftApiIdentity>
   attributes: CharacterAttributesDraft
-  blood: CharacterDraftApiBlood
+  blood: CharacterDraftApiBlood | null
   skills: CharacterSkillsDraft
   skillSpecialties:
     CharacterDraftApiSkillSpecialty[]
@@ -195,7 +195,7 @@ export interface CreateCharacterDraftApiRequest {
     rating: number
     method: ThinBloodAlchemyMethod | null
     formulaKeys: string[]
-  }
+  } | null
   thinBloodTraits:
     CharacterDraftApiThinBloodTrait[]
   advantages: {
@@ -204,6 +204,7 @@ export interface CreateCharacterDraftApiRequest {
   }
   humanity: CharacterDraftApiHumanity
   creation: {
+    creationMode?: CharacterDraftApiCreationMode
     currentStep: CreationStepId
     skillDistributionMethod:
       SkillDistributionMethod

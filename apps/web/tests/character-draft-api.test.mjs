@@ -534,6 +534,8 @@ test(
       parseCharacterDraftApiSnapshotResponse({
         ...snapshot(),
         nature: 'human',
+        blood: null,
+        thinBloodAlchemy: null,
         creation: {
           ...snapshot().creation,
           creationMode: 'sessionZero',

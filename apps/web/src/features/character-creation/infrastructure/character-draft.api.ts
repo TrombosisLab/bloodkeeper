@@ -664,7 +664,10 @@ export function parseCharacterDraftApiSnapshotResponse(
       value.attributes,
       attributeKeys,
     ) ||
-    !validBlood(value.blood) ||
+    !(
+      value.blood === null ||
+      validBlood(value.blood)
+    ) ||
     !validDamage(value.damage) ||
     !validIntegerRecord(
       value.skills,
@@ -682,14 +685,39 @@ export function parseCharacterDraftApiSnapshotResponse(
       value.oblivionCeremonies,
       'ceremonyKeys',
     ) ||
-    !validAlchemy(
-      value.thinBloodAlchemy,
+    !(
+      value.thinBloodAlchemy === null ||
+      validAlchemy(value.thinBloodAlchemy)
     ) ||
     !validThinBloodTraits(
       value.thinBloodTraits,
     ) ||
     !validAdvantages(value.advantages) ||
     !validHumanity(value.humanity)
+  ) {
+    return invalidResponse()
+  }
+
+  const resolvedNature =
+    value.nature === undefined
+      ? 'vampire'
+      : value.nature
+
+  if (
+    (
+      resolvedNature === 'human' &&
+      (
+        value.blood !== null ||
+        value.thinBloodAlchemy !== null
+      )
+    ) ||
+    (
+      resolvedNature === 'vampire' &&
+      (
+        value.blood === null ||
+        value.thinBloodAlchemy === null
+      )
+    )
   ) {
     return invalidResponse()
   }

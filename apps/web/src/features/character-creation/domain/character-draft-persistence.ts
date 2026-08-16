@@ -1,3 +1,7 @@
+import type {
+  CharacterDraftApiCreationMode,
+} from '../types/character-draft-api.types.ts'
+
 import {
   CharacterDraftApiError,
 } from '../infrastructure/character-draft.api.ts'
@@ -84,13 +88,19 @@ export async function persistCharacterDraftEditorState(
   draft: CharacterDraft,
   currentStepId: CreationStepId,
   editorState: CharacterDraftApiEditorState | null,
+  creationMode:
+    CharacterDraftApiCreationMode =
+      editorState?.creationMode ?? 'standard',
 ): Promise<CharacterDraftApiEditorState> {
   const snapshot =
     editorState === null
       ? await gateway.create(
           mapCharacterDraftToCreateRequest(
             draft,
-            { currentStepId },
+            {
+              currentStepId,
+              creationMode,
+            },
           ),
         )
       : await gateway.update(
@@ -100,6 +110,8 @@ export async function persistCharacterDraftEditorState(
             {
               expectedRevision:
                 editorState.revision,
+              creationMode:
+                editorState.creationMode,
               currentStepId,
               chronicleId:
                 editorState.chronicleId,

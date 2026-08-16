@@ -743,23 +743,49 @@ function validateCreation(
   const value = record(input, path)
   onlyKeys(
     value,
-    [
-      'currentStep',
-      'skillDistributionMethod',
-      'predatorTypeChoices',
-    ],
+    complete
+      ? [
+          'creationMode',
+          'currentStep',
+          'skillDistributionMethod',
+          'predatorTypeChoices',
+        ]
+      : [
+          'currentStep',
+          'skillDistributionMethod',
+          'predatorTypeChoices',
+        ],
     path,
   )
 
+  if (
+    complete &&
+    Object.hasOwn(value, 'creationMode')
+  ) {
+    oneOf(
+      value.creationMode,
+      ['standard', 'sessionZero'],
+      `${path}.creationMode`,
+    )
+  }
+
   if (complete || Object.hasOwn(value, 'currentStep')) {
     oneOf(
-      complete ? required(value, 'currentStep', path) : value.currentStep,
-      ['identity', 'attributes', 'skills', 'blood', 'disciplines', 'advantages', 'humanity', 'review'],
+      complete
+        ? required(value, 'currentStep', path)
+        : value.currentStep,
+      [
+        'identity', 'attributes', 'skills', 'blood',
+        'disciplines', 'advantages', 'humanity', 'review',
+      ],
       `${path}.currentStep`,
     )
   }
 
-  if (complete || Object.hasOwn(value, 'skillDistributionMethod')) {
+  if (
+    complete ||
+    Object.hasOwn(value, 'skillDistributionMethod')
+  ) {
     oneOf(
       complete
         ? required(value, 'skillDistributionMethod', path)
@@ -771,18 +797,11 @@ function validateCreation(
 
   if (
     complete ||
-    Object.hasOwn(
-      value,
-      'predatorTypeChoices',
-    )
+    Object.hasOwn(value, 'predatorTypeChoices')
   ) {
     validatePredatorTypeChoices(
       complete
-        ? required(
-            value,
-            'predatorTypeChoices',
-            path,
-          )
+        ? required(value, 'predatorTypeChoices', path)
         : value.predatorTypeChoices,
       `${path}.predatorTypeChoices`,
     )
@@ -798,29 +817,108 @@ function validateCreateBody(input: unknown): void {
     'thinBloodAlchemy', 'thinBloodTraits', 'advantages',
     'humanity', 'creation',
   ] as const
+
   onlyKeys(value, keys, 'body')
   keys.forEach((key) => required(value, key, 'body'))
 
-  const chronicleId = value.chronicleId
-  if (chronicleId !== null) {
+  if (value.chronicleId !== null) {
     throw new InvalidCharacterDraftRequestError(
       'body.chronicleId',
       'must be null; use the dedicated chronicle association operation',
     )
   }
+
   validateIdentity(value.identity, 'body.identity')
-  validateIntegerRecord(value.attributes, CHARACTER_ATTRIBUTE_KEYS, 'body.attributes', true)
-  validateIntegerRecord(value.blood, ['bloodPotency', 'hunger'], 'body.blood', true)
-  validateIntegerRecord(value.skills, CHARACTER_SKILL_KEYS, 'body.skills', true)
+  validateIntegerRecord(
+    value.attributes,
+    CHARACTER_ATTRIBUTE_KEYS,
+    'body.attributes',
+    true,
+  )
+  validateIntegerRecord(
+    value.skills,
+    CHARACTER_SKILL_KEYS,
+    'body.skills',
+    true,
+  )
   validateSpecialties(value.skillSpecialties, 'body.skillSpecialties')
   validateDisciplines(value.disciplines, 'body.disciplines')
-  validateKeyList(value.bloodSorceryRituals, 'ritualKeys', 'body.bloodSorceryRituals')
-  validateKeyList(value.oblivionCeremonies, 'ceremonyKeys', 'body.oblivionCeremonies')
-  validateThinBloodAlchemy(value.thinBloodAlchemy, 'body.thinBloodAlchemy')
+  validateKeyList(
+    value.bloodSorceryRituals,
+    'ritualKeys',
+    'body.bloodSorceryRituals',
+  )
+  validateKeyList(
+    value.oblivionCeremonies,
+    'ceremonyKeys',
+    'body.oblivionCeremonies',
+  )
   validateThinBloodTraits(value.thinBloodTraits, 'body.thinBloodTraits')
   validateAdvantages(value.advantages, 'body.advantages')
   validateHumanity(value.humanity, 'body.humanity')
   validateCreation(value.creation, 'body.creation', true)
+
+  const creation = record(value.creation, 'body.creation')
+  const identity = record(value.identity, 'body.identity')
+  const creationMode =
+    creation.creationMode === 'sessionZero'
+      ? 'sessionZero'
+      : 'standard'
+
+  if (creationMode === 'standard') {
+    validateIntegerRecord(
+      value.blood,
+      ['bloodPotency', 'hunger'],
+      'body.blood',
+      true,
+    )
+    validateThinBloodAlchemy(
+      value.thinBloodAlchemy,
+      'body.thinBloodAlchemy',
+    )
+    return
+  }
+
+  const disciplines =
+    arrayValue(value.disciplines, 'body.disciplines')
+  const rituals =
+    record(value.bloodSorceryRituals, 'body.bloodSorceryRituals')
+  const ceremonies =
+    record(value.oblivionCeremonies, 'body.oblivionCeremonies')
+  const traits =
+    arrayValue(value.thinBloodTraits, 'body.thinBloodTraits')
+  const choices =
+    record(
+      creation.predatorTypeChoices,
+      'body.creation.predatorTypeChoices',
+    )
+
+  const hasVampireState =
+    value.blood !== null ||
+    value.thinBloodAlchemy !== null ||
+    disciplines.length > 0 ||
+    arrayValue(
+      rituals.ritualKeys,
+      'body.bloodSorceryRituals.ritualKeys',
+    ).length > 0 ||
+    arrayValue(
+      ceremonies.ceremonyKeys,
+      'body.oblivionCeremonies.ceremonyKeys',
+    ).length > 0 ||
+    traits.length > 0 ||
+    Object.keys(choices).length > 0 ||
+    identity.predatorTypeKey != null ||
+    identity.clanKey != null ||
+    identity.sire != null ||
+    identity.generation != null ||
+    identity.ageCategory != null
+
+  if (hasVampireState) {
+    throw new InvalidCharacterDraftRequestError(
+      'body.creation.creationMode',
+      'is not allowed with vampire state',
+    )
+  }
 }
 
 export function parseCreateCharacterDraftRequest(

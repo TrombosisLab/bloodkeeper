@@ -293,6 +293,18 @@ function advantageSelections(
   )
 }
 
+function requireVampireBlood(
+  snapshot: CharacterDraftApiSnapshot,
+): NonNullable<CharacterDraftApiSnapshot['blood']> {
+  if (snapshot.blood === null) {
+    throw new Error(
+      'CHARACTER_SHEET_VAMPIRE_BLOOD_REQUIRED',
+    )
+  }
+
+  return snapshot.blood
+}
+
 export function adaptPersistedCharacterToSheetModel(
   snapshot: CharacterDraftApiSnapshot,
 ): CharacterSheetModel {
@@ -378,9 +390,10 @@ export function adaptPersistedCharacterToSheetModel(
           snapshot.humanity.stains,
       },
       hunger:
-        snapshot.blood.hunger,
+        requireVampireBlood(snapshot).hunger,
       bloodPotency:
-        snapshot.blood.bloodPotency,
+        requireVampireBlood(snapshot)
+          .bloodPotency,
     },
 
     damage: {
