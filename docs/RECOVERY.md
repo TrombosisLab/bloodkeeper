@@ -203,8 +203,9 @@ fallan.
 6. Restaurar el dump lógico validado en PostgreSQL.
 7. Volver a iniciar los servicios y comprobar `/api/health` desde la web.
 
-El checkout Git y las imágenes se recuperan desde GitHub/GHCR; no deben
-transportar datos de aplicación. Los paquetes y sus checksums se guardan
+El checkout Git se recupera desde GitHub y las imágenes de BloodKeeper se
+reconstruyen localmente; ninguno debe transportar datos de aplicación.
+Los paquetes y sus checksums se guardan
 fuera del repositorio y, al menos, una copia reciente debe permanecer
 fuera de la máquina Docker.
 

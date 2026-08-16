@@ -13,27 +13,23 @@ de instalación en `docs/PORTABLE_INSTALLATION.md`.
 
 - Docker Engine o Docker Desktop;
 - Docker Compose integrado (`docker compose`);
-- Git con acceso al repositorio privado;
-- permiso para descargar los paquetes privados de GHCR.
+- Git para clonar el repositorio público;
+- acceso a Internet para descargar imágenes base y dependencias públicas.
 
-Docker resuelve la arquitectura compatible de las imágenes publicadas.
-El host puede ser Linux, macOS o Windows siempre que permita ejecutar
-contenedores Linux mediante Docker.
+Docker construye las imágenes release para la arquitectura del host. El
+host puede ser Linux, macOS o Windows siempre que permita construir y
+ejecutar contenedores Linux mediante Docker.
 
 ## Instalación nueva
 
-Una cuenta autorizada puede descargar y desplegar en una sola línea:
+BloodKeeper puede descargarse y desplegarse en una sola línea:
 
 ```bash
 git clone https://github.com/TrombosisLab/bloodkeeper.git && cd bloodkeeper && ./install.sh
 ```
 
-La autenticación de Git y GHCR pertenece a cada persona y no se almacena
-en el repositorio. Si GHCR necesita autenticación, el instalador ofrece
-`docker login ghcr.io` y reintenta la descarga.
-
-`install.sh` crea una configuración local protegida, descarga las
-imágenes correspondientes al commit, crea volúmenes vacíos, aplica las
+`install.sh` crea una configuración local protegida, construye las
+imágenes release desde el checkout, crea volúmenes vacíos, aplica las
 migraciones, inicia los servicios, valida los health checks y permite
 crear el primer administrador.
 
@@ -63,7 +59,7 @@ proyecto mediante el wrapper:
 ```bash
 ./scripts/portable-compose.sh ps
 ./scripts/portable-compose.sh logs --tail=100
-./scripts/portable-compose.sh pull
+./scripts/portable-compose.sh build --pull
 ./scripts/portable-compose.sh up -d
 ./scripts/portable-compose.sh down
 ```
@@ -85,16 +81,15 @@ contenedor administrativo durante esa ejecución.
 
 ## Actualización
 
-Después de actualizar el checkout Git y una vez publicadas las imágenes
-del nuevo commit:
+Después de actualizar el checkout Git:
 
 ```bash
 ./install.sh
 ```
 
-El instalador conserva `.env` y los volúmenes, descarga la versión
-correspondiente, aplica únicamente las migraciones pendientes y vuelve a
-validar los servicios.
+El instalador conserva `.env` y los volúmenes, reconstruye la aplicación,
+aplica únicamente las migraciones pendientes y vuelve a validar los
+servicios.
 
 ## Copias
 
@@ -117,5 +112,5 @@ una instalación release se usa `install.sh` y `portable-compose.sh`.
 
 Los secretos permanecen en `.env`, ignorado por Git. Docker Compose exige
 `DATABASE_URL`, `POSTGRES_DB`, `POSTGRES_USER` y `POSTGRES_PASSWORD`. Las
-variables de versión y puertos tienen valores seguros por defecto y
+variables de puertos tienen valores seguros por defecto y
 pueden personalizarse localmente.

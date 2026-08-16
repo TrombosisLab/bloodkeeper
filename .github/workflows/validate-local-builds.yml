@@ -1,0 +1,62 @@
+name: Validate BloodKeeper local builds
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-local-builds-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verify source builds
+    runs-on: ubuntu-24.04
+    env:
+      POSTGRES_DB: bloodkeeper
+      POSTGRES_USER: bloodkeeper
+      POSTGRES_PASSWORD: validation-only
+      DATABASE_URL: postgresql://bloodkeeper:validation-only@postgres:5432/bloodkeeper?schema=public
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - name: Validate portable installer
+        run: ./scripts/check-portable-installer.sh
+
+      - name: Validate deployment Compose
+        run: docker compose --file compose.deploy.yaml config --quiet
+
+      - name: Build API test stage
+        run: docker build --target build --file apps/api/Dockerfile.release --tag bloodkeeper-api-verify .
+
+      - name: Test API
+        run: >-
+          docker run --rm
+          --env DATABASE_URL=$DATABASE_URL
+          bloodkeeper-api-verify npm test
+
+      - name: Audit API dependencies
+        run: docker run --rm bloodkeeper-api-verify npm audit --audit-level=high
+
+      - name: Build Web test stage
+        run: docker build --target build --file apps/web/Dockerfile.release --tag bloodkeeper-web-verify .
+
+      - name: Test Web
+        run: docker run --rm bloodkeeper-web-verify npm test
+
+      - name: Audit Web dependencies
+        run: docker run --rm bloodkeeper-web-verify npm audit --audit-level=high
+
+      - name: Validate backup image
+        run: docker build --file apps/backup/Dockerfile --tag bloodkeeper-backup-verify .

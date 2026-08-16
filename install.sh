@@ -20,15 +20,15 @@ require_command() {
 }
 
 DOCKER_COMMAND=(docker)
-PULL_LOG=''
+BUILD_LOG=''
 
-cleanup_pull_log() {
-  if [ -n "$PULL_LOG" ]; then
-    rm -f "$PULL_LOG"
-    PULL_LOG=''
+cleanup_build_log() {
+  if [ -n "$BUILD_LOG" ]; then
+    rm -f "$BUILD_LOG"
+    BUILD_LOG=''
   fi
 }
-trap cleanup_pull_log EXIT
+trap cleanup_build_log EXIT
 
 prepare_docker() {
   if command -v docker >/dev/null 2>&1 \
@@ -88,7 +88,7 @@ docker_command() {
 }
 
 warn_low_disk_space() {
-  warning_mb="${BLOODKEEPER_WARN_FREE_MB:-2048}"
+  warning_mb="${BLOODKEEPER_WARN_FREE_MB:-4096}"
   case "$warning_mb" in
     ''|*[!0-9]*) die 'BLOODKEEPER_WARN_FREE_MB debe ser numérico' ;;
   esac
@@ -109,7 +109,7 @@ warn_low_disk_space() {
   printf 'Espacio disponible para Docker: %s MiB en %s.\n' \
     "$available_mb" "$docker_root"
   if [ "$available_mb" -lt "$warning_mb" ]; then
-    printf 'AVISO: queda poco espacio; la extracción de imágenes puede fallar.\n' >&2
+    printf 'AVISO: queda poco espacio; la construcción local puede fallar.\n' >&2
   fi
 }
 
@@ -129,15 +129,10 @@ for file in \
   "$COMPOSE_FILE" \
   "$ROOT/apps/api/Dockerfile.release" \
   "$ROOT/apps/web/Dockerfile.release" \
-  "$ROOT/apps/web/nginx.release.conf"; do
+  "$ROOT/apps/web/nginx.release.conf" \
+  "$ROOT/apps/backup/Dockerfile"; do
   [ -s "$file" ] || die "instalación incompleta: falta $file"
 done
-
-if [ -d "$ROOT/.git" ] && command -v git >/dev/null 2>&1; then
-  DEFAULT_VERSION="sha-$(git -C "$ROOT" rev-parse --short=7 HEAD)"
-else
-  DEFAULT_VERSION='latest'
-fi
 
 random_hex() {
   docker_command run --rm --network none alpine:3.22 \
@@ -159,7 +154,6 @@ create_environment() {
 
   database="${BLOODKEEPER_POSTGRES_DB:-bloodkeeper}"
   username="${BLOODKEEPER_POSTGRES_USER:-bloodkeeper}"
-  version="${BLOODKEEPER_VERSION:-$DEFAULT_VERSION}"
   web_port="${BLOODKEEPER_WEB_PORT:-5173}"
   api_port="${BLOODKEEPER_API_PORT:-3000}"
 
@@ -177,7 +171,6 @@ POSTGRES_DB=$database
 POSTGRES_USER=$username
 POSTGRES_PASSWORD=$password
 DATABASE_URL=postgresql://$username:$password@postgres:5432/$database?schema=public
-BLOODKEEPER_VERSION=$version
 BLOODKEEPER_WEB_PORT=$web_port
 BLOODKEEPER_API_PORT=$api_port
 EOF
@@ -199,81 +192,49 @@ COMPOSE=(
 
 "${COMPOSE[@]}" config --quiet
 
-run_pull() {
-  cleanup_pull_log
-  PULL_LOG="$(mktemp)"
+run_build() {
+  cleanup_build_log
+  BUILD_LOG="$(mktemp)"
 
-  if "${COMPOSE[@]}" pull 2>&1 | tee "$PULL_LOG"; then
-    cleanup_pull_log
+  if "${COMPOSE[@]}" build --pull 2>&1 | tee "$BUILD_LOG"; then
+    cleanup_build_log
     return 0
   fi
 
   return 1
 }
 
-pull_failed_for_authentication() {
-  grep -Eiq \
-    'unauthorized|authentication required|pull access denied|requested access .* denied|insufficient_scope' \
-    "$PULL_LOG"
-}
-
-abort_for_pull_failure() {
-  if grep -Fiq 'no space left on device' "$PULL_LOG"; then
-    die 'espacio insuficiente al descargar imágenes; libera espacio y repite (no es un fallo de autenticación)'
-  fi
-
-  if pull_failed_for_authentication; then
-    die 'la cuenta autenticada no tiene acceso a las imágenes privadas de GHCR'
+abort_for_build_failure() {
+  if grep -Fiq 'no space left on device' "$BUILD_LOG"; then
+    die 'espacio insuficiente durante la construcción local; libera espacio y repite'
   fi
 
   if grep -Eiq \
     'i/o timeout|TLS handshake timeout|temporary failure|no such host|network is unreachable|connection refused' \
-    "$PULL_LOG"; then
-    die 'falló la conexión durante la descarga de imágenes; revisa red y DNS'
+    "$BUILD_LOG"; then
+    die 'falló la red al descargar dependencias o imágenes base; revisa red y DNS'
   fi
 
-  die 'falló la descarga de imágenes por una causa no relacionada con autenticación; revisa la salida anterior'
+  if grep -Eiq \
+    'out of memory|cannot allocate memory|killed|exit code: 137' \
+    "$BUILD_LOG"; then
+    die 'memoria insuficiente durante la construcción local; amplía temporalmente memoria o swap y repite'
+  fi
+
+  die 'falló la construcción local; revisa la salida anterior'
 }
 
-authenticate_ghcr() {
-  if command -v gh >/dev/null 2>&1 \
-    && gh auth status --hostname github.com >/dev/null 2>&1; then
-    gh_username="$(gh api user --jq .login)"
-    gh auth token \
-      | docker_command login ghcr.io \
-          --username "$gh_username" \
-          --password-stdin
-    unset gh_username
+build_images() {
+  if [ "${BLOODKEEPER_SKIP_BUILD:-0}" = '1' ]; then
+    printf 'Construcción de imágenes omitida por validación local.\n'
     return
   fi
 
-  docker_command login ghcr.io
-}
-
-pull_images() {
-  if [ "${BLOODKEEPER_SKIP_PULL:-0}" = '1' ]; then
-    printf 'Descarga de imágenes omitida por validación local.\n'
+  printf '\nConstruyendo API, web y copias desde el código local...\n'
+  if run_build; then
     return
   fi
-
-  if run_pull; then
-    return
-  fi
-
-  if ! pull_failed_for_authentication; then
-    abort_for_pull_failure
-  fi
-
-  if [ "${BLOODKEEPER_NONINTERACTIVE:-0}" = '1' ] || [ ! -t 0 ]; then
-    if ! command -v gh >/dev/null 2>&1 \
-      || ! gh auth status --hostname github.com >/dev/null 2>&1; then
-      die 'GHCR requiere autenticación; inicia sesión o proporciona una sesión válida de gh'
-    fi
-  fi
-
-  printf '\nGitHub Container Registry requiere autenticación para este paquete privado.\n'
-  authenticate_ghcr || die 'autenticación GHCR cancelada o fallida'
-  run_pull || abort_for_pull_failure
+  abort_for_build_failure
 }
 
 wait_for_service() {
@@ -315,7 +276,7 @@ wait_for_service() {
 
 warn_low_disk_space
 
-pull_images
+build_images
 
 printf '\nIniciando base de datos y volúmenes portátiles...\n'
 "${COMPOSE[@]}" up -d postgres backup-init

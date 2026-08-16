@@ -1,9 +1,11 @@
-# BloodKeeper — despliegue desde imágenes publicadas
+# BloodKeeper — despliegue de producción construido desde el checkout local
 # Generado a partir del contrato de compose.yaml. No contiene secretos ni datos.
 services:
 
   web:
-    image: ${BLOODKEEPER_WEB_IMAGE:-ghcr.io/trombosislab/bloodkeeper-web}:${BLOODKEEPER_VERSION:-latest}
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile.release
 
     init: true
     user: "101:101"
@@ -41,7 +43,9 @@ services:
         max-size: "10m"
         max-file: "5"
   api:
-    image: ${BLOODKEEPER_API_IMAGE:-ghcr.io/trombosislab/bloodkeeper-api}:${BLOODKEEPER_VERSION:-latest}
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile.release
 
     init: true
     user: "node"
@@ -121,7 +125,9 @@ services:
     restart: "no"
 
   backup-worker:
-    image: ${BLOODKEEPER_BACKUP_IMAGE:-ghcr.io/trombosislab/bloodkeeper-backup}:${BLOODKEEPER_VERSION:-latest}
+    build:
+      context: .
+      dockerfile: apps/backup/Dockerfile
     init: true
     user: "1000:1000"
     read_only: true

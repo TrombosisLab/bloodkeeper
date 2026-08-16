@@ -6,30 +6,26 @@ BloodKeeper se distribuye como contenedores y no depende de Ubuntu, de
 una máquina virtual, de una ruta personal ni de una dirección IP fija.
 El destino sólo necesita:
 
-- Git o GitHub CLI con acceso al repositorio privado;
+- Git para clonar el repositorio público;
 - Docker Engine o Docker Desktop; en Ubuntu 24.04 `install.sh` puede
   instalar Docker Engine desde el repositorio oficial después de pedir
   autorización;
 - Docker Compose integrado (`docker compose`);
-- acceso autorizado a los paquetes privados de GHCR.
+- acceso a Internet para descargar imágenes base y dependencias públicas.
 
-La instalación nueva crea volúmenes Docker vacíos. El repositorio y las
-imágenes no contienen usuarios, crónicas, personajes, copias de
-seguridad ni una base de datos preexistente.
+La instalación nueva crea volúmenes Docker vacíos. El repositorio no
+contiene usuarios, crónicas, personajes, copias de seguridad ni una base
+de datos preexistente.
 
 ## Instalación en una línea
-
-Después de que la cuenta haya recibido acceso al repositorio privado:
 
 ```bash
 git clone https://github.com/TrombosisLab/bloodkeeper.git && cd bloodkeeper && ./install.sh
 ```
 
-Git puede solicitar autenticación durante la clonación. Si las imágenes
-de GHCR todavía no son accesibles, `install.sh` ofrece ejecutar
-`docker login ghcr.io` y reintenta la descarga. La autenticación no puede
-incluirse en el código: cada persona usa sus propias credenciales y
-permisos de GitHub.
+No requiere GitHub CLI, token, invitación ni inicio de sesión en un
+registro privado. El instalador construye localmente las imágenes release
+de API, web y worker a partir del checkout descargado.
 
 El instalador solicita la primera cuenta administradora únicamente en
 una configuración nueva. Esa cuenta se crea en la base local del destino
@@ -41,8 +37,8 @@ y nunca forma parte del repositorio ni de las imágenes.
    ofrece preparar el host reutilizando el adaptador oficial del
    repositorio;
 2. crea `.env` con credenciales PostgreSQL aleatorias si no existe;
-3. selecciona las imágenes correspondientes al commit Git descargado;
-4. descarga API, web y worker de copias desde GHCR;
+3. valida el Compose y los Dockerfiles release incluidos en el checkout;
+4. construye localmente las imágenes release de API, web y worker de copias;
 5. crea volúmenes Docker con nombres pertenecientes a la instalación;
 6. aplica las migraciones Prisma;
 7. arranca PostgreSQL, API, web y el worker portátil;
@@ -69,15 +65,14 @@ En otros sistemas, `install.sh` conserva el contrato portable y solicita
 que Docker con Compose esté disponible. No intenta instalar Docker
 Desktop ni aplicar órdenes propias de una distribución distinta.
 
-Antes de descargar, el instalador muestra el espacio disponible del
+Antes de construir, el instalador muestra el espacio disponible del
 almacenamiento Docker. El umbral de aviso, que nunca bloquea por sí
-mismo, puede ajustarse con `BLOODKEEPER_WARN_FREE_MB`.
+mismo, puede ajustarse con `BLOODKEEPER_WARN_FREE_MB`. La construcción
+necesita temporalmente más memoria y espacio que la mera ejecución.
 
-Los errores de descarga se clasifican antes de solicitar credenciales.
-La falta de espacio no activa un reintento de autenticación. Los fallos
-de red, permisos de GHCR y almacenamiento producen mensajes distintos.
-Si GitHub CLI ya tiene una sesión válida, el instalador puede reutilizarla
-sin mostrar el token.
+Los fallos de construcción distinguen falta de espacio, memoria
+insuficiente y problemas de red al descargar imágenes base o dependencias.
+No se solicitan credenciales de ningún registro privado.
 
 ## Acceso
 

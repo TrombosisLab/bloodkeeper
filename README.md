@@ -7,10 +7,11 @@ Vampiro: La Mascarada V5.
 
 - Docker Engine o Docker Desktop con Docker Compose; `install.sh` puede
   preparar automáticamente Ubuntu 24.04 después de pedir autorización.
-- Imágenes release para `linux/amd64` y `linux/arm64`.
+- Construcción local de imágenes release para la arquitectura Docker
+  del host.
 - Sin dependencia de Ubuntu, ruta personal o IP fija.
 
-Instalación desde el repositorio privado:
+Instalación desde el repositorio público:
 
 ```bash
 git clone https://github.com/TrombosisLab/bloodkeeper.git && cd bloodkeeper && ./install.sh
@@ -20,9 +21,9 @@ La guía completa está en `docs/PORTABLE_INSTALLATION.md`.
 
 ## Desarrollo y adaptadores heredados
 
-`compose.yaml` y `scripts/bootstrap-server.sh` se conservan para el flujo
-source-build y la preparación opcional de Ubuntu. La distribución usa
-`compose.deploy.yaml`, `install.sh` y `scripts/portable-compose.sh`.
+`compose.yaml` se conserva para desarrollo. La distribución construye
+localmente los Dockerfiles release mediante `compose.deploy.yaml`,
+`install.sh` y `scripts/portable-compose.sh`.
 
 ## Operación source-build heredada
 
@@ -39,7 +40,7 @@ source-build y la preparación opcional de Ubuntu. La distribución usa
 
 ## Documentación
 
-- `docs/PORTABLE_INSTALLATION.md`: instalación desde GitHub y GHCR.
+- `docs/PORTABLE_INSTALLATION.md`: instalación pública y construcción local.
 - `docs/DEPLOYMENT.md`: instalación y despliegue.
 - `docs/DOCKER_ARCHITECTURE.md`: arquitectura Docker oficial.
 - `docs/PROJECT_STRUCTURE.md`: estructura oficial del repositorio.
