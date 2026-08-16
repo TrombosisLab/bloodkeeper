@@ -6,8 +6,10 @@ Este documento materializa la arquitectura oficial definida por
 SPEC-003 para el entorno local de BloodKeeper.
 
 Docker es la plataforma de ejecución y Docker Compose es el orquestador
-principal. `compose.yaml` es el único archivo Compose necesario en el
-estado actual.
+principal. `compose.yaml` define el flujo source-build y
+`compose.deploy.yaml` materializa la misma topología mediante imágenes
+publicadas. Ambos conservan servicios, redes y volúmenes equivalentes
+dentro de sus respectivos modos de ejecución.
 
 ## Topología
 
@@ -30,8 +32,10 @@ PostgreSQL
 postgres_data
 ```
 
-Los tres servicios comparten exclusivamente la red Docker
-`application`.
+Web, API, PostgreSQL y el worker de copias comparten exclusivamente la
+red Docker `application`. `backup-init` es una tarea puntual aislada de
+la red que prepara permisos en los volúmenes de copias antes de arrancar
+API y worker.
 
 ## Servicios
 
@@ -67,9 +71,17 @@ producción.
 
 ### Copias de seguridad
 
-Las copias no requieren un contenedor residente adicional.
-`scripts/backup.sh` y `scripts/restore.sh` operan contra PostgreSQL,
-generan checksums y permiten validar una restauración temporal.
+`backup-init` prepara con privilegios mínimos los volúmenes
+`backup_status`, `backup_requests` y `backup_archives`, termina y no se
+reinicia. No participa en la red de aplicación.
+
+`backup-worker` se ejecuta como usuario no root, con sistema de archivos
+de sólo lectura, capacidades eliminadas y `no-new-privileges`. Atiende
+peticiones mediante volúmenes, accede a PostgreSQL sólo por la red
+`application` y conserva los archivos en `backup_archives`.
+
+Los scripts de backup y restauración siguen proporcionando operación,
+checksums y validación temporal sin sustituir la base activa.
 
 No existe caché porque todavía no ha sido incorporada formalmente.
 
@@ -89,7 +101,9 @@ La superficie publicada del despliegue local se limita a lo necesario:
   diagnóstico y scripts operativos locales;
 - PostgreSQL no publica `5432` en el host;
 - Web, API y PostgreSQL se comunican internamente por la red Docker
-  `application`.
+  `application`;
+- el worker de copias usa esa red únicamente para PostgreSQL y no
+  publica puertos en el host.
 
 La instalación base está orientada a red local. Cualquier exposición a
 Internet requiere una revisión específica de seguridad antes de abrir
@@ -97,17 +111,20 @@ puertos, publicar servicios o incorporar infraestructura perimetral.
 
 ## Persistencia
 
-Los datos PostgreSQL residen exclusivamente en `postgres_data`. Detener,
-eliminar o recrear los contenedores no elimina el volumen.
+Los datos PostgreSQL residen en `postgres_data`. El estado, las
+peticiones y los archivos de backup residen respectivamente en
+`backup_status`, `backup_requests` y `backup_archives`. Detener, eliminar
+o recrear contenedores no elimina estos volúmenes.
 
 No debe usarse `docker compose down --volumes` durante la operación
 habitual.
 
 ## Disponibilidad
 
-Todos los servicios declaran health check y reinicio
-`unless-stopped`. Las dependencias esperan a que el servicio requerido
-esté saludable.
+Los servicios persistentes declaran health check y reinicio
+`unless-stopped`. Las dependencias esperan a PostgreSQL y a la
+preparación satisfactoria de volúmenes. `backup-init` es deliberadamente
+una tarea de ejecución única con reinicio desactivado.
 
 ## Registros
 
@@ -128,6 +145,6 @@ Los servicios escriben en la salida estándar y de error de Docker.
 
 ## Cambios futuros
 
-Un reverse proxy dedicado, una caché o un contenedor programado de
-backups solo se incorporarán mediante una SPEC aprobada. No deben
-añadirse preventivamente.
+Un reverse proxy dedicado, una caché u otra infraestructura adicional
+solo se incorporarán mediante una SPEC aprobada. No deben añadirse
+preventivamente.

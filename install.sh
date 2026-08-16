@@ -19,17 +19,111 @@ require_command() {
   command -v "$1" >/dev/null 2>&1 || die "falta el comando obligatorio: $1"
 }
 
+DOCKER_COMMAND=(docker)
+PULL_LOG=''
+
+cleanup_pull_log() {
+  if [ -n "$PULL_LOG" ]; then
+    rm -f "$PULL_LOG"
+    PULL_LOG=''
+  fi
+}
+trap cleanup_pull_log EXIT
+
+prepare_docker() {
+  if command -v docker >/dev/null 2>&1 \
+    && docker compose version >/dev/null 2>&1; then
+    return
+  fi
+
+  if [ ! -r /etc/os-release ]; then
+    die 'Docker no está instalado; instálalo con Docker Compose y repite'
+  fi
+
+  # shellcheck disable=SC1091
+  source /etc/os-release
+  if [ "${ID:-}" != 'ubuntu' ] || [ "${VERSION_ID:-}" != '24.04' ]; then
+    die 'Docker no está instalado; la preparación automática sólo admite Ubuntu 24.04'
+  fi
+
+  [ -s "$ROOT/scripts/bootstrap-server.sh" ] \
+    || die 'falta el adaptador de preparación de Ubuntu'
+
+  if [ "${BLOODKEEPER_AUTO_INSTALL_DOCKER:-0}" != '1' ]; then
+    if [ "${BLOODKEEPER_NONINTERACTIVE:-0}" = '1' ] || [ ! -t 0 ]; then
+      die 'Docker no está instalado; usa BLOODKEEPER_AUTO_INSTALL_DOCKER=1 para autorizar su instalación no interactiva'
+    fi
+
+    answer='s'
+    read -r -p 'Docker no está instalado. ¿Preparar este host Ubuntu? [S/n] ' answer
+    case "$answer" in
+      n|N|no|NO)
+        die 'instalación de Docker cancelada'
+        ;;
+    esac
+  fi
+
+  bash "$ROOT/scripts/bootstrap-server.sh" --prepare-host
+}
+
+configure_docker_access() {
+  if docker info >/dev/null 2>&1; then
+    DOCKER_COMMAND=(docker)
+    return
+  fi
+
+  if [ "$(id -u)" -ne 0 ] \
+    && command -v sudo >/dev/null 2>&1 \
+    && sudo docker info >/dev/null 2>&1; then
+    DOCKER_COMMAND=(sudo docker)
+    printf 'Docker se utilizará mediante sudo durante esta sesión.\n'
+    return
+  fi
+
+  die 'Docker está instalado pero el usuario actual no puede utilizarlo'
+}
+
+docker_command() {
+  "${DOCKER_COMMAND[@]}" "$@"
+}
+
+warn_low_disk_space() {
+  warning_mb="${BLOODKEEPER_WARN_FREE_MB:-2048}"
+  case "$warning_mb" in
+    ''|*[!0-9]*) die 'BLOODKEEPER_WARN_FREE_MB debe ser numérico' ;;
+  esac
+
+  docker_root="$(
+    docker_command info --format '{{.DockerRootDir}}' 2>/dev/null || true
+  )"
+  [ -d "$docker_root" ] || docker_root='/'
+  available_kb="$(df -Pk "$docker_root" | awk 'NR == 2 {print $4}')"
+  case "$available_kb" in
+    ''|*[!0-9]*)
+      printf 'AVISO: no se pudo determinar el espacio disponible para Docker.\n' >&2
+      return
+      ;;
+  esac
+  available_mb=$((available_kb / 1024))
+
+  printf 'Espacio disponible para Docker: %s MiB en %s.\n' \
+    "$available_mb" "$docker_root"
+  if [ "$available_mb" -lt "$warning_mb" ]; then
+    printf 'AVISO: queda poco espacio; la extracción de imágenes puede fallar.\n' >&2
+  fi
+}
+
 case "$PROJECT_NAME" in
   ''|*[!a-z0-9_-]*|[-_]* )
     die 'BLOODKEEPER_PROJECT_NAME debe usar minúsculas, números, guion o guion bajo'
     ;;
 esac
 
+prepare_docker
 require_command docker
 docker compose version >/dev/null 2>&1 \
   || die 'Docker Compose no está disponible'
-docker info >/dev/null 2>&1 \
-  || die 'Docker está instalado pero el usuario actual no puede utilizarlo'
+configure_docker_access
 
 for file in \
   "$COMPOSE_FILE" \
@@ -46,7 +140,7 @@ else
 fi
 
 random_hex() {
-  docker run --rm --network none alpine:3.22 \
+  docker_command run --rm --network none alpine:3.22 \
     sh -c 'od -An -N32 -tx1 /dev/urandom | tr -d " \n"'
 }
 
@@ -96,7 +190,8 @@ EOF
 create_environment
 
 COMPOSE=(
-  docker compose
+  "${DOCKER_COMMAND[@]}"
+  compose
   --env-file "$ENV_FILE"
   --project-name "$PROJECT_NAME"
   --file "$COMPOSE_FILE"
@@ -104,24 +199,81 @@ COMPOSE=(
 
 "${COMPOSE[@]}" config --quiet
 
+run_pull() {
+  cleanup_pull_log
+  PULL_LOG="$(mktemp)"
+
+  if "${COMPOSE[@]}" pull 2>&1 | tee "$PULL_LOG"; then
+    cleanup_pull_log
+    return 0
+  fi
+
+  return 1
+}
+
+pull_failed_for_authentication() {
+  grep -Eiq \
+    'unauthorized|authentication required|pull access denied|requested access .* denied|insufficient_scope' \
+    "$PULL_LOG"
+}
+
+abort_for_pull_failure() {
+  if grep -Fiq 'no space left on device' "$PULL_LOG"; then
+    die 'espacio insuficiente al descargar imágenes; libera espacio y repite (no es un fallo de autenticación)'
+  fi
+
+  if pull_failed_for_authentication; then
+    die 'la cuenta autenticada no tiene acceso a las imágenes privadas de GHCR'
+  fi
+
+  if grep -Eiq \
+    'i/o timeout|TLS handshake timeout|temporary failure|no such host|network is unreachable|connection refused' \
+    "$PULL_LOG"; then
+    die 'falló la conexión durante la descarga de imágenes; revisa red y DNS'
+  fi
+
+  die 'falló la descarga de imágenes por una causa no relacionada con autenticación; revisa la salida anterior'
+}
+
+authenticate_ghcr() {
+  if command -v gh >/dev/null 2>&1 \
+    && gh auth status --hostname github.com >/dev/null 2>&1; then
+    gh_username="$(gh api user --jq .login)"
+    gh auth token \
+      | docker_command login ghcr.io \
+          --username "$gh_username" \
+          --password-stdin
+    unset gh_username
+    return
+  fi
+
+  docker_command login ghcr.io
+}
+
 pull_images() {
   if [ "${BLOODKEEPER_SKIP_PULL:-0}" = '1' ]; then
     printf 'Descarga de imágenes omitida por validación local.\n'
     return
   fi
 
-  if "${COMPOSE[@]}" pull; then
+  if run_pull; then
     return
   fi
 
+  if ! pull_failed_for_authentication; then
+    abort_for_pull_failure
+  fi
+
   if [ "${BLOODKEEPER_NONINTERACTIVE:-0}" = '1' ] || [ ! -t 0 ]; then
-    die 'no se pudieron descargar las imágenes privadas; ejecuta docker login ghcr.io y repite'
+    if ! command -v gh >/dev/null 2>&1 \
+      || ! gh auth status --hostname github.com >/dev/null 2>&1; then
+      die 'GHCR requiere autenticación; inicia sesión o proporciona una sesión válida de gh'
+    fi
   fi
 
   printf '\nGitHub Container Registry requiere autenticación para este paquete privado.\n'
-  docker login ghcr.io || die 'autenticación GHCR cancelada o fallida'
-  "${COMPOSE[@]}" pull \
-    || die 'las imágenes siguen sin estar disponibles para esta cuenta'
+  authenticate_ghcr || die 'autenticación GHCR cancelada o fallida'
+  run_pull || abort_for_pull_failure
 }
 
 wait_for_service() {
@@ -133,7 +285,7 @@ wait_for_service() {
     state='missing'
     if [ -n "$container_id" ]; then
       state="$(
-        docker inspect \
+        docker_command inspect \
           --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
           "$container_id" \
           2>/dev/null || true
@@ -160,6 +312,8 @@ wait_for_service() {
   "${COMPOSE[@]}" logs --tail=100 "$service"
   die "$service no alcanzó un estado saludable"
 }
+
+warn_low_disk_space
 
 pull_images
 

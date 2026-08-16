@@ -162,6 +162,8 @@ unexpected_scripts="$(
     -type f \
     \( -name '*.sh' -o -name '*.bash' \) \
     -not -path './scripts/*' \
+    -not -path './install.sh' \
+    -not -path './apps/backup/worker.sh' \
     -not -path './.git/*' \
     -not -path '*/node_modules/*' \
     -not -path '*/dist/*' \

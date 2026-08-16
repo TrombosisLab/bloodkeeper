@@ -5,7 +5,8 @@ Vampiro: La Mascarada V5.
 
 ## Distribución portátil
 
-- Docker Engine o Docker Desktop con Docker Compose.
+- Docker Engine o Docker Desktop con Docker Compose; `install.sh` puede
+  preparar automáticamente Ubuntu 24.04 después de pedir autorización.
 - Imágenes release para `linux/amd64` y `linux/arm64`.
 - Sin dependencia de Ubuntu, ruta personal o IP fija.
 

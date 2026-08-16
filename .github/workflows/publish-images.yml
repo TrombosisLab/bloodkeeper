@@ -24,6 +24,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
+      - name: Validate portable installer
+        run: ./scripts/check-portable-installer.sh
+
       - name: Build API test stage
         run: docker build --target build --file apps/api/Dockerfile.release --tag bloodkeeper-api-verify .
 

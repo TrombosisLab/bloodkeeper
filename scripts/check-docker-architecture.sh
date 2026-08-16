@@ -23,7 +23,7 @@ services="$(
 )"
 
 expected_services="$(
-  printf '%s\n' api postgres web |
+  printf '%s\n' api backup-init backup-worker postgres web |
     sort
 )"
 
@@ -41,6 +41,7 @@ echo "== Salud =="
 
 for container in \
   v5r-postgres \
+  v5r-backup-worker \
   v5r-api \
   v5r-web
 do
@@ -60,6 +61,7 @@ echo
 echo "== Mínimo privilegio =="
 
 for container in \
+  v5r-backup-worker \
   v5r-api \
   v5r-web
 do
@@ -107,6 +109,7 @@ echo "== Red y persistencia =="
 
 for container in \
   v5r-postgres \
+  v5r-backup-worker \
   v5r-api \
   v5r-web
 do

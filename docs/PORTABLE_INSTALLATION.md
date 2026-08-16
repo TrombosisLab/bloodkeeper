@@ -6,8 +6,10 @@ BloodKeeper se distribuye como contenedores y no depende de Ubuntu, de
 una máquina virtual, de una ruta personal ni de una dirección IP fija.
 El destino sólo necesita:
 
-- Git con acceso al repositorio privado;
-- Docker Engine o Docker Desktop;
+- Git o GitHub CLI con acceso al repositorio privado;
+- Docker Engine o Docker Desktop; en Ubuntu 24.04 `install.sh` puede
+  instalar Docker Engine desde el repositorio oficial después de pedir
+  autorización;
 - Docker Compose integrado (`docker compose`);
 - acceso autorizado a los paquetes privados de GHCR.
 
@@ -35,7 +37,9 @@ y nunca forma parte del repositorio ni de las imágenes.
 
 ## Qué realiza `install.sh`
 
-1. comprueba Docker y Docker Compose;
+1. comprueba Docker y Docker Compose y, si faltan en Ubuntu 24.04,
+   ofrece preparar el host reutilizando el adaptador oficial del
+   repositorio;
 2. crea `.env` con credenciales PostgreSQL aleatorias si no existe;
 3. selecciona las imágenes correspondientes al commit Git descargado;
 4. descarga API, web y worker de copias desde GHCR;
@@ -48,6 +52,32 @@ y nunca forma parte del repositorio ni de las imágenes.
 
 La ejecución es idempotente: conserva `.env` y los volúmenes existentes.
 No ejecuta `down --volumes` ni borra datos.
+
+## Preparación de Docker
+
+La preparación automática sólo modifica el host cuando Docker falta y
+la persona confirma la operación. En instalaciones no interactivas debe
+autorizarse expresamente:
+
+```bash
+BLOODKEEPER_AUTO_INSTALL_DOCKER=1 \
+BLOODKEEPER_NONINTERACTIVE=1 \
+./install.sh
+```
+
+En otros sistemas, `install.sh` conserva el contrato portable y solicita
+que Docker con Compose esté disponible. No intenta instalar Docker
+Desktop ni aplicar órdenes propias de una distribución distinta.
+
+Antes de descargar, el instalador muestra el espacio disponible del
+almacenamiento Docker. El umbral de aviso, que nunca bloquea por sí
+mismo, puede ajustarse con `BLOODKEEPER_WARN_FREE_MB`.
+
+Los errores de descarga se clasifican antes de solicitar credenciales.
+La falta de espacio no activa un reintento de autenticación. Los fallos
+de red, permisos de GHCR y almacenamiento producen mensajes distintos.
+Si GitHub CLI ya tiene una sesión válida, el instalador puede reutilizarla
+sin mostrar el token.
 
 ## Acceso
 
@@ -95,6 +125,6 @@ seguirse el procedimiento de recuperación y exportación documentado.
 ## Adaptador heredado de Ubuntu
 
 `scripts/bootstrap-server.sh` se conserva temporalmente como adaptador
-para preparar Ubuntu Server 24.04. Ya no es el contrato portable ni el
-punto de entrada recomendado. En cualquier sistema con Docker debe
-usarse `install.sh`.
+para preparar Ubuntu Server 24.04. `install.sh` lo reutiliza únicamente
+cuando Docker falta y se autoriza la modificación del host. El punto de
+entrada recomendado continúa siendo `install.sh`.
