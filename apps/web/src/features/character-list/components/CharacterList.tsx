@@ -52,6 +52,23 @@ function characterName(
     : 'Personaje sin nombre'
 }
 
+function characterPhaseLabel(
+  character: CharacterDraftApiSnapshot,
+): string {
+  if (character.nature === 'human') {
+    return 'Humano'
+  }
+
+  if (
+    character.creation.creationMode ===
+    'sessionZero'
+  ) {
+    return 'Vampiro en transición'
+  }
+
+  return 'Vampiro establecido'
+}
+
 function errorMessage(
   error: unknown,
 ): string {
@@ -253,6 +270,10 @@ export function CharacterList({
                             character.status
                           ]
                         }
+                        {' · '}
+                        {characterPhaseLabel(
+                          character,
+                        )}
                       </span>
                       <h3>
                         {characterName(
@@ -279,16 +300,20 @@ export function CharacterList({
                   </div>
 
                   <div className="character-list-card__actions">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onOpenCharacter(
-                          character.characterId,
-                        )
-                      }
-                    >
-                      Abrir ficha
-                    </button>
+                    {character.nature === 'vampire' &&
+                    character.creation.creationMode ===
+                      'standard' ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onOpenCharacter(
+                            character.characterId,
+                          )
+                        }
+                      >
+                        Abrir ficha
+                      </button>
+                    ) : null}
 
                     {character.status ===
                     'draft' ? (

@@ -93,8 +93,16 @@ import {
 } from './thin-blood-trait-rules.ts'
 
 import {
+  validateHumanAdvantageSelections,
+} from './session-zero-creation-rules.ts'
+
+import {
   validateDisciplines,
 } from './discipline-rules.ts'
+
+import type {
+  CharacterDraftApiCreationMode,
+} from '../types/character-draft-api.types.ts'
 
 import type {
   CharacterDraft,
@@ -118,6 +126,8 @@ function valid(): StepValidationResult {
 
 export function validateIdentityStep(
   draft: CharacterDraft,
+  creationMode:
+    CharacterDraftApiCreationMode = 'standard',
 ): StepValidationResult {
   const errors: string[] = []
 
@@ -131,6 +141,13 @@ export function validateIdentityStep(
     errors.push(
       'El concepto es obligatorio.',
     )
+  }
+
+  if (creationMode === 'sessionZero') {
+    return {
+      valid: errors.length === 0,
+      errors,
+    }
   }
 
   if (draft.identity.clan === null) {
@@ -213,12 +230,19 @@ export function validateAttributesStep(
 
 export function validateSkillsStep(
   draft: CharacterDraft,
+  creationMode:
+    CharacterDraftApiCreationMode = 'standard',
 ): StepValidationResult {
+  const creationSkills =
+    creationMode === 'sessionZero'
+      ? draft.skills
+      : resolvePredatorTypeCreationSkills(
+          draft,
+        )
+
   const distribution =
     validateSkillDistribution(
-      resolvePredatorTypeCreationSkills(
-        draft,
-      ),
+      creationSkills,
       draft.skillDistributionMethod,
     )
 
@@ -374,16 +398,34 @@ export function validateDisciplinesStep(
 export function validateStep(
   stepId: CreationStepId,
   draft: CharacterDraft,
+  creationMode:
+    CharacterDraftApiCreationMode = 'standard',
 ): StepValidationResult {
+  if (
+    creationMode === 'sessionZero' &&
+    (
+      stepId === 'blood' ||
+      stepId === 'disciplines'
+    )
+  ) {
+    return valid()
+  }
+
   switch (stepId) {
     case 'identity':
-      return validateIdentityStep(draft)
+      return validateIdentityStep(
+        draft,
+        creationMode,
+      )
 
     case 'attributes':
       return validateAttributesStep(draft)
 
     case 'skills':
-      return validateSkillsStep(draft)
+      return validateSkillsStep(
+        draft,
+        creationMode,
+      )
 
     case 'blood':
       return validateBloodStep(draft)
@@ -394,6 +436,34 @@ export function validateStep(
           draft.advantages,
           'characterCreation',
         )
+
+      if (creationMode === 'sessionZero') {
+        const parentValidation =
+          validateAdvantageRelations(
+            draft.advantages,
+            characterAdvantageDefinitions,
+          )
+
+        const humanValidation =
+          validateHumanAdvantageSelections(
+            draft.advantages,
+            characterAdvantageDefinitions,
+          )
+
+        const errors = [
+          ...advantageValidation.errors,
+          ...parentValidation.errors,
+          ...humanValidation.errors,
+        ]
+
+        return {
+          valid:
+            advantageValidation.valid &&
+            parentValidation.valid &&
+            humanValidation.valid,
+          errors: [...new Set(errors)],
+        }
+      }
 
       const regulatoryValidation =
         validateCharacterAdvantageRegulatoryState(
@@ -451,14 +521,16 @@ export function validateStep(
 
     case 'humanity': {
       const expectedHumanity =
-        INITIAL_HUMANITY_VALUE +
-        resolvePredatorTypeHumanityModifier(
-          draft.identity.predatorType,
-          {
-            clan: draft.identity.clan,
-          },
-          draft.predatorTypeChoices ?? {},
-        )
+        creationMode === 'sessionZero'
+          ? INITIAL_HUMANITY_VALUE
+          : INITIAL_HUMANITY_VALUE +
+            resolvePredatorTypeHumanityModifier(
+              draft.identity.predatorType,
+              {
+                clan: draft.identity.clan,
+              },
+              draft.predatorTypeChoices ?? {},
+            )
 
       const result =
         validateInitialHumanity(
@@ -537,54 +609,64 @@ export function validateStep(
 
 export function buildStepValidationMap(
   draft: CharacterDraft,
+  creationMode:
+    CharacterDraftApiCreationMode = 'standard',
 ): StepValidationMap {
   return {
     identity:
       validateStep(
         'identity',
         draft,
+        creationMode,
       ),
 
     attributes:
       validateStep(
         'attributes',
         draft,
+        creationMode,
       ),
 
     skills:
       validateStep(
         'skills',
         draft,
+        creationMode,
       ),
 
     blood:
       validateStep(
         'blood',
         draft,
+        creationMode,
       ),
 
     disciplines:
       validateStep(
         'disciplines',
         draft,
+        creationMode,
       ),
 
     advantages:
       validateStep(
         'advantages',
         draft,
+        creationMode,
       ),
 
     humanity:
       validateStep(
         'humanity',
         draft,
+        creationMode,
       ),
 
     review:
       validateStep(
         'review',
         draft,
+        creationMode,
       ),
   }
 }

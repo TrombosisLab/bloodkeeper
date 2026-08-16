@@ -47,6 +47,10 @@ import {
 } from '../data/thin-blood-trait-definitions'
 
 import type {
+  CharacterDraftApiCreationMode,
+} from '../types/character-draft-api.types'
+
+import type {
   CharacterDraft,
 } from '../types/character-draft.types'
 
@@ -56,6 +60,7 @@ import type {
 } from '../../character-sheet/types/character-validation.types'
 
 interface ReviewStepProps {
+  creationMode: CharacterDraftApiCreationMode
   draft: CharacterDraft
   validationReport:
     CharacterValidationReport | null
@@ -226,6 +231,7 @@ function CompactValue({
 }
 
 export function ReviewStep({
+  creationMode,
   draft,
   validationReport,
   lifecycleStatus,
@@ -235,6 +241,9 @@ export function ReviewStep({
   onCheck,
   onFinalize,
 }: ReviewStepProps) {
+  const sessionZero =
+    creationMode === 'sessionZero'
+
   const derived =
     deriveCharacterTraits(
       draft.attributes,
@@ -321,9 +330,9 @@ export function ReviewStep({
           )}
         </h2>
         <p>
-          Revisa de un vistazo el personaje
-          completo y valida su estado antes
-          de finalizar la creación.
+          {sessionZero
+            ? 'Revisa la base humana y valida su estado antes de finalizar la Sesión 0.'
+            : 'Revisa de un vistazo el personaje completo y valida su estado antes de finalizar la creación.'}
         </p>
       </div>
 
@@ -342,6 +351,14 @@ export function ReviewStep({
               )
             }
           />
+          {sessionZero ? (
+            <CompactValue
+              label="Naturaleza"
+              value="Humano"
+            />
+          ) : null}
+          {!sessionZero ? (
+            <>
           <CompactValue
             label="Clan"
             value={clan}
@@ -363,6 +380,8 @@ export function ReviewStep({
             label="Categoría etaria"
             value={ageCategory}
           />
+            </>
+          ) : null}
         </section>
 
         <section className="blood-panel">
@@ -395,6 +414,7 @@ export function ReviewStep({
               )
             }
           />
+          {!sessionZero ? (
           <CompactValue
             label="Sire"
             value={
@@ -403,39 +423,50 @@ export function ReviewStep({
               )
             }
           />
+          ) : null}
         </section>
 
-        <section className="blood-panel">
-          <div className="blood-panel__heading">
-            <span>Estado</span>
-            <h3>Sangre y resistencia</h3>
-          </div>
 
-          <CompactValue
-            label="Potencia de Sangre"
-            value={String(
-              draft.blood.bloodPotency,
-            )}
-          />
-          <CompactValue
-            label="Hambre"
-            value={String(
-              draft.blood.hunger,
-            )}
-          />
-          <CompactValue
-            label="Salud"
-            value={String(
-              derived.health,
-            )}
-          />
-          <CompactValue
-            label="Fuerza de Voluntad"
-            value={String(
-              derived.willpower,
-            )}
-          />
-        </section>
+<section className="blood-panel">
+  <div className="blood-panel__heading">
+    <span>Estado</span>
+    <h3>
+      {sessionZero
+        ? 'Salud y voluntad'
+        : 'Sangre y resistencia'}
+    </h3>
+  </div>
+
+  {!sessionZero ? (
+    <>
+      <CompactValue
+        label="Potencia de Sangre"
+        value={String(
+          draft.blood.bloodPotency,
+        )}
+      />
+      <CompactValue
+        label="Hambre"
+        value={String(
+          draft.blood.hunger,
+        )}
+      />
+    </>
+  ) : null}
+
+  <CompactValue
+    label="Salud"
+    value={String(
+      derived.health,
+    )}
+  />
+  <CompactValue
+    label="Fuerza de Voluntad"
+    value={String(
+      derived.willpower,
+    )}
+  />
+</section>
       </div>
 
       <section className="creation-step-section">
@@ -585,6 +616,8 @@ export function ReviewStep({
         </div>
       </section>
 
+      {!sessionZero ? (
+        <>
       <section className="creation-step-section">
         <header className="creation-step-section__header">
           <div>
@@ -796,6 +829,9 @@ export function ReviewStep({
           </section>
         ) : null}
       </section>
+
+        </>
+      ) : null}
 
       <section className="creation-step-section">
         <header className="creation-step-section__header">

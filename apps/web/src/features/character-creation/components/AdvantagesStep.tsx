@@ -25,6 +25,10 @@ import {
 } from '../domain/advantage-instance-details-rules'
 
 import {
+  isHumanAdvantageDefinitionAllowed,
+} from '../domain/session-zero-creation-rules'
+
+import {
   getThinBloodTraitDefinitionsByCategory,
 } from '../data/thin-blood-trait-definitions'
 
@@ -70,7 +74,13 @@ import type {
   CharacterGeneration,
 } from '../types/character-generation.types'
 
+import type {
+  CharacterDraftApiCreationMode,
+} from '../types/character-draft-api.types'
+
 interface AdvantagesStepProps {
+  creationMode: CharacterDraftApiCreationMode
+
   clanKey: ClanKey | null
 
   generation: CharacterGeneration | null
@@ -174,6 +184,7 @@ function getChildAdvantageDefinitionsByCategory(
 }
 
 export function AdvantagesStep({
+  creationMode,
   clanKey,
   generation,
   value,
@@ -188,15 +199,20 @@ export function AdvantagesStep({
     setHavenConfigurationOpen,
   ] = useState(true)
 
+  const sessionZero =
+    creationMode === 'sessionZero'
+
   const budget =
     getCharacterAdvantagesBudget(value)
 
   const predatorTypeSelections =
-    value.selections.filter(
-      (selection) =>
-        selection.origin ===
-        'predatorType',
-    )
+    sessionZero
+      ? []
+      : value.selections.filter(
+          (selection) =>
+            selection.origin ===
+            'predatorType',
+        )
 
   const advantageDelta =
     7 - budget.advantagePoints
@@ -215,6 +231,7 @@ export function AdvantagesStep({
     )
 
   const isThinBlood =
+    !sessionZero &&
     clanKey === 'thinBlood'
 
   const thinBlood =
@@ -383,10 +400,9 @@ export function AdvantagesStep({
         </h2>
 
         <p>
-          Este panel permite probar el sistema
-          de selección construido en el dominio.
-          Los elementos complejos se incorporarán
-          progresivamente.
+          {sessionZero
+            ? 'Selecciona únicamente Ventajas, Trasfondos y Defectos válidos durante la fase humana.'
+            : 'Este panel permite probar el sistema de selección construido en el dominio. Los elementos complejos se incorporarán progresivamente.'}
         </p>
       </div>
 
@@ -558,11 +574,13 @@ export function AdvantagesStep({
         />
       )}
 
-      <LoresheetSelector
-        clanKey={clanKey}
-        value={value}
-        onChange={onChange}
-      />
+      {!sessionZero ? (
+        <LoresheetSelector
+          clanKey={clanKey}
+          value={value}
+          onChange={onChange}
+        />
+      ) : null}
 
       {categories.map(
         (category) => {
@@ -584,13 +602,19 @@ export function AdvantagesStep({
                   definition.requiresParentSelection !== true ||
                   definition.allowsOptionalParentSelection === true
                 ) &&
-                canShowAdvantageDefinition(
-                  definition,
-                  value,
-                  {
-                    clanKey,
-                    generation,
-                  },
+                (
+                  sessionZero
+                    ? isHumanAdvantageDefinitionAllowed(
+                        definition,
+                      )
+                    : canShowAdvantageDefinition(
+                        definition,
+                        value,
+                        {
+                          clanKey,
+                          generation,
+                        },
+                      )
                 ),
             ).filter(
               (definition) =>

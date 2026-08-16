@@ -38,7 +38,13 @@ import type {
   CharacterAdvantagesDraft,
 } from '../types/character-advantages-draft.types'
 
+import type {
+  CharacterDraftApiCreationMode,
+} from '../types/character-draft-api.types'
+
 interface IdentityStepProps {
+  creationMode: CharacterDraftApiCreationMode
+
   value: CharacterIdentityDraft
 
   choiceSelections: Record<string, number>
@@ -65,6 +71,7 @@ type TextIdentityFieldName =
   >
 
 export function IdentityStep({
+  creationMode,
   value,
   choiceSelections,
   advantages,
@@ -72,6 +79,9 @@ export function IdentityStep({
   onChoiceSelectionsChange,
   onAdvantagesChange,
 }: IdentityStepProps) {
+  const sessionZero =
+    creationMode === 'sessionZero'
+
   const predatorTypeOptions =
     getPredatorTypeOptions()
 
@@ -189,6 +199,8 @@ export function IdentityStep({
           />
         </label>
 
+        {!sessionZero ? (
+          <>
         <label className="creation-field">
           <span>Clan</span>
 
@@ -336,6 +348,9 @@ export function IdentityStep({
           </small>
         </label>
 
+          </>
+        ) : null}
+
         <label className="creation-field">
           <span>Crónica</span>
 
@@ -360,6 +375,7 @@ export function IdentityStep({
           />
         </label>
 
+        {!sessionZero ? (
         <label className="creation-field">
           <span>Sire</span>
 
@@ -371,6 +387,8 @@ export function IdentityStep({
             placeholder="Nombre del sire"
           />
         </label>
+
+        ) : null}
 
         <label className="creation-field creation-field--wide">
           <span>Deseo</span>

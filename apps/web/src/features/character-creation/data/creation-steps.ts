@@ -1,6 +1,11 @@
 import type {
   CreationStep,
+  CreationStepId,
 } from '../types/creation-step.types'
+
+import type {
+  CharacterDraftApiCreationMode,
+} from '../types/character-draft-api.types'
 
 export const creationSteps: CreationStep[] = [
   {
@@ -68,3 +73,35 @@ export const creationSteps: CreationStep[] = [
       'Comprueba el personaje completo antes de finalizar.',
   },
 ]
+
+
+const sessionZeroStepIds:
+  readonly CreationStepId[] = [
+    'identity',
+    'attributes',
+    'skills',
+    'advantages',
+    'humanity',
+    'review',
+  ]
+
+export function getCreationSteps(
+  creationMode: CharacterDraftApiCreationMode,
+): CreationStep[] {
+  const selected =
+    creationMode === 'sessionZero'
+      ? creationSteps.filter(
+          step =>
+            sessionZeroStepIds.includes(
+              step.id,
+            ),
+        )
+      : creationSteps
+
+  return selected.map(
+    (step, index) => ({
+      ...step,
+      number: index + 1,
+    }),
+  )
+}

@@ -5,7 +5,7 @@ import {
   useState,
 } from 'react'
 
-import { creationSteps } from '../data/creation-steps'
+import { getCreationSteps } from '../data/creation-steps'
 import { initialCharacterDraft } from '../data/initial-character-draft'
 
 import {
@@ -78,11 +78,19 @@ import {
 } from '../domain/character-draft-normalization'
 
 import {
+  prepareDraftForCreationMode,
+} from '../domain/session-zero-creation-rules'
+
+import {
   resolvePredatorTypeBonusSkillKey,
   resolvePredatorTypeCreationSkills,
   resolvePredatorTypeEffectiveSkills,
 } from '../domain/predator-type-skill-grant-rules'
 
+
+import type {
+  CharacterDraftApiCreationMode,
+} from '../types/character-draft-api.types'
 
 import type {
   CharacterDraft,
@@ -106,6 +114,7 @@ import { DisciplinesStep } from './DisciplinesStep'
 import { AdvantagesStep } from './AdvantagesStep'
 import { HumanityStep } from './HumanityStep'
 import { ReviewStep } from './ReviewStep'
+import { CharacterCreationModeSelector } from './CharacterCreationModeSelector'
 
 type ReviewUiState =
   | 'idle'
@@ -196,6 +205,13 @@ export function CharacterCreationWizard({
   )
 
   const [
+    creationMode,
+    setCreationMode,
+  ] = useState<CharacterDraftApiCreationMode | null>(
+    null,
+  )
+
+  const [
     persistenceState,
     setPersistenceState,
   ] = useState<CharacterDraftPersistenceUiState>(
@@ -256,23 +272,34 @@ export function CharacterCreationWizard({
     setReviewMessage,
   ] = useState<string | null>(null)
 
-  const currentIndex = creationSteps.findIndex(
+  const activeCreationSteps = useMemo(
+    () =>
+      getCreationSteps(
+        creationMode ?? 'standard',
+      ),
+    [creationMode],
+  )
+
+  const currentIndex = activeCreationSteps.findIndex(
     (step) => step.id === currentStepId,
   )
 
   const currentStep =
-    creationSteps[currentIndex]
+    activeCreationSteps[currentIndex]
 
   const isFirst =
     currentIndex === 0
 
   const isLast =
-    currentIndex === creationSteps.length - 1
+    currentIndex === activeCreationSteps.length - 1
 
   const validations = useMemo(
     () =>
-      buildStepValidationMap(draft),
-    [draft],
+      buildStepValidationMap(
+        draft,
+        creationMode ?? 'standard',
+      ),
+    [draft, creationMode],
   )
 
   const currentValidation =
@@ -339,8 +366,11 @@ export function CharacterCreationWizard({
         if (!active) return
 
         const normalizedDraft =
-          normalizeCharacterDraft(
-            loaded.draft,
+          prepareDraftForCreationMode(
+            normalizeCharacterDraft(
+              loaded.draft,
+            ),
+            loaded.creationMode,
           )
 
         const normalizationChanged =
@@ -358,11 +388,26 @@ export function CharacterCreationWizard({
 
         loadedCharacterIdRef.current =
           normalizedLoaded.characterId
+        const availableSteps =
+          getCreationSteps(
+            normalizedLoaded.creationMode,
+          )
+
+        const loadedStepId =
+          availableSteps.some(
+            step =>
+              step.id ===
+              normalizedLoaded.currentStepId,
+          )
+            ? normalizedLoaded.currentStepId
+            : 'identity'
+
         setEditorState(normalizedLoaded)
-        setDraft(normalizedDraft)
-        setCurrentStepId(
-          normalizedLoaded.currentStepId,
+        setCreationMode(
+          normalizedLoaded.creationMode,
         )
+        setDraft(normalizedDraft)
+        setCurrentStepId(loadedStepId)
         setShowValidation(false)
         setReviewReport(null)
         setReviewRevision(null)
@@ -411,6 +456,9 @@ export function CharacterCreationWizard({
           draft,
           currentStepId,
           editorState,
+          creationMode ??
+            editorState?.creationMode ??
+            'standard',
         )
 
       loadedCharacterIdRef.current =
@@ -444,6 +492,29 @@ export function CharacterCreationWizard({
     setReviewRevision(null)
     setReviewState('idle')
     setReviewMessage(null)
+  }
+
+  function selectCreationMode(
+    selectedMode: CharacterDraftApiCreationMode,
+  ) {
+    if (
+      characterId !== null ||
+      editorState !== null
+    ) {
+      return
+    }
+
+    setCreationMode(selectedMode)
+    setDraft(
+      prepareDraftForCreationMode(
+        initialCharacterDraft,
+        selectedMode,
+      ),
+    )
+    setCurrentStepId('identity')
+    setShowValidation(false)
+    setHasUnsavedChanges(false)
+    invalidateReview()
   }
 
   function retryPersistence() {
@@ -556,7 +627,7 @@ export function CharacterCreationWizard({
     stepId: CreationStepId,
   ) {
     const targetIndex =
-      creationSteps.findIndex(
+      activeCreationSteps.findIndex(
         (step) => step.id === stepId,
       )
 
@@ -572,7 +643,7 @@ export function CharacterCreationWizard({
       index += 1
     ) {
       const step =
-        creationSteps[index]
+        activeCreationSteps[index]
 
       if (!validations[step.id].valid) {
         setShowValidation(true)
@@ -593,7 +664,7 @@ export function CharacterCreationWizard({
     }
 
     const targetIndex =
-      creationSteps.findIndex(
+      activeCreationSteps.findIndex(
         (step) => step.id === stepId,
       )
 
@@ -607,7 +678,7 @@ export function CharacterCreationWizard({
       index += 1
     ) {
       const step =
-        creationSteps[index]
+        activeCreationSteps[index]
 
       if (!validations[step.id].valid) {
         return false
@@ -625,7 +696,7 @@ export function CharacterCreationWizard({
     setShowValidation(false)
 
     changeCurrentStep(
-      creationSteps[
+      activeCreationSteps[
         currentIndex - 1
       ].id,
     )
@@ -644,7 +715,7 @@ export function CharacterCreationWizard({
     setShowValidation(false)
 
     changeCurrentStep(
-      creationSteps[
+      activeCreationSteps[
         currentIndex + 1
       ].id,
     )
@@ -805,6 +876,38 @@ export function CharacterCreationWizard({
         ? `Cambios pendientes · revisión ${editorState.revision}`
         : `Guardado · revisión ${editorState.revision}`
 
+  if (creationMode === null) {
+    if (characterId !== null) {
+      return (
+        <section
+          className="creation-page"
+          data-view-state="loading"
+          aria-busy="true"
+        >
+          <div className="creation-workspace">
+            <div className="creation-step-heading">
+              <span>Personajes</span>
+              <h2>Cargando creación…</h2>
+              <p>
+                Recuperando el modo y el progreso guardados.
+              </p>
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    return (
+      <CharacterCreationModeSelector
+        onSelect={selectCreationMode}
+        onCancel={onBackToSheet}
+      />
+    )
+  }
+
+  const sessionZero =
+    creationMode === 'sessionZero'
+
   return (
     <section
       className="creation-page"
@@ -817,11 +920,16 @@ export function CharacterCreationWizard({
             Vampiro: La Mascarada V5
           </p>
 
-          <h1>Crear personaje</h1>
+          <h1>
+            {sessionZero
+              ? 'Crear personaje humano'
+              : 'Crear personaje'}
+          </h1>
 
           <p className="creation-header__description">
-            Construye el personaje paso a paso.
-            Cada fase completará una parte de su ficha.
+            {sessionZero
+              ? 'Sesión 0 · construye la base humana antes del Abrazo.'
+              : 'Construye el personaje paso a paso. Cada fase completará una parte de su ficha.'}
           </p>
         </div>
 
@@ -886,7 +994,9 @@ export function CharacterCreationWizard({
               onClick={onBackToSheet}
               disabled={interactionBusy}
             >
-              Ver ficha
+              {sessionZero
+                ? 'Volver a personajes'
+                : 'Ver ficha'}
             </button>
           </div>
         </div>
@@ -900,12 +1010,12 @@ export function CharacterCreationWizard({
             <strong>
               {currentStep.number}
               {' / '}
-              {creationSteps.length}
+              {activeCreationSteps.length}
             </strong>
           </div>
 
           <CreationProgress
-            steps={creationSteps}
+            steps={activeCreationSteps}
             currentStepId={currentStepId}
             onSelect={navigateTo}
             canNavigateTo={
@@ -917,6 +1027,7 @@ export function CharacterCreationWizard({
         <section className="creation-workspace">
           {currentStepId === 'identity' ? (
             <IdentityStep
+              creationMode={creationMode}
               value={draft.identity}
               choiceSelections={
                 draft.predatorTypeChoices ?? {}
@@ -987,17 +1098,21 @@ export function CharacterCreationWizard({
             'skills' ? (
             <SkillsStep
               value={
-                resolvePredatorTypeCreationSkills(
-                  draft,
-                )
+                sessionZero
+                  ? draft.skills
+                  : resolvePredatorTypeCreationSkills(
+                      draft,
+                    )
               }
               effectiveSkills={
                 draft.skills
               }
               predatorTypeBonusSkillKey={
-                resolvePredatorTypeBonusSkillKey(
-                  draft,
-                )
+                sessionZero
+                  ? null
+                  : resolvePredatorTypeBonusSkillKey(
+                      draft,
+                    )
               }
               method={
                 draft.skillDistributionMethod
@@ -1009,10 +1124,12 @@ export function CharacterCreationWizard({
                 updateDraft(
                   (current) => {
                     const effectiveSkills =
-                      resolvePredatorTypeEffectiveSkills(
-                        current,
-                        skills,
-                      )
+                      sessionZero
+                        ? skills
+                        : resolvePredatorTypeEffectiveSkills(
+                            current,
+                            skills,
+                          )
 
                     return {
                       ...current,
@@ -1121,6 +1238,7 @@ export function CharacterCreationWizard({
           ) : currentStepId ===
             'advantages' ? (
             <AdvantagesStep
+              creationMode={creationMode}
               clanKey={
                 draft.identity.clan
               }
@@ -1187,6 +1305,7 @@ export function CharacterCreationWizard({
           ) : currentStepId ===
             'review' ? (
             <ReviewStep
+              creationMode={creationMode}
               draft={draft}
               validationReport={
                 reviewReport
@@ -1315,7 +1434,7 @@ export function CharacterCreationWizard({
             <span className="creation-actions__position">
               Paso {currentStep.number}
               {' de '}
-              {creationSteps.length}
+              {activeCreationSteps.length}
             </span>
 
             <button
