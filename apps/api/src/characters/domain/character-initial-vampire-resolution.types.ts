@@ -11,6 +11,8 @@ export type InitialVampireResolutionKind =
   | 'clan'
   | 'generation'
   | 'bloodState'
+  | 'discipline'
+  | 'power'
 
 export type PersistInitialVampireResolutionData =
   | {
@@ -30,6 +32,20 @@ export type PersistInitialVampireResolutionData =
       readonly characterId: string
       readonly expectedRevision: number
       readonly blood: PersistedCharacterBlood
+    }
+  | {
+      readonly kind: 'discipline'
+      readonly characterId: string
+      readonly expectedRevision: number
+      readonly disciplineKey: string
+      readonly rating: number
+    }
+  | {
+      readonly kind: 'power'
+      readonly characterId: string
+      readonly expectedRevision: number
+      readonly disciplineKey: string
+      readonly powerKey: string
     }
 
 export interface InitialVampireResolutionResult {

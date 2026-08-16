@@ -1761,6 +1761,17 @@ export class PrismaCharacterDraftRepository
                   characterId: true,
                 },
               },
+              disciplines: {
+                select: {
+                  disciplineKey: true,
+                  contributionKey: true,
+                  powers: {
+                    select: {
+                      powerKey: true,
+                    },
+                  },
+                },
+              },
             },
           })
 
@@ -1793,6 +1804,51 @@ export class PrismaCharacterDraftRepository
           throw new CharacterInitialVampireResolutionWriteConflictError(
             data.characterId,
           )
+        }
+
+        if (
+          data.kind === 'discipline' &&
+          current.disciplines.some(
+            (discipline) =>
+              discipline.disciplineKey ===
+                data.disciplineKey &&
+              discipline.contributionKey ===
+                'creation',
+          )
+        ) {
+          throw new CharacterInitialVampireResolutionWriteConflictError(
+            data.characterId,
+          )
+        }
+
+        if (data.kind === 'power') {
+          const target =
+            current.disciplines.find(
+              (discipline) =>
+                discipline.disciplineKey ===
+                  data.disciplineKey &&
+                discipline.contributionKey ===
+                  'creation',
+            )
+
+          const duplicated =
+            current.disciplines.some(
+              (discipline) =>
+                discipline.powers.some(
+                  ({ powerKey }) =>
+                    powerKey ===
+                      data.powerKey,
+                ),
+            )
+
+          if (
+            target === undefined ||
+            duplicated
+          ) {
+            throw new CharacterInitialVampireResolutionWriteConflictError(
+              data.characterId,
+            )
+          }
         }
 
         const claimed =
@@ -1841,13 +1897,45 @@ export class PrismaCharacterDraftRepository
               generation: data.generation,
             },
           })
-        } else {
+        } else if (
+          data.kind === 'bloodState'
+        ) {
           await transaction.characterBloodState.create({
             data: {
               characterId: data.characterId,
               bloodPotency:
                 data.blood.bloodPotency,
               hunger: data.blood.hunger,
+            },
+          })
+        } else if (
+          data.kind === 'discipline'
+        ) {
+          await transaction.characterDiscipline.create({
+            data: {
+              characterId: data.characterId,
+              disciplineKey:
+                data.disciplineKey,
+              contributionKey:
+                disciplineContributionKey(
+                  'creation',
+                ),
+              rating: data.rating,
+              origin:
+                PrismaDisciplineOrigin.CREATION,
+            },
+          })
+        } else {
+          await transaction.characterDisciplinePower.create({
+            data: {
+              characterId: data.characterId,
+              disciplineKey:
+                data.disciplineKey,
+              contributionKey:
+                disciplineContributionKey(
+                  'creation',
+                ),
+              powerKey: data.powerKey,
             },
           })
         }

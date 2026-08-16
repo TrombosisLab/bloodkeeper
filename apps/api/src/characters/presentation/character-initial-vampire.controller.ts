@@ -18,6 +18,7 @@ import {
 
 import {
   InitialVampireDecisionAlreadyResolvedError,
+  InitialVampireDisciplineInvalidError,
   InitialVampirePrerequisitePendingError,
   InitialVampireResolutionArchivedError,
   InitialVampireResolutionCreationModeError,
@@ -35,6 +36,8 @@ import {
 import {
   InvalidInitialVampireResolutionRequestError,
   parseEstablishInitialBloodRequest,
+  parseManifestInitialDisciplineRequest,
+  parseManifestInitialPowerRequest,
   parseResolveInitialClanRequest,
   parseResolveInitialGenerationRequest,
   toInitialVampireResolutionResponse,
@@ -169,6 +172,17 @@ function throwInitialVampireHttpError(
     })
   }
 
+  if (
+    error instanceof
+      InitialVampireDisciplineInvalidError
+  ) {
+    throw new UnprocessableEntityException({
+      code:
+        'INITIAL_VAMPIRE_DISCIPLINE_SELECTION_INVALID',
+      violations: error.violations,
+    })
+  }
+
   throw error
 }
 
@@ -265,4 +279,63 @@ export class CharacterInitialVampireController {
       throwInitialVampireHttpError(error)
     }
   }
+
+  @Patch(
+    ':characterId/initial-vampire/discipline',
+  )
+  async discipline(
+    @Req()
+    request:
+      AuthenticatedInitialVampireRequest,
+    @Param('characterId')
+    characterIdInput: unknown,
+    @Body() body: unknown,
+  ): Promise<InitialVampireResolutionResponseDto> {
+    const actorUserId =
+      authenticatedActorId(request)
+
+    try {
+      return toInitialVampireResolutionResponse(
+        await this.resolve.manifestDiscipline(
+          actorUserId,
+          parseManifestInitialDisciplineRequest(
+            characterIdInput,
+            body,
+          ),
+        ),
+      )
+    } catch (error: unknown) {
+      throwInitialVampireHttpError(error)
+    }
+  }
+
+  @Patch(
+    ':characterId/initial-vampire/power',
+  )
+  async power(
+    @Req()
+    request:
+      AuthenticatedInitialVampireRequest,
+    @Param('characterId')
+    characterIdInput: unknown,
+    @Body() body: unknown,
+  ): Promise<InitialVampireResolutionResponseDto> {
+    const actorUserId =
+      authenticatedActorId(request)
+
+    try {
+      return toInitialVampireResolutionResponse(
+        await this.resolve.manifestPower(
+          actorUserId,
+          parseManifestInitialPowerRequest(
+            characterIdInput,
+            body,
+          ),
+        ),
+      )
+    } catch (error: unknown) {
+      throwInitialVampireHttpError(error)
+    }
+  }
+
 }

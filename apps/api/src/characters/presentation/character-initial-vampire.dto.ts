@@ -1,5 +1,7 @@
 import type {
   EstablishInitialBloodCommand,
+  ManifestInitialDisciplineCommand,
+  ManifestInitialPowerCommand,
   ResolveInitialClanCommand,
   ResolveInitialGenerationCommand,
 } from '../application/resolve-initial-vampire-state.use-case'
@@ -240,6 +242,91 @@ export function parseEstablishInitialBloodRequest(
       integer(
         parsed.body.hunger,
         'body.hunger',
+      ),
+  }
+}
+
+
+export function parseManifestInitialDisciplineRequest(
+  characterIdInput: unknown,
+  bodyInput: unknown,
+): ManifestInitialDisciplineCommand {
+  const parsed = base(
+    characterIdInput,
+    bodyInput,
+    [
+      'expectedRevision',
+      'disciplineKey',
+      'rating',
+    ],
+  )
+
+  for (
+    const key of
+      ['disciplineKey', 'rating'] as const
+  ) {
+    if (!Object.hasOwn(parsed.body, key)) {
+      throw new InvalidInitialVampireResolutionRequestError(
+        `body.${key} is required`,
+      )
+    }
+  }
+
+  return {
+    characterId: parsed.characterId,
+    expectedRevision:
+      parsed.expectedRevision,
+    disciplineKey:
+      nonEmptyString(
+        parsed.body.disciplineKey,
+        'body.disciplineKey',
+      ),
+    rating:
+      integer(
+        parsed.body.rating,
+        'body.rating',
+      ),
+  }
+}
+
+export function parseManifestInitialPowerRequest(
+  characterIdInput: unknown,
+  bodyInput: unknown,
+): ManifestInitialPowerCommand {
+  const parsed = base(
+    characterIdInput,
+    bodyInput,
+    [
+      'expectedRevision',
+      'disciplineKey',
+      'powerKey',
+    ],
+  )
+
+  for (
+    const key of
+      ['disciplineKey', 'powerKey'] as const
+  ) {
+    if (!Object.hasOwn(parsed.body, key)) {
+      throw new InvalidInitialVampireResolutionRequestError(
+        `body.${key} is required`,
+      )
+    }
+  }
+
+  return {
+    characterId: parsed.characterId,
+    expectedRevision:
+      parsed.expectedRevision,
+    disciplineKey:
+      nonEmptyString(
+        parsed.body.disciplineKey,
+        'body.disciplineKey',
+      ),
+    powerKey:
+      nonEmptyString(
+        parsed.body.powerKey,
+        'body.powerKey',
       ),
   }
 }

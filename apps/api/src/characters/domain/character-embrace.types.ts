@@ -2,6 +2,10 @@ import type {
   PersistedCharacterDraft,
 } from './persisted-character.types'
 
+import {
+  deriveInitialDisciplineProgress,
+} from './character-initial-discipline.rules'
+
 export const CHARACTER_EMBRACE_PENDING_DECISIONS = [
   'clan',
   'generation',
@@ -56,14 +60,21 @@ export function deriveCharacterEmbracePendingDecisions(
     pending.push('predatorType')
   }
 
-  if (character.disciplines.length === 0) {
+  const initialDisciplineProgress =
+    deriveInitialDisciplineProgress(
+      character,
+    )
+
+  if (
+    !initialDisciplineProgress
+      .disciplinesComplete
+  ) {
     pending.push('initialDisciplines')
   }
 
   if (
-    character.disciplines.every(
-      ({ powerKeys }) => powerKeys.length === 0,
-    )
+    !initialDisciplineProgress
+      .powersComplete
   ) {
     pending.push('initialPowers')
   }

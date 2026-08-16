@@ -35,6 +35,15 @@ import type {
   CharacterRulesCatalog,
 } from '../domain/character-rules-catalog'
 
+import {
+  validateInitialDisciplineManifestation,
+  validateInitialPowerManifestation,
+} from '../domain/character-initial-discipline.rules'
+
+import type {
+  InitialDisciplineViolation,
+} from '../domain/character-initial-discipline.rules'
+
 export interface ResolveInitialClanCommand {
   readonly characterId: string
   readonly expectedRevision: number
@@ -52,6 +61,20 @@ export interface EstablishInitialBloodCommand {
   readonly expectedRevision: number
   readonly bloodPotency: number
   readonly hunger: number
+}
+
+export interface ManifestInitialDisciplineCommand {
+  readonly characterId: string
+  readonly expectedRevision: number
+  readonly disciplineKey: string
+  readonly rating: number
+}
+
+export interface ManifestInitialPowerCommand {
+  readonly characterId: string
+  readonly expectedRevision: number
+  readonly disciplineKey: string
+  readonly powerKey: string
 }
 
 export class InitialVampireResolutionNotFoundError
@@ -143,6 +166,20 @@ export type InitialVampireSelectionViolation =
   | 'HUNGER_VALUE_INVALID'
   | 'EXISTING_BLOOD_INCOMPATIBLE_WITH_CLAN'
   | 'EXISTING_BLOOD_INCOMPATIBLE_WITH_GENERATION'
+
+export class InitialVampireDisciplineInvalidError
+  extends Error {
+  constructor(
+    readonly violations:
+      readonly InitialDisciplineViolation[],
+  ) {
+    super(
+      'Initial vampire Discipline manifestation violates creation rules',
+    )
+    this.name =
+      'InitialVampireDisciplineInvalidError'
+  }
+}
 
 export class InitialVampireSelectionInvalidError
   extends Error {
@@ -536,4 +573,81 @@ export class ResolveInitialVampireStateUseCase {
 
     return this.finish(current, character)
   }
+
+  async manifestDiscipline(
+    actorUserId: string,
+    command: ManifestInitialDisciplineCommand,
+  ): Promise<InitialVampireResolutionResult> {
+    const current = await this.load(
+      actorUserId,
+      command.characterId,
+      command.expectedRevision,
+    )
+
+    const violations =
+      validateInitialDisciplineManifestation(
+        current,
+        command.disciplineKey,
+        command.rating,
+        this.catalog,
+      )
+
+    if (violations.length > 0) {
+      throw new InitialVampireDisciplineInvalidError(
+        violations,
+      )
+    }
+
+    const character =
+      await this.characters.resolveInitialVampireState({
+        kind: 'discipline',
+        characterId: command.characterId,
+        expectedRevision:
+          command.expectedRevision,
+        disciplineKey:
+          command.disciplineKey,
+        rating: command.rating,
+      })
+
+    return this.finish(current, character)
+  }
+
+  async manifestPower(
+    actorUserId: string,
+    command: ManifestInitialPowerCommand,
+  ): Promise<InitialVampireResolutionResult> {
+    const current = await this.load(
+      actorUserId,
+      command.characterId,
+      command.expectedRevision,
+    )
+
+    const violations =
+      validateInitialPowerManifestation(
+        current,
+        command.disciplineKey,
+        command.powerKey,
+        this.catalog,
+      )
+
+    if (violations.length > 0) {
+      throw new InitialVampireDisciplineInvalidError(
+        violations,
+      )
+    }
+
+    const character =
+      await this.characters.resolveInitialVampireState({
+        kind: 'power',
+        characterId: command.characterId,
+        expectedRevision:
+          command.expectedRevision,
+        disciplineKey:
+          command.disciplineKey,
+        powerKey: command.powerKey,
+      })
+
+    return this.finish(current, character)
+  }
+
 }
