@@ -16,6 +16,10 @@ import type {
   UpdateCharacterStateData,
 } from '../domain/character-state.types'
 
+import type {
+  PersistCharacterEmbraceData,
+} from '../domain/character-embrace.types'
+
 import { Injectable } from '@nestjs/common'
 
 import {
@@ -37,6 +41,7 @@ import {
 
 import {
   CharacterDraftWriteConflictError,
+  CharacterEmbraceWriteConflictError,
   CharacterLifecycleWriteConflictError,
 } from '../application/character-draft.repository'
 
@@ -860,6 +865,8 @@ function toPersistedDraft(
 
   if (
     row.nature === PrismaCharacterNature.VAMPIRE &&
+    row.creationState.creationMode ===
+      PrismaCharacterCreationMode.STANDARD &&
     (
       row.blood === null ||
       row.thinBloodAlchemy === null
@@ -1510,6 +1517,22 @@ export class PrismaCharacterDraftRepository
     )
   }
 
+  async findByCharacterId(
+    characterId: string,
+  ): Promise<PersistedCharacterDraft | null> {
+    const row =
+      await this.database.character.findUnique({
+        where: {
+          id: characterId,
+        },
+        include: characterRelations,
+      })
+
+    return row === null
+      ? null
+      : toPersistedDraft(row)
+  }
+
   async findById(
     ownerId: string,
     characterId: string,
@@ -1597,6 +1620,110 @@ export class PrismaCharacterDraftRepository
     }
 
     return toPersistedDraft(row)
+  }
+
+  async embrace(
+    data: PersistCharacterEmbraceData,
+  ): Promise<PersistedCharacterDraft> {
+    return this.database.$transaction(
+      async (transaction) => {
+        const current =
+          await transaction.character
+            .findUnique({
+              where: {
+                id: data.characterId,
+              },
+              select: {
+                id: true,
+                revision: true,
+                status: true,
+                nature: true,
+                creationState: {
+                  select: {
+                    creationMode: true,
+                  },
+                },
+              },
+            })
+
+        if (
+          current === null ||
+          current.revision !==
+            data.expectedRevision ||
+          current.status ===
+            PrismaCharacterStatus.ARCHIVED ||
+          current.nature !==
+            PrismaCharacterNature.HUMAN ||
+          current.creationState === null ||
+          current.creationState.creationMode !==
+            PrismaCharacterCreationMode.SESSION_ZERO
+        ) {
+          throw new CharacterEmbraceWriteConflictError(
+            data.characterId,
+          )
+        }
+
+        const updated =
+          await transaction.character
+            .updateMany({
+              where: {
+                id: data.characterId,
+                revision:
+                  data.expectedRevision,
+                nature:
+                  PrismaCharacterNature.HUMAN,
+                status: {
+                  not:
+                    PrismaCharacterStatus.ARCHIVED,
+                },
+              },
+              data: {
+                nature:
+                  PrismaCharacterNature.VAMPIRE,
+                revision: {
+                  increment: 1,
+                },
+              },
+            })
+
+        if (updated.count !== 1) {
+          throw new CharacterEmbraceWriteConflictError(
+            data.characterId,
+          )
+        }
+
+        await transaction
+          .characterHistoryEntry
+          .create({
+            data: {
+              id: data.historyEntryId,
+              characterId:
+                data.characterId,
+              title: 'Abrazo',
+              description:
+                'El personaje ha recibido el Abrazo.',
+            },
+          })
+
+        const row =
+          await transaction.character
+            .findUnique({
+              where: {
+                id: data.characterId,
+              },
+              include:
+                characterRelations,
+            })
+
+        if (row === null) {
+          throw new CharacterEmbraceWriteConflictError(
+            data.characterId,
+          )
+        }
+
+        return toPersistedDraft(row)
+      },
+    )
   }
 
   async update(

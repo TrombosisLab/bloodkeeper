@@ -29,6 +29,10 @@ import {
 } from './application/create-character-draft.use-case'
 
 import {
+  EmbraceCharacterUseCase,
+} from './application/embrace-character.use-case'
+
+import {
   LoadCharacterDraftUseCase,
 } from './application/load-character-draft.use-case'
 
@@ -116,6 +120,10 @@ import {
 import {
   CharacterDraftController,
 } from './presentation/character-draft.controller'
+
+import {
+  CharacterEmbraceController,
+} from './presentation/character-embrace.controller'
 
 import {
   ChronicleCharacterController,
@@ -262,6 +270,27 @@ const experienceUseCaseProviders = [
 ]
 
 const useCaseProviders = [
+  {
+    provide: EmbraceCharacterUseCase,
+    inject: [
+      CHARACTER_DRAFT_REPOSITORY,
+      CHRONICLE_PARTICIPANT_REPOSITORY,
+      CharacterValidator,
+    ],
+    useFactory: (
+      repository:
+        PrismaCharacterDraftRepository,
+      participants:
+        ChronicleParticipantRepository,
+      validator:
+        CharacterValidator,
+    ) =>
+      new EmbraceCharacterUseCase(
+        repository,
+        participants,
+        validator,
+      ),
+  },
   {
     provide: CreateCharacterDraftUseCase,
     inject: [CHARACTER_DRAFT_REPOSITORY],
@@ -410,6 +439,7 @@ const useCaseProviders = [
   ],
   controllers: [
     CharacterDraftController,
+    CharacterEmbraceController,
     ChronicleCharacterController,
     CharacterLifecycleController,
     CharacterStateController,
@@ -465,6 +495,7 @@ const useCaseProviders = [
   ],
   exports: [
     CHARACTER_SECONDARY_REPOSITORY,
+    EmbraceCharacterUseCase,
     CreateCharacterDraftUseCase,
     LoadCharacterAttributeSkillRatingsUseCase,
     LoadCharacterHungerUseCase,

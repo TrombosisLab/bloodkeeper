@@ -1,0 +1,79 @@
+import type {
+  PersistedCharacterDraft,
+} from './persisted-character.types'
+
+export const CHARACTER_EMBRACE_PENDING_DECISIONS = [
+  'clan',
+  'generation',
+  'sire',
+  'bloodState',
+  'predatorType',
+  'initialDisciplines',
+  'initialPowers',
+  'advantagesReview',
+] as const
+
+export type CharacterEmbracePendingDecision =
+  typeof CHARACTER_EMBRACE_PENDING_DECISIONS[number]
+
+export interface PersistCharacterEmbraceData {
+  readonly characterId: string
+  readonly expectedRevision: number
+  readonly historyEntryId: string
+}
+
+export interface EmbraceCharacterResult {
+  readonly character: PersistedCharacterDraft
+  readonly pendingDecisions:
+    readonly CharacterEmbracePendingDecision[]
+}
+
+export function deriveCharacterEmbracePendingDecisions(
+  character: PersistedCharacterDraft,
+): readonly CharacterEmbracePendingDecision[] {
+  const pending:
+    CharacterEmbracePendingDecision[] = []
+
+  if (character.identity.clanKey === null) {
+    pending.push('clan')
+  }
+
+  if (character.identity.generation === null) {
+    pending.push('generation')
+  }
+
+  if (character.identity.sire === null) {
+    pending.push('sire')
+  }
+
+  if (character.blood === null) {
+    pending.push('bloodState')
+  }
+
+  if (
+    character.identity.predatorTypeKey === null
+  ) {
+    pending.push('predatorType')
+  }
+
+  if (character.disciplines.length === 0) {
+    pending.push('initialDisciplines')
+  }
+
+  if (
+    character.disciplines.every(
+      ({ powerKeys }) => powerKeys.length === 0,
+    )
+  ) {
+    pending.push('initialPowers')
+  }
+
+  /*
+   * SPEC-057-E resolverá si las Ventajas mortales
+   * siguen siendo válidas después del Abrazo.
+   * D sólo registra que esa revisión queda pendiente.
+   */
+  pending.push('advantagesReview')
+
+  return pending
+}

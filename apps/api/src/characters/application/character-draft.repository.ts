@@ -8,6 +8,10 @@ import type {
 } from '../domain/character-state.types'
 
 import type {
+  PersistCharacterEmbraceData,
+} from '../domain/character-embrace.types'
+
+import type {
   CreateCharacterDraftData,
   PersistedCharacterDraft,
   TransitionCharacterLifecycleData,
@@ -48,6 +52,10 @@ export interface CharacterDraftRepository {
     characterId: string,
   ): Promise<PersistedCharacterDraft | null>
 
+  findByCharacterId(
+    characterId: string,
+  ): Promise<PersistedCharacterDraft | null>
+
   update(
     ownerId: string,
     data: UpdateCharacterDraftData,
@@ -66,6 +74,10 @@ export interface CharacterDraftRepository {
   updateState(
     ownerId: string,
     data: UpdateCharacterStateData,
+  ): Promise<PersistedCharacterDraft>
+
+  embrace(
+    data: PersistCharacterEmbraceData,
   ): Promise<PersistedCharacterDraft>
 
   transitionLifecycle(
@@ -91,6 +103,17 @@ export class CharacterStateWriteConflictError
       `Character state ${characterId} was not found or has changed`,
     )
     this.name = 'CharacterStateWriteConflictError'
+  }
+}
+
+export class CharacterEmbraceWriteConflictError
+  extends Error {
+  constructor(characterId: string) {
+    super(
+      `Character Embrace ${characterId} was not found or changed concurrently`,
+    )
+    this.name =
+      'CharacterEmbraceWriteConflictError'
   }
 }
 
