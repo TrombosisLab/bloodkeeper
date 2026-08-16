@@ -43,6 +43,7 @@ import {
 import {
   CharacterChronicleAssociationRequiredError,
   HumanCharacterVampireStateMutationError,
+  SessionZeroVampireInitialStateMutationError,
   UpdateCharacterDraftUseCase,
 } from '../application/update-character-draft.use-case'
 
@@ -142,6 +143,16 @@ function throwCharacterDraftHttpError(
     throw new UnprocessableEntityException({
       code:
         'CHARACTER_HUMAN_VAMPIRE_STATE_FORBIDDEN',
+    })
+  }
+
+  if (
+    error instanceof
+      SessionZeroVampireInitialStateMutationError
+  ) {
+    throw new UnprocessableEntityException({
+      code:
+        'CHARACTER_INITIAL_VAMPIRE_STATE_REQUIRES_DEDICATED_OPERATION',
     })
   }
 

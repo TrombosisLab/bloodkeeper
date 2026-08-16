@@ -33,6 +33,10 @@ import {
 } from './application/embrace-character.use-case'
 
 import {
+  ResolveInitialVampireStateUseCase,
+} from './application/resolve-initial-vampire-state.use-case'
+
+import {
   LoadCharacterDraftUseCase,
 } from './application/load-character-draft.use-case'
 
@@ -124,6 +128,10 @@ import {
 import {
   CharacterEmbraceController,
 } from './presentation/character-embrace.controller'
+
+import {
+  CharacterInitialVampireController,
+} from './presentation/character-initial-vampire.controller'
 
 import {
   ChronicleCharacterController,
@@ -270,6 +278,28 @@ const experienceUseCaseProviders = [
 ]
 
 const useCaseProviders = [
+  {
+    provide:
+      ResolveInitialVampireStateUseCase,
+    inject: [
+      CHARACTER_DRAFT_REPOSITORY,
+      CHRONICLE_PARTICIPANT_REPOSITORY,
+      CHARACTER_RULES_CATALOG,
+    ],
+    useFactory: (
+      repository:
+        PrismaCharacterDraftRepository,
+      participants:
+        ChronicleParticipantRepository,
+      rulesCatalog:
+        CharacterRulesCatalog,
+    ) =>
+      new ResolveInitialVampireStateUseCase(
+        repository,
+        participants,
+        rulesCatalog,
+      ),
+  },
   {
     provide: EmbraceCharacterUseCase,
     inject: [
@@ -440,6 +470,7 @@ const useCaseProviders = [
   controllers: [
     CharacterDraftController,
     CharacterEmbraceController,
+    CharacterInitialVampireController,
     ChronicleCharacterController,
     CharacterLifecycleController,
     CharacterStateController,
@@ -496,6 +527,7 @@ const useCaseProviders = [
   exports: [
     CHARACTER_SECONDARY_REPOSITORY,
     EmbraceCharacterUseCase,
+    ResolveInitialVampireStateUseCase,
     CreateCharacterDraftUseCase,
     LoadCharacterAttributeSkillRatingsUseCase,
     LoadCharacterHungerUseCase,

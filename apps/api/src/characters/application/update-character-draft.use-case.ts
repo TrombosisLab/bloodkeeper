@@ -58,6 +58,36 @@ export class HumanCharacterVampireStateMutationError
   }
 }
 
+export class SessionZeroVampireInitialStateMutationError
+  extends Error {
+  constructor(characterId: string) {
+    super(
+      `Session Zero vampire ${characterId} must resolve initial vampire state through dedicated operations`,
+    )
+    this.name =
+      'SessionZeroVampireInitialStateMutationError'
+  }
+}
+
+function changesInitialVampireState(
+  data: UpdateCharacterDraftData,
+): boolean {
+  return (
+    data.blood !== undefined ||
+    data.identity?.clanKey !== undefined ||
+    data.identity?.generation !== undefined ||
+    data.identity?.predatorTypeKey !== undefined ||
+    data.identity?.sire !== undefined ||
+    data.identity?.ageCategory !== undefined ||
+    data.disciplines !== undefined ||
+    data.bloodSorceryRituals !== undefined ||
+    data.oblivionCeremonies !== undefined ||
+    data.thinBloodAlchemy !== undefined ||
+    data.thinBloodTraits !== undefined ||
+    data.creation?.predatorTypeChoices !== undefined
+  )
+}
+
 function changesHumanVampireState(
   data: UpdateCharacterDraftData,
 ): boolean {
@@ -155,7 +185,8 @@ export class UpdateCharacterDraftUseCase {
       changesHumanityState ||
       changesHungerState ||
       checksChronicleAssociation ||
-      changesHumanVampireState(data)
+      changesHumanVampireState(data) ||
+      changesInitialVampireState(data)
     ) {
       const current =
         await this.repository.findById(
@@ -177,6 +208,17 @@ export class UpdateCharacterDraftUseCase {
         changesHumanVampireState(data)
       ) {
         throw new HumanCharacterVampireStateMutationError(
+          data.characterId,
+        )
+      }
+
+      if (
+        current.nature === 'vampire' &&
+        current.creation.creationMode ===
+          'sessionZero' &&
+        changesInitialVampireState(data)
+      ) {
+        throw new SessionZeroVampireInitialStateMutationError(
           data.characterId,
         )
       }

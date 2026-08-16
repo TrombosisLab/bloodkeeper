@@ -32,6 +32,10 @@ import {
   resolvePredatorTypeValidationSpecialties,
 } from './predator-type-skill-grant.rules'
 
+import {
+  allowsSessionZeroPendingVampireState,
+} from './character-transition.rules'
+
 import type {
   CharacterValidationContributor,
 } from './character-validator'
@@ -1745,6 +1749,22 @@ function validatePersistedDependencies(
     character.blood === null ||
     character.thinBloodAlchemy === null
   ) {
+    if (
+      allowsSessionZeroPendingVampireState(
+        character,
+        context,
+      )
+    ) {
+      return sectionResult([
+        issue(
+          'CHARACTER_VAMPIRE_STATE_PENDING',
+          'warning',
+          null,
+          'El perfil vampírico de Sesión 0 todavía tiene estados mecánicos pendientes.',
+        ),
+      ])
+    }
+
     return sectionResult([
       errorIssue(
         'CHARACTER_VAMPIRE_STATE_INCOMPLETE',

@@ -1,0 +1,56 @@
+import type {
+  PersistedCharacterDraft,
+} from './persisted-character.types'
+
+import type {
+  CharacterValidationContext,
+  CharacterValidationSeverity,
+} from './character-validation.types'
+
+export function isSessionZeroTransitionalVampire(
+  character: Pick<
+    PersistedCharacterDraft,
+    'nature' | 'creation'
+  >,
+): boolean {
+  return (
+    character.nature === 'vampire' &&
+    character.creation.creationMode ===
+      'sessionZero'
+  )
+}
+
+export function allowsSessionZeroPendingVampireState(
+  character: Pick<
+    PersistedCharacterDraft,
+    'nature' | 'creation'
+  >,
+  context: CharacterValidationContext,
+): boolean {
+  return (
+    isSessionZeroTransitionalVampire(character) &&
+    context !== 'activation' &&
+    context !== 'evolution'
+  )
+}
+
+export function vampireRequirementSeverity(
+  character: Pick<
+    PersistedCharacterDraft,
+    'nature' | 'creation'
+  >,
+  context: CharacterValidationContext,
+): CharacterValidationSeverity {
+  if (
+    allowsSessionZeroPendingVampireState(
+      character,
+      context,
+    )
+  ) {
+    return 'warning'
+  }
+
+  return context === 'draftSave'
+    ? 'warning'
+    : 'error'
+}

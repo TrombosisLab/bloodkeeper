@@ -42,6 +42,10 @@ import {
   characterBloodPotencyRanges as bloodPotencyRanges,
 } from './character-blood-potency.rules'
 
+import {
+  vampireRequirementSeverity,
+} from './character-transition.rules'
+
 const attributeSkillMessages: Record<
   CharacterAttributeSkillViolation,
   string
@@ -127,36 +131,33 @@ function validateIdentity(
   character: PersistedCharacterDraft,
   context: CharacterValidationContext,
 ): CharacterSectionValidation {
-  const severity = requiredSeverity(context)
   const issues: CharacterValidationIssue[] = []
-  const requiredText = [
-    [
-      'name',
-      character.identity.name,
-      'CHARACTER_NAME_REQUIRED',
-    ],
-    [
-      'concept',
-      character.identity.concept,
-      'CHARACTER_CONCEPT_REQUIRED',
-    ],
-    ...(character.nature === 'human'
-      ? []
-      : [
-          [
-            'clanKey',
-            character.identity.clanKey,
-            'CHARACTER_CLAN_REQUIRED',
-          ] as const,
-        ]),
-  ] as const
+  const ordinarySeverity =
+    requiredSeverity(context)
 
-  for (const [field, value, code] of requiredText) {
-    if (value === null || value.trim().length === 0) {
+  for (
+    const [field, value, code] of
+      [
+        [
+          'name',
+          character.identity.name,
+          'CHARACTER_NAME_REQUIRED',
+        ],
+        [
+          'concept',
+          character.identity.concept,
+          'CHARACTER_CONCEPT_REQUIRED',
+        ],
+      ] as const
+  ) {
+    if (
+      value === null ||
+      value.trim().length === 0
+    ) {
       issues.push(
         issue(
           code,
-          severity,
+          ordinarySeverity,
           'identity',
           field,
           'Falta información obligatoria de Identidad.',
@@ -165,55 +166,84 @@ function validateIdentity(
     }
   }
 
+  if (character.nature === 'human') {
+    return sectionResult(
+      'identity',
+      issues,
+    )
+  }
+
+  const vampireSeverity =
+    vampireRequirementSeverity(
+      character,
+      context,
+    )
+  const clanKey =
+    character.identity.clanKey
   const generation =
     character.identity.generation
 
-  if (character.nature !== 'human') {
-    if (generation === null) {
-      issues.push(
-        issue(
-          'CHARACTER_GENERATION_REQUIRED',
-          severity,
-          'identity',
-          'generation',
-          'La Generación es obligatoria.',
-        ),
-      )
-    } else if (
-      !Number.isInteger(generation) ||
-      bloodPotencyRanges[generation] ===
-        undefined
-    ) {
-      issues.push(
-        issue(
-          'CHARACTER_GENERATION_INVALID',
-          'error',
-          'identity',
-          'generation',
-          'La Generación no está admitida por las reglas implementadas.',
-        ),
-      )
-    }
-
-    if (
-      character.identity.clanKey ===
-        'thinBlood' &&
-      generation !== null &&
-      ![14, 15, 16].includes(generation)
-    ) {
-      issues.push(
-        issue(
-          'THIN_BLOOD_GENERATION_INVALID',
-          'error',
-          'identity',
-          'generation',
-          'Un Sangre Débil debe ser de generación 14, 15 o 16.',
-        ),
-      )
-    }
+  if (
+    clanKey === null ||
+    clanKey.trim().length === 0
+  ) {
+    issues.push(
+      issue(
+        'CHARACTER_CLAN_REQUIRED',
+        vampireSeverity,
+        'identity',
+        'clanKey',
+        'El Clan está pendiente para completar el perfil vampírico.',
+      ),
+    )
   }
 
-  return sectionResult('identity', issues)
+  if (generation === null) {
+    issues.push(
+      issue(
+        'CHARACTER_GENERATION_REQUIRED',
+        vampireSeverity,
+        'identity',
+        'generation',
+        'La Generación está pendiente para completar el perfil vampírico.',
+      ),
+    )
+  } else if (
+    !Number.isInteger(generation) ||
+    bloodPotencyRanges[generation] ===
+      undefined
+  ) {
+    issues.push(
+      issue(
+        'CHARACTER_GENERATION_INVALID',
+        'error',
+        'identity',
+        'generation',
+        'La Generación no está admitida por las reglas implementadas.',
+      ),
+    )
+  }
+
+  if (
+    clanKey === 'thinBlood' &&
+    generation !== null &&
+    ![14, 15, 16].includes(generation)
+  ) {
+    issues.push(
+      issue(
+        'THIN_BLOOD_GENERATION_INVALID',
+        'error',
+        'identity',
+        'generation',
+        'Un Sangre Débil debe ser de generación 14, 15 o 16.',
+      ),
+    )
+  }
+
+  return sectionResult(
+    'identity',
+    issues,
+  )
 }
 
 function belongsToAttributes(
@@ -344,16 +374,22 @@ function validateBlood(
     )
   }
 
+  const missingSeverity =
+    vampireRequirementSeverity(
+      character,
+      context,
+    )
+
   if (character.blood === null) {
     return sectionResult(
       'blood',
       [
         issue(
           'CHARACTER_VAMPIRE_BLOOD_STATE_REQUIRED',
-          requiredSeverity(context),
+          missingSeverity,
           'blood',
           null,
-          'El estado de Sangre es obligatorio para un vampiro establecido.',
+          'El estado de Sangre está pendiente para completar el perfil vampírico.',
         ),
       ],
     )
@@ -371,10 +407,10 @@ function validateBlood(
     issues.push(
       issue(
         'BLOOD_GENERATION_REQUIRED',
-        requiredSeverity(context),
+        missingSeverity,
         'blood',
         'bloodPotency',
-        'Selecciona una Generación válida para comprobar la Sangre.',
+        'La Generación debe resolverse antes de validar completamente la Sangre.',
       ),
     )
   } else {
@@ -398,6 +434,22 @@ function validateBlood(
         ),
       )
     }
+  }
+
+  if (
+    character.identity.clanKey ===
+      'thinBlood' &&
+    blood.bloodPotency !== 0
+  ) {
+    issues.push(
+      issue(
+        'THIN_BLOOD_BLOOD_POTENCY_INVALID',
+        'error',
+        'blood',
+        'bloodPotency',
+        'Un Sangre Débil de creación debe tener Potencia de Sangre 0.',
+      ),
+    )
   }
 
   for (

@@ -12,6 +12,10 @@ import type {
 } from '../domain/character-embrace.types'
 
 import type {
+  PersistInitialVampireResolutionData,
+} from '../domain/character-initial-vampire-resolution.types'
+
+import type {
   CreateCharacterDraftData,
   PersistedCharacterDraft,
   TransitionCharacterLifecycleData,
@@ -80,6 +84,10 @@ export interface CharacterDraftRepository {
     data: PersistCharacterEmbraceData,
   ): Promise<PersistedCharacterDraft>
 
+  resolveInitialVampireState(
+    data: PersistInitialVampireResolutionData,
+  ): Promise<PersistedCharacterDraft>
+
   transitionLifecycle(
     ownerId: string,
     data: TransitionCharacterLifecycleData,
@@ -103,6 +111,17 @@ export class CharacterStateWriteConflictError
       `Character state ${characterId} was not found or has changed`,
     )
     this.name = 'CharacterStateWriteConflictError'
+  }
+}
+
+export class CharacterInitialVampireResolutionWriteConflictError
+  extends Error {
+  constructor(characterId: string) {
+    super(
+      `Initial vampire resolution ${characterId} was not found or changed concurrently`,
+    )
+    this.name =
+      'CharacterInitialVampireResolutionWriteConflictError'
   }
 }
 

@@ -11,6 +11,10 @@ import {
   characterRulesCatalog,
 } from './character-rules-catalog'
 
+import {
+  allowsSessionZeroPendingVampireState,
+} from './character-transition.rules'
+
 import type {
   CharacterRulesCatalog,
 } from './character-rules-catalog'
@@ -1093,6 +1097,22 @@ function validatePersistedDisciplineState(
   if (
     character.thinBloodAlchemy === null
   ) {
+    if (
+      allowsSessionZeroPendingVampireState(
+        character,
+        context,
+      )
+    ) {
+      return sectionResult([
+        issue(
+          'CHARACTER_VAMPIRE_THIN_BLOOD_ALCHEMY_STATE_PENDING',
+          'warning',
+          'thinBloodAlchemy',
+          'El estado de Alquimia todavía no se ha resuelto durante la transición de Sesión 0.',
+        ),
+      ])
+    }
+
     return sectionResult([
       errorIssue(
         'CHARACTER_VAMPIRE_THIN_BLOOD_ALCHEMY_STATE_REQUIRED',
@@ -1100,6 +1120,7 @@ function validatePersistedDisciplineState(
         'Falta el estado persistente de Alquimia requerido por el perfil vampírico actual.',
       ),
     ])
+
   }
 
   const structuralIssues = [

@@ -20,6 +20,10 @@ import type {
   PersistCharacterEmbraceData,
 } from '../domain/character-embrace.types'
 
+import type {
+  PersistInitialVampireResolutionData,
+} from '../domain/character-initial-vampire-resolution.types'
+
 import { Injectable } from '@nestjs/common'
 
 import {
@@ -42,6 +46,7 @@ import {
 import {
   CharacterDraftWriteConflictError,
   CharacterEmbraceWriteConflictError,
+  CharacterInitialVampireResolutionWriteConflictError,
   CharacterLifecycleWriteConflictError,
 } from '../application/character-draft.repository'
 
@@ -1717,6 +1722,146 @@ export class PrismaCharacterDraftRepository
 
         if (row === null) {
           throw new CharacterEmbraceWriteConflictError(
+            data.characterId,
+          )
+        }
+
+        return toPersistedDraft(row)
+      },
+    )
+  }
+
+  async resolveInitialVampireState(
+    data: PersistInitialVampireResolutionData,
+  ): Promise<PersistedCharacterDraft> {
+    return this.database.$transaction(
+      async (transaction) => {
+        const current =
+          await transaction.character.findUnique({
+            where: {
+              id: data.characterId,
+            },
+            select: {
+              revision: true,
+              status: true,
+              nature: true,
+              creationState: {
+                select: {
+                  creationMode: true,
+                },
+              },
+              identity: {
+                select: {
+                  clanKey: true,
+                  generation: true,
+                },
+              },
+              blood: {
+                select: {
+                  characterId: true,
+                },
+              },
+            },
+          })
+
+        if (
+          current === null ||
+          current.revision !==
+            data.expectedRevision ||
+          current.status ===
+            PrismaCharacterStatus.ARCHIVED ||
+          current.nature !==
+            PrismaCharacterNature.VAMPIRE ||
+          current.creationState === null ||
+          current.creationState.creationMode !==
+            PrismaCharacterCreationMode.SESSION_ZERO ||
+          current.identity === null
+        ) {
+          throw new CharacterInitialVampireResolutionWriteConflictError(
+            data.characterId,
+          )
+        }
+
+        if (
+          (data.kind === 'clan' &&
+            current.identity.clanKey !== null) ||
+          (data.kind === 'generation' &&
+            current.identity.generation !== null) ||
+          (data.kind === 'bloodState' &&
+            current.blood !== null)
+        ) {
+          throw new CharacterInitialVampireResolutionWriteConflictError(
+            data.characterId,
+          )
+        }
+
+        const claimed =
+          await transaction.character.updateMany({
+            where: {
+              id: data.characterId,
+              revision:
+                data.expectedRevision,
+              status: {
+                not:
+                  PrismaCharacterStatus.ARCHIVED,
+              },
+              nature:
+                PrismaCharacterNature.VAMPIRE,
+            },
+            data: {
+              revision: {
+                increment: 1,
+              },
+            },
+          })
+
+        if (claimed.count !== 1) {
+          throw new CharacterInitialVampireResolutionWriteConflictError(
+            data.characterId,
+          )
+        }
+
+        if (data.kind === 'clan') {
+          await transaction.characterIdentity.update({
+            where: {
+              characterId: data.characterId,
+            },
+            data: {
+              clanKey: data.clanKey,
+            },
+          })
+        } else if (
+          data.kind === 'generation'
+        ) {
+          await transaction.characterIdentity.update({
+            where: {
+              characterId: data.characterId,
+            },
+            data: {
+              generation: data.generation,
+            },
+          })
+        } else {
+          await transaction.characterBloodState.create({
+            data: {
+              characterId: data.characterId,
+              bloodPotency:
+                data.blood.bloodPotency,
+              hunger: data.blood.hunger,
+            },
+          })
+        }
+
+        const row =
+          await transaction.character.findUnique({
+            where: {
+              id: data.characterId,
+            },
+            include: characterRelations,
+          })
+
+        if (row === null) {
+          throw new CharacterInitialVampireResolutionWriteConflictError(
             data.characterId,
           )
         }
