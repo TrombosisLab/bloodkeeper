@@ -703,6 +703,14 @@ export function parseCharacterDraftApiSnapshotResponse(
       ? 'vampire'
       : value.nature
 
+  const creation =
+    value.creation as UnknownRecord
+
+  const resolvedCreationMode =
+    creation.creationMode === undefined
+      ? 'standard'
+      : creation.creationMode
+
   if (
     (
       resolvedNature === 'human' &&
@@ -713,6 +721,7 @@ export function parseCharacterDraftApiSnapshotResponse(
     ) ||
     (
       resolvedNature === 'vampire' &&
+      resolvedCreationMode === 'standard' &&
       (
         value.blood === null ||
         value.thinBloodAlchemy === null
