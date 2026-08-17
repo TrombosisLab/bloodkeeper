@@ -6,6 +6,10 @@ import {
   deriveInitialDisciplineProgress,
 } from './character-initial-discipline.rules'
 
+import {
+  analyzeInitialAdvantageReview,
+} from './character-initial-advantage.rules'
+
 export const CHARACTER_EMBRACE_PENDING_DECISIONS = [
   'clan',
   'generation',
@@ -79,12 +83,13 @@ export function deriveCharacterEmbracePendingDecisions(
     pending.push('initialPowers')
   }
 
-  /*
-   * SPEC-057-E resolverá si las Ventajas mortales
-   * siguen siendo válidas después del Abrazo.
-   * D sólo registra que esa revisión queda pendiente.
-   */
-  pending.push('advantagesReview')
+  if (
+    analyzeInitialAdvantageReview(
+      character,
+    ).required
+  ) {
+    pending.push('advantagesReview')
+  }
 
   return pending
 }

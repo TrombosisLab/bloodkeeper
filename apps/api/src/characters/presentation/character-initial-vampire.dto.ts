@@ -2,6 +2,7 @@ import type {
   EstablishInitialBloodCommand,
   ManifestInitialDisciplineCommand,
   ManifestInitialPowerCommand,
+  ReviewInitialAdvantagesCommand,
   ResolveInitialClanCommand,
   ResolveInitialGenerationCommand,
 } from '../application/resolve-initial-vampire-state.use-case'
@@ -11,7 +12,9 @@ import type {
 } from '../domain/character-initial-vampire-resolution.types'
 
 import {
+  InvalidCharacterDraftRequestError,
   parseCharacterDraftIdParam,
+  parseUpdateCharacterDraftRequest,
   toCharacterDraftResponse,
 } from './character-draft.dto'
 
@@ -328,6 +331,72 @@ export function parseManifestInitialPowerRequest(
         parsed.body.powerKey,
         'body.powerKey',
       ),
+  }
+}
+
+
+export function parseReviewInitialAdvantagesRequest(
+  characterIdInput: unknown,
+  bodyInput: unknown,
+): ReviewInitialAdvantagesCommand {
+  const parsed = base(
+    characterIdInput,
+    bodyInput,
+    [
+      'expectedRevision',
+      'advantages',
+    ],
+  )
+
+  if (
+    !Object.hasOwn(
+      parsed.body,
+      'advantages',
+    )
+  ) {
+    throw new InvalidInitialVampireResolutionRequestError(
+      'body.advantages is required',
+    )
+  }
+
+  try {
+    const update =
+      parseUpdateCharacterDraftRequest(
+        characterIdInput,
+        bodyInput,
+      )
+
+    if (update.advantages === undefined) {
+      throw new InvalidInitialVampireResolutionRequestError(
+        'body.advantages is required',
+      )
+    }
+
+    return {
+      characterId: update.characterId,
+      expectedRevision:
+        parsed.expectedRevision,
+      advantages:
+        update.advantages,
+    }
+  } catch (error: unknown) {
+    if (
+      error instanceof
+        InvalidInitialVampireResolutionRequestError
+    ) {
+      throw error
+    }
+
+    if (
+      error instanceof
+        InvalidCharacterDraftRequestError
+    ) {
+      throw new InvalidInitialVampireResolutionRequestError(
+        error.message,
+      )
+    }
+
+    throw error
   }
 }
 

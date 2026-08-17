@@ -46,6 +46,9 @@ function character(overrides = {}) {
     blood: null,
     thinBloodAlchemy: null,
     disciplines: [],
+    advantages: {
+      selections: [],
+    },
     humanity: {
       value: 6,
       stains: 1,

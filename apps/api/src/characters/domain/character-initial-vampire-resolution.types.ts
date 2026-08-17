@@ -1,4 +1,5 @@
 import type {
+  PersistedCharacterAdvantages,
   PersistedCharacterBlood,
   PersistedCharacterDraft,
 } from './persisted-character.types'
@@ -13,6 +14,7 @@ export type InitialVampireResolutionKind =
   | 'bloodState'
   | 'discipline'
   | 'power'
+  | 'advantagesReview'
 
 export type PersistInitialVampireResolutionData =
   | {
@@ -46,6 +48,13 @@ export type PersistInitialVampireResolutionData =
       readonly expectedRevision: number
       readonly disciplineKey: string
       readonly powerKey: string
+    }
+  | {
+      readonly kind: 'advantagesReview'
+      readonly characterId: string
+      readonly expectedRevision: number
+      readonly advantages:
+        PersistedCharacterAdvantages
     }
 
 export interface InitialVampireResolutionResult {

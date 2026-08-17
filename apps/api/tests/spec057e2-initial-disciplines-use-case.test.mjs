@@ -37,6 +37,9 @@ function character(overrides = {}) {
       hunger: 1,
     },
     disciplines: [],
+    advantages: {
+      selections: [],
+    },
     humanity: {
       value: 6,
       stains: 1,

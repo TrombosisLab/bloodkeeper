@@ -1925,7 +1925,9 @@ export class PrismaCharacterDraftRepository
                 PrismaDisciplineOrigin.CREATION,
             },
           })
-        } else {
+        } else if (
+          data.kind === 'power'
+        ) {
           await transaction.characterDisciplinePower.create({
             data: {
               characterId: data.characterId,
@@ -1938,6 +1940,22 @@ export class PrismaCharacterDraftRepository
               powerKey: data.powerKey,
             },
           })
+        } else if (
+          data.kind === 'advantagesReview'
+        ) {
+          await transaction.characterAdvantageSelection.deleteMany({
+            where: {
+              characterId: data.characterId,
+              origin:
+                PrismaAdvantageSelectionOrigin.CREATION,
+            },
+          })
+
+          await createAdvantageSelections(
+            transaction,
+            data.characterId,
+            data.advantages,
+          )
         }
 
         const row =

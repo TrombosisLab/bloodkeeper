@@ -17,6 +17,7 @@ import {
 } from '../application/character-draft.repository'
 
 import {
+  InitialVampireAdvantagesInvalidError,
   InitialVampireDecisionAlreadyResolvedError,
   InitialVampireDisciplineInvalidError,
   InitialVampirePrerequisitePendingError,
@@ -38,6 +39,7 @@ import {
   parseEstablishInitialBloodRequest,
   parseManifestInitialDisciplineRequest,
   parseManifestInitialPowerRequest,
+  parseReviewInitialAdvantagesRequest,
   parseResolveInitialClanRequest,
   parseResolveInitialGenerationRequest,
   toInitialVampireResolutionResponse,
@@ -180,6 +182,17 @@ function throwInitialVampireHttpError(
       code:
         'INITIAL_VAMPIRE_DISCIPLINE_SELECTION_INVALID',
       violations: error.violations,
+    })
+  }
+
+  if (
+    error instanceof
+      InitialVampireAdvantagesInvalidError
+  ) {
+    throw new UnprocessableEntityException({
+      code:
+        'INITIAL_VAMPIRE_ADVANTAGES_REVIEW_INVALID',
+      issues: error.issues,
     })
   }
 
@@ -328,6 +341,36 @@ export class CharacterInitialVampireController {
         await this.resolve.manifestPower(
           actorUserId,
           parseManifestInitialPowerRequest(
+            characterIdInput,
+            body,
+          ),
+        ),
+      )
+    } catch (error: unknown) {
+      throwInitialVampireHttpError(error)
+    }
+  }
+
+
+  @Patch(
+    ':characterId/initial-vampire/advantages',
+  )
+  async advantages(
+    @Req()
+    request:
+      AuthenticatedInitialVampireRequest,
+    @Param('characterId')
+    characterIdInput: unknown,
+    @Body() body: unknown,
+  ): Promise<InitialVampireResolutionResponseDto> {
+    const actorUserId =
+      authenticatedActorId(request)
+
+    try {
+      return toInitialVampireResolutionResponse(
+        await this.resolve.reviewAdvantages(
+          actorUserId,
+          parseReviewInitialAdvantagesRequest(
             characterIdInput,
             body,
           ),

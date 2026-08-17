@@ -18,6 +18,10 @@ import {
   deriveCharacterEmbracePendingDecisions,
 } from '../domain/character-embrace.types'
 
+import type {
+  CharacterEmbracePendingDecision,
+} from '../domain/character-embrace.types'
+
 import {
   validateCharacterHunger,
 } from '../domain/character-hunger.rules'
@@ -40,9 +44,22 @@ import {
   validateInitialPowerManifestation,
 } from '../domain/character-initial-discipline.rules'
 
+import {
+  analyzeInitialAdvantageReview,
+  validateInitialAdvantageReplacement,
+} from '../domain/character-initial-advantage.rules'
+
 import type {
   InitialDisciplineViolation,
 } from '../domain/character-initial-discipline.rules'
+
+import type {
+  CharacterValidationIssue,
+} from '../domain/character-validation.types'
+
+import type {
+  PersistedCharacterAdvantages,
+} from '../domain/persisted-character.types'
 
 export interface ResolveInitialClanCommand {
   readonly characterId: string
@@ -75,6 +92,13 @@ export interface ManifestInitialPowerCommand {
   readonly expectedRevision: number
   readonly disciplineKey: string
   readonly powerKey: string
+}
+
+export interface ReviewInitialAdvantagesCommand {
+  readonly characterId: string
+  readonly expectedRevision: number
+  readonly advantages:
+    PersistedCharacterAdvantages
 }
 
 export class InitialVampireResolutionNotFoundError
@@ -134,7 +158,7 @@ export class InitialVampireDecisionAlreadyResolvedError
   extends Error {
   constructor(
     readonly decision:
-      'clan' | 'generation' | 'bloodState',
+      CharacterEmbracePendingDecision,
   ) {
     super(
       `Initial vampire decision already resolved: ${decision}`,
@@ -166,6 +190,20 @@ export type InitialVampireSelectionViolation =
   | 'HUNGER_VALUE_INVALID'
   | 'EXISTING_BLOOD_INCOMPATIBLE_WITH_CLAN'
   | 'EXISTING_BLOOD_INCOMPATIBLE_WITH_GENERATION'
+
+export class InitialVampireAdvantagesInvalidError
+  extends Error {
+  constructor(
+    readonly issues:
+      readonly CharacterValidationIssue[],
+  ) {
+    super(
+      'Initial vampire Advantage review violates creation rules',
+    )
+    this.name =
+      'InitialVampireAdvantagesInvalidError'
+  }
+}
 
 export class InitialVampireDisciplineInvalidError
   extends Error {
@@ -645,6 +683,55 @@ export class ResolveInitialVampireStateUseCase {
         disciplineKey:
           command.disciplineKey,
         powerKey: command.powerKey,
+      })
+
+    return this.finish(current, character)
+  }
+
+
+  async reviewAdvantages(
+    actorUserId: string,
+    command: ReviewInitialAdvantagesCommand,
+  ): Promise<InitialVampireResolutionResult> {
+    const current = await this.load(
+      actorUserId,
+      command.characterId,
+      command.expectedRevision,
+    )
+
+    const review =
+      analyzeInitialAdvantageReview(
+        current,
+        this.catalog,
+      )
+
+    if (!review.required) {
+      throw new InitialVampireDecisionAlreadyResolvedError(
+        'advantagesReview',
+      )
+    }
+
+    const issues =
+      validateInitialAdvantageReplacement(
+        current,
+        command.advantages,
+        this.catalog,
+      )
+
+    if (issues.length > 0) {
+      throw new InitialVampireAdvantagesInvalidError(
+        issues,
+      )
+    }
+
+    const character =
+      await this.characters.resolveInitialVampireState({
+        kind: 'advantagesReview',
+        characterId: command.characterId,
+        expectedRevision:
+          command.expectedRevision,
+        advantages:
+          command.advantages,
       })
 
     return this.finish(current, character)
