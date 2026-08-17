@@ -7,9 +7,6 @@ import {
   LoadCharacterAttributeSkillRatingsUseCase,
 } from '../characters/application/load-character-attribute-skill-ratings.use-case'
 import {
-  LoadCharacterHungerUseCase,
-} from '../characters/application/load-character-hunger.use-case'
-import {
   LoadCharacterDraftUseCase,
 } from '../characters/application/load-character-draft.use-case'
 
@@ -28,6 +25,9 @@ import type {
 
 import { DICE_RANDOM_SOURCE } from './application/dice-random-source'
 import type { DiceRandomSource } from './application/dice-random-source'
+import {
+  CharacterDiceHungerAdapter,
+} from './application/character-dice-hunger.adapter'
 import {
   ExecuteCharacterDiceRollUseCase,
 } from './application/execute-character-dice-roll.use-case'
@@ -96,15 +96,24 @@ import { DiceController } from './presentation/dice.controller'
         new ExecuteManualDiceRollUseCase(random),
     },
     {
+      provide: CharacterDiceHungerAdapter,
+      inject: [LoadCharacterDraftUseCase],
+      useFactory: (
+        characters: LoadCharacterDraftUseCase,
+      ) => new CharacterDiceHungerAdapter(
+        characters,
+      ),
+    },
+    {
       provide: ExecuteCharacterDiceRollUseCase,
       inject: [
         LoadCharacterAttributeSkillRatingsUseCase,
-        LoadCharacterHungerUseCase,
+        CharacterDiceHungerAdapter,
         DICE_RANDOM_SOURCE,
       ],
       useFactory: (
         ratings: LoadCharacterAttributeSkillRatingsUseCase,
-        hunger: LoadCharacterHungerUseCase,
+        hunger: CharacterDiceHungerAdapter,
         random: DiceRandomSource,
       ) => new ExecuteCharacterDiceRollUseCase(
         ratings,
