@@ -31,6 +31,10 @@ import {
   initialVampirePowerDisciplineChoices,
 } from '../domain/initial-vampire-transition-discipline-ui-state'
 
+import {
+  PersistedInitialVampirePredatorType,
+} from './PersistedInitialVampirePredatorType'
+
 import type {
   CharacterInitialVampireGateway,
 } from '../infrastructure/character-initial-vampire.api'
@@ -956,6 +960,30 @@ export function PersistedInitialVampireTransition({
               </button>
             </form>
           ) : null}
+          {pending.includes(
+            'predatorType',
+          ) ? (
+            <PersistedInitialVampirePredatorType
+              transition={transition}
+              busy={busy}
+              resolving={
+                busyDecision ===
+                  'predatorType'
+              }
+              onAdopt={(input) => {
+                void resolve(
+                  'predatorType',
+                  () =>
+                    resolvedGateway
+                      .adoptPredatorType(
+                        transition.characterId,
+                        transition.revision,
+                        input,
+                      ),
+                )
+              }}
+            />
+          ) : null}
         </div>
 
         {pending.some(
@@ -967,6 +995,7 @@ export function PersistedInitialVampireTransition({
               'bloodState',
               'initialDisciplines',
               'initialPowers',
+              'predatorType',
             ].includes(decision),
         ) ? (
           <p

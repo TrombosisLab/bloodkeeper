@@ -327,7 +327,6 @@ test(
   () => {
     for (
       const forbidden of [
-        'adoptPredatorType(',
         'reviewAdvantages(',
         'resolveThinBloodState(',
         'consolidate(',
