@@ -175,6 +175,12 @@ export interface ResolveInitialGenerationCommand {
   readonly generation: number
 }
 
+export interface ResolveInitialSireCommand {
+  readonly characterId: string
+  readonly expectedRevision: number
+  readonly sire: string
+}
+
 export interface EstablishInitialBloodCommand {
   readonly characterId: string
   readonly expectedRevision: number
@@ -660,6 +666,34 @@ export class ResolveInitialVampireStateUseCase {
         expectedRevision:
           command.expectedRevision,
         clanKey: command.clanKey,
+      })
+
+    return this.finish(current, character)
+  }
+
+  async resolveSire(
+    actorUserId: string,
+    command: ResolveInitialSireCommand,
+  ): Promise<InitialVampireResolutionResult> {
+    const current = await this.load(
+      actorUserId,
+      command.characterId,
+      command.expectedRevision,
+    )
+
+    if (current.identity.sire !== null) {
+      throw new InitialVampireDecisionAlreadyResolvedError(
+        'sire',
+      )
+    }
+
+    const character =
+      await this.characters.resolveInitialVampireState({
+        kind: 'sire',
+        characterId: command.characterId,
+        expectedRevision:
+          command.expectedRevision,
+        sire: command.sire,
       })
 
     return this.finish(current, character)

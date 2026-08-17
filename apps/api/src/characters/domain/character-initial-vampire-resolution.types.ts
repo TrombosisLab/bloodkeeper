@@ -16,6 +16,7 @@ import type {
 export type InitialVampireResolutionKind =
   | 'clan'
   | 'generation'
+  | 'sire'
   | 'bloodState'
   | 'thinBloodState'
   | 'discipline'
@@ -35,6 +36,12 @@ export type PersistInitialVampireResolutionData =
       readonly characterId: string
       readonly expectedRevision: number
       readonly generation: number
+    }
+  | {
+      readonly kind: 'sire'
+      readonly characterId: string
+      readonly expectedRevision: number
+      readonly sire: string
     }
   | {
       readonly kind: 'bloodState'

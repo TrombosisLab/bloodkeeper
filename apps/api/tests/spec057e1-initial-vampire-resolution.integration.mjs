@@ -89,7 +89,7 @@ function humanCreateData(
 }
 
 test(
-  '057-E1 persiste Clan Generación y Sangre sin XP ni defaults ficticios',
+  '057-E1 persiste identidad vampírica inicial y Sangre sin XP ni defaults ficticios',
   async () => {
     const database =
       new DatabaseService()
@@ -156,13 +156,24 @@ test(
           },
         )
 
+      const sire =
+        await useCase.resolveSire(
+          ownerId,
+          {
+            characterId,
+            expectedRevision:
+              clan.character.revision,
+            sire: 'Helena',
+          },
+        )
+
       const generation =
         await useCase.resolveGeneration(
           ownerId,
           {
             characterId,
             expectedRevision:
-              clan.character.revision,
+              sire.character.revision,
             generation: 13,
           },
         )
@@ -187,6 +198,11 @@ test(
         blood.character.identity.generation,
         13,
       )
+      assert.equal(
+        blood.character.identity.sire,
+        'Helena',
+      )
+
       assert.deepEqual(
         blood.character.blood,
         {

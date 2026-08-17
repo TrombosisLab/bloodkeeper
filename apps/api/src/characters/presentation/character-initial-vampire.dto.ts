@@ -9,6 +9,7 @@ import type {
   ResolveInitialThinBloodStateCommand,
   ResolveInitialClanCommand,
   ResolveInitialGenerationCommand,
+  ResolveInitialSireCommand,
 } from '../application/resolve-initial-vampire-state.use-case'
 
 import type {
@@ -191,6 +192,39 @@ export function parseResolveInitialClanRequest(
       nonEmptyString(
         parsed.body.clanKey,
         'body.clanKey',
+      ),
+  }
+}
+
+export function parseResolveInitialSireRequest(
+  characterIdInput: unknown,
+  bodyInput: unknown,
+): ResolveInitialSireCommand {
+  const parsed = base(
+    characterIdInput,
+    bodyInput,
+    ['expectedRevision', 'sire'],
+  )
+
+  if (
+    !Object.hasOwn(
+      parsed.body,
+      'sire',
+    )
+  ) {
+    throw new InvalidInitialVampireResolutionRequestError(
+      'body.sire is required',
+    )
+  }
+
+  return {
+    characterId: parsed.characterId,
+    expectedRevision:
+      parsed.expectedRevision,
+    sire:
+      nonEmptyString(
+        parsed.body.sire,
+        'body.sire',
       ),
   }
 }

@@ -48,6 +48,7 @@ import {
   parseResolveInitialThinBloodStateRequest,
   parseResolveInitialClanRequest,
   parseResolveInitialGenerationRequest,
+  parseResolveInitialSireRequest,
   toInitialVampireProfileConsolidationResponse,
   toInitialVampireResolutionResponse,
 } from './character-initial-vampire.dto'
@@ -266,6 +267,35 @@ export class CharacterInitialVampireController {
         await this.resolve.resolveClan(
           actorUserId,
           parseResolveInitialClanRequest(
+            characterIdInput,
+            body,
+          ),
+        ),
+      )
+    } catch (error: unknown) {
+      throwInitialVampireHttpError(error)
+    }
+  }
+
+  @Patch(
+    ':characterId/initial-vampire/sire',
+  )
+  async sire(
+    @Req()
+    request:
+      AuthenticatedInitialVampireRequest,
+    @Param('characterId')
+    characterIdInput: unknown,
+    @Body() body: unknown,
+  ): Promise<InitialVampireResolutionResponseDto> {
+    const actorUserId =
+      authenticatedActorId(request)
+
+    try {
+      return toInitialVampireResolutionResponse(
+        await this.resolve.resolveSire(
+          actorUserId,
+          parseResolveInitialSireRequest(
             characterIdInput,
             body,
           ),

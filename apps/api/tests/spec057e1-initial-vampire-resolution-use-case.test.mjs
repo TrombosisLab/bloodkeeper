@@ -78,6 +78,17 @@ function setup({
           },
         }
       } else if (
+        data.kind === 'sire'
+      ) {
+        value = {
+          ...value,
+          revision: value.revision + 1,
+          identity: {
+            ...value.identity,
+            sire: data.sire,
+          },
+        }
+      } else if (
         data.kind === 'generation'
       ) {
         value = {
@@ -112,6 +123,49 @@ function setup({
     characterRulesCatalog,
   )
 }
+
+test(
+  '057-F2A3B2A resuelve Sire mediante operación dedicada',
+  async () => {
+    const useCase = setup()
+
+    const resolved =
+      await useCase.resolveSire(
+        ownerId,
+        {
+          characterId,
+          expectedRevision: 2,
+          sire: 'Helena',
+        },
+      )
+
+    assert.equal(
+      resolved.character.identity.sire,
+      'Helena',
+    )
+
+    assert.equal(
+      resolved.pendingDecisions.includes(
+        'sire',
+      ),
+      false,
+    )
+
+    await assert.rejects(
+      () =>
+        useCase.resolveSire(
+          ownerId,
+          {
+            characterId,
+            expectedRevision:
+              resolved.character.revision,
+            sire: 'Otro Sire',
+          },
+        ),
+      InitialVampireDecisionAlreadyResolvedError,
+    )
+  },
+)
 
 test(
   '057-E1 resuelve Clan y conserva Humanidad',

@@ -1761,6 +1761,7 @@ export class PrismaCharacterDraftRepository
                 select: {
                   clanKey: true,
                   generation: true,
+                  sire: true,
                   predatorTypeKey: true,
                 },
               },
@@ -1807,6 +1808,8 @@ export class PrismaCharacterDraftRepository
             current.identity.clanKey !== null) ||
           (data.kind === 'generation' &&
             current.identity.generation !== null) ||
+          (data.kind === 'sire' &&
+            current.identity.sire !== null) ||
           (data.kind === 'bloodState' &&
             current.blood !== null)
         ) {
@@ -2007,6 +2010,17 @@ export class PrismaCharacterDraftRepository
             },
             data: {
               generation: data.generation,
+            },
+          })
+        } else if (
+          data.kind === 'sire'
+        ) {
+          await transaction.characterIdentity.update({
+            where: {
+              characterId: data.characterId,
+            },
+            data: {
+              sire: data.sire,
             },
           })
         } else if (
