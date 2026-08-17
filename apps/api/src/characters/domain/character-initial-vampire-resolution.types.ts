@@ -105,3 +105,15 @@ export interface InitialVampireResolutionResult {
   readonly pendingDecisions:
     readonly CharacterEmbracePendingDecision[]
 }
+
+export const CHARACTER_PROFILE_CONSOLIDATION_HISTORY_TITLE =
+  'Consolidación del perfil vampírico'
+
+export const CHARACTER_PROFILE_CONSOLIDATION_HISTORY_DESCRIPTION =
+  'El perfil vampírico inicial del personaje se ha consolidado.'
+
+export interface PersistInitialVampireProfileConsolidationData {
+  readonly characterId: string
+  readonly expectedRevision: number
+  readonly historyEntryId: string
+}

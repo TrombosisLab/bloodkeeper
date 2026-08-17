@@ -1,5 +1,7 @@
 import type {
   AdoptInitialPredatorTypeCommand,
+  ConsolidateInitialVampireProfileCommand,
+  InitialVampireProfileConsolidationResult,
   EstablishInitialBloodCommand,
   ManifestInitialDisciplineCommand,
   ManifestInitialPowerCommand,
@@ -140,6 +142,23 @@ function base(
         'body.expectedRevision',
       ),
     body,
+  }
+}
+
+export function parseConsolidateInitialVampireProfileRequest(
+  characterIdInput: unknown,
+  bodyInput: unknown,
+): ConsolidateInitialVampireProfileCommand {
+  const parsed = base(
+    characterIdInput,
+    bodyInput,
+    ['expectedRevision'],
+  )
+
+  return {
+    characterId: parsed.characterId,
+    expectedRevision:
+      parsed.expectedRevision,
   }
 }
 
@@ -625,5 +644,34 @@ export function toInitialVampireResolutionResponse(
     pendingDecisions: [
       ...result.pendingDecisions,
     ],
+  }
+}
+
+export interface InitialVampireProfileConsolidationResponseDto {
+  readonly character:
+    CharacterDraftResponseDto
+  readonly pendingDecisions:
+    InitialVampireProfileConsolidationResult[
+      'pendingDecisions'
+    ]
+  readonly phase:
+    InitialVampireProfileConsolidationResult[
+      'phase'
+    ]
+}
+
+export function toInitialVampireProfileConsolidationResponse(
+  result:
+    InitialVampireProfileConsolidationResult,
+): InitialVampireProfileConsolidationResponseDto {
+  return {
+    character:
+      toCharacterDraftResponse(
+        result.character,
+      ),
+    pendingDecisions: [
+      ...result.pendingDecisions,
+    ],
+    phase: result.phase,
   }
 }

@@ -20,7 +20,13 @@ import type {
   PersistCharacterEmbraceData,
 } from '../domain/character-embrace.types'
 
+import {
+  CHARACTER_PROFILE_CONSOLIDATION_HISTORY_DESCRIPTION,
+  CHARACTER_PROFILE_CONSOLIDATION_HISTORY_TITLE,
+} from '../domain/character-initial-vampire-resolution.types'
+
 import type {
+  PersistInitialVampireProfileConsolidationData,
   PersistInitialVampireResolutionData,
 } from '../domain/character-initial-vampire-resolution.types'
 
@@ -2737,6 +2743,154 @@ export class PrismaCharacterDraftRepository
             where: { id: data.characterId },
             include: characterRelations,
           })
+
+        return toPersistedDraft(row)
+      },
+    )
+  }
+
+  async consolidateInitialVampireProfile(
+    data:
+      PersistInitialVampireProfileConsolidationData,
+  ): Promise<PersistedCharacterDraft> {
+    return this.database.$transaction(
+      async (transaction) => {
+        const current =
+          await transaction.character.findUnique({
+            where: {
+              id: data.characterId,
+            },
+            select: {
+              revision: true,
+              status: true,
+              nature: true,
+              creationState: {
+                select: {
+                  creationMode: true,
+                },
+              },
+            },
+          })
+
+        if (
+          current === null ||
+          current.status ===
+            PrismaCharacterStatus.ARCHIVED ||
+          current.nature !==
+            PrismaCharacterNature.VAMPIRE ||
+          current.creationState === null ||
+          current.creationState.creationMode !==
+            PrismaCharacterCreationMode.SESSION_ZERO
+        ) {
+          throw new CharacterInitialVampireResolutionWriteConflictError(
+            data.characterId,
+          )
+        }
+
+        const existing =
+          await transaction.characterHistoryEntry.findUnique({
+            where: {
+              id: data.historyEntryId,
+            },
+            select: {
+              characterId: true,
+              title: true,
+              description: true,
+            },
+          })
+
+        if (existing !== null) {
+          if (
+            existing.characterId !==
+              data.characterId ||
+            existing.title !==
+              CHARACTER_PROFILE_CONSOLIDATION_HISTORY_TITLE ||
+            existing.description !==
+              CHARACTER_PROFILE_CONSOLIDATION_HISTORY_DESCRIPTION
+          ) {
+            throw new CharacterInitialVampireResolutionWriteConflictError(
+              data.characterId,
+            )
+          }
+
+          const idempotentRow =
+            await transaction.character.findUnique({
+              where: {
+                id: data.characterId,
+              },
+              include: characterRelations,
+            })
+
+          if (idempotentRow === null) {
+            throw new CharacterInitialVampireResolutionWriteConflictError(
+              data.characterId,
+            )
+          }
+
+          return toPersistedDraft(
+            idempotentRow,
+          )
+        }
+
+        if (
+          current.revision !==
+          data.expectedRevision
+        ) {
+          throw new CharacterInitialVampireResolutionWriteConflictError(
+            data.characterId,
+          )
+        }
+
+        const claimed =
+          await transaction.character.updateMany({
+            where: {
+              id: data.characterId,
+              revision:
+                data.expectedRevision,
+              status: {
+                not:
+                  PrismaCharacterStatus.ARCHIVED,
+              },
+              nature:
+                PrismaCharacterNature.VAMPIRE,
+            },
+            data: {
+              revision: {
+                increment: 1,
+              },
+            },
+          })
+
+        if (claimed.count !== 1) {
+          throw new CharacterInitialVampireResolutionWriteConflictError(
+            data.characterId,
+          )
+        }
+
+        await transaction.characterHistoryEntry.create({
+          data: {
+            id: data.historyEntryId,
+            characterId: data.characterId,
+            title:
+              CHARACTER_PROFILE_CONSOLIDATION_HISTORY_TITLE,
+            description:
+              CHARACTER_PROFILE_CONSOLIDATION_HISTORY_DESCRIPTION,
+          },
+        })
+
+        const row =
+          await transaction.character.findUnique({
+            where: {
+              id: data.characterId,
+            },
+            include: characterRelations,
+          })
+
+        if (row === null) {
+          throw new CharacterInitialVampireResolutionWriteConflictError(
+            data.characterId,
+          )
+        }
 
         return toPersistedDraft(row)
       },

@@ -353,6 +353,20 @@ function requiredAlchemy(
   if (
     character.thinBloodAlchemy === null
   ) {
+    if (
+      character.nature === 'vampire' &&
+      character.creation.creationMode ===
+        'sessionZero' &&
+      character.identity.clanKey !==
+        'thinBlood'
+    ) {
+      return {
+        rating: 0,
+        method: null,
+        formulaKeys: [],
+      } as const
+    }
+
     throw new Error(
       `Character ${character.characterId} has no Thin-Blood Alchemy state`,
     )
@@ -1095,7 +1109,13 @@ function validatePersistedDisciplineState(
   }
 
   if (
-    character.thinBloodAlchemy === null
+    character.thinBloodAlchemy === null &&
+    (
+      character.identity.clanKey ===
+        'thinBlood' ||
+      character.creation.creationMode !==
+        'sessionZero'
+    )
   ) {
     if (
       allowsSessionZeroPendingVampireState(

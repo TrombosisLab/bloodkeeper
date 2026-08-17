@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import type {
   ChronicleParticipantRepository,
 } from '../../chronicles/application/chronicle-participant.repository'
@@ -39,6 +41,22 @@ import type {
   CharacterRulesCatalog,
 } from '../domain/character-rules-catalog'
 
+import type {
+  CharacterValidator,
+} from '../domain/character-validator'
+
+import type {
+  CharacterValidationReport,
+} from '../domain/character-validation.types'
+
+import {
+  deriveCharacterProfilePhase,
+} from '../domain/character-transition.rules'
+
+import type {
+  CharacterProfilePhase,
+} from '../domain/character-transition.rules'
+
 import {
   validateInitialDisciplineManifestation,
   validateInitialPowerManifestation,
@@ -78,6 +96,72 @@ import type {
   PersistedCharacterThinBloodAlchemy,
   PersistedCharacterThinBloodTrait,
 } from '../domain/persisted-character.types'
+
+const INITIAL_VAMPIRE_PROFILE_CONSOLIDATION_ID_NAMESPACE =
+  'bloodkeeper:character-profile-consolidation:v1'
+
+export function deriveInitialVampireProfileConsolidationHistoryEntryId(
+  characterId: string,
+): string {
+  const hash = createHash('sha256')
+    .update(
+      `${INITIAL_VAMPIRE_PROFILE_CONSOLIDATION_ID_NAMESPACE}:${characterId}`,
+    )
+    .digest('hex')
+    .slice(0, 32)
+
+  const variantNibble = (
+    (
+      Number.parseInt(
+        hash.slice(16, 17),
+        16,
+      ) &
+      0x3
+    ) |
+    0x8
+  ).toString(16)
+
+  const uuidHex =
+    `${hash.slice(0, 12)}8${hash.slice(13, 16)}` +
+    `${variantNibble}${hash.slice(17)}`
+
+  return (
+    `${uuidHex.slice(0, 8)}-` +
+    `${uuidHex.slice(8, 12)}-` +
+    `${uuidHex.slice(12, 16)}-` +
+    `${uuidHex.slice(16, 20)}-` +
+    uuidHex.slice(20)
+  )
+}
+
+export interface ConsolidateInitialVampireProfileCommand {
+  readonly characterId: string
+  readonly expectedRevision: number
+}
+
+export interface InitialVampireProfileConsolidationResult {
+  readonly character: PersistedCharacterDraft
+  readonly pendingDecisions:
+    readonly CharacterEmbracePendingDecision[]
+  readonly phase: CharacterProfilePhase
+}
+
+export class InitialVampireProfileIncompleteError
+  extends Error {
+  readonly report:
+    CharacterValidationReport
+
+  constructor(
+    report: CharacterValidationReport,
+  ) {
+    super(
+      'Initial vampire profile is not mechanically complete',
+    )
+    this.name =
+      'InitialVampireProfileIncompleteError'
+    this.report = report
+  }
+}
 
 export interface ResolveInitialClanCommand {
   readonly characterId: string
@@ -307,6 +391,8 @@ export class ResolveInitialVampireStateUseCase {
       ChronicleParticipantRepository,
     private readonly catalog:
       CharacterRulesCatalog,
+    private readonly validator?:
+      CharacterValidator,
   ) {}
 
   private async assertPermission(
@@ -367,6 +453,50 @@ export class ResolveInitialVampireStateUseCase {
 
     if (current.revision !== expectedRevision) {
       throw new CharacterInitialVampireResolutionWriteConflictError(
+        characterId,
+      )
+    }
+
+    if (current.nature !== 'vampire') {
+      throw new InitialVampireResolutionNatureError(
+        characterId,
+      )
+    }
+
+    if (
+      current.creation.creationMode !==
+      'sessionZero'
+    ) {
+      throw new InitialVampireResolutionCreationModeError(
+        characterId,
+      )
+    }
+
+    return current
+  }
+
+  private async loadForConsolidation(
+    actorUserId: string,
+    characterId: string,
+  ): Promise<PersistedCharacterDraft> {
+    const current =
+      await this.characters.findByCharacterId(
+        characterId,
+      )
+
+    if (current === null) {
+      throw new InitialVampireResolutionNotFoundError(
+        characterId,
+      )
+    }
+
+    await this.assertPermission(
+      actorUserId,
+      current,
+    )
+
+    if (current.status === 'archived') {
+      throw new InitialVampireResolutionArchivedError(
         characterId,
       )
     }
@@ -982,5 +1112,69 @@ export class ResolveInitialVampireStateUseCase {
     )
   }
 
+
+
+  async consolidateProfile(
+    actorUserId: string,
+    command:
+      ConsolidateInitialVampireProfileCommand,
+  ): Promise<
+    InitialVampireProfileConsolidationResult
+  > {
+    const current =
+      await this.loadForConsolidation(
+        actorUserId,
+        command.characterId,
+      )
+
+    if (this.validator === undefined) {
+      throw new Error(
+        'INITIAL_VAMPIRE_CONSOLIDATION_VALIDATOR_REQUIRED',
+      )
+    }
+
+    const validation =
+      this.validator.validate(
+        current,
+        'activation',
+      )
+
+    const phase =
+      deriveCharacterProfilePhase(
+        current,
+        validation.valid,
+      )
+
+    if (
+      phase !== 'ESTABLISHED_VAMPIRE'
+    ) {
+      throw new InitialVampireProfileIncompleteError(
+        validation,
+      )
+    }
+
+    const character =
+      await this.characters
+        .consolidateInitialVampireProfile({
+          characterId:
+            command.characterId,
+          expectedRevision:
+            command.expectedRevision,
+          historyEntryId:
+            deriveInitialVampireProfileConsolidationHistoryEntryId(
+              command.characterId,
+            ),
+        })
+
+    return {
+      character,
+      pendingDecisions:
+        deriveCharacterEmbracePendingDecisions(
+          character,
+        ),
+      phase:
+        'ESTABLISHED_VAMPIRE',
+    }
+  }
 
 }

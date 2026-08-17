@@ -12,6 +12,7 @@ import type {
 } from '../domain/character-embrace.types'
 
 import type {
+  PersistInitialVampireProfileConsolidationData,
   PersistInitialVampireResolutionData,
 } from '../domain/character-initial-vampire-resolution.types'
 
@@ -86,6 +87,11 @@ export interface CharacterDraftRepository {
 
   resolveInitialVampireState(
     data: PersistInitialVampireResolutionData,
+  ): Promise<PersistedCharacterDraft>
+
+  consolidateInitialVampireProfile(
+    data:
+      PersistInitialVampireProfileConsolidationData,
   ): Promise<PersistedCharacterDraft>
 
   transitionLifecycle(

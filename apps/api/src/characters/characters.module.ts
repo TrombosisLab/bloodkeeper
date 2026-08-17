@@ -285,6 +285,7 @@ const useCaseProviders = [
       CHARACTER_DRAFT_REPOSITORY,
       CHRONICLE_PARTICIPANT_REPOSITORY,
       CHARACTER_RULES_CATALOG,
+      CharacterValidator,
     ],
     useFactory: (
       repository:
@@ -293,11 +294,14 @@ const useCaseProviders = [
         ChronicleParticipantRepository,
       rulesCatalog:
         CharacterRulesCatalog,
+      validator:
+        CharacterValidator,
     ) =>
       new ResolveInitialVampireStateUseCase(
         repository,
         participants,
         rulesCatalog,
+        validator,
       ),
   },
   {

@@ -54,3 +54,39 @@ export function vampireRequirementSeverity(
     ? 'warning'
     : 'error'
 }
+
+export const CHARACTER_PROFILE_PHASES = [
+  'HUMAN',
+  'TRANSITIONAL_VAMPIRE',
+  'ESTABLISHED_VAMPIRE',
+] as const
+
+export type CharacterProfilePhase =
+  typeof CHARACTER_PROFILE_PHASES[number]
+
+export function deriveCharacterProfilePhase(
+  character: Pick<
+    PersistedCharacterDraft,
+    'nature' | 'creation'
+  >,
+  fullVampireProfileValid: boolean,
+): CharacterProfilePhase {
+  if (character.nature === 'human') {
+    return 'HUMAN'
+  }
+
+  if (fullVampireProfileValid) {
+    return 'ESTABLISHED_VAMPIRE'
+  }
+
+  if (
+    character.creation.creationMode ===
+      'sessionZero'
+  ) {
+    return 'TRANSITIONAL_VAMPIRE'
+  }
+
+  throw new Error(
+    'STANDARD_VAMPIRE_PROFILE_INVALID',
+  )
+}

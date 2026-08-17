@@ -18,6 +18,7 @@ import {
 
 import {
   InitialVampireAdvantagesInvalidError,
+  InitialVampireProfileIncompleteError,
   InitialVampirePredatorInvalidError,
   InitialVampireThinBloodInvalidError,
   InitialVampireDecisionAlreadyResolvedError,
@@ -39,6 +40,7 @@ import {
 import {
   InvalidInitialVampireResolutionRequestError,
   parseAdoptInitialPredatorTypeRequest,
+  parseConsolidateInitialVampireProfileRequest,
   parseEstablishInitialBloodRequest,
   parseManifestInitialDisciplineRequest,
   parseManifestInitialPowerRequest,
@@ -46,10 +48,12 @@ import {
   parseResolveInitialThinBloodStateRequest,
   parseResolveInitialClanRequest,
   parseResolveInitialGenerationRequest,
+  toInitialVampireProfileConsolidationResponse,
   toInitialVampireResolutionResponse,
 } from './character-initial-vampire.dto'
 
 import type {
+  InitialVampireProfileConsolidationResponseDto,
   InitialVampireResolutionResponseDto,
 } from './character-initial-vampire.dto'
 
@@ -219,6 +223,17 @@ function throwInitialVampireHttpError(
       code:
         'INITIAL_VAMPIRE_PREDATOR_TYPE_INVALID',
       issues: error.issues,
+    })
+  }
+
+  if (
+    error instanceof
+      InitialVampireProfileIncompleteError
+  ) {
+    throw new UnprocessableEntityException({
+      code:
+        'INITIAL_VAMPIRE_PROFILE_INCOMPLETE',
+      issues: error.report.issues,
     })
   }
 
@@ -466,5 +481,37 @@ export class CharacterInitialVampireController {
     }
   }
 
+
+
+  @Patch(
+    ':characterId/initial-vampire/consolidate',
+  )
+  async consolidate(
+    @Req()
+    request:
+      AuthenticatedInitialVampireRequest,
+    @Param('characterId')
+    characterIdInput: unknown,
+    @Body() body: unknown,
+  ): Promise<
+    InitialVampireProfileConsolidationResponseDto
+  > {
+    const actorUserId =
+      authenticatedActorId(request)
+
+    try {
+      return toInitialVampireProfileConsolidationResponse(
+        await this.resolve.consolidateProfile(
+          actorUserId,
+          parseConsolidateInitialVampireProfileRequest(
+            characterIdInput,
+            body,
+          ),
+        ),
+      )
+    } catch (error: unknown) {
+      throwInitialVampireHttpError(error)
+    }
+  }
 
 }
