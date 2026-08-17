@@ -186,6 +186,9 @@ export function PersistedCharacterSheet({
           loadState.model.characterId
         }
         model={loadState.model}
+        transition={
+          loadState.transition
+        }
         onStateSaved={(snapshot) => {
           setLoadState((current) =>
             current.kind === 'ready'

@@ -32,6 +32,10 @@ import type {
 } from '../types/character-sheet-model.types'
 
 import type {
+  CharacterInitialVampireTransitionReadModel,
+} from '../types/character-transition-read-model.types'
+
+import type {
   CharacterExperienceGateway,
 } from '../types/character-experience.types'
 
@@ -49,10 +53,13 @@ import { PersistedCharacterSecondary } from './PersistedCharacterSecondary'
 import { PersistedCharacterLifecycle } from './PersistedCharacterLifecycle'
 import { PersistedCharacterValidation } from './PersistedCharacterValidation'
 import { PersistedCharacterEmbrace } from './PersistedCharacterEmbrace'
+import { PersistedInitialVampireTransition } from './PersistedInitialVampireTransition'
 
 interface CharacterSheetProps {
   characterId?: string
   model?: CharacterSheetModel
+  transition?:
+    CharacterInitialVampireTransitionReadModel | null
   stateGateway?: CharacterStateGateway
   experienceGateway?: CharacterExperienceGateway
   onStateSaved?: (
@@ -106,6 +113,7 @@ function persistenceMessage(
 export function CharacterSheet({
   characterId,
   model,
+  transition,
   stateGateway,
   experienceGateway,
   onStateSaved,
@@ -545,6 +553,18 @@ export function CharacterSheet({
               characterId={characterId}
               revision={model.revision}
               onEmbraced={onStateReload}
+            />
+          ) : null}
+
+          {model?.profilePhase ===
+            'TRANSITIONAL_VAMPIRE' &&
+          model.status !== 'archived' &&
+          transition !== undefined &&
+          transition !== null &&
+          onStateReload !== undefined ? (
+            <PersistedInitialVampireTransition
+              transition={transition}
+              onResolved={onStateReload}
             />
           ) : null}
 
