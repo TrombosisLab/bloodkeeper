@@ -1,7 +1,9 @@
 import type {
+  CharacterSkillKey,
   PersistedCharacterAdvantages,
   PersistedCharacterBlood,
   PersistedCharacterDraft,
+  PersistedCharacterSkillSpecialty,
 } from './persisted-character.types'
 
 import type {
@@ -15,6 +17,7 @@ export type InitialVampireResolutionKind =
   | 'discipline'
   | 'power'
   | 'advantagesReview'
+  | 'predatorType'
 
 export type PersistInitialVampireResolutionData =
   | {
@@ -53,6 +56,27 @@ export type PersistInitialVampireResolutionData =
       readonly kind: 'advantagesReview'
       readonly characterId: string
       readonly expectedRevision: number
+      readonly advantages:
+        PersistedCharacterAdvantages
+    }
+  | {
+      readonly kind: 'predatorType'
+      readonly characterId: string
+      readonly expectedRevision: number
+      readonly predatorTypeKey: string
+      readonly predatorTypeChoices:
+        Readonly<Record<string, number>>
+      readonly humanityValue: number
+      readonly bloodPotency: number
+      readonly bonusSkillKey:
+        CharacterSkillKey | null
+      readonly specialty:
+        PersistedCharacterSkillSpecialty | null
+      readonly discipline: {
+        readonly disciplineKey: string
+        readonly rating: number
+        readonly powerKey: string
+      }
       readonly advantages:
         PersistedCharacterAdvantages
     }

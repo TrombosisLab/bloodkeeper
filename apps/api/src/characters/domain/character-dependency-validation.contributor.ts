@@ -1256,6 +1256,21 @@ function validatePredatorScalarEffects(
   definition: CharacterRulesPredatorTypeDefinition,
   context: CharacterValidationContext,
 ): CharacterValidationIssue[] {
+  /*
+   * SPEC-057-E3B:
+   * en SESSION_ZERO el modificador de Humanidad se
+   * aplica una sola vez sobre la Humanidad real conservada
+   * del humano y la Potencia de Sangre sobre el estado real.
+   * Después ambas son estados vivos del personaje y no
+   * deben revalidarse permanentemente contra una base 7.
+   */
+  if (
+    character.creation?.creationMode ===
+      'sessionZero'
+  ) {
+    return []
+  }
+
   if (!validatesInitialCreation(context)) return []
 
   const issues: CharacterValidationIssue[] = []
@@ -1805,6 +1820,34 @@ function validatePersistedDependencies(
       context,
       index,
     ),
+  )
+}
+
+export function validateCharacterPredatorTypeState(
+  character: PersistedCharacterDraft,
+  context: CharacterValidationContext,
+  catalog:
+    CharacterRulesCatalog =
+      characterRulesCatalog,
+): readonly CharacterValidationIssue[] {
+  if (
+    catalog.stateOf('dependencies') !==
+      'ready'
+  ) {
+    return [
+      issue(
+        'CHARACTER_CATALOG_DEPENDENCY_VALIDATION_PENDING',
+        'warning',
+        null,
+        'Falta el catálogo canónico de dependencias.',
+      ),
+    ]
+  }
+
+  return validatePredatorType(
+    character,
+    context,
+    buildCatalogIndex(catalog),
   )
 }
 

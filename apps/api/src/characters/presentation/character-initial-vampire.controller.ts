@@ -18,6 +18,7 @@ import {
 
 import {
   InitialVampireAdvantagesInvalidError,
+  InitialVampirePredatorInvalidError,
   InitialVampireDecisionAlreadyResolvedError,
   InitialVampireDisciplineInvalidError,
   InitialVampirePrerequisitePendingError,
@@ -36,6 +37,7 @@ import {
 
 import {
   InvalidInitialVampireResolutionRequestError,
+  parseAdoptInitialPredatorTypeRequest,
   parseEstablishInitialBloodRequest,
   parseManifestInitialDisciplineRequest,
   parseManifestInitialPowerRequest,
@@ -192,6 +194,17 @@ function throwInitialVampireHttpError(
     throw new UnprocessableEntityException({
       code:
         'INITIAL_VAMPIRE_ADVANTAGES_REVIEW_INVALID',
+      issues: error.issues,
+    })
+  }
+
+  if (
+    error instanceof
+      InitialVampirePredatorInvalidError
+  ) {
+    throw new UnprocessableEntityException({
+      code:
+        'INITIAL_VAMPIRE_PREDATOR_TYPE_INVALID',
       issues: error.issues,
     })
   }
@@ -371,6 +384,36 @@ export class CharacterInitialVampireController {
         await this.resolve.reviewAdvantages(
           actorUserId,
           parseReviewInitialAdvantagesRequest(
+            characterIdInput,
+            body,
+          ),
+        ),
+      )
+    } catch (error: unknown) {
+      throwInitialVampireHttpError(error)
+    }
+  }
+
+
+  @Patch(
+    ':characterId/initial-vampire/predator-type',
+  )
+  async predatorType(
+    @Req()
+    request:
+      AuthenticatedInitialVampireRequest,
+    @Param('characterId')
+    characterIdInput: unknown,
+    @Body() body: unknown,
+  ): Promise<InitialVampireResolutionResponseDto> {
+    const actorUserId =
+      authenticatedActorId(request)
+
+    try {
+      return toInitialVampireResolutionResponse(
+        await this.resolve.adoptPredatorType(
+          actorUserId,
+          parseAdoptInitialPredatorTypeRequest(
             characterIdInput,
             body,
           ),

@@ -1748,17 +1748,20 @@ export class PrismaCharacterDraftRepository
               creationState: {
                 select: {
                   creationMode: true,
+                  predatorTypeChoices: true,
                 },
               },
               identity: {
                 select: {
                   clanKey: true,
                   generation: true,
+                  predatorTypeKey: true,
                 },
               },
               blood: {
                 select: {
                   characterId: true,
+                  bloodPotency: true,
                 },
               },
               disciplines: {
@@ -1844,6 +1847,63 @@ export class PrismaCharacterDraftRepository
           if (
             target === undefined ||
             duplicated
+          ) {
+            throw new CharacterInitialVampireResolutionWriteConflictError(
+              data.characterId,
+            )
+          }
+        }
+
+        if (
+          data.kind === 'predatorType'
+        ) {
+          const choices =
+            current.creationState
+              .predatorTypeChoices
+
+          const hasChoices =
+            typeof choices === 'object' &&
+            choices !== null &&
+            !Array.isArray(choices) &&
+            Object.keys(
+              choices as Record<string, unknown>,
+            ).length > 0
+
+          const [
+            predatorDisciplines,
+            predatorSpecialties,
+            predatorAdvantages,
+          ] = await Promise.all([
+            transaction.characterDiscipline.count({
+              where: {
+                characterId: data.characterId,
+                origin:
+                  PrismaDisciplineOrigin.PREDATOR_TYPE,
+              },
+            }),
+            transaction.characterSkillSpecialty.count({
+              where: {
+                characterId: data.characterId,
+                origin:
+                  PrismaSkillSpecialtyOrigin.PREDATOR_TYPE,
+              },
+            }),
+            transaction.characterAdvantageSelection.count({
+              where: {
+                characterId: data.characterId,
+                origin:
+                  PrismaAdvantageSelectionOrigin.PREDATOR_TYPE,
+              },
+            }),
+          ])
+
+          if (
+            current.identity.predatorTypeKey !== null ||
+            hasChoices ||
+            current.blood === null ||
+            predatorDisciplines > 0 ||
+            predatorSpecialties > 0 ||
+            predatorAdvantages > 0
           ) {
             throw new CharacterInitialVampireResolutionWriteConflictError(
               data.characterId,
@@ -1948,6 +2008,117 @@ export class PrismaCharacterDraftRepository
               characterId: data.characterId,
               origin:
                 PrismaAdvantageSelectionOrigin.CREATION,
+            },
+          })
+
+          await createAdvantageSelections(
+            transaction,
+            data.characterId,
+            data.advantages,
+          )
+        } else if (
+          data.kind === 'predatorType'
+        ) {
+          await transaction.characterIdentity.update({
+            where: {
+              characterId: data.characterId,
+            },
+            data: {
+              predatorTypeKey:
+                data.predatorTypeKey,
+            },
+          })
+
+          await transaction.characterCreationState.update({
+            where: {
+              characterId: data.characterId,
+            },
+            data: {
+              predatorTypeChoices:
+                toPredatorTypeChoicesJson(
+                  data.predatorTypeChoices,
+                ),
+            },
+          })
+
+          await transaction.characterHumanityState.update({
+            where: {
+              characterId: data.characterId,
+            },
+            data: {
+              value: data.humanityValue,
+            },
+          })
+
+          await transaction.characterBloodState.update({
+            where: {
+              characterId: data.characterId,
+            },
+            data: {
+              bloodPotency:
+                data.bloodPotency,
+            },
+          })
+
+          if (
+            data.bonusSkillKey !== null
+          ) {
+            await transaction.characterSkill.update({
+              where: {
+                characterId_skillKey: {
+                  characterId:
+                    data.characterId,
+                  skillKey:
+                    data.bonusSkillKey,
+                },
+              },
+              data: {
+                rating: {
+                  increment: 1,
+                },
+              },
+            })
+          }
+
+          if (
+            data.specialty !== null
+          ) {
+            await transaction.characterSkillSpecialty.create({
+              data: {
+                id:
+                  data.specialty.id,
+                characterId:
+                  data.characterId,
+                skillKey:
+                  data.specialty.skillKey,
+                name:
+                  data.specialty.name,
+                origin:
+                  PrismaSkillSpecialtyOrigin.PREDATOR_TYPE,
+              },
+            })
+          }
+
+          await transaction.characterDiscipline.create({
+            data: {
+              characterId:
+                data.characterId,
+              disciplineKey:
+                data.discipline.disciplineKey,
+              contributionKey:
+                disciplineContributionKey(
+                  'predatorType',
+                ),
+              rating:
+                data.discipline.rating,
+              origin:
+                PrismaDisciplineOrigin.PREDATOR_TYPE,
+              powers: {
+                create: {
+                  powerKey:
+                    data.discipline.powerKey,
+                },
+              },
             },
           })
 

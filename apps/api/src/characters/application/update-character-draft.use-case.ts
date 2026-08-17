@@ -84,6 +84,7 @@ function changesInitialVampireState(
     data.oblivionCeremonies !== undefined ||
     data.thinBloodAlchemy !== undefined ||
     data.thinBloodTraits !== undefined ||
+    data.advantages !== undefined ||
     data.creation?.predatorTypeChoices !== undefined
   )
 }

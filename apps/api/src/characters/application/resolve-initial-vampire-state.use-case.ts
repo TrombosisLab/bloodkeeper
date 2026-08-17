@@ -49,6 +49,14 @@ import {
   validateInitialAdvantageReplacement,
 } from '../domain/character-initial-advantage.rules'
 
+import {
+  analyzeInitialPredatorAdoption,
+} from '../domain/character-initial-predator.rules'
+
+import type {
+  InitialPredatorAdoptionPlan,
+} from '../domain/character-initial-predator.rules'
+
 import type {
   InitialDisciplineViolation,
 } from '../domain/character-initial-discipline.rules'
@@ -97,6 +105,17 @@ export interface ManifestInitialPowerCommand {
 export interface ReviewInitialAdvantagesCommand {
   readonly characterId: string
   readonly expectedRevision: number
+  readonly advantages:
+    PersistedCharacterAdvantages
+}
+
+export interface AdoptInitialPredatorTypeCommand {
+  readonly characterId: string
+  readonly expectedRevision: number
+  readonly predatorTypeKey: string
+  readonly predatorTypeChoices:
+    Readonly<Record<string, number>>
+  readonly disciplinePowerKey: string
   readonly advantages:
     PersistedCharacterAdvantages
 }
@@ -190,6 +209,20 @@ export type InitialVampireSelectionViolation =
   | 'HUNGER_VALUE_INVALID'
   | 'EXISTING_BLOOD_INCOMPATIBLE_WITH_CLAN'
   | 'EXISTING_BLOOD_INCOMPATIBLE_WITH_GENERATION'
+
+export class InitialVampirePredatorInvalidError
+  extends Error {
+  constructor(
+    readonly issues:
+      readonly CharacterValidationIssue[],
+  ) {
+    super(
+      'Initial vampire Predator Type adoption violates current V5 rules',
+    )
+    this.name =
+      'InitialVampirePredatorInvalidError'
+  }
+}
 
 export class InitialVampireAdvantagesInvalidError
   extends Error {
@@ -335,6 +368,36 @@ export class ResolveInitialVampireStateUseCase {
     ) {
       throw new Error(
         'INITIAL_VAMPIRE_RESOLUTION_CHANGED_HUMANITY',
+      )
+    }
+
+    return {
+      character,
+      pendingDecisions:
+        deriveCharacterEmbracePendingDecisions(
+          character,
+        ),
+    }
+  }
+
+  private finishPredator(
+    before: PersistedCharacterDraft,
+    character: PersistedCharacterDraft,
+    plan: InitialPredatorAdoptionPlan,
+  ): InitialVampireResolutionResult {
+    if (
+      character.identity.predatorTypeKey !==
+        plan.predatorTypeKey ||
+      character.humanity.value !==
+        plan.humanityValue ||
+      character.humanity.stains !==
+        before.humanity.stains ||
+      character.blood === null ||
+      character.blood.bloodPotency !==
+        plan.bloodPotency
+    ) {
+      throw new Error(
+        'INITIAL_PREDATOR_PERSISTENCE_MISMATCH',
       )
     }
 
@@ -735,6 +798,85 @@ export class ResolveInitialVampireStateUseCase {
       })
 
     return this.finish(current, character)
+  }
+
+
+  async adoptPredatorType(
+    actorUserId: string,
+    command: AdoptInitialPredatorTypeCommand,
+  ): Promise<InitialVampireResolutionResult> {
+    const current = await this.load(
+      actorUserId,
+      command.characterId,
+      command.expectedRevision,
+    )
+
+    if (
+      current.identity.predatorTypeKey !== null
+    ) {
+      throw new InitialVampireDecisionAlreadyResolvedError(
+        'predatorType',
+      )
+    }
+
+    const analysis =
+      analyzeInitialPredatorAdoption(
+        current,
+        {
+          predatorTypeKey:
+            command.predatorTypeKey,
+          predatorTypeChoices:
+            command.predatorTypeChoices,
+          disciplinePowerKey:
+            command.disciplinePowerKey,
+          advantages:
+            command.advantages,
+        },
+        this.catalog,
+      )
+
+    if (
+      analysis.plan === null ||
+      analysis.issues.length > 0
+    ) {
+      throw new InitialVampirePredatorInvalidError(
+        analysis.issues,
+      )
+    }
+
+    const plan =
+      analysis.plan
+
+    const character =
+      await this.characters.resolveInitialVampireState({
+        kind: 'predatorType',
+        characterId:
+          command.characterId,
+        expectedRevision:
+          command.expectedRevision,
+        predatorTypeKey:
+          plan.predatorTypeKey,
+        predatorTypeChoices:
+          plan.predatorTypeChoices,
+        humanityValue:
+          plan.humanityValue,
+        bloodPotency:
+          plan.bloodPotency,
+        bonusSkillKey:
+          plan.bonusSkillKey,
+        specialty:
+          plan.specialty,
+        discipline:
+          plan.discipline,
+        advantages:
+          plan.advantages,
+      })
+
+    return this.finishPredator(
+      current,
+      character,
+      plan,
+    )
   }
 
 }

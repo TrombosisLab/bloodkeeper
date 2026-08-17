@@ -1,4 +1,5 @@
 import type {
+  AdoptInitialPredatorTypeCommand,
   EstablishInitialBloodCommand,
   ManifestInitialDisciplineCommand,
   ManifestInitialPowerCommand,
@@ -376,6 +377,132 @@ export function parseReviewInitialAdvantagesRequest(
       characterId: update.characterId,
       expectedRevision:
         parsed.expectedRevision,
+      advantages:
+        update.advantages,
+    }
+  } catch (error: unknown) {
+    if (
+      error instanceof
+        InvalidInitialVampireResolutionRequestError
+    ) {
+      throw error
+    }
+
+    if (
+      error instanceof
+        InvalidCharacterDraftRequestError
+    ) {
+      throw new InvalidInitialVampireResolutionRequestError(
+        error.message,
+      )
+    }
+
+    throw error
+  }
+}
+
+
+function initialPredatorNonEmptyText(
+  value: unknown,
+  path: string,
+): string {
+  if (
+    typeof value !== 'string' ||
+    value.trim().length === 0
+  ) {
+    throw new InvalidInitialVampireResolutionRequestError(
+      `${path} must be a non-empty string`,
+    )
+  }
+
+  return value.trim()
+}
+
+export function parseAdoptInitialPredatorTypeRequest(
+  characterIdInput: unknown,
+  bodyInput: unknown,
+): AdoptInitialPredatorTypeCommand {
+  const parsed = base(
+    characterIdInput,
+    bodyInput,
+    [
+      'expectedRevision',
+      'predatorTypeKey',
+      'predatorTypeChoices',
+      'disciplinePowerKey',
+      'advantages',
+    ],
+  )
+
+  for (
+    const key of [
+      'predatorTypeKey',
+      'predatorTypeChoices',
+      'disciplinePowerKey',
+      'advantages',
+    ] as const
+  ) {
+    if (!Object.hasOwn(parsed.body, key)) {
+      throw new InvalidInitialVampireResolutionRequestError(
+        `body.${key} is required`,
+      )
+    }
+  }
+
+  const predatorTypeKey =
+    initialPredatorNonEmptyText(
+      parsed.body.predatorTypeKey,
+      'body.predatorTypeKey',
+    )
+
+  const disciplinePowerKey =
+    initialPredatorNonEmptyText(
+      parsed.body.disciplinePowerKey,
+      'body.disciplinePowerKey',
+    )
+
+  try {
+    const update =
+      parseUpdateCharacterDraftRequest(
+        characterIdInput,
+        {
+          expectedRevision:
+            parsed.expectedRevision,
+          identity: {
+            predatorTypeKey,
+          },
+          creation: {
+            predatorTypeChoices:
+              parsed.body.predatorTypeChoices,
+          },
+          advantages:
+            parsed.body.advantages,
+        },
+      )
+
+    if (
+      update.identity?.predatorTypeKey ===
+        undefined ||
+      update.identity.predatorTypeKey ===
+        null ||
+      update.creation?.predatorTypeChoices ===
+        undefined ||
+      update.advantages === undefined
+    ) {
+      throw new InvalidInitialVampireResolutionRequestError(
+        'Predator Type request is incomplete',
+      )
+    }
+
+    return {
+      characterId: parsed.characterId,
+      expectedRevision:
+        parsed.expectedRevision,
+      predatorTypeKey:
+        update.identity.predatorTypeKey,
+      predatorTypeChoices:
+        update.creation.predatorTypeChoices,
+      disciplinePowerKey,
       advantages:
         update.advantages,
     }
