@@ -1239,6 +1239,11 @@ export function CharacterCreationWizard({
             'advantages' ? (
             <AdvantagesStep
               creationMode={creationMode}
+              profileNature={
+                sessionZero
+                  ? 'human'
+                  : 'vampire'
+              }
               clanKey={
                 draft.identity.clan
               }

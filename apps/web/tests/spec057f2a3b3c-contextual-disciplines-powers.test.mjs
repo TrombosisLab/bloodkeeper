@@ -327,7 +327,6 @@ test(
   () => {
     for (
       const forbidden of [
-        'reviewAdvantages(',
         'consolidate(',
         'BloodSorceryRitualSelector',
         'OblivionCeremonySelector',

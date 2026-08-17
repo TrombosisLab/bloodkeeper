@@ -39,6 +39,10 @@ import {
   PersistedInitialVampireThinBloodState,
 } from './PersistedInitialVampireThinBloodState'
 
+import {
+  PersistedInitialVampireAdvantagesReview,
+} from './PersistedInitialVampireAdvantagesReview'
+
 import type {
   CharacterInitialVampireGateway,
 } from '../infrastructure/character-initial-vampire.api'
@@ -1015,6 +1019,30 @@ export function PersistedInitialVampireTransition({
               }}
             />
           ) : null}
+          {pending.includes(
+            'advantagesReview',
+          ) ? (
+            <PersistedInitialVampireAdvantagesReview
+              transition={transition}
+              busy={busy}
+              resolving={
+                busyDecision ===
+                  'advantagesReview'
+              }
+              onReview={(advantages) => {
+                void resolve(
+                  'advantagesReview',
+                  () =>
+                    resolvedGateway
+                      .reviewAdvantages(
+                        transition.characterId,
+                        transition.revision,
+                        advantages,
+                      ),
+                )
+              }}
+            />
+          ) : null}
         </div>
 
         {pending.some(
@@ -1028,6 +1056,7 @@ export function PersistedInitialVampireTransition({
               'initialPowers',
               'predatorType',
               'thinBloodState',
+              'advantagesReview',
             ].includes(decision),
         ) ? (
           <p

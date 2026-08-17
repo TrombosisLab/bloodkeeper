@@ -76,10 +76,17 @@ import type {
 
 import type {
   CharacterDraftApiCreationMode,
+  CharacterDraftApiNature,
 } from '../types/character-draft-api.types'
 
 interface AdvantagesStepProps {
   creationMode: CharacterDraftApiCreationMode
+
+  profileNature: CharacterDraftApiNature
+
+  showThinBloodState?: boolean
+
+  automaticGrantDetailsReadOnly?: boolean
 
   clanKey: ClanKey | null
 
@@ -185,6 +192,9 @@ function getChildAdvantageDefinitionsByCategory(
 
 export function AdvantagesStep({
   creationMode,
+  profileNature,
+  showThinBloodState = true,
+  automaticGrantDetailsReadOnly = false,
   clanKey,
   generation,
   value,
@@ -200,7 +210,8 @@ export function AdvantagesStep({
   ] = useState(true)
 
   const sessionZero =
-    creationMode === 'sessionZero'
+    creationMode === 'sessionZero' &&
+    profileNature === 'human'
 
   const budget =
     getCharacterAdvantagesBudget(value)
@@ -231,6 +242,7 @@ export function AdvantagesStep({
     )
 
   const isThinBlood =
+    showThinBloodState &&
     !sessionZero &&
     clanKey === 'thinBlood'
 
@@ -531,7 +543,8 @@ export function AdvantagesStep({
                     </p>
 
                     {definition?.requiresInstanceDetails ===
-                      true && (
+                      true &&
+                      !automaticGrantDetailsReadOnly && (
                       <AdvantageInstanceDetailsEditor
                         selection={
                           selection

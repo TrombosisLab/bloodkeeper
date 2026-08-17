@@ -7,6 +7,10 @@ import type {
 } from '../types/character-draft.types.ts'
 
 import type {
+  CharacterAdvantagesDraft,
+} from '../types/character-advantages-draft.types.ts'
+
+import type {
   CreationStepId,
 } from '../types/creation-step.types.ts'
 
@@ -149,8 +153,11 @@ export function draftThinBloodTraitsToApi(
   )
 }
 
-function draftAdvantagesToApi(
-  draft: CharacterDraft,
+export function draftAdvantagesToApi(
+  draft: Pick<
+    CharacterDraft,
+    'advantages'
+  >,
 ): CreateCharacterDraftApiRequest['advantages'] {
   return {
     selections:
@@ -352,6 +359,53 @@ function nullableTextToDraft(
   return value ?? ''
 }
 
+export function apiAdvantagesToDraft(
+  advantages: {
+    readonly selections:
+      ReadonlyArray<
+        CharacterDraftApiSnapshot[
+          'advantages'
+        ][
+          'selections'
+        ][number]
+      >
+  },
+): CharacterAdvantagesDraft {
+  return {
+    selections:
+      advantages.selections.map(
+        (selection) => ({
+          selectionId:
+            selection.selectionId,
+          definitionKey:
+            selection.definitionKey,
+          category:
+            selection.category,
+          rating:
+            selection.rating,
+          origin:
+            selection.origin,
+          ...(selection
+            .parentSelectionId === null
+            ? {}
+            : {
+                parentSelectionId:
+                  selection
+                    .parentSelectionId,
+              }),
+          ...(selection.details === null
+            ? {}
+            : {
+                details:
+                  structuredClone(
+                    selection.details,
+                  ),
+              }),
+        }),
+      ),
+  }
+}
+
 export function mapCharacterDraftApiSnapshotToEditorState(
   snapshot: CharacterDraftApiSnapshot,
 ): CharacterDraftApiEditorState {
@@ -506,39 +560,10 @@ export function mapCharacterDraftApiSnapshotToEditorState(
         ),
     },
 
-    advantages: {
-      selections:
-        snapshot.advantages.selections.map(
-          (selection) => ({
-            selectionId:
-              selection.selectionId,
-            definitionKey:
-              selection.definitionKey,
-            category:
-              selection.category,
-            rating:
-              selection.rating,
-            origin:
-              selection.origin,
-            ...(selection
-              .parentSelectionId === null
-              ? {}
-              : {
-                  parentSelectionId:
-                    selection
-                      .parentSelectionId,
-                }),
-            ...(selection.details === null
-              ? {}
-              : {
-                  details:
-                    structuredClone(
-                      selection.details,
-                    ),
-                }),
-          }),
-        ),
-    },
+    advantages:
+      apiAdvantagesToDraft(
+        snapshot.advantages,
+      ),
 
     humanity: {
       value:
