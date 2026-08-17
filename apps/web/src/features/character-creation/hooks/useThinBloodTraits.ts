@@ -7,6 +7,7 @@ import {
 
 import type {
   CharacterThinBloodTraitsDraft,
+  ClanCurseThinBloodTraitDetails,
   DisciplineAffinityThinBloodTraitDetails,
   ThinBloodTraitSelectionDraft,
 } from '../types/thin-blood-trait.types'
@@ -42,6 +43,15 @@ export interface UseThinBloodTraitsResult {
 
   toggle: (
     definitionKey: string,
+  ) => void
+
+  getClanCurseDetails: () =>
+    ClanCurseThinBloodTraitDetails | null
+
+  setClanCurseDetails: (
+    details:
+      | ClanCurseThinBloodTraitDetails
+      | null,
   ) => void
 
   getDisciplineAffinityDetails: () =>
@@ -180,6 +190,65 @@ export function useThinBloodTraits({
     })
   }
 
+  function getClanCurseDetails():
+    ClanCurseThinBloodTraitDetails | null {
+    const selection =
+      value.selections.find(
+        (candidate) =>
+          candidate.definitionKey ===
+          'clan-curse',
+      )
+
+    return (
+      selection?.clanCurseDetails ??
+      null
+    )
+  }
+
+  function setClanCurseDetails(
+    details:
+      | ClanCurseThinBloodTraitDetails
+      | null,
+  ): void {
+    if (
+      !selectedKeys.has(
+        'clan-curse',
+      )
+    ) {
+      return
+    }
+
+    onChange({
+      ...value,
+      selections:
+        value.selections.map(
+          (selection) => {
+            if (
+              selection.definitionKey !==
+              'clan-curse'
+            ) {
+              return selection
+            }
+
+            if (details === null) {
+              const {
+                clanCurseDetails: _removed,
+                ...withoutDetails
+              } = selection
+
+              return withoutDetails
+            }
+
+            return {
+              ...selection,
+              clanCurseDetails:
+                details,
+            }
+          },
+        ),
+    })
+  }
+
   function getDisciplineAffinityDetails():
     DisciplineAffinityThinBloodTraitDetails | null {
     const selection =
@@ -249,6 +318,9 @@ export function useThinBloodTraits({
 
     isSelected,
     toggle,
+
+    getClanCurseDetails,
+    setClanCurseDetails,
 
     getDisciplineAffinityDetails,
     setDisciplineAffinityDetails,

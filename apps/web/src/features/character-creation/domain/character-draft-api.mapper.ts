@@ -121,8 +121,11 @@ function draftDisciplinesToApi(
   )
 }
 
-function draftThinBloodTraitsToApi(
-  draft: CharacterDraft,
+export function draftThinBloodTraitsToApi(
+  draft: Pick<
+    CharacterDraft,
+    'thinBloodTraits'
+  >,
 ): CreateCharacterDraftApiRequest['thinBloodTraits'] {
   return draft.thinBloodTraits.selections.map(
     (selection) => ({

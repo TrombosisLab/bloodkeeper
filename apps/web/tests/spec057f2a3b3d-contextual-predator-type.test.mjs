@@ -346,7 +346,6 @@ test(
     for (
       const forbidden of [
         'reviewAdvantages(',
-        'resolveThinBloodState(',
         'consolidate(',
       ]
     ) {

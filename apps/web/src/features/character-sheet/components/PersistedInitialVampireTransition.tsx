@@ -35,6 +35,10 @@ import {
   PersistedInitialVampirePredatorType,
 } from './PersistedInitialVampirePredatorType'
 
+import {
+  PersistedInitialVampireThinBloodState,
+} from './PersistedInitialVampireThinBloodState'
+
 import type {
   CharacterInitialVampireGateway,
 } from '../infrastructure/character-initial-vampire.api'
@@ -984,6 +988,33 @@ export function PersistedInitialVampireTransition({
               }}
             />
           ) : null}
+          {pending.includes(
+            'thinBloodState',
+          ) ? (
+            <PersistedInitialVampireThinBloodState
+              transition={transition}
+              busy={busy}
+              resolving={
+                busyDecision ===
+                  'thinBloodState'
+              }
+              onResolve={(resolution) => {
+                void resolve(
+                  'thinBloodState',
+                  () =>
+                    resolvedGateway
+                      .resolveThinBloodState(
+                        transition.characterId,
+                        transition.revision,
+                        resolution
+                          .thinBloodTraits,
+                        resolution
+                          .thinBloodAlchemy,
+                      ),
+                )
+              }}
+            />
+          ) : null}
         </div>
 
         {pending.some(
@@ -996,6 +1027,7 @@ export function PersistedInitialVampireTransition({
               'initialDisciplines',
               'initialPowers',
               'predatorType',
+              'thinBloodState',
             ].includes(decision),
         ) ? (
           <p
