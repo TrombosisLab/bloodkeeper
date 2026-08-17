@@ -13,7 +13,7 @@ import type {
 } from '../../character-creation/infrastructure/character-draft.api'
 
 import {
-  loadPersistedCharacterSheet,
+  loadPersistedCharacterSheetState,
   messageForCharacterSheetLoadState,
   stateForCharacterSheetLoadError,
 } from '../domain/persisted-character-sheet.loader'
@@ -38,6 +38,10 @@ import type {
   CharacterSheetModel,
 } from '../types/character-sheet-model.types'
 
+import type {
+  CharacterInitialVampireTransitionReadModel,
+} from '../types/character-transition-read-model.types'
+
 import { CharacterSheet } from './CharacterSheet'
 
 interface PersistedCharacterSheetProps {
@@ -53,6 +57,8 @@ type LoadState =
   | {
       kind: 'ready'
       model: CharacterSheetModel
+      transition:
+        CharacterInitialVampireTransitionReadModel | null
     }
   | {
       kind: CharacterSheetLoadFailureState
@@ -121,17 +127,19 @@ export function PersistedCharacterSheet({
       kind: 'loading',
     })
 
-    void loadPersistedCharacterSheet(
+    void loadPersistedCharacterSheetState(
       resolvedGateway,
       resolvedProfilePhaseGateway,
       characterId,
     )
-      .then((model) => {
+      .then((result) => {
         if (cancelled) return
 
         setLoadState({
           kind: 'ready',
-          model,
+          model: result.model,
+          transition:
+            result.transition,
         })
       })
       .catch((error: unknown) => {
@@ -182,7 +190,7 @@ export function PersistedCharacterSheet({
           setLoadState((current) =>
             current.kind === 'ready'
               ? {
-                  kind: 'ready',
+                  ...current,
                   model:
                     withOperationalState(
                       current.model,

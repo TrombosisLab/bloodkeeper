@@ -121,10 +121,8 @@ test(
       ]
     ) {
       assert.deepEqual(
-        parseCharacterProfilePhaseResponse({
-          phase,
-        }),
-        { phase },
+        parseCharacterProfilePhaseResponse({ phase, pendingDecisions: [] }),
+        { phase, pendingDecisions: [] },
       )
     }
   },
@@ -155,9 +153,10 @@ test(
 
           return response({
             body: {
-              phase:
-                'TRANSITIONAL_VAMPIRE',
-            },
+        phase:
+          'TRANSITIONAL_VAMPIRE',
+        pendingDecisions: [],
+      },
           })
         },
       )
@@ -167,6 +166,7 @@ test(
       {
         phase:
           'TRANSITIONAL_VAMPIRE',
+        pendingDecisions: [],
       },
     )
 
@@ -278,6 +278,59 @@ test(
     assert.equal(
       parsed.blood,
       null,
+    )
+  },
+)
+
+test(
+  '057-F2A3B2B2B profile phase consume pendingDecisions autoritativos',
+  () => {
+    assert.deepEqual(
+      parseCharacterProfilePhaseResponse({
+        phase:
+          'TRANSITIONAL_VAMPIRE',
+        pendingDecisions: [
+          'clan',
+          'generation',
+          'sire',
+          'bloodState',
+        ],
+      }),
+      {
+        phase:
+          'TRANSITIONAL_VAMPIRE',
+        pendingDecisions: [
+          'clan',
+          'generation',
+          'sire',
+          'bloodState',
+        ],
+      },
+    )
+
+    assert.throws(
+      () =>
+        parseCharacterProfilePhaseResponse({
+          phase:
+            'TRANSITIONAL_VAMPIRE',
+          pendingDecisions: [
+            'clan',
+            'inventedDecision',
+          ],
+        }),
+      CharacterProfilePhaseApiError,
+    )
+
+    assert.throws(
+      () =>
+        parseCharacterProfilePhaseResponse({
+          phase:
+            'ESTABLISHED_VAMPIRE',
+          pendingDecisions: [
+            'clan',
+          ],
+        }),
+      CharacterProfilePhaseApiError,
     )
   },
 )

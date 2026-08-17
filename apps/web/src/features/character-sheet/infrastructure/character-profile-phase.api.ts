@@ -2,12 +2,22 @@ import type {
   CharacterProfilePhase,
 } from '../types/character-sheet-model.types.ts'
 
+import type {
+  CharacterInitialVampirePendingDecision,
+} from '../types/character-transition-read-model.types.ts'
+
+import {
+  characterEmbracePendingDecisions,
+} from './character-embrace.api.ts'
+
 export type {
   CharacterProfilePhase,
 } from '../types/character-sheet-model.types.ts'
 
 export interface CharacterProfilePhaseSnapshot {
   readonly phase: CharacterProfilePhase
+  readonly pendingDecisions:
+    readonly CharacterInitialVampirePendingDecision[]
 }
 
 type FetchImplementation =
@@ -41,6 +51,52 @@ function isProfilePhase(
   )
 }
 
+function isPendingDecision(
+  value: unknown,
+): value is CharacterInitialVampirePendingDecision {
+  return (
+    typeof value === 'string' &&
+    characterEmbracePendingDecisions.some(
+      (decision) =>
+        decision === value,
+    )
+  )
+}
+
+function parsePendingDecisions(
+  value: unknown,
+): readonly CharacterInitialVampirePendingDecision[] {
+  if (value === undefined) {
+    return []
+  }
+
+  if (
+    !Array.isArray(value) ||
+    !value.every(isPendingDecision)
+  ) {
+    throw new CharacterProfilePhaseApiError(
+      502,
+      'INVALID_CHARACTER_PROFILE_PHASE_RESPONSE',
+    )
+  }
+
+  const decisions = [
+    ...value,
+  ]
+
+  if (
+    new Set(decisions).size !==
+      decisions.length
+  ) {
+    throw new CharacterProfilePhaseApiError(
+      502,
+      'INVALID_CHARACTER_PROFILE_PHASE_RESPONSE',
+    )
+  }
+
+  return decisions
+}
+
 export class CharacterProfilePhaseApiError
   extends Error {
   readonly status: number
@@ -71,8 +127,25 @@ export function parseCharacterProfilePhaseResponse(
     )
   }
 
+  const pendingDecisions =
+    parsePendingDecisions(
+      value.pendingDecisions,
+    )
+
+  if (
+    value.phase !==
+      'TRANSITIONAL_VAMPIRE' &&
+    pendingDecisions.length > 0
+  ) {
+    throw new CharacterProfilePhaseApiError(
+      502,
+      'INVALID_CHARACTER_PROFILE_PHASE_RESPONSE',
+    )
+  }
+
   return {
     phase: value.phase,
+    pendingDecisions,
   }
 }
 

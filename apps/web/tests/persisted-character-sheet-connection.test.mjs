@@ -12,6 +12,7 @@ import {
 
 import {
   loadPersistedCharacterSheet,
+  loadPersistedCharacterSheetState,
   messageForCharacterSheetLoadState,
   stateForCharacterSheetLoadError,
 } from '../src/features/character-sheet/domain/persisted-character-sheet.loader.ts'
@@ -317,6 +318,104 @@ test(
     assert.doesNotMatch(
       persistedSource,
       /\bCharacterDraft\b/,
+    )
+  },
+)
+
+test(
+  '057-F2A3B2B2B conserva pending fuera del CharacterSheetModel',
+  async () => {
+    const source = snapshot()
+
+    source.nature = 'vampire'
+    source.creation.creationMode =
+      'sessionZero'
+    source.identity.clanKey = null
+    source.identity.generation = null
+    source.identity.sire = null
+    source.identity.predatorTypeKey = null
+    source.creation.predatorTypeChoices = {
+      specialty: 1,
+    }
+    source.blood = null
+    source.thinBloodAlchemy = null
+
+    const gateway = {
+      async load(characterId) {
+        assert.equal(
+          characterId,
+          source.characterId,
+        )
+
+        return source
+      },
+    }
+
+    const profilePhaseGateway = {
+      async load(characterId) {
+        assert.equal(
+          characterId,
+          source.characterId,
+        )
+
+        return {
+          phase:
+            'TRANSITIONAL_VAMPIRE',
+          pendingDecisions: [
+            'clan',
+            'generation',
+            'sire',
+            'bloodState',
+          ],
+        }
+      },
+    }
+
+    const result =
+      await loadPersistedCharacterSheetState(
+        gateway,
+        profilePhaseGateway,
+        source.characterId,
+      )
+
+    assert.equal(
+      result.model.profilePhase,
+      'TRANSITIONAL_VAMPIRE',
+    )
+
+    assert.equal(
+      Object.hasOwn(
+        result.model,
+        'pendingDecisions',
+      ),
+      false,
+    )
+
+    assert.deepEqual(
+      result.transition?.pendingDecisions,
+      [
+        'clan',
+        'generation',
+        'sire',
+        'bloodState',
+      ],
+    )
+
+    assert.equal(
+      result.transition?.revision,
+      source.revision,
+    )
+
+    assert.equal(
+      result.transition?.creationMode,
+      'sessionZero',
+    )
+
+    assert.deepEqual(
+      result.transition?.predatorTypeChoices,
+      {
+        specialty: 1,
+      },
     )
   },
 )

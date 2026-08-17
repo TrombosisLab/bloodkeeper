@@ -18,6 +18,10 @@ import type {
   CharacterSheetModel,
 } from '../types/character-sheet-model.types.ts'
 
+import type {
+  CharacterInitialVampireTransitionReadModel,
+} from '../types/character-transition-read-model.types.ts'
+
 import {
   adaptPersistedCharacterToSheetModel,
 } from './persisted-character-sheet.adapter.ts'
@@ -27,11 +31,105 @@ export type CharacterSheetLoadFailureState =
   | 'not-found'
   | 'error'
 
-export async function loadPersistedCharacterSheet(
+export interface PersistedCharacterSheetLoadResult {
+  readonly model: CharacterSheetModel
+  readonly transition:
+    CharacterInitialVampireTransitionReadModel | null
+}
+
+function buildTransitionReadModel(
+  snapshot:
+    Awaited<ReturnType<CharacterDraftGateway['load']>>,
+  profilePhase:
+    Awaited<ReturnType<CharacterProfilePhaseGateway['load']>>,
+): CharacterInitialVampireTransitionReadModel | null {
+  if (
+    profilePhase.phase !==
+      'TRANSITIONAL_VAMPIRE'
+  ) {
+    return null
+  }
+
+  return {
+    characterId:
+      snapshot.characterId,
+    revision:
+      snapshot.revision,
+    status:
+      snapshot.status,
+    phase:
+      'TRANSITIONAL_VAMPIRE',
+    pendingDecisions: [
+      ...profilePhase.pendingDecisions,
+    ],
+    creationMode:
+      snapshot.creation.creationMode,
+
+    identity: {
+      clanKey:
+        snapshot.identity.clanKey,
+      generation:
+        snapshot.identity.generation,
+      sire:
+        snapshot.identity.sire,
+      predatorTypeKey:
+        snapshot.identity.predatorTypeKey,
+    },
+
+    predatorTypeChoices: {
+      ...snapshot.creation
+        .predatorTypeChoices,
+    },
+
+    blood:
+      snapshot.blood === null
+        ? null
+        : {
+            ...snapshot.blood,
+          },
+
+    disciplines:
+      snapshot.disciplines.map(
+        (discipline) => ({
+          ...discipline,
+          powerKeys: [
+            ...discipline.powerKeys,
+          ],
+        }),
+      ),
+
+    advantages: {
+      selections:
+        structuredClone(
+          snapshot.advantages
+            .selections,
+        ),
+    },
+
+    thinBloodTraits:
+      structuredClone(
+        snapshot.thinBloodTraits,
+      ),
+
+    thinBloodAlchemy:
+      snapshot.thinBloodAlchemy === null
+        ? null
+        : {
+            ...snapshot.thinBloodAlchemy,
+            formulaKeys: [
+              ...snapshot
+                .thinBloodAlchemy
+                .formulaKeys,
+            ],
+          },
+  }
+}
+
+export async function loadPersistedCharacterSheetState(
   gateway: CharacterDraftGateway,
   profilePhaseGateway: CharacterProfilePhaseGateway,
   characterId: string,
-): Promise<CharacterSheetModel> {
+): Promise<PersistedCharacterSheetLoadResult> {
   const [
     snapshot,
     profilePhase,
@@ -40,10 +138,33 @@ export async function loadPersistedCharacterSheet(
     profilePhaseGateway.load(characterId),
   ])
 
-  return adaptPersistedCharacterToSheetModel(
-    snapshot,
-    profilePhase.phase,
-  )
+  return {
+    model:
+      adaptPersistedCharacterToSheetModel(
+        snapshot,
+        profilePhase.phase,
+      ),
+    transition:
+      buildTransitionReadModel(
+        snapshot,
+        profilePhase,
+      ),
+  }
+}
+
+export async function loadPersistedCharacterSheet(
+  gateway: CharacterDraftGateway,
+  profilePhaseGateway: CharacterProfilePhaseGateway,
+  characterId: string,
+): Promise<CharacterSheetModel> {
+  const result =
+    await loadPersistedCharacterSheetState(
+      gateway,
+      profilePhaseGateway,
+      characterId,
+    )
+
+  return result.model
 }
 
 export function stateForCharacterSheetLoadError(
