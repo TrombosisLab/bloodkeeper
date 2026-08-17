@@ -26,6 +26,11 @@ import {
   initialVampireHungerOptions,
 } from '../domain/initial-vampire-transition-blood-ui-state'
 
+import {
+  initialVampireDisciplineChoices,
+  initialVampirePowerDisciplineChoices,
+} from '../domain/initial-vampire-transition-discipline-ui-state'
+
 import type {
   CharacterInitialVampireGateway,
 } from '../infrastructure/character-initial-vampire.api'
@@ -84,6 +89,26 @@ export function PersistedInitialVampireTransition({
     setInitialHunger,
   ] = useState('')
 
+  const [
+    initialDisciplineKey,
+    setInitialDisciplineKey,
+  ] = useState('')
+
+  const [
+    initialDisciplineRating,
+    setInitialDisciplineRating,
+  ] = useState('')
+
+  const [
+    initialPowerDisciplineKey,
+    setInitialPowerDisciplineKey,
+  ] = useState('')
+
+  const [
+    initialPowerKey,
+    setInitialPowerKey,
+  ] = useState('')
+
   const pending =
     transition.pendingDecisions
 
@@ -100,6 +125,59 @@ export function PersistedInitialVampireTransition({
     bloodPotencyOptions.length > 0 &&
     bloodPotency !== '' &&
     initialHunger !== ''
+
+  const disciplineChoices =
+    useMemo(
+      () =>
+        initialVampireDisciplineChoices(
+          transition,
+        ),
+      [transition],
+    )
+
+  const selectedDisciplineChoice =
+    disciplineChoices.find(
+      ({ key }) =>
+        key === initialDisciplineKey,
+    )
+
+  const disciplineReady =
+    selectedDisciplineChoice !==
+      undefined &&
+    selectedDisciplineChoice
+      .ratingOptions.includes(
+        Number(
+          initialDisciplineRating,
+        ),
+      )
+
+  const powerDisciplineChoices =
+    useMemo(
+      () =>
+        initialVampirePowerDisciplineChoices(
+          transition,
+        ),
+      [transition],
+    )
+
+  const selectedPowerDiscipline =
+    powerDisciplineChoices.find(
+      ({ key }) =>
+        key ===
+        initialPowerDisciplineKey,
+    )
+
+  const selectedPower =
+    selectedPowerDiscipline
+      ?.powers.find(
+        ({ key }) =>
+          key === initialPowerKey,
+      )
+
+  const powerReady =
+    selectedPowerDiscipline !==
+      undefined &&
+    selectedPower !== undefined
 
   const busy =
     busyDecision !== null
@@ -591,6 +669,293 @@ export function PersistedInitialVampireTransition({
               </button>
             </form>
           ) : null}
+
+          {pending.includes(
+            'initialDisciplines',
+          ) ? (
+            <form
+              className={
+                'initial-vampire-transition__card'
+              }
+              onSubmit={(event) => {
+                event.preventDefault()
+
+                if (!disciplineReady) {
+                  return
+                }
+
+                void resolve(
+                  'initialDisciplines',
+                  () =>
+                    resolvedGateway
+                      .manifestDiscipline(
+                        transition.characterId,
+                        transition.revision,
+                        selectedDisciplineChoice.key,
+                        Number(
+                          initialDisciplineRating,
+                        ),
+                      ),
+                )
+              }}
+            >
+              <h3>
+                Disciplinas iniciales
+              </h3>
+
+              <p>
+                Manifiesta una contribución
+                inicial cada vez. El catálogo y
+                las puntuaciones disponibles se
+                derivan del creador existente; el
+                backend conserva la decisión
+                final.
+              </p>
+
+              {disciplineChoices.length >
+              0 ? (
+                <>
+                  <label>
+                    <span>Disciplina</span>
+
+                    <select
+                      value={
+                        initialDisciplineKey
+                      }
+                      disabled={busy}
+                      onChange={(event) => {
+                        setInitialDisciplineKey(
+                          event.target.value,
+                        )
+                        setInitialDisciplineRating(
+                          '',
+                        )
+                      }}
+                    >
+                      <option value="">
+                        Seleccionar…
+                      </option>
+
+                      {disciplineChoices.map(
+                        (choice) => (
+                          <option
+                            key={choice.key}
+                            value={choice.key}
+                          >
+                            {choice.name}
+                          </option>
+                        ),
+                      )}
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>Puntuación</span>
+
+                    <select
+                      value={
+                        initialDisciplineRating
+                      }
+                      disabled={
+                        busy ||
+                        selectedDisciplineChoice ===
+                          undefined
+                      }
+                      onChange={(event) => {
+                        setInitialDisciplineRating(
+                          event.target.value,
+                        )
+                      }}
+                    >
+                      <option value="">
+                        Seleccionar…
+                      </option>
+
+                      {selectedDisciplineChoice
+                        ?.ratingOptions.map(
+                          (rating) => (
+                            <option
+                              key={rating}
+                              value={rating}
+                            >
+                              {rating}
+                            </option>
+                          ),
+                        )}
+                    </select>
+                  </label>
+                </>
+              ) : (
+                <p>
+                  No hay una Disciplina inicial
+                  disponible para manifestar con
+                  el estado canónico actual.
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className={
+                  'initial-vampire-transition__submit'
+                }
+                disabled={
+                  busy ||
+                  !disciplineReady
+                }
+              >
+                {
+                  busyDecision ===
+                    'initialDisciplines'
+                    ? 'Manifestando Disciplina…'
+                    : 'Manifestar Disciplina'
+                }
+              </button>
+            </form>
+          ) : null}
+
+          {pending.includes(
+            'initialPowers',
+          ) ? (
+            <form
+              className={
+                'initial-vampire-transition__card'
+              }
+              onSubmit={(event) => {
+                event.preventDefault()
+
+                if (!powerReady) {
+                  return
+                }
+
+                void resolve(
+                  'initialPowers',
+                  () =>
+                    resolvedGateway
+                      .manifestPower(
+                        transition.characterId,
+                        transition.revision,
+                        selectedPowerDiscipline.key,
+                        selectedPower.key,
+                      ),
+                )
+              }}
+            >
+              <h3>Poderes iniciales</h3>
+
+              <p>
+                Selecciona un Poder aprendible
+                para una Disciplina ya
+                manifestada. Nivel,
+                prerrequisitos y capacidad se
+                resuelven con las reglas de
+                creación existentes.
+              </p>
+
+              {powerDisciplineChoices.length >
+              0 ? (
+                <>
+                  <label>
+                    <span>Disciplina</span>
+
+                    <select
+                      value={
+                        initialPowerDisciplineKey
+                      }
+                      disabled={busy}
+                      onChange={(event) => {
+                        setInitialPowerDisciplineKey(
+                          event.target.value,
+                        )
+                        setInitialPowerKey('')
+                      }}
+                    >
+                      <option value="">
+                        Seleccionar…
+                      </option>
+
+                      {powerDisciplineChoices.map(
+                        (choice) => (
+                          <option
+                            key={choice.key}
+                            value={choice.key}
+                          >
+                            {choice.name}
+                            {' · '}
+                            {
+                              choice
+                                .selectedPowerCount
+                            }
+                            {' / '}
+                            {choice.rating}
+                          </option>
+                        ),
+                      )}
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>Poder</span>
+
+                    <select
+                      value={initialPowerKey}
+                      disabled={
+                        busy ||
+                        selectedPowerDiscipline ===
+                          undefined
+                      }
+                      onChange={(event) => {
+                        setInitialPowerKey(
+                          event.target.value,
+                        )
+                      }}
+                    >
+                      <option value="">
+                        Seleccionar…
+                      </option>
+
+                      {selectedPowerDiscipline
+                        ?.powers.map(
+                          (power) => (
+                            <option
+                              key={power.key}
+                              value={power.key}
+                            >
+                              {power.name}
+                              {' · nivel '}
+                              {power.level}
+                            </option>
+                          ),
+                        )}
+                    </select>
+                  </label>
+                </>
+              ) : (
+                <p>
+                  Manifiesta primero una
+                  Disciplina con capacidad para
+                  nuevos Poderes.
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className={
+                  'initial-vampire-transition__submit'
+                }
+                disabled={
+                  busy ||
+                  !powerReady
+                }
+              >
+                {
+                  busyDecision ===
+                    'initialPowers'
+                    ? 'Manifestando Poder…'
+                    : 'Manifestar Poder'
+                }
+              </button>
+            </form>
+          ) : null}
         </div>
 
         {pending.some(
@@ -600,6 +965,8 @@ export function PersistedInitialVampireTransition({
               'generation',
               'sire',
               'bloodState',
+              'initialDisciplines',
+              'initialPowers',
             ].includes(decision),
         ) ? (
           <p

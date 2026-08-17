@@ -200,12 +200,10 @@ test(
 )
 
 test(
-  '057-F2A3B3B no reabre decisiones mecánicas posteriores',
+  '057-F2A3B3B no reabre decisiones posteriores a Disciplinas/Poderes',
   () => {
     for (
       const forbidden of [
-        'manifestDiscipline(',
-        'manifestPower(',
         'adoptPredatorType(',
         'reviewAdvantages(',
         'resolveThinBloodState(',
