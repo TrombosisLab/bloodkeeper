@@ -21,6 +21,11 @@ import {
   messageForInitialVampireTransitionError,
 } from '../domain/initial-vampire-transition-ui-state'
 
+import {
+  initialVampireBloodPotencyOptions,
+  initialVampireHungerOptions,
+} from '../domain/initial-vampire-transition-blood-ui-state'
+
 import type {
   CharacterInitialVampireGateway,
 } from '../infrastructure/character-initial-vampire.api'
@@ -69,8 +74,32 @@ export function PersistedInitialVampireTransition({
   const [sire, setSire] =
     useState('')
 
+  const [
+    bloodPotency,
+    setBloodPotency,
+  ] = useState('')
+
+  const [
+    initialHunger,
+    setInitialHunger,
+  ] = useState('')
+
   const pending =
     transition.pendingDecisions
+
+  const bloodPotencyOptions =
+    useMemo(
+      () =>
+        initialVampireBloodPotencyOptions(
+          transition.identity.generation,
+        ),
+      [transition.identity.generation],
+    )
+
+  const bloodReady =
+    bloodPotencyOptions.length > 0 &&
+    bloodPotency !== '' &&
+    initialHunger !== ''
 
   const busy =
     busyDecision !== null
@@ -407,6 +436,161 @@ export function PersistedInitialVampireTransition({
               </button>
             </form>
           ) : null}
+
+          {pending.includes(
+            'bloodState',
+          ) ? (
+            <form
+              className={
+                'initial-vampire-transition__card'
+              }
+              onSubmit={(event) => {
+                event.preventDefault()
+
+                if (!bloodReady) {
+                  return
+                }
+
+                void resolve(
+                  'bloodState',
+                  () =>
+                    resolvedGateway
+                      .establishBlood(
+                        transition.characterId,
+                        transition.revision,
+                        Number(
+                          bloodPotency,
+                        ),
+                        Number(
+                          initialHunger,
+                        ),
+                      ),
+                )
+              }}
+            >
+              <h3>Estado de Sangre</h3>
+
+              <p>
+                Selecciona explícitamente
+                Potencia de Sangre y Hambre. Los
+                rangos proceden de las reglas
+                canónicas ya usadas por el
+                creador.
+              </p>
+
+              <div
+                className={
+                  'blood-generation-summary'
+                }
+              >
+                <strong>
+                  {
+                    transition.identity
+                      .generation === null
+                      ? 'Generación pendiente'
+                      : `${transition.identity.generation}.ª`
+                  }
+                </strong>
+
+                <span>
+                  Referencia para el rango de
+                  Potencia de Sangre
+                </span>
+              </div>
+
+              {bloodPotencyOptions.length >
+              0 ? (
+                <>
+                  <label>
+                    <span>
+                      Potencia de Sangre
+                    </span>
+
+                    <select
+                      value={bloodPotency}
+                      disabled={busy}
+                      onChange={(event) => {
+                        setBloodPotency(
+                          event.target.value,
+                        )
+                      }}
+                    >
+                      <option value="">
+                        Seleccionar…
+                      </option>
+
+                      {bloodPotencyOptions.map(
+                        (value) => (
+                          <option
+                            key={value}
+                            value={value}
+                          >
+                            {value}
+                          </option>
+                        ),
+                      )}
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>
+                      Hambre inicial
+                    </span>
+
+                    <select
+                      value={initialHunger}
+                      disabled={busy}
+                      onChange={(event) => {
+                        setInitialHunger(
+                          event.target.value,
+                        )
+                      }}
+                    >
+                      <option value="">
+                        Seleccionar…
+                      </option>
+
+                      {initialVampireHungerOptions.map(
+                        (value) => (
+                          <option
+                            key={value}
+                            value={value}
+                          >
+                            {value}
+                          </option>
+                        ),
+                      )}
+                    </select>
+                  </label>
+                </>
+              ) : (
+                <p>
+                  Las opciones se habilitarán
+                  cuando exista una Generación
+                  canónica con rango de Sangre
+                  definido.
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className={
+                  'initial-vampire-transition__submit'
+                }
+                disabled={
+                  busy ||
+                  !bloodReady
+                }
+              >
+                {
+                  busyDecision ===
+                    'bloodState'
+                    ? 'Guardando Sangre…'
+                    : 'Establecer Sangre'
+                }
+              </button>
+            </form>
+          ) : null}
         </div>
 
         {pending.some(
@@ -415,6 +599,7 @@ export function PersistedInitialVampireTransition({
               'clan',
               'generation',
               'sire',
+              'bloodState',
             ].includes(decision),
         ) ? (
           <p
