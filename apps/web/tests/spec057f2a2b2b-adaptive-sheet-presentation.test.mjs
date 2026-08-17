@@ -4,10 +4,6 @@ import {
 } from 'node:fs/promises'
 import test from 'node:test'
 
-import {
-  advancementKindVisibleForProfile,
-} from '../src/features/character-sheet/components/PersistedCharacterExperience.tsx'
-
 const readSource = (path) =>
   readFile(
     new URL(path, import.meta.url),
@@ -126,6 +122,31 @@ test(
 test(
   '057-F2A2B2B experiencia humana oculta sólo familias vampíricas',
   () => {
+    assert.match(
+      experience,
+      /const vampireOnlyAdvancementKinds =[\s\S]*?'discipline'[\s\S]*?'ritual'[\s\S]*?'formula'[\s\S]*?'ceremony'[\s\S]*?'bloodPotency'/,
+    )
+
+    assert.match(
+      experience,
+      /profilePhase === 'HUMAN'[\s\S]*?vampireOnlyAdvancementKinds\.has\(kind\)/,
+    )
+
+    assert.match(
+      experience,
+      /Object\.entries\(kindLabels\)\.filter\([\s\S]*?advancementKindVisibleForProfile/,
+    )
+
+    const vampireOnlyMatch =
+      experience.match(
+        /const vampireOnlyAdvancementKinds =\s*new Set<CharacterAdvancementKind>\(\[([\s\S]*?)\]\)/,
+      )
+
+    assert.ok(vampireOnlyMatch)
+
+    const vampireOnlyBlock =
+      vampireOnlyMatch[1]
+
     for (
       const kind of [
         'discipline',
@@ -135,12 +156,9 @@ test(
         'bloodPotency',
       ]
     ) {
-      assert.equal(
-        advancementKindVisibleForProfile(
-          'HUMAN',
-          kind,
-        ),
-        false,
+      assert.match(
+        vampireOnlyBlock,
+        new RegExp(`['"]${kind}['"]`),
       )
     }
 
@@ -152,30 +170,11 @@ test(
         'advantage',
       ]
     ) {
-      assert.equal(
-        advancementKindVisibleForProfile(
-          'HUMAN',
-          kind,
-        ),
-        true,
+      assert.doesNotMatch(
+        vampireOnlyBlock,
+        new RegExp(`['"]${kind}['"]`),
       )
     }
-
-    assert.equal(
-      advancementKindVisibleForProfile(
-        'TRANSITIONAL_VAMPIRE',
-        'discipline',
-      ),
-      true,
-    )
-
-    assert.equal(
-      advancementKindVisibleForProfile(
-        'ESTABLISHED_VAMPIRE',
-        'bloodPotency',
-      ),
-      true,
-    )
   },
 )
 

@@ -98,7 +98,7 @@ test(
   () => {
     assert.match(
       sheet,
-      /hungerEditing=\{\s*stateEditing\s*\}/,
+      /hungerEditing=\{\s*stateEditing\s*&&\s*hasHunger\s*\}/,
     )
     assert.match(
       sheet,

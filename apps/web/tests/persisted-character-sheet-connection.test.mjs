@@ -307,7 +307,7 @@ test(
     )
     assert.match(
       stateSource,
-      /bloodPotency =\s*demoState\.bloodPotency/,
+      /const resolvedBloodPotency =[\s\S]*?demo[\s\S]*?bloodPotency \?\?[\s\S]*?demoState\.bloodPotency[\s\S]*?: bloodPotency \?\? null/,
     )
     assert.match(
       bloodExperienceSource,

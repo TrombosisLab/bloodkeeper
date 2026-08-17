@@ -131,11 +131,37 @@ test('057-C1 parser exige coherencia nature/relaciones', () => {
     CharacterDraftApiError,
   )
 
+  const transitional =
+    parseCharacterDraftApiSnapshotResponse({
+      ...snapshot(),
+      nature: 'vampire',
+    })
+
+  assert.equal(
+    transitional.nature,
+    'vampire',
+  )
+  assert.equal(
+    transitional.creation.creationMode,
+    'sessionZero',
+  )
+  assert.equal(
+    transitional.blood,
+    null,
+  )
+
+  const standardSnapshot =
+    snapshot()
+
   assert.throws(
     () =>
       parseCharacterDraftApiSnapshotResponse({
-        ...snapshot(),
+        ...standardSnapshot,
         nature: 'vampire',
+        creation: {
+          ...standardSnapshot.creation,
+          creationMode: 'standard',
+        },
       }),
     CharacterDraftApiError,
   )

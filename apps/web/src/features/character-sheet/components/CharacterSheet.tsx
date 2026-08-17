@@ -48,6 +48,7 @@ import { CharacterSecondary } from './CharacterSecondary'
 import { PersistedCharacterSecondary } from './PersistedCharacterSecondary'
 import { PersistedCharacterLifecycle } from './PersistedCharacterLifecycle'
 import { PersistedCharacterValidation } from './PersistedCharacterValidation'
+import { PersistedCharacterEmbrace } from './PersistedCharacterEmbrace'
 
 interface CharacterSheetProps {
   characterId?: string
@@ -537,9 +538,20 @@ export function CharacterSheet({
 
       {characterId ? (
         <>
+          {model?.profilePhase === 'HUMAN' &&
+          model.status !== 'archived' &&
+          onStateReload !== undefined ? (
+            <PersistedCharacterEmbrace
+              characterId={characterId}
+              revision={model.revision}
+              onEmbraced={onStateReload}
+            />
+          ) : null}
+
           <PersistedCharacterValidation
             characterId={characterId}
           />
+
           <PersistedCharacterLifecycle
             characterId={characterId}
           />

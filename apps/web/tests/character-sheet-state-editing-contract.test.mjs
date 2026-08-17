@@ -81,7 +81,7 @@ test(
     )
     assert.match(
       characterSheet,
-      /hungerEditing=\{\s*stateEditing\s*\}/,
+      /hungerEditing=\{\s*stateEditing\s*&&\s*hasHunger\s*\}/,
     )
     assert.match(
       characterTrackers,

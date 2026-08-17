@@ -23,13 +23,38 @@ const secondaryStart = sheetStyles.indexOf(
 
 assert.notEqual(secondaryStart, -1)
 
+const embraceMarker =
+  '/* SPEC-057-F2A3A — acción explícita de Abrazo */'
+
+const secondaryEnd = sheetStyles.indexOf(
+  embraceMarker,
+  secondaryStart,
+)
+
+assert.notEqual(secondaryEnd, -1)
+
 const beforeSecondary = sheetStyles.slice(
   0,
   secondaryStart,
 )
-const secondaryBlock = sheetStyles.slice(
-  secondaryStart,
+const secondaryBlockWithSeparator =
+  sheetStyles.slice(
+    secondaryStart,
+    secondaryEnd,
+  )
+
+assert.equal(
+  secondaryBlockWithSeparator.endsWith(
+    '\n',
+  ),
+  true,
 )
+
+const secondaryBlock =
+  secondaryBlockWithSeparator.slice(
+    0,
+    -1,
+  )
 
 test('SPEC-010 limita la adopción de ficha al bloque 002-J Especialidades y Secciones Secundarias', () => {
   const prefixHash = createHash('sha256')
@@ -45,10 +70,12 @@ test('SPEC-010 limita la adopción de ficha al bloque 002-J Especialidades y Sec
   )
   assert.equal(
     blockHash,
-    'f486827812ad1ef9fa906890ffe68293b82550d004e7f44d6bfec081eeb376d2',
+    '5aac1dbeb2313481c1967a0b0006c43a00d03214a082e88e3c7db23e20634c2b',
   )
   assert.equal(
-    sheetStyles.endsWith(secondaryBlock),
+    sheetStyles
+      .slice(secondaryEnd)
+      .startsWith(embraceMarker),
     true,
   )
 })
