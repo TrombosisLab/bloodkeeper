@@ -51,6 +51,7 @@ import type {
 } from '../types/character-disciplines.types.ts'
 
 import type {
+  CharacterProfilePhase,
   CharacterSheetModel,
 } from '../types/character-sheet-model.types.ts'
 
@@ -293,20 +294,9 @@ function advantageSelections(
   )
 }
 
-function requireVampireBlood(
-  snapshot: CharacterDraftApiSnapshot,
-): NonNullable<CharacterDraftApiSnapshot['blood']> {
-  if (snapshot.blood === null) {
-    throw new Error(
-      'CHARACTER_SHEET_VAMPIRE_BLOOD_REQUIRED',
-    )
-  }
-
-  return snapshot.blood
-}
-
 export function adaptPersistedCharacterToSheetModel(
   snapshot: CharacterDraftApiSnapshot,
+  profilePhase: CharacterProfilePhase,
 ): CharacterSheetModel {
   const derived =
     deriveCharacterTraits(
@@ -336,6 +326,9 @@ export function adaptPersistedCharacterToSheetModel(
       snapshot.status,
     chronicleId:
       snapshot.chronicleId,
+    nature:
+      snapshot.nature,
+    profilePhase,
 
     identity: {
       name:
@@ -390,10 +383,9 @@ export function adaptPersistedCharacterToSheetModel(
           snapshot.humanity.stains,
       },
       hunger:
-        requireVampireBlood(snapshot).hunger,
+        snapshot.blood?.hunger ?? null,
       bloodPotency:
-        requireVampireBlood(snapshot)
-          .bloodPotency,
+        snapshot.blood?.bloodPotency ?? null,
     },
 
     damage: {

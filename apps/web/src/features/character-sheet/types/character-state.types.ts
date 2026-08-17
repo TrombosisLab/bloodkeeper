@@ -4,6 +4,6 @@ import type {
 
 export interface CharacterState {
   humanity: CharacterHumanityState
-  hunger: number
-  bloodPotency: number
+  hunger: number | null
+  bloodPotency: number | null
 }

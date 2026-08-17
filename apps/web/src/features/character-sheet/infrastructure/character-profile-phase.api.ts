@@ -1,7 +1,10 @@
-export type CharacterProfilePhase =
-  | 'HUMAN'
-  | 'TRANSITIONAL_VAMPIRE'
-  | 'ESTABLISHED_VAMPIRE'
+import type {
+  CharacterProfilePhase,
+} from '../types/character-sheet-model.types.ts'
+
+export type {
+  CharacterProfilePhase,
+} from '../types/character-sheet-model.types.ts'
 
 export interface CharacterProfilePhaseSnapshot {
   readonly phase: CharacterProfilePhase

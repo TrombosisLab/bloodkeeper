@@ -86,7 +86,10 @@ export function parseCharacterStateResponse(
     !['draft', 'active', 'archived'].includes(
       value.status as string,
     ) ||
-    !isInteger(value.hunger) ||
+    (
+      value.hunger !== null &&
+      !isInteger(value.hunger)
+    ) ||
     !isRecord(value.damage) ||
     !isRecord(value.humanity)
   ) {
@@ -113,9 +116,12 @@ export function parseCharacterStateResponse(
   if (
     validateCharacterHumanityState(humanity)
       .length > 0 ||
-    !validateCharacterHunger(
-      value.hunger,
-    ).valid
+    (
+      value.hunger !== null &&
+      !validateCharacterHunger(
+        value.hunger,
+      ).valid
+    )
   ) {
     return invalidResponse()
   }
@@ -135,7 +141,8 @@ export function parseCharacterStateResponse(
     revision: value.revision,
     status:
       value.status as CharacterOperationalStateSnapshot['status'],
-    hunger: value.hunger,
+    hunger:
+      value.hunger as number | null,
     damage: {
       health: {
         superficial:

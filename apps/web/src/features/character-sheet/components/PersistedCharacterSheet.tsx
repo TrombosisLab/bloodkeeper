@@ -18,6 +18,14 @@ import {
   stateForCharacterSheetLoadError,
 } from '../domain/persisted-character-sheet.loader'
 
+import {
+  createCharacterProfilePhaseGateway,
+} from '../infrastructure/character-profile-phase.api'
+
+import type {
+  CharacterProfilePhaseGateway,
+} from '../infrastructure/character-profile-phase.api'
+
 import type {
   CharacterSheetLoadFailureState,
 } from '../domain/persisted-character-sheet.loader'
@@ -35,6 +43,7 @@ import { CharacterSheet } from './CharacterSheet'
 interface PersistedCharacterSheetProps {
   characterId: string
   gateway?: CharacterDraftGateway
+  profilePhaseGateway?: CharacterProfilePhaseGateway
 }
 
 type LoadState =
@@ -79,6 +88,7 @@ function withOperationalState(
 export function PersistedCharacterSheet({
   characterId,
   gateway,
+  profilePhaseGateway,
 }: PersistedCharacterSheetProps) {
   const resolvedGateway =
     useMemo(
@@ -86,6 +96,14 @@ export function PersistedCharacterSheet({
         gateway ??
         createCharacterDraftGateway(),
       [gateway],
+    )
+
+  const resolvedProfilePhaseGateway =
+    useMemo(
+      () =>
+        profilePhaseGateway ??
+        createCharacterProfilePhaseGateway(),
+      [profilePhaseGateway],
     )
 
   const [reloadVersion, setReloadVersion] =
@@ -105,6 +123,7 @@ export function PersistedCharacterSheet({
 
     void loadPersistedCharacterSheet(
       resolvedGateway,
+      resolvedProfilePhaseGateway,
       characterId,
     )
       .then((model) => {
@@ -133,6 +152,7 @@ export function PersistedCharacterSheet({
     characterId,
     reloadVersion,
     resolvedGateway,
+    resolvedProfilePhaseGateway,
   ])
 
   const viewState =

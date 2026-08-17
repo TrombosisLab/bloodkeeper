@@ -176,9 +176,24 @@ test(
       },
     }
 
+    const profilePhaseGateway = {
+      async load(receivedCharacterId) {
+        assert.equal(
+          receivedCharacterId,
+          source.characterId,
+        )
+
+        return {
+          phase:
+            'ESTABLISHED_VAMPIRE',
+        }
+      },
+    }
+
     const model =
       await loadPersistedCharacterSheet(
         gateway,
+        profilePhaseGateway,
         source.characterId,
       )
 

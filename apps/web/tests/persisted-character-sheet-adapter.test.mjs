@@ -204,6 +204,7 @@ test(
     const model =
       adaptPersistedCharacterToSheetModel(
         snapshot(),
+        'ESTABLISHED_VAMPIRE',
       )
 
     assert.equal(
@@ -243,6 +244,7 @@ test(
     const model =
       adaptPersistedCharacterToSheetModel(
         snapshot(),
+        'ESTABLISHED_VAMPIRE',
       )
 
     assert.deepEqual(
@@ -320,6 +322,7 @@ test(
     const model =
       adaptPersistedCharacterToSheetModel(
         snapshot(),
+        'ESTABLISHED_VAMPIRE',
       )
 
     assert.equal(
@@ -356,6 +359,7 @@ test(
     const model =
       adaptPersistedCharacterToSheetModel(
         snapshot(),
+        'ESTABLISHED_VAMPIRE',
       )
 
     assert.equal(
@@ -434,6 +438,7 @@ test(
     const model =
       adaptPersistedCharacterToSheetModel(
         source,
+        'ESTABLISHED_VAMPIRE',
       )
 
     model.identity.name = 'Mutada'

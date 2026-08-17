@@ -19,7 +19,7 @@ export interface CharacterOperationalStateSnapshot {
   characterId: string
   revision: number
   status: CharacterSheetLifecycleStatus
-  hunger: number
+  hunger: number | null
   damage: CharacterOperationalDamageState
   humanity: CharacterHumanityState
 }

@@ -6,6 +6,14 @@ import type {
   CharacterDraftGateway,
 } from '../../character-creation/infrastructure/character-draft.api.ts'
 
+import {
+  CharacterProfilePhaseApiError,
+} from '../infrastructure/character-profile-phase.api.ts'
+
+import type {
+  CharacterProfilePhaseGateway,
+} from '../infrastructure/character-profile-phase.api.ts'
+
 import type {
   CharacterSheetModel,
 } from '../types/character-sheet-model.types.ts'
@@ -21,10 +29,20 @@ export type CharacterSheetLoadFailureState =
 
 export async function loadPersistedCharacterSheet(
   gateway: CharacterDraftGateway,
+  profilePhaseGateway: CharacterProfilePhaseGateway,
   characterId: string,
 ): Promise<CharacterSheetModel> {
+  const [
+    snapshot,
+    profilePhase,
+  ] = await Promise.all([
+    gateway.load(characterId),
+    profilePhaseGateway.load(characterId),
+  ])
+
   return adaptPersistedCharacterToSheetModel(
-    await gateway.load(characterId),
+    snapshot,
+    profilePhase.phase,
   )
 }
 
@@ -32,7 +50,8 @@ export function stateForCharacterSheetLoadError(
   error: unknown,
 ): CharacterSheetLoadFailureState {
   if (
-    error instanceof CharacterDraftApiError
+    error instanceof CharacterDraftApiError ||
+    error instanceof CharacterProfilePhaseApiError
   ) {
     if (error.status === 401) {
       return 'unauthorized'

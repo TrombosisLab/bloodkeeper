@@ -30,6 +30,15 @@ import type {
   CharacterDamageTrack,
 } from '../domain/damage-track-rules.ts'
 
+export type CharacterNature =
+  | 'human'
+  | 'vampire'
+
+export type CharacterProfilePhase =
+  | 'HUMAN'
+  | 'TRANSITIONAL_VAMPIRE'
+  | 'ESTABLISHED_VAMPIRE'
+
 export type CharacterSheetLifecycleStatus =
   | 'draft'
   | 'active'
@@ -61,6 +70,8 @@ export interface CharacterSheetModel {
   revision: number
   status: CharacterSheetLifecycleStatus
   chronicleId: string | null
+  nature: CharacterNature
+  profilePhase: CharacterProfilePhase
 
   identity: CharacterIdentity
   attributes: CharacterAttributeCategory[]
