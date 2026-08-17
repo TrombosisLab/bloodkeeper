@@ -70,20 +70,20 @@ export class CharacterProfilePhaseController {
       )
 
     try {
-      const phase =
-        await this.loadProfilePhase.execute(
+      const snapshot =
+        await this.loadProfilePhase.read(
           ownerId,
           characterId,
         )
 
-      if (phase === null) {
+      if (snapshot === null) {
         throw new NotFoundException({
           code: 'CHARACTER_NOT_FOUND',
         })
       }
 
       return toCharacterProfilePhaseResponse(
-        phase,
+        snapshot,
       )
     } catch (error: unknown) {
       if (

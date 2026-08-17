@@ -180,3 +180,131 @@ test(
     )
   },
 )
+
+test(
+  '057-F2A3B2B2A read expone pendientes canónicos sólo durante transición',
+  async () => {
+    const transitionalCharacter = {
+      characterId:
+        '11111111-1111-4111-8111-111111111111',
+      ownerId:
+        '22222222-2222-4222-8222-222222222222',
+      chronicleId: null,
+      status: 'active',
+      nature: 'vampire',
+      revision: 4,
+      createdAt:
+        new Date('2026-08-17T10:00:00.000Z'),
+      updatedAt:
+        new Date('2026-08-17T11:00:00.000Z'),
+      identity: {
+        name: 'Alicia',
+        concept: null,
+        predatorTypeKey: null,
+        ambition: null,
+        clanKey: null,
+        sire: null,
+        desire: null,
+        generation: null,
+        ageCategory: null,
+      },
+      creation: {
+        schemaVersion: 1,
+        currentStep: 'review',
+        creationMode: 'sessionZero',
+        skillDistributionMethod: 'balanced',
+        predatorTypeChoices: {},
+        updatedAt:
+          new Date('2026-08-17T11:00:00.000Z'),
+      },
+      attributes: {},
+      blood: null,
+      damage: {
+        health: {
+          superficial: 0,
+          aggravated: 0,
+        },
+        willpower: {
+          superficial: 0,
+          aggravated: 0,
+        },
+      },
+      skills: {},
+      skillSpecialties: [],
+      disciplines: [],
+      bloodSorceryRituals: {
+        ritualKeys: [],
+      },
+      oblivionCeremonies: {
+        ceremonyKeys: [],
+      },
+      thinBloodAlchemy: null,
+      thinBloodTraits: [],
+      advantages: {
+        selections: [],
+      },
+      humanity: {
+        value: 7,
+        stains: 0,
+        convictions: [],
+        touchstones: [],
+      },
+    }
+
+    const useCase =
+      new LoadCharacterProfilePhaseUseCase(
+        {
+          async findById(
+            receivedOwnerId,
+            receivedCharacterId,
+          ) {
+            assert.equal(
+              receivedOwnerId,
+              transitionalCharacter.ownerId,
+            )
+            assert.equal(
+              receivedCharacterId,
+              transitionalCharacter.characterId,
+            )
+
+            return transitionalCharacter
+          },
+        },
+        {
+          validate() {
+            return {
+              valid: false,
+              canProceed: true,
+              sections: [],
+              issues: [],
+            }
+          },
+        },
+      )
+
+    const result =
+      await useCase.read(
+        transitionalCharacter.ownerId,
+        transitionalCharacter.characterId,
+      )
+
+    assert.equal(
+      result?.phase,
+      'TRANSITIONAL_VAMPIRE',
+    )
+
+    assert.deepEqual(
+      result?.pendingDecisions,
+      [
+        'clan',
+        'generation',
+        'sire',
+        'bloodState',
+        'predatorType',
+        'initialDisciplines',
+        'initialPowers',
+        'advantagesReview',
+      ],
+    )
+  },
+)

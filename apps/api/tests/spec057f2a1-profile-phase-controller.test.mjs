@@ -27,7 +27,7 @@ test(
   async () => {
     const controller =
       new CharacterProfilePhaseController({
-        async execute(
+        async read(
           receivedOwnerId,
           receivedCharacterId,
         ) {
@@ -39,7 +39,15 @@ test(
             receivedCharacterId,
             characterId,
           )
-          return 'TRANSITIONAL_VAMPIRE'
+          return {
+            phase:
+              'TRANSITIONAL_VAMPIRE',
+            pendingDecisions: [
+              'clan',
+              'generation',
+              'sire',
+            ],
+          }
         },
       })
 
@@ -51,6 +59,11 @@ test(
       {
         phase:
           'TRANSITIONAL_VAMPIRE',
+        pendingDecisions: [
+          'clan',
+          'generation',
+          'sire',
+        ],
       },
     )
   },
@@ -61,7 +74,7 @@ test(
   async () => {
     const controller =
       new CharacterProfilePhaseController({
-        async execute() {
+        async read() {
           return null
         },
       })
@@ -82,7 +95,7 @@ test(
   async () => {
     const controller =
       new CharacterProfilePhaseController({
-        async execute() {
+        async read() {
           throw new CharacterProfilePhaseUnavailableError(
             characterId,
           )
@@ -105,7 +118,7 @@ test(
   async () => {
     const controller =
       new CharacterProfilePhaseController({
-        async execute() {
+        async read() {
           throw new Error('unexpected')
         },
       })
