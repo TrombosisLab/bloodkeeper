@@ -1,9 +1,12 @@
 import type {
   CharacterLifecycleStatus,
+  CharacterNature,
+  PersistedCharacterBlood,
 } from './persisted-character.types'
 
 export type CharacterStateUpdateViolation =
-  'CHARACTER_STATE_NOT_EDITABLE'
+  | 'CHARACTER_STATE_NOT_EDITABLE'
+  | 'CHARACTER_HUNGER_NOT_AVAILABLE'
 
 export class InvalidCharacterStateUpdateError
   extends Error {
@@ -26,6 +29,20 @@ export function assertCharacterStateEditable(
   if (status === 'archived') {
     throw new InvalidCharacterStateUpdateError([
       'CHARACTER_STATE_NOT_EDITABLE',
+    ])
+  }
+}
+
+export function assertCharacterHungerAvailable(
+  nature: CharacterNature | undefined,
+  blood: PersistedCharacterBlood | null,
+): void {
+  if (
+    nature === 'human' ||
+    blood === null
+  ) {
+    throw new InvalidCharacterStateUpdateError([
+      'CHARACTER_HUNGER_NOT_AVAILABLE',
     ])
   }
 }

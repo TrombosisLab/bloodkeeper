@@ -19,6 +19,7 @@ import {
 } from '../domain/character-hunger.rules'
 
 import {
+  assertCharacterHungerAvailable,
   assertCharacterStateEditable,
 } from '../domain/character-state.rules'
 
@@ -80,6 +81,11 @@ export class UpdateCharacterStateUseCase {
     }
 
     if (data.hunger !== undefined) {
+      assertCharacterHungerAvailable(
+        current.nature,
+        current.blood,
+      )
+
       assertValidCharacterHunger(
         data.hunger,
       )
