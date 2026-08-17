@@ -36,6 +36,11 @@ import {
   allowsSessionZeroPendingVampireState,
 } from './character-transition.rules'
 
+import {
+  validateThinBloodAlchemyEligibility,
+  validateThinBloodTraitState,
+} from './character-thin-blood.rules'
+
 import type {
   CharacterValidationContributor,
 } from './character-validator'
@@ -260,7 +265,21 @@ function validateThinBloodOwnership(
   character: PersistedCharacterDraft,
 ): CharacterValidationIssue[] {
   if (character.identity.clanKey === 'thinBlood') {
-    return []
+    const predatorTypeKey =
+      selectedPredatorTypeKey(character)
+
+    if (predatorTypeKey === null) {
+      return []
+    }
+
+    return [
+      errorIssue(
+        'CHARACTER_PREDATOR_TYPE_THIN_BLOOD_FORBIDDEN',
+        'identity.predatorTypeKey',
+        'Los Sangre Débil no pueden tener Tipo de Depredador.',
+        { predatorTypeKey },
+      ),
+    ]
   }
 
   const issues: CharacterValidationIssue[] = []
@@ -299,124 +318,48 @@ function validateThinBloodOwnership(
 
 function validateThinBloodTraitDetails(
   character: PersistedCharacterDraft,
+  catalog: CharacterRulesCatalog,
+  context: CharacterValidationContext,
 ): CharacterValidationIssue[] {
-  if (character.identity.clanKey !== 'thinBlood') {
+  if (
+    character.identity.clanKey !==
+      'thinBlood'
+  ) {
     return []
   }
 
-  const issues: CharacterValidationIssue[] = []
-  const traits = character.thinBloodTraits
-  const selectedKeys = new Set(
-    traits.map((trait) => trait.definitionKey),
-  )
+  const ruleIssues = [
+    ...validateThinBloodTraitState(
+      character.thinBloodTraits,
+      catalog,
+    ),
+    ...validateThinBloodAlchemyEligibility(
+      character.thinBloodTraits,
+      character.thinBloodAlchemy,
+    ),
+  ]
 
-  for (const definitionKey of duplicateTraitKeys(traits)) {
-    issues.push(
-      errorIssue(
-        'CHARACTER_THIN_BLOOD_TRAIT_DUPLICATE',
+  return ruleIssues.map(
+    (ruleIssue) =>
+      issue(
+        ruleIssue.code,
+        ruleIssue.completion === true
+          ? (
+              allowsSessionZeroPendingVampireState(
+                character,
+                context,
+              )
+                ? 'warning'
+                : completionSeverity(
+                    context,
+                  )
+            )
+          : 'error',
         'thinBloodTraits',
-        'Un Merito o Defecto de Sangre Debil no puede repetirse.',
-        { definitionKey },
+        ruleIssue.message,
+        ruleIssue.details,
       ),
-    )
-  }
-
-  for (const trait of traits) {
-    const clanCurse = trait.clanCurseDetails
-    const affinity = trait.disciplineAffinityDetails
-
-    if (trait.definitionKey === 'clan-curse') {
-      if (
-        clanCurse === null ||
-        clanCurse.clanKey.trim().length === 0
-      ) {
-        issues.push(
-          errorIssue(
-            'CHARACTER_THIN_BLOOD_CLAN_CURSE_REQUIRED',
-            'thinBloodTraits',
-            'Maldicion de Clan necesita seleccionar un clan.',
-          ),
-        )
-      }
-
-      if (affinity !== null) {
-        issues.push(
-          errorIssue(
-            'CHARACTER_THIN_BLOOD_TRAIT_DETAILS_CONFLICT',
-            'thinBloodTraits',
-            'Maldicion de Clan no puede contener una Disciplina Afin.',
-          ),
-        )
-      }
-
-      if (
-        clanCurse?.clanKey === 'brujah' ||
-        clanCurse?.clanKey === 'gangrel'
-      ) {
-        if (!selectedKeys.has('bestial-temper')) {
-          issues.push(
-            errorIssue(
-              'CHARACTER_THIN_BLOOD_BESTIAL_TEMPER_REQUIRED',
-              'thinBloodTraits',
-              'Esta Maldicion de Clan requiere Temperamento Bestial.',
-            ),
-          )
-        }
-      }
-
-      if (
-        clanCurse?.clanKey === 'tremere' &&
-        !selectedKeys.has('bonding-blood')
-      ) {
-        issues.push(
-          errorIssue(
-            'CHARACTER_THIN_BLOOD_BONDING_BLOOD_REQUIRED',
-            'thinBloodTraits',
-            'La Maldicion Tremere requiere Sangre Vinculante.',
-          ),
-        )
-      }
-
-      continue
-    }
-
-    if (clanCurse !== null) {
-      issues.push(
-        errorIssue(
-          'CHARACTER_THIN_BLOOD_CLAN_CURSE_DETAILS_NOT_ALLOWED',
-          'thinBloodTraits',
-          'Solo Maldicion de Clan puede contener esos detalles.',
-          { definitionKey: trait.definitionKey },
-        ),
-      )
-    }
-
-    if (trait.definitionKey === 'discipline-affinity') {
-      if (
-        affinity === null ||
-        affinity.powerKey.trim().length === 0
-      ) {
-        issues.push(
-          errorIssue(
-            'CHARACTER_THIN_BLOOD_DISCIPLINE_AFFINITY_REQUIRED',
-            'thinBloodTraits',
-            'Disciplina Afin necesita una Disciplina y un Poder.',
-          ),
-        )
-      }
-    } else if (affinity !== null) {
-      issues.push(
-        errorIssue(
-          'CHARACTER_THIN_BLOOD_DISCIPLINE_AFFINITY_DETAILS_NOT_ALLOWED',
-          'thinBloodTraits',
-          'Solo Disciplina Afin puede contener esos detalles.',
-          { definitionKey: trait.definitionKey },
-        ),
-      )
-    }
-  }
-
-  return issues
+  )
 }
 
 function allowedAdvantageRatings(
@@ -1792,7 +1735,11 @@ function validatePersistedDependencies(
   const structuralIssues = [
     ...validateOrigins(character),
     ...validateThinBloodOwnership(character),
-    ...validateThinBloodTraitDetails(character),
+    ...validateThinBloodTraitDetails(
+      character,
+      catalog,
+      context,
+    ),
   ]
 
   if (structuralIssues.length > 0) {

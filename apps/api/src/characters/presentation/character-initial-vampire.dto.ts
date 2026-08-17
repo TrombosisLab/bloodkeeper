@@ -4,6 +4,7 @@ import type {
   ManifestInitialDisciplineCommand,
   ManifestInitialPowerCommand,
   ReviewInitialAdvantagesCommand,
+  ResolveInitialThinBloodStateCommand,
   ResolveInitialClanCommand,
   ResolveInitialGenerationCommand,
 } from '../application/resolve-initial-vampire-state.use-case'
@@ -332,6 +333,83 @@ export function parseManifestInitialPowerRequest(
         parsed.body.powerKey,
         'body.powerKey',
       ),
+  }
+}
+
+
+export function parseResolveInitialThinBloodStateRequest(
+  characterIdInput: unknown,
+  bodyInput: unknown,
+): ResolveInitialThinBloodStateCommand {
+  const parsed = base(
+    characterIdInput,
+    bodyInput,
+    [
+      'expectedRevision',
+      'thinBloodTraits',
+      'thinBloodAlchemy',
+    ],
+  )
+
+  for (
+    const key of [
+      'thinBloodTraits',
+      'thinBloodAlchemy',
+    ] as const
+  ) {
+    if (!Object.hasOwn(parsed.body, key)) {
+      throw new InvalidInitialVampireResolutionRequestError(
+        `body.${key} is required`,
+      )
+    }
+  }
+
+  try {
+    const update =
+      parseUpdateCharacterDraftRequest(
+        characterIdInput,
+        bodyInput,
+      )
+
+    if (
+      update.thinBloodTraits ===
+        undefined ||
+      update.thinBloodAlchemy ===
+        undefined
+    ) {
+      throw new InvalidInitialVampireResolutionRequestError(
+        'Thin-Blood request is incomplete',
+      )
+    }
+
+    return {
+      characterId:
+        update.characterId,
+      expectedRevision:
+        parsed.expectedRevision,
+      thinBloodTraits:
+        update.thinBloodTraits,
+      thinBloodAlchemy:
+        update.thinBloodAlchemy,
+    }
+  } catch (error: unknown) {
+    if (
+      error instanceof
+        InvalidInitialVampireResolutionRequestError
+    ) {
+      throw error
+    }
+
+    if (
+      error instanceof
+        InvalidCharacterDraftRequestError
+    ) {
+      throw new InvalidInitialVampireResolutionRequestError(
+        error.message,
+      )
+    }
+
+    throw error
   }
 }
 

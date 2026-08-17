@@ -15,6 +15,7 @@ export const CHARACTER_EMBRACE_PENDING_DECISIONS = [
   'generation',
   'sire',
   'bloodState',
+  'thinBloodState',
   'predatorType',
   'initialDisciplines',
   'initialPowers',
@@ -59,6 +60,19 @@ export function deriveCharacterEmbracePendingDecisions(
   }
 
   if (
+    character.identity.clanKey ===
+      'thinBlood' &&
+    (
+      character.thinBloodTraits.length === 0 ||
+      character.thinBloodAlchemy === null
+    )
+  ) {
+    pending.push('thinBloodState')
+  }
+
+  if (
+    character.identity.clanKey !==
+      'thinBlood' &&
     character.identity.predatorTypeKey === null
   ) {
     pending.push('predatorType')

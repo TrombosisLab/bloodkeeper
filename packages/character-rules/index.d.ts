@@ -517,9 +517,29 @@ export interface CharacterRulesPredatorTypeDefinition {
   readonly tags?: readonly string[]
 }
 
+export type CharacterRulesThinBloodTraitCategory =
+  | 'merit'
+  | 'flaw'
+
+export type CharacterRulesThinBloodTraitSource =
+  | 'core'
+
+export interface CharacterRulesThinBloodTraitDefinition {
+  readonly key: string
+  readonly name: string
+  readonly category:
+    CharacterRulesThinBloodTraitCategory
+  readonly source:
+    CharacterRulesThinBloodTraitSource
+  readonly incompatibleWithKeys?:
+    readonly string[]
+}
+
 export interface CharacterRulesDependencyCatalog {
   readonly predatorTypes:
     readonly CharacterRulesPredatorTypeDefinition[]
+  readonly thinBloodTraits:
+    readonly CharacterRulesThinBloodTraitDefinition[]
 }
 
 export const characterRulesCatalogManifest:

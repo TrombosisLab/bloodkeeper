@@ -1910,6 +1910,52 @@ export class PrismaCharacterDraftRepository
             )
           }
         }
+        if (
+          data.kind === 'thinBloodState'
+        ) {
+          const [
+            traitCount,
+            alchemyState,
+            thinBloodDisciplineCount,
+          ] = await Promise.all([
+            transaction.characterThinBloodTrait.count({
+              where: {
+                characterId:
+                  data.characterId,
+              },
+            }),
+            transaction.characterThinBloodAlchemyState.findUnique({
+              where: {
+                characterId:
+                  data.characterId,
+              },
+              select: {
+                characterId: true,
+              },
+            }),
+            transaction.characterDiscipline.count({
+              where: {
+                characterId:
+                  data.characterId,
+                origin:
+                  PrismaDisciplineOrigin.THIN_BLOOD,
+              },
+            }),
+          ])
+
+          if (
+            current.identity.clanKey !==
+              'thinBlood' ||
+            traitCount > 0 ||
+            alchemyState !== null ||
+            thinBloodDisciplineCount > 0
+          ) {
+            throw new CharacterInitialVampireResolutionWriteConflictError(
+              data.characterId,
+            )
+          }
+        }
+
 
         const claimed =
           await transaction.character.updateMany({
@@ -1968,6 +2014,99 @@ export class PrismaCharacterDraftRepository
               hunger: data.blood.hunger,
             },
           })
+        } else if (
+          data.kind === 'thinBloodState'
+        ) {
+          if (
+            data.thinBloodTraits.length > 0
+          ) {
+            await transaction.characterThinBloodTrait.createMany({
+              data:
+                data.thinBloodTraits.map(
+                  (trait) => ({
+                    characterId:
+                      data.characterId,
+                    definitionKey:
+                      trait.definitionKey,
+                    clanCurseClanKey:
+                      trait.clanCurseDetails
+                        ?.clanKey ?? null,
+                    disciplineAffinityDisciplineKey:
+                      trait
+                        .disciplineAffinityDetails
+                        ?.disciplineKey ??
+                      null,
+                    disciplineAffinityPowerKey:
+                      trait
+                        .disciplineAffinityDetails
+                        ?.powerKey ?? null,
+                  }),
+                ),
+            })
+          }
+
+          await transaction.characterThinBloodAlchemyState.create({
+            data: {
+              characterId:
+                data.characterId,
+              rating:
+                data.thinBloodAlchemy
+                  .rating,
+              method:
+                data.thinBloodAlchemy
+                  .method === null
+                  ? null
+                  : alchemyMethodToPrisma[
+                      data.thinBloodAlchemy
+                        .method
+                    ],
+            },
+          })
+
+          if (
+            data.thinBloodAlchemy
+              .formulaKeys.length > 0
+          ) {
+            await transaction.characterThinBloodAlchemyFormula.createMany({
+              data:
+                data.thinBloodAlchemy
+                  .formulaKeys.map(
+                    (formulaKey) => ({
+                      characterId:
+                        data.characterId,
+                      formulaKey,
+                    }),
+                  ),
+            })
+          }
+
+          if (
+            data.discipline !== null
+          ) {
+            await transaction.characterDiscipline.create({
+              data: {
+                characterId:
+                  data.characterId,
+                disciplineKey:
+                  data.discipline
+                    .disciplineKey,
+                contributionKey:
+                  disciplineContributionKey(
+                    'thinBlood',
+                  ),
+                rating: 1,
+                origin:
+                  PrismaDisciplineOrigin.THIN_BLOOD,
+                powers: {
+                  create: {
+                    powerKey:
+                      data.discipline
+                        .powerKey,
+                  },
+                },
+              },
+            })
+          }
         } else if (
           data.kind === 'discipline'
         ) {

@@ -57,6 +57,14 @@ import type {
   InitialPredatorAdoptionPlan,
 } from '../domain/character-initial-predator.rules'
 
+import {
+  analyzeInitialThinBloodResolution,
+} from '../domain/character-initial-thin-blood.rules'
+
+import type {
+  CharacterThinBloodRuleIssue,
+} from '../domain/character-thin-blood.rules'
+
 import type {
   InitialDisciplineViolation,
 } from '../domain/character-initial-discipline.rules'
@@ -67,6 +75,8 @@ import type {
 
 import type {
   PersistedCharacterAdvantages,
+  PersistedCharacterThinBloodAlchemy,
+  PersistedCharacterThinBloodTrait,
 } from '../domain/persisted-character.types'
 
 export interface ResolveInitialClanCommand {
@@ -107,6 +117,15 @@ export interface ReviewInitialAdvantagesCommand {
   readonly expectedRevision: number
   readonly advantages:
     PersistedCharacterAdvantages
+}
+
+export interface ResolveInitialThinBloodStateCommand {
+  readonly characterId: string
+  readonly expectedRevision: number
+  readonly thinBloodTraits:
+    readonly PersistedCharacterThinBloodTrait[]
+  readonly thinBloodAlchemy:
+    PersistedCharacterThinBloodAlchemy
 }
 
 export interface AdoptInitialPredatorTypeCommand {
@@ -209,6 +228,20 @@ export type InitialVampireSelectionViolation =
   | 'HUNGER_VALUE_INVALID'
   | 'EXISTING_BLOOD_INCOMPATIBLE_WITH_CLAN'
   | 'EXISTING_BLOOD_INCOMPATIBLE_WITH_GENERATION'
+
+export class InitialVampireThinBloodInvalidError
+  extends Error {
+  constructor(
+    readonly issues:
+      readonly CharacterThinBloodRuleIssue[],
+  ) {
+    super(
+      'Initial Thin-Blood resolution violates current V5 rules',
+    )
+    this.name =
+      'InitialVampireThinBloodInvalidError'
+  }
+}
 
 export class InitialVampirePredatorInvalidError
   extends Error {
@@ -878,5 +911,76 @@ export class ResolveInitialVampireStateUseCase {
       plan,
     )
   }
+
+  async resolveThinBloodState(
+    actorUserId: string,
+    command:
+      ResolveInitialThinBloodStateCommand,
+  ): Promise<InitialVampireResolutionResult> {
+    const current = await this.load(
+      actorUserId,
+      command.characterId,
+      command.expectedRevision,
+    )
+
+    if (
+      current.thinBloodTraits.length > 0 ||
+      current.thinBloodAlchemy !== null
+    ) {
+      throw new InitialVampireDecisionAlreadyResolvedError(
+        'thinBloodState',
+      )
+    }
+
+    const analysis =
+      analyzeInitialThinBloodResolution(
+        current,
+        command.thinBloodTraits,
+        command.thinBloodAlchemy,
+        this.catalog,
+      )
+
+    if (
+      analysis.plan === null ||
+      analysis.issues.length > 0
+    ) {
+      throw new InitialVampireThinBloodInvalidError(
+        analysis.issues,
+      )
+    }
+
+    const plan = analysis.plan
+
+    const character =
+      await this.characters.resolveInitialVampireState({
+        kind: 'thinBloodState',
+        characterId:
+          command.characterId,
+        expectedRevision:
+          command.expectedRevision,
+        thinBloodTraits:
+          plan.thinBloodTraits,
+        thinBloodAlchemy:
+          plan.thinBloodAlchemy,
+        discipline:
+          plan.discipline === null
+            ? null
+            : {
+                disciplineKey:
+                  plan.discipline
+                    .disciplineKey,
+                rating: 1,
+                powerKey:
+                  plan.discipline
+                    .powerKeys[0],
+              },
+      })
+
+    return this.finish(
+      current,
+      character,
+    )
+  }
+
 
 }

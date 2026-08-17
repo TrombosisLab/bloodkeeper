@@ -1,9 +1,12 @@
 import type {
+  CharacterDisciplineKey,
   CharacterSkillKey,
   PersistedCharacterAdvantages,
   PersistedCharacterBlood,
   PersistedCharacterDraft,
   PersistedCharacterSkillSpecialty,
+  PersistedCharacterThinBloodAlchemy,
+  PersistedCharacterThinBloodTrait,
 } from './persisted-character.types'
 
 import type {
@@ -14,6 +17,7 @@ export type InitialVampireResolutionKind =
   | 'clan'
   | 'generation'
   | 'bloodState'
+  | 'thinBloodState'
   | 'discipline'
   | 'power'
   | 'advantagesReview'
@@ -37,6 +41,21 @@ export type PersistInitialVampireResolutionData =
       readonly characterId: string
       readonly expectedRevision: number
       readonly blood: PersistedCharacterBlood
+    }
+  | {
+      readonly kind: 'thinBloodState'
+      readonly characterId: string
+      readonly expectedRevision: number
+      readonly thinBloodTraits:
+        readonly PersistedCharacterThinBloodTrait[]
+      readonly thinBloodAlchemy:
+        PersistedCharacterThinBloodAlchemy
+      readonly discipline: {
+        readonly disciplineKey:
+          CharacterDisciplineKey
+        readonly rating: 1
+        readonly powerKey: string
+      } | null
     }
   | {
       readonly kind: 'discipline'

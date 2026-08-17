@@ -10,6 +10,7 @@ const clanDisciplineAffinities = require('./catalogs/clan-discipline-affinities.
 const advantageDefinitions = require('./catalogs/advantages.json')
 const loresheets = require('./catalogs/loresheets.json')
 const predatorTypes = require('./catalogs/predator-types.json')
+const thinBloodTraits = require('./catalogs/thin-blood-traits.json')
 const mortalAdvantageExclusions = require('./catalogs/mortal-advantage-exclusions.json')
 const skills = require('./catalogs/skills.json')
 
@@ -67,6 +68,7 @@ const characterAdvantageCatalog =
 const characterDependencyCatalog =
   deepFreeze({
     predatorTypes: clone(predatorTypes),
+    thinBloodTraits: clone(thinBloodTraits),
   })
 
 const characterSkillCatalog =

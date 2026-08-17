@@ -19,6 +19,7 @@ import {
 import {
   InitialVampireAdvantagesInvalidError,
   InitialVampirePredatorInvalidError,
+  InitialVampireThinBloodInvalidError,
   InitialVampireDecisionAlreadyResolvedError,
   InitialVampireDisciplineInvalidError,
   InitialVampirePrerequisitePendingError,
@@ -42,6 +43,7 @@ import {
   parseManifestInitialDisciplineRequest,
   parseManifestInitialPowerRequest,
   parseReviewInitialAdvantagesRequest,
+  parseResolveInitialThinBloodStateRequest,
   parseResolveInitialClanRequest,
   parseResolveInitialGenerationRequest,
   toInitialVampireResolutionResponse,
@@ -194,6 +196,17 @@ function throwInitialVampireHttpError(
     throw new UnprocessableEntityException({
       code:
         'INITIAL_VAMPIRE_ADVANTAGES_REVIEW_INVALID',
+      issues: error.issues,
+    })
+  }
+
+  if (
+    error instanceof
+      InitialVampireThinBloodInvalidError
+  ) {
+    throw new UnprocessableEntityException({
+      code:
+        'INITIAL_VAMPIRE_THIN_BLOOD_INVALID',
       issues: error.issues,
     })
   }
@@ -423,5 +436,35 @@ export class CharacterInitialVampireController {
       throwInitialVampireHttpError(error)
     }
   }
+
+  @Patch(
+    ':characterId/initial-vampire/thin-blood',
+  )
+  async thinBlood(
+    @Req()
+    request:
+      AuthenticatedInitialVampireRequest,
+    @Param('characterId')
+    characterIdInput: unknown,
+    @Body() body: unknown,
+  ): Promise<InitialVampireResolutionResponseDto> {
+    const actorUserId =
+      authenticatedActorId(request)
+
+    try {
+      return toInitialVampireResolutionResponse(
+        await this.resolve.resolveThinBloodState(
+          actorUserId,
+          parseResolveInitialThinBloodStateRequest(
+            characterIdInput,
+            body,
+          ),
+        ),
+      )
+    } catch (error: unknown) {
+      throwInitialVampireHttpError(error)
+    }
+  }
+
 
 }

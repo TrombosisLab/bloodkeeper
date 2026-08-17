@@ -651,7 +651,7 @@ test(
             clanCurseDetails: null,
             disciplineAffinityDetails: {
               disciplineKey: 'auspex',
-              powerKey: 'heightened-senses',
+              powerKey: 'auspex-heightened-senses',
             },
           },
           {
@@ -663,6 +663,11 @@ test(
           },
           {
             definitionKey: 'bestial-temper',
+            clanCurseDetails: null,
+            disciplineAffinityDetails: null,
+          },
+          {
+            definitionKey: 'day-drinker',
             clanCurseDetails: null,
             disciplineAffinityDetails: null,
           },
