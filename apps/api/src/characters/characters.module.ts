@@ -57,6 +57,10 @@ import {
 } from './application/load-character-hunger.use-case'
 
 import {
+  LoadCharacterProfilePhaseUseCase,
+} from './application/load-character-profile-phase.use-case'
+
+import {
   LoadCharacterSecondaryUseCase,
 } from './application/load-character-secondary.use-case'
 
@@ -132,6 +136,10 @@ import {
 import {
   CharacterInitialVampireController,
 } from './presentation/character-initial-vampire.controller'
+
+import {
+  CharacterProfilePhaseController,
+} from './presentation/character-profile-phase.controller'
 
 import {
   ChronicleCharacterController,
@@ -278,6 +286,24 @@ const experienceUseCaseProviders = [
 ]
 
 const useCaseProviders = [
+  {
+    provide:
+      LoadCharacterProfilePhaseUseCase,
+    inject: [
+      CHARACTER_DRAFT_REPOSITORY,
+      CharacterValidator,
+    ],
+    useFactory: (
+      repository:
+        PrismaCharacterDraftRepository,
+      validator:
+        CharacterValidator,
+    ) =>
+      new LoadCharacterProfilePhaseUseCase(
+        repository,
+        validator,
+      ),
+  },
   {
     provide:
       ResolveInitialVampireStateUseCase,
@@ -475,6 +501,7 @@ const useCaseProviders = [
     CharacterDraftController,
     CharacterEmbraceController,
     CharacterInitialVampireController,
+    CharacterProfilePhaseController,
     ChronicleCharacterController,
     CharacterLifecycleController,
     CharacterStateController,
