@@ -82,10 +82,13 @@ function persistenceStateForError(
 
 function persistenceMessage(
   state: StatePersistenceState,
+  hasHunger: boolean,
 ): string | null {
   switch (state) {
     case 'saving':
-      return 'Guardando Salud, Voluntad, Humanidad, Manchas y Hambre…'
+      return hasHunger
+        ? 'Guardando Salud, Voluntad, Humanidad, Manchas y Hambre…'
+        : 'Guardando Salud, Voluntad, Humanidad y Manchas…'
     case 'unauthorized':
       return 'La sesión ya no permite guardar estos estados.'
     case 'not-found':
@@ -160,16 +163,47 @@ export function CharacterSheet({
     )
 
   const [hunger, setHunger] =
-    useState(
+    useState<number | null>(
       () =>
-        model?.state.hunger ??
-        demoState.hunger,
+        model === undefined
+          ? demoState.hunger
+          : model.state.hunger,
     )
 
   const persistedStateEditable =
     persisted &&
     model.status !== 'archived' &&
     resolvedStateGateway !== null
+
+  const hasHunger =
+    hunger !== null
+
+  const profilePhase =
+    model?.profilePhase
+
+  const showDisciplines =
+    !persisted ||
+    model.profilePhase ===
+      'ESTABLISHED_VAMPIRE' ||
+    (
+      model.profilePhase ===
+        'TRANSITIONAL_VAMPIRE' &&
+      model.disciplines.length > 0
+    )
+
+  const phaseNotice =
+    !persisted
+      ? null
+      : model.profilePhase === 'HUMAN'
+        ? (
+            'Personaje humano · sin Hambre, Potencia de Sangre ni rasgos vampíricos.'
+          )
+        : model.profilePhase ===
+            'TRANSITIONAL_VAMPIRE'
+          ? (
+              'Vampiro en transición · sólo se muestran los recursos ya disponibles; lo pendiente no se sustituye por valores ficticios.'
+            )
+          : null
 
   async function persistState(
     changes: CharacterOperationalStateUpdate,
@@ -300,7 +334,10 @@ export function CharacterSheet({
   }
 
   const persistenceStatus =
-    persistenceMessage(statePersistence)
+    persistenceMessage(
+      statePersistence,
+      hasHunger,
+    )
 
   const canRetryPersistence =
     persisted &&
@@ -309,7 +346,12 @@ export function CharacterSheet({
     onStateReload !== undefined
 
   return (
-    <article className="character-sheet">
+    <article
+      className="character-sheet"
+      data-profile-phase={
+        profilePhase ?? 'DEMO'
+      }
+    >
       <header className="sheet-header">
         <div>
           <p className="sheet-header__eyebrow">
@@ -349,6 +391,15 @@ export function CharacterSheet({
         </div>
       </header>
 
+      {phaseNotice !== null ? (
+        <p
+          className="sheet-phase-notice"
+          role="status"
+        >
+          {phaseNotice}
+        </p>
+      ) : null}
+
       {persisted ? (
         <div
           className="sheet-edit-notice"
@@ -364,7 +415,9 @@ export function CharacterSheet({
                     )
                   : stateEditing
                     ? (
-                        'Edición persistida de Salud, Voluntad, Humanidad, Manchas y Hambre.'
+                        hasHunger
+                          ? 'Edición persistida de Salud, Voluntad, Humanidad, Manchas y Hambre.'
+                          : 'Edición persistida de Salud, Voluntad, Humanidad y Manchas.'
                       )
                     : (
                         `Ficha persistida · revisión ${model.revision}`
@@ -400,6 +453,7 @@ export function CharacterSheet({
           model?.identity ??
           demoCharacter
         }
+        profilePhase={profilePhase}
       />
 
       <CharacterAttributes
@@ -429,9 +483,11 @@ export function CharacterSheet({
         bloodPotency={
           model?.state.bloodPotency
         }
+        profilePhase={profilePhase}
         stateEditing={stateEditing}
         hungerEditing={
-          stateEditing
+          stateEditing &&
+          hasHunger
         }
         onHumanityChange={
           handleHumanityChange
@@ -441,9 +497,11 @@ export function CharacterSheet({
         }
       />
 
-      <CharacterDisciplines
-        disciplines={model?.disciplines}
-      />
+      {showDisciplines ? (
+        <CharacterDisciplines
+          disciplines={model?.disciplines}
+        />
+      ) : null}
 
       <CharacterAdvantages
         advantages={model?.advantages}
@@ -461,6 +519,9 @@ export function CharacterSheet({
           revision={model.revision}
           status={model.status}
           advantages={model.advantages}
+          profilePhase={
+            model.profilePhase
+          }
           gateway={experienceGateway}
           onPurchased={onStateReload}
         />

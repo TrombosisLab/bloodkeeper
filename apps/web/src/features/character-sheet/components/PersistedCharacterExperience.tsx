@@ -17,6 +17,7 @@ import { createInitialAdvantageInstanceDetails } from '../../character-creation/
 
 import type { CharacterAdvantageSelectionDraft } from '../../character-creation/types/character-advantages-draft.types.ts'
 import type { CharacterAdvantages, RatedTrait } from '../types/character-advantages.types.ts'
+import type { CharacterProfilePhase } from '../types/character-sheet-model.types.ts'
 import type {
   CharacterAdvancementKind,
   CharacterAdvancementPreview,
@@ -36,6 +37,7 @@ interface PersistedCharacterExperienceProps {
   revision: number
   status: 'draft' | 'active' | 'archived'
   advantages: CharacterAdvantages
+  profilePhase?: CharacterProfilePhase
   gateway?: CharacterExperienceGateway
   onPurchased?: () => void
 }
@@ -50,6 +52,25 @@ const kindLabels: Readonly<Record<CharacterAdvancementKind, string>> = {
   ceremony: 'Ceremonia de Olvido',
   advantage: 'Ventaja',
   bloodPotency: 'Potencia de Sangre',
+}
+
+const vampireOnlyAdvancementKinds =
+  new Set<CharacterAdvancementKind>([
+    'discipline',
+    'ritual',
+    'formula',
+    'ceremony',
+    'bloodPotency',
+  ])
+
+export function advancementKindVisibleForProfile(
+  profilePhase: CharacterProfilePhase | undefined,
+  kind: CharacterAdvancementKind,
+): boolean {
+  return !(
+    profilePhase === 'HUMAN' &&
+    vampireOnlyAdvancementKinds.has(kind)
+  )
 }
 
 const reasonLabels: Readonly<Record<string, string>> = {
@@ -150,6 +171,7 @@ export function PersistedCharacterExperience({
   revision,
   status,
   advantages,
+  profilePhase,
   gateway,
   onPurchased,
 }: PersistedCharacterExperienceProps) {
@@ -394,11 +416,24 @@ export function PersistedCharacterExperience({
 
   const movementRows = ledger?.movements ?? []
 
+  const visibleKindEntries =
+    Object.entries(kindLabels).filter(
+      ([value]) =>
+        advancementKindVisibleForProfile(
+          profilePhase,
+          value as CharacterAdvancementKind,
+        ),
+    )
+
   return (
     <section className="sheet-section blood-experience-section persisted-experience" aria-labelledby="blood-experience-title" data-xp-panel="ready">
       <div className="section-title">
         <div>
-          <p className="section-kicker">Sangre y evolución</p>
+          <p className="section-kicker">
+            {profilePhase === 'HUMAN'
+              ? 'Evolución'
+              : 'Sangre y evolución'}
+          </p>
           <h2 id="blood-experience-title">Experiencia</h2>
         </div>
         <span className="section-number">07</span>
@@ -428,7 +463,7 @@ export function PersistedCharacterExperience({
                 <label>
                   <span>Tipo de mejora</span>
                   <select value={kind} onChange={(event) => selectKind(event.target.value as CharacterAdvancementKind)}>
-                    {Object.entries(kindLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                    {visibleKindEntries.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                   </select>
                 </label>
 

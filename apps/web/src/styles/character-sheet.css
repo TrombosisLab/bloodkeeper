@@ -1922,3 +1922,32 @@
     justify-content: flex-start;
   }
 }
+
+/* SPEC-057-F2A2B2B — estado humano/transitorio */
+
+.state-grid--human {
+  grid-template-columns: 1fr;
+}
+
+.state-card--pending {
+  color: var(--color-text-secondary);
+}
+
+.state-card--pending p {
+  margin: 0 0 12px;
+
+  line-height: 1.55;
+}
+
+.state-card--pending ul {
+  margin: 0;
+  padding-left: 20px;
+
+  color: var(--color-text-subtle-muted);
+}
+
+@media (max-width: 900px) {
+  .state-grid {
+    grid-template-columns: 1fr;
+  }
+}

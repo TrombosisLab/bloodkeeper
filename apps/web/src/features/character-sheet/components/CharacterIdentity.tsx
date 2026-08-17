@@ -2,19 +2,46 @@ import type {
   CharacterIdentity as CharacterIdentityData,
 } from '../types/character-sheet.types'
 
+import type {
+  CharacterProfilePhase,
+} from '../types/character-sheet-model.types'
+
 import { IdentityField } from './IdentityField'
 
 interface CharacterIdentityProps {
   character: CharacterIdentityData
+  profilePhase?: CharacterProfilePhase
+}
+
+function transitionalValue(
+  value: string,
+  profilePhase:
+    | CharacterProfilePhase
+    | undefined,
+): string {
+  return (
+    profilePhase ===
+      'TRANSITIONAL_VAMPIRE' &&
+    value.trim() === ''
+  )
+    ? 'Pendiente'
+    : value
 }
 
 export function CharacterIdentity({
   character,
+  profilePhase,
 }: CharacterIdentityProps) {
+  const human =
+    profilePhase === 'HUMAN'
+
   return (
     <section
       className="sheet-section identity-section"
       aria-labelledby="identity-title"
+      data-profile-phase={
+        profilePhase ?? 'DEMO'
+      }
     >
       <div className="section-heading identity-heading">
         <div>
@@ -27,10 +54,17 @@ export function CharacterIdentity({
           </h2>
         </div>
 
-        <div className="clan-mark">
-          <span>Clan</span>
-          <strong>{character.clan}</strong>
-        </div>
+        {!human ? (
+          <div className="clan-mark">
+            <span>Clan</span>
+            <strong>
+              {transitionalValue(
+                character.clan,
+                profilePhase,
+              )}
+            </strong>
+          </div>
+        ) : null}
       </div>
 
       <div className="identity-grid">
@@ -40,10 +74,15 @@ export function CharacterIdentity({
           featured
         />
 
-        <IdentityField
-          label="Depredador"
-          value={character.predatorType}
-        />
+        {!human ? (
+          <IdentityField
+            label="Depredador"
+            value={transitionalValue(
+              character.predatorType,
+              profilePhase,
+            )}
+          />
+        ) : null}
 
         <IdentityField
           label="Crónica"
@@ -56,20 +95,33 @@ export function CharacterIdentity({
           featured
         />
 
-        <IdentityField
-          label="Clan"
-          value={character.clan}
-        />
+        {!human ? (
+          <>
+            <IdentityField
+              label="Clan"
+              value={transitionalValue(
+                character.clan,
+                profilePhase,
+              )}
+            />
 
-        <IdentityField
-          label="Generación"
-          value={character.generation}
-        />
+            <IdentityField
+              label="Generación"
+              value={transitionalValue(
+                character.generation,
+                profilePhase,
+              )}
+            />
 
-        <IdentityField
-          label="Sire"
-          value={character.sire}
-        />
+            <IdentityField
+              label="Sire"
+              value={transitionalValue(
+                character.sire,
+                profilePhase,
+              )}
+            />
+          </>
+        ) : null}
 
         <IdentityField
           label="Deseo"
