@@ -124,6 +124,39 @@ test(
 )
 
 test(
+  '057-F2A3B2B1 Sire usa la operación dedicada y cuerpo exacto',
+  async () => {
+    const call =
+      await capture(
+        gateway =>
+          gateway.resolveSire(
+            characterId,
+            6,
+            'Helena',
+          ),
+      )
+
+    assert.equal(
+      call.url,
+      `/api/characters/${characterId}/initial-vampire/sire`,
+    )
+
+    assert.equal(
+      call.init.method,
+      'PATCH',
+    )
+
+    assert.deepEqual(
+      call.body,
+      {
+        expectedRevision: 6,
+        sire: 'Helena',
+      },
+    )
+  },
+)
+
+test(
   '057-F2A3B1 Generación y Sangre conservan DTO backend',
   async () => {
     const generation =

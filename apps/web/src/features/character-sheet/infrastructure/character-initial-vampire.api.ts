@@ -86,6 +86,12 @@ export interface CharacterInitialVampireGateway {
     generation: number,
   ): Promise<CharacterInitialVampireResolutionResponse>
 
+  resolveSire(
+    characterId: string,
+    expectedRevision: number,
+    sire: string,
+  ): Promise<CharacterInitialVampireResolutionResponse>
+
   establishBlood(
     characterId: string,
     expectedRevision: number,
@@ -368,6 +374,22 @@ export function createCharacterInitialVampireGateway(
         {
           expectedRevision,
           generation,
+        },
+      ) as Promise<CharacterInitialVampireResolutionResponse>
+    },
+
+    async resolveSire(
+      characterId,
+      expectedRevision,
+      sire,
+    ) {
+      return request(
+        fetchImplementation,
+        characterId,
+        'sire',
+        {
+          expectedRevision,
+          sire,
         },
       ) as Promise<CharacterInitialVampireResolutionResponse>
     },
