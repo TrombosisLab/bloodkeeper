@@ -323,11 +323,10 @@ test(
 )
 
 test(
-  '057-F2A3B3C no adelanta rituales depredador Sangre Débil ventajas ni consolidación',
+  '057-F2A3B3C no adelanta rituales, depredador, Sangre Débil ni ventajas',
   () => {
     for (
       const forbidden of [
-        'consolidate(',
         'BloodSorceryRitualSelector',
         'OblivionCeremonySelector',
       ]

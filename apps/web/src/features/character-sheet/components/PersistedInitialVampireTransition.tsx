@@ -13,6 +13,7 @@ import {
 } from '../../character-creation/data/identity-options'
 
 import {
+  CharacterInitialVampireApiError,
   createCharacterInitialVampireGateway,
 } from '../infrastructure/character-initial-vampire.api'
 
@@ -45,6 +46,7 @@ import {
 
 import type {
   CharacterInitialVampireGateway,
+  CharacterInitialVampireResolutionResponse,
 } from '../infrastructure/character-initial-vampire.api'
 
 import type {
@@ -197,7 +199,9 @@ export function PersistedInitialVampireTransition({
   async function resolve(
     decision:
       CharacterInitialVampirePendingDecision,
-    operation: () => Promise<unknown>,
+    operation: () => Promise<
+      CharacterInitialVampireResolutionResponse
+    >,
   ): Promise<void> {
     if (busy) return
 
@@ -205,10 +209,35 @@ export function PersistedInitialVampireTransition({
     setMessage(null)
 
     try {
-      await operation()
+      const resolution =
+        await operation()
+
+      try {
+        await resolvedGateway.consolidate(
+          transition.characterId,
+          resolution.character.revision,
+        )
+      } catch (error: unknown) {
+        if (
+          !(
+            error instanceof
+              CharacterInitialVampireApiError &&
+            error.code ===
+              'INITIAL_VAMPIRE_PROFILE_INCOMPLETE'
+          )
+        ) {
+          /*
+           * El write inicial ya se confirmó. Recargamos su
+           * estado autoritativo antes de mostrar el fallo real
+           * de consolidación.
+           */
+          onResolved()
+          throw error
+        }
+      }
 
       /*
-       * No aplicamos aquí la respuesta parcial:
+       * No aplicamos aquí ninguna respuesta parcial:
        * la ficha vuelve a leer snapshot + phase/pending.
        */
       onResolved()

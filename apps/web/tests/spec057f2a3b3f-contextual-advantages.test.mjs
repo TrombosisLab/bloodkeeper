@@ -281,25 +281,6 @@ test(
 )
 
 test(
-  '057-F2A3B3F mantiene consolidación fuera de este bloque',
-  () => {
-    assert.equal(
-      parentSource.includes(
-        'consolidate(',
-      ),
-      false,
-    )
-
-    assert.equal(
-      componentSource.includes(
-        'consolidate(',
-      ),
-      false,
-    )
-  },
-)
-
-test(
   '057-F2A3B3F no intenta decidir qué selección válida puede sustituirse',
   () => {
     for (

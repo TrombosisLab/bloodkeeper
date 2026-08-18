@@ -324,30 +324,3 @@ test(
     )
   },
 )
-
-test(
-  '057-F2A3B3E no adelanta revisión de Ventajas ni consolidación',
-  () => {
-    for (
-      const forbidden of [
-        'consolidate(',
-      ]
-    ) {
-      assert.equal(
-        parentSource.includes(
-          forbidden,
-        ),
-        false,
-        forbidden,
-      )
-
-      assert.equal(
-        componentSource.includes(
-          forbidden,
-        ),
-        false,
-        forbidden,
-      )
-    }
-  },
-)

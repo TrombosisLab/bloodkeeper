@@ -198,19 +198,3 @@ test(
     )
   },
 )
-
-test(
-  '057-F2A3B3B no reabre decisiones posteriores a Disciplinas/Poderes',
-  () => {
-    for (
-      const forbidden of [
-        'consolidate(',
-      ]
-    ) {
-      assert.equal(
-        component.includes(forbidden),
-        false,
-      )
-    }
-  },
-)

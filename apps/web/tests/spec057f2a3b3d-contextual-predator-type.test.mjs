@@ -341,33 +341,6 @@ test(
 )
 
 test(
-  '057-F2A3B3D no adelanta Thin Blood Ventajas ni consolidación',
-  () => {
-    for (
-      const forbidden of [
-        'consolidate(',
-      ]
-    ) {
-      assert.equal(
-        parentSource.includes(
-          forbidden,
-        ),
-        false,
-        forbidden,
-      )
-
-      assert.equal(
-        predatorSource.includes(
-          forbidden,
-        ),
-        false,
-        forbidden,
-      )
-    }
-  },
-)
-
-test(
   '057-F2A3B3D mantiene mecánica fuera de React',
   () => {
     for (
