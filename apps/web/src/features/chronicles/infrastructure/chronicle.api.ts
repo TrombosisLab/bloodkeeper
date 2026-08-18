@@ -12,6 +12,10 @@ import type {
 
 import type {
   ChronicleNpcApiPage,
+  ChronicleSessionAttendanceApiPage,
+  ChronicleSessionAttendanceApiSnapshot,
+  ChronicleSessionAttendanceRemovalApiResponse,
+  AddChronicleSessionAttendanceApiRequest,
   ChronicleSessionApiPage,
 } from '../types/chronicle-api.types'
 
@@ -252,6 +256,30 @@ export interface ChronicleLifecycleGateway
   ): Promise<ChronicleEventApiSnapshot>
 
 
+  sessionAttendancesPage(
+    chronicleId: string,
+    sessionId: string,
+    query?: ChronicleListQuery,
+  ): Promise<ChronicleSessionAttendanceApiPage>
+  sessionAttendances(
+    chronicleId: string,
+    sessionId: string,
+  ): Promise<
+    readonly ChronicleSessionAttendanceApiSnapshot[]
+  >
+  addSessionAttendance(
+    chronicleId: string,
+    sessionId: string,
+    request:
+      AddChronicleSessionAttendanceApiRequest,
+  ): Promise<ChronicleSessionAttendanceApiSnapshot>
+  removeSessionAttendance(
+    chronicleId: string,
+    sessionId: string,
+    characterId: string,
+  ): Promise<
+    ChronicleSessionAttendanceRemovalApiResponse
+  >
   sessions(
     chronicleId: string,
     query?: ChronicleListQuery,
@@ -504,6 +532,48 @@ export function parseChronicleEventResponse(
     status: value.status,
     createdAt: value.createdAt,
     updatedAt: value.updatedAt,
+  }
+}
+
+export function parseChronicleSessionAttendanceResponse(
+  value: unknown,
+): ChronicleSessionAttendanceApiSnapshot {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'string' ||
+    typeof value.sessionId !== 'string' ||
+    typeof value.characterId !== 'string' ||
+    !validTimestamp(value.createdAt) ||
+    !validTimestamp(value.updatedAt)
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    id: value.id,
+    sessionId: value.sessionId,
+    characterId: value.characterId,
+    createdAt: value.createdAt,
+    updatedAt: value.updatedAt,
+  }
+}
+
+export function parseChronicleSessionAttendanceRemovalResponse(
+  value: unknown,
+): ChronicleSessionAttendanceRemovalApiResponse {
+  if (
+    !isRecord(value) ||
+    typeof value.sessionId !== 'string' ||
+    typeof value.characterId !== 'string' ||
+    value.attending !== false
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    sessionId: value.sessionId,
+    characterId: value.characterId,
+    attending: false,
   }
 }
 
@@ -1553,6 +1623,108 @@ export function createChronicleGateway(
       )
     },
 
+
+    async sessionAttendancesPage(
+      chronicleId,
+      sessionId,
+      query = {},
+    ) {
+      const limit =
+        query.limit ?? 25
+      const offset =
+        query.offset ?? 0
+
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/sessions/${sessionId}/attendances?limit=${limit}&offset=${offset}`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseNestedOffsetPage(
+        await jsonResponse(response),
+        parseChronicleSessionAttendanceResponse,
+      )
+    },
+
+    async sessionAttendances(
+      chronicleId,
+      sessionId,
+    ) {
+      const items:
+        ChronicleSessionAttendanceApiSnapshot[] = []
+
+      let nextOffset:
+        number | null = 0
+
+      while (nextOffset !== null) {
+        const page =
+          await this.sessionAttendancesPage(
+            chronicleId,
+            sessionId,
+            {
+              limit: 50,
+              offset: nextOffset,
+            },
+          )
+
+        items.push(...page.items)
+        nextOffset = page.nextOffset
+      }
+
+      return items
+    },
+
+    async addSessionAttendance(
+      chronicleId,
+      sessionId,
+      request,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/sessions/${sessionId}/attendances`,
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(request),
+          },
+        )
+
+      return parseChronicleSessionAttendanceResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async removeSessionAttendance(
+      chronicleId,
+      sessionId,
+      characterId,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/sessions/${sessionId}/attendances/${characterId}/remove`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseChronicleSessionAttendanceRemovalResponse(
+        await jsonResponse(response),
+      )
+    },
 
     async sessions(
       chronicleId,

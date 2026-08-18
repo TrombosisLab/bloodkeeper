@@ -173,6 +173,31 @@ export interface ReorderChronicleEventsApiRequest {
   readonly eventIds: readonly string[]
 }
 
+export interface ChronicleSessionAttendanceApiSnapshot {
+  readonly id: string
+  readonly sessionId: string
+  readonly characterId: string
+  readonly createdAt: string
+  readonly updatedAt: string
+}
+
+export interface ChronicleSessionAttendanceApiPage {
+  readonly items:
+    readonly ChronicleSessionAttendanceApiSnapshot[]
+  readonly nextOffset: number | null
+}
+
+export interface AddChronicleSessionAttendanceApiRequest {
+  readonly characterId: string
+}
+
+export interface ChronicleSessionAttendanceRemovalApiResponse {
+  readonly sessionId: string
+  readonly characterId: string
+  readonly attending: false
+}
+
+
 export type ChronicleSessionApiStatus =
   | 'preparation'
   | 'completed'

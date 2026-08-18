@@ -1,0 +1,201 @@
+.chronicle-session-attendance {
+  margin-top: var(--space-5);
+  border-top:
+    1px solid
+    var(--color-border-subtle);
+  padding-top: var(--space-4);
+}
+
+.chronicle-session-attendance__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.chronicle-session-attendance__heading > div > span {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.chronicle-session-attendance h4 {
+  margin: 0;
+}
+
+.chronicle-session-attendance__count {
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-emphasis);
+  font-size: var(--font-size-sm);
+  padding: 0.35rem 0.65rem;
+  white-space: nowrap;
+}
+
+.chronicle-session-attendance__help {
+  max-width: 72ch;
+  margin: var(--space-3) 0 0;
+  line-height: var(--line-height-normal);
+  opacity: 0.82;
+}
+
+.chronicle-session-attendance__list {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chronicle-session-attendance__item {
+  border-top:
+    1px solid
+    var(--color-border-subtle);
+  padding-top: var(--space-2);
+}
+
+.chronicle-session-attendance__item label,
+.chronicle-session-attendance__historical {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 2.5rem;
+}
+
+.chronicle-session-attendance__item input {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: 0 0 auto;
+  accent-color: currentColor;
+}
+
+.chronicle-session-attendance__identity,
+.chronicle-session-attendance__historical {
+  min-width: 0;
+}
+
+.chronicle-session-attendance__identity strong,
+.chronicle-session-attendance__identity small,
+.chronicle-session-attendance__historical strong,
+.chronicle-session-attendance__historical small {
+  display: block;
+}
+
+.chronicle-session-attendance__identity small,
+.chronicle-session-attendance__historical small {
+  margin-top: 0.2rem;
+  font-size: var(--font-size-sm);
+  opacity: 0.72;
+  overflow-wrap: anywhere;
+}
+
+.chronicle-session-attendance__item--historical {
+  opacity: 0.75;
+}
+
+.chronicle-session-attendance__empty,
+.chronicle-session-attendance__message {
+  margin: var(--space-4) 0 0;
+  opacity: 0.72;
+}
+
+.chronicle-session-attendance__error {
+  margin: var(--space-4) 0 0;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-translucent);
+  color: var(--color-danger);
+  padding: var(--space-3);
+}
+
+@media (max-width: 760px) {
+  .chronicle-session-attendance__heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* A2 visual layout repair */
+.chronicle-session-attendance .chronicle-session-attendance__list {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-4);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  overflow: hidden;
+}
+
+.chronicle-session-attendance .chronicle-session-attendance__item {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border-top: 0;
+  padding: 0;
+}
+
+.chronicle-session-attendance .chronicle-session-attendance__item + .chronicle-session-attendance__item {
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.chronicle-session-attendance .chronicle-session-attendance__item > label {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 4.5rem;
+  box-sizing: border-box;
+  align-items: center;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+}
+
+.chronicle-session-attendance .chronicle-session-attendance__identity {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+  text-align: left;
+}
+
+.chronicle-session-attendance .chronicle-session-attendance__identity strong,
+.chronicle-session-attendance .chronicle-session-attendance__identity small {
+  display: block;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.chronicle-session-attendance .chronicle-session-attendance__item > label > input[type='checkbox'] {
+  display: block;
+  width: 1.35rem;
+  height: 1.35rem;
+  min-width: 1.35rem;
+  max-width: 1.35rem;
+  flex: 0 0 1.35rem;
+  margin: 0;
+  padding: 0;
+  align-self: center;
+}
+
+.chronicle-session-attendance .chronicle-session-attendance__historical {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 4.5rem;
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+}
+
+@media (max-width: 760px) {
+  .chronicle-session-attendance .chronicle-session-attendance__item > label {
+    min-height: 4rem;
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+}

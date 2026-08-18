@@ -337,11 +337,29 @@ model ChronicleSession {
     chronicle Chronicle @relation("ChronicleSessionChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
     experienceMovements CharacterExperienceMovement[] @relation("CharacterExperienceSession")
     diceRolls           DiceRollRecord[] @relation("DiceRollSession")
+    attendances         ChronicleSessionAttendance[] @relation("ChronicleSessionAttendanceSession")
 
     @@index([chronicleId, status])
     @@index([chronicleId, sessionNumber])
     @@index([chronicleId, realDate])
     @@map("chronicle_sessions")
+}
+
+model ChronicleSessionAttendance {
+  id          String    @id @default(uuid()) @db.Uuid
+  sessionId   String    @db.Uuid
+  characterId String    @db.Uuid
+  removedAt   DateTime? @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime  @updatedAt @db.Timestamptz(3)
+
+  session   ChronicleSession @relation("ChronicleSessionAttendanceSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  character Character        @relation("ChronicleSessionAttendanceCharacter", fields: [characterId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([sessionId, characterId])
+  @@index([sessionId])
+  @@index([characterId])
+  @@map("chronicle_session_attendances")
 }
 
 enum DiceRollSource {
@@ -459,6 +477,7 @@ model Character {
   historyEntries CharacterHistoryEntry[]
   experienceMovements CharacterExperienceMovement[] @relation("CharacterExperienceCharacter")
   diceRolls           DiceRollRecord[] @relation("DiceRollCharacter")
+  sessionAttendances  ChronicleSessionAttendance[] @relation("ChronicleSessionAttendanceCharacter")
 
   @@index([ownerId])
   @@index([chronicleId])

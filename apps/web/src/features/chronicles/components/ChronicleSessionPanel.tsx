@@ -13,6 +13,7 @@ import {
 } from '../infrastructure/chronicle.api.ts'
 
 import type {
+  ChronicleCharacterApiSummary,
   ChronicleSessionApiSnapshot,
   ChronicleSessionApiStatus,
   CreateChronicleSessionApiRequest,
@@ -29,6 +30,10 @@ import {
 import {
   DiceRollPanel,
 } from '../../dice/components/DiceRollPanel'
+
+import {
+  ChronicleSessionAttendancePanel,
+} from './ChronicleSessionAttendancePanel'
 
 import './chronicle-session-panel.css'
 
@@ -65,6 +70,8 @@ const emptyForm: SessionFormState = {
 
 interface ChronicleSessionPanelProps {
   readonly chronicleId: string
+  readonly associatedCharacters:
+    readonly ChronicleCharacterApiSummary[]
 }
 
 function optionalText(
@@ -241,6 +248,7 @@ function sessionNumberLabel(
 
 export function ChronicleSessionPanel({
   chronicleId,
+  associatedCharacters,
 }: ChronicleSessionPanelProps) {
   const [
     sessions,
@@ -1017,6 +1025,15 @@ export function ChronicleSessionPanel({
               </dd>
             </div>
           </dl>
+
+          <ChronicleSessionAttendancePanel
+            key={selectedSession.id}
+            chronicleId={chronicleId}
+            session={selectedSession}
+            associatedCharacters={
+              associatedCharacters
+            }
+          />
         </section>
       ) : null}
 

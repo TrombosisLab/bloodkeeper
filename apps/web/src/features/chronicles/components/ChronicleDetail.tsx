@@ -1081,6 +1081,9 @@ export function ChronicleDetail({
         <>
           <ChronicleSessionPanel
             chronicleId={chronicleId}
+            associatedCharacters={
+              associatedCharacters
+            }
           />
 
           <div className="chronicle-detail__dice-context">

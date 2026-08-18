@@ -28,6 +28,9 @@ test(
         types.indexOf(
           'export type ChronicleEventApiStatus',
         ),
+        types.indexOf(
+          'export interface ChronicleSessionAttendanceApiSnapshot',
+        ),
       )
 
     for (const field of [

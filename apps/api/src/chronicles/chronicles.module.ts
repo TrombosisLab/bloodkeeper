@@ -215,6 +215,24 @@ import {
 } from './presentation/chronicle-session.controller'
 
 import {
+  CHRONICLE_SESSION_ATTENDANCE_REPOSITORY,
+} from './application/chronicle-session-attendance.repository'
+
+import {
+  AddChronicleSessionAttendanceUseCase,
+  ListChronicleSessionAttendancesUseCase,
+  RemoveChronicleSessionAttendanceUseCase,
+} from './application/chronicle-session-attendance.use-cases'
+
+import {
+  PrismaChronicleSessionAttendanceRepository,
+} from './infrastructure/prisma-chronicle-session-attendance.repository'
+
+import {
+  ChronicleSessionAttendanceController,
+} from './presentation/chronicle-session-attendance.controller'
+
+import {
   ChronicleController,
 } from './presentation/chronicle.controller'
 
@@ -228,6 +246,7 @@ import {
     ChronicleLocationController,
     ChronicleEventController,
     ChronicleSessionController,
+    ChronicleSessionAttendanceController,
   ],
   providers: [
     PrismaChronicleRepository,
@@ -328,6 +347,16 @@ import {
       useExisting:
         PrismaChronicleSessionRepository,
     },
+    PrismaChronicleSessionAttendanceRepository,
+    {
+      provide:
+        CHRONICLE_SESSION_ATTENDANCE_REPOSITORY,
+      useExisting:
+        PrismaChronicleSessionAttendanceRepository,
+    },
+    ListChronicleSessionAttendancesUseCase,
+    AddChronicleSessionAttendanceUseCase,
+    RemoveChronicleSessionAttendanceUseCase,
     ListChronicleSessionsUseCase,
     LoadChronicleSessionUseCase,
     CreateChronicleSessionUseCase,
@@ -389,6 +418,7 @@ import {
   exports: [
     CHRONICLE_PARTICIPANT_REPOSITORY,
     CHRONICLE_SESSION_REPOSITORY,
+    CHRONICLE_SESSION_ATTENDANCE_REPOSITORY,
     CreateChronicleUseCase,
     ListChroniclesUseCase,
     LoadChronicleUseCase,
