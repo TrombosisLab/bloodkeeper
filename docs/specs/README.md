@@ -75,7 +75,7 @@ confirmadas.
 | SPEC-054 | [SPEC-054 – ACCESSIBILITY_RESPONSIVE_AND_COMPATIBILITY](SPEC-054_ACCESSIBILITY_RESPONSIVE_AND_COMPATIBILITY_v1.0.md) | 1.0 | Aprobado | Cerrada | Accesibilidad por teclado, responsive móvil/tablet/escritorio, controles táctiles y compatibilidad moderna validados y documentados. |
 | SPEC-055 | [SPEC-055 – PROJECT_COMPLETION_CRITERIA](SPEC-055_PROJECT_COMPLETION_CRITERIA_v1.0.md) | 1.0 | Aprobado | Cerrada | Definition of Done, integración modular E2E, release, health/smoke, backup/rollback y validación continua acreditados. |
 | SPEC-056 | [SPEC-056 – CHARACTER_EXPERIENCE_AND_ADVANCEMENT](SPEC-056_CHARACTER_EXPERIENCE_AND_ADVANCEMENT_v1.0.md) | 1.0 | Aprobado | Cerrada | Experiencia y evolución completas: ledger trazable, concesiones y correcciones autorizadas, costes V5, compra atómica, validación `evolution` e integración Web verificadas. |
-| SPEC-057 | [SPEC-057 – CHARACTER_SESSION_ZERO_AND_EMBRACE](SPEC-057_CHARACTER_SESSION_ZERO_AND_EMBRACE_v1.0.md) | 1.0 | Aprobado | En desarrollo | SPEC aprobada; auditoría de entrada superada y primer bloque autorizado: 057-A Modelo y compatibilidad. |
+| SPEC-057 | [SPEC-057 – CHARACTER_SESSION_ZERO_AND_EMBRACE](SPEC-057_CHARACTER_SESSION_ZERO_AND_EMBRACE_v1.0.md) | 1.0 | Aprobado | Cerrada | Sesión 0 humana, Abrazo atómico, transición vampírica progresiva, ficha y dados adaptativos validados; migración compatible, regresión API/Web y cierre integral superados. |
 
 ## Versiones archivadas
 

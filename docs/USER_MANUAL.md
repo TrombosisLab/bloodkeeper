@@ -62,18 +62,31 @@ persistidos.
 
 **Crear personaje** abre el creador guiado.
 
-El creador divide la configuración del personaje en fases y aplica las reglas
-y validaciones que correspondan a cada decisión.
+Al iniciar una creación nueva puede elegirse entre la creación vampírica
+estándar y **Sesión 0**. La ruta de Sesión 0 permite crear primero un personaje
+humano sin completar campos vampíricos ficticios.
+
+El creador humano reutiliza el asistente existente para Identidad, Atributos,
+Habilidades, Ventajas, Humanidad, Convicciones, Piedras de Toque y Revisión.
+No solicita Clan, Generación, Hambre, Disciplinas ni Tipo de Depredador mientras
+el personaje continúa siendo humano.
 
 Cuando un borrador ya está guardado, puede retomarse desde el listado mediante
 **Continuar creación**.
 
 La revisión final indica si el personaje cumple las condiciones necesarias
-para continuar con su ciclo de vida.
+para continuar con su ciclo de vida. Un personaje de Sesión 0 puede activarse
+como humano cuando su perfil mortal es válido.
 
 ### Ficha persistida
 
 Al abrir un personaje persistido se muestra su ficha.
+
+La ficha se adapta a la naturaleza y al estado real del personaje. Un humano
+activo puede abrir su ficha sin que la interfaz invente Hambre, Potencia de
+Sangre, Clan o Disciplinas. Después del Abrazo, un vampiro de Sesión 0 puede
+continuar activo mientras resuelve progresivamente las decisiones vampíricas
+que todavía estén pendientes.
 
 Según el estado y los permisos del usuario, la ficha puede permitir editar
 datos ya materializados, entre ellos:
@@ -82,11 +95,33 @@ datos ya materializados, entre ellos:
 - Fuerza de Voluntad;
 - Humanidad;
 - Manchas;
-- Hambre.
+- Hambre, únicamente cuando existe estado vampírico compatible.
 
 Las operaciones persistidas utilizan control de revisión. Si otra operación ha
 modificado el personaje, la interfaz puede exigir recargar o repetir la
 acción.
+
+### Abrazo y transición vampírica
+
+Un personaje humano de Sesión 0 puede recibir el **Abrazo** mediante la acción
+explícita disponible cuando corresponda.
+
+El Abrazo transforma el mismo personaje: conserva su identidad, propietario,
+Crónica asociada, Atributos, Habilidades, Especialidades, Humanidad, Inventario,
+Notas e Historial. No crea una segunda ficha ni reduce Humanidad
+automáticamente.
+
+Dentro de una Crónica, el Abrazo y las decisiones narrativas posteriores
+requieren el permiso contextual establecido para el Narrador. Cuando el
+personaje no pertenece a una Crónica, la aplicación puede permitir la operación
+al propietario según las reglas de autorización vigentes.
+
+Tras el Abrazo, la ficha muestra las decisiones vampíricas pendientes y permite
+resolverlas mediante las operaciones específicas disponibles. Clan, Sangre,
+Disciplinas, Poderes, Ventajas, Tipo de Depredador y Sangre Débil reutilizan
+las reglas ya existentes; estas dotaciones iniciales no consumen Experiencia.
+Cuando el perfil cumple la validación vampírica completa, deja de mostrarse como
+vampiro en transición.
 
 ### Inventario, Notas e Historial
 
@@ -200,6 +235,11 @@ privadas.
 El panel de Sesiones permite gestionar las Sesiones de la Crónica según el
 estado y permisos definidos por el sistema.
 
+El Narrador contextual puede registrar la asistencia de personajes activos
+asociados a la Crónica, tanto humanos como vampiros, mientras la Sesión sea
+editable. La asistencia histórica se conserva y su registro no concede
+Experiencia automáticamente.
+
 Puede incluir preparación y notas privadas del Narrador.
 
 ## Dados V5
@@ -212,11 +252,14 @@ Se admiten:
 - tiradas manuales;
 - tiradas vinculadas a un personaje;
 - preparación previa de la reserva;
-- Hambre;
+- Hambre cuando el personaje dispone de estado vampírico compatible;
 - dificultad cuando corresponda;
 - visualización de los dados individuales;
 - resultado estructurado;
 - historial de tiradas.
+
+Las tiradas vinculadas a un personaje humano utilizan únicamente dados
+normales: no generan ni sustituyen Dados de Hambre ficticios.
 
 Los resultados especiales materializados incluyen, cuando proceda:
 

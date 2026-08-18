@@ -1541,6 +1541,21 @@ Al cerrar SPEC-057 se actualizará:
 
 No se documentarán comportamientos antes de validarlos.
 
+### Evidencia de cierre implementada
+
+El cierre técnico de SPEC-057 mantiene el estado documental original
+`Aprobado` y registra el resultado operativo en `docs/specs/README.md`.
+
+La persistencia se amplió mediante la migración versionada
+`20260816185000_add_character_nature_creation_mode`, que incorpora
+`CharacterNature` (`HUMAN`, `VAMPIRE`) y `CharacterCreationMode`
+(`STANDARD`, `SESSION_ZERO`). Los registros existentes conservan compatibilidad
+mediante los valores por defecto `VAMPIRE` y `STANDARD`.
+
+La validación final acredita el flujo humano de Sesión 0, el Abrazo atómico,
+la transición vampírica progresiva, la ficha adaptativa y las tiradas humanas
+sin Dados de Hambre, además de la regresión global de API y Web.
+
 ## Fuera de alcance inicial detallado
 
 Queda fuera:
