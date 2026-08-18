@@ -88,6 +88,13 @@ const characterStatusLabels = {
   archived: 'Archivado',
 } as const
 
+type ChronicleDetailSection =
+  | 'summary'
+  | 'participants'
+  | 'sessions'
+  | 'story'
+  | 'resources'
+
 interface ChronicleDetailProps {
   readonly chronicleId: string
   readonly onBack: () => void
@@ -301,6 +308,13 @@ export function ChronicleDetail({
     setPendingConfirmationCharacterId,
   ] = useState<string | null>(null)
 
+  const [
+    activeSection,
+    setActiveSection,
+  ] = useState<ChronicleDetailSection>(
+    'summary',
+  )
+
   async function load() {
     setLoading(true)
     setError(null)
@@ -422,6 +436,18 @@ export function ChronicleDetail({
         participant.role ===
         'player',
     )
+
+  const activeNarratorCount =
+    narrators.filter(
+      (participant) =>
+        participant.status === 'active',
+    ).length
+
+  const activePlayerCount =
+    players.filter(
+      (participant) =>
+        participant.status === 'active',
+    ).length
 
   const independentOwnCharacters =
     ownCharacters.filter(
@@ -842,9 +868,108 @@ export function ChronicleDetail({
         </p>
       ) : null}
 
+      <nav
+        className="chronicle-detail__sections"
+        aria-label="Secciones de la crónica"
+      >
+        <div
+          className="chronicle-detail__section-tabs"
+          role="tablist"
+          aria-label="Contenido de la crónica"
+        >
+          <button
+            id="chronicle-section-summary-tab"
+            type="button"
+            role="tab"
+            aria-selected={activeSection === 'summary'}
+            aria-controls="chronicle-section-summary-panel"
+            className={
+              activeSection === 'summary'
+                ? 'chronicle-detail__section-tab chronicle-detail__section-tab--active'
+                : 'chronicle-detail__section-tab'
+            }
+            onClick={() => setActiveSection('summary')}
+          >
+            Resumen
+          </button>
+
+          <button
+            id="chronicle-section-participants-tab"
+            type="button"
+            role="tab"
+            aria-selected={activeSection === 'participants'}
+            aria-controls="chronicle-section-participants-panel"
+            className={
+              activeSection === 'participants'
+                ? 'chronicle-detail__section-tab chronicle-detail__section-tab--active'
+                : 'chronicle-detail__section-tab'
+            }
+            onClick={() => setActiveSection('participants')}
+          >
+            Participantes
+          </button>
+
+          {canManageSessions ? (
+            <button
+              id="chronicle-section-sessions-tab"
+              type="button"
+              role="tab"
+              aria-selected={activeSection === 'sessions'}
+              aria-controls="chronicle-section-sessions-panel"
+              className={
+                activeSection === 'sessions'
+                  ? 'chronicle-detail__section-tab chronicle-detail__section-tab--active'
+                  : 'chronicle-detail__section-tab'
+              }
+              onClick={() => setActiveSection('sessions')}
+            >
+              Sesiones
+            </button>
+          ) : null}
+
+          {canManageEvents ? (
+            <button
+              id="chronicle-section-story-tab"
+              type="button"
+              role="tab"
+              aria-selected={activeSection === 'story'}
+              aria-controls="chronicle-section-story-panel"
+              className={
+                activeSection === 'story'
+                  ? 'chronicle-detail__section-tab chronicle-detail__section-tab--active'
+                  : 'chronicle-detail__section-tab'
+              }
+              onClick={() => setActiveSection('story')}
+            >
+              Historia
+            </button>
+          ) : null}
+
+          {canManageNpcs || canManageLocations ? (
+            <button
+              id="chronicle-section-resources-tab"
+              type="button"
+              role="tab"
+              aria-selected={activeSection === 'resources'}
+              aria-controls="chronicle-section-resources-panel"
+              className={
+                activeSection === 'resources'
+                  ? 'chronicle-detail__section-tab chronicle-detail__section-tab--active'
+                  : 'chronicle-detail__section-tab'
+              }
+              onClick={() => setActiveSection('resources')}
+            >
+              Recursos
+            </button>
+          ) : null}
+        </div>
+      </nav>
+
       <section
+        id="chronicle-section-summary-panel"
         className="chronicle-detail__summary"
         aria-labelledby="chronicle-summary-title"
+        hidden={activeSection !== 'summary'}
       >
         <div className="chronicle-detail__summary-heading">
           <h2 id="chronicle-summary-title">
@@ -870,6 +995,38 @@ export function ChronicleDetail({
             Sin descripción o premisa.
           </p>
         )}
+
+        <dl
+          className="chronicle-detail__overview"
+          aria-label="Situación actual de la crónica"
+        >
+          <div>
+            <dt>Tu papel</dt>
+            <dd>
+              {currentMembership?.role ===
+              'narrator'
+                ? 'Narrador'
+                : 'Jugador'}
+            </dd>
+          </div>
+
+          <div>
+            <dt>Narradores activos</dt>
+            <dd>{activeNarratorCount}</dd>
+          </div>
+
+          <div>
+            <dt>Jugadores activos</dt>
+            <dd>{activePlayerCount}</dd>
+          </div>
+
+          <div>
+            <dt>Personajes asociados</dt>
+            <dd>
+              {associatedCharacters.length}
+            </dd>
+          </div>
+        </dl>
 
         <dl className="chronicle-detail__metadata">
           <div>
@@ -911,7 +1068,11 @@ export function ChronicleDetail({
         ) : null}
       </section>
 
-      <div className="chronicle-detail__grid">
+      <div
+        id="chronicle-section-participants-panel"
+        className="chronicle-detail__grid"
+        hidden={activeSection !== 'participants'}
+      >
         <section
           className="chronicle-detail__panel"
           aria-labelledby="chronicle-narrators-title"
@@ -977,6 +1138,7 @@ export function ChronicleDetail({
         <section
           className="chronicle-detail__panel"
           aria-labelledby="chronicle-add-participant-title"
+          hidden={activeSection !== 'participants'}
         >
           <div className="chronicle-detail__panel-heading">
             <div>
@@ -1059,7 +1221,11 @@ export function ChronicleDetail({
         </section>
       ) : null}
 
-      {canManageNpcs ? (
+      <div
+        id="chronicle-section-resources-panel"
+        hidden={activeSection !== 'resources'}
+      >
+        {canManageNpcs ? (
         <ChronicleNpcPanel
           chronicleId={chronicleId}
         />
@@ -1071,13 +1237,25 @@ export function ChronicleDetail({
         />
       ) : null}
 
-      {canManageEvents ? (
+      </div>
+
+      <div
+        id="chronicle-section-story-panel"
+        hidden={activeSection !== 'story'}
+      >
+        {canManageEvents ? (
         <ChronicleEventPanel
           chronicleId={chronicleId}
         />
       ) : null}
 
-      {canManageSessions ? (
+      </div>
+
+      <div
+        id="chronicle-section-sessions-panel"
+        hidden={activeSection !== 'sessions'}
+      >
+        {canManageSessions ? (
         <>
           <ChronicleSessionPanel
             chronicleId={chronicleId}
@@ -1099,8 +1277,11 @@ export function ChronicleDetail({
         </>
       ) : null}
 
+      </div>
+
       <section
         className="chronicle-detail__panel chronicle-detail__characters"
+        hidden={activeSection !== 'participants'}
         aria-labelledby="chronicle-characters-title"
       >
         <div className="chronicle-detail__panel-heading">
