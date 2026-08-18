@@ -300,9 +300,7 @@ export function CharacterList({
                   </div>
 
                   <div className="character-list-card__actions">
-                    {character.nature === 'vampire' &&
-                    character.creation.creationMode ===
-                      'standard' ? (
+                    {character.status === 'active' ? (
                       <button
                         type="button"
                         onClick={() =>
