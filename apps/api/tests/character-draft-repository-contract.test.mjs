@@ -184,3 +184,17 @@ test(
     )
   },
 )
+
+test(
+  '057-SANDMAN evita colisiones globales al persistir la misma concesión en personajes distintos',
+  () => {
+    assert.match(
+      repository,
+      /function createCharacterScopedSkillSpecialtyId\([\s\S]*specialtyId\.startsWith\(prefix\)/,
+    )
+    assert.match(
+      repository,
+      /id:\s*createCharacterScopedSkillSpecialtyId\(\s*data\.characterId,\s*specialty\.id,\s*\),/,
+    )
+  },
+)

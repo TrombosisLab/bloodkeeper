@@ -1148,6 +1148,18 @@ function toPersistedDraft(
   }
 }
 
+function createCharacterScopedSkillSpecialtyId(
+  characterId: string,
+  specialtyId: string,
+): string {
+  const prefix =
+    characterId + ":"
+
+  return specialtyId.startsWith(prefix)
+    ? specialtyId
+    : prefix + specialtyId
+}
+
 @Injectable()
 export class PrismaCharacterDraftRepository
   implements CharacterDraftRepository {
@@ -2474,7 +2486,11 @@ export class PrismaCharacterDraftRepository
               .characterSkillSpecialty.createMany({
                 data: data.skillSpecialties.map(
                   (specialty) => ({
-                    id: specialty.id,
+                    id:
+                      createCharacterScopedSkillSpecialtyId(
+                        data.characterId,
+                        specialty.id,
+                      ),
                     characterId: data.characterId,
                     skillKey: specialty.skillKey,
                     name: specialty.name,
