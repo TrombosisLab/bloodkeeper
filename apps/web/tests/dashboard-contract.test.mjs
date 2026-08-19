@@ -269,3 +269,112 @@ test('SPEC-013 personaliza la entrada sin crear componentes genéricos', () => {
     )
   }
 })
+test(
+  'UX Inicio compacta Personajes como acceso directo sin cambiar navegación',
+  () => {
+    assert.match(
+      dashboardSource,
+      /dashboard-panel--characters/,
+    )
+    assert.match(
+      dashboardSource,
+      /dashboard-panel__characters-action/,
+    )
+    assert.match(
+      dashboardSource,
+      /onClick=\{onNavigateCharacters\}/,
+    )
+    assert.match(
+      dashboardStyles,
+      /\.dashboard-panel--characters\s*\{[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*auto/,
+    )
+    assert.match(
+      dashboardStyles,
+      /\.dashboard-panel__characters-action[\s\S]*width:\s*auto/,
+    )
+  },
+)
+
+test(
+  'UX Inicio densifica las tres crónicas de resumen sin inventar paginación',
+  () => {
+    assert.match(
+      dashboardSource,
+      /limit:\s*3/,
+    )
+    assert.match(
+      dashboardSource,
+      /\.slice\(0,\s*3\)/,
+    )
+    assert.match(
+      dashboardStyles,
+      /\.dashboard-chronicles\s*\{[\s\S]*gap:\s*0\.5rem/,
+    )
+    assert.match(
+      dashboardStyles,
+      /\.dashboard-chronicles article\s*\{[\s\S]*padding:\s*0\.65rem 0\.75rem/,
+    )
+    assert.doesNotMatch(
+      dashboardSource,
+      /Cargar más crónicas|chroniclesNextOffset|loadMoreChronicles/,
+    )
+  },
+)
+
+test(
+  'UX Inicio conserva responsive y no introduce contenido ficticio',
+  () => {
+    assert.match(
+      dashboardStyles,
+      /@media \(max-width:\s*600px\)[\s\S]*dashboard-panel--characters[\s\S]*grid-template-columns:\s*1fr/,
+    )
+    assert.doesNotMatch(
+      dashboardSource,
+      /Actividad reciente|Estadísticas|Métricas|Buscar crónicas|Filtrar crónicas/,
+    )
+  },
+)
+
+test(
+  'UX Inicio alinea Tirada manual e Historial con el Dashboard sin tocar Dados',
+  () => {
+    assert.match(
+      mainSource,
+      /<Dashboard[\s\S]*<DiceRollPanel mode="manual" \/>[\s\S]*<DiceHistoryPanel \/>/,
+    )
+    assert.match(
+      dashboardStyles,
+      /\.dashboard \+ \.dice-roll-panel\s*\{[\s\S]*width:\s*auto[\s\S]*max-width:\s*none/,
+    )
+    assert.match(
+      dashboardStyles,
+      /\.dashboard[\s\S]*\+ \.dice-roll-panel[\s\S]*\+ \.dice-history-panel\s*\{[\s\S]*margin:/,
+    )
+    assert.match(
+      dashboardStyles,
+      /\.dashboard\s*\{[\s\S]*padding-bottom:\s*0\.75rem/,
+    )
+    assert.doesNotMatch(
+      mainSource,
+      /dashboard-dice-wrapper|dashboard-workspace-wrapper/,
+    )
+  },
+)
+
+test(
+  'UX Inicio alinea la altura de Personajes con Crónicas sin rellenar contenido',
+  () => {
+    assert.match(
+      dashboardStyles,
+      /\.dashboard-panel--characters\s*\{[\s\S]*align-self:\s*stretch/,
+    )
+    assert.match(
+      dashboardStyles,
+      /\.dashboard-panel--characters\s*\{[\s\S]*align-content:\s*start/,
+    )
+    assert.doesNotMatch(
+      dashboardSource,
+      /Personajes recientes|Personajes activos|Último personaje|Estadísticas/,
+    )
+  },
+)

@@ -200,7 +200,7 @@ export function Dashboard({
 
       <div className="dashboard__grid">
         <section
-          className="dashboard-panel"
+          className="dashboard-panel dashboard-panel--characters"
           aria-labelledby="dashboard-characters-title"
         >
           <div className="dashboard-panel__heading">
@@ -220,6 +220,7 @@ export function Dashboard({
 
           <button
             type="button"
+            className="dashboard-panel__characters-action"
             onClick={onNavigateCharacters}
           >
             Ir a Personajes
@@ -228,7 +229,7 @@ export function Dashboard({
 
         {canAccessChronicles ? (
           <section
-            className="dashboard-panel"
+            className="dashboard-panel dashboard-panel--chronicles"
             aria-labelledby="dashboard-chronicles-title"
             aria-busy={loading}
           >

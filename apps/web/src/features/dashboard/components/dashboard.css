@@ -137,3 +137,123 @@
     width: 100%;
   }
 }
+
+/* UX Inicio: densidad del resumen sin alterar sus funciones. */
+.dashboard__grid {
+  align-items: start;
+  gap: 0.9rem;
+}
+
+.dashboard-panel--characters,
+.dashboard-panel--chronicles {
+  padding: 1rem 1.15rem;
+}
+
+.dashboard-panel--characters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "heading action"
+    "copy action";
+  align-self: stretch;
+  align-content: start;
+  align-items: center;
+  gap: 0.35rem 1rem;
+}
+
+.dashboard-panel--characters .dashboard-panel__heading {
+  grid-area: heading;
+}
+
+.dashboard-panel--characters > p {
+  grid-area: copy;
+  margin: 0;
+  max-width: 42rem;
+}
+
+.dashboard-panel--characters
+  .dashboard-panel__characters-action {
+  grid-area: action;
+  align-self: center;
+  width: auto;
+  min-width: 9rem;
+  white-space: nowrap;
+}
+
+.dashboard-panel--chronicles
+  .dashboard-panel__heading {
+  margin-bottom: 0.65rem;
+}
+
+.dashboard-chronicles {
+  gap: 0.5rem;
+}
+
+.dashboard-chronicles article {
+  padding: 0.65rem 0.75rem;
+  gap: 0.2rem;
+}
+
+.dashboard-chronicles article > div {
+  gap: 0.75rem;
+}
+
+.dashboard-chronicles h3,
+.dashboard-chronicles article > p {
+  line-height: 1.25;
+}
+
+.dashboard-chronicles article > p {
+  margin: 0.15rem 0 0;
+}
+
+@media (max-width: 600px) {
+  .dashboard-panel--characters {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "heading"
+      "copy"
+      "action";
+    align-items: stretch;
+  }
+
+  .dashboard-panel--characters
+    .dashboard-panel__characters-action {
+    width: 100%;
+    margin-top: 0.35rem;
+  }
+}
+
+/* UX Inicio: alinear Dados con el ancho real del Dashboard. */
+.dashboard {
+  padding-bottom: 0.75rem;
+}
+
+.dashboard + .dice-roll-panel {
+  width: auto;
+  max-width: none;
+  margin:
+    0
+    clamp(1rem, 2vw, 2rem);
+}
+
+.dashboard
+  + .dice-roll-panel
+  + .dice-history-panel {
+  margin:
+    1rem
+    clamp(1rem, 2vw, 2rem)
+    0;
+}
+
+@media (max-width: 900px) {
+  .dashboard + .dice-roll-panel {
+    margin-inline: 1rem;
+  }
+
+  .dashboard
+    + .dice-roll-panel
+    + .dice-history-panel {
+    margin-inline: 1rem;
+  }
+}
