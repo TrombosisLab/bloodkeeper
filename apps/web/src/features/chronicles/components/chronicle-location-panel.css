@@ -1,52 +1,72 @@
 .chronicle-location-panel {
-  margin-top: var(--space-4);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-xl);
-  background: var(--color-surface-translucent);
-  box-shadow: var(--shadow-raised);
-  padding: clamp(1rem, 2.5vw, 1.5rem);
+  min-width: 0;
 }
 
-.chronicle-location-panel__heading,
-.chronicle-location-panel__item-heading,
-.chronicle-location-panel__detail-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.chronicle-location-panel__heading > div > span,
-.chronicle-location-panel__detail-heading > div > span {
-  display: block;
-  margin-bottom: 0.45rem;
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  opacity: 0.72;
-}
-
-.chronicle-location-panel h2,
 .chronicle-location-panel h3 {
   margin: 0;
 }
 
-.chronicle-location-panel__count,
-.chronicle-location-panel__state {
-  border-radius: var(--radius-pill);
+.chronicle-location-panel button {
+  min-height: 2.5rem;
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-control);
   background: var(--color-surface-emphasis);
-  font-size: var(--font-size-sm);
-  padding: 0.35rem 0.65rem;
-  white-space: nowrap;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.55rem 0.9rem;
 }
 
-.chronicle-location-panel__create,
-.chronicle-location-panel__detail {
-  margin-top: var(--space-5);
-  border-top:
-    1px solid
-    var(--color-border-subtle);
-  padding-top: var(--space-4);
+.chronicle-location-panel button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.chronicle-location-panel__compact-action {
+  min-height: 2rem !important;
+  padding: 0.35rem 0.65rem !important;
+  font-size: 0.78rem !important;
+}
+
+.chronicle-location-panel__create-launcher {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  border-color: var(--color-border-default) !important;
+  background: var(--color-surface-translucent) !important;
+  padding: var(--space-4) !important;
+  text-align: left;
+}
+
+.chronicle-location-panel__create-launcher > span:first-child {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.chronicle-location-panel__create-launcher small {
+  font-weight: 400;
+  opacity: 0.72;
+}
+
+.chronicle-location-panel__create {
+  margin-top: var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-emphasis);
+  padding: var(--space-4);
+}
+
+.chronicle-location-panel__create-heading,
+.chronicle-location-panel__browser-heading,
+.chronicle-location-panel__detail-heading,
+.chronicle-location-panel__detail-heading-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
 }
 
 .chronicle-location-panel__fields {
@@ -72,6 +92,7 @@
 .chronicle-location-panel select,
 .chronicle-location-panel textarea {
   width: 100%;
+  box-sizing: border-box;
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-control);
   background: var(--color-surface-emphasis);
@@ -84,92 +105,167 @@
   resize: vertical;
 }
 
-.chronicle-location-panel button {
-  min-height: 2.5rem;
-  border: 1px solid var(--color-border-accent);
-  border-radius: var(--radius-control);
-  background: var(--color-surface-emphasis);
-  color: var(--color-text-primary);
-  cursor: pointer;
-  font: inherit;
-  font-weight: 700;
-  padding: 0.55rem 0.9rem;
-}
-
-.chronicle-location-panel__create > button {
+.chronicle-location-panel__create > button[type='submit'] {
   margin-top: var(--space-4);
 }
 
-.chronicle-location-panel button:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
+.chronicle-location-panel__error {
+  margin: var(--space-3) 0 0;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-translucent);
+  color: var(--color-danger);
+  padding: var(--space-3);
 }
 
-.chronicle-location-panel__compact-action {
-  min-height: 2rem !important;
-  padding: 0.35rem 0.65rem !important;
-  font-size: 0.78rem !important;
+.chronicle-location-panel__workspace {
+  display: grid;
+  grid-template-columns:
+    minmax(16rem, 0.30fr)
+    minmax(0, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.chronicle-location-panel__browser,
+.chronicle-location-panel__detail {
+  min-width: 0;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-translucent);
+}
+
+.chronicle-location-panel__browser {
+  align-self: start;
+  max-height: 44rem;
+  overflow: hidden;
+  padding: var(--space-3);
+}
+
+.chronicle-location-panel__browser-heading {
+  padding: var(--space-2);
+}
+
+.chronicle-location-panel__browser-heading h3 {
+  white-space: nowrap;
+}
+
+.chronicle-location-panel__browser-heading > span,
+.chronicle-location-panel__state {
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-emphasis);
+  font-size: var(--font-size-sm);
+  padding: 0.35rem 0.65rem;
+  white-space: nowrap;
 }
 
 .chronicle-location-panel__list {
   display: grid;
-  gap: var(--space-3);
-  margin: var(--space-4) 0 0;
-  padding: 0;
+  max-height: 36rem;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  overflow-y: auto;
+  padding: 0 var(--space-1) 0 0;
   list-style: none;
+  scrollbar-gutter: stable;
 }
 
 .chronicle-location-panel__item {
-  border-top:
-    1px solid
-    var(--color-border-subtle);
-  padding-top: var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  overflow: hidden;
 }
 
 .chronicle-location-panel__item--archived {
   opacity: 0.72;
 }
 
-.chronicle-location-panel__item-heading > div {
-  min-width: 0;
+.chronicle-location-panel__item--selected {
+  border-color: var(--color-border-accent);
+  box-shadow:
+    inset 0 0 0 1px
+    var(--color-border-accent);
 }
 
-.chronicle-location-panel__item-heading strong,
-.chronicle-location-panel__item-heading > div > span {
-  display: block;
+.chronicle-location-panel__select {
+  display: grid;
+  width: 100%;
+  gap: 0.35rem;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: var(--space-3) !important;
+  text-align: left;
 }
 
-.chronicle-location-panel__item-heading > div > span {
-  margin-top: 0.25rem;
+.chronicle-location-panel__select-title {
+  overflow-wrap: anywhere;
+  font-weight: 800;
+}
+
+.chronicle-location-panel__select-meta,
+.chronicle-location-panel__select-footer {
   font-size: var(--font-size-sm);
+}
+
+.chronicle-location-panel__select-meta {
   opacity: 0.72;
 }
 
-.chronicle-location-panel__actions {
+.chronicle-location-panel__select-footer {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  justify-content: space-between;
   gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.chronicle-location-panel__load-more {
+  width: 100%;
   margin-top: var(--space-3);
 }
 
-.chronicle-location-panel__edit {
-  margin-top: var(--space-3);
+.chronicle-location-panel__detail {
+  min-height: 25rem;
+  padding: var(--space-4);
+}
+
+.chronicle-location-panel__detail-empty {
+  display: grid;
+  min-height: 20rem;
+  place-content: center;
+  text-align: center;
+}
+
+.chronicle-location-panel__detail-empty > span,
+.chronicle-location-panel__detail-heading > div > span {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.chronicle-location-panel__detail-empty p {
+  max-width: 46ch;
+  margin: var(--space-3) auto 0;
+  opacity: 0.72;
 }
 
 .chronicle-location-panel__detail-grid {
   display: grid;
   grid-template-columns:
     repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
+  gap: var(--space-3);
   margin: var(--space-4) 0 0;
 }
 
-.chronicle-location-panel__detail-grid div {
-  border-top:
-    1px solid
-    var(--color-border-subtle);
-  padding-top: var(--space-3);
+.chronicle-location-panel__detail-grid > div {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-translucent);
+  padding: var(--space-3);
 }
 
 .chronicle-location-panel__detail-grid dt {
@@ -180,28 +276,36 @@
 .chronicle-location-panel__detail-grid dd {
   margin: 0.35rem 0 0;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .chronicle-location-panel__detail-wide {
   grid-column: span 2;
 }
 
+.chronicle-location-panel__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.chronicle-location-panel__edit {
+  margin-top: var(--space-4);
+}
+
 .chronicle-location-panel__empty,
 .chronicle-location-panel__message {
-  margin: var(--space-4) 0 0;
+  margin: var(--space-3);
   opacity: 0.72;
 }
 
-.chronicle-location-panel__error {
-  margin: var(--space-4) 0 0;
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-control);
-  background: var(--color-surface-translucent);
-  color: var(--color-danger);
-  padding: var(--space-3);
-}
+@media (max-width: 1100px) {
+  .chronicle-location-panel__workspace {
+    grid-template-columns: 1fr;
+  }
 
-@media (max-width: 900px) {
   .chronicle-location-panel__fields {
     grid-template-columns: 1fr;
   }
@@ -212,11 +316,14 @@
 }
 
 @media (max-width: 760px) {
-  .chronicle-location-panel__heading,
-  .chronicle-location-panel__item-heading,
+  .chronicle-location-panel__create-heading,
   .chronicle-location-panel__detail-heading {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .chronicle-location-panel__detail-heading-actions {
+    width: 100%;
   }
 
   .chronicle-location-panel__detail-grid {
@@ -232,7 +339,22 @@
   }
 
   .chronicle-location-panel__actions button,
-  .chronicle-location-panel__create > button {
+  .chronicle-location-panel__create > button[type='submit'] {
     width: 100%;
   }
+}
+
+/* UX final: el navegador ocupa sólo lo necesario y pagina visualmente por scroll. */
+.chronicle-location-panel__workspace {
+  align-items: start;
+}
+
+.chronicle-location-panel__browser {
+  width: 100%;
+  height: fit-content;
+  box-sizing: border-box;
+}
+
+.chronicle-location-panel__list {
+  max-height: min(32rem, 55vh);
 }

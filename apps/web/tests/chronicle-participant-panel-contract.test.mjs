@@ -199,3 +199,83 @@ test(
     )
   },
 )
+
+test(
+  'UX Participantes pliega la incorporación contextual por defecto',
+  () => {
+    assert.match(
+      detail,
+      /showParticipantAdmin[\s\S]*useState\(false\)/,
+    )
+    assert.match(
+      detail,
+      /aria-expanded=\{showParticipantAdmin\}/,
+    )
+    assert.match(
+      detail,
+      /showParticipantAdmin \? \([\s\S]*chronicle-detail__participant-form/,
+    )
+  },
+)
+
+test(
+  'UX Participantes pliega la asociación de personajes por defecto',
+  () => {
+    assert.match(
+      detail,
+      /showCharacterAssociation[\s\S]*useState\(false\)/,
+    )
+    assert.match(
+      detail,
+      /aria-expanded=\{showCharacterAssociation\}/,
+    )
+    assert.match(
+      detail,
+      /showCharacterAssociation \? \([\s\S]*independentOwnCharacters/,
+    )
+  },
+)
+
+test(
+  'UX Participantes mantiene ids estables pero no imprime ids técnicos en el selector',
+  () => {
+    assert.match(
+      detail,
+      /key=\{candidate\.id\}[\s\S]*value=\{candidate\.id\}/,
+    )
+    assert.match(
+      detail,
+      /value=\{candidate\.id\}[\s\S]*\{candidate\.displayName\}/,
+    )
+    assert.doesNotMatch(
+      detail,
+      /\{'\s*'\}\(@\{candidate\.username\}\)/,
+    )
+    assert.match(
+      detail,
+      /readableUsername[\s\S]*normalized\.length > 32/,
+    )
+  },
+)
+
+test(
+  'UX Participantes compacta filas y reutiliza launcher plegable responsive',
+  () => {
+    assert.match(
+      styles,
+      /chronicle-detail__fold-launcher/,
+    )
+    assert.match(
+      styles,
+      /chronicle-detail__fold-content/,
+    )
+    assert.match(
+      styles,
+      /chronicle-detail__participants,[\s\S]*chronicle-detail__character-list[\s\S]*gap:\s*var\(--space-2\)/,
+    )
+    assert.match(
+      styles,
+      /@media \(max-width: 760px\)[\s\S]*chronicle-detail__fold-launcher/,
+    )
+  },
+)

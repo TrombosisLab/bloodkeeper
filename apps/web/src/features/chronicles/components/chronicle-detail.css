@@ -352,3 +352,72 @@
   margin: 0.35rem 0 0;
   font-weight: 700;
 }
+
+/* UX Participantes: acciones auxiliares plegables y densidad compacta. */
+.chronicle-detail__participant-admin {
+  margin-top: var(--space-4);
+}
+
+.chronicle-detail__fold-launcher {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-translucent);
+  color: var(--color-text-primary);
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+}
+
+.chronicle-detail__fold-launcher > span:first-child {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.chronicle-detail__fold-launcher small {
+  font-weight: 400;
+  opacity: 0.72;
+}
+
+.chronicle-detail__fold-content {
+  margin-top: var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-translucent);
+  padding: var(--space-4);
+}
+
+.chronicle-detail__fold-content > p:first-child {
+  max-width: 72ch;
+  margin-top: 0;
+  line-height: var(--line-height-normal);
+}
+
+.chronicle-detail__participants,
+.chronicle-detail__character-list {
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.chronicle-detail__participant,
+.chronicle-detail__character {
+  padding-top: var(--space-2);
+}
+
+.chronicle-detail__association {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+}
+
+@media (max-width: 760px) {
+  .chronicle-detail__fold-launcher {
+    align-items: flex-start;
+  }
+
+  .chronicle-detail__fold-content {
+    padding: var(--space-3);
+  }
+}

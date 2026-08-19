@@ -13,6 +13,15 @@ const detail =
     'utf8',
   )
 
+const workspace =
+  await readFile(
+    new URL(
+      '../src/features/chronicles/components/ChronicleResourcesWorkspace.tsx',
+      import.meta.url,
+    ),
+    'utf8',
+  )
+
 const panel =
   await readFile(
     new URL(
@@ -44,7 +53,11 @@ test(
     )
     assert.match(
       detail,
-      /canManageNpcs\s*\?\s*\([\s\S]*<ChronicleNpcPanel/,
+      /<ChronicleResourcesWorkspace[\s\S]*canManageNpcs=\{canManageNpcs\}/,
+    )
+    assert.match(
+      workspace,
+      /canManageNpcs \? \([\s\S]*<ChronicleNpcPanel/,
     )
   },
 )
@@ -69,19 +82,20 @@ test(
 
     assert.match(
       panel,
-      />\s*Crear PNJ simple\s*</,
+      /Crear PNJ/,
     )
-
-    for (const action of [
-      'Consultar',
-      'Editar',
-      'Archivar',
-    ]) {
-      assert.match(
-        panel,
-        new RegExp(action),
-      )
-    }
+    assert.match(
+      panel,
+      /consultNpc\([\s\S]*npc\.id/,
+    )
+    assert.match(
+      panel,
+      />\s*Editar\s*</,
+    )
+    assert.match(
+      panel,
+      /Archivar/,
+    )
   },
 )
 
@@ -109,16 +123,14 @@ test(
 )
 
 test(
-  '032-C consulta rápida muestra datos esenciales y técnicos',
+  '032-C detalle seleccionado muestra datos esenciales y técnicos',
   () => {
     assert.match(
       panel,
-      />\s*Consulta rápida\s*</,
+      /Detalle del PNJ/,
     )
 
     for (const label of [
-      'Estado',
-      'Nivel',
       'Tipo o categoría',
       'Rol narrativo',
       'Descripción',
@@ -135,11 +147,55 @@ test(
 )
 
 test(
-  '032-C no adelanta búsqueda ni recursos de SPEC-033–035',
+  '032-C UX usa id estable listado izquierda detalle derecha y alta plegable',
+  () => {
+    assert.match(
+      panel,
+      /key=\{npc\.id\}/,
+    )
+    assert.match(
+      panel,
+      /selectedNpc\?\.id ===[\s\S]*npc\.id/,
+    )
+    assert.match(
+      panel,
+      /showCreateForm/,
+    )
+    assert.match(
+      panel,
+      /aria-expanded=\{showCreateForm\}/,
+    )
+    assert.match(
+      styles,
+      /grid-template-columns:[\s\S]*minmax\(16rem,[\s\S]*minmax\(0, 1fr\)/,
+    )
+  },
+)
+
+test(
+  '032-C archivados consultables pero acciones de escritura sólo activas',
+  () => {
+    assert.match(
+      panel,
+      /selectedNpc\.status ===[\s\S]*'active'/,
+    )
+    assert.match(
+      panel,
+      /gateway\.npc/,
+    )
+    assert.match(
+      panel,
+      /chronicle-npc-panel__item--\$\{npc\.status\}/,
+    )
+  },
+)
+
+test(
+  '032-C no adelanta búsqueda ni contenido vampírico desarrollado',
   () => {
     assert.doesNotMatch(
       panel,
-      /Buscar|Filtrar|Localizaciones|Eventos|Línea temporal|Sesiones/,
+      /Buscar|Filtrar|Atributos|Habilidades|Salud|Voluntad|Disciplinas/,
     )
   },
 )
@@ -147,33 +203,46 @@ test(
 test(
   '032-C diseño usa tokens y mantiene responsive',
   () => {
-    assert.match(
-      styles,
-      /var\(--color-border-default\)/,
-    )
-    assert.match(
-      styles,
-      /var\(--color-surface-translucent\)/,
-    )
-    assert.match(
-      styles,
-      /var\(--radius-xl\)/,
-    )
-    assert.match(
-      styles,
-      /@media \(max-width: 900px\)/,
-    )
-    assert.match(
-      styles,
-      /@media \(max-width: 760px\)/,
-    )
+    for (const token of [
+      'var(--color-border-default)',
+      'var(--color-surface-translucent)',
+      'var(--radius-xl)',
+      '@media (max-width: 1100px)',
+      '@media (max-width: 760px)',
+    ]) {
+      assert.ok(
+        styles.includes(token),
+        `Falta token/patrón visual: ${token}`,
+      )
+    }
+
     assert.doesNotMatch(
       styles,
-      /#[0-9a-f]{3,8}\b/i,
+      /#[0-9a-f]{3,8}\b|rgba?\(/i,
     )
-    assert.doesNotMatch(
+  },
+)
+
+test(
+  'UX Recursos selecciona el primer PNJ cargado mediante su id estable',
+  () => {
+    assert.match(
+      panel,
+      /page\.items\.length > 0[\s\S]*gateway\.npc\([\s\S]*chronicleId,[\s\S]*page\.items\[0\]\.id/,
+    )
+  },
+)
+
+test(
+  'UX Recursos ajusta el listado PNJ al contenido y conserva scroll acotado',
+  () => {
+    assert.match(
       styles,
-      /rgba?\(/,
+      /height:\s*fit-content/,
+    )
+    assert.match(
+      styles,
+      /max-height:\s*min\(32rem,\s*55vh\)/,
     )
   },
 )

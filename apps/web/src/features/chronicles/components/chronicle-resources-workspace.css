@@ -1,0 +1,116 @@
+.chronicle-resources-workspace {
+  margin-top: var(--space-4);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-translucent);
+  box-shadow: var(--shadow-raised);
+  overflow: hidden;
+}
+
+.chronicle-resources-workspace__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.chronicle-resources-workspace__heading > div > span {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.chronicle-resources-workspace h2 {
+  margin: 0;
+}
+
+.chronicle-resources-workspace__count,
+.chronicle-resources-workspace__tab strong {
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-emphasis);
+  font-size: var(--font-size-sm);
+  padding: 0.35rem 0.65rem;
+  white-space: nowrap;
+}
+
+.chronicle-resources-workspace__tabs {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  border-top:
+    1px solid
+    var(--color-border-subtle);
+  border-bottom:
+    1px solid
+    var(--color-border-subtle);
+}
+
+.chronicle-resources-workspace__tab {
+  display: flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 0;
+  border-right:
+    1px solid
+    var(--color-border-subtle);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.chronicle-resources-workspace__tab:last-child {
+  border-right: 0;
+}
+
+.chronicle-resources-workspace__tab--active {
+  background: var(--color-surface-emphasis);
+  box-shadow:
+    inset 0 -2px 0
+    var(--color-border-accent);
+}
+
+.chronicle-resources-workspace__panel {
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.chronicle-resources-workspace__panel[hidden] {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .chronicle-resources-workspace__heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .chronicle-resources-workspace__tabs {
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .chronicle-resources-workspace__tab {
+    flex: 1 0 9rem;
+  }
+}
+
+/* UX final: la pestaña inactiva queda visualmente subordinada. */
+.chronicle-resources-workspace__tab:not(
+  .chronicle-resources-workspace__tab--active
+) {
+  background: transparent;
+  opacity: 0.62;
+  box-shadow: none;
+}
+
+.chronicle-resources-workspace__tab--active {
+  opacity: 1;
+}

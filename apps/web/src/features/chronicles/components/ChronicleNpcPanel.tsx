@@ -28,6 +28,9 @@ const gateway =
 
 interface ChronicleNpcPanelProps {
   readonly chronicleId: string
+  readonly onCountChange?: (
+    count: number,
+  ) => void
 }
 
 interface NpcFormState {
@@ -124,14 +127,19 @@ function operationErrorMessage(
 
 export function ChronicleNpcPanel({
   chronicleId,
+  onCountChange,
 }: ChronicleNpcPanelProps) {
-  const [npcs, setNpcs] =
-    useState<
-      readonly ChronicleNpcApiSnapshot[]
-    >([])
+  const [
+    npcs,
+    setNpcs,
+  ] = useState<
+    readonly ChronicleNpcApiSnapshot[]
+  >([])
 
-  const [loading, setLoading] =
-    useState(true)
+  const [
+    loading,
+    setLoading,
+  ] = useState(true)
 
   const [
     npcsNextOffset,
@@ -152,6 +160,11 @@ export function ChronicleNpcPanel({
     operationId,
     setOperationId,
   ] = useState<string | null>(null)
+
+  const [
+    showCreateForm,
+    setShowCreateForm,
+  ] = useState(false)
 
   const [
     createForm,
@@ -181,6 +194,14 @@ export function ChronicleNpcPanel({
     ChronicleNpcApiSnapshot | null
   >(null)
 
+  function replaceNpcs(
+    items:
+      readonly ChronicleNpcApiSnapshot[],
+  ) {
+    setNpcs(items)
+    onCountChange?.(items.length)
+  }
+
   async function loadNpcs() {
     setLoading(true)
     setOperationError(null)
@@ -195,10 +216,21 @@ export function ChronicleNpcPanel({
           },
         )
 
-      setNpcs(page.items)
+      replaceNpcs(page.items)
       setNpcsNextOffset(
         page.nextOffset,
       )
+
+      if (page.items.length > 0) {
+        setSelectedNpc(
+          await gateway.npc(
+            chronicleId,
+            page.items[0].id,
+          ),
+        )
+      } else {
+        setSelectedNpc(null)
+      }
     } catch (error: unknown) {
       setOperationError(
         operationErrorMessage(error),
@@ -231,10 +263,18 @@ export function ChronicleNpcPanel({
         )
 
       setNpcs(
-        (current) => [
-          ...current,
-          ...page.items,
-        ],
+        (current) => {
+          const updated = [
+            ...current,
+            ...page.items,
+          ]
+
+          onCountChange?.(
+            updated.length,
+          )
+
+          return updated
+        },
       )
       setNpcsNextOffset(
         page.nextOffset,
@@ -249,6 +289,9 @@ export function ChronicleNpcPanel({
   }
 
   useEffect(() => {
+    setSelectedNpc(null)
+    setEditingNpcId(null)
+    setEditForm(emptyForm)
     void loadNpcs()
   }, [chronicleId])
 
@@ -288,7 +331,7 @@ export function ChronicleNpcPanel({
         },
       )
 
-    setNpcs(page.items)
+    replaceNpcs(page.items)
     setNpcsNextOffset(
       page.nextOffset,
     )
@@ -334,6 +377,7 @@ export function ChronicleNpcPanel({
       )
 
       setCreateForm(emptyForm)
+      setShowCreateForm(false)
       await refreshAfterWrite()
     } catch (error: unknown) {
       setOperationError(
@@ -359,6 +403,8 @@ export function ChronicleNpcPanel({
           npcId,
         ),
       )
+      setEditingNpcId(null)
+      setEditForm(emptyForm)
     } catch (error: unknown) {
       setOperationError(
         operationErrorMessage(error),
@@ -368,16 +414,25 @@ export function ChronicleNpcPanel({
     }
   }
 
-  function beginEdit(
-    npc: ChronicleNpcApiSnapshot,
-  ) {
-    if (npc.status !== 'active') {
+  function closeDetail() {
+    setSelectedNpc(null)
+    setEditingNpcId(null)
+    setEditForm(emptyForm)
+  }
+
+  function beginEdit() {
+    if (
+      selectedNpc === null ||
+      selectedNpc.status !== 'active'
+    ) {
       return
     }
 
-    setEditingNpcId(npc.id)
+    setEditingNpcId(
+      selectedNpc.id,
+    )
     setEditForm(
-      formFromNpc(npc),
+      formFromNpc(selectedNpc),
     )
     setOperationError(null)
   }
@@ -440,10 +495,7 @@ export function ChronicleNpcPanel({
         npcId,
       )
 
-      if (editingNpcId === npcId) {
-        cancelEdit()
-      }
-
+      cancelEdit()
       await refreshAfterWrite(npcId)
     } catch (error: unknown) {
       setOperationError(
@@ -540,52 +592,80 @@ export function ChronicleNpcPanel({
     )
   }
 
+  const editingSelected =
+    selectedNpc !== null &&
+    editingNpcId === selectedNpc.id
+
   return (
     <section
       className="chronicle-npc-panel"
-      aria-labelledby="chronicle-npcs-title"
+      aria-label="Gestión de PNJ"
     >
-      <div className="chronicle-npc-panel__heading">
-        <div>
-          <span>
-            Información privada del Narrador
-          </span>
-          <h2 id="chronicle-npcs-title">
-            PNJ
-          </h2>
-        </div>
-
-        <span className="chronicle-npc-panel__count">
-          {npcs.length}
-        </span>
-      </div>
-
-      <form
-        className="chronicle-npc-panel__create"
-        aria-labelledby="chronicle-npc-create-title"
-        onSubmit={createNpc}
+      <button
+        type="button"
+        className="chronicle-npc-panel__create-launcher"
+        aria-expanded={showCreateForm}
+        aria-controls="chronicle-npc-create-panel"
+        onClick={() =>
+          setShowCreateForm(
+            (current) => !current,
+          )
+        }
       >
-        <h3 id="chronicle-npc-create-title">
-          Crear PNJ simple
-        </h3>
+        <span>
+          <strong>Crear PNJ</strong>
+          <small>
+            Añade un PNJ simple a esta crónica.
+          </small>
+        </span>
 
-        {formFields(
-          createForm,
-          updateCreateField,
-          'create-npc',
-        )}
+        <span aria-hidden="true">
+          {showCreateForm ? '−' : '+'}
+        </span>
+      </button>
 
-        <button
-          type="submit"
-          disabled={
-            operationId === 'npc-create'
-          }
+      {showCreateForm ? (
+        <form
+          id="chronicle-npc-create-panel"
+          className="chronicle-npc-panel__create"
+          aria-labelledby="chronicle-npc-create-title"
+          onSubmit={createNpc}
         >
-          {operationId === 'npc-create'
-            ? 'Creando…'
-            : 'Crear PNJ'}
-        </button>
-      </form>
+          <div className="chronicle-npc-panel__create-heading">
+            <h3 id="chronicle-npc-create-title">
+              Nuevo PNJ
+            </h3>
+
+            <button
+              type="button"
+              className="chronicle-npc-panel__compact-action"
+              onClick={() => {
+                setShowCreateForm(false)
+                setCreateForm(emptyForm)
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+
+          {formFields(
+            createForm,
+            updateCreateField,
+            'create-npc',
+          )}
+
+          <button
+            type="submit"
+            disabled={
+              operationId === 'npc-create'
+            }
+          >
+            {operationId === 'npc-create'
+              ? 'Creando…'
+              : 'Crear PNJ'}
+          </button>
+        </form>
+      ) : null}
 
       {operationError !== null ? (
         <p
@@ -597,259 +677,279 @@ export function ChronicleNpcPanel({
         </p>
       ) : null}
 
-      {loading ? (
-        <ViewStateStatus
-          state="loading"
-          className="chronicle-npc-panel__message"
+      <div className="chronicle-npc-panel__workspace">
+        <aside
+          className="chronicle-npc-panel__browser"
+          aria-label="Listado de PNJ"
         >
-          Cargando PNJ…
-        </ViewStateStatus>
-      ) : npcs.length === 0 ? (
-        <p className="chronicle-npc-panel__empty">
-          No hay PNJ registrados en esta crónica.
-        </p>
-      ) : (
-        <ul className="chronicle-npc-panel__list">
-          {npcs.map((npc) => {
-            const consulting =
-              operationId ===
-              `npc-detail:${npc.id}`
-            const updating =
-              operationId ===
-              `npc-update:${npc.id}`
-            const archiving =
-              operationId ===
-              `npc-archive:${npc.id}`
-            const editing =
-              editingNpcId === npc.id
+          <div className="chronicle-npc-panel__browser-heading">
+            <h3>Listado de PNJ</h3>
+            <span>{npcs.length}</span>
+          </div>
 
-            return (
-              <li
-                key={npc.id}
-                className={
-                  'chronicle-npc-panel__item ' +
-                  `chronicle-npc-panel__item--${npc.status}`
-                }
-              >
-                <div className="chronicle-npc-panel__item-heading">
-                  <div>
-                    <strong>
-                      {npc.name}
-                    </strong>
+          {loading ? (
+            <ViewStateStatus
+              state="loading"
+              className="chronicle-npc-panel__message"
+            >
+              Cargando PNJ…
+            </ViewStateStatus>
+          ) : npcs.length === 0 ? (
+            <p className="chronicle-npc-panel__empty">
+              No hay PNJ registrados en esta crónica.
+            </p>
+          ) : (
+            <ul className="chronicle-npc-panel__list">
+              {npcs.map((npc) => {
+                const consulting =
+                  operationId ===
+                  `npc-detail:${npc.id}`
 
-                    <span>
-                      {npc.category ??
-                        npc.narrativeRole ??
-                        'PNJ simple'}
-                    </span>
-                  </div>
+                const selected =
+                  selectedNpc?.id ===
+                  npc.id
 
-                  <span className="chronicle-npc-panel__state">
-                    {
-                      npcStatusLabels[
-                        npc.status
-                      ]
-                    }
-                  </span>
-                </div>
-
-                {editing ? (
-                  <form
-                    className="chronicle-npc-panel__edit"
-                    onSubmit={(event) =>
-                      void updateNpc(
-                        event,
-                        npc.id,
+                return (
+                  <li
+                    key={npc.id}
+                    className={
+                      'chronicle-npc-panel__item ' +
+                      `chronicle-npc-panel__item--${npc.status} ` +
+                      (
+                        selected
+                          ? 'chronicle-npc-panel__item--selected'
+                          : ''
                       )
                     }
                   >
-                    {formFields(
-                      editForm,
-                      updateEditField,
-                      `edit-${npc.id}`,
-                    )}
-
-                    <div className="chronicle-npc-panel__actions">
-                      <button
-                        type="submit"
-                        disabled={updating}
-                      >
-                        {updating
-                          ? 'Guardando…'
-                          : 'Guardar'}
-                      </button>
-
-                      <button
-                        type="button"
-                        className="chronicle-npc-panel__compact-action"
-                        disabled={updating}
-                        onClick={cancelEdit}
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="chronicle-npc-panel__actions">
                     <button
                       type="button"
-                      className="chronicle-npc-panel__compact-action"
+                      className="chronicle-npc-panel__select"
                       disabled={consulting}
+                      aria-pressed={selected}
                       onClick={() =>
                         void consultNpc(
                           npc.id,
                         )
                       }
                     >
-                      {consulting
-                        ? 'Consultando…'
-                        : 'Consultar'}
+                      <span className="chronicle-npc-panel__select-title">
+                        {npc.name}
+                      </span>
+
+                      <span className="chronicle-npc-panel__select-meta">
+                        {npc.category ??
+                          npc.narrativeRole ??
+                          'PNJ simple'}
+                      </span>
+
+                      <span className="chronicle-npc-panel__select-footer">
+                        <span>
+                          {npc.narrativeRole ??
+                            'Sin rol narrativo'}
+                        </span>
+
+                        <span className="chronicle-npc-panel__state">
+                          {
+                            npcStatusLabels[
+                              npc.status
+                            ]
+                          }
+                        </span>
+                      </span>
                     </button>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
 
-                    {npc.status ===
-                    'active' ? (
-                      <>
-                        <button
-                          type="button"
-                          className="chronicle-npc-panel__compact-action"
-                          onClick={() =>
-                            beginEdit(npc)
-                          }
-                        >
-                          Editar
-                        </button>
-
-                        <button
-                          type="button"
-                          className="chronicle-npc-panel__compact-action"
-                          disabled={archiving}
-                          onClick={() =>
-                            void archiveNpc(
-                              npc.id,
-                            )
-                          }
-                        >
-                          {archiving
-                            ? 'Archivando…'
-                            : 'Archivar'}
-                        </button>
-                      </>
-                    ) : null}
-                  </div>
-                )}
-              </li>
-            )
-          })}
-        </ul>
-      )}
-
-      {npcsNextOffset !== null ? (
-        <button
-          type="button"
-          onClick={() => {
-            void loadMoreNpcs()
-          }}
-          disabled={loadingMoreNpcs}
-        >
-          {loadingMoreNpcs
-            ? 'Cargando más PNJ…'
-            : 'Cargar más PNJ'}
-        </button>
-      ) : null}
-
-      {selectedNpc !== null ? (
-        <section
-          className="chronicle-npc-panel__detail"
-          aria-labelledby="chronicle-npc-detail-title"
-        >
-          <div className="chronicle-npc-panel__detail-heading">
-            <div>
-              <span>Consulta rápida</span>
-              <h3 id="chronicle-npc-detail-title">
-                {selectedNpc.name}
-              </h3>
-            </div>
-
+          {npcsNextOffset !== null ? (
             <button
               type="button"
-              className="chronicle-npc-panel__compact-action"
+              className="chronicle-npc-panel__load-more"
               onClick={() =>
-                setSelectedNpc(null)
+                void loadMoreNpcs()
               }
+              disabled={loadingMoreNpcs}
             >
-              Cerrar detalle
+              {loadingMoreNpcs
+                ? 'Cargando más PNJ…'
+                : 'Cargar más PNJ'}
             </button>
-          </div>
+          ) : null}
+        </aside>
 
-          <dl className="chronicle-npc-panel__detail-grid">
-            <div>
-              <dt>Estado</dt>
-              <dd>
-                {
-                  npcStatusLabels[
-                    selectedNpc.status
-                  ]
-                }
-              </dd>
+        <div className="chronicle-npc-panel__detail">
+          {selectedNpc === null ? (
+            <div className="chronicle-npc-panel__detail-empty">
+              <span>PNJ</span>
+              <h3>Selecciona un PNJ</h3>
+              <p>
+                Elige una entrada del listado para consultar sus datos privados y acciones.
+              </p>
             </div>
+          ) : (
+            <>
+              <div className="chronicle-npc-panel__detail-heading">
+                <div>
+                  <span>
+                    Detalle del PNJ
+                  </span>
+                  <h3>
+                    {selectedNpc.name}
+                  </h3>
+                </div>
 
-            <div>
-              <dt>Nivel</dt>
-              <dd>Simple</dd>
-            </div>
+                <div className="chronicle-npc-panel__detail-heading-actions">
+                  <span className="chronicle-npc-panel__state">
+                    {
+                      npcStatusLabels[
+                        selectedNpc.status
+                      ]
+                    }
+                  </span>
 
-            <div>
-              <dt>Tipo o categoría</dt>
-              <dd>
-                {selectedNpc.category ??
-                  'Sin categoría'}
-              </dd>
-            </div>
+                  <button
+                    type="button"
+                    className="chronicle-npc-panel__compact-action"
+                    onClick={closeDetail}
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
 
-            <div>
-              <dt>Rol narrativo</dt>
-              <dd>
-                {selectedNpc.narrativeRole ??
-                  'Sin rol narrativo'}
-              </dd>
-            </div>
+              {editingSelected ? (
+                <form
+                  className="chronicle-npc-panel__edit"
+                  onSubmit={(event) =>
+                    void updateNpc(
+                      event,
+                      selectedNpc.id,
+                    )
+                  }
+                >
+                  {formFields(
+                    editForm,
+                    updateEditField,
+                    `edit-${selectedNpc.id}`,
+                  )}
 
-            <div className="chronicle-npc-panel__detail-wide">
-              <dt>Descripción</dt>
-              <dd>
-                {selectedNpc.description ??
-                  'Sin descripción'}
-              </dd>
-            </div>
+                  <div className="chronicle-npc-panel__actions">
+                    <button
+                      type="submit"
+                      disabled={
+                        operationId ===
+                        `npc-update:${selectedNpc.id}`
+                      }
+                    >
+                      {operationId ===
+                      `npc-update:${selectedNpc.id}`
+                        ? 'Guardando…'
+                        : 'Guardar cambios'}
+                    </button>
 
-            <div className="chronicle-npc-panel__detail-wide">
-              <dt>Notas privadas</dt>
-              <dd>
-                {selectedNpc.notes ??
-                  'Sin notas'}
-              </dd>
-            </div>
+                    <button
+                      type="button"
+                      className="chronicle-npc-panel__compact-action"
+                      onClick={cancelEdit}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <dl className="chronicle-npc-panel__detail-grid">
+                    <div>
+                      <dt>Tipo o categoría</dt>
+                      <dd>
+                        {selectedNpc.category ??
+                          'Sin categoría'}
+                      </dd>
+                    </div>
 
-            <div>
-              <dt>Creado</dt>
-              <dd>
-                {technicalDate(
-                  selectedNpc.createdAt,
-                )}
-              </dd>
-            </div>
+                    <div>
+                      <dt>Rol narrativo</dt>
+                      <dd>
+                        {selectedNpc.narrativeRole ??
+                          'Sin rol narrativo'}
+                      </dd>
+                    </div>
 
-            <div>
-              <dt>Actualizado</dt>
-              <dd>
-                {technicalDate(
-                  selectedNpc.updatedAt,
-                )}
-              </dd>
-            </div>
-          </dl>
-        </section>
-      ) : null}
+                    <div className="chronicle-npc-panel__detail-wide">
+                      <dt>Descripción</dt>
+                      <dd>
+                        {selectedNpc.description ??
+                          'Sin descripción'}
+                      </dd>
+                    </div>
+
+                    <div className="chronicle-npc-panel__detail-wide">
+                      <dt>Notas privadas</dt>
+                      <dd>
+                        {selectedNpc.notes ??
+                          'Sin notas'}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt>Creado</dt>
+                      <dd>
+                        {technicalDate(
+                          selectedNpc.createdAt,
+                        )}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt>Actualizado</dt>
+                      <dd>
+                        {technicalDate(
+                          selectedNpc.updatedAt,
+                        )}
+                      </dd>
+                    </div>
+                  </dl>
+
+                  {selectedNpc.status ===
+                  'active' ? (
+                    <div className="chronicle-npc-panel__actions">
+                      <button
+                        type="button"
+                        className="chronicle-npc-panel__compact-action"
+                        onClick={beginEdit}
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        type="button"
+                        className="chronicle-npc-panel__compact-action"
+                        disabled={
+                          operationId ===
+                          `npc-archive:${selectedNpc.id}`
+                        }
+                        onClick={() =>
+                          void archiveNpc(
+                            selectedNpc.id,
+                          )
+                        }
+                      >
+                        {operationId ===
+                        `npc-archive:${selectedNpc.id}`
+                          ? 'Archivando…'
+                          : 'Archivar'}
+                      </button>
+                    </div>
+                  ) : null}
+                </>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     </section>
   )
 }

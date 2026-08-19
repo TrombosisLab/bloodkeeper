@@ -4,29 +4,41 @@ import {
 } from 'node:fs/promises'
 import test from 'node:test'
 
-const panel = await readFile(
-  new URL(
-    '../src/features/chronicles/components/ChronicleLocationPanel.tsx',
-    import.meta.url,
-  ),
-  'utf8',
-)
+const panel =
+  await readFile(
+    new URL(
+      '../src/features/chronicles/components/ChronicleLocationPanel.tsx',
+      import.meta.url,
+    ),
+    'utf8',
+  )
 
-const styles = await readFile(
-  new URL(
-    '../src/features/chronicles/components/chronicle-location-panel.css',
-    import.meta.url,
-  ),
-  'utf8',
-)
+const styles =
+  await readFile(
+    new URL(
+      '../src/features/chronicles/components/chronicle-location-panel.css',
+      import.meta.url,
+    ),
+    'utf8',
+  )
 
-const detail = await readFile(
-  new URL(
-    '../src/features/chronicles/components/ChronicleDetail.tsx',
-    import.meta.url,
-  ),
-  'utf8',
-)
+const detail =
+  await readFile(
+    new URL(
+      '../src/features/chronicles/components/ChronicleDetail.tsx',
+      import.meta.url,
+    ),
+    'utf8',
+  )
+
+const workspace =
+  await readFile(
+    new URL(
+      '../src/features/chronicles/components/ChronicleResourcesWorkspace.tsx',
+      import.meta.url,
+    ),
+    'utf8',
+  )
 
 test(
   '033-C monta Localizaciones sólo para Narrador contextual',
@@ -41,7 +53,11 @@ test(
     )
     assert.match(
       detail,
-      /<ChronicleLocationPanel[\s\S]*chronicleId=\{chronicleId\}/,
+      /<ChronicleResourcesWorkspace[\s\S]*canManageLocations=\{[\s\S]*canManageLocations/,
+    )
+    assert.match(
+      workspace,
+      /canManageLocations \? \([\s\S]*<ChronicleLocationPanel/,
     )
   },
 )
@@ -56,10 +72,9 @@ test(
       'gateway.updateLocation',
       'gateway.archiveLocation',
       'Crear Localización',
-      'Consultar',
       'Editar',
       'Archivar',
-      'Consulta rápida',
+      'Detalle de la Localización',
     ]) {
       assert.match(
         panel,
@@ -102,12 +117,11 @@ test(
 )
 
 test(
-  '033-C consulta rápida prioriza información esencial y reservada',
+  '033-C detalle muestra información esencial y reservada',
   () => {
     for (const label of [
-      'Estado',
-      'Dentro de',
       'Tipo o categoría',
+      'Dentro de',
       'Descripción',
       'Notas privadas',
       'Creada',
@@ -122,11 +136,37 @@ test(
 )
 
 test(
+  '033-C UX usa id estable listado izquierda detalle derecha y alta plegable',
+  () => {
+    assert.match(
+      panel,
+      /key=\{location\.id\}/,
+    )
+    assert.match(
+      panel,
+      /selectedLocation\?\.id ===[\s\S]*location\.id/,
+    )
+    assert.match(
+      panel,
+      /showCreateForm/,
+    )
+    assert.match(
+      panel,
+      /aria-expanded=\{showCreateForm\}/,
+    )
+    assert.match(
+      styles,
+      /grid-template-columns:[\s\S]*minmax\(16rem,[\s\S]*minmax\(0, 1fr\)/,
+    )
+  },
+)
+
+test(
   '033-C archivadas siguen consultables pero no editables',
   () => {
     assert.match(
       panel,
-      /location\.status ===[\s\S]*'active'/,
+      /selectedLocation\.status ===[\s\S]*'active'/,
     )
     assert.match(
       panel,
@@ -156,7 +196,7 @@ test(
       'var(--color-border-default)',
       'var(--color-surface-translucent)',
       'var(--radius-xl)',
-      '@media (max-width: 900px)',
+      '@media (max-width: 1100px)',
       '@media (max-width: 760px)',
     ]) {
       assert.ok(
@@ -168,6 +208,30 @@ test(
     assert.doesNotMatch(
       styles,
       /#[0-9a-f]{3,8}\b|rgb\(/i,
+    )
+  },
+)
+
+test(
+  'UX Recursos selecciona la primera Localización cargada mediante su id estable',
+  () => {
+    assert.match(
+      panel,
+      /loadedLocations\.length > 0[\s\S]*gateway\.location\([\s\S]*chronicleId,[\s\S]*loadedLocations\[0\]\.id/,
+    )
+  },
+)
+
+test(
+  'UX Recursos ajusta el listado de Localizaciones al contenido y conserva scroll acotado',
+  () => {
+    assert.match(
+      styles,
+      /height:\s*fit-content/,
+    )
+    assert.match(
+      styles,
+      /max-height:\s*min\(32rem,\s*55vh\)/,
     )
   },
 )

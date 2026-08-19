@@ -99,7 +99,7 @@ test(
   () => {
     assert.match(
       panel,
-      /activeEvents/,
+      /const activeEvents[\s\S]*events\.filter/,
     )
     assert.match(
       panel,
@@ -121,7 +121,7 @@ test(
 )
 
 test(
-  '034-C consulta rápida muestra tiempo detalle privado y fechas técnicas',
+  '034-C detalle muestra tiempo detalle privado y fechas técnicas',
   () => {
     for (const label of [
       'Consulta rápida',
@@ -146,7 +146,7 @@ test(
   () => {
     assert.match(
       panel,
-      /event\.status ===[\s\S]*'active'/,
+      /selectedEvent\.status ===[\s\S]*'active'/,
     )
     assert.match(
       panel,
@@ -159,6 +159,68 @@ test(
     assert.match(
       panel,
       /event\.status !== 'active'/,
+    )
+  },
+)
+
+test(
+  '034-C UX crea workspace por id con alta plegable y autoselección',
+  () => {
+    assert.match(
+      panel,
+      /showCreateForm[\s\S]*useState\(false\)/,
+    )
+    assert.match(
+      panel,
+      /aria-expanded=\{showCreateForm\}/,
+    )
+    assert.match(
+      panel,
+      /loadedEvents\.length > 0[\s\S]*gateway\.event\([\s\S]*chronicleId,[\s\S]*loadedEvents\[0\]\.id/,
+    )
+    assert.match(
+      panel,
+      /key=\{event\.id\}/,
+    )
+    assert.match(
+      panel,
+      /selectedEvent\?\.id ===[\s\S]*event\.id/,
+    )
+  },
+)
+
+test(
+  '034-C UX usa listado izquierda detalle derecha y scroll acotado',
+  () => {
+    assert.match(
+      styles,
+      /grid-template-columns:[\s\S]*minmax\(16rem,[\s\S]*minmax\(0, 1fr\)/,
+    )
+    assert.match(
+      styles,
+      /max-height:\s*min\(32rem,\s*55vh\)/,
+    )
+    assert.match(
+      styles,
+      /height:\s*fit-content/,
+    )
+  },
+)
+
+test(
+  '034-C archivados consultables pero no editables',
+  () => {
+    assert.match(
+      panel,
+      /chronicle-event-panel__item--\$\{event\.status\}/,
+    )
+    assert.match(
+      panel,
+      /gateway\.event/,
+    )
+    assert.match(
+      panel,
+      /selectedEvent\.status ===[\s\S]*'active'/,
     )
   },
 )
@@ -180,16 +242,18 @@ test(
       'var(--color-border-default)',
       'var(--color-surface-translucent)',
       'var(--radius-xl)',
-      '@media (max-width: 900px)',
+      '@media (max-width: 1100px)',
       '@media (max-width: 760px)',
     ]) {
-      assert.match(
-        styles,
-        new RegExp(
-          token
-            .replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
-        ),
+      assert.ok(
+        styles.includes(token),
+        `Falta token/patrón visual: ${token}`,
       )
     }
+
+    assert.doesNotMatch(
+      styles,
+      /#[0-9a-f]{3,8}\b|rgb\(/i,
+    )
   },
 )

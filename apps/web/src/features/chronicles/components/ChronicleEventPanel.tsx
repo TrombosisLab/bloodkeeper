@@ -54,8 +54,7 @@ const eventStatusLabels = {
 function optionalText(
   value: string,
 ): string | null {
-  const trimmed =
-    value.trim()
+  const trimmed = value.trim()
 
   return trimmed.length === 0
     ? null
@@ -69,8 +68,7 @@ function localDateTimeFromIso(
     return ''
   }
 
-  const date =
-    new Date(value)
+  const date = new Date(value)
 
   const pad = (
     part: number,
@@ -107,9 +105,7 @@ function requestFromForm(
     description:
       optionalText(form.description),
     narratorNotes:
-      optionalText(
-        form.narratorNotes,
-      ),
+      optionalText(form.narratorNotes),
     narrativeTimeLabel:
       optionalText(
         form.narrativeTimeLabel,
@@ -195,8 +191,10 @@ export function ChronicleEventPanel({
     readonly ChronicleEventApiSnapshot[]
   >([])
 
-  const [loading, setLoading] =
-    useState(true)
+  const [
+    loading,
+    setLoading,
+  ] = useState(true)
 
   const [
     operationError,
@@ -211,6 +209,11 @@ export function ChronicleEventPanel({
   ] = useState<string | null>(
     null,
   )
+
+  const [
+    showCreateForm,
+    setShowCreateForm,
+  ] = useState(false)
 
   const [
     createForm,
@@ -245,11 +248,23 @@ export function ChronicleEventPanel({
     setOperationError(null)
 
     try {
-      setEvents(
+      const loadedEvents =
         await gateway.events(
           chronicleId,
-        ),
-      )
+        )
+
+      setEvents(loadedEvents)
+
+      if (loadedEvents.length > 0) {
+        setSelectedEvent(
+          await gateway.event(
+            chronicleId,
+            loadedEvents[0].id,
+          ),
+        )
+      } else {
+        setSelectedEvent(null)
+      }
     } catch (error: unknown) {
       setOperationError(
         operationErrorMessage(
@@ -262,6 +277,9 @@ export function ChronicleEventPanel({
   }
 
   useEffect(() => {
+    setSelectedEvent(null)
+    setEditingEventId(null)
+    setEditForm(emptyForm)
     void loadEvents()
   }, [chronicleId])
 
@@ -323,9 +341,7 @@ export function ChronicleEventPanel({
     submitEvent.preventDefault()
 
     const request =
-      requestFromForm(
-        createForm,
-      )
+      requestFromForm(createForm)
 
     if (
       request.title.length === 0
@@ -342,13 +358,28 @@ export function ChronicleEventPanel({
     setOperationError(null)
 
     try {
-      await gateway.createEvent(
-        chronicleId,
-        request,
-      )
+      const created =
+        await gateway.createEvent(
+          chronicleId,
+          request,
+        )
 
       setCreateForm(emptyForm)
-      await refreshAfterWrite()
+      setShowCreateForm(false)
+
+      const updated =
+        await gateway.events(
+          chronicleId,
+        )
+
+      setEvents(updated)
+
+      setSelectedEvent(
+        await gateway.event(
+          chronicleId,
+          created.id,
+        ),
+      )
     } catch (error: unknown) {
       setOperationError(
         operationErrorMessage(
@@ -375,6 +406,8 @@ export function ChronicleEventPanel({
           eventId,
         ),
       )
+      setEditingEventId(null)
+      setEditForm(emptyForm)
     } catch (error: unknown) {
       setOperationError(
         operationErrorMessage(
@@ -384,6 +417,12 @@ export function ChronicleEventPanel({
     } finally {
       setOperationId(null)
     }
+  }
+
+  function closeDetail() {
+    setSelectedEvent(null)
+    setEditingEventId(null)
+    setEditForm(emptyForm)
   }
 
   function beginEdit(
@@ -417,9 +456,7 @@ export function ChronicleEventPanel({
     submitEvent.preventDefault()
 
     const request =
-      requestFromForm(
-        editForm,
-      )
+      requestFromForm(editForm)
 
     if (
       request.title.length === 0
@@ -659,6 +696,25 @@ export function ChronicleEventPanel({
     )
   }
 
+  const editingSelected =
+    selectedEvent !== null &&
+    editingEventId ===
+      selectedEvent.id
+
+  const selectedActiveIndex =
+    selectedEvent === null
+      ? -1
+      : activeEvents.findIndex(
+          (event) =>
+            event.id ===
+            selectedEvent.id,
+        )
+
+  const reordering =
+    operationId?.startsWith(
+      'event-reorder:',
+    ) ?? false
+
   return (
     <section
       className="chronicle-event-panel"
@@ -669,6 +725,7 @@ export function ChronicleEventPanel({
           <span>
             Información privada del Narrador
           </span>
+
           <h2 id="chronicle-events-title">
             Eventos / Línea temporal
           </h2>
@@ -679,34 +736,73 @@ export function ChronicleEventPanel({
         </span>
       </div>
 
-      <form
-        className="chronicle-event-panel__create"
-        aria-labelledby="chronicle-event-create-title"
-        onSubmit={createEvent}
+      <button
+        type="button"
+        className="chronicle-event-panel__create-launcher"
+        aria-expanded={showCreateForm}
+        aria-controls="chronicle-event-create-panel"
+        onClick={() =>
+          setShowCreateForm(
+            (current) => !current,
+          )
+        }
       >
-        <h3 id="chronicle-event-create-title">
-          Crear Evento
-        </h3>
+        <span>
+          <strong>Crear Evento</strong>
+          <small>
+            Añade un hito a la historia sin alterar el orden narrativo existente.
+          </small>
+        </span>
 
-        {formFields(
-          createForm,
-          updateCreateField,
-          'create-event',
-        )}
+        <span aria-hidden="true">
+          {showCreateForm ? '−' : '+'}
+        </span>
+      </button>
 
-        <button
-          type="submit"
-          disabled={
-            operationId ===
-            'event-create'
-          }
+      {showCreateForm ? (
+        <form
+          id="chronicle-event-create-panel"
+          className="chronicle-event-panel__create"
+          aria-labelledby="chronicle-event-create-title"
+          onSubmit={createEvent}
         >
-          {operationId ===
-          'event-create'
-            ? 'Creando…'
-            : 'Crear Evento'}
-        </button>
-      </form>
+          <div className="chronicle-event-panel__create-heading">
+            <h3 id="chronicle-event-create-title">
+              Nuevo Evento
+            </h3>
+
+            <button
+              type="button"
+              className="chronicle-event-panel__compact-action"
+              onClick={() => {
+                setShowCreateForm(false)
+                setCreateForm(emptyForm)
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+
+          {formFields(
+            createForm,
+            updateCreateField,
+            'create-event',
+          )}
+
+          <button
+            type="submit"
+            disabled={
+              operationId ===
+              'event-create'
+            }
+          >
+            {operationId ===
+            'event-create'
+              ? 'Creando…'
+              : 'Crear Evento'}
+          </button>
+        </form>
+      ) : null}
 
       {operationError !== null ? (
         <p
@@ -718,119 +814,56 @@ export function ChronicleEventPanel({
         </p>
       ) : null}
 
-      {loading ? (
-        <ViewStateStatus
-          state="loading"
-          className="chronicle-event-panel__message"
+      <div className="chronicle-event-panel__workspace">
+        <aside
+          className="chronicle-event-panel__browser"
+          aria-label="Historia de la crónica"
         >
-          Cargando Eventos…
-        </ViewStateStatus>
-      ) : events.length === 0 ? (
-        <p className="chronicle-event-panel__empty">
-          No hay Eventos registrados en esta crónica.
-        </p>
-      ) : (
-        <ul className="chronicle-event-panel__list">
-          {events.map(
-            (event) => {
-              const consulting =
-                operationId ===
-                `event-detail:${event.id}`
-              const updating =
-                operationId ===
-                `event-update:${event.id}`
-              const archiving =
-                operationId ===
-                `event-archive:${event.id}`
-              const reordering =
-                operationId?.startsWith(
-                  'event-reorder:',
-                ) ?? false
-              const editing =
-                editingEventId ===
-                event.id
+          <div className="chronicle-event-panel__browser-heading">
+            <h3>Historia</h3>
+            <span>{events.length}</span>
+          </div>
 
-              const activeIndex =
-                activeEvents.findIndex(
-                  (candidate) =>
-                    candidate.id ===
-                    event.id,
-                )
+          {loading ? (
+            <ViewStateStatus
+              state="loading"
+              className="chronicle-event-panel__message"
+            >
+              Cargando Eventos…
+            </ViewStateStatus>
+          ) : events.length === 0 ? (
+            <p className="chronicle-event-panel__empty">
+              No hay Eventos registrados en esta crónica.
+            </p>
+          ) : (
+            <ul className="chronicle-event-panel__list">
+              {events.map(
+                (event) => {
+                  const selected =
+                    selectedEvent?.id ===
+                    event.id
 
-              return (
-                <li
-                  key={event.id}
-                  className={
-                    'chronicle-event-panel__item ' +
-                    `chronicle-event-panel__item--${event.status}`
-                  }
-                >
-                  <div className="chronicle-event-panel__item-heading">
-                    <div>
-                      <strong>
-                        {event.title}
-                      </strong>
+                  const consulting =
+                    operationId ===
+                    `event-detail:${event.id}`
 
-                      <span>
-                        {event.narrativeTimeLabel ??
-                          realDateLabel(
-                            event.realDate,
-                          )}
-                      </span>
-                    </div>
-
-                    <span className="chronicle-event-panel__state">
-                      {
-                        eventStatusLabels[
-                          event.status
-                        ]
-                      }
-                    </span>
-                  </div>
-
-                  {editing ? (
-                    <form
-                      className="chronicle-event-panel__edit"
-                      onSubmit={(
-                        submitEvent,
-                      ) =>
-                        void updateEvent(
-                          submitEvent,
-                          event.id,
+                  return (
+                    <li
+                      key={event.id}
+                      className={
+                        'chronicle-event-panel__item ' +
+                        `chronicle-event-panel__item--${event.status} ` +
+                        (
+                          selected
+                            ? 'chronicle-event-panel__item--selected'
+                            : ''
                         )
                       }
                     >
-                      {formFields(
-                        editForm,
-                        updateEditField,
-                        `edit-${event.id}`,
-                      )}
-
-                      <div className="chronicle-event-panel__actions">
-                        <button
-                          type="submit"
-                          disabled={updating}
-                        >
-                          {updating
-                            ? 'Guardando…'
-                            : 'Guardar'}
-                        </button>
-
-                        <button
-                          type="button"
-                          className="chronicle-event-panel__compact-action"
-                          disabled={updating}
-                          onClick={cancelEdit}
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    </form>
-                  ) : (
-                    <div className="chronicle-event-panel__actions">
                       <button
                         type="button"
-                        className="chronicle-event-panel__compact-action"
+                        className="chronicle-event-panel__select"
+                        aria-pressed={selected}
                         disabled={consulting}
                         onClick={() =>
                           void consultEvent(
@@ -838,189 +871,282 @@ export function ChronicleEventPanel({
                           )
                         }
                       >
-                        {consulting
-                          ? 'Consultando…'
-                          : 'Consultar'}
+                        <span className="chronicle-event-panel__select-order">
+                          {event.status ===
+                          'active'
+                            ? event.timelineOrder +
+                              1
+                            : '—'}
+                        </span>
+
+                        <span className="chronicle-event-panel__select-main">
+                          <strong>
+                            {event.title}
+                          </strong>
+
+                          <small>
+                            {event.narrativeTimeLabel ??
+                              realDateLabel(
+                                event.realDate,
+                              )}
+                          </small>
+                        </span>
+
+                        <span className="chronicle-event-panel__state">
+                          {
+                            eventStatusLabels[
+                              event.status
+                            ]
+                          }
+                        </span>
+                      </button>
+                    </li>
+                  )
+                },
+              )}
+            </ul>
+          )}
+        </aside>
+
+        <div className="chronicle-event-panel__detail">
+          {selectedEvent === null ? (
+            <div className="chronicle-event-panel__detail-empty">
+              <span>Evento</span>
+              <h3>Selecciona un Evento</h3>
+              <p>
+                Elige una entrada para consultar su posición narrativa, información privada y acciones.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="chronicle-event-panel__detail-heading">
+                <div>
+                  <span>
+                    Consulta rápida
+                  </span>
+
+                  <h3>
+                    {selectedEvent.title}
+                  </h3>
+                </div>
+
+                <div className="chronicle-event-panel__detail-heading-actions">
+                  <span className="chronicle-event-panel__state">
+                    {
+                      eventStatusLabels[
+                        selectedEvent.status
+                      ]
+                    }
+                  </span>
+
+                  <button
+                    type="button"
+                    className="chronicle-event-panel__compact-action"
+                    onClick={closeDetail}
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+
+              {editingSelected ? (
+                <form
+                  className="chronicle-event-panel__edit"
+                  onSubmit={(submitEvent) =>
+                    void updateEvent(
+                      submitEvent,
+                      selectedEvent.id,
+                    )
+                  }
+                >
+                  {formFields(
+                    editForm,
+                    updateEditField,
+                    `edit-${selectedEvent.id}`,
+                  )}
+
+                  <div className="chronicle-event-panel__actions">
+                    <button
+                      type="submit"
+                      disabled={
+                        operationId ===
+                        `event-update:${selectedEvent.id}`
+                      }
+                    >
+                      {operationId ===
+                      `event-update:${selectedEvent.id}`
+                        ? 'Guardando…'
+                        : 'Guardar cambios'}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="chronicle-event-panel__compact-action"
+                      onClick={cancelEdit}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <dl className="chronicle-event-panel__detail-grid">
+                    <div>
+                      <dt>Posición temporal</dt>
+                      <dd>
+                        {selectedEvent.status ===
+                        'active'
+                          ? selectedEvent.timelineOrder +
+                            1
+                          : `Archivada · orden ${selectedEvent.timelineOrder + 1}`}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt>
+                        Referencia temporal
+                      </dt>
+                      <dd>
+                        {selectedEvent.narrativeTimeLabel ??
+                          'Sin referencia narrativa'}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt>Fecha real</dt>
+                      <dd>
+                        {realDateLabel(
+                          selectedEvent.realDate,
+                        )}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt>Estado</dt>
+                      <dd>
+                        {
+                          eventStatusLabels[
+                            selectedEvent.status
+                          ]
+                        }
+                      </dd>
+                    </div>
+
+                    <div className="chronicle-event-panel__detail-wide">
+                      <dt>Descripción</dt>
+                      <dd>
+                        {selectedEvent.description ??
+                          'Sin descripción'}
+                      </dd>
+                    </div>
+
+                    <div className="chronicle-event-panel__detail-wide">
+                      <dt>Notas privadas</dt>
+                      <dd>
+                        {selectedEvent.narratorNotes ??
+                          'Sin notas privadas'}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt>Creado</dt>
+                      <dd>
+                        {technicalDate(
+                          selectedEvent.createdAt,
+                        )}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt>Actualizado</dt>
+                      <dd>
+                        {technicalDate(
+                          selectedEvent.updatedAt,
+                        )}
+                      </dd>
+                    </div>
+                  </dl>
+
+                  {selectedEvent.status ===
+                  'active' ? (
+                    <div className="chronicle-event-panel__actions">
+                      <button
+                        type="button"
+                        className="chronicle-event-panel__compact-action"
+                        onClick={() =>
+                          beginEdit(
+                            selectedEvent,
+                          )
+                        }
+                      >
+                        Editar
                       </button>
 
-                      {event.status ===
-                      'active' ? (
-                        <>
-                          <button
-                            type="button"
-                            className="chronicle-event-panel__compact-action"
-                            onClick={() =>
-                              beginEdit(
-                                event,
-                              )
-                            }
-                          >
-                            Editar
-                          </button>
+                      <button
+                        type="button"
+                        className="chronicle-event-panel__compact-action"
+                        disabled={
+                          reordering ||
+                          selectedActiveIndex <=
+                            0
+                        }
+                        onClick={() =>
+                          void moveEvent(
+                            selectedEvent.id,
+                            -1,
+                          )
+                        }
+                      >
+                        Subir
+                      </button>
 
-                          <button
-                            type="button"
-                            className="chronicle-event-panel__compact-action"
-                            disabled={
-                              reordering ||
-                              activeIndex <= 0
-                            }
-                            onClick={() =>
-                              void moveEvent(
-                                event.id,
-                                -1,
-                              )
-                            }
-                          >
-                            Subir
-                          </button>
+                      <button
+                        type="button"
+                        className="chronicle-event-panel__compact-action"
+                        disabled={
+                          reordering ||
+                          selectedActiveIndex <
+                            0 ||
+                          selectedActiveIndex ===
+                            activeEvents.length -
+                              1
+                        }
+                        onClick={() =>
+                          void moveEvent(
+                            selectedEvent.id,
+                            1,
+                          )
+                        }
+                      >
+                        Bajar
+                      </button>
 
-                          <button
-                            type="button"
-                            className="chronicle-event-panel__compact-action"
-                            disabled={
-                              reordering ||
-                              activeIndex < 0 ||
-                              activeIndex ===
-                                activeEvents.length -
-                                  1
-                            }
-                            onClick={() =>
-                              void moveEvent(
-                                event.id,
-                                1,
-                              )
-                            }
-                          >
-                            Bajar
-                          </button>
-
-                          <button
-                            type="button"
-                            className="chronicle-event-panel__compact-action"
-                            disabled={archiving}
-                            onClick={() =>
-                              void archiveEvent(
-                                event.id,
-                              )
-                            }
-                          >
-                            {archiving
-                              ? 'Archivando…'
-                              : 'Archivar'}
-                          </button>
-                        </>
-                      ) : null}
+                      <button
+                        type="button"
+                        className="chronicle-event-panel__compact-action"
+                        disabled={
+                          operationId ===
+                          `event-archive:${selectedEvent.id}`
+                        }
+                        onClick={() =>
+                          void archiveEvent(
+                            selectedEvent.id,
+                          )
+                        }
+                      >
+                        {operationId ===
+                        `event-archive:${selectedEvent.id}`
+                          ? 'Archivando…'
+                          : 'Archivar'}
+                      </button>
                     </div>
-                  )}
-                </li>
-              )
-            },
+                  ) : null}
+                </>
+              )}
+            </>
           )}
-        </ul>
-      )}
-
-      {selectedEvent !== null ? (
-        <section className="chronicle-event-panel__detail">
-          <div className="chronicle-event-panel__detail-heading">
-            <div>
-              <span>
-                Consulta rápida
-              </span>
-              <h3>
-                {selectedEvent.title}
-              </h3>
-            </div>
-
-            <button
-              type="button"
-              className="chronicle-event-panel__compact-action"
-              onClick={() =>
-                setSelectedEvent(null)
-              }
-            >
-              Cerrar
-            </button>
-          </div>
-
-          <dl className="chronicle-event-panel__detail-grid">
-            <div>
-              <dt>Estado</dt>
-              <dd>
-                {
-                  eventStatusLabels[
-                    selectedEvent.status
-                  ]
-                }
-              </dd>
-            </div>
-
-            <div>
-              <dt>Posición temporal</dt>
-              <dd>
-                {selectedEvent.status ===
-                'active'
-                  ? selectedEvent.timelineOrder +
-                    1
-                  : `Archivada · orden ${selectedEvent.timelineOrder + 1}`}
-              </dd>
-            </div>
-
-            <div>
-              <dt>
-                Referencia temporal
-              </dt>
-              <dd>
-                {selectedEvent.narrativeTimeLabel ??
-                  'Sin referencia narrativa'}
-              </dd>
-            </div>
-
-            <div>
-              <dt>Fecha real</dt>
-              <dd>
-                {realDateLabel(
-                  selectedEvent.realDate,
-                )}
-              </dd>
-            </div>
-
-            <div className="chronicle-event-panel__detail-wide">
-              <dt>Descripción</dt>
-              <dd>
-                {selectedEvent.description ??
-                  'Sin descripción'}
-              </dd>
-            </div>
-
-            <div className="chronicle-event-panel__detail-wide">
-              <dt>Notas privadas</dt>
-              <dd>
-                {selectedEvent.narratorNotes ??
-                  'Sin notas privadas'}
-              </dd>
-            </div>
-
-            <div>
-              <dt>Creado</dt>
-              <dd>
-                {technicalDate(
-                  selectedEvent.createdAt,
-                )}
-              </dd>
-            </div>
-
-            <div>
-              <dt>Actualizado</dt>
-              <dd>
-                {technicalDate(
-                  selectedEvent.updatedAt,
-                )}
-              </dd>
-            </div>
-          </dl>
-        </section>
-      ) : null}
+        </div>
+      </div>
     </section>
   )
 }

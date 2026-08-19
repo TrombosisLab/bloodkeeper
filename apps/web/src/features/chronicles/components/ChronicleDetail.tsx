@@ -49,12 +49,8 @@ import {
 
 
 import {
-  ChronicleLocationPanel,
-} from './ChronicleLocationPanel'
-
-import {
-  ChronicleNpcPanel,
-} from './ChronicleNpcPanel'
+  ChronicleResourcesWorkspace,
+} from './ChronicleResourcesWorkspace'
 
 import './chronicle-detail.css'
 
@@ -224,6 +220,22 @@ function characterName(
     : 'Personaje sin nombre'
 }
 
+function readableUsername(
+  username: string,
+): string | null {
+  const normalized =
+    username.trim()
+
+  if (
+    normalized.length === 0 ||
+    normalized.length > 32
+  ) {
+    return null
+  }
+
+  return `@${normalized}`
+}
+
 export function ChronicleDetail({
   chronicleId,
   onBack,
@@ -278,6 +290,16 @@ export function ChronicleDetail({
   ] = useState<
     ChronicleParticipantApiRole
   >('player')
+
+  const [
+    showParticipantAdmin,
+    setShowParticipantAdmin,
+  ] = useState(false)
+
+  const [
+    showCharacterAssociation,
+    setShowCharacterAssociation,
+  ] = useState(false)
 
   const [loading, setLoading] =
     useState(true)
@@ -595,6 +617,7 @@ export function ChronicleDetail({
       )
 
       await refreshParticipants()
+      setShowParticipantAdmin(false)
     } catch (addError: unknown) {
       setOperationError(
         operationErrorMessage(
@@ -739,9 +762,15 @@ export function ChronicleDetail({
           <strong>
             {participant.displayName}
           </strong>
-          <span>
-            @{participant.username}
-          </span>
+          {readableUsername(
+            participant.username,
+          ) !== null ? (
+            <span>
+              {readableUsername(
+                participant.username,
+              )}
+            </span>
+          ) : null}
         </div>
 
         <div className="chronicle-detail__participant-meta">
@@ -1130,88 +1159,112 @@ export function ChronicleDetail({
 
       {canManageParticipants ? (
         <section
-          className="chronicle-detail__panel"
-          aria-labelledby="chronicle-add-participant-title"
+          className="chronicle-detail__participant-admin"
           hidden={activeSection !== 'participants'}
+          aria-label="Administración contextual de participantes"
         >
-          <div className="chronicle-detail__panel-heading">
-            <div>
-              <span>Administración contextual</span>
-              <h2 id="chronicle-add-participant-title">
+          <button
+            type="button"
+            className="chronicle-detail__fold-launcher"
+            aria-expanded={showParticipantAdmin}
+            aria-controls="chronicle-participant-admin-panel"
+            onClick={() =>
+              setShowParticipantAdmin(
+                (current) => !current,
+              )
+            }
+          >
+            <span>
+              <strong>
                 Incorporar participante
-              </h2>
-            </div>
-          </div>
+              </strong>
+              <small>
+                Añade un usuario a la crónica con su rol contextual.
+              </small>
+            </span>
 
-          {candidates.length === 0 ? (
-            <p className="chronicle-detail__empty">
-              No hay usuarios disponibles para incorporar.
-            </p>
-          ) : (
-            <form
-              className="chronicle-detail__participant-form"
-              onSubmit={addParticipant}
+            <span aria-hidden="true">
+              {showParticipantAdmin
+                ? '−'
+                : '+'}
+            </span>
+          </button>
+
+          {showParticipantAdmin ? (
+            <div
+              id="chronicle-participant-admin-panel"
+              className="chronicle-detail__fold-content"
             >
-              <label>
-                <span>Usuario</span>
-                <select
-                  value={
-                    selectedCandidateId
-                  }
-                  onChange={(event) =>
-                    setSelectedCandidateId(
-                      event.target.value,
-                    )
-                  }
+              {candidates.length === 0 ? (
+                <p className="chronicle-detail__empty">
+                  No hay usuarios disponibles para incorporar.
+                </p>
+              ) : (
+                <form
+                  className="chronicle-detail__participant-form"
+                  onSubmit={addParticipant}
                 >
-                  {candidates.map(
-                    (candidate) => (
-                      <option
-                        key={candidate.id}
-                        value={candidate.id}
-                      >
-                        {candidate.displayName}
-                        {' '}(@{candidate.username})
+                  <label>
+                    <span>Usuario</span>
+                    <select
+                      value={
+                        selectedCandidateId
+                      }
+                      onChange={(event) =>
+                        setSelectedCandidateId(
+                          event.target.value,
+                        )
+                      }
+                    >
+                      {candidates.map(
+                        (candidate) => (
+                          <option
+                            key={candidate.id}
+                            value={candidate.id}
+                          >
+                            {candidate.displayName}
+                          </option>
+                        ),
+                      )}
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>Rol contextual</span>
+                    <select
+                      value={selectedRole}
+                      onChange={(event) =>
+                        setSelectedRole(
+                          event.target.value as
+                            ChronicleParticipantApiRole,
+                        )
+                      }
+                    >
+                      <option value="player">
+                        Jugador
                       </option>
-                    ),
-                  )}
-                </select>
-              </label>
+                      <option value="narrator">
+                        Narrador
+                      </option>
+                    </select>
+                  </label>
 
-              <label>
-                <span>Rol contextual</span>
-                <select
-                  value={selectedRole}
-                  onChange={(event) =>
-                    setSelectedRole(
-                      event.target.value as
-                        ChronicleParticipantApiRole,
-                    )
-                  }
-                >
-                  <option value="player">
-                    Jugador
-                  </option>
-                  <option value="narrator">
-                    Narrador
-                  </option>
-                </select>
-              </label>
-
-              <button
-                type="submit"
-                disabled={
-                  operationId ===
-                  'add-participant'
-                }
-              >
-                {operationId ===
-                'add-participant'
-                  ? 'Incorporando…'
-                  : 'Incorporar'}
-              </button>
-            </form>
-          )}
+                  <button
+                    type="submit"
+                    disabled={
+                      operationId ===
+                      'add-participant'
+                    }
+                  >
+                    {operationId ===
+                    'add-participant'
+                      ? 'Incorporando…'
+                      : 'Incorporar'}
+                  </button>
+                </form>
+              )}
+            </div>
+          ) : null}
         </section>
       ) : null}
 
@@ -1219,18 +1272,16 @@ export function ChronicleDetail({
         id="chronicle-section-resources-panel"
         hidden={activeSection !== 'resources'}
       >
-        {canManageNpcs ? (
-        <ChronicleNpcPanel
-          chronicleId={chronicleId}
-        />
-      ) : null}
-
-      {canManageLocations ? (
-        <ChronicleLocationPanel
-          chronicleId={chronicleId}
-        />
-      ) : null}
-
+        {canManageNpcs ||
+        canManageLocations ? (
+          <ChronicleResourcesWorkspace
+            chronicleId={chronicleId}
+            canManageNpcs={canManageNpcs}
+            canManageLocations={
+              canManageLocations
+            }
+          />
+        ) : null}
       </div>
 
       <div
@@ -1386,70 +1437,100 @@ export function ChronicleDetail({
         )}
 
         <div className="chronicle-detail__association">
-          <h3>
-            Asociar uno de tus personajes
-          </h3>
+          <button
+            type="button"
+            className="chronicle-detail__fold-launcher"
+            aria-expanded={showCharacterAssociation}
+            aria-controls="chronicle-character-association-panel"
+            onClick={() =>
+              setShowCharacterAssociation(
+                (current) => !current,
+              )
+            }
+          >
+            <span>
+              <strong>
+                Asociar uno de tus personajes
+              </strong>
+              <small>
+                Añade uno de tus personajes independientes a esta crónica.
+              </small>
+            </span>
 
-          <p>
-            Sólo se muestran personajes independientes.
-            Para mover uno desde otra crónica debes
-            resolver primero su relación allí.
-          </p>
+            <span aria-hidden="true">
+              {showCharacterAssociation
+                ? '−'
+                : '+'}
+            </span>
+          </button>
 
-          {independentOwnCharacters.length ===
-          0 ? (
-            <p className="chronicle-detail__empty">
-              No tienes personajes independientes disponibles.
-            </p>
-          ) : (
-            <ul className="chronicle-detail__association-list">
-              {independentOwnCharacters.map(
-                (character) => {
-                  const associating =
-                    operationId ===
-                    `associate:${character.characterId}`
+          {showCharacterAssociation ? (
+            <div
+              id="chronicle-character-association-panel"
+              className="chronicle-detail__fold-content"
+            >
+              <p>
+                Sólo se muestran personajes independientes.
+                Para mover uno desde otra crónica debes
+                resolver primero su relación allí.
+              </p>
 
-                  return (
-                    <li
-                      key={
-                        character.characterId
-                      }
-                    >
-                      <div>
-                        <strong>
-                          {characterName(
-                            character,
-                          )}
-                        </strong>
-                        <span>
-                          {
-                            characterStatusLabels[
-                              character.status
-                            ]
+              {independentOwnCharacters.length ===
+              0 ? (
+                <p className="chronicle-detail__empty">
+                  No tienes personajes independientes disponibles.
+                </p>
+              ) : (
+                <ul className="chronicle-detail__association-list">
+                  {independentOwnCharacters.map(
+                    (character) => {
+                      const associating =
+                        operationId ===
+                        `associate:${character.characterId}`
+
+                      return (
+                        <li
+                          key={
+                            character.characterId
                           }
-                        </span>
-                      </div>
+                        >
+                          <div>
+                            <strong>
+                              {characterName(
+                                character,
+                              )}
+                            </strong>
+                            <span>
+                              {
+                                characterStatusLabels[
+                                  character.status
+                                ]
+                              }
+                            </span>
+                          </div>
 
-                      <button
-                        type="button"
-                        className="chronicle-detail__compact-action"
-                        disabled={associating}
-                        onClick={() =>
-                          void associateCharacter(
-                            character,
-                          )
-                        }
-                      >
-                        {associating
-                          ? 'Asociando…'
-                          : 'Asociar'}
-                      </button>
-                    </li>
-                  )
-                },
+                          <button
+                            type="button"
+                            className="chronicle-detail__compact-action"
+                            disabled={associating}
+                            onClick={() =>
+                              void associateCharacter(
+                                character,
+                              )
+                            }
+                          >
+                            {associating
+                              ? 'Asociando…'
+                              : 'Asociar'}
+                          </button>
+                        </li>
+                      )
+                    },
+                  )}
+                </ul>
               )}
-            </ul>
-          )}
+            </div>
+          ) : null}
         </div>
       </section>
     </section>

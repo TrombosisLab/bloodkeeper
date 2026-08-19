@@ -28,6 +28,9 @@ const gateway =
 
 interface ChronicleLocationPanelProps {
   readonly chronicleId: string
+  readonly onCountChange?: (
+    count: number,
+  ) => void
 }
 
 interface LocationFormState {
@@ -137,6 +140,7 @@ function operationErrorMessage(
 
 export function ChronicleLocationPanel({
   chronicleId,
+  onCountChange,
 }: ChronicleLocationPanelProps) {
   const [
     locations,
@@ -145,8 +149,10 @@ export function ChronicleLocationPanel({
     readonly ChronicleLocationApiSnapshot[]
   >([])
 
-  const [loading, setLoading] =
-    useState(true)
+  const [
+    loading,
+    setLoading,
+  ] = useState(true)
 
   const [
     operationError,
@@ -157,6 +163,11 @@ export function ChronicleLocationPanel({
     operationId,
     setOperationId,
   ] = useState<string | null>(null)
+
+  const [
+    showCreateForm,
+    setShowCreateForm,
+  ] = useState(false)
 
   const [
     createForm,
@@ -186,16 +197,38 @@ export function ChronicleLocationPanel({
     ChronicleLocationApiSnapshot | null
   >(null)
 
+  function replaceLocations(
+    items:
+      readonly ChronicleLocationApiSnapshot[],
+  ) {
+    setLocations(items)
+    onCountChange?.(items.length)
+  }
+
   async function loadLocations() {
     setLoading(true)
     setOperationError(null)
 
     try {
-      setLocations(
+      const loadedLocations =
         await gateway.locations(
           chronicleId,
-        ),
+        )
+
+      replaceLocations(
+        loadedLocations,
       )
+
+      if (loadedLocations.length > 0) {
+        setSelectedLocation(
+          await gateway.location(
+            chronicleId,
+            loadedLocations[0].id,
+          ),
+        )
+      } else {
+        setSelectedLocation(null)
+      }
     } catch (error: unknown) {
       setOperationError(
         operationErrorMessage(error),
@@ -206,6 +239,9 @@ export function ChronicleLocationPanel({
   }
 
   useEffect(() => {
+    setSelectedLocation(null)
+    setEditingLocationId(null)
+    setEditForm(emptyForm)
     void loadLocations()
   }, [chronicleId])
 
@@ -257,7 +293,7 @@ export function ChronicleLocationPanel({
         chronicleId,
       )
 
-    setLocations(updated)
+    replaceLocations(updated)
 
     if (
       selectedLocation !== null &&
@@ -307,6 +343,7 @@ export function ChronicleLocationPanel({
       )
 
       setCreateForm(emptyForm)
+      setShowCreateForm(false)
       await refreshAfterWrite()
     } catch (error: unknown) {
       setOperationError(
@@ -332,6 +369,8 @@ export function ChronicleLocationPanel({
           locationId,
         ),
       )
+      setEditingLocationId(null)
+      setEditForm(emptyForm)
     } catch (error: unknown) {
       setOperationError(
         operationErrorMessage(error),
@@ -341,20 +380,28 @@ export function ChronicleLocationPanel({
     }
   }
 
-  function beginEdit(
-    location: ChronicleLocationApiSnapshot,
-  ) {
+  function closeDetail() {
+    setSelectedLocation(null)
+    setEditingLocationId(null)
+    setEditForm(emptyForm)
+  }
+
+  function beginEdit() {
     if (
-      location.status !== 'active'
+      selectedLocation === null ||
+      selectedLocation.status !==
+        'active'
     ) {
       return
     }
 
     setEditingLocationId(
-      location.id,
+      selectedLocation.id,
     )
     setEditForm(
-      formFromLocation(location),
+      formFromLocation(
+        selectedLocation,
+      ),
     )
     setOperationError(null)
   }
@@ -419,13 +466,7 @@ export function ChronicleLocationPanel({
         locationId,
       )
 
-      if (
-        editingLocationId ===
-        locationId
-      ) {
-        cancelEdit()
-      }
-
+      cancelEdit()
       await refreshAfterWrite(
         locationId,
       )
@@ -558,54 +599,85 @@ export function ChronicleLocationPanel({
     )
   }
 
+  const editingSelected =
+    selectedLocation !== null &&
+    editingLocationId ===
+      selectedLocation.id
+
   return (
     <section
       className="chronicle-location-panel"
-      aria-labelledby="chronicle-locations-title"
+      aria-label="Gestión de Localizaciones"
     >
-      <div className="chronicle-location-panel__heading">
-        <div>
-          <span>
-            Información privada del Narrador
-          </span>
-          <h2 id="chronicle-locations-title">
-            Localizaciones
-          </h2>
-        </div>
-
-        <span className="chronicle-location-panel__count">
-          {locations.length}
-        </span>
-      </div>
-
-      <form
-        className="chronicle-location-panel__create"
-        aria-labelledby="chronicle-location-create-title"
-        onSubmit={createLocation}
+      <button
+        type="button"
+        className="chronicle-location-panel__create-launcher"
+        aria-expanded={showCreateForm}
+        aria-controls="chronicle-location-create-panel"
+        onClick={() =>
+          setShowCreateForm(
+            (current) => !current,
+          )
+        }
       >
-        <h3 id="chronicle-location-create-title">
-          Crear Localización
-        </h3>
+        <span>
+          <strong>
+            Crear Localización
+          </strong>
+          <small>
+            Añade una localización y, si procede, asígnala dentro de otra.
+          </small>
+        </span>
 
-        {formFields(
-          createForm,
-          updateCreateField,
-          'create-location',
-        )}
+        <span aria-hidden="true">
+          {showCreateForm ? '−' : '+'}
+        </span>
+      </button>
 
-        <button
-          type="submit"
-          disabled={
-            operationId ===
-            'location-create'
-          }
+      {showCreateForm ? (
+        <form
+          id="chronicle-location-create-panel"
+          className="chronicle-location-panel__create"
+          aria-labelledby="chronicle-location-create-title"
+          onSubmit={createLocation}
         >
-          {operationId ===
-          'location-create'
-            ? 'Creando…'
-            : 'Crear Localización'}
-        </button>
-      </form>
+          <div className="chronicle-location-panel__create-heading">
+            <h3 id="chronicle-location-create-title">
+              Nueva Localización
+            </h3>
+
+            <button
+              type="button"
+              className="chronicle-location-panel__compact-action"
+              onClick={() => {
+                setShowCreateForm(false)
+                setCreateForm(emptyForm)
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+
+          {formFields(
+            createForm,
+            updateCreateField,
+            'create-location',
+          )}
+
+          <button
+            type="submit"
+            disabled={
+              operationId ===
+              'location-create'
+            }
+          >
+            {operationId ===
+            'location-create'
+              ? 'Creando…'
+              : 'Crear Localización'}
+          </button>
+        </form>
+      ) : null}
 
       {operationError !== null ? (
         <p
@@ -617,253 +689,275 @@ export function ChronicleLocationPanel({
         </p>
       ) : null}
 
-      {loading ? (
-        <ViewStateStatus
-          state="loading"
-          className="chronicle-location-panel__message"
+      <div className="chronicle-location-panel__workspace">
+        <aside
+          className="chronicle-location-panel__browser"
+          aria-label="Listado de Localizaciones"
         >
-          Cargando Localizaciones…
-        </ViewStateStatus>
-      ) : locations.length === 0 ? (
-        <p className="chronicle-location-panel__empty">
-          No hay Localizaciones registradas en esta crónica.
-        </p>
-      ) : (
-        <ul className="chronicle-location-panel__list">
-          {locations.map(
-            (location) => {
-              const consulting =
-                operationId ===
-                `location-detail:${location.id}`
-              const updating =
-                operationId ===
-                `location-update:${location.id}`
-              const archiving =
-                operationId ===
-                `location-archive:${location.id}`
-              const editing =
-                editingLocationId ===
-                location.id
+          <div className="chronicle-location-panel__browser-heading">
+            <h3>Localizaciones</h3>
+            <span>
+              {locations.length}
+            </span>
+          </div>
 
-              return (
-                <li
-                  key={location.id}
-                  className={
-                    'chronicle-location-panel__item ' +
-                    `chronicle-location-panel__item--${location.status}`
-                  }
-                >
-                  <div className="chronicle-location-panel__item-heading">
-                    <div>
-                      <strong>
-                        {location.name}
-                      </strong>
+          {loading ? (
+            <ViewStateStatus
+              state="loading"
+              className="chronicle-location-panel__message"
+            >
+              Cargando Localizaciones…
+            </ViewStateStatus>
+          ) : locations.length === 0 ? (
+            <p className="chronicle-location-panel__empty">
+              No hay Localizaciones registradas en esta crónica.
+            </p>
+          ) : (
+            <ul className="chronicle-location-panel__list">
+              {locations.map(
+                (location) => {
+                  const consulting =
+                    operationId ===
+                    `location-detail:${location.id}`
 
-                      <span>
-                        {location.parentLocationId ===
-                        null
-                          ? (
-                              location.category ??
-                              'Localización raíz'
-                            )
-                          : `Dentro de ${locationName(
-                              location.parentLocationId,
-                            )}`}
-                      </span>
-                    </div>
+                  const selected =
+                    selectedLocation?.id ===
+                    location.id
 
-                    <span className="chronicle-location-panel__state">
-                      {
-                        locationStatusLabels[
-                          location.status
-                        ]
-                      }
-                    </span>
-                  </div>
-
-                  {editing ? (
-                    <form
-                      className="chronicle-location-panel__edit"
-                      onSubmit={(event) =>
-                        void updateLocation(
-                          event,
-                          location.id,
+                  return (
+                    <li
+                      key={location.id}
+                      className={
+                        'chronicle-location-panel__item ' +
+                        `chronicle-location-panel__item--${location.status} ` +
+                        (
+                          selected
+                            ? 'chronicle-location-panel__item--selected'
+                            : ''
                         )
                       }
                     >
-                      {formFields(
-                        editForm,
-                        updateEditField,
-                        `edit-${location.id}`,
-                        location.id,
-                      )}
-
-                      <div className="chronicle-location-panel__actions">
-                        <button
-                          type="submit"
-                          disabled={updating}
-                        >
-                          {updating
-                            ? 'Guardando…'
-                            : 'Guardar'}
-                        </button>
-
-                        <button
-                          type="button"
-                          className="chronicle-location-panel__compact-action"
-                          disabled={updating}
-                          onClick={cancelEdit}
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    </form>
-                  ) : (
-                    <div className="chronicle-location-panel__actions">
                       <button
                         type="button"
-                        className="chronicle-location-panel__compact-action"
+                        className="chronicle-location-panel__select"
                         disabled={consulting}
+                        aria-pressed={selected}
                         onClick={() =>
                           void consultLocation(
                             location.id,
                           )
                         }
                       >
-                        {consulting
-                          ? 'Consultando…'
-                          : 'Consultar'}
+                        <span className="chronicle-location-panel__select-title">
+                          {location.name}
+                        </span>
+
+                        <span className="chronicle-location-panel__select-meta">
+                          {location.category ??
+                            'Sin categoría'}
+                        </span>
+
+                        <span className="chronicle-location-panel__select-footer">
+                          <span>
+                            {location.parentLocationId ===
+                            null
+                              ? 'Raíz de la crónica'
+                              : `Dentro de ${locationName(
+                                  location.parentLocationId,
+                                )}`}
+                          </span>
+
+                          <span className="chronicle-location-panel__state">
+                            {
+                              locationStatusLabels[
+                                location.status
+                              ]
+                            }
+                          </span>
+                        </span>
+                      </button>
+                    </li>
+                  )
+                },
+              )}
+            </ul>
+          )}
+        </aside>
+
+        <div className="chronicle-location-panel__detail">
+          {selectedLocation === null ? (
+            <div className="chronicle-location-panel__detail-empty">
+              <span>Localización</span>
+              <h3>
+                Selecciona una Localización
+              </h3>
+              <p>
+                Elige una entrada del listado para consultar su jerarquía, información privada y acciones.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="chronicle-location-panel__detail-heading">
+                <div>
+                  <span>
+                    Detalle de la Localización
+                  </span>
+                  <h3>
+                    {selectedLocation.name}
+                  </h3>
+                </div>
+
+                <div className="chronicle-location-panel__detail-heading-actions">
+                  <span className="chronicle-location-panel__state">
+                    {
+                      locationStatusLabels[
+                        selectedLocation.status
+                      ]
+                    }
+                  </span>
+
+                  <button
+                    type="button"
+                    className="chronicle-location-panel__compact-action"
+                    onClick={closeDetail}
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+
+              {editingSelected ? (
+                <form
+                  className="chronicle-location-panel__edit"
+                  onSubmit={(event) =>
+                    void updateLocation(
+                      event,
+                      selectedLocation.id,
+                    )
+                  }
+                >
+                  {formFields(
+                    editForm,
+                    updateEditField,
+                    `edit-${selectedLocation.id}`,
+                    selectedLocation.id,
+                  )}
+
+                  <div className="chronicle-location-panel__actions">
+                    <button
+                      type="submit"
+                      disabled={
+                        operationId ===
+                        `location-update:${selectedLocation.id}`
+                      }
+                    >
+                      {operationId ===
+                      `location-update:${selectedLocation.id}`
+                        ? 'Guardando…'
+                        : 'Guardar cambios'}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="chronicle-location-panel__compact-action"
+                      onClick={cancelEdit}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <dl className="chronicle-location-panel__detail-grid">
+                    <div>
+                      <dt>Tipo o categoría</dt>
+                      <dd>
+                        {selectedLocation.category ??
+                          'Sin categoría'}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt>Dentro de</dt>
+                      <dd>
+                        {locationName(
+                          selectedLocation.parentLocationId,
+                        )}
+                      </dd>
+                    </div>
+
+                    <div className="chronicle-location-panel__detail-wide">
+                      <dt>Descripción</dt>
+                      <dd>
+                        {selectedLocation.description ??
+                          'Sin descripción'}
+                      </dd>
+                    </div>
+
+                    <div className="chronicle-location-panel__detail-wide">
+                      <dt>Notas privadas</dt>
+                      <dd>
+                        {selectedLocation.narratorNotes ??
+                          'Sin notas'}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt>Creada</dt>
+                      <dd>
+                        {technicalDate(
+                          selectedLocation.createdAt,
+                        )}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt>Actualizada</dt>
+                      <dd>
+                        {technicalDate(
+                          selectedLocation.updatedAt,
+                        )}
+                      </dd>
+                    </div>
+                  </dl>
+
+                  {selectedLocation.status ===
+                  'active' ? (
+                    <div className="chronicle-location-panel__actions">
+                      <button
+                        type="button"
+                        className="chronicle-location-panel__compact-action"
+                        onClick={beginEdit}
+                      >
+                        Editar
                       </button>
 
-                      {location.status ===
-                      'active' ? (
-                        <>
-                          <button
-                            type="button"
-                            className="chronicle-location-panel__compact-action"
-                            onClick={() =>
-                              beginEdit(
-                                location,
-                              )
-                            }
-                          >
-                            Editar
-                          </button>
-
-                          <button
-                            type="button"
-                            className="chronicle-location-panel__compact-action"
-                            disabled={archiving}
-                            onClick={() =>
-                              void archiveLocation(
-                                location.id,
-                              )
-                            }
-                          >
-                            {archiving
-                              ? 'Archivando…'
-                              : 'Archivar'}
-                          </button>
-                        </>
-                      ) : null}
+                      <button
+                        type="button"
+                        className="chronicle-location-panel__compact-action"
+                        disabled={
+                          operationId ===
+                          `location-archive:${selectedLocation.id}`
+                        }
+                        onClick={() =>
+                          void archiveLocation(
+                            selectedLocation.id,
+                          )
+                        }
+                      >
+                        {operationId ===
+                        `location-archive:${selectedLocation.id}`
+                          ? 'Archivando…'
+                          : 'Archivar'}
+                      </button>
                     </div>
-                  )}
-                </li>
-              )
-            },
+                  ) : null}
+                </>
+              )}
+            </>
           )}
-        </ul>
-      )}
-
-      {selectedLocation !== null ? (
-        <section
-          className="chronicle-location-panel__detail"
-          aria-labelledby="chronicle-location-detail-title"
-        >
-          <div className="chronicle-location-panel__detail-heading">
-            <div>
-              <span>Consulta rápida</span>
-              <h3 id="chronicle-location-detail-title">
-                {selectedLocation.name}
-              </h3>
-            </div>
-
-            <button
-              type="button"
-              className="chronicle-location-panel__compact-action"
-              onClick={() =>
-                setSelectedLocation(null)
-              }
-            >
-              Cerrar detalle
-            </button>
-          </div>
-
-          <dl className="chronicle-location-panel__detail-grid">
-            <div>
-              <dt>Estado</dt>
-              <dd>
-                {
-                  locationStatusLabels[
-                    selectedLocation.status
-                  ]
-                }
-              </dd>
-            </div>
-
-            <div>
-              <dt>Dentro de</dt>
-              <dd>
-                {locationName(
-                  selectedLocation.parentLocationId,
-                )}
-              </dd>
-            </div>
-
-            <div>
-              <dt>Tipo o categoría</dt>
-              <dd>
-                {selectedLocation.category ??
-                  'Sin categoría'}
-              </dd>
-            </div>
-
-            <div className="chronicle-location-panel__detail-wide">
-              <dt>Descripción</dt>
-              <dd>
-                {selectedLocation.description ??
-                  'Sin descripción'}
-              </dd>
-            </div>
-
-            <div className="chronicle-location-panel__detail-wide">
-              <dt>Notas privadas</dt>
-              <dd>
-                {selectedLocation.narratorNotes ??
-                  'Sin notas'}
-              </dd>
-            </div>
-
-            <div>
-              <dt>Creada</dt>
-              <dd>
-                {technicalDate(
-                  selectedLocation.createdAt,
-                )}
-              </dd>
-            </div>
-
-            <div>
-              <dt>Actualizada</dt>
-              <dd>
-                {technicalDate(
-                  selectedLocation.updatedAt,
-                )}
-              </dd>
-            </div>
-          </dl>
-        </section>
-      ) : null}
+        </div>
+      </div>
     </section>
   )
 }

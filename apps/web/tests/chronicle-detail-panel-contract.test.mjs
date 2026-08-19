@@ -114,7 +114,7 @@ test(
     )
     assert.match(
       detail,
-      /ChronicleLocationPanel/,
+      /ChronicleResourcesWorkspace/,
     )
     assert.match(
       detail,
