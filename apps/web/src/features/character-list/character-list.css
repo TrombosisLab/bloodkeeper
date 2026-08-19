@@ -104,3 +104,127 @@
     flex: 1 1 auto;
   }
 }
+
+/* UX Personajes: listado guardado compacto y acotado. */
+.character-list__cards {
+  max-height: min(36rem, 62vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.25rem;
+}
+
+.character-list-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+}
+
+.character-list-card__body {
+  display: grid;
+  grid-template-columns:
+    minmax(11rem, 1.15fr)
+    minmax(10rem, 1fr)
+    auto;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  min-width: 0;
+}
+
+.character-list-card__identity,
+.character-list-card__concept {
+  min-width: 0;
+}
+
+.character-list-card__identity h3 {
+  margin-top: 0.18rem;
+  overflow-wrap: anywhere;
+}
+
+.character-list-card__status {
+  display: block;
+  line-height: 1.25;
+}
+
+.character-list-card__concept {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.character-list-card__concept--empty {
+  min-height: 1px;
+}
+
+.character-list-card__updated {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.character-list-card__actions {
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+.character-list-card__actions button {
+  white-space: nowrap;
+}
+
+.character-list__load-more {
+  align-self: flex-start;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 900px) {
+  .character-list-card__body {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .character-list-card__concept {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .character-list-card__updated {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .character-list__cards {
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+  }
+
+  .character-list-card {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 0.65rem;
+    padding: 0.85rem;
+  }
+
+  .character-list-card__body {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .character-list-card__concept,
+  .character-list-card__updated {
+    grid-column: 1;
+    grid-row: auto;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .character-list-card__actions {
+    width: 100%;
+  }
+
+  .character-list-card__actions button {
+    width: 100%;
+  }
+}

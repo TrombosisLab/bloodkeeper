@@ -263,7 +263,7 @@ export function CharacterList({
                   className="character-list-card"
                 >
                   <div className="character-list-card__body">
-                    <div>
+                    <div className="character-list-card__identity">
                       <span className="character-list-card__status">
                         {
                           statusLabels[
@@ -284,12 +284,17 @@ export function CharacterList({
 
                     {character.identity.concept !==
                     null ? (
-                      <p>
+                      <p className="character-list-card__concept">
                         {character.identity.concept}
                       </p>
-                    ) : null}
+                    ) : (
+                      <span
+                        className="character-list-card__concept character-list-card__concept--empty"
+                        aria-hidden="true"
+                      />
+                    )}
 
-                    <small>
+                    <small className="character-list-card__updated">
                       Actualizado{' '}
                       {new Date(
                         character.updatedAt,
@@ -339,6 +344,7 @@ export function CharacterList({
         charactersNextOffset !== null ? (
           <button
             type="button"
+            className="character-list__load-more"
             onClick={() =>
               void loadMoreCharacters()
             }
