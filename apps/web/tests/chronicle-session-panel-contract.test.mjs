@@ -76,7 +76,7 @@ test(
   () => {
     assert.match(
       panel,
-      /session\.status !==[\s\S]*'archived'/,
+      /selectedSession\.status !==[\s\S]*'archived'/,
     )
     assert.match(panel, />\s*Editar\s*</)
     assert.match(
@@ -104,7 +104,7 @@ test(
   '035-C detalle separa resumen notas privadas y fechas tecnicas',
   () => {
     for (const label of [
-      'Consulta de',
+      'chronicle-session-workspace-summary-panel',
       'Resumen narrativo',
       'Notas privadas del Narrador',
       'Fecha real',
@@ -117,11 +117,15 @@ test(
 )
 
 test(
-  '035-C no adelanta relaciones dados tiempo real ni sesion activa',
+  '035-C no adelanta tiempo real ni estados fuera del workspace aprobado',
   () => {
+    assert.match(
+      panel,
+      /workspaceTab\([\s\S]*'dice',[\s\S]*'Tiradas'/,
+    )
     assert.doesNotMatch(
       panel,
-      /eventId|npcId|locationId|characterId|Tiradas|Dados|WebSocket|socket|polling|Sesión activa|Iniciar sesión/i,
+      /WebSocket|socket|polling|Sesión activa|Iniciar sesión/i,
     )
   },
 )

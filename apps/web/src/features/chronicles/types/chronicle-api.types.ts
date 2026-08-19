@@ -197,6 +197,53 @@ export interface ChronicleSessionAttendanceRemovalApiResponse {
   readonly attending: false
 }
 
+export interface ChronicleSessionContextEventApiSnapshot {
+  readonly id: string
+  readonly title: string
+  readonly status:
+    | 'active'
+    | 'archived'
+  readonly narrativeTimeLabel: string | null
+  readonly realDate: string | null
+  readonly timelineOrder: number
+}
+
+export interface ChronicleSessionContextNpcApiSnapshot {
+  readonly id: string
+  readonly name: string
+  readonly status:
+    | 'active'
+    | 'archived'
+  readonly category: string | null
+  readonly narrativeRole: string | null
+}
+
+export interface ChronicleSessionContextLocationApiSnapshot {
+  readonly id: string
+  readonly name: string
+  readonly status:
+    | 'active'
+    | 'archived'
+  readonly category: string | null
+  readonly parentLocationId: string | null
+}
+
+export interface ChronicleSessionContextApiSnapshot {
+  readonly sessionId: string
+  readonly events:
+    readonly ChronicleSessionContextEventApiSnapshot[]
+  readonly npcs:
+    readonly ChronicleSessionContextNpcApiSnapshot[]
+  readonly locations:
+    readonly ChronicleSessionContextLocationApiSnapshot[]
+}
+
+export interface ReplaceChronicleSessionContextApiRequest {
+  readonly eventIds: readonly string[]
+  readonly npcIds: readonly string[]
+  readonly locationIds: readonly string[]
+}
+
 
 export type ChronicleSessionApiStatus =
   | 'preparation'

@@ -233,6 +233,26 @@ import {
 } from './presentation/chronicle-session-attendance.controller'
 
 import {
+  CHRONICLE_SESSION_CONTEXT_REPOSITORY,
+} from './application/chronicle-session-context.repository'
+
+import {
+  LoadChronicleSessionContextUseCase,
+} from './application/load-chronicle-session-context.use-case'
+
+import {
+  ReplaceChronicleSessionContextUseCase,
+} from './application/replace-chronicle-session-context.use-case'
+
+import {
+  PrismaChronicleSessionContextRepository,
+} from './infrastructure/prisma-chronicle-session-context.repository'
+
+import {
+  ChronicleSessionContextController,
+} from './presentation/chronicle-session-context.controller'
+
+import {
   ChronicleController,
 } from './presentation/chronicle.controller'
 
@@ -247,6 +267,7 @@ import {
     ChronicleEventController,
     ChronicleSessionController,
     ChronicleSessionAttendanceController,
+    ChronicleSessionContextController,
   ],
   providers: [
     PrismaChronicleRepository,
@@ -354,6 +375,15 @@ import {
       useExisting:
         PrismaChronicleSessionAttendanceRepository,
     },
+    PrismaChronicleSessionContextRepository,
+    {
+      provide:
+        CHRONICLE_SESSION_CONTEXT_REPOSITORY,
+      useExisting:
+        PrismaChronicleSessionContextRepository,
+    },
+    LoadChronicleSessionContextUseCase,
+    ReplaceChronicleSessionContextUseCase,
     ListChronicleSessionAttendancesUseCase,
     AddChronicleSessionAttendanceUseCase,
     RemoveChronicleSessionAttendanceUseCase,

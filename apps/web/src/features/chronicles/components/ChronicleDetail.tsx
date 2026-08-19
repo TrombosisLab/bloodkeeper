@@ -46,13 +46,7 @@ import {
   ChronicleSessionPanel,
 } from './ChronicleSessionPanel'
 
-import {
-  DiceHistoryPanel,
-} from '../../dice/components/DiceHistoryPanel'
 
-import {
-  DiceRollPanel,
-} from '../../dice/components/DiceRollPanel'
 
 import {
   ChronicleLocationPanel,
@@ -1263,18 +1257,7 @@ export function ChronicleDetail({
               associatedCharacters
             }
           />
-
-          <div className="chronicle-detail__dice-context">
-            <DiceRollPanel
-              mode="manual"
-              chronicleId={chronicleId}
-            />
-            <DiceHistoryPanel
-              chronicleId={chronicleId}
-              contextLabel="Historial de la crónica"
-            />
-          </div>
-        </>
+</>
       ) : null}
 
       </div>

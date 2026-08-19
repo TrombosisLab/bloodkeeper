@@ -262,6 +262,7 @@ model ChronicleNpc {
   updatedAt     DateTime                 @updatedAt @db.Timestamptz(3)
 
   chronicle Chronicle @relation("ChronicleNpcChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  contextLinks ChronicleSessionNpc[] @relation("ChronicleSessionNpcNpc")
 
   @@index([chronicleId, status])
   @@index([chronicleId, detailLevel])
@@ -286,6 +287,7 @@ model ChronicleLocation {
   updatedAt        DateTime                @updatedAt @db.Timestamptz(3)
 
   chronicle Chronicle @relation("ChronicleLocationChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  contextLinks ChronicleSessionLocation[] @relation("ChronicleSessionLocationLocation")
 
   parentLocation ChronicleLocation?  @relation("ChronicleLocationHierarchy", fields: [parentLocationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   childLocations ChronicleLocation[] @relation("ChronicleLocationHierarchy")
@@ -315,6 +317,7 @@ model ChronicleEvent {
   updatedAt          DateTime             @updatedAt @db.Timestamptz(3)
 
   chronicle Chronicle @relation("ChronicleEventChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  contextLinks ChronicleSessionEvent[] @relation("ChronicleSessionEventEvent")
 
   @@index([chronicleId, status])
   @@index([chronicleId, timelineOrder])
@@ -338,11 +341,53 @@ model ChronicleSession {
     experienceMovements CharacterExperienceMovement[] @relation("CharacterExperienceSession")
     diceRolls           DiceRollRecord[] @relation("DiceRollSession")
     attendances         ChronicleSessionAttendance[] @relation("ChronicleSessionAttendanceSession")
+    eventLinks          ChronicleSessionEvent[] @relation("ChronicleSessionEventSession")
+    npcLinks            ChronicleSessionNpc[] @relation("ChronicleSessionNpcSession")
+    locationLinks       ChronicleSessionLocation[] @relation("ChronicleSessionLocationSession")
 
     @@index([chronicleId, status])
     @@index([chronicleId, sessionNumber])
     @@index([chronicleId, realDate])
     @@map("chronicle_sessions")
+}
+
+model ChronicleSessionEvent {
+  sessionId String   @db.Uuid
+  eventId   String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  session ChronicleSession @relation("ChronicleSessionEventSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  event   ChronicleEvent   @relation("ChronicleSessionEventEvent", fields: [eventId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@id([sessionId, eventId])
+  @@index([eventId])
+  @@map("chronicle_session_event_links")
+}
+
+model ChronicleSessionNpc {
+  sessionId String   @db.Uuid
+  npcId     String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  session ChronicleSession @relation("ChronicleSessionNpcSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  npc     ChronicleNpc     @relation("ChronicleSessionNpcNpc", fields: [npcId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@id([sessionId, npcId])
+  @@index([npcId])
+  @@map("chronicle_session_npc_links")
+}
+
+model ChronicleSessionLocation {
+  sessionId  String   @db.Uuid
+  locationId String   @db.Uuid
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+
+  session  ChronicleSession  @relation("ChronicleSessionLocationSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  location ChronicleLocation @relation("ChronicleSessionLocationLocation", fields: [locationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@id([sessionId, locationId])
+  @@index([locationId])
+  @@map("chronicle_session_location_links")
 }
 
 model ChronicleSessionAttendance {

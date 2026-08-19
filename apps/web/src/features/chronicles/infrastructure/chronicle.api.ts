@@ -17,6 +17,8 @@ import type {
   ChronicleSessionAttendanceRemovalApiResponse,
   AddChronicleSessionAttendanceApiRequest,
   ChronicleSessionApiPage,
+  ChronicleSessionContextApiSnapshot,
+  ReplaceChronicleSessionContextApiRequest,
 } from '../types/chronicle-api.types'
 
 import type {
@@ -255,6 +257,18 @@ export interface ChronicleLifecycleGateway
     eventId: string,
   ): Promise<ChronicleEventApiSnapshot>
 
+
+  sessionContext(
+    chronicleId: string,
+    sessionId: string,
+  ): Promise<ChronicleSessionContextApiSnapshot>
+
+  replaceSessionContext(
+    chronicleId: string,
+    sessionId: string,
+    request:
+      ReplaceChronicleSessionContextApiRequest,
+  ): Promise<ChronicleSessionContextApiSnapshot>
 
   sessionAttendancesPage(
     chronicleId: string,
@@ -574,6 +588,143 @@ export function parseChronicleSessionAttendanceRemovalResponse(
     sessionId: value.sessionId,
     characterId: value.characterId,
     attending: false,
+  }
+}
+
+function validContextResourceStatus(
+  value: unknown,
+): value is 'active' | 'archived' {
+  return (
+    value === 'active' ||
+    value === 'archived'
+  )
+}
+
+function parseChronicleSessionContextEventResponse(
+  value: unknown,
+) {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'string' ||
+    typeof value.title !== 'string' ||
+    !validContextResourceStatus(
+      value.status,
+    ) ||
+    !isStringOrNull(
+      value.narrativeTimeLabel,
+    ) ||
+    !(
+      value.realDate === null ||
+      validTimestamp(value.realDate)
+    ) ||
+    typeof value.timelineOrder !== 'number' ||
+    !Number.isInteger(
+      value.timelineOrder,
+    ) ||
+    value.timelineOrder < 0
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    id: value.id,
+    title: value.title,
+    status: value.status,
+    narrativeTimeLabel:
+      value.narrativeTimeLabel,
+    realDate: value.realDate,
+    timelineOrder:
+      value.timelineOrder,
+  }
+}
+
+function parseChronicleSessionContextNpcResponse(
+  value: unknown,
+) {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'string' ||
+    typeof value.name !== 'string' ||
+    !validContextResourceStatus(
+      value.status,
+    ) ||
+    !isStringOrNull(
+      value.category,
+    ) ||
+    !isStringOrNull(
+      value.narrativeRole,
+    )
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    id: value.id,
+    name: value.name,
+    status: value.status,
+    category: value.category,
+    narrativeRole:
+      value.narrativeRole,
+  }
+}
+
+function parseChronicleSessionContextLocationResponse(
+  value: unknown,
+) {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'string' ||
+    typeof value.name !== 'string' ||
+    !validContextResourceStatus(
+      value.status,
+    ) ||
+    !isStringOrNull(
+      value.category,
+    ) ||
+    !isStringOrNull(
+      value.parentLocationId,
+    )
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    id: value.id,
+    name: value.name,
+    status: value.status,
+    category: value.category,
+    parentLocationId:
+      value.parentLocationId,
+  }
+}
+
+export function parseChronicleSessionContextResponse(
+  value: unknown,
+): ChronicleSessionContextApiSnapshot {
+  if (
+    !isRecord(value) ||
+    typeof value.sessionId !== 'string' ||
+    !Array.isArray(value.events) ||
+    !Array.isArray(value.npcs) ||
+    !Array.isArray(value.locations)
+  ) {
+    return invalidResponse()
+  }
+
+  return {
+    sessionId: value.sessionId,
+    events:
+      value.events.map(
+        parseChronicleSessionContextEventResponse,
+      ),
+    npcs:
+      value.npcs.map(
+        parseChronicleSessionContextNpcResponse,
+      ),
+    locations:
+      value.locations.map(
+        parseChronicleSessionContextLocationResponse,
+      ),
   }
 }
 
@@ -1619,6 +1770,52 @@ export function createChronicleGateway(
         )
 
       return parseChronicleEventResponse(
+        await jsonResponse(response),
+      )
+    },
+
+
+    async sessionContext(
+      chronicleId,
+      sessionId,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/sessions/${sessionId}/context`,
+          {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+        )
+
+      return parseChronicleSessionContextResponse(
+        await jsonResponse(response),
+      )
+    },
+
+    async replaceSessionContext(
+      chronicleId,
+      sessionId,
+      request,
+    ) {
+      const response =
+        await fetchImplementation(
+          `/api/chronicles/${chronicleId}/sessions/${sessionId}/context`,
+          {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify(request),
+          },
+        )
+
+      return parseChronicleSessionContextResponse(
         await jsonResponse(response),
       )
     },

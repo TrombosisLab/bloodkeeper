@@ -35,6 +35,10 @@ import {
   ChronicleSessionAttendancePanel,
 } from './ChronicleSessionAttendancePanel'
 
+import {
+  ChronicleSessionContextPanel,
+} from './ChronicleSessionContextPanel'
+
 import './chronicle-session-panel.css'
 
 const gateway =
@@ -51,6 +55,12 @@ const sessionStatusLabels:
     completed: 'Completada',
     archived: 'Archivada',
   }
+
+type SessionWorkspaceSection =
+  | 'summary'
+  | 'preparation'
+  | 'attendance'
+  | 'dice'
 
 interface SessionFormState {
   readonly sessionNumber: string
@@ -246,6 +256,13 @@ function sessionNumberLabel(
     : `Número ${sessionNumber}`
 }
 
+function sessionSummaryLabel(
+  session: ChronicleSessionApiSnapshot,
+): string {
+  return session.summary ??
+    'Sin resumen narrativo.'
+}
+
 export function ChronicleSessionPanel({
   chronicleId,
   associatedCharacters,
@@ -256,46 +273,67 @@ export function ChronicleSessionPanel({
   ] = useState<
     readonly ChronicleSessionApiSnapshot[]
   >([])
+
   const [loading, setLoading] =
     useState(true)
+
   const [
     sessionsNextOffset,
     setSessionsNextOffset,
   ] = useState<number | null>(null)
+
   const [
     loadingMoreSessions,
     setLoadingMoreSessions,
   ] = useState(false)
+
   const [
     operationError,
     setOperationError,
   ] = useState<string | null>(null)
+
   const [
     operationId,
     setOperationId,
   ] = useState<string | null>(null)
+
+  const [
+    showCreateForm,
+    setShowCreateForm,
+  ] = useState(false)
+
   const [
     createForm,
     setCreateForm,
   ] = useState<SessionFormState>(
     emptyForm,
   )
+
   const [
     editingSessionId,
     setEditingSessionId,
   ] = useState<string | null>(null)
+
   const [
     editForm,
     setEditForm,
   ] = useState<SessionFormState>(
     emptyForm,
   )
+
   const [
     selectedSession,
     setSelectedSession,
   ] = useState<
     ChronicleSessionApiSnapshot | null
   >(null)
+
+  const [
+    activeWorkspaceSection,
+    setActiveWorkspaceSection,
+  ] = useState<SessionWorkspaceSection>(
+    'summary',
+  )
 
   async function loadSessions() {
     setLoading(true)
@@ -459,6 +497,7 @@ export function ChronicleSessionPanel({
         requestFromForm(createForm),
       )
       setCreateForm(emptyForm)
+      setShowCreateForm(false)
       await refreshAfterWrite()
     } catch (error: unknown) {
       setOperationError(
@@ -484,6 +523,11 @@ export function ChronicleSessionPanel({
           sessionId,
         ),
       )
+      setActiveWorkspaceSection(
+        'summary',
+      )
+      setEditingSessionId(null)
+      setEditForm(emptyForm)
     } catch (error: unknown) {
       setOperationError(
         operationErrorMessage(error),
@@ -491,6 +535,15 @@ export function ChronicleSessionPanel({
     } finally {
       setOperationId(null)
     }
+  }
+
+  function closeWorkspace() {
+    setSelectedSession(null)
+    setEditingSessionId(null)
+    setEditForm(emptyForm)
+    setActiveWorkspaceSection(
+      'summary',
+    )
   }
 
   function beginEdit(
@@ -505,6 +558,9 @@ export function ChronicleSessionPanel({
       formFromSession(session),
     )
     setOperationError(null)
+    setActiveWorkspaceSection(
+      'summary',
+    )
   }
 
   function cancelEdit() {
@@ -691,6 +747,44 @@ export function ChronicleSessionPanel({
     )
   }
 
+  function workspaceTab(
+    section: SessionWorkspaceSection,
+    label: string,
+  ) {
+    const selected =
+      activeWorkspaceSection === section
+
+    return (
+      <button
+        type="button"
+        role="tab"
+        id={`chronicle-session-workspace-${section}-tab`}
+        aria-controls={`chronicle-session-workspace-${section}-panel`}
+        aria-selected={selected}
+        className={
+          'chronicle-session-panel__workspace-tab ' +
+          (
+            selected
+              ? 'chronicle-session-panel__workspace-tab--active'
+              : ''
+          )
+        }
+        onClick={() =>
+          setActiveWorkspaceSection(
+            section,
+          )
+        }
+      >
+        {label}
+      </button>
+    )
+  }
+
+  const editingSelectedSession =
+    selectedSession !== null &&
+    editingSessionId ===
+      selectedSession.id
+
   return (
     <section
       className="chronicle-session-panel"
@@ -711,34 +805,75 @@ export function ChronicleSessionPanel({
         </span>
       </div>
 
-      <form
-        className="chronicle-session-panel__create"
-        aria-labelledby="chronicle-session-create-title"
-        onSubmit={createSession}
+      <button
+        type="button"
+        className="chronicle-session-panel__create-launcher"
+        aria-expanded={showCreateForm}
+        aria-controls="chronicle-session-create-panel"
+        onClick={() =>
+          setShowCreateForm(
+            (current) => !current,
+          )
+        }
       >
-        <h3 id="chronicle-session-create-title">
-          Preparar Sesión
-        </h3>
+        <span>
+          <strong>
+            Preparar nueva sesión
+          </strong>
+          <small>
+            Crea la sesión y después organiza su preparación, asistencia y tiradas.
+          </small>
+        </span>
 
-        {formFields(
-          createForm,
-          updateCreateField,
-          'create-session',
-        )}
+        <span aria-hidden="true">
+          {showCreateForm ? '−' : '+'}
+        </span>
+      </button>
 
-        <button
-          type="submit"
-          disabled={
-            operationId ===
-            'session-create'
-          }
+      {showCreateForm ? (
+        <form
+          id="chronicle-session-create-panel"
+          className="chronicle-session-panel__create"
+          aria-labelledby="chronicle-session-create-title"
+          onSubmit={createSession}
         >
-          {operationId ===
-          'session-create'
-            ? 'Creando…'
-            : 'Crear Sesión'}
-        </button>
-      </form>
+          <div className="chronicle-session-panel__create-heading">
+            <h3 id="chronicle-session-create-title">
+              Nueva sesión
+            </h3>
+
+            <button
+              type="button"
+              className="chronicle-session-panel__compact-action"
+              onClick={() => {
+                setShowCreateForm(false)
+                setCreateForm(emptyForm)
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+
+          {formFields(
+            createForm,
+            updateCreateField,
+            'create-session',
+          )}
+
+          <button
+            type="submit"
+            disabled={
+              operationId ===
+              'session-create'
+            }
+          >
+            {operationId ===
+            'session-create'
+              ? 'Creando…'
+              : 'Crear Sesión'}
+          </button>
+        </form>
+      ) : null}
 
       {operationError !== null ? (
         <p
@@ -750,308 +885,455 @@ export function ChronicleSessionPanel({
         </p>
       ) : null}
 
-      {loading ? (
-        <ViewStateStatus
-          state="loading"
-          className="chronicle-session-panel__message"
+      <div className="chronicle-session-panel__workspace-layout">
+        <aside
+          className="chronicle-session-panel__browser"
+          aria-label="Lista de sesiones"
         >
-          Cargando Sesiones…
-        </ViewStateStatus>
-      ) : sessions.length === 0 ? (
-        <p className="chronicle-session-panel__empty">
-          No hay Sesiones registradas en esta crónica.
-        </p>
-      ) : (
-        <ul className="chronicle-session-panel__list">
-          {sessions.map(
-            (session) => {
-              const consulting =
-                operationId ===
-                `session-detail:${session.id}`
-              const updating =
-                operationId ===
-                `session-update:${session.id}`
-              const completing =
-                operationId ===
-                `session-complete:${session.id}`
-              const archiving =
-                operationId ===
-                `session-archive:${session.id}`
-              const editing =
-                editingSessionId ===
-                session.id
+          <div className="chronicle-session-panel__browser-heading">
+            <h3>Historial de sesiones</h3>
+            <span>
+              {sessions.length}
+            </span>
+          </div>
 
-              return (
-                <li
-                  key={session.id}
-                  className={
-                    'chronicle-session-panel__item ' +
-                    `chronicle-session-panel__item--${session.status}`
-                  }
-                >
-                  <div className="chronicle-session-panel__item-heading">
-                    <div>
-                      <strong>
-                        {sessionTitle(session)}
-                      </strong>
-                      <span>
-                        {sessionNumberLabel(
-                          session.sessionNumber,
-                        )}
-                        {' · '}
-                        {realDateLabel(
-                          session.realDate,
-                        )}
-                      </span>
-                    </div>
+          {loading ? (
+            <ViewStateStatus
+              state="loading"
+              className="chronicle-session-panel__message"
+            >
+              Cargando Sesiones…
+            </ViewStateStatus>
+          ) : sessions.length === 0 ? (
+            <p className="chronicle-session-panel__empty">
+              No hay Sesiones registradas en esta crónica.
+            </p>
+          ) : (
+            <ul className="chronicle-session-panel__list">
+              {sessions.map(
+                (session) => {
+                  const consulting =
+                    operationId ===
+                    `session-detail:${session.id}`
 
-                    <span className="chronicle-session-panel__state">
-                      {
-                        sessionStatusLabels[
-                          session.status
-                        ]
-                      }
-                    </span>
-                  </div>
+                  const selected =
+                    selectedSession?.id ===
+                    session.id
 
-                  {editing ? (
-                    <form
-                      className="chronicle-session-panel__edit"
-                      onSubmit={(
-                        submitEvent,
-                      ) =>
-                        void updateSession(
-                          submitEvent,
-                          session.id,
+                  return (
+                    <li
+                      key={session.id}
+                      className={
+                        'chronicle-session-panel__item ' +
+                        `chronicle-session-panel__item--${session.status} ` +
+                        (
+                          selected
+                            ? 'chronicle-session-panel__item--selected'
+                            : ''
                         )
                       }
                     >
-                      {formFields(
-                        editForm,
-                        updateEditField,
-                        `edit-${session.id}`,
-                      )}
-
-                      <div className="chronicle-session-panel__actions">
-                        <button
-                          type="submit"
-                          disabled={updating}
-                        >
-                          {updating
-                            ? 'Guardando…'
-                            : 'Guardar'}
-                        </button>
-                        <button
-                          type="button"
-                          className="chronicle-session-panel__compact-action"
-                          disabled={updating}
-                          onClick={cancelEdit}
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    </form>
-                  ) : (
-                    <div className="chronicle-session-panel__actions">
                       <button
                         type="button"
-                        className="chronicle-session-panel__compact-action"
+                        className="chronicle-session-panel__select"
                         disabled={consulting}
+                        aria-pressed={selected}
                         onClick={() =>
                           void consultSession(
                             session.id,
                           )
                         }
                       >
-                        {consulting
-                          ? 'Consultando…'
-                          : 'Consultar'}
+                        <span className="chronicle-session-panel__select-meta">
+                          {realDateLabel(
+                            session.realDate,
+                          )}
+                        </span>
+
+                        <span className="chronicle-session-panel__select-title">
+                          {sessionTitle(
+                            session,
+                          )}
+                        </span>
+
+                        <span className="chronicle-session-panel__select-summary">
+                          {sessionSummaryLabel(
+                            session,
+                          )}
+                        </span>
+
+                        <span className="chronicle-session-panel__select-footer">
+                          <span>
+                            {sessionNumberLabel(
+                              session.sessionNumber,
+                            )}
+                          </span>
+
+                          <span className="chronicle-session-panel__state">
+                            {
+                              sessionStatusLabels[
+                                session.status
+                              ]
+                            }
+                          </span>
+                        </span>
+                      </button>
+                    </li>
+                  )
+                },
+              )}
+            </ul>
+          )}
+
+          {sessionsNextOffset !== null ? (
+            <button
+              type="button"
+              className="chronicle-session-panel__load-more"
+              onClick={() => {
+                void loadMoreSessions()
+              }}
+              disabled={
+                loadingMoreSessions
+              }
+            >
+              {loadingMoreSessions
+                ? 'Cargando más sesiones…'
+                : 'Cargar más sesiones'}
+            </button>
+          ) : null}
+        </aside>
+
+        <div className="chronicle-session-panel__workspace">
+          {selectedSession === null ? (
+            <div className="chronicle-session-panel__workspace-empty">
+              <span>
+                Sesión
+              </span>
+              <h3>
+                Selecciona una sesión
+              </h3>
+              <p>
+                Abre una sesión de la lista para consultar su resumen, preparar recursos, registrar asistencia o trabajar con sus tiradas.
+              </p>
+            </div>
+          ) : (
+            <>
+              <header className="chronicle-session-panel__workspace-heading">
+                <div>
+                  <span>
+                    {realDateLabel(
+                      selectedSession.realDate,
+                    )}
+                  </span>
+                  <h3>
+                    {sessionTitle(
+                      selectedSession,
+                    )}
+                  </h3>
+                </div>
+
+                <div className="chronicle-session-panel__workspace-heading-actions">
+                  <span className="chronicle-session-panel__state">
+                    {
+                      sessionStatusLabels[
+                        selectedSession.status
+                      ]
+                    }
+                  </span>
+
+                  <button
+                    type="button"
+                    className="chronicle-session-panel__compact-action"
+                    onClick={closeWorkspace}
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </header>
+
+              <div
+                className="chronicle-session-panel__workspace-tabs"
+                role="tablist"
+                aria-label="Áreas de trabajo de la sesión"
+              >
+                {workspaceTab(
+                  'summary',
+                  'Resumen',
+                )}
+                {workspaceTab(
+                  'preparation',
+                  'Preparación',
+                )}
+                {workspaceTab(
+                  'attendance',
+                  'Asistencia',
+                )}
+                {workspaceTab(
+                  'dice',
+                  'Tiradas',
+                )}
+              </div>
+
+              <div
+                id="chronicle-session-workspace-summary-panel"
+                role="tabpanel"
+                aria-labelledby="chronicle-session-workspace-summary-tab"
+                hidden={
+                  activeWorkspaceSection !==
+                  'summary'
+                }
+                className="chronicle-session-panel__workspace-panel"
+              >
+                {editingSelectedSession ? (
+                  <form
+                    className="chronicle-session-panel__edit"
+                    onSubmit={(
+                      submitEvent,
+                    ) =>
+                      void updateSession(
+                        submitEvent,
+                        selectedSession.id,
+                      )
+                    }
+                  >
+                    {formFields(
+                      editForm,
+                      updateEditField,
+                      `edit-${selectedSession.id}`,
+                    )}
+
+                    <div className="chronicle-session-panel__actions">
+                      <button
+                        type="submit"
+                        disabled={
+                          operationId ===
+                          `session-update:${selectedSession.id}`
+                        }
+                      >
+                        {operationId ===
+                        `session-update:${selectedSession.id}`
+                          ? 'Guardando…'
+                          : 'Guardar cambios'}
                       </button>
 
-                      {session.status !==
-                      'archived' ? (
-                        <>
-                          <button
-                            type="button"
-                            className="chronicle-session-panel__compact-action"
-                            onClick={() =>
-                              beginEdit(session)
-                            }
-                          >
-                            Editar
-                          </button>
+                      <button
+                        type="button"
+                        className="chronicle-session-panel__compact-action"
+                        onClick={cancelEdit}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <>
+                    <dl className="chronicle-session-panel__detail-grid">
+                      <div className="chronicle-session-panel__detail-section chronicle-session-panel__detail-wide">
+                        <div className="chronicle-session-panel__detail-section-heading">
+                          Datos de sesión
+                        </div>
 
-                          {session.status ===
-                          'preparation' ? (
-                            <button
-                              type="button"
-                              className="chronicle-session-panel__compact-action"
-                              disabled={completing}
-                              onClick={() =>
-                                void completeSession(
-                                  session.id,
-                                )
+                        <div className="chronicle-session-panel__detail-meta-grid">
+                          <div>
+                            <dt>Estado</dt>
+                            <dd>
+                              {
+                                sessionStatusLabels[
+                                  selectedSession.status
+                                ]
                               }
-                            >
-                              {completing
-                                ? 'Completando…'
-                                : 'Marcar completada'}
-                            </button>
-                          ) : null}
+                            </dd>
+                          </div>
 
+                          <div>
+                            <dt>Fecha real</dt>
+                            <dd>
+                              {realDateLabel(
+                                selectedSession.realDate,
+                              )}
+                            </dd>
+                          </div>
+
+                          <div>
+                            <dt>Número</dt>
+                            <dd>
+                              {selectedSession.sessionNumber === null
+                                ? '—'
+                                : selectedSession.sessionNumber}
+                            </dd>
+                          </div>
+
+                          <div>
+                            <dt>Creada</dt>
+                            <dd>
+                              {technicalDate(
+                                selectedSession.createdAt,
+                              )}
+                            </dd>
+                          </div>
+
+                          <div>
+                            <dt>Actualizada</dt>
+                            <dd>
+                              {technicalDate(
+                                selectedSession.updatedAt,
+                              )}
+                            </dd>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="chronicle-session-panel__detail-section chronicle-session-panel__detail-wide">
+                        <div className="chronicle-session-panel__detail-section-heading">
+                          Resumen narrativo
+                        </div>
+                        <dd className="chronicle-session-panel__detail-section-content">
+                          {selectedSession.summary ??
+                            'Sin resumen narrativo'}
+                        </dd>
+                      </div>
+
+                      <div className="chronicle-session-panel__detail-section chronicle-session-panel__detail-wide">
+                        <div className="chronicle-session-panel__detail-section-heading">
+                          Notas del Narrador
+                        </div>
+                        <dd className="chronicle-session-panel__detail-section-content">
+                          {selectedSession.narratorNotes ??
+                            'Sin notas privadas'}
+                        </dd>
+                      </div>
+                    </dl>
+
+                    {selectedSession.status !==
+                    'archived' ? (
+                      <div className="chronicle-session-panel__actions">
+                        <button
+                          type="button"
+                          className="chronicle-session-panel__compact-action"
+                          onClick={() =>
+                            beginEdit(
+                              selectedSession,
+                            )
+                          }
+                        >
+                          Editar
+                        </button>
+
+                        {selectedSession.status ===
+                        'preparation' ? (
                           <button
                             type="button"
                             className="chronicle-session-panel__compact-action"
-                            disabled={archiving}
+                            disabled={
+                              operationId ===
+                              `session-complete:${selectedSession.id}`
+                            }
                             onClick={() =>
-                              void archiveSession(
-                                session.id,
+                              void completeSession(
+                                selectedSession.id,
                               )
                             }
                           >
-                            {archiving
-                              ? 'Archivando…'
-                              : 'Archivar'}
+                            {operationId ===
+                            `session-complete:${selectedSession.id}`
+                              ? 'Completando…'
+                              : 'Marcar completada'}
                           </button>
-                        </>
-                      ) : null}
-                    </div>
-                  )}
-                </li>
-              )
-            },
-          )}
-        </ul>
-      )}
+                        ) : null}
 
-      {sessionsNextOffset !== null ? (
-        <button
-          type="button"
-          onClick={() => {
-            void loadMoreSessions()
-          }}
-          disabled={loadingMoreSessions}
-        >
-          {loadingMoreSessions
-            ? 'Cargando más sesiones…'
-            : 'Cargar más sesiones'}
-        </button>
-      ) : null}
-
-      {selectedSession !== null ? (
-        <section className="chronicle-session-panel__detail">
-          <div className="chronicle-session-panel__detail-heading">
-            <div>
-              <span>Consulta de Sesión</span>
-              <h3>
-                {sessionTitle(
-                  selectedSession,
+                        <button
+                          type="button"
+                          className="chronicle-session-panel__compact-action"
+                          disabled={
+                            operationId ===
+                            `session-archive:${selectedSession.id}`
+                          }
+                          onClick={() =>
+                            void archiveSession(
+                              selectedSession.id,
+                            )
+                          }
+                        >
+                          {operationId ===
+                          `session-archive:${selectedSession.id}`
+                            ? 'Archivando…'
+                            : 'Archivar'}
+                        </button>
+                      </div>
+                    ) : null}
+                  </>
                 )}
-              </h3>
-            </div>
+              </div>
 
-            <button
-              type="button"
-              className="chronicle-session-panel__compact-action"
-              onClick={() =>
-                setSelectedSession(null)
-              }
-            >
-              Cerrar
-            </button>
-          </div>
-
-          <dl className="chronicle-session-panel__detail-grid">
-            <div>
-              <dt>Estado</dt>
-              <dd>
-                {
-                  sessionStatusLabels[
-                    selectedSession.status
-                  ]
+              <div
+                id="chronicle-session-workspace-preparation-panel"
+                role="tabpanel"
+                aria-labelledby="chronicle-session-workspace-preparation-tab"
+                hidden={
+                  activeWorkspaceSection !==
+                  'preparation'
                 }
-              </dd>
-            </div>
+                className="chronicle-session-panel__workspace-panel"
+              >
+                <ChronicleSessionContextPanel
+                  key={`context:${selectedSession.id}`}
+                  chronicleId={chronicleId}
+                  session={selectedSession}
+                />
+              </div>
 
-            <div>
-              <dt>Numeración</dt>
-              <dd>
-                {sessionNumberLabel(
-                  selectedSession.sessionNumber,
-                )}
-              </dd>
-            </div>
+              <div
+                id="chronicle-session-workspace-attendance-panel"
+                role="tabpanel"
+                aria-labelledby="chronicle-session-workspace-attendance-tab"
+                hidden={
+                  activeWorkspaceSection !==
+                  'attendance'
+                }
+                className="chronicle-session-panel__workspace-panel"
+              >
+                <ChronicleSessionAttendancePanel
+                  key={`attendance:${selectedSession.id}`}
+                  chronicleId={chronicleId}
+                  session={selectedSession}
+                  associatedCharacters={
+                    associatedCharacters
+                  }
+                />
+              </div>
 
-            <div>
-              <dt>Fecha real</dt>
-              <dd>
-                {realDateLabel(
-                  selectedSession.realDate,
-                )}
-              </dd>
-            </div>
+              <div
+                id="chronicle-session-workspace-dice-panel"
+                role="tabpanel"
+                aria-labelledby="chronicle-session-workspace-dice-tab"
+                hidden={
+                  activeWorkspaceSection !==
+                  'dice'
+                }
+                className="chronicle-session-panel__workspace-panel"
+              >
+                <div className="chronicle-session-panel__dice-context">
+                  <DiceRollPanel
+                    mode="manual"
+                    chronicleId={chronicleId}
+                    sessionId={
+                      selectedSession.id
+                    }
+                  />
 
-            <div className="chronicle-session-panel__detail-wide">
-              <dt>Resumen narrativo</dt>
-              <dd>
-                {selectedSession.summary ??
-                  'Sin resumen narrativo'}
-              </dd>
-            </div>
-
-            <div className="chronicle-session-panel__detail-wide">
-              <dt>Notas privadas del Narrador</dt>
-              <dd>
-                {selectedSession.narratorNotes ??
-                  'Sin notas privadas'}
-              </dd>
-            </div>
-
-            <div>
-              <dt>Creada</dt>
-              <dd>
-                {technicalDate(
-                  selectedSession.createdAt,
-                )}
-              </dd>
-            </div>
-
-            <div>
-              <dt>Actualizada</dt>
-              <dd>
-                {technicalDate(
-                  selectedSession.updatedAt,
-                )}
-              </dd>
-            </div>
-          </dl>
-
-          <ChronicleSessionAttendancePanel
-            key={selectedSession.id}
-            chronicleId={chronicleId}
-            session={selectedSession}
-            associatedCharacters={
-              associatedCharacters
-            }
-          />
-        </section>
-      ) : null}
-
-      {selectedSession !== null ? (
-        <div className="chronicle-session-panel__dice-context">
-          <DiceRollPanel
-            mode="manual"
-            chronicleId={chronicleId}
-            sessionId={selectedSession.id}
-          />
-          <DiceHistoryPanel
-            chronicleId={chronicleId}
-            sessionId={selectedSession.id}
-            contextLabel="Historial de la sesión seleccionada"
-          />
+                  <DiceHistoryPanel
+                    chronicleId={chronicleId}
+                    sessionId={
+                      selectedSession.id
+                    }
+                    contextLabel="Historial de la sesión seleccionada"
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
-      ) : null}
-
+      </div>
     </section>
   )
 }

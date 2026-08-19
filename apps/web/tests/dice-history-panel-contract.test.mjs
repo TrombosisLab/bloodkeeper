@@ -67,12 +67,14 @@ test('039-C integra historial propio y de personaje sin sobrecargar ficha', () =
   assert.match(main, /contextLabel="Historial del personaje"/)
 })
 
-test('039-C integra cronica y sesion seleccionada por contexto', () => {
-  assert.match(chronicle, /chronicleId=\{chronicleId\}/)
-  assert.match(chronicle, /Historial de la crónica/)
+test('039-C integra dados de Sesion dentro del workspace seleccionado', () => {
+  assert.doesNotMatch(chronicle, /Historial de la crónica/)
+  assert.doesNotMatch(chronicle, /<DiceRollPanel/)
+  assert.doesNotMatch(chronicle, /<DiceHistoryPanel/)
   assert.match(sessions, /chronicleId=\{chronicleId\}/)
-  assert.match(sessions, /sessionId=\{selectedSession\.id\}/)
+  assert.match(sessions, /sessionId=\{[\s\S]*selectedSession\.id/)
   assert.match(sessions, /Historial de la sesión seleccionada/)
+  assert.match(sessions, /workspaceTab\([\s\S]*'dice',[\s\S]*'Tiradas'/)
 })
 
 test('039-C permite registrar tirada contextual o privada desde Sesiones', () => {
@@ -80,6 +82,5 @@ test('039-C permite registrar tirada contextual o privada desde Sesiones', () =>
   assert.match(rollPanel, /readonly sessionId\?: string/)
   assert.match(rollPanel, /Visibilidad/)
   assert.match(rollPanel, /value="private"/)
-  assert.match(chronicle, /<DiceRollPanel/)
   assert.match(sessions, /<DiceRollPanel/)
 })

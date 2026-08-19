@@ -189,17 +189,28 @@ test(
 )
 
 test(
-  '032-A no adelanta relaciones ni duplica la ficha completa',
+  '032-A no adelanta relaciones salvo contexto de Sesión aprobado por 035-D',
   () => {
     const npc = block(
       schema,
       /model ChronicleNpc\s*\{/,
     )
 
+    assert.match(
+      npc,
+      /contextLinks\s+ChronicleSessionNpc\[\]\s+@relation\("ChronicleSessionNpcNpc"\)/,
+    )
+
     assert.doesNotMatch(
       npc,
-      /location|event|session|characterId|attribute|skill|discipline|health|willpower/i,
+      /location|event|characterId|attribute|skill|discipline|health|willpower/i,
     )
+
+    assert.doesNotMatch(
+      npc,
+      /sessionId\s+String|ChronicleSessionEvent|ChronicleSessionLocation/i,
+    )
+
     assert.doesNotMatch(
       migration,
       /location|event|session|characterId|attribute|skill|discipline|health|willpower/i,
