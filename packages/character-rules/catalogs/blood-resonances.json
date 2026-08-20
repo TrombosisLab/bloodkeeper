@@ -1,0 +1,99 @@
+{
+  "resonances": [
+    {
+      "key": "choleric",
+      "name": "Colérica",
+      "disciplineKeys": [
+        "celerity",
+        "potence"
+      ],
+      "source": "core",
+      "sourcePage": 227,
+      "active": true
+    },
+    {
+      "key": "melancholy",
+      "name": "Melancólica",
+      "disciplineKeys": [
+        "fortitude",
+        "obfuscate"
+      ],
+      "source": "core",
+      "sourcePage": 227,
+      "active": true
+    },
+    {
+      "key": "phlegmatic",
+      "name": "Flemática",
+      "disciplineKeys": [
+        "auspex",
+        "dominate"
+      ],
+      "source": "core",
+      "sourcePage": 227,
+      "active": true
+    },
+    {
+      "key": "sanguine",
+      "name": "Sanguínea",
+      "disciplineKeys": [
+        "bloodSorcery",
+        "presence"
+      ],
+      "source": "core",
+      "sourcePage": 227,
+      "active": true
+    }
+  ],
+  "temperaments": [
+    {
+      "key": "fleeting",
+      "name": "Efímero",
+      "baseDisciplineDiceBonus": 0,
+      "source": "core",
+      "sourcePage": 228,
+      "active": true
+    },
+    {
+      "key": "intense",
+      "name": "Intenso",
+      "baseDisciplineDiceBonus": 1,
+      "source": "core",
+      "sourcePage": 228,
+      "active": true
+    },
+    {
+      "key": "acute",
+      "name": "Agudo",
+      "baseDisciplineDiceBonus": 1,
+      "source": "core",
+      "sourcePage": 228,
+      "active": true
+    }
+  ],
+  "specialAffinities": [
+    {
+      "key": "animalBlood",
+      "name": "Sangre animal",
+      "disciplineKeys": [
+        "animalism",
+        "protean"
+      ],
+      "usesTemperamentDiceBonus": true,
+      "source": "core",
+      "sourcePage": 227,
+      "active": true
+    },
+    {
+      "key": "resonanceFree",
+      "name": "Sangre libre de Resonancia",
+      "disciplineKeys": [
+        "oblivion"
+      ],
+      "usesTemperamentDiceBonus": false,
+      "source": "playersGuide",
+      "sourcePage": 84,
+      "active": true
+    }
+  ]
+}

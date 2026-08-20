@@ -37,6 +37,9 @@ import mortalAdvantageExclusions from './catalogs/mortal-advantage-exclusions.js
 import skills from './catalogs/skills.json' with {
   type: 'json',
 }
+import bloodResonanceCatalogData from './catalogs/blood-resonances.json' with {
+  type: 'json',
+}
 
 function deepFreeze(value) {
   if (value === null || typeof value !== 'object') {
@@ -64,6 +67,23 @@ export function deriveCharacterWillpowerCapacity(
   attributes,
 ) {
   return attributes.composure + attributes.resolve
+}
+
+export function deriveCharacterBloodResonanceBaseDiceBonus(
+  temperament,
+) {
+  const definition =
+    bloodResonanceCatalogData.temperaments.find(
+      ({ key }) => key === temperament,
+    )
+
+  if (definition === undefined) {
+    throw new Error(
+      'Unsupported character blood temperament',
+    )
+  }
+
+  return definition.baseDisciplineDiceBonus
 }
 
 export const characterRulesCatalogManifest =
@@ -104,3 +124,8 @@ export const characterSkillCatalog =
   deepFreeze({
     definitions: clone(skills),
   })
+
+export const characterBloodResonanceCatalog =
+  deepFreeze(
+    clone(bloodResonanceCatalogData),
+  )

@@ -32,6 +32,76 @@ export type CharacterRulesDisciplineKey =
   | 'protean'
   | 'thinBloodAlchemy'
 
+export type CharacterRulesBloodResonanceKey =
+  | 'choleric'
+  | 'melancholy'
+  | 'phlegmatic'
+  | 'sanguine'
+
+export type CharacterRulesBloodTemperament =
+  | 'fleeting'
+  | 'intense'
+  | 'acute'
+
+export type CharacterRulesBloodSourceKind =
+  | 'human'
+  | 'animal'
+
+export type CharacterRulesBloodSpecialAffinityKey =
+  | 'animalBlood'
+  | 'resonanceFree'
+
+export type CharacterRulesBloodResonanceSource =
+  | 'core'
+  | 'playersGuide'
+
+export interface CharacterRulesBloodResonanceDefinition {
+  readonly key: CharacterRulesBloodResonanceKey
+  readonly name: string
+  readonly disciplineKeys:
+    readonly CharacterRulesDisciplineKey[]
+  readonly source:
+    CharacterRulesBloodResonanceSource
+  readonly sourcePage: number
+  readonly active: boolean
+}
+
+export interface CharacterRulesBloodTemperamentDefinition {
+  readonly key: CharacterRulesBloodTemperament
+  readonly name: string
+  readonly baseDisciplineDiceBonus: 0 | 1
+  readonly source:
+    CharacterRulesBloodResonanceSource
+  readonly sourcePage: number
+  readonly active: boolean
+}
+
+export interface CharacterRulesBloodSpecialAffinityDefinition {
+  readonly key:
+    CharacterRulesBloodSpecialAffinityKey
+  readonly name: string
+  readonly disciplineKeys:
+    readonly CharacterRulesDisciplineKey[]
+  readonly usesTemperamentDiceBonus: boolean
+  readonly source:
+    CharacterRulesBloodResonanceSource
+  readonly sourcePage: number
+  readonly active: boolean
+}
+
+export interface CharacterRulesBloodResonanceCatalog {
+  readonly resonances:
+    readonly CharacterRulesBloodResonanceDefinition[]
+  readonly temperaments:
+    readonly CharacterRulesBloodTemperamentDefinition[]
+  readonly specialAffinities:
+    readonly CharacterRulesBloodSpecialAffinityDefinition[]
+}
+
+export function deriveCharacterBloodResonanceBaseDiceBonus(
+  temperament: CharacterRulesBloodTemperament,
+): 0 | 1
+
 export type CharacterRulesAttributeKey =
   | 'strength'
   | 'dexterity'
@@ -556,6 +626,9 @@ export const characterDependencyCatalog:
 
 export const characterSkillCatalog:
   CharacterRulesSkillCatalog
+
+export const characterBloodResonanceCatalog:
+  CharacterRulesBloodResonanceCatalog
 
 export interface CharacterRulesMortalAdvantageExclusionCatalog {
   readonly feeding: readonly string[]

@@ -13,6 +13,7 @@ const predatorTypes = require('./catalogs/predator-types.json')
 const thinBloodTraits = require('./catalogs/thin-blood-traits.json')
 const mortalAdvantageExclusions = require('./catalogs/mortal-advantage-exclusions.json')
 const skills = require('./catalogs/skills.json')
+const bloodResonanceCatalogData = require('./catalogs/blood-resonances.json')
 
 function deepFreeze(value) {
   if (value === null || typeof value !== 'object') {
@@ -40,6 +41,23 @@ function deriveCharacterWillpowerCapacity(
   attributes,
 ) {
   return attributes.composure + attributes.resolve
+}
+
+function deriveCharacterBloodResonanceBaseDiceBonus(
+  temperament,
+) {
+  const definition =
+    bloodResonanceCatalogData.temperaments.find(
+      ({ key }) => key === temperament,
+    )
+
+  if (definition === undefined) {
+    throw new Error(
+      'Unsupported character blood temperament',
+    )
+  }
+
+  return definition.baseDisciplineDiceBonus
 }
 
 const characterRulesCatalogManifest =
@@ -76,6 +94,11 @@ const characterSkillCatalog =
     definitions: clone(skills),
   })
 
+const characterBloodResonanceCatalog =
+  deepFreeze(
+    clone(bloodResonanceCatalogData),
+  )
+
 const characterMortalAdvantageExclusionCatalog =
   deepFreeze(
     clone(mortalAdvantageExclusions),
@@ -84,10 +107,12 @@ const characterMortalAdvantageExclusionCatalog =
 module.exports = {
   deriveCharacterHealthCapacity,
   deriveCharacterWillpowerCapacity,
+  deriveCharacterBloodResonanceBaseDiceBonus,
   characterRulesCatalogManifest,
   characterDisciplineCatalog,
   characterAdvantageCatalog,
   characterDependencyCatalog,
   characterSkillCatalog,
+  characterBloodResonanceCatalog,
   characterMortalAdvantageExclusionCatalog,
 }

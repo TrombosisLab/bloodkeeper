@@ -77,6 +77,8 @@ confirmadas.
 | SPEC-056 | [SPEC-056 – CHARACTER_EXPERIENCE_AND_ADVANCEMENT](SPEC-056_CHARACTER_EXPERIENCE_AND_ADVANCEMENT_v1.0.md) | 1.0 | Aprobado | Cerrada | Experiencia y evolución completas: ledger trazable, concesiones y correcciones autorizadas, costes V5, compra atómica, validación `evolution` e integración Web verificadas. |
 | SPEC-057 | [SPEC-057 – CHARACTER_SESSION_ZERO_AND_EMBRACE](SPEC-057_CHARACTER_SESSION_ZERO_AND_EMBRACE_v1.0.md) | 1.0 | Aprobado | Cerrada | Sesión 0 humana, Abrazo atómico, transición vampírica progresiva, ficha y dados adaptativos validados; migración compatible, regresión API/Web y cierre integral superados. |
 
+| SPEC-058 | [SPEC-058 – CHARACTER_BLOOD_RESONANCE_AND_DYSCRASIA](SPEC-058_CHARACTER_BLOOD_RESONANCE_AND_DYSCRASIA_v1.0.md) | 1.0 | Aprobado | En desarrollo | Resonancias, temperamentos, afinidades especiales y Discrasias V5; implementación por bloques con integración segura en Sangre, Dados, Experiencia y ficha. |
+
 ## Versiones archivadas
 
 - [SPEC-026 v1.0](archive/SPEC-026_CHARACTER_ADVANTAGES_BACKGROUNDS_FLAWS_v1.0.md): sustituida por v1.1.
