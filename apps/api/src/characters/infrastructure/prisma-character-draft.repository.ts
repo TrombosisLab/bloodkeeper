@@ -3229,6 +3229,72 @@ export class PrismaCharacterDraftRepository
     }
   }
 
+  async listBloodResonanceOperations(
+    characterId: string,
+  ): Promise<
+    readonly PersistedCharacterBloodResonanceOperation[]
+  > {
+    const rows =
+      await this.database
+        .characterBloodResonanceOperation
+        .findMany({
+          where: {
+            characterId,
+          },
+          orderBy: [
+            {
+              createdAt: 'desc',
+            },
+            {
+              operationId: 'desc',
+            },
+          ],
+        })
+
+    return rows.map((row) => ({
+      characterId: row.characterId,
+      operationId: row.operationId,
+      sourceKind:
+        bloodSourceFromPrisma[
+          row.sourceKind
+        ],
+      resonanceKey:
+        row.resonanceKey === null
+          ? null
+          : resonanceKeyFromPrisma[
+              row.resonanceKey
+            ],
+      specialAffinityKey:
+        row.specialAffinityKey === null
+          ? null
+          : affinityFromPrisma[
+              row.specialAffinityKey
+            ],
+      temperament:
+        row.temperament === null
+          ? null
+          : temperamentFromPrisma[
+              row.temperament
+            ],
+      dyscrasiaKey:
+        row.dyscrasiaKey === null
+          ? null
+          : dyscrasiaKeyFromPrisma[
+              row.dyscrasiaKey
+            ],
+      dyscrasiaAcquisitionMode:
+        row.dyscrasiaAcquisitionMode === null
+          ? null
+          : dyscrasiaAcquisitionModeFromPrisma[
+              row.dyscrasiaAcquisitionMode
+            ],
+      hungerSlaked: row.hungerSlaked,
+      hungerBefore: row.hungerBefore,
+      hungerAfter: row.hungerAfter,
+      createdAt: row.createdAt,
+    }))
+  }
+
   async applyBloodResonance(
     data: ApplyCharacterBloodResonanceData,
   ): Promise<PersistedCharacterDraft> {

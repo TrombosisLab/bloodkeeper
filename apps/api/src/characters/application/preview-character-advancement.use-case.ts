@@ -14,6 +14,9 @@ import {
   previewCharacterAdvancement,
 } from '../domain/character-advancement-cost.rules'
 import {
+  applyCharacterDisciplineResonanceEvidence,
+} from '../domain/character-discipline-resonance-evidence.rules'
+import {
   applyCharacterAdvancement,
   normalizeCharacterAdvancementMutation,
 } from '../domain/character-advancement-apply.rules'
@@ -51,12 +54,34 @@ export class PreviewCharacterAdvancementUseCase {
     ])
     if (character === null) throw new CharacterExperienceCharacterNotFoundError(characterId)
 
-    const preview = previewCharacterAdvancement(
+    let preview = previewCharacterAdvancement(
       character,
       ledger.available,
       request,
       this.catalog,
     )
+
+    if (
+      request.kind === 'discipline' &&
+      preview.eligible &&
+      typeof this.drafts
+        .listBloodResonanceOperations ===
+        'function'
+    ) {
+      const resonanceOperations =
+        await this.drafts
+          .listBloodResonanceOperations(
+            characterId,
+          )
+
+      preview =
+        applyCharacterDisciplineResonanceEvidence(
+          preview,
+          request,
+          resonanceOperations,
+        )
+    }
+
     if (!preview.eligible) return preview
 
     const acquisitionId = `preview:${request.kind}:${preview.key}`

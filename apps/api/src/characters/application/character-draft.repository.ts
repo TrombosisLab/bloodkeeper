@@ -93,6 +93,12 @@ export interface CharacterDraftRepository {
     PersistedCharacterBloodResonanceOperation | null
   >
 
+  listBloodResonanceOperations(
+    characterId: string,
+  ): Promise<
+    readonly PersistedCharacterBloodResonanceOperation[]
+  >
+
   applyBloodResonance(
     data: ApplyCharacterBloodResonanceData,
   ): Promise<PersistedCharacterDraft>
