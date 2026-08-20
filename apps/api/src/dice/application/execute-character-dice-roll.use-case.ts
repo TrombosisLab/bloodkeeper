@@ -1,6 +1,14 @@
 import type {
+  CharacterRulesDisciplineKey,
+} from '@v5r/character-rules'
+
+import type {
   DiceRandomSource,
 } from './dice-random-source'
+
+import type {
+  CharacterDiceResonanceSnapshot,
+} from './character-dice-resonance.adapter'
 
 import {
   executeDicePool,
@@ -13,6 +21,11 @@ import type {
 import {
   buildDicePool,
 } from '../domain/dice-pool.rules'
+
+import {
+  CHARACTER_BLOOD_RESONANCE_DICE_MODIFIER_KEY,
+  deriveCharacterBloodResonanceDiceModifier,
+} from '../domain/character-dice-resonance.rules'
 
 import type {
   BuiltDicePool,
@@ -40,10 +53,21 @@ interface CharacterHungerReader {
   } | null>
 }
 
+interface CharacterResonanceReader {
+  execute(
+    ownerId: string,
+    characterId: string,
+  ): Promise<
+    CharacterDiceResonanceSnapshot | null
+  >
+}
+
 export interface ExecuteCharacterDiceRollCommand {
   readonly characterId: string
   readonly attribute: string
   readonly skill?: string
+  readonly disciplineKey?:
+    CharacterRulesDisciplineKey
   readonly modifier?: number
   readonly modifiers?: readonly DicePoolModifier[]
   readonly difficulty?: number | null
@@ -78,31 +102,70 @@ function selectedRating(
 }
 
 export class ExecuteCharacterDiceRollUseCase {
+  private readonly ratings:
+    CharacterRatingsReader
+  private readonly hunger:
+    CharacterHungerReader
+  private readonly resonance:
+    CharacterResonanceReader
+  private readonly random:
+    DiceRandomSource
+
   constructor(
-    private readonly ratings:
-      CharacterRatingsReader,
-    private readonly hunger:
-      CharacterHungerReader,
-    private readonly random:
-      DiceRandomSource,
-  ) {}
+    ratings: CharacterRatingsReader,
+    hunger: CharacterHungerReader,
+    resonanceOrRandom:
+      CharacterResonanceReader | DiceRandomSource,
+    random?: DiceRandomSource,
+  ) {
+    this.ratings = ratings
+    this.hunger = hunger
+
+    if (random === undefined) {
+      this.random =
+        resonanceOrRandom as DiceRandomSource
+
+      this.resonance = {
+        async execute() {
+          return Object.freeze({
+            disciplineKeys: Object.freeze([]),
+            resonance: null,
+          })
+        },
+      }
+      return
+    }
+
+    this.resonance =
+      resonanceOrRandom as CharacterResonanceReader
+    this.random = random
+  }
 
   async preview(
     ownerId: string,
     command: ExecuteCharacterDiceRollCommand,
   ): Promise<BuiltDicePool | null> {
-    const [ratings, hunger] = await Promise.all([
-      this.ratings.execute(
-        ownerId,
-        command.characterId,
-      ),
-      this.hunger.execute(
-        ownerId,
-        command.characterId,
-      ),
-    ])
+    const [ratings, hunger, resonance] =
+      await Promise.all([
+        this.ratings.execute(
+          ownerId,
+          command.characterId,
+        ),
+        this.hunger.execute(
+          ownerId,
+          command.characterId,
+        ),
+        this.resonance.execute(
+          ownerId,
+          command.characterId,
+        ),
+      ])
 
-    if (ratings === null || hunger === null) {
+    if (
+      ratings === null ||
+      hunger === null ||
+      resonance === null
+    ) {
       return null
     }
 
@@ -126,10 +189,69 @@ export class ExecuteCharacterDiceRollUseCase {
       })
     }
 
+    const disciplineKey =
+      command.disciplineKey ?? null
+
+    if (
+      disciplineKey !== null &&
+      !resonance.disciplineKeys.includes(
+        disciplineKey,
+      )
+    ) {
+      throw new DicePoolSelectionError(
+        `discipline:${disciplineKey}`,
+      )
+    }
+
+    if (
+      command.modifiers?.some(
+        ({ key }) =>
+          key ===
+          CHARACTER_BLOOD_RESONANCE_DICE_MODIFIER_KEY,
+      )
+    ) {
+      throw new DicePoolSelectionError(
+        `modifier:${CHARACTER_BLOOD_RESONANCE_DICE_MODIFIER_KEY}`,
+      )
+    }
+
+    const resonanceModifier =
+      deriveCharacterBloodResonanceDiceModifier(
+        resonance.resonance,
+        disciplineKey,
+      )
+
+    const effectiveModifiers =
+      resonanceModifier === null
+        ? command.modifiers
+        : command.modifiers !== undefined
+          ? [
+              ...command.modifiers,
+              resonanceModifier,
+            ]
+          : command.modifier === undefined ||
+              command.modifier === 0
+            ? [resonanceModifier]
+            : [
+                {
+                  key: 'general',
+                  label:
+                    'Modificador general',
+                  value: command.modifier,
+                },
+                resonanceModifier,
+              ]
+
+    const effectiveModifier =
+      resonanceModifier === null ||
+      command.modifiers !== undefined
+        ? command.modifier
+        : undefined
+
     return buildDicePool({
       components,
-      modifier: command.modifier,
-      modifiers: command.modifiers,
+      modifier: effectiveModifier,
+      modifiers: effectiveModifiers,
       hunger: hunger.hunger,
       difficulty: command.difficulty,
       context: {

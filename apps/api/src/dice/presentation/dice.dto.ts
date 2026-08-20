@@ -1,6 +1,14 @@
 import type {
+  CharacterRulesDisciplineKey,
+} from '@v5r/character-rules'
+
+import type {
   RecordCharacterDiceRollCommand,
 } from '../application/record-character-dice-roll.use-case'
+
+import {
+  CHARACTER_BLOOD_RESONANCE_DICE_MODIFIER_KEY,
+} from '../domain/character-dice-resonance.rules'
 
 import type {
   RecordManualDiceRollCommand,
@@ -127,8 +135,24 @@ function optionalDescription(
 function modifier(input: unknown, index: number): DicePoolModifier {
   const body = record(input)
   exactKeys(body, ['key', 'label', 'value'])
+
+  const key =
+    selection(
+      body.key,
+      `modifiers[${index}].key`,
+    )
+
+  if (
+    key ===
+    CHARACTER_BLOOD_RESONANCE_DICE_MODIFIER_KEY
+  ) {
+    throw new InvalidDiceRollRequestError(
+      `${CHARACTER_BLOOD_RESONANCE_DICE_MODIFIER_KEY} is a backend-only modifier`,
+    )
+  }
+
   return {
-    key: selection(body.key, `modifiers[${index}].key`),
+    key,
     label: text(body.label, `modifiers[${index}].label`),
     value: integer(body.value, `modifiers[${index}].value`),
   }
@@ -213,7 +237,8 @@ export function parseCharacterDiceRollRequest(
   const characterId = uuid(characterIdInput, 'characterId')
   const body = record(input)
   exactKeys(body, [
-    'attribute', 'skill', 'modifier', 'modifiers',
+    'attribute', 'skill', 'disciplineKey',
+    'modifier', 'modifiers',
     'difficulty', 'description', ...contextKeys,
   ])
   const modifiers = optionalModifiers(body.modifiers)
@@ -226,6 +251,15 @@ export function parseCharacterDiceRollRequest(
       body.skill === undefined
         ? undefined
         : selection(body.skill, 'skill'),
+    ...(body.disciplineKey === undefined
+      ? {}
+      : {
+          disciplineKey:
+            selection(
+              body.disciplineKey,
+              'disciplineKey',
+            ) as CharacterRulesDisciplineKey,
+        }),
     modifier: optionalInteger(body.modifier, 'modifier'),
     ...(modifiers === undefined ? {} : { modifiers }),
     difficulty: difficulty(body.difficulty),

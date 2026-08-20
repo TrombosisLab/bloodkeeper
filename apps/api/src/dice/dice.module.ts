@@ -29,6 +29,9 @@ import {
   CharacterDiceHungerAdapter,
 } from './application/character-dice-hunger.adapter'
 import {
+  CharacterDiceResonanceAdapter,
+} from './application/character-dice-resonance.adapter'
+import {
   ExecuteCharacterDiceRollUseCase,
 } from './application/execute-character-dice-roll.use-case'
 import {
@@ -105,19 +108,31 @@ import { DiceController } from './presentation/dice.controller'
       ),
     },
     {
+      provide: CharacterDiceResonanceAdapter,
+      inject: [LoadCharacterDraftUseCase],
+      useFactory: (
+        characters: LoadCharacterDraftUseCase,
+      ) => new CharacterDiceResonanceAdapter(
+        characters,
+      ),
+    },
+    {
       provide: ExecuteCharacterDiceRollUseCase,
       inject: [
         LoadCharacterAttributeSkillRatingsUseCase,
         CharacterDiceHungerAdapter,
+        CharacterDiceResonanceAdapter,
         DICE_RANDOM_SOURCE,
       ],
       useFactory: (
         ratings: LoadCharacterAttributeSkillRatingsUseCase,
         hunger: CharacterDiceHungerAdapter,
+        resonance: CharacterDiceResonanceAdapter,
         random: DiceRandomSource,
       ) => new ExecuteCharacterDiceRollUseCase(
         ratings,
         hunger,
+        resonance,
         random,
       ),
     },
