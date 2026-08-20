@@ -102,6 +102,99 @@ export function deriveCharacterBloodResonanceBaseDiceBonus(
   temperament: CharacterRulesBloodTemperament,
 ): 0 | 1
 
+export type CharacterRulesBloodDyscrasiaKey =
+  | 'aggressive'
+  | 'cycleOfViolence'
+  | 'energetic'
+  | 'envy'
+  | 'bully'
+  | 'righteous'
+  | 'vengeful'
+  | 'lostLove'
+  | 'grieving'
+  | 'evocative'
+  | 'colossalFailure'
+  | 'nostalgic'
+  | 'lostRelative'
+  | 'comfortablyNumb'
+  | 'eatingYourEmotions'
+  | 'givenUp'
+  | 'loneWolf'
+  | 'procrastinate'
+  | 'reflection'
+  | 'relaxed'
+  | 'trueLove'
+  | 'manicHigh'
+  | 'excited'
+  | 'enthusiasticAboutLife'
+  | 'contagiousEnthusiasm'
+  | 'sniffingGame'
+
+export type CharacterRulesBloodDyscrasiaDonorPersistence =
+  'storytellerDefined'
+
+export type CharacterRulesBloodDyscrasiaAcquisitionMode =
+  | 'drainAndKill'
+  | 'feedThreeNights'
+
+export type CharacterRulesBloodDyscrasiaEffectDuration =
+  | 'untilNextFeedingOrHungerFive'
+  | 'nextFeeding'
+  | 'scene'
+  | 'consumedImmediately'
+
+export type CharacterRulesBloodDyscrasiaEffectKind =
+  | 'contextualReroll'
+  | 'nextFeedingSatietyByResonance'
+  | 'restrictedExperienceGrant'
+  | 'conditionalDamageModifier'
+  | 'contextualPoolModifier'
+  | 'remorsePoolModifier'
+  | 'nostalgiaPoolModifier'
+  | 'relationshipFeedingSatietyModifier'
+  | 'ignoreDamagePenalties'
+  | 'foodTolerance'
+  | 'soloTeamworkPoolModifier'
+  | 'willpowerRecovery'
+  | 'frenzyResistancePoolModifier'
+  | 'trueLove'
+  | 'poolShiftAfterFailure'
+  | 'rouseCheckExemption'
+  | 'contactPersuasionPoolModifier'
+  | 'detectResonanceVesselsPoolModifier'
+
+export interface CharacterRulesBloodDyscrasiaEffect {
+  readonly kind:
+    CharacterRulesBloodDyscrasiaEffectKind
+  readonly [key: string]: unknown
+}
+
+export interface CharacterRulesBloodDyscrasiaDefinition {
+  readonly key:
+    CharacterRulesBloodDyscrasiaKey
+  readonly name: string
+  readonly resonanceKey:
+    CharacterRulesBloodResonanceKey
+  readonly summary: string
+  readonly source: 'core'
+  readonly sourcePage: 230 | 231
+  readonly donorPersistence:
+    CharacterRulesBloodDyscrasiaDonorPersistence
+  readonly acquisitionModes:
+    readonly CharacterRulesBloodDyscrasiaAcquisitionMode[]
+  readonly drinkerEffectDuration:
+    CharacterRulesBloodDyscrasiaEffectDuration
+  readonly consumable: boolean
+  readonly effect:
+    CharacterRulesBloodDyscrasiaEffect
+  readonly active: boolean
+}
+
+export interface CharacterRulesBloodDyscrasiaCatalog {
+  readonly definitions:
+    readonly CharacterRulesBloodDyscrasiaDefinition[]
+}
+
 export type CharacterRulesAttributeKey =
   | 'strength'
   | 'dexterity'
@@ -629,6 +722,9 @@ export const characterSkillCatalog:
 
 export const characterBloodResonanceCatalog:
   CharacterRulesBloodResonanceCatalog
+
+export const characterBloodDyscrasiaCatalog:
+  CharacterRulesBloodDyscrasiaCatalog
 
 export interface CharacterRulesMortalAdvantageExclusionCatalog {
   readonly feeding: readonly string[]

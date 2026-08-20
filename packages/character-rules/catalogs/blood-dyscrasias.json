@@ -1,0 +1,477 @@
+[
+  {
+    "key": "aggressive",
+    "name": "Agresivo",
+    "resonanceKey": "choleric",
+    "summary": "Permite repetir pruebas basadas en Intimidación con la restricción normal sobre unos de Ansia.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "contextualReroll",
+      "context": "intimidation",
+      "forbidRerollHungerOnes": true
+    },
+    "active": true
+  },
+  {
+    "key": "cycleOfViolence",
+    "name": "Ciclo de violencia",
+    "resonanceKey": "choleric",
+    "summary": "Modifica la saciedad de la siguiente alimentación según su Resonancia.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "nextFeeding",
+    "consumable": false,
+    "effect": {
+      "kind": "nextFeedingSatietyByResonance",
+      "matchingResonanceKey": "choleric",
+      "matchingDelta": 1,
+      "otherDelta": -1
+    },
+    "active": true
+  },
+  {
+    "key": "energetic",
+    "name": "Enérgico",
+    "resonanceKey": "choleric",
+    "summary": "Concede un punto de Experiencia restringido a Celeridad o Potencia y se consume.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "consumedImmediately",
+    "consumable": true,
+    "effect": {
+      "kind": "restrictedExperienceGrant",
+      "amount": 1,
+      "disciplineKeys": ["celerity", "potence"]
+    },
+    "active": true
+  },
+  {
+    "key": "envy",
+    "name": "Envidia",
+    "resonanceKey": "choleric",
+    "summary": "Aumenta el daño contra adversarios percibidos como superiores.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "conditionalDamageModifier",
+      "value": 1,
+      "targetRelation": "superior",
+      "conflictKinds": ["physical", "social"]
+    },
+    "active": true
+  },
+  {
+    "key": "bully",
+    "name": "Matón",
+    "resonanceKey": "choleric",
+    "summary": "Aumenta el daño contra adversarios más débiles o equivalentes al patrón de abuso del recipiente.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "conditionalDamageModifier",
+      "value": 1,
+      "targetRelation": "weakerOrAbusePattern",
+      "conflictKinds": ["physical", "social"]
+    },
+    "active": true
+  },
+  {
+    "key": "righteous",
+    "name": "Probo",
+    "resonanceKey": "choleric",
+    "summary": "Permite repetir pruebas de conflicto contra un enemigo ideológico con restricción de unos de Ansia.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "contextualReroll",
+      "context": "ideologicalEnemyConflict",
+      "forbidRerollHungerOnes": true
+    },
+    "active": true
+  },
+  {
+    "key": "vengeful",
+    "name": "Vengativo",
+    "resonanceKey": "choleric",
+    "summary": "Añade dos dados contra el objetivo o categoría de objetivo de la venganza del recipiente.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "contextualPoolModifier",
+      "value": 2,
+      "context": "vengeanceTarget"
+    },
+    "active": true
+  },
+
+  {
+    "key": "lostLove",
+    "name": "Amor perdido",
+    "resonanceKey": "melancholy",
+    "summary": "Añade un dado para resistir intentos de seducción, incluida Presencia.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "contextualPoolModifier",
+      "value": 1,
+      "context": "resistSeduction",
+      "includesPresence": true
+    },
+    "active": true
+  },
+  {
+    "key": "grieving",
+    "name": "De luto",
+    "resonanceKey": "melancholy",
+    "summary": "Añade un dado a pruebas de Remordimiento.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "remorsePoolModifier",
+      "value": 1
+    },
+    "active": true
+  },
+  {
+    "key": "evocative",
+    "name": "Evocador",
+    "resonanceKey": "melancholy",
+    "summary": "Concede un punto de Experiencia restringido a Fortaleza u Ofuscación y se consume.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "consumedImmediately",
+    "consumable": true,
+    "effect": {
+      "kind": "restrictedExperienceGrant",
+      "amount": 1,
+      "disciplineKeys": ["fortitude", "obfuscate"]
+    },
+    "active": true
+  },
+  {
+    "key": "colossalFailure",
+    "name": "Fallo colosal",
+    "resonanceKey": "melancholy",
+    "summary": "Permite repetir pruebas que reflejen el fracaso del recipiente, sin repetir unos de Ansia.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "contextualReroll",
+      "context": "failureEcho",
+      "forbidRerollHungerOnes": true
+    },
+    "active": true
+  },
+  {
+    "key": "nostalgic",
+    "name": "Nostálgico",
+    "resonanceKey": "melancholy",
+    "summary": "Bonifica pruebas ligadas a la nostalgia del recipiente y aumenta más las reservas de Memoriam relacionadas.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "nostalgiaPoolModifier",
+      "generalValue": 1,
+      "memoriamValue": 3
+    },
+    "active": true
+  },
+  {
+    "key": "lostRelative",
+    "name": "Pariente perdido",
+    "resonanceKey": "melancholy",
+    "summary": "Sacia un punto adicional de Ansia al alimentarse de determinados parientes del recipiente.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "relationshipFeedingSatietyModifier",
+      "value": 1,
+      "relationship": "remainingRelative"
+    },
+    "active": true
+  },
+
+  {
+    "key": "comfortablyNumb",
+    "name": "Confortablemente anestesiado",
+    "resonanceKey": "phlegmatic",
+    "summary": "Ignora penalizaciones y efectos negativos derivados del daño físico o social.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "ignoreDamagePenalties",
+      "damageKinds": ["physical", "social"]
+    },
+    "active": true
+  },
+  {
+    "key": "eatingYourEmotions",
+    "name": "Comiéndote tus emociones",
+    "resonanceKey": "phlegmatic",
+    "summary": "Permite comer y digerir comida sin náuseas, sin saciar Ansia.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "foodTolerance",
+      "slakesHunger": false
+    },
+    "active": true
+  },
+  {
+    "key": "givenUp",
+    "name": "Dado por vencido",
+    "resonanceKey": "phlegmatic",
+    "summary": "Modifica la saciedad de la siguiente alimentación según su Resonancia.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "nextFeeding",
+    "consumable": false,
+    "effect": {
+      "kind": "nextFeedingSatietyByResonance",
+      "matchingResonanceKey": "phlegmatic",
+      "matchingDelta": 1,
+      "otherDelta": -1
+    },
+    "active": true
+  },
+  {
+    "key": "loneWolf",
+    "name": "Lobo solitario",
+    "resonanceKey": "phlegmatic",
+    "summary": "Durante una escena, bonifica pruebas en solitario y penaliza ayuda o trabajo en equipo.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "scene",
+    "consumable": false,
+    "effect": {
+      "kind": "soloTeamworkPoolModifier",
+      "soloValue": 1,
+      "teamworkValue": -1
+    },
+    "active": true
+  },
+  {
+    "key": "procrastinate",
+    "name": "Procrastinar",
+    "resonanceKey": "phlegmatic",
+    "summary": "Permite recuperar Fuerza de Voluntad al posponer algo importante, una vez por sesión.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "willpowerRecovery",
+      "amount": 1,
+      "trigger": "postponeImportantTask",
+      "perSessionLimit": 1
+    },
+    "active": true
+  },
+  {
+    "key": "reflection",
+    "name": "Reflejo",
+    "resonanceKey": "phlegmatic",
+    "summary": "Concede un punto de Experiencia restringido a Auspex o Dominación y se consume.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "consumedImmediately",
+    "consumable": true,
+    "effect": {
+      "kind": "restrictedExperienceGrant",
+      "amount": 1,
+      "disciplineKeys": ["auspex", "dominate"]
+    },
+    "active": true
+  },
+  {
+    "key": "relaxed",
+    "name": "Relajado",
+    "resonanceKey": "phlegmatic",
+    "summary": "Añade dos dados a reservas para resistir el Frenesí.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "frenzyResistancePoolModifier",
+      "value": 2
+    },
+    "active": true
+  },
+
+  {
+    "key": "trueLove",
+    "name": "Amor verdadero",
+    "resonanceKey": "sanguine",
+    "summary": "Mejora la saciedad al beber del amor verdadero del recipiente y añade una interacción específica con Auspex.",
+    "source": "core",
+    "sourcePage": 230,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "trueLove",
+      "feedingSatietyValue": 1,
+      "relationship": "trueLove",
+      "auspexRemoteView": true
+    },
+    "active": true
+  },
+  {
+    "key": "manicHigh",
+    "name": "Arrebato maníaco",
+    "resonanceKey": "sanguine",
+    "summary": "Bonifica las pruebas hasta el primer fallo y después aplica una penalización general.",
+    "source": "core",
+    "sourcePage": 231,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "poolShiftAfterFailure",
+      "beforeFailureValue": 1,
+      "afterFailureValue": -2
+    },
+    "active": true
+  },
+  {
+    "key": "excited",
+    "name": "Emocionado",
+    "resonanceKey": "sanguine",
+    "summary": "Concede un punto de Experiencia restringido a Hechicería de Sangre o Presencia y se consume.",
+    "source": "core",
+    "sourcePage": 231,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "consumedImmediately",
+    "consumable": true,
+    "effect": {
+      "kind": "restrictedExperienceGrant",
+      "amount": 1,
+      "disciplineKeys": ["bloodSorcery", "presence"]
+    },
+    "active": true
+  },
+  {
+    "key": "enthusiasticAboutLife",
+    "name": "Entusiasmado por la vida",
+    "resonanceKey": "sanguine",
+    "summary": "Permite usar Rubor de la Vida sin su Control de Enardecimiento.",
+    "source": "core",
+    "sourcePage": 231,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "rouseCheckExemption",
+      "action": "blushOfLife"
+    },
+    "active": true
+  },
+  {
+    "key": "contagiousEnthusiasm",
+    "name": "Entusiasmo contagioso",
+    "resonanceKey": "sanguine",
+    "summary": "Bonifica una prueba para convencer a alguien bajo contacto físico directo y conserva límites equivalentes a Dominación.",
+    "source": "core",
+    "sourcePage": 231,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "contactPersuasionPoolModifier",
+      "value": 3,
+      "requiresSkinContact": true,
+      "requiresSweatContact": true,
+      "usesDominateLimits": true
+    },
+    "active": true
+  },
+  {
+    "key": "sniffingGame",
+    "name": "Juego de olfateo",
+    "resonanceKey": "sanguine",
+    "summary": "Añade tres dados a pruebas para detectar recipientes Sanguíneos.",
+    "source": "core",
+    "sourcePage": 231,
+    "donorPersistence": "storytellerDefined",
+    "acquisitionModes": ["drainAndKill", "feedThreeNights"],
+    "drinkerEffectDuration": "untilNextFeedingOrHungerFive",
+    "consumable": false,
+    "effect": {
+      "kind": "detectResonanceVesselsPoolModifier",
+      "value": 3,
+      "targetResonanceKey": "sanguine"
+    },
+    "active": true
+  }
+]

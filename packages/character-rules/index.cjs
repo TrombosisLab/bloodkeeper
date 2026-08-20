@@ -14,6 +14,7 @@ const thinBloodTraits = require('./catalogs/thin-blood-traits.json')
 const mortalAdvantageExclusions = require('./catalogs/mortal-advantage-exclusions.json')
 const skills = require('./catalogs/skills.json')
 const bloodResonanceCatalogData = require('./catalogs/blood-resonances.json')
+const bloodDyscrasiaDefinitions = require('./catalogs/blood-dyscrasias.json')
 
 function deepFreeze(value) {
   if (value === null || typeof value !== 'object') {
@@ -99,6 +100,13 @@ const characterBloodResonanceCatalog =
     clone(bloodResonanceCatalogData),
   )
 
+const characterBloodDyscrasiaCatalog =
+  deepFreeze({
+    definitions: clone(
+      bloodDyscrasiaDefinitions,
+    ),
+  })
+
 const characterMortalAdvantageExclusionCatalog =
   deepFreeze(
     clone(mortalAdvantageExclusions),
@@ -114,5 +122,6 @@ module.exports = {
   characterDependencyCatalog,
   characterSkillCatalog,
   characterBloodResonanceCatalog,
+  characterBloodDyscrasiaCatalog,
   characterMortalAdvantageExclusionCatalog,
 }

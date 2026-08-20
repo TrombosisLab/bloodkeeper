@@ -40,6 +40,9 @@ import skills from './catalogs/skills.json' with {
 import bloodResonanceCatalogData from './catalogs/blood-resonances.json' with {
   type: 'json',
 }
+import bloodDyscrasiaDefinitions from './catalogs/blood-dyscrasias.json' with {
+  type: 'json',
+}
 
 function deepFreeze(value) {
   if (value === null || typeof value !== 'object') {
@@ -129,3 +132,10 @@ export const characterBloodResonanceCatalog =
   deepFreeze(
     clone(bloodResonanceCatalogData),
   )
+
+export const characterBloodDyscrasiaCatalog =
+  deepFreeze({
+    definitions: clone(
+      bloodDyscrasiaDefinitions,
+    ),
+  })
