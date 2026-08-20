@@ -647,6 +647,7 @@ model CharacterBloodState {
   resonanceSpecialAffinityKey CharacterBloodSpecialAffinityKey?
   dyscrasiaKey                CharacterBloodDyscrasiaKey?
   dyscrasiaAcquisitionMode    CharacterBloodDyscrasiaAcquisitionMode?
+  dyscrasiaSourceOperationId  String?                                  @db.Uuid
 
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
@@ -668,10 +669,26 @@ model CharacterBloodResonanceOperation {
   createdAt                DateTime                                @default(now()) @db.Timestamptz(3)
 
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  dyscrasiaConsumption CharacterBloodDyscrasiaConsumptionOperation? @relation("CharacterBloodDyscrasiaSource")
 
   @@id([characterId, operationId])
   @@index([characterId, createdAt])
   @@map("character_blood_resonance_operations")
+}
+
+model CharacterBloodDyscrasiaConsumptionOperation {
+  characterId            String                     @db.Uuid
+  operationId            String                     @db.Uuid
+  sourceBloodOperationId String                     @db.Uuid
+  dyscrasiaKey           CharacterBloodDyscrasiaKey
+  createdAt              DateTime                   @default(now()) @db.Timestamptz(3)
+
+  sourceBloodOperation CharacterBloodResonanceOperation @relation("CharacterBloodDyscrasiaSource", fields: [characterId, sourceBloodOperationId], references: [characterId, operationId], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([characterId, operationId])
+  @@unique([characterId, sourceBloodOperationId])
+  @@index([characterId, createdAt])
+  @@map("character_blood_dyscrasia_consumption_operations")
 }
 
 model CharacterDamageState {

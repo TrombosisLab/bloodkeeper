@@ -1,4 +1,20 @@
 import {
+  CharacterBloodDyscrasiaAlreadyConsumedError,
+  CharacterBloodDyscrasiaConsumptionOperationConflictError,
+  CharacterBloodDyscrasiaConsumptionWriteConflictError,
+} from '../application/character-blood-dyscrasia-consumption.repository'
+
+import {
+  isSameCharacterBloodDyscrasiaConsumptionOperation,
+} from '../domain/character-blood-dyscrasia-consumption.types'
+
+import type {
+  ConsumeCharacterBloodDyscrasiaData,
+  PersistedCharacterBloodDyscrasiaActiveInstance,
+  PersistedCharacterBloodDyscrasiaConsumptionOperation,
+} from '../domain/character-blood-dyscrasia-consumption.types'
+
+import {
   MAX_OFFSET_PAGE_LIMIT,
   offsetPageFromRows,
 } from '../../common/offset-pagination'
@@ -3419,6 +3435,10 @@ export class PrismaCharacterDraftRepository
                     : dyscrasiaAcquisitionModeToPrisma[
                         data.dyscrasiaAcquisitionMode
                       ],
+                dyscrasiaSourceOperationId:
+                  data.dyscrasiaKey === null
+                    ? null
+                    : data.operationId,
               },
             })
 
@@ -3520,6 +3540,365 @@ export class PrismaCharacterDraftRepository
     }
   }
 
+  async findActiveBloodDyscrasia(
+    characterId: string,
+  ): Promise<
+    PersistedCharacterBloodDyscrasiaActiveInstance | null
+  > {
+    const row =
+      await this.database.characterBloodState
+        .findUnique({
+          where: {
+            characterId,
+          },
+          select: {
+            dyscrasiaKey: true,
+            dyscrasiaSourceOperationId: true,
+          },
+        })
+
+    if (
+      row === null ||
+      row.dyscrasiaKey === null ||
+      row.dyscrasiaSourceOperationId === null
+    ) {
+      return null
+    }
+
+    return {
+      characterId,
+      sourceBloodOperationId:
+        row.dyscrasiaSourceOperationId,
+      dyscrasiaKey:
+        dyscrasiaKeyFromPrisma[
+          row.dyscrasiaKey
+        ],
+    }
+  }
+
+  async findBloodDyscrasiaConsumptionOperation(
+    characterId: string,
+    operationId: string,
+  ): Promise<
+    PersistedCharacterBloodDyscrasiaConsumptionOperation | null
+  > {
+    const row =
+      await this.database
+        .characterBloodDyscrasiaConsumptionOperation
+        .findUnique({
+          where: {
+            characterId_operationId: {
+              characterId,
+              operationId,
+            },
+          },
+        })
+
+    if (row === null) return null
+
+    return {
+      characterId: row.characterId,
+      operationId: row.operationId,
+      sourceBloodOperationId:
+        row.sourceBloodOperationId,
+      dyscrasiaKey:
+        dyscrasiaKeyFromPrisma[
+          row.dyscrasiaKey
+        ],
+      createdAt: row.createdAt,
+    }
+  }
+
+  async findBloodDyscrasiaConsumptionBySource(
+    characterId: string,
+    sourceBloodOperationId: string,
+  ): Promise<
+    PersistedCharacterBloodDyscrasiaConsumptionOperation | null
+  > {
+    const row =
+      await this.database
+        .characterBloodDyscrasiaConsumptionOperation
+        .findUnique({
+          where: {
+            characterId_sourceBloodOperationId: {
+              characterId,
+              sourceBloodOperationId,
+            },
+          },
+        })
+
+    if (row === null) return null
+
+    return {
+      characterId: row.characterId,
+      operationId: row.operationId,
+      sourceBloodOperationId:
+        row.sourceBloodOperationId,
+      dyscrasiaKey:
+        dyscrasiaKeyFromPrisma[
+          row.dyscrasiaKey
+        ],
+      createdAt: row.createdAt,
+    }
+  }
+
+  async consumeBloodDyscrasia(
+    data: ConsumeCharacterBloodDyscrasiaData,
+  ): Promise<PersistedCharacterDraft> {
+    const execute = async () =>
+      this.database.$transaction(
+        async (transaction) => {
+          const existing =
+            await transaction
+              .characterBloodDyscrasiaConsumptionOperation
+              .findUnique({
+                where: {
+                  characterId_operationId: {
+                    characterId:
+                      data.characterId,
+                    operationId:
+                      data.operationId,
+                  },
+                },
+              })
+
+          if (existing !== null) {
+            const persistedExisting = {
+              characterId:
+                existing.characterId,
+              operationId:
+                existing.operationId,
+              sourceBloodOperationId:
+                existing.sourceBloodOperationId,
+              dyscrasiaKey:
+                dyscrasiaKeyFromPrisma[
+                  existing.dyscrasiaKey
+                ],
+              createdAt:
+                existing.createdAt,
+            } satisfies PersistedCharacterBloodDyscrasiaConsumptionOperation
+
+            if (
+              !isSameCharacterBloodDyscrasiaConsumptionOperation(
+                persistedExisting,
+                data,
+              )
+            ) {
+              throw new CharacterBloodDyscrasiaConsumptionOperationConflictError(
+                data.characterId,
+                data.operationId,
+              )
+            }
+
+            const row =
+              await transaction.character
+                .findUniqueOrThrow({
+                  where: {
+                    id: data.characterId,
+                  },
+                  include: characterRelations,
+                })
+
+            return toPersistedDraft(row)
+          }
+
+          const consumedSource =
+            await transaction
+              .characterBloodDyscrasiaConsumptionOperation
+              .findUnique({
+                where: {
+                  characterId_sourceBloodOperationId: {
+                    characterId:
+                      data.characterId,
+                    sourceBloodOperationId:
+                      data.sourceBloodOperationId,
+                  },
+                },
+              })
+
+          if (consumedSource !== null) {
+            throw new CharacterBloodDyscrasiaAlreadyConsumedError(
+              data.characterId,
+              data.sourceBloodOperationId,
+            )
+          }
+
+          const current =
+            await transaction.character
+              .findUnique({
+                where: {
+                  id: data.characterId,
+                },
+                select: {
+                  revision: true,
+                  status: true,
+                  nature: true,
+                  blood: {
+                    select: {
+                      dyscrasiaKey: true,
+                      dyscrasiaSourceOperationId:
+                        true,
+                    },
+                  },
+                },
+              })
+
+          if (
+            current === null ||
+            current.revision !==
+              data.expectedRevision ||
+            current.status ===
+              PrismaCharacterStatus.ARCHIVED ||
+            current.nature !==
+              PrismaCharacterNature.VAMPIRE ||
+            current.blood === null ||
+            current.blood.dyscrasiaKey !==
+              dyscrasiaKeyToPrisma[
+                data.dyscrasiaKey
+              ] ||
+            current.blood
+              .dyscrasiaSourceOperationId !==
+                data.sourceBloodOperationId
+          ) {
+            throw new CharacterBloodDyscrasiaConsumptionWriteConflictError(
+              data.characterId,
+            )
+          }
+
+          const claimed =
+            await transaction.character
+              .updateMany({
+                where: {
+                  id: data.characterId,
+                  revision:
+                    data.expectedRevision,
+                  status: {
+                    in: [
+                      PrismaCharacterStatus.DRAFT,
+                      PrismaCharacterStatus.ACTIVE,
+                    ],
+                  },
+                  nature:
+                    PrismaCharacterNature.VAMPIRE,
+                },
+                data: {
+                  revision: {
+                    increment: 1,
+                  },
+                },
+              })
+
+          if (claimed.count !== 1) {
+            throw new CharacterBloodDyscrasiaConsumptionWriteConflictError(
+              data.characterId,
+            )
+          }
+
+          const cleared =
+            await transaction.characterBloodState
+              .updateMany({
+                where: {
+                  characterId:
+                    data.characterId,
+                  dyscrasiaKey:
+                    dyscrasiaKeyToPrisma[
+                      data.dyscrasiaKey
+                    ],
+                  dyscrasiaSourceOperationId:
+                    data.sourceBloodOperationId,
+                },
+                data: {
+                  dyscrasiaKey: null,
+                  dyscrasiaAcquisitionMode:
+                    null,
+                  dyscrasiaSourceOperationId:
+                    null,
+                },
+              })
+
+          if (cleared.count !== 1) {
+            throw new CharacterBloodDyscrasiaConsumptionWriteConflictError(
+              data.characterId,
+            )
+          }
+
+          await transaction
+            .characterBloodDyscrasiaConsumptionOperation
+            .create({
+              data: {
+                characterId:
+                  data.characterId,
+                operationId:
+                  data.operationId,
+                sourceBloodOperationId:
+                  data.sourceBloodOperationId,
+                dyscrasiaKey:
+                  dyscrasiaKeyToPrisma[
+                    data.dyscrasiaKey
+                  ],
+              },
+            })
+
+          const row =
+            await transaction.character
+              .findUniqueOrThrow({
+                where: {
+                  id: data.characterId,
+                },
+                include: characterRelations,
+              })
+
+          return toPersistedDraft(row)
+        },
+      )
+
+    try {
+      return await execute()
+    } catch (error: unknown) {
+      const existing =
+        await this.findBloodDyscrasiaConsumptionOperation(
+          data.characterId,
+          data.operationId,
+        )
+
+      if (
+        existing !== null &&
+        isSameCharacterBloodDyscrasiaConsumptionOperation(
+          existing,
+          data,
+        )
+      ) {
+        const row =
+          await this.database.character
+            .findUnique({
+              where: {
+                id: data.characterId,
+              },
+              include: characterRelations,
+            })
+
+        if (row !== null) {
+          return toPersistedDraft(row)
+        }
+      }
+
+      const consumedSource =
+        await this.findBloodDyscrasiaConsumptionBySource(
+          data.characterId,
+          data.sourceBloodOperationId,
+        )
+
+      if (consumedSource !== null) {
+        throw new CharacterBloodDyscrasiaAlreadyConsumedError(
+          data.characterId,
+          data.sourceBloodOperationId,
+        )
+      }
+
+      throw error
+    }
+  }
+
   async updateState(
     ownerId: string,
     data: UpdateCharacterStateData,
@@ -3571,6 +3950,8 @@ export class PrismaCharacterDraftRepository
                         null,
                       dyscrasiaKey: null,
                       dyscrasiaAcquisitionMode:
+                        null,
+                      dyscrasiaSourceOperationId:
                         null,
                     }
                   : {}),
