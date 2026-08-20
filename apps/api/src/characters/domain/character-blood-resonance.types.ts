@@ -1,8 +1,11 @@
 import {
+  characterBloodDyscrasiaCatalog,
   characterBloodResonanceCatalog,
 } from '@v5r/character-rules'
 
 import type {
+  CharacterRulesBloodDyscrasiaAcquisitionMode,
+  CharacterRulesBloodDyscrasiaKey,
   CharacterRulesBloodResonanceKey,
   CharacterRulesBloodSourceKind,
   CharacterRulesBloodSpecialAffinityKey,
@@ -25,6 +28,12 @@ export type CharacterBloodSpecialAffinityKey =
 export type CharacterBloodTemperament =
   CharacterRulesBloodTemperament
 
+export type CharacterBloodDyscrasiaKey =
+  CharacterRulesBloodDyscrasiaKey
+
+export type CharacterBloodDyscrasiaAcquisitionMode =
+  CharacterRulesBloodDyscrasiaAcquisitionMode
+
 export interface PersistedCharacterBloodResonance {
   readonly sourceKind: CharacterBloodSourceKind
   readonly resonanceKey:
@@ -45,6 +54,10 @@ export interface PersistedCharacterBloodResonanceOperation {
     CharacterBloodSpecialAffinityKey | null
   readonly temperament:
     CharacterBloodTemperament | null
+  readonly dyscrasiaKey:
+    CharacterBloodDyscrasiaKey | null
+  readonly dyscrasiaAcquisitionMode:
+    CharacterBloodDyscrasiaAcquisitionMode | null
   readonly hungerSlaked: number
   readonly hungerBefore: number
   readonly hungerAfter: number
@@ -62,6 +75,10 @@ export interface ApplyCharacterBloodResonanceData {
     CharacterBloodSpecialAffinityKey | null
   readonly temperament:
     CharacterBloodTemperament | null
+  readonly dyscrasiaKey:
+    CharacterBloodDyscrasiaKey | null
+  readonly dyscrasiaAcquisitionMode:
+    CharacterBloodDyscrasiaAcquisitionMode | null
   readonly hungerSlaked: number
   readonly hungerBefore: number
   readonly hungerAfter: number
@@ -70,6 +87,9 @@ export interface ApplyCharacterBloodResonanceData {
 export type CharacterBloodResonanceViolation =
   | 'PROFILE_INVALID'
   | 'HUNGER_SLAKED_INVALID'
+  | 'DYSCRASIA_ACQUISITION_INVALID'
+  | 'DYSCRASIA_REQUIRES_ACUTE'
+  | 'DYSCRASIA_RESONANCE_MISMATCH'
 
 export class InvalidCharacterBloodResonanceError
   extends Error {
@@ -169,6 +189,78 @@ export function assertValidConsumedBloodProfile(
   }
 }
 
+export function assertValidConsumedBloodDyscrasia(
+  profile: Pick<
+    PersistedCharacterBloodResonanceOperation,
+    | 'resonanceKey'
+    | 'specialAffinityKey'
+    | 'temperament'
+  > & {
+    readonly dyscrasiaKey?:
+      CharacterBloodDyscrasiaKey | null
+    readonly dyscrasiaAcquisitionMode?:
+      CharacterBloodDyscrasiaAcquisitionMode | null
+  },
+): void {
+  const dyscrasiaKey =
+    profile.dyscrasiaKey ?? null
+  const acquisitionMode =
+    profile.dyscrasiaAcquisitionMode ?? null
+
+  if (
+    dyscrasiaKey === null &&
+    acquisitionMode === null
+  ) {
+    return
+  }
+
+  if (
+    dyscrasiaKey === null ||
+    acquisitionMode === null
+  ) {
+    throw new InvalidCharacterBloodResonanceError(
+      ['DYSCRASIA_ACQUISITION_INVALID'],
+    )
+  }
+
+  const definition =
+    characterBloodDyscrasiaCatalog
+      .definitions
+      .find(
+        ({ key }) => key === dyscrasiaKey,
+      )
+
+  if (
+    definition === undefined ||
+    !definition.acquisitionModes.includes(
+      acquisitionMode,
+    )
+  ) {
+    throw new InvalidCharacterBloodResonanceError(
+      ['DYSCRASIA_ACQUISITION_INVALID'],
+    )
+  }
+
+  if (
+    profile.resonanceKey === null ||
+    profile.specialAffinityKey !== null ||
+    profile.temperament !== 'acute'
+  ) {
+    throw new InvalidCharacterBloodResonanceError(
+      ['DYSCRASIA_REQUIRES_ACUTE'],
+    )
+  }
+
+  if (
+    definition.resonanceKey !==
+      profile.resonanceKey
+  ) {
+    throw new InvalidCharacterBloodResonanceError(
+      ['DYSCRASIA_RESONANCE_MISMATCH'],
+    )
+  }
+}
+
 export function deriveCharacterBloodResonanceHungerAfter(
   hungerBefore: number,
   hungerSlaked: number,
@@ -230,6 +322,12 @@ export function isSameCharacterBloodResonanceOperation(
     | 'specialAffinityKey'
     | 'temperament'
     | 'hungerSlaked'
+  > & Partial<
+    Pick<
+      ApplyCharacterBloodResonanceData,
+      | 'dyscrasiaKey'
+      | 'dyscrasiaAcquisitionMode'
+    >
   >,
 ): boolean {
   return (
@@ -238,6 +336,10 @@ export function isSameCharacterBloodResonanceOperation(
     existing.specialAffinityKey ===
       attempted.specialAffinityKey &&
     existing.temperament === attempted.temperament &&
+    (existing.dyscrasiaKey ?? null) ===
+      (attempted.dyscrasiaKey ?? null) &&
+    (existing.dyscrasiaAcquisitionMode ?? null) ===
+      (attempted.dyscrasiaAcquisitionMode ?? null) &&
     existing.hungerSlaked === attempted.hungerSlaked
   )
 }

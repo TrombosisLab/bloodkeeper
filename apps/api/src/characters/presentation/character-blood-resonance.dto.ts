@@ -1,4 +1,5 @@
 import {
+  characterBloodDyscrasiaCatalog,
   characterBloodResonanceCatalog,
 } from '@v5r/character-rules'
 
@@ -39,6 +40,22 @@ const affinityKeys =
   characterBloodResonanceCatalog
     .specialAffinities
     .map(({ key }) => key)
+
+const dyscrasiaKeys =
+  characterBloodDyscrasiaCatalog
+    .definitions
+    .map(({ key }) => key)
+
+const dyscrasiaAcquisitionModes = [
+  ...new Set(
+    characterBloodDyscrasiaCatalog
+      .definitions
+      .flatMap(
+        ({ acquisitionModes }) =>
+          acquisitionModes,
+      ),
+  ),
+]
 
 function record(
   value: unknown,
@@ -137,6 +154,8 @@ export function parseApplyCharacterBloodResonanceRequest(
       'resonanceKey',
       'specialAffinityKey',
       'temperament',
+      'dyscrasiaKey',
+      'dyscrasiaAcquisitionMode',
       'hungerSlaked',
     ],
   )
@@ -186,6 +205,26 @@ export function parseApplyCharacterBloodResonanceRequest(
         temperamentKeys,
         'body.temperament',
       ) as ApplyCharacterBloodResonanceCommand['temperament'],
+    ...(body.dyscrasiaKey === undefined
+      ? {}
+      : {
+          dyscrasiaKey:
+            nullableOneOf(
+              body.dyscrasiaKey,
+              dyscrasiaKeys,
+              'body.dyscrasiaKey',
+            ) as ApplyCharacterBloodResonanceCommand['dyscrasiaKey'],
+        }),
+    ...(body.dyscrasiaAcquisitionMode === undefined
+      ? {}
+      : {
+          dyscrasiaAcquisitionMode:
+            nullableOneOf(
+              body.dyscrasiaAcquisitionMode,
+              dyscrasiaAcquisitionModes,
+              'body.dyscrasiaAcquisitionMode',
+            ) as ApplyCharacterBloodResonanceCommand['dyscrasiaAcquisitionMode'],
+        }),
     hungerSlaked:
       positiveInteger(
         body.hungerSlaked,

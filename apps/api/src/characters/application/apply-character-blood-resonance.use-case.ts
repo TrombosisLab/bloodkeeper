@@ -12,12 +12,15 @@ import type {
 } from './character-draft.repository'
 
 import {
+  assertValidConsumedBloodDyscrasia,
   assertValidConsumedBloodProfile,
   deriveCharacterBloodResonanceHungerAfter,
   isSameCharacterBloodResonanceOperation,
 } from '../domain/character-blood-resonance.types'
 
 import type {
+  CharacterBloodDyscrasiaAcquisitionMode,
+  CharacterBloodDyscrasiaKey,
   CharacterBloodResonanceKey,
   CharacterBloodSourceKind,
   CharacterBloodSpecialAffinityKey,
@@ -43,6 +46,10 @@ export interface ApplyCharacterBloodResonanceCommand {
     CharacterBloodSpecialAffinityKey | null
   readonly temperament:
     CharacterBloodTemperament | null
+  readonly dyscrasiaKey?:
+    CharacterBloodDyscrasiaKey | null
+  readonly dyscrasiaAcquisitionMode?:
+    CharacterBloodDyscrasiaAcquisitionMode | null
   readonly hungerSlaked: number
 }
 
@@ -194,6 +201,20 @@ export class ApplyCharacterBloodResonanceUseCase {
 
     assertValidConsumedBloodProfile(command)
 
+    const dyscrasiaKey =
+      command.dyscrasiaKey ?? null
+    const dyscrasiaAcquisitionMode =
+      command.dyscrasiaAcquisitionMode ?? null
+
+    assertValidConsumedBloodDyscrasia({
+      resonanceKey: command.resonanceKey,
+      specialAffinityKey:
+        command.specialAffinityKey,
+      temperament: command.temperament,
+      dyscrasiaKey,
+      dyscrasiaAcquisitionMode,
+    })
+
     const hungerAfter =
       deriveCharacterBloodResonanceHungerAfter(
         blood.hunger,
@@ -211,6 +232,8 @@ export class ApplyCharacterBloodResonanceUseCase {
         specialAffinityKey:
           command.specialAffinityKey,
         temperament: command.temperament,
+        dyscrasiaKey,
+        dyscrasiaAcquisitionMode,
         hungerSlaked: command.hungerSlaked,
         hungerBefore: blood.hunger,
         hungerAfter,

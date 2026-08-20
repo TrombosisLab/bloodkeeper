@@ -24,6 +24,8 @@ import {
 
 import type {
   ApplyCharacterBloodResonanceData,
+  CharacterBloodDyscrasiaAcquisitionMode,
+  CharacterBloodDyscrasiaKey,
   CharacterBloodResonanceKey,
   CharacterBloodSourceKind,
   CharacterBloodSpecialAffinityKey,
@@ -50,6 +52,8 @@ import { Injectable } from '@nestjs/common'
 import {
   AdvantageCategory as PrismaAdvantageCategory,
   CharacterAgeCategory as PrismaCharacterAgeCategory,
+  CharacterBloodDyscrasiaAcquisitionMode as PrismaCharacterBloodDyscrasiaAcquisitionMode,
+  CharacterBloodDyscrasiaKey as PrismaCharacterBloodDyscrasiaKey,
   CharacterBloodResonanceKey as PrismaCharacterBloodResonanceKey,
   CharacterBloodSourceKind as PrismaCharacterBloodSourceKind,
   CharacterBloodSpecialAffinityKey as PrismaCharacterBloodSpecialAffinityKey,
@@ -254,6 +258,88 @@ const affinityFromPrisma: Record<
 > = {
   ANIMAL_BLOOD: 'animalBlood',
   RESONANCE_FREE: 'resonanceFree',
+}
+
+const dyscrasiaAcquisitionModeToPrisma: Record<
+  CharacterBloodDyscrasiaAcquisitionMode,
+  PrismaCharacterBloodDyscrasiaAcquisitionMode
+> = {
+  drainAndKill:
+    PrismaCharacterBloodDyscrasiaAcquisitionMode.DRAIN_AND_KILL,
+  feedThreeNights:
+    PrismaCharacterBloodDyscrasiaAcquisitionMode.FEED_THREE_NIGHTS,
+}
+
+const dyscrasiaAcquisitionModeFromPrisma: Record<
+  PrismaCharacterBloodDyscrasiaAcquisitionMode,
+  CharacterBloodDyscrasiaAcquisitionMode
+> = {
+  DRAIN_AND_KILL: 'drainAndKill',
+  FEED_THREE_NIGHTS: 'feedThreeNights',
+}
+
+const dyscrasiaKeyToPrisma: Record<
+  CharacterBloodDyscrasiaKey,
+  PrismaCharacterBloodDyscrasiaKey
+> = {
+  aggressive: PrismaCharacterBloodDyscrasiaKey.AGGRESSIVE,
+  cycleOfViolence: PrismaCharacterBloodDyscrasiaKey.CYCLE_OF_VIOLENCE,
+  energetic: PrismaCharacterBloodDyscrasiaKey.ENERGETIC,
+  envy: PrismaCharacterBloodDyscrasiaKey.ENVY,
+  bully: PrismaCharacterBloodDyscrasiaKey.BULLY,
+  righteous: PrismaCharacterBloodDyscrasiaKey.RIGHTEOUS,
+  vengeful: PrismaCharacterBloodDyscrasiaKey.VENGEFUL,
+  lostLove: PrismaCharacterBloodDyscrasiaKey.LOST_LOVE,
+  grieving: PrismaCharacterBloodDyscrasiaKey.GRIEVING,
+  evocative: PrismaCharacterBloodDyscrasiaKey.EVOCATIVE,
+  colossalFailure: PrismaCharacterBloodDyscrasiaKey.COLOSSAL_FAILURE,
+  nostalgic: PrismaCharacterBloodDyscrasiaKey.NOSTALGIC,
+  lostRelative: PrismaCharacterBloodDyscrasiaKey.LOST_RELATIVE,
+  comfortablyNumb: PrismaCharacterBloodDyscrasiaKey.COMFORTABLY_NUMB,
+  eatingYourEmotions: PrismaCharacterBloodDyscrasiaKey.EATING_YOUR_EMOTIONS,
+  givenUp: PrismaCharacterBloodDyscrasiaKey.GIVEN_UP,
+  loneWolf: PrismaCharacterBloodDyscrasiaKey.LONE_WOLF,
+  procrastinate: PrismaCharacterBloodDyscrasiaKey.PROCRASTINATE,
+  reflection: PrismaCharacterBloodDyscrasiaKey.REFLECTION,
+  relaxed: PrismaCharacterBloodDyscrasiaKey.RELAXED,
+  trueLove: PrismaCharacterBloodDyscrasiaKey.TRUE_LOVE,
+  manicHigh: PrismaCharacterBloodDyscrasiaKey.MANIC_HIGH,
+  excited: PrismaCharacterBloodDyscrasiaKey.EXCITED,
+  enthusiasticAboutLife: PrismaCharacterBloodDyscrasiaKey.ENTHUSIASTIC_ABOUT_LIFE,
+  contagiousEnthusiasm: PrismaCharacterBloodDyscrasiaKey.CONTAGIOUS_ENTHUSIASM,
+  sniffingGame: PrismaCharacterBloodDyscrasiaKey.SNIFFING_GAME,
+}
+
+const dyscrasiaKeyFromPrisma: Record<
+  PrismaCharacterBloodDyscrasiaKey,
+  CharacterBloodDyscrasiaKey
+> = {
+  AGGRESSIVE: 'aggressive',
+  CYCLE_OF_VIOLENCE: 'cycleOfViolence',
+  ENERGETIC: 'energetic',
+  ENVY: 'envy',
+  BULLY: 'bully',
+  RIGHTEOUS: 'righteous',
+  VENGEFUL: 'vengeful',
+  LOST_LOVE: 'lostLove',
+  GRIEVING: 'grieving',
+  EVOCATIVE: 'evocative',
+  COLOSSAL_FAILURE: 'colossalFailure',
+  NOSTALGIC: 'nostalgic',
+  LOST_RELATIVE: 'lostRelative',
+  COMFORTABLY_NUMB: 'comfortablyNumb',
+  EATING_YOUR_EMOTIONS: 'eatingYourEmotions',
+  GIVEN_UP: 'givenUp',
+  LONE_WOLF: 'loneWolf',
+  PROCRASTINATE: 'procrastinate',
+  REFLECTION: 'reflection',
+  RELAXED: 'relaxed',
+  TRUE_LOVE: 'trueLove',
+  MANIC_HIGH: 'manicHigh',
+  EXCITED: 'excited',
+  ENTHUSIASTIC_ABOUT_LIFE: 'enthusiasticAboutLife',
+  CONTAGIOUS_ENTHUSIASM: 'contagiousEnthusiasm',
+  SNIFFING_GAME: 'sniffingGame',
 }
 
 const creationModeFromPrisma: Record<
@@ -1095,6 +1181,22 @@ function toPersistedDraft(
                               .resonanceTemperament
                           ],
                   },
+            ...(row.blood.dyscrasiaKey === null ||
+            row.blood.dyscrasiaAcquisitionMode === null
+              ? {}
+              : {
+                  dyscrasia: {
+                    key:
+                      dyscrasiaKeyFromPrisma[
+                        row.blood.dyscrasiaKey
+                      ],
+                    acquisitionMode:
+                      dyscrasiaAcquisitionModeFromPrisma[
+                        row.blood
+                          .dyscrasiaAcquisitionMode
+                      ],
+                  },
+                }),
           },
     damage: {
       health: {
@@ -3092,6 +3194,18 @@ export class PrismaCharacterDraftRepository
           : temperamentFromPrisma[
               row.temperament
             ],
+      dyscrasiaKey:
+        row.dyscrasiaKey === null
+          ? null
+          : dyscrasiaKeyFromPrisma[
+              row.dyscrasiaKey
+            ],
+      dyscrasiaAcquisitionMode:
+        row.dyscrasiaAcquisitionMode === null
+          ? null
+          : dyscrasiaAcquisitionModeFromPrisma[
+              row.dyscrasiaAcquisitionMode
+            ],
       hungerSlaked: row.hungerSlaked,
       hungerBefore: row.hungerBefore,
       hungerAfter: row.hungerAfter,
@@ -3144,6 +3258,18 @@ export class PrismaCharacterDraftRepository
                   ? null
                   : temperamentFromPrisma[
                       existing.temperament
+                    ],
+              dyscrasiaKey:
+                existing.dyscrasiaKey === null
+                  ? null
+                  : dyscrasiaKeyFromPrisma[
+                      existing.dyscrasiaKey
+                    ],
+              dyscrasiaAcquisitionMode:
+                existing.dyscrasiaAcquisitionMode === null
+                  ? null
+                  : dyscrasiaAcquisitionModeFromPrisma[
+                      existing.dyscrasiaAcquisitionMode
                     ],
               hungerSlaked:
                 existing.hungerSlaked,
@@ -3281,6 +3407,18 @@ export class PrismaCharacterDraftRepository
                     : affinityToPrisma[
                         data.specialAffinityKey
                       ],
+                dyscrasiaKey:
+                  data.dyscrasiaKey === null
+                    ? null
+                    : dyscrasiaKeyToPrisma[
+                        data.dyscrasiaKey
+                      ],
+                dyscrasiaAcquisitionMode:
+                  data.dyscrasiaAcquisitionMode === null
+                    ? null
+                    : dyscrasiaAcquisitionModeToPrisma[
+                        data.dyscrasiaAcquisitionMode
+                      ],
               },
             })
 
@@ -3313,6 +3451,18 @@ export class PrismaCharacterDraftRepository
                     ? null
                     : affinityToPrisma[
                         data.specialAffinityKey
+                      ],
+                dyscrasiaKey:
+                  data.dyscrasiaKey === null
+                    ? null
+                    : dyscrasiaKeyToPrisma[
+                        data.dyscrasiaKey
+                      ],
+                dyscrasiaAcquisitionMode:
+                  data.dyscrasiaAcquisitionMode === null
+                    ? null
+                    : dyscrasiaAcquisitionModeToPrisma[
+                        data.dyscrasiaAcquisitionMode
                       ],
                 hungerSlaked:
                   data.hungerSlaked,
@@ -3418,6 +3568,9 @@ export class PrismaCharacterDraftRepository
                       resonanceKey: null,
                       resonanceTemperament: null,
                       resonanceSpecialAffinityKey:
+                        null,
+                      dyscrasiaKey: null,
+                      dyscrasiaAcquisitionMode:
                         null,
                     }
                   : {}),

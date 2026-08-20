@@ -59,6 +59,40 @@ enum CharacterBloodSpecialAffinityKey {
   RESONANCE_FREE
 }
 
+enum CharacterBloodDyscrasiaAcquisitionMode {
+  DRAIN_AND_KILL
+  FEED_THREE_NIGHTS
+}
+
+enum CharacterBloodDyscrasiaKey {
+  AGGRESSIVE
+  CYCLE_OF_VIOLENCE
+  ENERGETIC
+  ENVY
+  BULLY
+  RIGHTEOUS
+  VENGEFUL
+  LOST_LOVE
+  GRIEVING
+  EVOCATIVE
+  COLOSSAL_FAILURE
+  NOSTALGIC
+  LOST_RELATIVE
+  COMFORTABLY_NUMB
+  EATING_YOUR_EMOTIONS
+  GIVEN_UP
+  LONE_WOLF
+  PROCRASTINATE
+  REFLECTION
+  RELAXED
+  TRUE_LOVE
+  MANIC_HIGH
+  EXCITED
+  ENTHUSIASTIC_ABOUT_LIFE
+  CONTAGIOUS_ENTHUSIASM
+  SNIFFING_GAME
+}
+
 enum CharacterCreationMode {
   STANDARD
   SESSION_ZERO
@@ -604,13 +638,15 @@ model CharacterAttributes {
 }
 
 model CharacterBloodState {
-  characterId                 String                           @id @db.Uuid
-  bloodPotency                Int                              @default(1)
-  hunger                      Int                              @default(1)
+  characterId                 String                                  @id @db.Uuid
+  bloodPotency                Int                                     @default(1)
+  hunger                      Int                                     @default(1)
   resonanceSourceKind         CharacterBloodSourceKind?
   resonanceKey                CharacterBloodResonanceKey?
   resonanceTemperament        CharacterBloodTemperament?
   resonanceSpecialAffinityKey CharacterBloodSpecialAffinityKey?
+  dyscrasiaKey                CharacterBloodDyscrasiaKey?
+  dyscrasiaAcquisitionMode    CharacterBloodDyscrasiaAcquisitionMode?
 
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
@@ -618,16 +654,18 @@ model CharacterBloodState {
 }
 
 model CharacterBloodResonanceOperation {
-  characterId        String                           @db.Uuid
-  operationId        String                           @db.Uuid
-  sourceKind         CharacterBloodSourceKind
-  resonanceKey       CharacterBloodResonanceKey?
-  temperament        CharacterBloodTemperament?
-  specialAffinityKey CharacterBloodSpecialAffinityKey?
-  hungerSlaked       Int
-  hungerBefore       Int
-  hungerAfter        Int
-  createdAt          DateTime                         @default(now()) @db.Timestamptz(3)
+  characterId              String                                  @db.Uuid
+  operationId              String                                  @db.Uuid
+  sourceKind               CharacterBloodSourceKind
+  resonanceKey             CharacterBloodResonanceKey?
+  temperament              CharacterBloodTemperament?
+  specialAffinityKey       CharacterBloodSpecialAffinityKey?
+  dyscrasiaKey             CharacterBloodDyscrasiaKey?
+  dyscrasiaAcquisitionMode CharacterBloodDyscrasiaAcquisitionMode?
+  hungerSlaked             Int
+  hungerBefore             Int
+  hungerAfter              Int
+  createdAt                DateTime                                @default(now()) @db.Timestamptz(3)
 
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 

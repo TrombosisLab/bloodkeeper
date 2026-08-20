@@ -4,6 +4,8 @@ import {
 } from '@v5r/character-rules'
 
 import type {
+  CharacterRulesBloodDyscrasiaAcquisitionMode,
+  CharacterRulesBloodDyscrasiaKey,
   CharacterRulesBloodResonanceKey,
   CharacterRulesBloodSourceKind,
   CharacterRulesBloodSpecialAffinityKey,
@@ -99,11 +101,19 @@ export interface PersistedCharacterBloodResonance {
     CharacterRulesBloodTemperament | null
 }
 
+export interface PersistedCharacterBloodDyscrasia {
+  key: CharacterRulesBloodDyscrasiaKey
+  acquisitionMode:
+    CharacterRulesBloodDyscrasiaAcquisitionMode
+}
+
 export interface PersistedCharacterBlood {
   bloodPotency: number
   hunger: number
   resonance?:
     PersistedCharacterBloodResonance | null
+  dyscrasia?:
+    PersistedCharacterBloodDyscrasia | null
 }
 
 export interface PersistedCharacterDamageTrack {
