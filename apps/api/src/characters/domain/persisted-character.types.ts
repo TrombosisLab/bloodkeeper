@@ -4,6 +4,10 @@ import {
 } from '@v5r/character-rules'
 
 import type {
+  CharacterRulesBloodResonanceKey,
+  CharacterRulesBloodSourceKind,
+  CharacterRulesBloodSpecialAffinityKey,
+  CharacterRulesBloodTemperament,
   CharacterRulesDisciplineKey,
   CharacterRulesSkillKey,
 } from '@v5r/character-rules'
@@ -85,9 +89,21 @@ export type CharacterAttributeKey =
 export type PersistedCharacterAttributes =
   Record<CharacterAttributeKey, number>
 
+export interface PersistedCharacterBloodResonance {
+  sourceKind: CharacterRulesBloodSourceKind
+  resonanceKey:
+    CharacterRulesBloodResonanceKey | null
+  specialAffinityKey:
+    CharacterRulesBloodSpecialAffinityKey | null
+  temperament:
+    CharacterRulesBloodTemperament | null
+}
+
 export interface PersistedCharacterBlood {
   bloodPotency: number
   hunger: number
+  resonance?:
+    PersistedCharacterBloodResonance | null
 }
 
 export interface PersistedCharacterDamageTrack {
@@ -372,7 +388,12 @@ export interface UpdateCharacterDraftData {
   chronicleId?: string | null
   identity?: Partial<PersistedCharacterIdentity>
   attributes?: Partial<PersistedCharacterAttributes>
-  blood?: Partial<PersistedCharacterBlood>
+  blood?: Partial<
+    Pick<
+      PersistedCharacterBlood,
+      'bloodPotency' | 'hunger'
+    >
+  >
   damage?: PersistedCharacterDamageState
   skills?: Partial<PersistedCharacterSkills>
   skillSpecialties?:

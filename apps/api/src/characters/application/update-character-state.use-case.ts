@@ -91,9 +91,22 @@ export class UpdateCharacterStateUseCase {
       )
     }
 
+    const clearBloodResonance =
+      data.hunger !== undefined &&
+      current.blood !== null &&
+      (
+        data.hunger < current.blood.hunger ||
+        data.hunger === 5
+      )
+
     return this.repository.updateState(
       ownerId,
-      data,
+      clearBloodResonance
+        ? {
+            ...data,
+            clearBloodResonance: true,
+          }
+        : data,
     )
   }
 }

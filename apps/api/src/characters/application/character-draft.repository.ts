@@ -8,6 +8,11 @@ import type {
 } from '../domain/character-state.types'
 
 import type {
+  ApplyCharacterBloodResonanceData,
+  PersistedCharacterBloodResonanceOperation,
+} from '../domain/character-blood-resonance.types'
+
+import type {
   PersistCharacterEmbraceData,
 } from '../domain/character-embrace.types'
 
@@ -81,6 +86,17 @@ export interface CharacterDraftRepository {
     data: UpdateCharacterStateData,
   ): Promise<PersistedCharacterDraft>
 
+  findBloodResonanceOperation(
+    characterId: string,
+    operationId: string,
+  ): Promise<
+    PersistedCharacterBloodResonanceOperation | null
+  >
+
+  applyBloodResonance(
+    data: ApplyCharacterBloodResonanceData,
+  ): Promise<PersistedCharacterDraft>
+
   embrace(
     data: PersistCharacterEmbraceData,
   ): Promise<PersistedCharacterDraft>
@@ -107,6 +123,31 @@ export class CharacterDraftWriteConflictError
       `Character draft ${characterId} was not found or has changed`,
     )
     this.name = 'CharacterDraftWriteConflictError'
+  }
+}
+
+export class CharacterBloodResonanceWriteConflictError
+  extends Error {
+  constructor(characterId: string) {
+    super(
+      `Character blood Resonance ${characterId} was not found or has changed`,
+    )
+    this.name =
+      'CharacterBloodResonanceWriteConflictError'
+  }
+}
+
+export class CharacterBloodResonanceOperationConflictError
+  extends Error {
+  constructor(
+    characterId: string,
+    operationId: string,
+  ) {
+    super(
+      `Character blood Resonance operation ${characterId}/${operationId} was already used with different data`,
+    )
+    this.name =
+      'CharacterBloodResonanceOperationConflictError'
   }
 }
 

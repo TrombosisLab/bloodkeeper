@@ -81,6 +81,16 @@ test('039-A impone inmutabilidad y coherencia contextual en PostgreSQL', () => {
 })
 
 test('039-A no adelanta repositorio API ni interfaz de historial', () => {
-  assert.doesNotMatch(schema, /operationId|analytics|exportedAt|purgedAt/i)
+  const diceRollRecordModel =
+    schema.match(
+      /model DiceRollRecord\s*\{[\s\S]*?\n\}/,
+    )?.[0]
+
+  assert.ok(diceRollRecordModel)
+
+  assert.doesNotMatch(
+    diceRollRecordModel,
+    /operationId|analytics|exportedAt|purgedAt/i,
+  )
   assert.doesNotMatch(migration, /INSERT\s+INTO\s+"dice_roll_records"/i)
 })

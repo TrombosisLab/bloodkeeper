@@ -9,4 +9,5 @@ export interface UpdateCharacterStateData {
   readonly humanityValue?: number
   readonly humanityStains?: number
   readonly hunger?: number
+  readonly clearBloodResonance?: boolean
 }

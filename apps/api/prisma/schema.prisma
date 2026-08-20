@@ -36,6 +36,29 @@ enum CharacterNature {
   VAMPIRE
 }
 
+enum CharacterBloodSourceKind {
+  HUMAN
+  ANIMAL
+}
+
+enum CharacterBloodResonanceKey {
+  CHOLERIC
+  MELANCHOLY
+  PHLEGMATIC
+  SANGUINE
+}
+
+enum CharacterBloodTemperament {
+  FLEETING
+  INTENSE
+  ACUTE
+}
+
+enum CharacterBloodSpecialAffinityKey {
+  ANIMAL_BLOOD
+  RESONANCE_FREE
+}
+
 enum CharacterCreationMode {
   STANDARD
   SESSION_ZERO
@@ -505,6 +528,7 @@ model Character {
   creationState CharacterCreationState?
   attributes    CharacterAttributes?
   blood         CharacterBloodState?
+  bloodResonanceOperations CharacterBloodResonanceOperation[]
   damage        CharacterDamageState?
   skills        CharacterSkill[]
   disciplines   CharacterDiscipline[]
@@ -580,13 +604,36 @@ model CharacterAttributes {
 }
 
 model CharacterBloodState {
-  characterId  String @id @db.Uuid
-  bloodPotency Int    @default(1)
-  hunger       Int    @default(1)
+  characterId                 String                           @id @db.Uuid
+  bloodPotency                Int                              @default(1)
+  hunger                      Int                              @default(1)
+  resonanceSourceKind         CharacterBloodSourceKind?
+  resonanceKey                CharacterBloodResonanceKey?
+  resonanceTemperament        CharacterBloodTemperament?
+  resonanceSpecialAffinityKey CharacterBloodSpecialAffinityKey?
 
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("character_blood_states")
+}
+
+model CharacterBloodResonanceOperation {
+  characterId        String                           @db.Uuid
+  operationId        String                           @db.Uuid
+  sourceKind         CharacterBloodSourceKind
+  resonanceKey       CharacterBloodResonanceKey?
+  temperament        CharacterBloodTemperament?
+  specialAffinityKey CharacterBloodSpecialAffinityKey?
+  hungerSlaked       Int
+  hungerBefore       Int
+  hungerAfter        Int
+  createdAt          DateTime                         @default(now()) @db.Timestamptz(3)
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([characterId, operationId])
+  @@index([characterId, createdAt])
+  @@map("character_blood_resonance_operations")
 }
 
 model CharacterDamageState {

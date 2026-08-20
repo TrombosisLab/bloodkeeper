@@ -9,12 +9,27 @@ import type {
 } from '../../common/offset-pagination'
 
 import {
+  CharacterBloodResonanceOperationConflictError,
+  CharacterBloodResonanceWriteConflictError,
   CharacterStateWriteConflictError,
 } from '../application/character-draft.repository'
 
 import type {
   UpdateCharacterStateData,
 } from '../domain/character-state.types'
+
+import {
+  isSameCharacterBloodResonanceOperation,
+} from '../domain/character-blood-resonance.types'
+
+import type {
+  ApplyCharacterBloodResonanceData,
+  CharacterBloodResonanceKey,
+  CharacterBloodSourceKind,
+  CharacterBloodSpecialAffinityKey,
+  CharacterBloodTemperament,
+  PersistedCharacterBloodResonanceOperation,
+} from '../domain/character-blood-resonance.types'
 
 import type {
   PersistCharacterEmbraceData,
@@ -35,6 +50,10 @@ import { Injectable } from '@nestjs/common'
 import {
   AdvantageCategory as PrismaAdvantageCategory,
   CharacterAgeCategory as PrismaCharacterAgeCategory,
+  CharacterBloodResonanceKey as PrismaCharacterBloodResonanceKey,
+  CharacterBloodSourceKind as PrismaCharacterBloodSourceKind,
+  CharacterBloodSpecialAffinityKey as PrismaCharacterBloodSpecialAffinityKey,
+  CharacterBloodTemperament as PrismaCharacterBloodTemperament,
   CharacterCreationMode as PrismaCharacterCreationMode,
   CharacterNature as PrismaCharacterNature,
   AdvantageDetailsKind as PrismaAdvantageDetailsKind,
@@ -163,6 +182,78 @@ const natureFromPrisma: Record<
 > = {
   HUMAN: 'human',
   VAMPIRE: 'vampire',
+}
+
+const bloodSourceToPrisma: Record<
+  CharacterBloodSourceKind,
+  PrismaCharacterBloodSourceKind
+> = {
+  human: PrismaCharacterBloodSourceKind.HUMAN,
+  animal: PrismaCharacterBloodSourceKind.ANIMAL,
+}
+
+const bloodSourceFromPrisma: Record<
+  PrismaCharacterBloodSourceKind,
+  CharacterBloodSourceKind
+> = {
+  HUMAN: 'human',
+  ANIMAL: 'animal',
+}
+
+const resonanceKeyToPrisma: Record<
+  CharacterBloodResonanceKey,
+  PrismaCharacterBloodResonanceKey
+> = {
+  choleric: PrismaCharacterBloodResonanceKey.CHOLERIC,
+  melancholy: PrismaCharacterBloodResonanceKey.MELANCHOLY,
+  phlegmatic: PrismaCharacterBloodResonanceKey.PHLEGMATIC,
+  sanguine: PrismaCharacterBloodResonanceKey.SANGUINE,
+}
+
+const resonanceKeyFromPrisma: Record<
+  PrismaCharacterBloodResonanceKey,
+  CharacterBloodResonanceKey
+> = {
+  CHOLERIC: 'choleric',
+  MELANCHOLY: 'melancholy',
+  PHLEGMATIC: 'phlegmatic',
+  SANGUINE: 'sanguine',
+}
+
+const temperamentToPrisma: Record<
+  CharacterBloodTemperament,
+  PrismaCharacterBloodTemperament
+> = {
+  fleeting: PrismaCharacterBloodTemperament.FLEETING,
+  intense: PrismaCharacterBloodTemperament.INTENSE,
+  acute: PrismaCharacterBloodTemperament.ACUTE,
+}
+
+const temperamentFromPrisma: Record<
+  PrismaCharacterBloodTemperament,
+  CharacterBloodTemperament
+> = {
+  FLEETING: 'fleeting',
+  INTENSE: 'intense',
+  ACUTE: 'acute',
+}
+
+const affinityToPrisma: Record<
+  CharacterBloodSpecialAffinityKey,
+  PrismaCharacterBloodSpecialAffinityKey
+> = {
+  animalBlood:
+    PrismaCharacterBloodSpecialAffinityKey.ANIMAL_BLOOD,
+  resonanceFree:
+    PrismaCharacterBloodSpecialAffinityKey.RESONANCE_FREE,
+}
+
+const affinityFromPrisma: Record<
+  PrismaCharacterBloodSpecialAffinityKey,
+  CharacterBloodSpecialAffinityKey
+> = {
+  ANIMAL_BLOOD: 'animalBlood',
+  RESONANCE_FREE: 'resonanceFree',
 }
 
 const creationModeFromPrisma: Record<
@@ -973,6 +1064,37 @@ function toPersistedDraft(
             bloodPotency:
               row.blood.bloodPotency,
             hunger: row.blood.hunger,
+            resonance:
+              row.blood.resonanceSourceKind === null
+                ? null
+                : {
+                    sourceKind:
+                      bloodSourceFromPrisma[
+                        row.blood.resonanceSourceKind
+                      ],
+                    resonanceKey:
+                      row.blood.resonanceKey === null
+                        ? null
+                        : resonanceKeyFromPrisma[
+                            row.blood.resonanceKey
+                          ],
+                    specialAffinityKey:
+                      row.blood
+                        .resonanceSpecialAffinityKey === null
+                        ? null
+                        : affinityFromPrisma[
+                            row.blood
+                              .resonanceSpecialAffinityKey
+                          ],
+                    temperament:
+                      row.blood
+                        .resonanceTemperament === null
+                        ? null
+                        : temperamentFromPrisma[
+                            row.blood
+                              .resonanceTemperament
+                          ],
+                  },
           },
     damage: {
       health: {
@@ -2927,6 +3049,327 @@ export class PrismaCharacterDraftRepository
     )
   }
 
+  async findBloodResonanceOperation(
+    characterId: string,
+    operationId: string,
+  ): Promise<
+    PersistedCharacterBloodResonanceOperation | null
+  > {
+    const row =
+      await this.database
+        .characterBloodResonanceOperation
+        .findUnique({
+          where: {
+            characterId_operationId: {
+              characterId,
+              operationId,
+            },
+          },
+        })
+
+    if (row === null) return null
+
+    return {
+      characterId: row.characterId,
+      operationId: row.operationId,
+      sourceKind:
+        bloodSourceFromPrisma[row.sourceKind],
+      resonanceKey:
+        row.resonanceKey === null
+          ? null
+          : resonanceKeyFromPrisma[
+              row.resonanceKey
+            ],
+      specialAffinityKey:
+        row.specialAffinityKey === null
+          ? null
+          : affinityFromPrisma[
+              row.specialAffinityKey
+            ],
+      temperament:
+        row.temperament === null
+          ? null
+          : temperamentFromPrisma[
+              row.temperament
+            ],
+      hungerSlaked: row.hungerSlaked,
+      hungerBefore: row.hungerBefore,
+      hungerAfter: row.hungerAfter,
+      createdAt: row.createdAt,
+    }
+  }
+
+  async applyBloodResonance(
+    data: ApplyCharacterBloodResonanceData,
+  ): Promise<PersistedCharacterDraft> {
+    const execute = async () =>
+      this.database.$transaction(
+        async (transaction) => {
+          const existing =
+            await transaction
+              .characterBloodResonanceOperation
+              .findUnique({
+                where: {
+                  characterId_operationId: {
+                    characterId:
+                      data.characterId,
+                    operationId:
+                      data.operationId,
+                  },
+                },
+              })
+
+          if (existing !== null) {
+            const persistedExisting = {
+              characterId: existing.characterId,
+              operationId: existing.operationId,
+              sourceKind:
+                bloodSourceFromPrisma[
+                  existing.sourceKind
+                ],
+              resonanceKey:
+                existing.resonanceKey === null
+                  ? null
+                  : resonanceKeyFromPrisma[
+                      existing.resonanceKey
+                    ],
+              specialAffinityKey:
+                existing.specialAffinityKey === null
+                  ? null
+                  : affinityFromPrisma[
+                      existing.specialAffinityKey
+                    ],
+              temperament:
+                existing.temperament === null
+                  ? null
+                  : temperamentFromPrisma[
+                      existing.temperament
+                    ],
+              hungerSlaked:
+                existing.hungerSlaked,
+              hungerBefore:
+                existing.hungerBefore,
+              hungerAfter:
+                existing.hungerAfter,
+              createdAt:
+                existing.createdAt,
+            } satisfies PersistedCharacterBloodResonanceOperation
+
+            if (
+              !isSameCharacterBloodResonanceOperation(
+                persistedExisting,
+                data,
+              )
+            ) {
+              throw new CharacterBloodResonanceOperationConflictError(
+                data.characterId,
+                data.operationId,
+              )
+            }
+
+            const idempotentRow =
+              await transaction.character
+                .findUniqueOrThrow({
+                  where: {
+                    id: data.characterId,
+                  },
+                  include: characterRelations,
+                })
+
+            return toPersistedDraft(
+              idempotentRow,
+            )
+          }
+
+          const current =
+            await transaction.character
+              .findUnique({
+                where: {
+                  id: data.characterId,
+                },
+                select: {
+                  revision: true,
+                  status: true,
+                  nature: true,
+                  blood: {
+                    select: {
+                      hunger: true,
+                    },
+                  },
+                },
+              })
+
+          if (
+            current === null ||
+            current.revision !==
+              data.expectedRevision ||
+            current.status ===
+              PrismaCharacterStatus.ARCHIVED ||
+            current.nature !==
+              PrismaCharacterNature.VAMPIRE ||
+            current.blood === null ||
+            current.blood.hunger !==
+              data.hungerBefore
+          ) {
+            throw new CharacterBloodResonanceWriteConflictError(
+              data.characterId,
+            )
+          }
+
+          const claimed =
+            await transaction.character
+              .updateMany({
+                where: {
+                  id: data.characterId,
+                  revision:
+                    data.expectedRevision,
+                  status: {
+                    in: [
+                      PrismaCharacterStatus.DRAFT,
+                      PrismaCharacterStatus.ACTIVE,
+                    ],
+                  },
+                  nature:
+                    PrismaCharacterNature.VAMPIRE,
+                },
+                data: {
+                  revision: {
+                    increment: 1,
+                  },
+                },
+              })
+
+          if (claimed.count !== 1) {
+            throw new CharacterBloodResonanceWriteConflictError(
+              data.characterId,
+            )
+          }
+
+          const hasActiveResonance =
+            data.resonanceKey !== null ||
+            data.specialAffinityKey !== null
+
+          await transaction.characterBloodState
+            .update({
+              where: {
+                characterId:
+                  data.characterId,
+              },
+              data: {
+                hunger: data.hungerAfter,
+                resonanceSourceKind:
+                  hasActiveResonance
+                    ? bloodSourceToPrisma[
+                        data.sourceKind
+                      ]
+                    : null,
+                resonanceKey:
+                  data.resonanceKey === null
+                    ? null
+                    : resonanceKeyToPrisma[
+                        data.resonanceKey
+                      ],
+                resonanceTemperament:
+                  data.temperament === null
+                    ? null
+                    : temperamentToPrisma[
+                        data.temperament
+                      ],
+                resonanceSpecialAffinityKey:
+                  data.specialAffinityKey === null
+                    ? null
+                    : affinityToPrisma[
+                        data.specialAffinityKey
+                      ],
+              },
+            })
+
+          await transaction
+            .characterBloodResonanceOperation
+            .create({
+              data: {
+                characterId:
+                  data.characterId,
+                operationId:
+                  data.operationId,
+                sourceKind:
+                  bloodSourceToPrisma[
+                    data.sourceKind
+                  ],
+                resonanceKey:
+                  data.resonanceKey === null
+                    ? null
+                    : resonanceKeyToPrisma[
+                        data.resonanceKey
+                      ],
+                temperament:
+                  data.temperament === null
+                    ? null
+                    : temperamentToPrisma[
+                        data.temperament
+                      ],
+                specialAffinityKey:
+                  data.specialAffinityKey === null
+                    ? null
+                    : affinityToPrisma[
+                        data.specialAffinityKey
+                      ],
+                hungerSlaked:
+                  data.hungerSlaked,
+                hungerBefore:
+                  data.hungerBefore,
+                hungerAfter:
+                  data.hungerAfter,
+              },
+            })
+
+          const row =
+            await transaction.character
+              .findUniqueOrThrow({
+                where: {
+                  id: data.characterId,
+                },
+                include: characterRelations,
+              })
+
+          return toPersistedDraft(row)
+        },
+      )
+
+    try {
+      return await execute()
+    } catch (error: unknown) {
+      const existing =
+        await this.findBloodResonanceOperation(
+          data.characterId,
+          data.operationId,
+        )
+
+      if (
+        existing !== null &&
+        isSameCharacterBloodResonanceOperation(
+          existing,
+          data,
+        )
+      ) {
+        const row =
+          await this.database.character
+            .findUnique({
+              where: {
+                id: data.characterId,
+              },
+              include: characterRelations,
+            })
+
+        if (row !== null) {
+          return toPersistedDraft(row)
+        }
+      }
+
+      throw error
+    }
+  }
+
   async updateState(
     ownerId: string,
     data: UpdateCharacterStateData,
@@ -2958,6 +3401,10 @@ export class PrismaCharacterDraftRepository
         }
 
         if (data.hunger !== undefined) {
+          const clearBloodResonance =
+            data.clearBloodResonance === true ||
+            data.hunger === 5
+
           await transaction.characterBloodState
             .update({
               where: {
@@ -2965,6 +3412,15 @@ export class PrismaCharacterDraftRepository
               },
               data: {
                 hunger: data.hunger,
+                ...(clearBloodResonance
+                  ? {
+                      resonanceSourceKind: null,
+                      resonanceKey: null,
+                      resonanceTemperament: null,
+                      resonanceSpecialAffinityKey:
+                        null,
+                    }
+                  : {}),
               },
             })
         }
