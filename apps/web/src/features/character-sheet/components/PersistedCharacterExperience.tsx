@@ -1,4 +1,8 @@
 import {
+  characterBloodDyscrasiaCatalog,
+} from '@v5r/character-rules'
+
+import {
   useEffect,
   useMemo,
   useState,
@@ -17,6 +21,9 @@ import { createInitialAdvantageInstanceDetails } from '../../character-creation/
 
 import type { CharacterAdvantageSelectionDraft } from '../../character-creation/types/character-advantages-draft.types.ts'
 import type { CharacterAdvantages, RatedTrait } from '../types/character-advantages.types.ts'
+import type {
+  CharacterBloodExperience,
+} from '../types/character-blood-experience.types.ts'
 import type { CharacterProfilePhase } from '../types/character-sheet-model.types.ts'
 import type {
   CharacterAdvancementKind,
@@ -38,6 +45,7 @@ interface PersistedCharacterExperienceProps {
   status: 'draft' | 'active' | 'archived'
   advantages: CharacterAdvantages
   profilePhase?: CharacterProfilePhase
+  blood?: CharacterBloodExperience | null
   gateway?: CharacterExperienceGateway
   onPurchased?: () => void
 }
@@ -84,6 +92,28 @@ const movementLabels: Readonly<Record<CharacterExperienceMovement['type'], strin
   grant: 'Concesión',
   spend: 'Gasto',
   correction: 'Corrección',
+}
+
+function activeDyscrasiaLabel(
+  blood: CharacterBloodExperience | null | undefined,
+): string | null {
+  const key =
+    blood?.dyscrasia?.key ?? null
+
+  if (key === null) {
+    return null
+  }
+
+  return (
+    characterBloodDyscrasiaCatalog
+      .definitions
+      .find(
+        (definition) =>
+          definition.key === key,
+      )
+      ?.name ??
+    key
+  )
 }
 
 function allAdvantages(advantages: CharacterAdvantages): RatedTrait[] {
@@ -172,6 +202,7 @@ export function PersistedCharacterExperience({
   status,
   advantages,
   profilePhase,
+  blood,
   gateway,
   onPurchased,
 }: PersistedCharacterExperienceProps) {
@@ -196,6 +227,10 @@ export function PersistedCharacterExperience({
   const [advantage, setAdvantage] = useState<CharacterAdvantageSelectionDraft>(initialAdvantage)
   const [parentSelectionId, setParentSelectionId] = useState('')
   const [preview, setPreview] = useState<CharacterAdvancementPreview | null>(null)
+  const [
+    useDyscrasiaExperience,
+    setUseDyscrasiaExperience,
+  ] = useState(false)
 
   const existingAdvantages = allAdvantages(advantages).filter((item) => item.category !== 'flaw')
   const activeAdvantageDefinitions = characterAdvantageDefinitions.filter(
@@ -296,6 +331,9 @@ export function PersistedCharacterExperience({
 
   function selectKind(nextKind: CharacterAdvancementKind): void {
     setKind(nextKind)
+    if (nextKind !== 'discipline') {
+      setUseDyscrasiaExperience(false)
+    }
     if (nextKind === 'attribute') setPrimaryKey(attributeDefinitions[0]?.key ?? '')
     if (nextKind === 'skill' || nextKind === 'specialty') setPrimaryKey(skillDefinitions[0]?.key ?? '')
     if (nextKind === 'ritual') setPrimaryKey(BLOOD_SORCERY_RITUAL_DEFINITIONS[0]?.key ?? '')
@@ -344,7 +382,13 @@ export function PersistedCharacterExperience({
     setWorking(true)
     setMessage(null)
     try {
-      setPreview(await resolvedGateway.preview(characterId, request))
+      setPreview(
+        await resolvedGateway.preview(
+          characterId,
+          request,
+          useDyscrasiaExperienceForRequest,
+        ),
+      )
     } catch (error: unknown) {
       setPreview(null)
       setMessage(errorMessage(error))
@@ -364,6 +408,7 @@ export function PersistedCharacterExperience({
         preview.revision,
         createEvolutionOperationId(),
         request,
+        useDyscrasiaExperienceForRequest,
       )
 
       const visibleMovementCount =
@@ -395,6 +440,7 @@ export function PersistedCharacterExperience({
       })
 
       setPreview(null)
+      setUseDyscrasiaExperience(false)
       setShowEvolution(false)
       setMessage('Compra aplicada. La ficha y el saldo ya están actualizados.')
       onPurchased?.()
@@ -424,6 +470,17 @@ export function PersistedCharacterExperience({
           value as CharacterAdvancementKind,
         ),
     )
+
+  const activeDyscrasia =
+    activeDyscrasiaLabel(blood)
+
+  const canOfferDyscrasiaExperience =
+    kind === 'discipline' &&
+    activeDyscrasia !== null
+
+  const useDyscrasiaExperienceForRequest =
+    canOfferDyscrasiaExperience &&
+    useDyscrasiaExperience
 
   return (
     <section className="sheet-section blood-experience-section persisted-experience" aria-labelledby="blood-experience-title" data-xp-panel="ready">
@@ -582,6 +639,35 @@ export function PersistedCharacterExperience({
                 <AdvantageInstanceDetailsEditor selection={advantage} onChange={(next) => { setAdvantage(next); resetPreview() }} />
               ) : null}
 
+              {canOfferDyscrasiaExperience ? (
+                <label
+                  className="persisted-experience__dyscrasia-option"
+                  data-xp-dyscrasia-option="available"
+                >
+                  <input
+                    type="checkbox"
+                    checked={useDyscrasiaExperience}
+                    onChange={(event) => {
+                      setUseDyscrasiaExperience(
+                        event.target.checked,
+                      )
+                      resetPreview()
+                    }}
+                  />
+                  <span>
+                    <strong>
+                      Usar Discrasia activa
+                    </strong>
+                    <small>
+                      {activeDyscrasia}. El backend comprobará si
+                      puede beneficiar a esta Disciplina. Si se
+                      aplica al confirmar la compra, la Discrasia
+                      se consumirá para esta adquisición.
+                    </small>
+                  </span>
+                </label>
+              ) : null}
+
               <button type="button" className="persisted-experience__preview" disabled={working} onClick={() => void requestPreview()}>
                 {working ? 'Consultando…' : 'Previsualizar coste y requisitos'}
               </button>
@@ -594,6 +680,16 @@ export function PersistedCharacterExperience({
                     <div><span>Coste calculado</span><strong>{preview.cost ?? '—'} XP</strong></div>
                     <div><span>Disponible</span><strong>{preview.available} XP</strong></div>
                   </div>
+                  {useDyscrasiaExperienceForRequest ? (
+                    <p
+                      className="persisted-experience__dyscrasia-preview"
+                      data-xp-dyscrasia-selected="true"
+                    >
+                      Esta previsualización se solicitó usando la
+                      Discrasia activa. El coste mostrado ya es el
+                      valor autoritativo calculado por el backend.
+                    </p>
+                  ) : null}
                   {preview.issues.length > 0 ? (
                     <ul className="persisted-experience__issues">{preview.issues.map((issue) => <li key={`${issue.code}:${issue.message}`}>{issue.message}</li>)}</ul>
                   ) : <p className="persisted-experience__eligible">La mejora cumple los requisitos actuales.</p>}

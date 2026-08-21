@@ -52,6 +52,17 @@ function resonanceLabel(
   return 'Sin Resonancia activa'
 }
 
+function resonanceFieldLabel(
+  blood: CharacterBloodExperienceModel,
+): string {
+  return blood.resonance
+    ?.specialAffinityKey !== null &&
+    blood.resonance
+      ?.specialAffinityKey !== undefined
+    ? 'Afinidad especial'
+    : 'Resonancia'
+}
+
 function temperamentLabel(
   blood: CharacterBloodExperienceModel,
 ): string {
@@ -127,7 +138,7 @@ export function CharacterBloodExperience({
         <div className="blood-experience-grid">
           <div className="blood-info-card">
             <span className="blood-info-card__label">
-              Resonancia
+              {resonanceFieldLabel(blood)}
             </span>
 
             <strong>
@@ -145,17 +156,16 @@ export function CharacterBloodExperience({
             </strong>
           </div>
 
-          {dyscrasia !== null ? (
-            <div className="blood-info-card">
-              <span className="blood-info-card__label">
-                Discrasia activa
-              </span>
+          <div className="blood-info-card">
+            <span className="blood-info-card__label">
+              Discrasia activa
+            </span>
 
-              <strong>
-                {dyscrasia}
-              </strong>
-            </div>
-          ) : null}
+            <strong>
+              {dyscrasia ??
+                'Sin Discrasia activa'}
+            </strong>
+          </div>
         </div>
       )}
     </section>

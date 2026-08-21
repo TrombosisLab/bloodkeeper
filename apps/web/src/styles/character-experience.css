@@ -182,3 +182,58 @@
     text-align: left;
   }
 }
+
+/* ==================================================
+   SPEC-058-E4B — DISCRASIA XP OPT-IN
+================================================== */
+
+.persisted-experience__dyscrasia-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-section-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text-heading);
+  cursor: pointer;
+}
+
+.persisted-experience__dyscrasia-option input {
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  flex: 0 0 auto;
+}
+
+.persisted-experience__dyscrasia-option > span {
+  display: grid;
+  gap: 4px;
+}
+
+.persisted-experience__dyscrasia-option strong {
+  font-family: var(--font-family-heading);
+  font-weight: 700;
+}
+
+.persisted-experience__dyscrasia-option small,
+.persisted-experience__dyscrasia-preview {
+  color: var(--color-text-caption-muted-soft);
+  line-height: 1.45;
+}
+
+.persisted-experience__dyscrasia-preview {
+  margin: 0;
+}
+
+.persisted-experience__dyscrasia-option:focus-within {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+  .persisted-experience__dyscrasia-option {
+    padding: 12px;
+  }
+}

@@ -538,6 +538,7 @@ export function CharacterSheet({
           profilePhase={
             model.profilePhase
           }
+          blood={model.blood}
           gateway={experienceGateway}
           onPurchased={onStateReload}
         />
