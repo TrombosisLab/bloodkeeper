@@ -79,6 +79,8 @@ confirmadas.
 
 | SPEC-058 | [SPEC-058 – CHARACTER_BLOOD_RESONANCE_AND_DYSCRASIA](SPEC-058_CHARACTER_BLOOD_RESONANCE_AND_DYSCRASIA_v1.0.md) | 1.0 | Aprobado | Cerrada | Resonancias, Temperamentos, afinidades especiales y Discrasias V5 persistidas e integradas con Sangre, Dados, Disciplinas, Experiencia, Historial y ficha; regresión API/Web, runtime y separación visual validados. |
 
+| SPEC-059 | [SPEC-059 – ROUSE_CHECKS_AND_BLOOD_QUICK_ACTIONS](SPEC-059_ROUSE_CHECKS_AND_BLOOD_QUICK_ACTIONS_v1.0.md) | 1.0 | Aprobado | Pendiente de implementación | Auditoría de entrada completada sobre `main` @ `a1e483a`; Control de Enardecimiento especializado, persistencia idempotente, acción rápida e integraciones contextuales planificadas por bloques 059-A–E. |
+
 ## Versiones archivadas
 
 - [SPEC-026 v1.0](archive/SPEC-026_CHARACTER_ADVANTAGES_BACKGROUNDS_FLAWS_v1.0.md): sustituida por v1.1.
