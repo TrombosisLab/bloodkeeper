@@ -39,6 +39,10 @@ import type {
 } from '../types/character-sheet-model.types'
 
 import type {
+  CharacterRouseCheckResult,
+} from '../types/character-rouse-check-persistence.types'
+
+import type {
   CharacterInitialVampireTransitionReadModel,
 } from '../types/character-transition-read-model.types'
 
@@ -115,10 +119,21 @@ export function PersistedCharacterSheet({
   const [reloadVersion, setReloadVersion] =
     useState(0)
 
+  const [
+    lastRouseCheckResult,
+    setLastRouseCheckResult,
+  ] = useState<
+    CharacterRouseCheckResult | null
+  >(null)
+
   const [loadState, setLoadState] =
     useState<LoadState>({
       kind: 'loading',
     })
+
+  useEffect(() => {
+    setLastRouseCheckResult(null)
+  }, [characterId])
 
   useEffect(() => {
     let cancelled = false
@@ -186,6 +201,17 @@ export function PersistedCharacterSheet({
           loadState.model.characterId
         }
         model={loadState.model}
+        lastRouseCheckResult={
+          lastRouseCheckResult
+        }
+        onRouseCheckApplied={(result) => {
+          setLastRouseCheckResult(
+            result,
+          )
+          setReloadVersion(
+            (version) => version + 1,
+          )
+        }}
         transition={
           loadState.transition
         }

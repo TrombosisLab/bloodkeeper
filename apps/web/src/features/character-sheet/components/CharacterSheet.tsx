@@ -39,6 +39,11 @@ import type {
   CharacterExperienceGateway,
 } from '../types/character-experience.types'
 
+import type {
+  CharacterRouseCheckGateway,
+  CharacterRouseCheckResult,
+} from '../types/character-rouse-check-persistence.types'
+
 import { CharacterAttributes } from './CharacterAttributes'
 import { CharacterIdentity } from './CharacterIdentity'
 import { CharacterSkills } from './CharacterSkills'
@@ -48,6 +53,7 @@ import { CharacterAdvantages } from './CharacterAdvantages'
 import { CharacterNarrative } from './CharacterNarrative'
 import { CharacterBloodExperience } from './CharacterBloodExperience'
 import { PersistedCharacterFeeding } from './PersistedCharacterFeeding'
+import { PersistedCharacterRouseCheck } from './PersistedCharacterRouseCheck'
 import { PersistedCharacterExperience } from './PersistedCharacterExperience'
 import { CharacterSecondary } from './CharacterSecondary'
 import { PersistedCharacterSecondary } from './PersistedCharacterSecondary'
@@ -63,6 +69,12 @@ interface CharacterSheetProps {
     CharacterInitialVampireTransitionReadModel | null
   stateGateway?: CharacterStateGateway
   experienceGateway?: CharacterExperienceGateway
+  rouseCheckGateway?: CharacterRouseCheckGateway
+  lastRouseCheckResult?:
+    CharacterRouseCheckResult | null
+  onRouseCheckApplied?: (
+    result: CharacterRouseCheckResult,
+  ) => void
   onStateSaved?: (
     snapshot: CharacterOperationalStateSnapshot,
   ) => void
@@ -117,6 +129,9 @@ export function CharacterSheet({
   transition,
   stateGateway,
   experienceGateway,
+  rouseCheckGateway,
+  lastRouseCheckResult = null,
+  onRouseCheckApplied,
   onStateSaved,
   onStateReload,
 }: CharacterSheetProps) {
@@ -531,12 +546,35 @@ export function CharacterSheet({
             model.state.hunger !== null &&
             model.status !== 'archived' &&
             onStateReload !== undefined ? (
-              <PersistedCharacterFeeding
-                characterId={characterId}
-                revision={model.revision}
-                hunger={model.state.hunger}
-                onApplied={onStateReload}
-              />
+              <div className="blood-quick-actions">
+                {onRouseCheckApplied !==
+                undefined ? (
+                  <PersistedCharacterRouseCheck
+                    characterId={characterId}
+                    revision={model.revision}
+                    hunger={model.state.hunger}
+                    result={
+                      lastRouseCheckResult
+                    }
+                    gateway={
+                      rouseCheckGateway
+                    }
+                    onApplied={
+                      onRouseCheckApplied
+                    }
+                    onConflictReload={
+                      onStateReload
+                    }
+                  />
+                ) : null}
+
+                <PersistedCharacterFeeding
+                  characterId={characterId}
+                  revision={model.revision}
+                  hunger={model.state.hunger}
+                  onApplied={onStateReload}
+                />
+              </div>
             ) : undefined
           }
         />
