@@ -2446,3 +2446,71 @@
     width: 100%;
   }
 }
+
+/* SPEC-059-D1B — Rubor de la Vida */
+
+.blush-of-life {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.875rem;
+  border: 1px solid currentColor;
+  border-radius: 0.75rem;
+}
+
+.blush-of-life__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.blush-of-life__heading h4,
+.blush-of-life__heading p,
+.blush-of-life__message,
+.blush-of-life__hunger-five-note {
+  margin: 0;
+}
+
+.blush-of-life__heading p,
+.blush-of-life__message,
+.blush-of-life__hunger-five-note {
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.blush-of-life__hunger-five-note {
+  font-weight: 600;
+}
+
+.blush-of-life__result {
+  display: grid;
+  gap: 0.5rem;
+  padding-top: 0.25rem;
+}
+
+.blush-of-life__result--exempted {
+  border-top: 1px solid currentColor;
+  padding-top: 0.75rem;
+}
+
+.blush-of-life button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.blush-of-life button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+@media (max-width: 600px) {
+  .blush-of-life__heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .blush-of-life__heading button {
+    width: 100%;
+  }
+}

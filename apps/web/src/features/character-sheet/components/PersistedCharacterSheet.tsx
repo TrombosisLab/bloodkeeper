@@ -48,6 +48,10 @@ import type {
 
 import { CharacterSheet } from './CharacterSheet'
 
+import type {
+  CharacterBlushOfLifeResult,
+} from '../types/character-blush-of-life-persistence.types'
+
 interface PersistedCharacterSheetProps {
   characterId: string
   gateway?: CharacterDraftGateway
@@ -126,6 +130,13 @@ export function PersistedCharacterSheet({
     CharacterRouseCheckResult | null
   >(null)
 
+  const [
+    lastBlushOfLifeResult,
+    setLastBlushOfLifeResult,
+  ] = useState<
+    CharacterBlushOfLifeResult | null
+  >(null)
+
   const [loadState, setLoadState] =
     useState<LoadState>({
       kind: 'loading',
@@ -133,6 +144,7 @@ export function PersistedCharacterSheet({
 
   useEffect(() => {
     setLastRouseCheckResult(null)
+    setLastBlushOfLifeResult(null)
   }, [characterId])
 
   useEffect(() => {
@@ -206,6 +218,17 @@ export function PersistedCharacterSheet({
         }
         onRouseCheckApplied={(result) => {
           setLastRouseCheckResult(
+            result,
+          )
+          setReloadVersion(
+            (version) => version + 1,
+          )
+        }}
+        lastBlushOfLifeResult={
+          lastBlushOfLifeResult
+        }
+        onBlushOfLifeApplied={(result) => {
+          setLastBlushOfLifeResult(
             result,
           )
           setReloadVersion(

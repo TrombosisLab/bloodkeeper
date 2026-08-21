@@ -54,6 +54,7 @@ import { CharacterNarrative } from './CharacterNarrative'
 import { CharacterBloodExperience } from './CharacterBloodExperience'
 import { PersistedCharacterFeeding } from './PersistedCharacterFeeding'
 import { PersistedCharacterRouseCheck } from './PersistedCharacterRouseCheck'
+import { PersistedCharacterBlushOfLife } from './PersistedCharacterBlushOfLife'
 import { PersistedCharacterExperience } from './PersistedCharacterExperience'
 import { CharacterSecondary } from './CharacterSecondary'
 import { PersistedCharacterSecondary } from './PersistedCharacterSecondary'
@@ -61,6 +62,10 @@ import { PersistedCharacterLifecycle } from './PersistedCharacterLifecycle'
 import { PersistedCharacterValidation } from './PersistedCharacterValidation'
 import { PersistedCharacterEmbrace } from './PersistedCharacterEmbrace'
 import { PersistedInitialVampireTransition } from './PersistedInitialVampireTransition'
+
+import type {
+  CharacterBlushOfLifeResult,
+} from '../types/character-blush-of-life-persistence.types'
 
 interface CharacterSheetProps {
   characterId?: string
@@ -74,6 +79,11 @@ interface CharacterSheetProps {
     CharacterRouseCheckResult | null
   onRouseCheckApplied?: (
     result: CharacterRouseCheckResult,
+  ) => void
+  lastBlushOfLifeResult?:
+    CharacterBlushOfLifeResult | null
+  onBlushOfLifeApplied?: (
+    result: CharacterBlushOfLifeResult,
   ) => void
   onStateSaved?: (
     snapshot: CharacterOperationalStateSnapshot,
@@ -132,6 +142,8 @@ export function CharacterSheet({
   rouseCheckGateway,
   lastRouseCheckResult = null,
   onRouseCheckApplied,
+  lastBlushOfLifeResult = null,
+  onBlushOfLifeApplied,
   onStateSaved,
   onStateReload,
 }: CharacterSheetProps) {
@@ -547,6 +559,24 @@ export function CharacterSheet({
             model.status !== 'archived' &&
             onStateReload !== undefined ? (
               <div className="blood-quick-actions">
+                {onBlushOfLifeApplied !==
+                undefined ? (
+                  <PersistedCharacterBlushOfLife
+                    characterId={characterId}
+                    revision={model.revision}
+                    hunger={model.state.hunger}
+                    result={
+                      lastBlushOfLifeResult
+                    }
+                    onApplied={
+                      onBlushOfLifeApplied
+                    }
+                    onConflictReload={
+                      onStateReload
+                    }
+                  />
+                ) : null}
+
                 {onRouseCheckApplied !==
                 undefined ? (
                   <PersistedCharacterRouseCheck
