@@ -37,6 +37,18 @@ import {
 } from './application/apply-character-blood-resonance.use-case'
 
 import {
+  ExecuteCharacterRouseCheckUseCase,
+} from './application/execute-character-rouse-check.use-case'
+
+import {
+  CHARACTER_ROUSE_CHECK_REPOSITORY,
+} from './application/character-rouse-check.repository'
+
+import type {
+  CharacterRouseCheckRepository,
+} from './application/character-rouse-check.repository'
+
+import {
   ResolveInitialVampireStateUseCase,
 } from './application/resolve-initial-vampire-state.use-case'
 
@@ -126,6 +138,10 @@ import {
 } from './infrastructure/prisma-character-draft.repository'
 
 import {
+  PrismaCharacterRouseCheckRepository,
+} from './infrastructure/prisma-character-rouse-check.repository'
+
+import {
   PrismaCharacterSecondaryRepository,
 } from './infrastructure/prisma-character-secondary.repository'
 
@@ -140,6 +156,10 @@ import {
 import {
   CharacterBloodResonanceController,
 } from './presentation/character-blood-resonance.controller'
+
+import {
+  CharacterRouseCheckController,
+} from './presentation/character-rouse-check.controller'
 
 import {
   CharacterInitialVampireController,
@@ -294,6 +314,28 @@ const experienceUseCaseProviders = [
 ]
 
 const useCaseProviders = [
+  {
+    provide:
+      ExecuteCharacterRouseCheckUseCase,
+    inject: [
+      CHARACTER_DRAFT_REPOSITORY,
+      CHARACTER_ROUSE_CHECK_REPOSITORY,
+      CHRONICLE_PARTICIPANT_REPOSITORY,
+    ],
+    useFactory: (
+      characters:
+        PrismaCharacterDraftRepository,
+      rouseChecks:
+        CharacterRouseCheckRepository,
+      participants:
+        ChronicleParticipantRepository,
+    ) =>
+      new ExecuteCharacterRouseCheckUseCase(
+        characters,
+        rouseChecks,
+        participants,
+      ),
+  },
   {
     provide:
       ApplyCharacterBloodResonanceUseCase,
@@ -527,6 +569,7 @@ const useCaseProviders = [
     CharacterDraftController,
     CharacterEmbraceController,
     CharacterBloodResonanceController,
+    CharacterRouseCheckController,
     CharacterInitialVampireController,
     CharacterProfilePhaseController,
     ChronicleCharacterController,
@@ -539,6 +582,7 @@ const useCaseProviders = [
   ],
   providers: [
     PrismaCharacterDraftRepository,
+    PrismaCharacterRouseCheckRepository,
     PrismaCharacterSecondaryRepository,
     PrismaCharacterExperienceRepository,
     {
@@ -569,6 +613,11 @@ const useCaseProviders = [
       useExisting: PrismaCharacterDraftRepository,
     },
     {
+      provide: CHARACTER_ROUSE_CHECK_REPOSITORY,
+      useExisting:
+        PrismaCharacterRouseCheckRepository,
+    },
+    {
       provide: CHARACTER_SECONDARY_REPOSITORY,
       useExisting:
         PrismaCharacterSecondaryRepository,
@@ -586,6 +635,7 @@ const useCaseProviders = [
     CHARACTER_SECONDARY_REPOSITORY,
     EmbraceCharacterUseCase,
     ApplyCharacterBloodResonanceUseCase,
+    ExecuteCharacterRouseCheckUseCase,
     ResolveInitialVampireStateUseCase,
     CreateCharacterDraftUseCase,
     LoadCharacterAttributeSkillRatingsUseCase,

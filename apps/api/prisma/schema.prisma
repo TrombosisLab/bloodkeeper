@@ -218,6 +218,7 @@ model User {
   chronicleParticipations ChronicleParticipant[] @relation("ChronicleParticipantUser")
   experienceMovements     CharacterExperienceMovement[] @relation("CharacterExperienceActor")
   executedDiceRolls       DiceRollRecord[] @relation("DiceRollActor")
+  rouseCheckOperations    CharacterRouseCheckOperation[] @relation("RouseCheckActor")
 
   @@index([status])
   @@map("users")
@@ -496,6 +497,7 @@ model DiceRollRecord {
   session      ChronicleSession? @relation("DiceRollSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   rerollParent DiceRollRecord?   @relation("DiceRollRerolls", fields: [rerollParentId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   rerolls      DiceRollRecord[]  @relation("DiceRollRerolls")
+  rouseCheckOperation CharacterRouseCheckOperation? @relation("RouseCheckHistory")
 
   @@index([actorId, createdAt, id])
   @@index([characterId, createdAt, id])
@@ -563,6 +565,7 @@ model Character {
   attributes    CharacterAttributes?
   blood         CharacterBloodState?
   bloodResonanceOperations CharacterBloodResonanceOperation[]
+  rouseCheckOperations     CharacterRouseCheckOperation[] @relation("RouseCheckCharacter")
   damage        CharacterDamageState?
   skills        CharacterSkill[]
   disciplines   CharacterDiscipline[]
@@ -689,6 +692,35 @@ model CharacterBloodDyscrasiaConsumptionOperation {
   @@unique([characterId, sourceBloodOperationId])
   @@index([characterId, createdAt])
   @@map("character_blood_dyscrasia_consumption_operations")
+}
+
+model CharacterRouseCheckOperation {
+  characterId            String   @db.Uuid
+  operationId            String   @db.Uuid
+  actorId                String   @db.Uuid
+  reason                 String
+  forced                 Boolean  @default(false)
+  bloodPotency           Int?
+  disciplinePowerLevel   Int?
+  rolls                  Json
+  selectedResult         Int
+  success                Boolean
+  hungerBefore           Int
+  hungerAfter            Int
+  consequence            String
+  consequenceDifficulty Int?
+  rollHistoryId          String   @unique @db.Uuid
+  characterRevision      Int
+  createdAt              DateTime @default(now()) @db.Timestamptz(3)
+
+  character   Character      @relation("RouseCheckCharacter", fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  actor       User           @relation("RouseCheckActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  rollHistory DiceRollRecord @relation("RouseCheckHistory", fields: [rollHistoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@id([characterId, operationId])
+  @@index([characterId, createdAt])
+  @@index([actorId, createdAt])
+  @@map("character_rouse_check_operations")
 }
 
 model CharacterDamageState {
