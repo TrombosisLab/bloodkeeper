@@ -226,27 +226,95 @@ export function createCharacterExperienceGateway(
       )
     },
 
-    async preview(characterId, advancement) {
-      const response = await fetchImplementation(endpoint(characterId, '/preview'), {
-        method: 'POST',
-        credentials: 'include',
-        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify(advancement),
-      })
-      return parseCharacterAdvancementPreview(await successfulPayload(response))
+    async preview(
+      characterId,
+      advancement,
+      useDyscrasiaExperience = false,
+    ) {
+      const response =
+        await fetchImplementation(
+          endpoint(
+            characterId,
+            '/preview',
+          ),
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body:
+              JSON.stringify(
+                useDyscrasiaExperience
+                  ? {
+                      advancement,
+                      useDyscrasiaExperience:
+                        true,
+                    }
+                  : advancement,
+              ),
+          },
+        )
+
+      return parseCharacterAdvancementPreview(
+        await successfulPayload(response),
+      )
     },
 
-    async purchase(characterId, expectedRevision, operationId, advancement) {
-      const response = await fetchImplementation(endpoint(characterId, '/purchase'), {
-        method: 'POST',
-        credentials: 'include',
-        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ expectedRevision, operationId, advancement }),
-      })
-      const body = record(await successfulPayload(response))
+    async purchase(
+      characterId,
+      expectedRevision,
+      operationId,
+      advancement,
+      useDyscrasiaExperience = false,
+    ) {
+      const response =
+        await fetchImplementation(
+          endpoint(
+            characterId,
+            '/purchase',
+          ),
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type':
+                'application/json',
+            },
+            body:
+              JSON.stringify({
+                expectedRevision,
+                operationId,
+                advancement,
+                ...(useDyscrasiaExperience
+                  ? {
+                      useDyscrasiaExperience:
+                        true,
+                    }
+                  : {}),
+              }),
+          },
+        )
+
+      const body =
+        record(
+          await successfulPayload(
+            response,
+          ),
+        )
+
       return {
-        experience: parseCharacterExperienceLedger(body.experience),
-        preview: parseCharacterAdvancementPreview(body.preview),
+        experience:
+          parseCharacterExperienceLedger(
+            body.experience,
+          ),
+        preview:
+          parseCharacterAdvancementPreview(
+            body.preview,
+          ),
       } satisfies CharacterAdvancementPurchaseResult
     },
   }

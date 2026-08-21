@@ -52,7 +52,7 @@ test('SPEC-053 gateway Experience devuelve una página física', async () => {
 
   assert.match(
     api,
-    /parseCharacterExperienceLedger\(body\.experience\)/,
+    /parseCharacterExperienceLedger\(\s*body\.experience,?\s*\)/,
   )
 })
 

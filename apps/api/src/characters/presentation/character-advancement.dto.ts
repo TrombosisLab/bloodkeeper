@@ -161,6 +161,58 @@ export function toCharacterAdvancementPreviewResponse(
 }
 
 
+export function parseCharacterAdvancementPreviewRequest(
+  input: unknown,
+) {
+  const body = record(input)
+
+  if (
+    !Object.hasOwn(
+      body,
+      'advancement',
+    )
+  ) {
+    return {
+      advancement:
+        parseCharacterAdvancementRequest(
+          input,
+        ),
+      useDyscrasiaExperience: false,
+    }
+  }
+
+  only(
+    body,
+    [
+      'advancement',
+      'useDyscrasiaExperience',
+    ],
+  )
+
+  if (
+    Object.hasOwn(
+      body,
+      'useDyscrasiaExperience',
+    ) &&
+    typeof body.useDyscrasiaExperience !==
+      'boolean'
+  ) {
+    throw new InvalidCharacterAdvancementRequestError(
+      'body.useDyscrasiaExperience',
+      'must be a boolean',
+    )
+  }
+
+  return {
+    advancement:
+      parseCharacterAdvancementRequest(
+        body.advancement,
+      ),
+    useDyscrasiaExperience:
+      body.useDyscrasiaExperience === true,
+  }
+}
+
 export function parseCharacterAdvancementPurchase(
   input: unknown,
   characterId: string,

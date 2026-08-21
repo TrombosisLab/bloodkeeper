@@ -521,6 +521,13 @@ export function CharacterSheet({
       />
 
       {persisted &&
+      model.nature === 'vampire' ? (
+        <CharacterBloodExperience
+          blood={model.blood}
+        />
+      ) : null}
+
+      {persisted &&
       characterId !== undefined &&
       model.availability.bloodExperience ? (
         <PersistedCharacterExperience
@@ -534,15 +541,7 @@ export function CharacterSheet({
           gateway={experienceGateway}
           onPurchased={onStateReload}
         />
-      ) : (
-        <CharacterBloodExperience
-          available={
-            model?.availability
-              .bloodExperience ??
-            true
-          }
-        />
-      )}
+      ) : null}
 
       {characterId ? (
         <>

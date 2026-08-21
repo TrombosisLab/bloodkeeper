@@ -17,6 +17,11 @@ import {
   applyCharacterDisciplineResonanceEvidence,
 } from '../domain/character-discipline-resonance-evidence.rules'
 import {
+  applyCharacterBloodDyscrasiaExperiencePreview,
+  assessCharacterBloodDyscrasiaExperience,
+  rejectCharacterBloodDyscrasiaExperiencePreview,
+} from '../domain/character-blood-dyscrasia-experience.rules'
+import {
   applyCharacterAdvancement,
   normalizeCharacterAdvancementMutation,
 } from '../domain/character-advancement-apply.rules'
@@ -43,6 +48,7 @@ export class PreviewCharacterAdvancementUseCase {
     actorUserId: string,
     characterId: string,
     request: CharacterAdvancementRequest,
+    useDyscrasiaExperience = false,
   ): Promise<CharacterAdvancementPreview> {
     const access = await this.experience.findCharacter(characterId)
     if (access === null) throw new CharacterExperienceCharacterNotFoundError(characterId)
@@ -54,12 +60,49 @@ export class PreviewCharacterAdvancementUseCase {
     ])
     if (character === null) throw new CharacterExperienceCharacterNotFoundError(characterId)
 
+    const dyscrasiaExperience =
+      assessCharacterBloodDyscrasiaExperience(
+        character.blood?.dyscrasia
+          ?.key ?? null,
+        request,
+        useDyscrasiaExperience,
+      )
+
+    const previewAvailable =
+      dyscrasiaExperience.status ===
+        'available'
+        ? ledger.available +
+          dyscrasiaExperience
+            .benefit.amount
+        : ledger.available
+
     let preview = previewCharacterAdvancement(
       character,
-      ledger.available,
+      previewAvailable,
       request,
       this.catalog,
     )
+
+    if (
+      dyscrasiaExperience.status ===
+        'available'
+    ) {
+      preview =
+        applyCharacterBloodDyscrasiaExperiencePreview(
+          preview,
+          ledger.available,
+          dyscrasiaExperience.benefit,
+        )
+    } else if (
+      dyscrasiaExperience.status ===
+        'unavailable'
+    ) {
+      preview =
+        rejectCharacterBloodDyscrasiaExperiencePreview(
+          preview,
+          dyscrasiaExperience.message,
+        )
+    }
 
     if (
       request.kind === 'discipline' &&

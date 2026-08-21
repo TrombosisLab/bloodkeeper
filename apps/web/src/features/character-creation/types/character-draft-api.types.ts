@@ -1,4 +1,13 @@
 import type {
+  CharacterRulesBloodDyscrasiaAcquisitionMode,
+  CharacterRulesBloodDyscrasiaKey,
+  CharacterRulesBloodResonanceKey,
+  CharacterRulesBloodSourceKind,
+  CharacterRulesBloodSpecialAffinityKey,
+  CharacterRulesBloodTemperament,
+} from '@v5r/character-rules'
+
+import type {
   CharacterAttributesDraft,
 } from './character-attributes-draft.types.ts'
 
@@ -75,8 +84,29 @@ export interface CharacterDraftApiCreationState {
   updatedAt: string
 }
 
+export interface CharacterDraftApiBloodResonance {
+  sourceKind: CharacterRulesBloodSourceKind
+  resonanceKey:
+    CharacterRulesBloodResonanceKey | null
+  specialAffinityKey:
+    CharacterRulesBloodSpecialAffinityKey | null
+  temperament:
+    CharacterRulesBloodTemperament | null
+}
+
+export interface CharacterDraftApiBloodDyscrasia {
+  key: CharacterRulesBloodDyscrasiaKey
+  acquisitionMode:
+    CharacterRulesBloodDyscrasiaAcquisitionMode
+}
+
 export interface CharacterDraftApiBlood
-  extends CharacterBloodDraft {}
+  extends CharacterBloodDraft {
+  resonance?:
+    CharacterDraftApiBloodResonance | null
+  dyscrasia?:
+    CharacterDraftApiBloodDyscrasia | null
+}
 
 export interface CharacterDraftApiDamageTrack {
   superficial: number
@@ -220,7 +250,12 @@ export interface UpdateCharacterDraftApiRequest {
     Partial<CharacterDraftApiIdentity>
   attributes?:
     Partial<CharacterAttributesDraft>
-  blood?: Partial<CharacterDraftApiBlood>
+  blood?: Partial<
+    Pick<
+      CharacterDraftApiBlood,
+      'bloodPotency' | 'hunger'
+    >
+  >
   damage?: CharacterDraftApiDamage
   skills?: Partial<CharacterSkillsDraft>
   skillSpecialties?:

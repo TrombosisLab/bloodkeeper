@@ -329,6 +329,23 @@ export function adaptPersistedCharacterToSheetModel(
     nature:
       snapshot.nature,
     profilePhase,
+    blood:
+      snapshot.blood === null
+        ? null
+        : {
+            resonance:
+              snapshot.blood.resonance == null
+                ? null
+                : {
+                    ...snapshot.blood.resonance,
+                  },
+            dyscrasia:
+              snapshot.blood.dyscrasia == null
+                ? null
+                : {
+                    ...snapshot.blood.dyscrasia,
+                  },
+          },
 
     identity: {
       name:

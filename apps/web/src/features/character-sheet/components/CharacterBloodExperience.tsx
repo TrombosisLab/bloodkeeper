@@ -1,40 +1,129 @@
 import {
-  demoBloodExperience,
-} from '../data/demo-blood-experience'
+  characterBloodDyscrasiaCatalog,
+  characterBloodResonanceCatalog,
+} from '@v5r/character-rules'
+
+import type {
+  CharacterBloodExperience as CharacterBloodExperienceModel,
+} from '../types/character-blood-experience.types.ts'
 
 interface CharacterBloodExperienceProps {
-  available?: boolean
+  blood: CharacterBloodExperienceModel | null
+}
+
+function resonanceLabel(
+  blood: CharacterBloodExperienceModel,
+): string {
+  const active = blood.resonance
+
+  if (active === null) {
+    return 'Sin Resonancia activa'
+  }
+
+  if (active.resonanceKey !== null) {
+    return (
+      characterBloodResonanceCatalog
+        .resonances
+        .find(
+          ({ key }) =>
+            key === active.resonanceKey,
+        )
+        ?.name ??
+      active.resonanceKey
+    )
+  }
+
+  if (
+    active.specialAffinityKey !== null
+  ) {
+    return (
+      characterBloodResonanceCatalog
+        .specialAffinities
+        .find(
+          ({ key }) =>
+            key ===
+              active.specialAffinityKey,
+        )
+        ?.name ??
+      active.specialAffinityKey
+    )
+  }
+
+  return 'Sin Resonancia activa'
+}
+
+function temperamentLabel(
+  blood: CharacterBloodExperienceModel,
+): string {
+  const temperament =
+    blood.resonance?.temperament ?? null
+
+  if (temperament === null) {
+    return 'Sin Temperamento'
+  }
+
+  return (
+    characterBloodResonanceCatalog
+      .temperaments
+      .find(
+        ({ key }) =>
+          key === temperament,
+      )
+      ?.name ??
+    temperament
+  )
+}
+
+function dyscrasiaLabel(
+  blood: CharacterBloodExperienceModel,
+): string | null {
+  if (blood.dyscrasia === null) {
+    return null
+  }
+
+  return (
+    characterBloodDyscrasiaCatalog
+      .definitions
+      .find(
+        ({ key }) =>
+          key === blood.dyscrasia?.key,
+      )
+      ?.name ??
+    blood.dyscrasia.key
+  )
 }
 
 export function CharacterBloodExperience({
-  available = true,
+  blood,
 }: CharacterBloodExperienceProps) {
-  const totalExperience =
-    demoBloodExperience.experienceCurrent +
-    demoBloodExperience.experienceSpent
+  const dyscrasia =
+    blood === null
+      ? null
+      : dyscrasiaLabel(blood)
 
   return (
     <section
       className="sheet-section blood-experience-section"
       aria-labelledby="blood-experience-title"
+      data-blood-resonance="persisted"
     >
       <div className="section-title">
         <div>
           <p className="section-kicker">
-            Sangre y evolución
+            Sangre
           </p>
 
           <h2 id="blood-experience-title">
-            Resonancia y Experiencia
+            Resonancia
           </h2>
         </div>
-
-        <span className="section-number">
-          07
-        </span>
       </div>
 
-      {available ? (
+      {blood === null ? (
+        <p className="secondary-empty">
+          Estado de Sangre pendiente.
+        </p>
+      ) : (
         <div className="blood-experience-grid">
           <div className="blood-info-card">
             <span className="blood-info-card__label">
@@ -42,7 +131,7 @@ export function CharacterBloodExperience({
             </span>
 
             <strong>
-              {demoBloodExperience.resonance}
+              {resonanceLabel(blood)}
             </strong>
           </div>
 
@@ -52,44 +141,22 @@ export function CharacterBloodExperience({
             </span>
 
             <strong>
-              {demoBloodExperience.temperament}
+              {temperamentLabel(blood)}
             </strong>
           </div>
 
-          <div className="experience-card">
-            <div>
-              <span>Experiencia disponible</span>
-              <strong>
-                {
-                  demoBloodExperience
-                    .experienceCurrent
-                }
-              </strong>
-            </div>
+          {dyscrasia !== null ? (
+            <div className="blood-info-card">
+              <span className="blood-info-card__label">
+                Discrasia activa
+              </span>
 
-            <div>
-              <span>Experiencia gastada</span>
               <strong>
-                {
-                  demoBloodExperience
-                    .experienceSpent
-                }
+                {dyscrasia}
               </strong>
             </div>
-
-            <div>
-              <span>Total obtenida</span>
-              <strong>
-                {totalExperience}
-              </strong>
-            </div>
-          </div>
+          ) : null}
         </div>
-      ) : (
-        <p className="secondary-empty">
-          Esta información todavía no forma parte del
-          contrato persistente.
-        </p>
       )}
     </section>
   )

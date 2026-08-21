@@ -3,6 +3,10 @@ import type {
 } from './character-advantages.types.ts'
 
 import type {
+  CharacterBloodExperience,
+} from './character-blood-experience.types.ts'
+
+import type {
   CharacterAttributeCategory,
 } from './character-attributes.types.ts'
 
@@ -60,7 +64,8 @@ export interface CharacterSheetAvailability {
 
   /*
    * SPEC-056 expone la Experiencia mediante un ledger propio.
-   * Resonancia y temperamento continúan fuera de este contrato.
+   * Este flag sólo gobierna ese panel de Experiencia.
+   * Resonancia y Discrasia viven en CharacterSheetModel.blood.
    */
   bloodExperience: boolean
 }
@@ -72,6 +77,7 @@ export interface CharacterSheetModel {
   chronicleId: string | null
   nature: CharacterNature
   profilePhase: CharacterProfilePhase
+  blood: CharacterBloodExperience | null
 
   identity: CharacterIdentity
   attributes: CharacterAttributeCategory[]

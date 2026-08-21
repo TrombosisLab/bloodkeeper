@@ -105,11 +105,13 @@ export interface CharacterExperienceGateway {
   preview(
     characterId: string,
     advancement: CharacterAdvancementRequest,
+    useDyscrasiaExperience?: boolean,
   ): Promise<CharacterAdvancementPreview>
   purchase(
     characterId: string,
     expectedRevision: number,
     operationId: string,
     advancement: CharacterAdvancementRequest,
+    useDyscrasiaExperience?: boolean,
   ): Promise<CharacterAdvancementPurchaseResult>
 }

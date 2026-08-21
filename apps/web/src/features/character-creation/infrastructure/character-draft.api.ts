@@ -1,4 +1,9 @@
 import {
+  characterBloodDyscrasiaCatalog,
+  characterBloodResonanceCatalog,
+} from '@v5r/character-rules'
+
+import {
   skillKeys,
 } from '../data/skill-definitions.ts'
 
@@ -7,6 +12,7 @@ import {
 } from '../data/discipline-definitions.ts'
 
 import type {
+  CharacterDraftApiBlood,
   CharacterDraftApiSnapshot,
   CreateCharacterDraftApiRequest,
   UpdateCharacterDraftApiRequest,
@@ -103,6 +109,44 @@ const alchemyMethods = [
   'calcinatio',
   'fixatio',
 ] as const
+
+const characterBloodResonanceKeys =
+  new Set<string>(
+    characterBloodResonanceCatalog
+      .resonances
+      .map(({ key }) => key),
+  )
+
+const characterBloodTemperamentKeys =
+  new Set<string>(
+    characterBloodResonanceCatalog
+      .temperaments
+      .map(({ key }) => key),
+  )
+
+const characterBloodSpecialAffinityKeys =
+  new Set<string>(
+    characterBloodResonanceCatalog
+      .specialAffinities
+      .map(({ key }) => key),
+  )
+
+const characterBloodDyscrasiaKeys =
+  new Set<string>(
+    characterBloodDyscrasiaCatalog
+      .definitions
+      .map(({ key }) => key),
+  )
+
+const characterBloodDyscrasiaAcquisitionModes =
+  new Set<string>(
+    characterBloodDyscrasiaCatalog
+      .definitions
+      .flatMap(
+        ({ acquisitionModes }) =>
+          acquisitionModes,
+      ),
+  )
 
 export class CharacterDraftApiError
   extends Error {
@@ -302,13 +346,93 @@ function validCreation(
   )
 }
 
-function validBlood(
+function validBloodResonance(
+  value: unknown,
+): boolean {
+  if (!isRecord(value)) return false
+
+  return (
+    (
+      typeof value.sourceKind === 'string' &&
+      (
+        value.sourceKind === 'human' ||
+        value.sourceKind === 'animal'
+      )
+    ) &&
+    (
+      value.resonanceKey === null ||
+      (
+        typeof value.resonanceKey === 'string' &&
+        characterBloodResonanceKeys.has(
+          value.resonanceKey,
+        )
+      )
+    ) &&
+    (
+      value.specialAffinityKey === null ||
+      (
+        typeof value.specialAffinityKey === 'string' &&
+        characterBloodSpecialAffinityKeys.has(
+          value.specialAffinityKey,
+        )
+      )
+    ) &&
+    (
+      value.temperament === null ||
+      (
+        typeof value.temperament === 'string' &&
+        characterBloodTemperamentKeys.has(
+          value.temperament,
+        )
+      )
+    )
+  )
+}
+
+function validBloodDyscrasia(
   value: unknown,
 ): boolean {
   return (
     isRecord(value) &&
+    typeof value.key === 'string' &&
+    characterBloodDyscrasiaKeys.has(
+      value.key,
+    ) &&
+    typeof value.acquisitionMode ===
+      'string' &&
+    characterBloodDyscrasiaAcquisitionModes.has(
+      value.acquisitionMode,
+    )
+  )
+}
+
+function validBlood(
+  value: unknown,
+): value is CharacterDraftApiBlood {
+  return (
+    isRecord(value) &&
     isInteger(value.bloodPotency) &&
-    isInteger(value.hunger)
+    isInteger(value.hunger) &&
+    (
+      !Object.hasOwn(
+        value,
+        'resonance',
+      ) ||
+      value.resonance === null ||
+      validBloodResonance(
+        value.resonance,
+      )
+    ) &&
+    (
+      !Object.hasOwn(
+        value,
+        'dyscrasia',
+      ) ||
+      value.dyscrasia === null ||
+      validBloodDyscrasia(
+        value.dyscrasia,
+      )
+    )
   )
 }
 

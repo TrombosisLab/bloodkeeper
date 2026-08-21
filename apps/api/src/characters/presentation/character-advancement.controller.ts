@@ -46,8 +46,8 @@ import {
 } from './character-experience.dto'
 import {
   InvalidCharacterAdvancementRequestError,
+  parseCharacterAdvancementPreviewRequest,
   parseCharacterAdvancementPurchase,
-  parseCharacterAdvancementRequest,
   toCharacterAdvancementPreviewResponse,
 } from './character-advancement.dto'
 import type {
@@ -77,11 +77,18 @@ export class CharacterAdvancementController {
     }
     try {
       const characterId = parseCharacterExperienceIdParam(characterIdInput)
+      const previewRequest =
+        parseCharacterAdvancementPreviewRequest(
+          body,
+        )
+
       return toCharacterAdvancementPreviewResponse(
         await this.preview.execute(
           actorUserId,
           characterId,
-          parseCharacterAdvancementRequest(body),
+          previewRequest.advancement,
+          previewRequest
+            .useDyscrasiaExperience,
         ),
       )
     } catch (error: unknown) {

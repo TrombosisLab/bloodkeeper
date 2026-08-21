@@ -312,6 +312,14 @@ test(
     )
     assert.match(
       bloodExperienceSource,
+      /data-blood-resonance="persisted"/,
+    )
+    assert.match(
+      bloodExperienceSource,
+      /Sin Resonancia activa/,
+    )
+    assert.doesNotMatch(
+      bloodExperienceSource,
       /contrato persistente/,
     )
 
