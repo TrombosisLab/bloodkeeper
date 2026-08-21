@@ -241,6 +241,42 @@ test('058-D3 consume una sola vez la instancia exacta sin borrar Resonancia', as
       'energetic',
     )
 
+    const feedHistory =
+      await database
+        .characterHistoryEntry
+        .findUnique({
+          where: {
+            id: sourceOperationId,
+          },
+        })
+
+    assert.equal(
+      feedHistory?.title,
+      'Alimentación y Resonancia',
+    )
+    assert.match(
+      feedHistory?.description ?? '',
+      /Discrasia/,
+    )
+
+    const consumeHistory =
+      await database
+        .characterHistoryEntry
+        .findUnique({
+          where: {
+            id: consumeOperationId,
+          },
+        })
+
+    assert.equal(
+      consumeHistory?.title,
+      'Discrasia consumida',
+    )
+    assert.match(
+      consumeHistory?.description ?? '',
+      /Enérgico|energetic/i,
+    )
+
     const retry =
       await consume.execute(
         ownerId,
@@ -259,6 +295,18 @@ test('058-D3 consume una sola vez la instancia exacta sin borrar Resonancia', as
     assert.equal(
       retry.revision,
       consumed.revision,
+    )
+
+    assert.equal(
+      await database
+        .characterHistoryEntry
+        .count({
+          where: {
+            id: consumeOperationId,
+            characterId,
+          },
+        }),
+      1,
     )
 
     await assert.rejects(

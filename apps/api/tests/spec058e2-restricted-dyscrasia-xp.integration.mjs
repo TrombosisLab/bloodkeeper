@@ -395,6 +395,42 @@ test('058-E2 compra Disciplina por 14 en vez de 15 y consume exactamente una vez
         }),
       1,
     )
+
+    const purchaseHistory =
+      await database
+        .characterHistoryEntry
+        .findUnique({
+          where: {
+            id:
+              purchaseOperationId,
+          },
+        })
+
+    assert.equal(
+      purchaseHistory?.characterId,
+      characterId,
+    )
+    assert.equal(
+      purchaseHistory?.title,
+      'Discrasia consumida',
+    )
+    assert.match(
+      purchaseHistory?.description ?? '',
+      /adquisición de/i,
+    )
+
+    assert.equal(
+      await database
+        .characterHistoryEntry
+        .count({
+          where: {
+            id:
+              purchaseOperationId,
+            characterId,
+          },
+        }),
+      1,
+    )
   } finally {
     // Esta integración usa PostgreSQL temporal y descartable.
     // El ledger de Experiencia es append-only e inmutable:

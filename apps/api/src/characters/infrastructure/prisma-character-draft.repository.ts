@@ -1,4 +1,9 @@
 import {
+  buildCharacterBloodDyscrasiaConsumptionHistoryEntry,
+  buildCharacterBloodFeedingHistoryEntry,
+} from '../domain/character-blood-history.rules'
+
+import {
   CharacterBloodDyscrasiaAlreadyConsumedError,
   CharacterBloodDyscrasiaConsumptionOperationConflictError,
   CharacterBloodDyscrasiaConsumptionWriteConflictError,
@@ -3559,6 +3564,35 @@ export class PrismaCharacterDraftRepository
               },
             })
 
+          const history =
+            buildCharacterBloodFeedingHistoryEntry({
+              sourceKind:
+                data.sourceKind,
+              resonanceKey:
+                data.resonanceKey,
+              specialAffinityKey:
+                data.specialAffinityKey,
+              temperament:
+                data.temperament,
+              dyscrasiaKey:
+                data.dyscrasiaKey,
+            })
+
+          await transaction
+            .characterHistoryEntry
+            .create({
+              data: {
+                id:
+                  data.operationId,
+                characterId:
+                  data.characterId,
+                title:
+                  history.title,
+                description:
+                  history.description,
+              },
+            })
+
           const row =
             await transaction.character
               .findUniqueOrThrow({
@@ -3902,6 +3936,27 @@ export class PrismaCharacterDraftRepository
                   dyscrasiaKeyToPrisma[
                     data.dyscrasiaKey
                   ],
+              },
+            })
+
+          const history =
+            buildCharacterBloodDyscrasiaConsumptionHistoryEntry({
+              dyscrasiaKey:
+                data.dyscrasiaKey,
+            })
+
+          await transaction
+            .characterHistoryEntry
+            .create({
+              data: {
+                id:
+                  data.operationId,
+                characterId:
+                  data.characterId,
+                title:
+                  history.title,
+                description:
+                  history.description,
               },
             })
 

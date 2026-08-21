@@ -1,4 +1,8 @@
 import {
+  buildCharacterBloodDyscrasiaConsumptionHistoryEntry,
+} from '../domain/character-blood-history.rules'
+
+import {
   Injectable,
 } from '@nestjs/common'
 import {
@@ -935,6 +939,29 @@ export class PrismaCharacterExperienceRepository
                     dyscrasiaSourceOperationId,
                   dyscrasiaKey:
                     dyscrasiaPrismaKey,
+                },
+              })
+
+            const history =
+              buildCharacterBloodDyscrasiaConsumptionHistoryEntry({
+                dyscrasiaKey:
+                  benefit.dyscrasiaKey,
+                disciplineKey:
+                  benefit.disciplineKey,
+              })
+
+            await transaction
+              .characterHistoryEntry
+              .create({
+                data: {
+                  id:
+                    data.operationId,
+                  characterId:
+                    data.characterId,
+                  title:
+                    history.title,
+                  description:
+                    history.description,
                 },
               })
           }

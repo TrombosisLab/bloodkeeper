@@ -286,6 +286,40 @@ test('058-B persiste, reemplaza, deduplica y expira Resonancia', async () => {
         })
 
     assert.equal(operationCount, 3)
+
+    const firstHistory =
+      await database
+        .characterHistoryEntry
+        .findUnique({
+          where: {
+            id: operationOne,
+          },
+        })
+
+    assert.equal(
+      firstHistory?.characterId,
+      characterId,
+    )
+    assert.equal(
+      firstHistory?.title,
+      'Alimentación y Resonancia',
+    )
+    assert.match(
+      firstHistory?.description ?? '',
+      /Colérica/,
+    )
+
+    assert.equal(
+      await database
+        .characterHistoryEntry
+        .count({
+          where: {
+            id: operationOne,
+            characterId,
+          },
+        }),
+      1,
+    )
   } finally {
     if (characterId !== null) {
       await database.character.deleteMany({
