@@ -10,6 +10,7 @@ import type {
 
 import {
   AdvantageCategory as PrismaAdvantageCategory,
+  CharacterBloodDyscrasiaKey as PrismaCharacterBloodDyscrasiaKey,
   AdvantageSelectionOrigin as PrismaAdvantageSelectionOrigin,
   CharacterExperienceComponent as PrismaCharacterExperienceComponent,
   CharacterExperienceMovementType as PrismaCharacterExperienceMovementType,
@@ -41,8 +42,12 @@ import {
   projectCharacterExperienceCorrection,
 } from '../domain/character-experience.rules'
 import type {
+  CharacterAdvancementDyscrasiaExperienceBenefit,
   PurchaseCharacterAdvancementData,
 } from '../domain/character-advancement.types'
+import {
+  isCharacterBloodDyscrasiaExperienceBenefit,
+} from '../domain/character-blood-dyscrasia-experience.rules'
 import {
   toAdvantageDetailsCreate,
 } from './prisma-character-draft.repository'
@@ -88,6 +93,24 @@ const characterStatusFromPrisma = {
   PrismaCharacterStatus,
   CharacterExperienceCharacter['status']
 >
+
+function restrictedDyscrasiaKeyFromPrisma(
+  value:
+    PrismaCharacterBloodDyscrasiaKey,
+): CharacterAdvancementDyscrasiaExperienceBenefit['dyscrasiaKey'] | null {
+  switch (value) {
+    case PrismaCharacterBloodDyscrasiaKey.ENERGETIC:
+      return 'energetic'
+    case PrismaCharacterBloodDyscrasiaKey.EVOCATIVE:
+      return 'evocative'
+    case PrismaCharacterBloodDyscrasiaKey.REFLECTION:
+      return 'reflection'
+    case PrismaCharacterBloodDyscrasiaKey.EXCITED:
+      return 'excited'
+    default:
+      return null
+  }
+}
 
 function toMovement(
   row: PrismaCharacterExperienceMovementRecord,
@@ -667,67 +690,302 @@ export class PrismaCharacterExperienceRepository
     data: PurchaseCharacterAdvancementData,
   ): Promise<CharacterExperienceLedger> {
     try {
-      return await this.database.$transaction(async (transaction) => {
-        const locked = await transaction.$queryRaw<readonly {
-          readonly id: string
-          readonly ownerId: string
-          readonly revision: number
-          readonly status: string
-        }[]>`
-          SELECT "id", "ownerId", "revision", "status"::text AS "status"
-          FROM "characters"
-          WHERE "id" = ${data.characterId}::uuid
-          FOR UPDATE
-        `
-        const character = locked[0]
-        if (character === undefined || character.ownerId !== data.actorId) {
-          throw new CharacterAdvancementRevisionConflictError(data.characterId)
-        }
+      return await this.database.$transaction(
+        async (transaction) => {
+          const locked =
+            await transaction.$queryRaw<
+              readonly {
+                readonly id: string
+                readonly ownerId: string
+                readonly revision: number
+                readonly status: string
+                readonly nature: string
+              }[]
+            >`
+              SELECT
+                "id",
+                "ownerId",
+                "revision",
+                "status"::text AS "status",
+                "nature"::text AS "nature"
+              FROM "characters"
+              WHERE "id" = ${data.characterId}::uuid
+              FOR UPDATE
+            `
 
-        const duplicate = await transaction.characterExperienceMovement.count({
-          where: {
-            characterId: data.characterId,
-            deduplicationKey: `spend:operation:${data.operationId}`,
-          },
-        })
-        if (duplicate !== 0) {
-          throw new CharacterExperienceDuplicateError(data.characterId)
-        }
-        if (character.revision !== data.expectedRevision) {
-          throw new CharacterAdvancementRevisionConflictError(data.characterId)
-        }
-        if (character.status === 'ARCHIVED') {
-          throw new CharacterAdvancementArchivedError()
-        }
+          const character = locked[0]
 
-        const ledger = await this.transactionLedger(transaction, data.characterId)
-        if (ledger.available < data.cost) {
-          throw new CharacterExperienceInsufficientError()
-        }
+          if (
+            character === undefined ||
+            character.ownerId !==
+              data.actorId
+          ) {
+            throw new CharacterAdvancementRevisionConflictError(
+              data.characterId,
+            )
+          }
 
-        await this.applyAdvancementMutation(transaction, data)
-        await transaction.character.update({
-          where: { id: data.characterId },
-          data: { revision: { increment: 1 } },
-        })
-        await transaction.characterExperienceMovement.create({
-          data: {
-            characterId: data.characterId,
-            actorId: data.actorId,
-            type: PrismaCharacterExperienceMovementType.SPEND,
-            component: PrismaCharacterExperienceComponent.SPENT,
-            amount: data.cost,
-            reason: 'advancement_purchase',
-            deduplicationKey: `spend:operation:${data.operationId}`,
-            acquisitionType: data.acquisitionType,
-            acquisitionKey: data.acquisitionKey,
-          },
-        })
+          const duplicate =
+            await transaction
+              .characterExperienceMovement
+              .count({
+                where: {
+                  characterId:
+                    data.characterId,
+                  deduplicationKey:
+                    `spend:operation:${data.operationId}`,
+                },
+              })
 
-        return this.transactionLedger(transaction, data.characterId)
-      })
+          if (duplicate !== 0) {
+            throw new CharacterExperienceDuplicateError(
+              data.characterId,
+            )
+          }
+
+          if (
+            character.revision !== data.expectedRevision
+          ) {
+            throw new CharacterAdvancementRevisionConflictError(
+              data.characterId,
+            )
+          }
+
+          if (
+            character.status ===
+              'ARCHIVED'
+          ) {
+            throw new CharacterAdvancementArchivedError()
+          }
+
+          const benefit =
+            data.dyscrasiaExperienceBenefit
+
+          let dyscrasiaSourceOperationId:
+            string | null = null
+
+          let dyscrasiaPrismaKey:
+            PrismaCharacterBloodDyscrasiaKey | null =
+              null
+
+          if (benefit !== null) {
+            if (
+              character.nature !==
+                'VAMPIRE' ||
+              data.mutation.kind !==
+                'discipline' ||
+              data.mutation
+                .disciplineKey !==
+                benefit.disciplineKey ||
+              !isCharacterBloodDyscrasiaExperienceBenefit(
+                benefit,
+              )
+            ) {
+              throw new CharacterAdvancementRevisionConflictError(
+                data.characterId,
+              )
+            }
+
+            const blood =
+              await transaction
+                .characterBloodState
+                .findUnique({
+                  where: {
+                    characterId:
+                      data.characterId,
+                  },
+                  select: {
+                    dyscrasiaKey: true,
+                    dyscrasiaSourceOperationId:
+                      true,
+                  },
+                })
+
+            if (
+              blood === null ||
+              blood.dyscrasiaKey ===
+                null ||
+              blood
+                .dyscrasiaSourceOperationId ===
+                null ||
+              restrictedDyscrasiaKeyFromPrisma(
+                blood.dyscrasiaKey,
+              ) !== benefit.dyscrasiaKey
+            ) {
+              throw new CharacterAdvancementRevisionConflictError(
+                data.characterId,
+              )
+            }
+
+            const existingOperation =
+              await transaction
+                .characterBloodDyscrasiaConsumptionOperation
+                .findUnique({
+                  where: {
+                    characterId_operationId: {
+                      characterId:
+                        data.characterId,
+                      operationId:
+                        data.operationId,
+                    },
+                  },
+                })
+
+            if (
+              existingOperation !== null
+            ) {
+              throw new CharacterExperienceDuplicateError(
+                data.characterId,
+              )
+            }
+
+            const existingSource =
+              await transaction
+                .characterBloodDyscrasiaConsumptionOperation
+                .findUnique({
+                  where: {
+                    characterId_sourceBloodOperationId: {
+                      characterId:
+                        data.characterId,
+                      sourceBloodOperationId:
+                        blood
+                          .dyscrasiaSourceOperationId,
+                    },
+                  },
+                })
+
+            if (
+              existingSource !== null
+            ) {
+              throw new CharacterAdvancementRevisionConflictError(
+                data.characterId,
+              )
+            }
+
+            dyscrasiaSourceOperationId =
+              blood
+                .dyscrasiaSourceOperationId
+            dyscrasiaPrismaKey =
+              blood.dyscrasiaKey
+          }
+
+          const ledger =
+            await this.transactionLedger(
+              transaction,
+              data.characterId,
+            )
+
+          if (
+            ledger.available < data.cost
+          ) {
+            throw new CharacterExperienceInsufficientError()
+          }
+
+          await this.applyAdvancementMutation(
+            transaction,
+            data,
+          )
+
+          if (benefit !== null) {
+            if (
+              dyscrasiaSourceOperationId ===
+                null ||
+              dyscrasiaPrismaKey === null
+            ) {
+              throw new CharacterAdvancementRevisionConflictError(
+                data.characterId,
+              )
+            }
+
+            const cleared =
+              await transaction
+                .characterBloodState
+                .updateMany({
+                  where: {
+                    characterId:
+                      data.characterId,
+                    dyscrasiaKey:
+                      dyscrasiaPrismaKey,
+                    dyscrasiaSourceOperationId,
+                  },
+                  data: {
+                    dyscrasiaKey: null,
+                    dyscrasiaAcquisitionMode:
+                      null,
+                    dyscrasiaSourceOperationId:
+                      null,
+                  },
+                })
+
+            if (cleared.count !== 1) {
+              throw new CharacterAdvancementRevisionConflictError(
+                data.characterId,
+              )
+            }
+
+            await transaction
+              .characterBloodDyscrasiaConsumptionOperation
+              .create({
+                data: {
+                  characterId:
+                    data.characterId,
+                  operationId:
+                    data.operationId,
+                  sourceBloodOperationId:
+                    dyscrasiaSourceOperationId,
+                  dyscrasiaKey:
+                    dyscrasiaPrismaKey,
+                },
+              })
+          }
+
+          await transaction.character.update({
+            where: {
+              id: data.characterId,
+            },
+            data: {
+              revision: { increment: 1 },
+            },
+          })
+
+          await transaction
+            .characterExperienceMovement
+            .create({
+              data: {
+                characterId:
+                  data.characterId,
+                actorId:
+                  data.actorId,
+                type:
+                  PrismaCharacterExperienceMovementType.SPEND,
+                component:
+                  PrismaCharacterExperienceComponent.SPENT,
+                amount:
+                  data.cost,
+                reason:
+                  benefit === null
+                    ? 'advancement_purchase'
+                    : 'advancement_purchase_dyscrasia',
+                deduplicationKey:
+                  `spend:operation:${data.operationId}`,
+                acquisitionType:
+                  data.acquisitionType,
+                acquisitionKey:
+                  data.acquisitionKey,
+              },
+            })
+
+          return this.transactionLedger(
+            transaction,
+            data.characterId,
+          )
+        },
+      )
     } catch (error: unknown) {
-      duplicateError(error, data.characterId)
+      duplicateError(
+        error,
+        data.characterId,
+      )
     }
   }
 

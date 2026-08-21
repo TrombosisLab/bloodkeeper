@@ -1,6 +1,8 @@
 import type {
   CharacterAdvantageCategory,
+  CharacterDisciplineKey,
   PersistedCharacterAdvantageDetails,
+  PersistedCharacterBloodDyscrasia,
 } from './persisted-character.types'
 
 export type CharacterAdvancementKind =
@@ -78,6 +80,14 @@ export type CharacterAdvancementPurchaseMutation =
       readonly details: PersistedCharacterAdvantageDetails | null
     }
 
+export interface CharacterAdvancementDyscrasiaExperienceBenefit {
+  readonly dyscrasiaKey:
+    PersistedCharacterBloodDyscrasia['key']
+  readonly disciplineKey:
+    CharacterDisciplineKey
+  readonly amount: 1
+}
+
 export interface PurchaseCharacterAdvancementData {
   readonly characterId: string
   readonly actorId: string
@@ -87,4 +97,6 @@ export interface PurchaseCharacterAdvancementData {
   readonly acquisitionType: CharacterAdvancementKind
   readonly acquisitionKey: string
   readonly mutation: CharacterAdvancementPurchaseMutation
+  readonly dyscrasiaExperienceBenefit:
+    CharacterAdvancementDyscrasiaExperienceBenefit | null
 }

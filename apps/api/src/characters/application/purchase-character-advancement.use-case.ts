@@ -20,6 +20,11 @@ import {
   applyCharacterDisciplineResonanceEvidence,
 } from '../domain/character-discipline-resonance-evidence.rules'
 import {
+  applyCharacterBloodDyscrasiaExperiencePreview,
+  assessCharacterBloodDyscrasiaExperience,
+  rejectCharacterBloodDyscrasiaExperiencePreview,
+} from '../domain/character-blood-dyscrasia-experience.rules'
+import {
   applyCharacterAdvancement,
   characterAdvancementAcquisitionKey,
   normalizeCharacterAdvancementMutation,
@@ -52,6 +57,7 @@ export interface PurchaseCharacterAdvancementCommand {
   readonly expectedRevision: number
   readonly operationId: string
   readonly advancement: CharacterAdvancementRequest
+  readonly useDyscrasiaExperience?: boolean
 }
 
 export interface PurchaseCharacterAdvancementResult {
@@ -93,12 +99,50 @@ export class PurchaseCharacterAdvancementUseCase {
       throw new CharacterAdvancementRevisionConflictError(command.characterId)
     }
 
+    const dyscrasiaExperience =
+      assessCharacterBloodDyscrasiaExperience(
+        character.blood?.dyscrasia
+          ?.key ?? null,
+        command.advancement,
+        command.useDyscrasiaExperience ===
+          true,
+      )
+
+    const previewAvailable =
+      dyscrasiaExperience.status ===
+        'available'
+        ? ledger.available +
+          dyscrasiaExperience
+            .benefit.amount
+        : ledger.available
+
     let preview = previewCharacterAdvancement(
       character,
-      ledger.available,
+      previewAvailable,
       command.advancement,
       this.catalog,
     )
+
+    if (
+      dyscrasiaExperience.status ===
+        'available'
+    ) {
+      preview =
+        applyCharacterBloodDyscrasiaExperiencePreview(
+          preview,
+          ledger.available,
+          dyscrasiaExperience.benefit,
+        )
+    } else if (
+      dyscrasiaExperience.status ===
+        'unavailable'
+    ) {
+      preview =
+        rejectCharacterBloodDyscrasiaExperiencePreview(
+          preview,
+          dyscrasiaExperience.message,
+        )
+    }
 
     if (
       command.advancement.kind ===
@@ -151,6 +195,11 @@ export class PurchaseCharacterAdvancementUseCase {
       acquisitionType: mutation.kind,
       acquisitionKey: characterAdvancementAcquisitionKey(mutation),
       mutation,
+      dyscrasiaExperienceBenefit:
+        dyscrasiaExperience.status ===
+          'available'
+          ? dyscrasiaExperience.benefit
+          : null,
     })
     const updated = await this.drafts.findById(actorUserId, command.characterId)
     if (updated === null) {

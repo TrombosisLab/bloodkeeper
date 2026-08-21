@@ -166,15 +166,63 @@ export function parseCharacterAdvancementPurchase(
   characterId: string,
 ): PurchaseCharacterAdvancementCommand {
   const body = record(input)
-  only(body, ['expectedRevision', 'operationId', 'advancement'])
-  const expectedRevision = integer(body.expectedRevision, 'body.expectedRevision')
+  only(
+    body,
+    [
+      'expectedRevision',
+      'operationId',
+      'advancement',
+      'useDyscrasiaExperience',
+    ],
+  )
+
+  const expectedRevision =
+    integer(
+      body.expectedRevision,
+      'body.expectedRevision',
+    )
+
   if (expectedRevision < 1) {
-    throw new InvalidCharacterAdvancementRequestError('body.expectedRevision', 'must be positive')
+    throw new InvalidCharacterAdvancementRequestError(
+      'body.expectedRevision',
+      'must be positive',
+    )
   }
+
+  if (
+    Object.hasOwn(
+      body,
+      'useDyscrasiaExperience',
+    ) &&
+    typeof body.useDyscrasiaExperience !==
+      'boolean'
+  ) {
+    throw new InvalidCharacterAdvancementRequestError(
+      'body.useDyscrasiaExperience',
+      'must be a boolean',
+    )
+  }
+
   return {
     characterId,
     expectedRevision,
-    operationId: uuid(body.operationId, 'body.operationId'),
-    advancement: parseCharacterAdvancementRequest(body.advancement),
+    operationId:
+      uuid(
+        body.operationId,
+        'body.operationId',
+      ),
+    advancement:
+      parseCharacterAdvancementRequest(
+        body.advancement,
+      ),
+    ...(Object.hasOwn(
+      body,
+      'useDyscrasiaExperience',
+    )
+      ? {
+          useDyscrasiaExperience:
+            body.useDyscrasiaExperience as boolean,
+        }
+      : {}),
   }
 }
