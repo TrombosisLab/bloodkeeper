@@ -2145,3 +2145,152 @@
     width: 100%;
   }
 }
+
+/* ==================================================
+   SPEC-058 — REGISTRO PERSISTIDO DE ALIMENTACIÓN
+   ================================================== */
+
+.blood-feeding {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+  border: 1px solid var(--color-group-border);
+  padding: 18px 20px;
+  background: var(--color-surface);
+}
+
+.blood-feeding__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.blood-feeding__toolbar > div {
+  display: grid;
+  gap: 4px;
+}
+
+.blood-feeding__toolbar strong {
+  color: var(--color-text-heading-muted-soft);
+  font-family: var(--font-family-heading);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.blood-feeding__toolbar span,
+.blood-feeding__notice,
+.blood-feeding__explanation,
+.blood-feeding__dyscrasia p {
+  color: var(--color-text-caption-muted-soft);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.blood-feeding__toggle,
+.blood-feeding__confirm {
+  border: 1px solid var(--color-section-border);
+  border-radius: 8px;
+  padding: 9px 14px;
+  background: var(--color-surface);
+  color: var(--color-text-heading);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.blood-feeding__confirm {
+  background: var(--color-accent-fill);
+  color: var(--color-text-strong);
+}
+
+.blood-feeding button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.blood-feeding__form {
+  display: grid;
+  gap: 16px;
+  border-top: 1px solid var(--color-row-divider);
+  padding-top: 16px;
+}
+
+.blood-feeding__grid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.blood-feeding label {
+  display: grid;
+  gap: 6px;
+  color: var(--color-text-label-muted-soft);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.blood-feeding select {
+  width: 100%;
+  border: 1px solid var(--color-row-divider);
+  border-radius: 7px;
+  padding: 9px 10px;
+  background: var(--color-surface);
+  color: var(--color-text-heading);
+  font: inherit;
+}
+
+.blood-feeding__dyscrasia {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  border-left: 3px solid var(--color-section-border);
+  padding: 14px 16px;
+  background: var(--color-section-tint-ghost);
+}
+
+.blood-feeding__dyscrasia p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.blood-feeding__notice,
+.blood-feeding__explanation,
+.blood-feeding__message {
+  margin: 0;
+}
+
+.blood-feeding__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.blood-feeding__message {
+  color: var(--color-danger);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 900px) {
+  .blood-feeding__grid,
+  .blood-feeding__dyscrasia {
+    grid-template-columns: 1fr;
+  }
+
+  .blood-feeding__dyscrasia p {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .blood-feeding__toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .blood-feeding__toolbar button,
+  .blood-feeding__confirm {
+    width: 100%;
+  }
+}

@@ -47,6 +47,7 @@ import { CharacterDisciplines } from './CharacterDisciplines'
 import { CharacterAdvantages } from './CharacterAdvantages'
 import { CharacterNarrative } from './CharacterNarrative'
 import { CharacterBloodExperience } from './CharacterBloodExperience'
+import { PersistedCharacterFeeding } from './PersistedCharacterFeeding'
 import { PersistedCharacterExperience } from './PersistedCharacterExperience'
 import { CharacterSecondary } from './CharacterSecondary'
 import { PersistedCharacterSecondary } from './PersistedCharacterSecondary'
@@ -524,6 +525,20 @@ export function CharacterSheet({
       model.nature === 'vampire' ? (
         <CharacterBloodExperience
           blood={model.blood}
+          actions={
+            characterId !== undefined &&
+            model.blood !== null &&
+            model.state.hunger !== null &&
+            model.status !== 'archived' &&
+            onStateReload !== undefined ? (
+              <PersistedCharacterFeeding
+                characterId={characterId}
+                revision={model.revision}
+                hunger={model.state.hunger}
+                onApplied={onStateReload}
+              />
+            ) : undefined
+          }
         />
       ) : null}
 

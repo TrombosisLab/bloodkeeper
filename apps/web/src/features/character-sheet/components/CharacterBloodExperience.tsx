@@ -1,3 +1,7 @@
+import type {
+  ReactNode,
+} from 'react'
+
 import {
   characterBloodDyscrasiaCatalog,
   characterBloodResonanceCatalog,
@@ -9,6 +13,7 @@ import type {
 
 interface CharacterBloodExperienceProps {
   blood: CharacterBloodExperienceModel | null
+  actions?: ReactNode
 }
 
 function resonanceLabel(
@@ -106,6 +111,7 @@ function dyscrasiaLabel(
 
 export function CharacterBloodExperience({
   blood,
+  actions,
 }: CharacterBloodExperienceProps) {
   const dyscrasia =
     blood === null
@@ -135,38 +141,42 @@ export function CharacterBloodExperience({
           Estado de Sangre pendiente.
         </p>
       ) : (
-        <div className="blood-experience-grid">
-          <div className="blood-info-card">
-            <span className="blood-info-card__label">
-              {resonanceFieldLabel(blood)}
-            </span>
+        <>
+          <div className="blood-experience-grid">
+            <div className="blood-info-card">
+              <span className="blood-info-card__label">
+                {resonanceFieldLabel(blood)}
+              </span>
 
-            <strong>
-              {resonanceLabel(blood)}
-            </strong>
+              <strong>
+                {resonanceLabel(blood)}
+              </strong>
+            </div>
+
+            <div className="blood-info-card">
+              <span className="blood-info-card__label">
+                Temperamento
+              </span>
+
+              <strong>
+                {temperamentLabel(blood)}
+              </strong>
+            </div>
+
+            <div className="blood-info-card">
+              <span className="blood-info-card__label">
+                Discrasia activa
+              </span>
+
+              <strong>
+                {dyscrasia ??
+                  'Sin Discrasia activa'}
+              </strong>
+            </div>
           </div>
 
-          <div className="blood-info-card">
-            <span className="blood-info-card__label">
-              Temperamento
-            </span>
-
-            <strong>
-              {temperamentLabel(blood)}
-            </strong>
-          </div>
-
-          <div className="blood-info-card">
-            <span className="blood-info-card__label">
-              Discrasia activa
-            </span>
-
-            <strong>
-              {dyscrasia ??
-                'Sin Discrasia activa'}
-            </strong>
-          </div>
-        </div>
+          {actions}
+        </>
       )}
     </section>
   )
