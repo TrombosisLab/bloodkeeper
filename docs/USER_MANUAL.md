@@ -101,6 +101,23 @@ Las operaciones persistidas utilizan control de revisión. Si otra operación ha
 modificado el personaje, la interfaz puede exigir recargar o repetir la
 acción.
 
+### Resonancia y Discrasia
+
+Cuando un vampiro dispone de estado de Sangre compatible, la ficha puede
+mostrar el estado real de la sangre consumida:
+
+- Resonancia activa, cuando existe;
+- Afinidad especial, cuando la fuente no corresponde a una Resonancia humoral;
+- Temperamento;
+- Discrasia activa, cuando existe.
+
+La aplicación no presenta sangre animal ni sangre libre de Resonancia como una
+quinta Resonancia. Un personaje humano no recibe este bloque vampírico.
+
+Las alimentaciones y consumos mecánicos que generan historial se conservan como
+eventos del personaje. La ficha muestra el estado vigente; el historial permite
+conservar la trazabilidad de cambios anteriores.
+
 ### Abrazo y transición vampírica
 
 Un personaje humano de Sesión 0 puede recibir el **Abrazo** mediante la acción
@@ -153,6 +170,13 @@ La acción **Evolucionar personaje** abre las compras permitidas por el sistema.
 
 La interfaz solicita al backend una previsualización del coste y de la validez
 antes de confirmar la compra. El usuario no introduce manualmente el coste.
+
+En una compra de Disciplina compatible, si existe una Discrasia activa capaz de
+aportar el beneficio de Experiencia previsto por las reglas, la interfaz puede
+ofrecer **Usar Discrasia activa**. Es opcional. La previsualización y la compra
+usan la misma elección y el backend calcula el coste efectivo. Cuando el
+beneficio se aplica al confirmar la adquisición, esa Discrasia queda consumida
+para ese uso y no puede reutilizarse como si siguiera activa.
 
 Las operaciones disponibles dependen de los permisos sobre el personaje y de
 su estado.
@@ -260,6 +284,12 @@ Se admiten:
 
 Las tiradas vinculadas a un personaje humano utilizan únicamente dados
 normales: no generan ni sustituyen Dados de Hambre ficticios.
+
+Cuando una tirada vampírica usa una Disciplina asociada a la Resonancia activa,
+el constructor de reserva puede aplicar el modificador correspondiente al
+Temperamento. El backend deriva este modificador desde el estado real del
+personaje y la explicación de la reserva lo refleja; la interfaz no se concede
+el bonus por sí sola.
 
 Los resultados especiales materializados incluyen, cuando proceda:
 

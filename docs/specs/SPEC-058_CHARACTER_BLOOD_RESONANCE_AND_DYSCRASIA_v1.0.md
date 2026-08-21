@@ -8,7 +8,7 @@
 | Documento | `SPEC-058_CHARACTER_BLOOD_RESONANCE_AND_DYSCRASIA_v1.0.md` |
 | Proyecto | BloodKeeper / Vampiro V5 Revolution |
 | Versión | 1.0 |
-| Estado | Aprobada — En desarrollo |
+| Estado | Cerrada |
 | Baseline técnico auditado | `31a2f57c3935fecc5323e506d1dfe36ca6d69b4b` |
 | Rama de desarrollo | `feature/spec-058-blood-resonance` |
 | Worktree aislado | `/home/trombosis/vampiro-v5-revolution-spec058` |
@@ -795,6 +795,24 @@ No incluye:
 - documentación;
 - auditoría final;
 - verificación de que `main` visual no fue mezclado.
+
+### Cierre ejecutado
+
+SPEC-058 quedó cerrada tras verificar:
+
+- cadena completa de implementación 058-A → 058-E4B;
+- catálogos canónicos de Resonancia, Temperamento y Discrasia;
+- persistencia e idempotencia del estado activo y de los consumos;
+- integración con Dados, aprendizaje de Disciplinas, Experiencia e Historial;
+- ficha persistida sin dependencia del demo;
+- opt-in autoritativo para Discrasias de Experiencia;
+- `prisma validate`, typecheck, suites API/Web completas y builds;
+- `scripts/check.sh` sobre el runtime canónico;
+- ausencia de automatización adelantada de SPEC-059;
+- separación íntegra del trabajo visual pendiente de `main`.
+
+El cierre no mezcla las trece rutas visuales mantenidas deliberadamente en
+`main` ni realiza push de la rama de trabajo.
 
 # 19. Pruebas mínimas
 
