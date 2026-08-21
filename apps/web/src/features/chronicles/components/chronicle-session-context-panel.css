@@ -151,3 +151,273 @@
     width: 100%;
   }
 }
+
+/* BEGIN SPEC035D_CONTEXT_VISUAL_REDESIGN */
+.chronicle-session-context-panel {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+  margin-top: var(--space-4);
+  border-top: 0;
+  padding-top: 0;
+}
+
+.chronicle-session-context-panel__heading {
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-translucent);
+  box-shadow: var(--shadow-raised);
+}
+
+.chronicle-session-context-panel__heading > div > span {
+  color: var(--color-text-secondary);
+  opacity: 0.82;
+}
+
+.chronicle-session-context-panel__heading h4 {
+  font-size: clamp(1.25rem, 2vw, 1.55rem);
+}
+
+.chronicle-session-context-panel__count {
+  min-width: 2.35rem;
+  text-align: center;
+  border: 1px solid var(--color-border-accent);
+}
+
+.chronicle-session-context-panel__summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.chronicle-session-context-panel__summary-card {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+  min-height: 5.75rem;
+  align-content: center;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-translucent);
+}
+
+.chronicle-session-context-panel__summary-card > span {
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.chronicle-session-context-panel__summary-card > strong {
+  font-size: 1.05rem;
+}
+
+.chronicle-session-context-panel__summary-card > small {
+  color: var(--color-text-secondary);
+}
+
+.chronicle-session-context-panel__summary-card--events {
+  border-top: 2px solid var(--color-border-accent);
+}
+
+.chronicle-session-context-panel__summary-card--npcs {
+  border-top: 2px solid var(--color-warning);
+}
+
+.chronicle-session-context-panel__summary-card--locations {
+  border-top: 2px solid var(--color-success);
+}
+
+.chronicle-session-context-panel__form {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: var(--space-3);
+  margin-top: 0;
+}
+
+.chronicle-session-context-panel__group {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: start;
+  min-height: 20rem;
+  padding: 0.9rem;
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-translucent);
+}
+
+.chronicle-session-context-panel__group--events {
+  border-top: 2px solid var(--color-border-accent);
+}
+
+.chronicle-session-context-panel__group--npcs {
+  border-top: 2px solid var(--color-warning);
+}
+
+.chronicle-session-context-panel__group--locations {
+  border-top: 2px solid var(--color-success);
+}
+
+.chronicle-session-context-panel__group legend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 100%;
+  padding: 0 var(--space-2);
+}
+
+.chronicle-session-context-panel__group legend span {
+  font-size: 1.02rem;
+}
+
+.chronicle-session-context-panel__group legend small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.65rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-emphasis);
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.chronicle-session-context-panel__options {
+  align-content: start;
+  gap: 0.6rem;
+  max-height: min(32rem, 48vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.15rem;
+}
+
+.chronicle-session-context-panel__option {
+  align-items: start;
+  gap: 0.65rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: var(--radius-control);
+  transition:
+    border-color 120ms ease,
+    background 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.chronicle-session-context-panel__option:hover {
+  border-color: var(--color-border-default);
+  background: var(--color-surface-emphasis);
+}
+
+.chronicle-session-context-panel__option:has(input:checked) {
+  border-color: var(--color-border-accent);
+  background: var(--color-surface-emphasis);
+  box-shadow:
+    inset 3px 0 0
+    var(--color-border-accent);
+}
+
+.chronicle-session-context-panel__option input {
+  margin-top: 0.2rem;
+}
+
+.chronicle-session-context-panel__option > span {
+  min-width: 0;
+}
+
+.chronicle-session-context-panel__option strong {
+  line-height: 1.25;
+}
+
+.chronicle-session-context-panel__option small {
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+  opacity: 0.9;
+}
+
+.chronicle-session-context-panel__option em {
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-emphasis);
+  white-space: nowrap;
+}
+
+.chronicle-session-context-panel__empty {
+  margin: 0;
+  padding: 0.85rem;
+  border: 1px dashed var(--color-border-subtle);
+  border-radius: var(--radius-control);
+}
+
+.chronicle-session-context-panel__notice,
+.chronicle-session-context-panel__error,
+.chronicle-session-context-panel__message {
+  margin: 0;
+}
+
+.chronicle-session-context-panel__footer {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-1);
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-translucent);
+}
+
+.chronicle-session-context-panel__footer p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.chronicle-session-context-panel__footer button {
+  grid-column: auto;
+  justify-self: end;
+  min-width: 12rem;
+}
+
+@media (max-width: 1100px) {
+  .chronicle-session-context-panel__summary,
+  .chronicle-session-context-panel__form {
+    grid-template-columns: 1fr;
+  }
+
+  .chronicle-session-context-panel__group {
+    min-height: auto;
+  }
+
+  .chronicle-session-context-panel__options {
+    max-height: none;
+    overflow-y: visible;
+  }
+}
+
+@media (max-width: 760px) {
+  .chronicle-session-context-panel__summary {
+    gap: var(--space-2);
+  }
+
+  .chronicle-session-context-panel__footer {
+    grid-template-columns: 1fr;
+  }
+
+  .chronicle-session-context-panel__footer button {
+    width: 100%;
+    min-width: 0;
+    justify-self: stretch;
+  }
+
+  .chronicle-session-context-panel__option {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .chronicle-session-context-panel__option em {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+/* END SPEC035D_CONTEXT_VISUAL_REDESIGN */

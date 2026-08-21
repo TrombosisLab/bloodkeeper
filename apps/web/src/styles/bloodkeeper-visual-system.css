@@ -1,0 +1,1341 @@
+/*
+ * BloodKeeper Visual System
+ * Fuente única de identidad visual global.
+ * Usa los tokens semánticos existentes y no contiene reglas de dominio.
+ */
+
+:root {
+  color-scheme: dark;
+
+  --color-canvas: #080808;
+  --color-surface: #101010;
+  --color-surface-raised: #151313;
+  --color-surface-soft: #1b1516;
+  --color-surface-emphasis: #211617;
+  --color-overlay: rgb(6 6 6 / .94);
+
+  --color-text-primary: #f1e8e1;
+  --color-text-secondary: #c6b9b2;
+  --color-text-muted: #8f817b;
+  --color-text-subtle: #716864;
+
+  --color-border-subtle: #292224;
+  --color-border-default: #403134;
+  --color-border-strong: #694248;
+  --color-border-accent: #a93645;
+
+  --color-accent: #b93647;
+  --color-accent-strong: #d0495a;
+  --color-accent-text: #ffd8d1;
+  --color-focus: #eea5ae;
+  --color-accent-glow: rgb(185 54 71 / .14);
+  --color-surface-translucent: rgb(16 13 14 / .92);
+  --color-surface-card: rgb(255 255 255 / .022);
+  --color-surface-hover: #211719;
+  --color-accent-active: #9e3040;
+
+  --ui-bg: var(--color-canvas);
+  --ui-surface: var(--color-surface);
+  --ui-surface-raised: var(--color-surface-raised);
+  --ui-control: #0c0c0c;
+  --ui-border: var(--color-border-default);
+  --ui-border-accent: var(--color-border-accent);
+  --ui-accent: #9b2f3e;
+  --ui-accent-hover: #bd3b4c;
+  --ui-accent-soft: rgb(165 47 64 / .10);
+  --ui-text: var(--color-text-primary);
+  --ui-text-muted: var(--color-text-muted);
+
+  --ui-button-primary-bg: #982d3c;
+  --ui-button-primary-bg-hover: #b93b4c;
+  --ui-button-primary-border: #bd4a59;
+  --ui-button-secondary-bg: #171415;
+  --ui-button-secondary-bg-hover: #231a1c;
+  --ui-button-secondary-border: #49383b;
+  --ui-button-ghost-border: #332a2c;
+  --ui-control-bg: #0c0c0c;
+  --ui-control-border: #413337;
+  --ui-control-border-focus: #c64d5d;
+  --ui-focus-ring: rgb(211 78 94 / .23);
+  --ui-surface-panel-gradient: linear-gradient(145deg, #171314 0%, #111010 70%);
+  --ui-surface-panel-gradient-hover: linear-gradient(145deg, #201718 0%, #141112 70%);
+  --ui-surface-panel-border: #3c2f31;
+}
+
+body {
+  background:
+    radial-gradient(circle at 78% -12%, rgb(128 28 40 / .10), transparent 31rem),
+    linear-gradient(180deg, #090909, #070707 58rem);
+  color: var(--color-text-primary);
+}
+
+/* Marca y marco compartido */
+.app-header {
+  border-bottom-color: var(--color-border-default);
+  background: rgb(8 8 8 / .92);
+}
+
+.app-brand__mark {
+  border-color: rgb(185 54 71 / .58);
+  background: radial-gradient(circle at 35% 30%, #43131c, #100d0e 68%);
+  color: #e65362;
+}
+
+.app-brand strong,
+.app-navigation__heading strong {
+  color: #f3e9e2;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.app-brand span,
+.app-header__status,
+.app-navigation__heading span,
+.app-navigation button small {
+  color: var(--color-text-muted);
+}
+
+.app-navigation-shell {
+  border-right-color: var(--color-border-default);
+  background:
+    linear-gradient(180deg, rgb(12 10 10 / .98), rgb(7 7 7 / .98));
+}
+
+.app-navigation-shell nav button,
+.app-navigation button {
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-text-secondary);
+  box-shadow: none;
+}
+
+.app-navigation-shell nav button:hover,
+.app-navigation button:hover {
+  border-color: var(--color-border-default);
+  background: rgb(255 255 255 / .025);
+  color: var(--color-text-primary);
+}
+
+.app-navigation-shell nav button[aria-current='page'],
+.app-navigation button[aria-current='page'] {
+  border-color: rgb(194 58 75 / .72);
+  background: linear-gradient(90deg, rgb(148 38 52 / .40), rgb(36 18 20 / .24));
+  box-shadow: inset 3px 0 0 #d24758;
+  color: #fff1eb;
+}
+
+/* Una jerarquía común: rojo para acciones primarias y estado activo; neutro para el resto. */
+.dashboard button,
+.character-list-workspace button,
+.chronicle-list-create button,
+.chronicle-detail button {
+  border-color: var(--ui-button-secondary-border);
+  background: var(--ui-button-secondary-bg);
+  box-shadow: none;
+}
+
+.dashboard button:hover,
+.character-list-workspace button:hover,
+.chronicle-list-create button:hover,
+.chronicle-detail button:hover {
+  border-color: #765156;
+  background: var(--ui-button-secondary-bg-hover);
+  filter: none;
+}
+
+.dashboard button[data-ui-variant='primary'],
+.character-list-workspace__primary,
+.creation-button--primary,
+.chronicle-detail button.chronicle-detail__primary-action {
+  border-color: var(--ui-button-primary-border);
+  background: linear-gradient(180deg, var(--ui-button-primary-bg-hover), var(--ui-button-primary-bg));
+  color: #fff4ef;
+}
+
+/* Paneles: negro profundo dominante; solo un leve tinte en cabeceras o estados. */
+.dashboard-panel,
+.character-list-card,
+.administration-hub__card,
+.administration-hub__backup-card,
+.administration-hub__operations-card,
+.administration-hub__users-card,
+.chronicle-card,
+.chronicle-detail__summary,
+.chronicle-detail__panel,
+.chronicle-session-panel,
+.chronicle-event-panel,
+.chronicle-location-panel,
+.chronicle-npc-panel,
+.chronicle-resources-workspace__panel,
+.chronicle-session-attendance,
+.chronicle-session-context-panel,
+.dice-roll-panel,
+.dice-history-panel {
+  border-color: var(--ui-surface-panel-border);
+  background: var(--ui-surface-panel-gradient);
+  box-shadow: 0 .9rem 2.4rem rgb(0 0 0 / .20);
+}
+
+.character-list-card:hover,
+.chronicle-card:hover,
+.dashboard-chronicles article:hover,
+.administration-hub__card:hover {
+  border-color: #67454a;
+  transform: none;
+}
+
+.character-list-card__status,
+.administration-hub__count,
+.chronicle-detail__status,
+.chronicle-session-panel__count,
+.chronicle-session-attendance__count,
+.chronicle-session-context-panel__count {
+  background: rgb(126 36 48 / .22);
+  border-color: rgb(197 67 83 / .42);
+  color: #f6d7d1;
+}
+
+/* Tipografía editorial únicamente en títulos, nunca en datos operativos. */
+h1,
+h2,
+h3,
+.sheet-header h1,
+.creation-header h1,
+.character-list-card__identity h3,
+.chronicle-card h3,
+.dashboard-panel h2,
+.dashboard-panel h3,
+.administration-hub h2,
+.administration-hub h3 {
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+input,
+textarea,
+select,
+.character-list-workspace input,
+.character-list-workspace select,
+.administration-hub input,
+.administration-hub select,
+.administration-hub textarea,
+.character-sheet input,
+.character-sheet select,
+.character-sheet textarea,
+.creation-page input,
+.creation-page select,
+.creation-page textarea,
+.chronicle-detail input,
+.chronicle-detail textarea,
+.chronicle-detail select {
+  background: var(--ui-control-bg);
+  border-color: var(--ui-control-border);
+  color: var(--color-text-primary);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--ui-control-border-focus);
+  box-shadow: 0 0 0 3px var(--ui-focus-ring);
+}
+
+/* La ficha conserva su jerarquía, pero evita el tinte rojo continuo. */
+.sheet-header {
+  background: linear-gradient(145deg, #1c1416, #121011 72%);
+  border-color: var(--color-border-default);
+}
+
+.sheet-section,
+.state-card,
+.discipline-card,
+.narrative-panel,
+.secondary-panel,
+.creation-sidebar,
+.creation-workspace,
+.creation-card,
+.creation-step-section,
+.creation-placeholder {
+  border-color: var(--color-border-default);
+  box-shadow: none;
+}
+
+/* BLOODKEEPER_REFINEMENT_V1_START */
+/* Refinamiento de jerarquía y densidad dentro del sistema visual único. */
+
+.dashboard {
+  gap: clamp(1.1rem, 2vw, 1.5rem);
+}
+
+.dashboard__header {
+  max-width: 62rem;
+}
+
+.dashboard__eyebrow,
+.dashboard-panel__heading span {
+  color: #bd6974;
+  font-weight: 800;
+}
+
+.dashboard-panel {
+  min-height: 0;
+}
+
+.dashboard-panel--characters,
+.dashboard-panel--chronicles {
+  border-color: #3c2f31;
+}
+
+.dashboard-panel--characters .dashboard-panel__characters-action,
+.dashboard-panel--chronicles .dashboard-panel__heading > button {
+  border-color: var(--ui-button-primary-border);
+  background: linear-gradient(180deg, var(--ui-button-primary-bg-hover), var(--ui-button-primary-bg));
+  color: #fff4ef;
+}
+
+.dashboard-panel--characters .dashboard-panel__characters-action:hover,
+.dashboard-panel--chronicles .dashboard-panel__heading > button:hover {
+  border-color: #e36a78;
+  background: linear-gradient(180deg, #c94658, #a63041);
+}
+
+.dashboard-chronicles article {
+  border-color: #30292b;
+  background: rgb(255 255 255 / .018);
+}
+
+.dashboard-chronicles article:hover {
+  border-color: #5b3d42;
+  background: rgb(255 255 255 / .028);
+}
+
+.character-list-workspace__header {
+  padding-bottom: .1rem;
+  border-bottom: 1px solid #292224;
+}
+
+.character-list-card {
+  border-color: #342b2d;
+  background: linear-gradient(90deg, rgb(255 255 255 / .022), transparent 46%);
+}
+
+.character-list-card:hover {
+  border-color: #624046;
+  background: linear-gradient(90deg, rgb(185 54 71 / .08), transparent 46%);
+}
+
+.character-list-card__status {
+  width: fit-content;
+  margin-bottom: .3rem;
+  padding: .16rem .46rem;
+  border: 1px solid rgb(185 54 71 / .32);
+  border-radius: 999px;
+  background: rgb(125 35 48 / .16);
+  color: #efc1b9;
+  font-size: .7rem;
+  line-height: 1.15;
+}
+
+.character-list-card__identity h3 {
+  color: #f1e8e1;
+}
+
+.character-list-card__updated {
+  color: var(--color-text-muted);
+  font-size: .82rem;
+}
+
+.chronicle-session-panel {
+  padding: clamp(1rem, 2vw, 1.35rem);
+}
+
+.chronicle-session-panel__create-launcher {
+  border-color: #3d2f32 !important;
+  background: linear-gradient(90deg, rgb(255 255 255 / .022), transparent) !important;
+}
+
+.chronicle-session-panel__workspace-layout {
+  gap: clamp(.9rem, 1.5vw, 1.25rem);
+}
+
+.chronicle-session-panel__browser,
+.chronicle-session-panel__workspace {
+  border-color: #382d2f;
+  background: #111010;
+}
+
+.chronicle-session-panel__item {
+  border-color: #30282a;
+  background: rgb(255 255 255 / .014);
+}
+
+.chronicle-session-panel__item--selected {
+  border-color: #b43b4c;
+  background: linear-gradient(135deg, rgb(156 43 57 / .20), rgb(255 255 255 / .018));
+  box-shadow: inset 3px 0 0 #d24758;
+}
+
+.chronicle-session-panel__workspace-heading {
+  background: linear-gradient(90deg, rgb(255 255 255 / .022), transparent);
+}
+
+.chronicle-session-panel__workspace-tab--active {
+  background: rgb(169 48 64 / .14) !important;
+  box-shadow: inset 0 -2px 0 #d24758;
+}
+
+.chronicle-session-panel__detail-section {
+  border-color: #332a2c;
+  background: #0f0e0e;
+}
+
+.chronicle-session-panel__detail-section-heading {
+  color: #f0e4dd;
+}
+
+@media (max-width: 760px) {
+  .dashboard-panel--chronicles .dashboard-panel__heading > button,
+  .dashboard-panel--characters .dashboard-panel__characters-action {
+    width: 100%;
+  }
+
+  .character-list-workspace__header {
+    padding-bottom: .7rem;
+  }
+}
+/* BLOODKEEPER_REFINEMENT_V1_END */
+
+/* BLOODKEEPER_COMPOSITION_V1_START */
+/* Composición y navegación: usa únicamente contenido y acciones existentes. */
+
+.app-header {
+  min-height: 4.25rem;
+  padding-inline: clamp(1rem, 2vw, 1.75rem);
+}
+
+.app-navigation-shell {
+  padding: 1.2rem 1rem 1rem;
+}
+
+.app-navigation__heading {
+  position: relative;
+  margin-bottom: 1.35rem;
+  padding: .15rem .1rem 1rem;
+  border-bottom: 1px solid #2c2426;
+}
+
+.app-navigation__heading::after {
+  position: absolute;
+  bottom: -1px;
+  left: .1rem;
+  width: 3rem;
+  height: 2px;
+  background: #bf3e50;
+  content: '';
+}
+
+.app-navigation__heading span {
+  color: #bf6974;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+
+.app-navigation__heading strong {
+  font-size: 1.18rem;
+  letter-spacing: .015em;
+}
+
+.app-navigation {
+  gap: .28rem;
+}
+
+.app-navigation button {
+  min-height: 3.25rem;
+  padding: .65rem .78rem;
+}
+
+.app-navigation button small {
+  margin-top: .05rem;
+  color: #817570;
+  font-size: .72rem;
+}
+
+.app-navigation button[aria-current='page'] small {
+  color: #d3b4ad;
+}
+
+.dashboard {
+  gap: 1.2rem;
+  max-width: 92rem;
+}
+
+.dashboard__header {
+  position: relative;
+  gap: .42rem;
+  max-width: 58rem;
+  padding: .25rem 0 .9rem;
+  border-bottom: 1px solid #292224;
+}
+
+.dashboard__header::after {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 4rem;
+  height: 2px;
+  background: #bd3b4c;
+  content: '';
+}
+
+.dashboard__header h1 {
+  font-size: clamp(2rem, 3vw, 3rem);
+  line-height: 1.05;
+}
+
+.dashboard__header > p {
+  max-width: 56ch;
+  color: #c6b9b2;
+}
+
+.dashboard__grid {
+  grid-template-columns: minmax(0, 1.06fr) minmax(20rem, .94fr);
+  gap: 1rem;
+}
+
+.dashboard-panel {
+  min-height: 14rem;
+  padding: clamp(1.1rem, 2vw, 1.45rem);
+}
+
+.dashboard-panel--characters {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 100% 0%, rgb(177 48 65 / .12), transparent 42%),
+    var(--ui-surface-panel-gradient);
+}
+
+.dashboard-panel--characters::after {
+  position: absolute;
+  right: 1.2rem;
+  bottom: 1rem;
+  color: rgb(230 110 123 / .16);
+  content: 'V5';
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.dashboard-panel--characters > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-panel--characters > p {
+  max-width: 38ch;
+}
+
+.dashboard-panel--chronicles {
+  min-height: 0;
+}
+
+.dashboard-panel--chronicles .dashboard-panel__heading {
+  align-items: center;
+}
+
+.dashboard-chronicles article {
+  padding: .72rem .78rem;
+}
+
+.dashboard-chronicles article > div span {
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+.character-list-workspace {
+  max-width: 92rem;
+}
+
+.character-list__heading {
+  padding-bottom: .55rem;
+  border-bottom: 1px solid #292224;
+}
+
+.character-list-card__identity {
+  position: relative;
+}
+
+.character-list-card__identity::before {
+  position: absolute;
+  top: .08rem;
+  bottom: .08rem;
+  left: -.62rem;
+  width: 2px;
+  border-radius: 999px;
+  background: rgb(189 59 76 / .62);
+  content: '';
+}
+
+.character-list-card__concept {
+  color: #b8aaa4;
+}
+
+.chronicle-session-panel__workspace-layout {
+  grid-template-columns: minmax(17rem, .32fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.chronicle-session-panel__workspace-empty {
+  min-height: 16rem;
+  background:
+    radial-gradient(circle at 50% 34%, rgb(184 54 71 / .08), transparent 14rem),
+    #101010;
+}
+
+.chronicle-session-panel__workspace-empty > span {
+  color: #bb6b75;
+  font-weight: 800;
+}
+
+.chronicle-session-panel__workspace-empty p {
+  max-width: 45ch;
+}
+
+.chronicle-session-panel__workspace-heading {
+  padding: 1rem 1.15rem;
+}
+
+.chronicle-session-panel__workspace-panel {
+  padding: 1.15rem;
+}
+
+@media (max-width: 1100px) {
+  .dashboard__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-panel {
+    min-height: 0;
+  }
+
+  .chronicle-session-panel__workspace-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-header {
+    min-height: 3.75rem;
+  }
+
+  .app-navigation__heading {
+    margin-bottom: .8rem;
+  }
+
+  .dashboard__header h1 {
+    font-size: 2rem;
+  }
+
+  .dashboard-panel--characters::after {
+    right: .75rem;
+    bottom: .6rem;
+    font-size: 2.8rem;
+  }
+
+  .character-list-card__identity::before {
+    display: none;
+  }
+}
+/* BLOODKEEPER_COMPOSITION_V1_END */
+
+/* BLOODKEEPER_REMAINING_UNIFICATION_V1_START */
+/* Administración, autenticación, dados, creación y ficha. Solo presentación. */
+
+.administration-hub {
+  max-width: 92rem;
+  gap: 1.15rem;
+}
+
+.administration-hub__header {
+  padding-bottom: .85rem;
+  border-bottom: 1px solid #292224;
+}
+
+.administration-hub__tabs {
+  gap: .35rem;
+  padding: .35rem;
+  border: 1px solid #302729;
+  border-radius: .7rem;
+  background: #0e0d0d;
+}
+
+.administration-hub__tab {
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: .45rem;
+  color: #a99a95;
+  padding: .62rem .85rem;
+}
+
+.administration-hub__tab--active {
+  border-color: #7a404a;
+  background: rgb(165 47 64 / .18);
+  color: #fff0eb;
+}
+
+.administration-hub__card,
+.administration-hub__backup-card,
+.administration-hub__operations-card,
+.administration-hub__users-card {
+  border-color: #3b2f31;
+  background: var(--ui-surface-panel-gradient);
+  box-shadow: none;
+}
+
+.administration-hub__create-launcher {
+  border-color: #3a2f31;
+  background: linear-gradient(90deg, rgb(255 255 255 / .02), transparent);
+}
+
+.administration-hub__user {
+  border-bottom-color: #2e2729;
+}
+
+.administration-hub__user:hover {
+  background: rgb(255 255 255 / .014);
+}
+
+.administration-hub__role-toggle {
+  border-color: #413437;
+  background: #121011;
+  color: #c8b9b3;
+}
+
+.administration-hub__role-toggle--active {
+  border-color: #a23b4a;
+  background: rgb(161 47 64 / .16);
+  color: #f5d9d2;
+}
+
+.administration-hub__diagnostics > div {
+  border-color: #342a2c;
+  background: #101010;
+}
+
+.authentication-shell {
+  background:
+    radial-gradient(circle at 50% 0%, rgb(180 50 67 / .15), transparent 28rem),
+    linear-gradient(180deg, #0b0a0a, #070707);
+}
+
+.authentication-card {
+  border-color: #493337;
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / .025), transparent 48%),
+    #121011;
+  box-shadow: 0 1.8rem 4.8rem rgb(0 0 0 / .42);
+}
+
+.authentication-card h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.authentication-card button {
+  border-color: var(--ui-button-primary-border);
+  background: linear-gradient(180deg, var(--ui-button-primary-bg-hover), var(--ui-button-primary-bg));
+  color: #fff4ef;
+}
+
+.dice-roll-panel,
+.dice-history-panel {
+  width: auto;
+  max-width: 92rem;
+  margin-inline: clamp(1rem, 2vw, 2rem);
+  border-color: #3b2f31;
+  background: var(--ui-surface-panel-gradient);
+  box-shadow: none;
+}
+
+.dice-roll-panel__header span,
+.dice-history-panel__heading span {
+  color: #bd6974;
+}
+
+.dice-pool-preview__parts li,
+.dice-pool-preview__totals div,
+.dice-history-panel__filters,
+.dice-history-panel__item {
+  border-color: #352a2c;
+  background: #101010;
+}
+
+.dice-history-panel__summary:hover {
+  background: rgb(177 48 65 / .09);
+}
+
+.dice-roll-result__die {
+  border-color: #665055;
+  background: #ebe2da;
+  box-shadow: 0 .35rem .8rem rgb(0 0 0 / .18);
+}
+
+.dice-roll-result__die--hunger {
+  border-color: #bd4a59;
+  background: linear-gradient(145deg, #9a3444, #40161d);
+}
+
+.creation-page {
+  max-width: 92rem;
+}
+
+.creation-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #292224;
+}
+
+.creation-layout {
+  overflow: hidden;
+  border-color: #3b2f31;
+  border-radius: .85rem;
+  background: #3b2f31;
+  box-shadow: 0 1rem 2.6rem rgb(0 0 0 / .18);
+}
+
+.creation-sidebar,
+.creation-workspace {
+  background: #111010;
+}
+
+.creation-sidebar {
+  background:
+    linear-gradient(180deg, rgb(178 48 65 / .08), transparent 28%),
+    #111010;
+}
+
+.creation-sidebar__heading {
+  border-bottom-color: #302729;
+}
+
+.creation-progress__step {
+  color: #9c8e89;
+}
+
+.creation-progress__step--active {
+  border-left-color: #d24758;
+  background: linear-gradient(90deg, rgb(179 51 68 / .16), transparent);
+  color: #fff0eb;
+}
+
+.creation-progress__number {
+  color: #d28a94;
+}
+
+.creation-actions {
+  border-top-color: #302729;
+  background: #0e0d0d;
+}
+
+.creation-button--primary {
+  border-color: var(--ui-button-primary-border);
+  background: linear-gradient(180deg, var(--ui-button-primary-bg-hover), var(--ui-button-primary-bg));
+  color: #fff4ef;
+}
+
+.creation-step-section,
+.creation-card,
+.skill-method-card,
+.discipline-editor-card,
+.advantage-catalog-card {
+  border-color: #382d2f;
+  background: #121011;
+  box-shadow: none;
+}
+
+.character-sheet {
+  max-width: 92rem;
+}
+
+.sheet-section {
+  border-color: #3a2f31;
+  background: linear-gradient(145deg, rgb(255 255 255 / .018), transparent 56%);
+}
+
+.state-card,
+.discipline-card,
+.trait-group,
+.narrative-panel,
+.secondary-panel {
+  border-color: #342a2c;
+  background: #111010;
+  box-shadow: none;
+}
+
+.state-card__heading,
+.discipline-card__header,
+.trait-group__header,
+.narrative-panel header,
+.secondary-panel > header {
+  border-bottom-color: #302729;
+}
+
+.discipline-card:hover,
+.trait-group:hover,
+.narrative-panel:hover,
+.secondary-panel:hover {
+  border-color: #5a3b40;
+}
+
+@media (max-width: 760px) {
+  .administration-hub__tabs {
+    padding: .28rem;
+  }
+
+  .dice-roll-panel,
+  .dice-history-panel {
+    margin-inline: 1rem;
+  }
+
+  .creation-layout {
+    border-radius: .65rem;
+  }
+
+  .creation-progress__step--active {
+    border-left-color: transparent;
+    border-bottom-color: #d24758;
+  }
+}
+/* BLOODKEEPER_REMAINING_UNIFICATION_V1_END */
+
+/* BLOODKEEPER_CREATION_CARDS_V1_START
+   Tarjetas de elección inspiradas en la composición de Progeny.
+   Sólo presentación: no modifica datos, flujo ni reglas de creación. */
+
+.creation-mode-selector .creation-workspace {
+  position: relative;
+  overflow: hidden;
+}
+
+.creation-mode-selector__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
+  margin-top: 1.5rem;
+}
+
+.creation-mode-selector__option {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-height: 22rem;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  overflow: hidden;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border: 1px solid rgba(138, 29, 29, 0.62);
+  border-radius: 0.75rem;
+  background:
+    linear-gradient(145deg, rgba(38, 8, 10, 0.96), rgba(12, 9, 10, 0.99));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 232, 218, 0.07),
+    0 1.2rem 3rem rgba(0, 0, 0, 0.26);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.creation-mode-selector__option::before {
+  position: absolute;
+  right: -0.05em;
+  bottom: -0.28em;
+  z-index: -1;
+  color: rgba(171, 31, 31, 0.12);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(12rem, 26vw, 21rem);
+  font-weight: 700;
+  line-height: 0.72;
+  pointer-events: none;
+}
+
+.creation-mode-selector__option:first-child::before {
+  content: "V";
+}
+
+.creation-mode-selector__option:nth-child(2) {
+  border-color: rgba(133, 102, 41, 0.68);
+  background:
+    linear-gradient(145deg, rgba(37, 25, 10, 0.95), rgba(12, 9, 10, 0.99));
+}
+
+.creation-mode-selector__option:nth-child(2)::before {
+  content: "0";
+  color: rgba(179, 132, 50, 0.13);
+}
+
+.creation-mode-selector__option:hover {
+  border-color: rgba(225, 62, 62, 0.88);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 232, 218, 0.1),
+    0 1.5rem 3.5rem rgba(0, 0, 0, 0.36),
+    0 0 2rem rgba(134, 19, 25, 0.16);
+  transform: translateY(-0.2rem);
+}
+
+.creation-mode-selector__option:nth-child(2):hover {
+  border-color: rgba(207, 151, 49, 0.84);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 241, 202, 0.1),
+    0 1.5rem 3.5rem rgba(0, 0, 0, 0.36),
+    0 0 2rem rgba(151, 101, 17, 0.15);
+}
+
+.creation-mode-selector__option > div {
+  max-width: 29rem;
+}
+
+.creation-mode-selector__option > div > span {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 1rem;
+  padding: 0.32rem 0.58rem;
+  border: 1px solid rgba(226, 66, 66, 0.45);
+  border-radius: 999px;
+  color: #f05a5a;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.creation-mode-selector__option:nth-child(2) > div > span {
+  border-color: rgba(211, 163, 66, 0.46);
+  color: #dfb757;
+}
+
+.creation-mode-selector__option h3 {
+  margin: 0;
+  color: #f7eee7;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.65rem, 2.5vw, 2.25rem);
+  line-height: 1.08;
+}
+
+.creation-mode-selector__option p {
+  max-width: 34rem;
+  margin: 1rem 0 0;
+  color: rgba(230, 219, 211, 0.8);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.creation-mode-selector__option .creation-button {
+  width: 100%;
+  min-height: 3.2rem;
+  border-color: rgba(211, 51, 51, 0.82);
+  box-shadow: 0 0.75rem 1.8rem rgba(0, 0, 0, 0.24);
+}
+
+.creation-mode-selector__option:nth-child(2) .creation-button {
+  border-color: rgba(183, 130, 35, 0.82);
+  background:
+    linear-gradient(135deg, rgba(113, 68, 12, 0.96), rgba(53, 31, 8, 0.98));
+}
+
+.disciplines-step__clan {
+  border-color: rgba(134, 31, 31, 0.6);
+  background:
+    linear-gradient(135deg, rgba(48, 10, 13, 0.88), rgba(17, 11, 12, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 234, 224, 0.06);
+}
+
+.discipline-editor-grid {
+  gap: 1rem;
+}
+
+.discipline-editor-card {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(105, 40, 40, 0.62);
+  background:
+    linear-gradient(145deg, rgba(29, 15, 17, 0.98), rgba(13, 10, 11, 0.99));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 234, 224, 0.045),
+    0 0.8rem 1.8rem rgba(0, 0, 0, 0.16);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.discipline-editor-card::before {
+  content: "◇";
+  position: absolute;
+  right: 0.55rem;
+  bottom: -0.44rem;
+  color: rgba(175, 35, 35, 0.1);
+  font-size: 7.5rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.discipline-editor-card:hover {
+  border-color: rgba(181, 52, 52, 0.82);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 234, 224, 0.07),
+    0 1rem 2rem rgba(0, 0, 0, 0.24);
+  transform: translateY(-0.12rem);
+}
+
+.discipline-editor-card--selected {
+  border-color: rgba(222, 63, 63, 0.92);
+  background:
+    linear-gradient(145deg, rgba(70, 14, 18, 0.96), rgba(23, 10, 12, 0.99));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 237, 226, 0.08),
+    0 0 1.5rem rgba(148, 23, 28, 0.18);
+}
+
+.discipline-editor-card__heading {
+  position: relative;
+}
+
+.discipline-editor-card__heading > strong {
+  border-color: rgba(225, 74, 74, 0.56);
+  background: rgba(82, 16, 19, 0.58);
+  color: #ffd0c6;
+}
+
+.discipline-editor-card__control {
+  position: relative;
+  border-color: rgba(139, 49, 49, 0.5);
+  background: rgba(8, 7, 8, 0.56);
+}
+
+.discipline-editor-card__control button:not(:disabled):hover {
+  background: rgba(146, 26, 31, 0.6);
+  color: #fff5ee;
+}
+
+.discipline-power-option {
+  border-color: rgba(109, 42, 42, 0.56);
+  background:
+    linear-gradient(145deg, rgba(27, 14, 16, 0.98), rgba(13, 10, 11, 0.99));
+}
+
+.discipline-power-option:hover:not(:disabled) {
+  border-color: rgba(184, 53, 53, 0.82);
+  background: rgba(67, 15, 19, 0.88);
+}
+
+.discipline-power-option--selected {
+  border-color: rgba(224, 68, 68, 0.9);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 187, 168, 0.12),
+    0 0 1.25rem rgba(141, 21, 26, 0.16);
+}
+
+@media (max-width: 760px) {
+  .creation-mode-selector__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .creation-mode-selector__option {
+    min-height: 18rem;
+  }
+
+  .creation-mode-selector__option::before {
+    font-size: 13rem;
+  }
+}
+/* BLOODKEEPER_CREATION_CARDS_V1_END */
+
+/* BLOODKEEPER_CLAN_CARDS_V1_START
+   Selector visual de clan. Sólo representación del catálogo canónico. */
+
+.clan-card-selector {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.clan-card-selector > legend {
+  padding: 0;
+  color: #f2e8df;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.clan-card-selector__help {
+  max-width: 52rem;
+  margin: 0.55rem 0 1rem;
+  color: rgba(230, 219, 211, 0.73);
+  line-height: 1.55;
+}
+
+.clan-card-selector__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.clan-card-selector__card {
+  position: relative;
+  display: flex;
+  min-height: 12.5rem;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+  padding: 1rem;
+  border: 1px solid rgba(111, 42, 42, 0.62);
+  border-radius: 0.6rem;
+  background:
+    linear-gradient(145deg, rgba(30, 15, 17, 0.98), rgba(13, 10, 11, 0.99));
+  color: #f4ece5;
+  text-align: left;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 234, 224, 0.045),
+    0 0.65rem 1.4rem rgba(0, 0, 0, 0.14);
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.clan-card-selector__card::after {
+  content: "◇";
+  position: absolute;
+  right: -0.08em;
+  bottom: -0.42em;
+  color: rgba(174, 37, 37, 0.1);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 7rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.clan-card-selector__card:hover {
+  border-color: rgba(192, 55, 55, 0.86);
+  background:
+    linear-gradient(145deg, rgba(61, 14, 18, 0.97), rgba(18, 10, 12, 0.99));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 234, 224, 0.08),
+    0 1rem 1.9rem rgba(0, 0, 0, 0.24);
+  transform: translateY(-0.14rem);
+}
+
+.clan-card-selector__card:focus-visible,
+.clan-card-selector__clear:focus-visible {
+  outline: 2px solid #f5d18a;
+  outline-offset: 3px;
+}
+
+.clan-card-selector__card--selected {
+  border-color: rgba(232, 72, 72, 0.96);
+  background:
+    linear-gradient(145deg, rgba(81, 15, 20, 0.98), rgba(28, 10, 13, 0.99));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 195, 176, 0.13),
+    0 0 1.5rem rgba(150, 23, 29, 0.2);
+}
+
+.clan-card-selector__card--selected::after {
+  color: rgba(238, 73, 73, 0.18);
+}
+
+.clan-card-selector__kind,
+.clan-card-selector__disciplines-label {
+  position: relative;
+  z-index: 1;
+  color: #da6d61;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.clan-card-selector__card strong {
+  position: relative;
+  z-index: 1;
+  margin-top: 0.4rem;
+  color: #f7eee7;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.2rem;
+  line-height: 1.1;
+}
+
+.clan-card-selector__disciplines-label {
+  margin-top: auto;
+  padding-top: 1.2rem;
+  color: rgba(223, 193, 179, 0.68);
+}
+
+.clan-card-selector__disciplines {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.32rem;
+  margin-top: 0.45rem;
+}
+
+.clan-card-selector__disciplines > span {
+  padding: 0.22rem 0.38rem;
+  border: 1px solid rgba(177, 76, 76, 0.34);
+  border-radius: 999px;
+  background: rgba(8, 7, 8, 0.42);
+  color: rgba(240, 228, 220, 0.84);
+  font-size: 0.7rem;
+  line-height: 1.15;
+}
+
+.clan-card-selector__clear {
+  margin-top: 0.9rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(224, 190, 174, 0.84);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.clan-card-selector__clear:hover:not(:disabled) {
+  color: #fff1e8;
+}
+
+.clan-card-selector__clear:disabled {
+  color: rgba(224, 190, 174, 0.38);
+  cursor: not-allowed;
+}
+
+@media (max-width: 1120px) {
+  .clan-card-selector__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .clan-card-selector__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .clan-card-selector__card {
+    min-height: 11.5rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .clan-card-selector__grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* BLOODKEEPER_CLAN_CARDS_V1_END */

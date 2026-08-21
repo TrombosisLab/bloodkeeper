@@ -7,8 +7,8 @@ export function AppHeader() {
         </span>
 
         <div>
-          <strong>Vampiro V5 Revolution</strong>
-          <span>Gestión de crónicas</span>
+          <strong>BloodKeeper</strong>
+          <span>Vampiro V5 Revolution</span>
         </div>
       </div>
 

@@ -178,3 +178,72 @@ test(
     }
   },
 )
+
+test(
+  'UX Preparación presenta resumen real y tres columnas de contexto',
+  () => {
+    for (const marker of [
+      'chronicle-session-context-panel__summary',
+      'chronicle-session-context-panel__summary-card--events',
+      'chronicle-session-context-panel__summary-card--npcs',
+      'chronicle-session-context-panel__summary-card--locations',
+      'chronicle-session-context-panel__group--events',
+      'chronicle-session-context-panel__group--npcs',
+      'chronicle-session-context-panel__group--locations',
+    ]) {
+      assert.match(
+        panel,
+        new RegExp(marker),
+      )
+    }
+
+    assert.match(
+      panel,
+      /\{eventIds\.length\} seleccionados/,
+    )
+    assert.match(
+      panel,
+      /\{npcIds\.length\} seleccionados/,
+    )
+    assert.match(
+      panel,
+      /\{locationIds\.length\} seleccionadas/,
+    )
+  },
+)
+
+test(
+  'UX Preparación conserva guardado real y no inventa búsqueda ni navegación',
+  () => {
+    assert.match(
+      panel,
+      /chronicle-session-context-panel__footer/,
+    )
+    assert.match(
+      panel,
+      /type="submit"[\s\S]*Guardar contexto/,
+    )
+    assert.doesNotMatch(
+      panel,
+      /type="search"|Buscar Eventos|Buscar PNJ|Buscar Localizaciones|Ver todos/,
+    )
+  },
+)
+
+test(
+  'UX Preparación usa columnas compactas con scroll sólo en escritorio',
+  () => {
+    assert.match(
+      styles,
+      /\.chronicle-session-context-panel__form\s*\{[\s\S]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/,
+    )
+    assert.match(
+      styles,
+      /\.chronicle-session-context-panel__options\s*\{[\s\S]*max-height:[\s\S]*overflow-y:\s*auto/,
+    )
+    assert.match(
+      styles,
+      /@media \(max-width:\s*1100px\)[\s\S]*\.chronicle-session-context-panel__options[\s\S]*max-height:\s*none[\s\S]*overflow-y:\s*visible/,
+    )
+  },
+)

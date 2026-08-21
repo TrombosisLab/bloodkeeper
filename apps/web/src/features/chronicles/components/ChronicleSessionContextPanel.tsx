@@ -608,6 +608,47 @@ export function ChronicleSessionContextPanel({
         </span>
       </div>
 
+      <div
+        className="chronicle-session-context-panel__summary"
+        aria-label="Resumen del contexto seleccionado"
+      >
+        <article
+          className="chronicle-session-context-panel__summary-card chronicle-session-context-panel__summary-card--events"
+        >
+          <span>Eventos</span>
+          <strong>
+            {eventIds.length} seleccionados
+          </strong>
+          <small>
+            {eventOptions.length} en el selector
+          </small>
+        </article>
+
+        <article
+          className="chronicle-session-context-panel__summary-card chronicle-session-context-panel__summary-card--npcs"
+        >
+          <span>PNJ</span>
+          <strong>
+            {npcIds.length} seleccionados
+          </strong>
+          <small>
+            {npcOptions.length} en el selector
+          </small>
+        </article>
+
+        <article
+          className="chronicle-session-context-panel__summary-card chronicle-session-context-panel__summary-card--locations"
+        >
+          <span>Localizaciones</span>
+          <strong>
+            {locationIds.length} seleccionadas
+          </strong>
+          <small>
+            {locationOptions.length} en el selector
+          </small>
+        </article>
+      </div>
+
       {readOnly ? (
         <p className="chronicle-session-context-panel__notice">
           La Sesión está archivada. Sus recursos vinculados se conservan como historial y son sólo de consulta.
@@ -637,13 +678,17 @@ export function ChronicleSessionContextPanel({
           onSubmit={saveContext}
         >
           <fieldset
+            className="chronicle-session-context-panel__group chronicle-session-context-panel__group--events"
             disabled={
               readOnly ||
               saving
             }
           >
             <legend>
-              Eventos
+              <span>Eventos</span>
+              <small>
+                {eventIds.length} / {eventOptions.length}
+              </small>
             </legend>
 
             {optionList(
@@ -655,13 +700,17 @@ export function ChronicleSessionContextPanel({
           </fieldset>
 
           <fieldset
+            className="chronicle-session-context-panel__group chronicle-session-context-panel__group--npcs"
             disabled={
               readOnly ||
               saving
             }
           >
             <legend>
-              PNJ
+              <span>PNJ</span>
+              <small>
+                {npcIds.length} / {npcOptions.length}
+              </small>
             </legend>
 
             {optionList(
@@ -673,13 +722,17 @@ export function ChronicleSessionContextPanel({
           </fieldset>
 
           <fieldset
+            className="chronicle-session-context-panel__group chronicle-session-context-panel__group--locations"
             disabled={
               readOnly ||
               saving
             }
           >
             <legend>
-              Localizaciones
+              <span>Localizaciones</span>
+              <small>
+                {locationIds.length} / {locationOptions.length}
+              </small>
             </legend>
 
             {optionList(
@@ -691,14 +744,20 @@ export function ChronicleSessionContextPanel({
           </fieldset>
 
           {!readOnly ? (
-            <button
-              type="submit"
-              disabled={saving}
-            >
-              {saving
-                ? 'Guardando contexto…'
-                : 'Guardar contexto'}
-            </button>
+            <div className="chronicle-session-context-panel__footer">
+              <p>
+                Los cambios se aplican únicamente al contexto de esta sesión.
+              </p>
+
+              <button
+                type="submit"
+                disabled={saving}
+              >
+                {saving
+                  ? 'Guardando contexto…'
+                  : 'Guardar contexto'}
+              </button>
+            </div>
           ) : null}
         </form>
       )}

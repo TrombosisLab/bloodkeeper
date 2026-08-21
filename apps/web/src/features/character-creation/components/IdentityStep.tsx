@@ -7,6 +7,10 @@ import {
 } from '../data/clan-definitions'
 
 import {
+  disciplineDefinitions,
+} from '../data/discipline-definitions'
+
+import {
   generationOptions,
 } from '../data/identity-options'
 
@@ -106,21 +110,23 @@ export function IdentityStep({
   }
 
   function updateClan(
-    event: ChangeEvent<
-      HTMLSelectElement
-    >,
+    clan: ClanKey | null,
   ) {
-    const rawValue =
-      event.target.value
-
     onChange({
       ...value,
-
-      clan:
-        rawValue === ''
-          ? null
-          : rawValue as ClanKey,
+      clan,
     })
+  }
+
+  function getDisciplineName(
+    key: string,
+  ): string {
+    return (
+      disciplineDefinitions.find(
+        discipline =>
+          discipline.key === key,
+      )?.name ?? key
+    )
   }
 
   function updateGeneration(
@@ -201,32 +207,75 @@ export function IdentityStep({
 
         {!sessionZero ? (
           <>
-        <label className="creation-field">
-          <span>Clan</span>
+        <fieldset className="creation-field creation-field--wide clan-card-selector">
+          <legend>Clan</legend>
 
-          <select
-            name="clan"
-            value={
-              value.clan ?? ''
-            }
-            onChange={updateClan}
-          >
-            <option value="">
-              Selecciona clan
-            </option>
+          <p className="clan-card-selector__help">
+            Elige el linaje del personaje. Las Disciplinas mostradas
+            proceden del catálogo canónico de cada opción.
+          </p>
 
+          <div className="clan-card-selector__grid">
             {clanDefinitions.map(
               (clan) => (
-                <option
+                <button
                   key={clan.key}
-                  value={clan.key}
+                  type="button"
+                  className={
+                    value.clan === clan.key
+                      ? 'clan-card-selector__card clan-card-selector__card--selected'
+                      : 'clan-card-selector__card'
+                  }
+                  aria-pressed={
+                    value.clan === clan.key
+                  }
+                  onClick={() =>
+                    updateClan(clan.key)
+                  }
                 >
-                  {clan.name}
-                </option>
+                  <span className="clan-card-selector__kind">
+                    {clan.kind === 'thinBlood'
+                      ? 'Sangre débil'
+                      : clan.kind === 'caitiff'
+                        ? 'Caitiff'
+                        : 'Clan'}
+                  </span>
+
+                  <strong>
+                    {clan.name}
+                  </strong>
+
+                  <span className="clan-card-selector__disciplines-label">
+                    Disciplinas
+                  </span>
+
+                  <span className="clan-card-selector__disciplines">
+                    {clan.inClanDisciplines.map(
+                      discipline => (
+                        <span key={discipline}>
+                          {getDisciplineName(
+                            discipline,
+                          )}
+                        </span>
+                      ),
+                    )}
+                  </span>
+                </button>
               ),
             )}
-          </select>
-        </label>
+          </div>
+
+          <button
+            type="button"
+            className="clan-card-selector__clear"
+            onClick={() =>
+              updateClan(null)
+            }
+            disabled={value.clan === null}
+          >
+            Dejar el clan sin seleccionar
+          </button>
+        </fieldset>
 
         <label className="creation-field">
           <span>Depredador</span>

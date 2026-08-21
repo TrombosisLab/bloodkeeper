@@ -39,6 +39,7 @@ import './styles/chronicle-surfaces.css';
 import './styles/dashboard-surfaces.css';
 import './styles/character-list-buttons.css';
 import './styles/app-shell-responsive.css';
+import './styles/bloodkeeper-visual-system.css';
 
 function App() {
   const authenticatedUser =
