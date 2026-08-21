@@ -219,6 +219,7 @@ model User {
   experienceMovements     CharacterExperienceMovement[] @relation("CharacterExperienceActor")
   executedDiceRolls       DiceRollRecord[] @relation("DiceRollActor")
   rouseCheckOperations    CharacterRouseCheckOperation[] @relation("RouseCheckActor")
+  blushOfLifeExemptions   CharacterBlushOfLifeExemptionOperation[] @relation("BlushOfLifeExemptionActor")
 
   @@index([status])
   @@map("users")
@@ -566,6 +567,7 @@ model Character {
   blood         CharacterBloodState?
   bloodResonanceOperations CharacterBloodResonanceOperation[]
   rouseCheckOperations     CharacterRouseCheckOperation[] @relation("RouseCheckCharacter")
+  blushOfLifeExemptions    CharacterBlushOfLifeExemptionOperation[] @relation("BlushOfLifeExemptionCharacter")
   damage        CharacterDamageState?
   skills        CharacterSkill[]
   disciplines   CharacterDiscipline[]
@@ -673,6 +675,7 @@ model CharacterBloodResonanceOperation {
 
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   dyscrasiaConsumption CharacterBloodDyscrasiaConsumptionOperation? @relation("CharacterBloodDyscrasiaSource")
+  blushOfLifeExemptions CharacterBlushOfLifeExemptionOperation[] @relation("BlushOfLifeExemptionSource")
 
   @@id([characterId, operationId])
   @@index([characterId, createdAt])
@@ -692,6 +695,28 @@ model CharacterBloodDyscrasiaConsumptionOperation {
   @@unique([characterId, sourceBloodOperationId])
   @@index([characterId, createdAt])
   @@map("character_blood_dyscrasia_consumption_operations")
+}
+
+model CharacterBlushOfLifeExemptionOperation {
+  characterId            String                     @db.Uuid
+  operationId            String                     @db.Uuid
+  actorId                String                     @db.Uuid
+  dyscrasiaKey           CharacterBloodDyscrasiaKey
+  sourceBloodOperationId String                     @db.Uuid
+  hungerBefore           Int
+  hungerAfter            Int
+  characterRevision      Int
+  createdAt              DateTime                   @default(now()) @db.Timestamptz(3)
+
+  character Character @relation("BlushOfLifeExemptionCharacter", fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  actor     User      @relation("BlushOfLifeExemptionActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  sourceBloodOperation CharacterBloodResonanceOperation @relation("BlushOfLifeExemptionSource", fields: [characterId, sourceBloodOperationId], references: [characterId, operationId], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([characterId, operationId])
+  @@index([characterId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([characterId, sourceBloodOperationId])
+  @@map("character_blush_of_life_exemption_operations")
 }
 
 model CharacterRouseCheckOperation {
