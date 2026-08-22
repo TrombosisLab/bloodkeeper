@@ -118,6 +118,39 @@ Las alimentaciones y consumos mecánicos que generan historial se conservan como
 eventos del personaje. La ficha muestra el estado vigente; el historial permite
 conservar la trazabilidad de cambios anteriores.
 
+### Control de Enardecimiento y Rubor de la Vida
+
+En una ficha persistida de un vampiro con estado de Sangre disponible aparecen
+acciones mecánicas específicas para el Control de Enardecimiento.
+
+**Control de Enardecimiento** resuelve un Control normal desde la ficha. La
+aplicación realiza la tirada específica de Rouse en backend y muestra el
+resultado. Un éxito no aumenta Hambre; un fallo incrementa Hambre en un punto,
+sin superar Hambre 5. Esta acción no utiliza las reglas de una tirada V5
+ordinaria con Dados de Hambre, críticos conflictivos o fallos bestiales.
+
+Cuando el personaje está en Hambre 5, un Control voluntario normal no puede
+iniciarse desde esta acción.
+
+**Rubor de la Vida** dispone de su propia acción contextual. El backend decide
+si requiere Control de Enardecimiento o si existe una exención activa. Si el
+personaje dispone de la Discrasia compatible **Entusiasmado por la vida**, la
+interfaz puede mostrar **Control omitido por Discrasia**:
+
+- no se lanza un dado ficticio;
+- Hambre no cambia;
+- la Discrasia no se consume por usar Rubor;
+- la exención puede seguir utilizándose mientras esa Discrasia permanezca
+  activa por sus reglas de duración.
+
+Rubor permanece disponible visualmente incluso en Hambre 5 porque la
+comprobación de una posible exención corresponde al backend. Si no existe una
+exención válida, el backend rechaza el Control voluntario en Hambre 5.
+
+Tras una resolución válida, la ficha vuelve a cargar el estado canónico del
+personaje. Si existe un conflicto por cambios concurrentes, la interfaz permite
+recargar la ficha antes de repetir la acción.
+
 ### Abrazo y transición vampírica
 
 Un personaje humano de Sesión 0 puede recibir el **Abrazo** mediante la acción

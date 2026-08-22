@@ -8,7 +8,7 @@
 | Documento | SPEC-059_ROUSE_CHECKS_AND_BLOOD_QUICK_ACTIONS_v1.0.md |
 | Proyecto | BloodKeeper / Vampiro V5 Revolution |
 | Versión | 1.0 |
-| Estado | **Aprobado — pendiente de implementación** |
+| Estado | **Cerrada** |
 | Baseline auditado | `main` @ `a1e483aac786b48e91bf1b3ee8be585dfcc22873` |
 | Dependencias | SPEC-027, SPEC-036–039, SPEC-057, SPEC-058 |
 | Integración diferida | Adenda de SPEC-025 para costes/mecánicas estructuradas de Poderes |
@@ -849,6 +849,54 @@ Cada integración podrá subdividirse y validarse por separado.
 - documentación de cierre.
 
 ---
+
+### Cierre ejecutado
+
+SPEC-059 queda cerrada tras completar y validar la cadena
+059-A → 059-B → 059-C → 059-D1A → 059-D1B.
+
+Alcance materializado:
+
+- resolución pura especializada de Control de Enardecimiento;
+- operación persistida, idempotente y revisionada en backend;
+- historial de acción y modificación autoritativa de Hambre;
+- consecuencias estructuradas para Hambre 5 sin inventar sistemas paralelos;
+- acción rápida manual **Control de Enardecimiento** en la ficha;
+- integración contextual real de **Rubor de la Vida**;
+- consumo canónico de la exención de Rubor definida por SPEC-058, sin consumir
+  la Discrasia y sin fabricar una tirada cuando el Control queda omitido;
+- reintentos con `operationId`, conflictos de revisión y recarga canónica;
+- compatibilidad con humanos, vampiros, estado archivado y disponibilidad real
+  de Sangre;
+- expiración canónica de Resonancia/Discrasia cuando una operación de Rouse
+  alcanza Hambre 5.
+
+Integraciones contextuales deliberadamente diferidas:
+
+- **Arrebato de Sangre / Blood Surge**: pendiente de una operación/estado
+  canónico que aplique y consuma su bonificador temporal;
+- **Curación vampírica**: pendiente de una operación atómica que una coste de
+  Rouse y modificación del daño;
+- **Poderes de Disciplina**: pendiente del coste Rouse estructurado previsto en
+  la adenda de SPEC-025;
+- **Rituales/Ceremonias**: pendientes de una operación canónica de ejecución;
+- **Despertar**: pendiente de una operación canónica de inicio de noche.
+
+Estas integraciones no se consideran deuda incompleta de SPEC-059: el dominio y
+la operación de Rouse ya soportan sus contextos cuando procede, pero la SPEC no
+crea botones ni sistemas ficticios sin un consumidor canónico real.
+
+Validación final acreditada:
+
+- cadena de commits A → B → C → D1A → D1B íntegra;
+- Prisma válido y **34 migraciones** aplicadas;
+- suite API completa: **945/945**;
+- Web typecheck y build: PASS;
+- suite Web completa: **1754/1754**;
+- `api`, `web`, `postgres` y `backup-worker`: healthy;
+- working tree limpio, staging vacío y stash histórico preservado;
+- cierre local sobre `4b450c8abcac1e54f1af8658694678da0e27aa0c`;
+- sin push durante el cierre técnico.
 
 # 27. Pruebas mínimas
 
