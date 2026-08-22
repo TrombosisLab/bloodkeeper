@@ -173,6 +173,9 @@ function formatEndCondition(
     case 'detected':
       return 'al ser detectado'
 
+    case 'voluntaryEnd':
+      return 'al terminarlo voluntariamente'
+
     default:
       return 'al cumplirse otra condición del Poder'
   }
@@ -223,6 +226,9 @@ function formatDuration(
     case 'singleUse':
       return 'Un uso'
 
+    case 'night':
+      return 'Una noche'
+
     case 'nightWithEndConditions':
       return (
         'Una noche; termina con ' +
@@ -231,6 +237,25 @@ function formatDuration(
             formatNightEndCondition,
           )
           .join(' o ')
+      )
+
+    case 'untilResisted':
+      return 'Hasta resistir con éxito'
+
+    case 'turns':
+      return formatCount(
+        duration.count,
+        'turno',
+        'turnos',
+      )
+
+    case 'hoursByMargin':
+      return (
+        `${formatCount(
+          duration.baseHours,
+          'hora base',
+          'horas base',
+        )}; aumenta según el margen`
       )
 
     case 'inheritedFromBasePower':

@@ -329,6 +329,7 @@ export type CharacterRulesDisciplinePowerDuration =
       readonly endConditions?: readonly (
         | 'movement'
         | 'detected'
+        | 'voluntaryEnd'
       )[]
     }
   | {
@@ -341,11 +342,25 @@ export type CharacterRulesDisciplinePowerDuration =
       readonly kind: 'singleUse'
     }
   | {
+      readonly kind: 'night'
+    }
+  | {
       readonly kind: 'nightWithEndConditions'
       readonly endConditions: readonly (
         | 'nextFeeding'
         | 'hungerFive'
       )[]
+    }
+  | {
+      readonly kind: 'untilResisted'
+    }
+  | {
+      readonly kind: 'turns'
+      readonly count: number
+    }
+  | {
+      readonly kind: 'hoursByMargin'
+      readonly baseHours: number
     }
   | {
       readonly kind: 'inheritedFromBasePower'

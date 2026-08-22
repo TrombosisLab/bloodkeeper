@@ -275,3 +275,105 @@ test(
     )
   },
 )
+
+test(
+  '025-A3-M1 presenta las duraciones propias de Presencia',
+  () => {
+    assert.equal(
+      presentSyntheticDuration(
+        {
+          kind: 'scene',
+          endConditions: [
+            'voluntaryEnd',
+          ],
+        },
+      ),
+      'Una escena; termina al terminarlo voluntariamente',
+    )
+
+    assert.equal(
+      presentSyntheticDuration(
+        {
+          kind: 'night',
+        },
+      ),
+      'Una noche',
+    )
+
+    assert.equal(
+      presentSyntheticDuration(
+        {
+          kind: 'untilResisted',
+        },
+      ),
+      'Hasta resistir con éxito',
+    )
+
+    assert.equal(
+      presentSyntheticDuration(
+        {
+          kind: 'turns',
+          count: 1,
+        },
+      ),
+      '1 turno',
+    )
+
+    assert.equal(
+      presentSyntheticDuration(
+        {
+          kind: 'turns',
+          count: 2,
+        },
+      ),
+      '2 turnos',
+    )
+
+    assert.equal(
+      presentSyntheticDuration(
+        {
+          kind: 'hoursByMargin',
+          baseHours: 1,
+        },
+      ),
+      '1 hora base; aumenta según el margen',
+    )
+  },
+)
+
+test(
+  '025-A3-M1 no expone keys internas de duración de Presencia',
+  () => {
+    const durations = [
+      {
+        kind: 'scene',
+        endConditions: [
+          'voluntaryEnd',
+        ],
+      },
+      {
+        kind: 'night',
+      },
+      {
+        kind: 'untilResisted',
+      },
+      {
+        kind: 'turns',
+        count: 1,
+      },
+      {
+        kind: 'hoursByMargin',
+        baseHours: 1,
+      },
+    ]
+
+    for (const duration of durations) {
+      assert.doesNotMatch(
+        presentSyntheticDuration(
+          duration,
+        ),
+        /voluntaryEnd|untilResisted|hoursByMargin|baseHours/,
+      )
+    }
+  },
+)

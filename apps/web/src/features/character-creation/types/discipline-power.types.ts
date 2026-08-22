@@ -88,6 +88,7 @@ export type DisciplinePowerDurationDefinition =
       endConditions?: (
         | 'movement'
         | 'detected'
+        | 'voluntaryEnd'
       )[]
     }
   | {
@@ -100,11 +101,25 @@ export type DisciplinePowerDurationDefinition =
       kind: 'singleUse'
     }
   | {
+      kind: 'night'
+    }
+  | {
       kind: 'nightWithEndConditions'
       endConditions: (
         | 'nextFeeding'
         | 'hungerFive'
       )[]
+    }
+  | {
+      kind: 'untilResisted'
+    }
+  | {
+      kind: 'turns'
+      count: number
+    }
+  | {
+      kind: 'hoursByMargin'
+      baseHours: number
     }
   | {
       kind: 'inheritedFromBasePower'

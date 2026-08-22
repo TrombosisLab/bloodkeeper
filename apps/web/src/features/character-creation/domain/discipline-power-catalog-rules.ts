@@ -205,10 +205,67 @@ export function validateDisciplinePowerCatalog(
         mechanics.duration
 
       if (
+        duration.kind === 'scene' &&
+        duration.endConditions !==
+          undefined
+      ) {
+        const endConditions =
+          duration.endConditions
+
+        const allowedSceneEndConditions =
+          new Set<string>([
+            'movement',
+            'detected',
+            'voluntaryEnd',
+          ])
+
+        if (
+          !Array.isArray(
+            endConditions,
+          ) ||
+          new Set(endConditions).size !==
+            endConditions.length ||
+          endConditions.some(
+            condition =>
+              !allowedSceneEndConditions.has(
+                condition,
+              ),
+          )
+        ) {
+          violations.push(
+            'POWER_MECHANICS_DURATION_INVALID',
+          )
+        }
+      }
+
+      if (
         duration.kind ===
           'nightsByMargin' &&
         !positiveInteger(
           duration.baseNights,
+        )
+      ) {
+        violations.push(
+          'POWER_MECHANICS_DURATION_INVALID',
+        )
+      }
+
+      if (
+        duration.kind ===
+          'hoursByMargin' &&
+        !positiveInteger(
+          duration.baseHours,
+        )
+      ) {
+        violations.push(
+          'POWER_MECHANICS_DURATION_INVALID',
+        )
+      }
+
+      if (
+        duration.kind === 'turns' &&
+        !positiveInteger(
+          duration.count,
         )
       ) {
         violations.push(

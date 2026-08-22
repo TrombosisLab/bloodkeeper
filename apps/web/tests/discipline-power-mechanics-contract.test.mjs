@@ -481,3 +481,131 @@ test(
     }
   },
 )
+
+test(
+  '025-A3-M1 admite las duraciones necesarias para Presencia',
+  () => {
+    const durations = [
+      {
+        kind: 'scene',
+        endConditions: [
+          'voluntaryEnd',
+        ],
+      },
+      {
+        kind: 'night',
+      },
+      {
+        kind: 'untilResisted',
+      },
+      {
+        kind: 'turns',
+        count: 1,
+      },
+      {
+        kind: 'hoursByMargin',
+        baseHours: 1,
+      },
+    ]
+
+    for (
+      const [index, duration] of
+      durations.entries()
+    ) {
+      const power = {
+        ...basePower,
+        key:
+          `presence-duration-contract-${index}`,
+        disciplineKey: 'presence',
+        mechanics: {
+          activation: {
+            kind: 'standalone',
+          },
+          rouseCost: {
+            kind: 'none',
+          },
+          duration,
+        },
+      }
+
+      assert.deepEqual(
+        validateDisciplinePowerCatalog(
+          [power],
+        ),
+        {
+          valid: true,
+          violations: [],
+        },
+      )
+    }
+  },
+)
+
+test(
+  '025-A3-M1 rechaza duraciones de Presencia estructuralmente inválidas',
+  () => {
+    const invalidDurations = [
+      {
+        kind: 'scene',
+        endConditions: [
+          'voluntaryEnd',
+          'voluntaryEnd',
+        ],
+      },
+      {
+        kind: 'scene',
+        endConditions: [
+          'sunrise',
+        ],
+      },
+      {
+        kind: 'turns',
+        count: 0,
+      },
+      {
+        kind: 'turns',
+        count: 1.5,
+      },
+      {
+        kind: 'hoursByMargin',
+        baseHours: 0,
+      },
+      {
+        kind: 'hoursByMargin',
+        baseHours: 1.5,
+      },
+    ]
+
+    for (
+      const [
+        index,
+        duration,
+      ] of invalidDurations.entries()
+    ) {
+      const power = {
+        ...basePower,
+        key:
+          `presence-invalid-duration-${index}`,
+        disciplineKey: 'presence',
+        mechanics: {
+          activation: {
+            kind: 'standalone',
+          },
+          rouseCost: {
+            kind: 'none',
+          },
+          duration,
+        },
+      }
+
+      assert.deepEqual(
+        validateDisciplinePowerCatalog(
+          [power],
+        ).violations,
+        [
+          'POWER_MECHANICS_DURATION_INVALID',
+        ],
+      )
+    }
+  },
+)
