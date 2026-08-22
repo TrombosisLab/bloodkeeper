@@ -202,3 +202,76 @@ test(
     )
   },
 )
+
+const presentSyntheticDuration =
+  (duration) =>
+    presentDisciplinePowerMechanics(
+      {
+        activation: {
+          kind: 'standalone',
+        },
+        rouseCost: {
+          kind: 'none',
+        },
+        duration,
+      },
+    ).duration
+
+test(
+  '025-A2-M1 presenta duraciones pasiva alimentación y uso único',
+  () => {
+    assert.equal(
+      presentSyntheticDuration(
+        {
+          kind: 'passive',
+        },
+      ),
+      'Pasiva',
+    )
+
+    assert.equal(
+      presentSyntheticDuration(
+        {
+          kind: 'feeding',
+        },
+      ),
+      'Una alimentación',
+    )
+
+    assert.equal(
+      presentSyntheticDuration(
+        {
+          kind: 'singleUse',
+        },
+      ),
+      'Un uso',
+    )
+  },
+)
+
+test(
+  '025-A2-M1 presenta una noche con condiciones de fin legibles',
+  () => {
+    const duration =
+      presentSyntheticDuration(
+        {
+          kind:
+            'nightWithEndConditions',
+          endConditions: [
+            'nextFeeding',
+            'hungerFive',
+          ],
+        },
+      )
+
+    assert.equal(
+      duration,
+      'Una noche; termina con la siguiente alimentación o Ansia 5',
+    )
+
+    assert.doesNotMatch(
+      duration,
+      /nextFeeding|hungerFive/,
+    )
+  },
+)

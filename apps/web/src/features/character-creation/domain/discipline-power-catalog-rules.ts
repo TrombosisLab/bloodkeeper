@@ -201,16 +201,52 @@ export function validateDisciplinePowerCatalog(
         )
       }
 
+      const duration =
+        mechanics.duration
+
       if (
-        mechanics.duration.kind ===
+        duration.kind ===
           'nightsByMargin' &&
         !positiveInteger(
-          mechanics.duration.baseNights,
+          duration.baseNights,
         )
       ) {
         violations.push(
           'POWER_MECHANICS_DURATION_INVALID',
         )
+      }
+
+      if (
+        duration.kind ===
+          'nightWithEndConditions'
+      ) {
+        const endConditions =
+          duration.endConditions
+
+        const allowedEndConditions =
+          new Set<string>([
+            'nextFeeding',
+            'hungerFive',
+          ])
+
+        if (
+          !Array.isArray(
+            endConditions,
+          ) ||
+          endConditions.length === 0 ||
+          new Set(endConditions).size !==
+            endConditions.length ||
+          endConditions.some(
+            condition =>
+              !allowedEndConditions.has(
+                condition,
+              ),
+          )
+        ) {
+          violations.push(
+            'POWER_MECHANICS_DURATION_INVALID',
+          )
+        }
       }
 
       const checkKeys =

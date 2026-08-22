@@ -373,3 +373,111 @@ test(
     )
   },
 )
+
+test(
+  '025-A2-M1 admite las cuatro nuevas duraciones generales',
+  () => {
+    const durations = [
+      {
+        kind: 'passive',
+      },
+      {
+        kind: 'feeding',
+      },
+      {
+        kind: 'singleUse',
+      },
+      {
+        kind: 'nightWithEndConditions',
+        endConditions: [
+          'nextFeeding',
+          'hungerFive',
+        ],
+      },
+    ]
+
+    for (
+      const [index, duration] of
+      durations.entries()
+    ) {
+      const power = {
+        ...basePower,
+        key:
+          `potence-duration-contract-${index}`,
+        disciplineKey: 'potence',
+        mechanics: {
+          activation: {
+            kind: 'standalone',
+          },
+          rouseCost: {
+            kind: 'none',
+          },
+          duration,
+        },
+      }
+
+      assert.deepEqual(
+        validateDisciplinePowerCatalog(
+          [power],
+        ),
+        {
+          valid: true,
+          violations: [],
+        },
+      )
+    }
+  },
+)
+
+test(
+  '025-A2-M1 rechaza condiciones nocturnas vacías duplicadas o desconocidas',
+  () => {
+    const invalidConditions = [
+      [],
+      [
+        'nextFeeding',
+        'nextFeeding',
+      ],
+      [
+        'nextFeeding',
+        'sunrise',
+      ],
+    ]
+
+    for (
+      const [
+        index,
+        endConditions,
+      ] of invalidConditions.entries()
+    ) {
+      const power = {
+        ...basePower,
+        key:
+          `potence-invalid-night-${index}`,
+        disciplineKey: 'potence',
+        mechanics: {
+          activation: {
+            kind: 'standalone',
+          },
+          rouseCost: {
+            kind: 'none',
+          },
+          duration: {
+            kind:
+              'nightWithEndConditions',
+            endConditions,
+          },
+        },
+      }
+
+      assert.deepEqual(
+        validateDisciplinePowerCatalog(
+          [power],
+        ).violations,
+        [
+          'POWER_MECHANICS_DURATION_INVALID',
+        ],
+      )
+    }
+  },
+)

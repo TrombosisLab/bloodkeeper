@@ -332,6 +332,22 @@ export type CharacterRulesDisciplinePowerDuration =
       )[]
     }
   | {
+      readonly kind: 'passive'
+    }
+  | {
+      readonly kind: 'feeding'
+    }
+  | {
+      readonly kind: 'singleUse'
+    }
+  | {
+      readonly kind: 'nightWithEndConditions'
+      readonly endConditions: readonly (
+        | 'nextFeeding'
+        | 'hungerFive'
+      )[]
+    }
+  | {
       readonly kind: 'inheritedFromBasePower'
     }
   | {

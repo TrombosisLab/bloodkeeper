@@ -178,6 +178,20 @@ function formatEndCondition(
   }
 }
 
+function formatNightEndCondition(
+  condition:
+    | 'nextFeeding'
+    | 'hungerFive',
+): string {
+  switch (condition) {
+    case 'nextFeeding':
+      return 'la siguiente alimentación'
+
+    case 'hungerFive':
+      return 'Ansia 5'
+  }
+}
+
 function formatDuration(
   mechanics: DisciplinePowerMechanicsDefinition,
 ): string {
@@ -199,6 +213,25 @@ function formatDuration(
           .join(' o ')
       )
     }
+
+    case 'passive':
+      return 'Pasiva'
+
+    case 'feeding':
+      return 'Una alimentación'
+
+    case 'singleUse':
+      return 'Un uso'
+
+    case 'nightWithEndConditions':
+      return (
+        'Una noche; termina con ' +
+        duration.endConditions
+          .map(
+            formatNightEndCondition,
+          )
+          .join(' o ')
+      )
 
     case 'inheritedFromBasePower':
       return 'Hereda la duración del Poder base'

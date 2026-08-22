@@ -91,6 +91,22 @@ export type DisciplinePowerDurationDefinition =
       )[]
     }
   | {
+      kind: 'passive'
+    }
+  | {
+      kind: 'feeding'
+    }
+  | {
+      kind: 'singleUse'
+    }
+  | {
+      kind: 'nightWithEndConditions'
+      endConditions: (
+        | 'nextFeeding'
+        | 'hungerFive'
+      )[]
+    }
+  | {
       kind: 'inheritedFromBasePower'
     }
   | {
