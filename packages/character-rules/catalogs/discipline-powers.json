@@ -87,7 +87,19 @@
     "summary": "Permite un equilibrio sobrenatural incluso en apoyos extremadamente difíciles.",
     "sourceKey": "core-v5-es",
     "sourcePage": 252,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Supera automáticamente las pruebas de Destreza o Atletismo necesarias para mantener el equilibrio, siempre que el apoyo pueda sostener físicamente al usuario.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "passive"
+      }
+    }
   },
   {
     "key": "celerity-rapid-reflexes",
@@ -97,7 +109,19 @@
     "summary": "Mejora las reacciones defensivas y permite realizar ciertas acciones menores con gran rapidez.",
     "sourceKey": "core-v5-es",
     "sourcePage": 252,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Elimina la penalización defensiva por falta de cobertura frente a ataques con Armas de Fuego y permite una acción menor de hasta dos dados por turno sin coste.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "passive"
+      }
+    }
   },
   {
     "key": "celerity-fleetness",
@@ -107,7 +131,20 @@
     "summary": "Potencia de forma sobrenatural las acciones basadas en Destreza.",
     "sourceKey": "core-v5-es",
     "sourcePage": 253,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Añade la puntuación de Celeridad a las reservas de Destreza que no sean de combate; una vez por turno también puede aplicarse a una defensa de Destreza + Atletismo.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      }
+    }
   },
   {
     "key": "celerity-blink",
@@ -117,7 +154,40 @@
     "summary": "Permite cubrir una distancia considerable en un instante aparente.",
     "sourceKey": "core-v5-es",
     "sourcePage": 253,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Permite recorrer en línea recta menos de 50 metros y conservar tiempo para una acción en el mismo turno. El terreno peligroso exige Destreza + Atletismo y el Narrador puede pedir otras contiendas según la oposición o el objetivo.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "turns",
+        "count": 1
+      },
+      "checks": [
+        {
+          "key": "cross-hazardous-terrain",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "dexterity"
+            },
+            {
+              "kind": "skill",
+              "key": "athletics"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        }
+      ]
+    }
   },
   {
     "key": "celerity-traversal",
@@ -127,7 +197,42 @@
     "summary": "Permite desplazarse a gran velocidad por superficies difíciles, verticales o incluso sobre líquidos.",
     "sourceKey": "core-v5-es",
     "sourcePage": 253,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Permite correr o ascender por superficies difíciles, verticales o líquidos mediante Destreza + Atletismo a dificultad 3–6; el margen amplía la distancia alcanzable.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "turns",
+        "count": 1
+      },
+      "checks": [
+        {
+          "key": "traverse-surface",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "dexterity"
+            },
+            {
+              "kind": "skill",
+              "key": "athletics"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty",
+            "min": 3,
+            "max": 6
+          }
+        }
+      ]
+    }
   },
   {
     "key": "celerity-unerring-aim",
@@ -143,7 +248,20 @@
         "minimumLevel": 2
       }
     },
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Antes de un ataque a distancia, impide la defensa normal del objetivo y resuelve el ataque a dificultad 1. Un oponente con Celeridad 5 puede gastar su propio Control para anular esta ventaja y defenderse.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "singleUse"
+      }
+    }
   },
   {
     "key": "celerity-draught-of-elegance",
@@ -153,7 +271,24 @@
     "summary": "Permite transmitir temporalmente parte de la Celeridad mediante la Sangre.",
     "sourceKey": "core-v5-es",
     "sourcePage": 254,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Quien bebe directamente Sangre por valor de un Control recibe Celeridad temporal igual a la mitad de la puntuación del donante, redondeada hacia abajo, y sus Poderes sin Amalgamas hasta ese nivel.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "nightWithEndConditions",
+        "endConditions": [
+          "nextFeeding",
+          "hungerFive"
+        ]
+      }
+    }
   },
   {
     "key": "celerity-lightning-strike",
@@ -163,7 +298,20 @@
     "summary": "Permite ejecutar un ataque cuerpo a cuerpo a una velocidad extraordinaria.",
     "sourceKey": "core-v5-es",
     "sourcePage": 254,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Antes de un ataque de Pelea o Pelea con Armas, impide la defensa normal del objetivo y resuelve el ataque a dificultad 1. Un oponente con Celeridad 5 puede gastar su propio Control para anular esta ventaja y defenderse.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "singleUse"
+      }
+    }
   },
   {
     "key": "celerity-split-second",
@@ -173,7 +321,20 @@
     "summary": "Permite reaccionar a acontecimientos con una velocidad que parece anticiparse a los demás.",
     "sourceKey": "core-v5-es",
     "sourcePage": 254,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Permite reaccionar retroactivamente de forma razonable a un suceso narrado con una acción de sólo unos segundos. El Narrador decide qué Habilidades, si alguna, deben tirarse para resolverla.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "singleUse"
+      }
+    }
   },
   {
     "key": "auspex-heightened-senses",

@@ -139,7 +139,7 @@ test(
 )
 
 test(
-  '025-A1-M3 transporta mecánicas presentadas sólo cuando existen en catálogo',
+  '025-A1-M3 transporta mecánicas presentadas desde el catálogo compartido',
   () => {
     const result =
       buildCharacterDisciplineReadModel(
@@ -179,9 +179,7 @@ test(
       'Inteligencia + Ofuscación · Dificultad 2–6',
     )
 
-    assert.equal(
-      catsGrace.mechanics,
-      undefined,
-    )
+    /* A4-M2: eliminada expectativa histórica de ausencia de mechanics;
+     las Disciplinas futuras pueden incorporarlas sin romper el read-model. */
   },
 )
