@@ -13,6 +13,10 @@ import type {
   DisciplinePowerView,
 } from '../types/character-disciplines.types'
 
+import {
+  presentDisciplinePowerMechanics,
+} from './discipline-power-mechanics-presenter.ts'
+
 export function buildCharacterDisciplineReadModel(
   state: readonly CharacterDisciplineState[],
   disciplineDefinitions:
@@ -89,6 +93,12 @@ export function buildCharacterDisciplineReadModel(
                   )?.shortName
                 : undefined,
             sourcePage: powerDefinition.sourcePage,
+            mechanics:
+              powerDefinition.mechanics
+                ? presentDisciplinePowerMechanics(
+                    powerDefinition.mechanics,
+                  )
+                : undefined,
             catalogStatus: 'resolved',
           }
         },

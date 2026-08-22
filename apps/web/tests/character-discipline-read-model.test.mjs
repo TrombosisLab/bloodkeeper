@@ -137,3 +137,51 @@ test(
     )
   },
 )
+
+test(
+  '025-A1-M3 transporta mecánicas presentadas sólo cuando existen en catálogo',
+  () => {
+    const result =
+      buildCharacterDisciplineReadModel(
+        [
+          {
+            key: 'obfuscate',
+            value: 4,
+            powerKeys: [
+              'obfuscate-conceal',
+            ],
+          },
+          {
+            key: 'celerity',
+            value: 1,
+            powerKeys: [
+              'celerity-cats-grace',
+            ],
+          },
+        ],
+        disciplineDefinitions,
+        disciplinePowerDefinitions,
+        contentSources,
+      )
+
+    const conceal =
+      result[0].powers[0]
+    const catsGrace =
+      result[1].powers[0]
+
+    assert.ok(conceal.mechanics)
+    assert.equal(
+      conceal.mechanics.cost,
+      '1 Control de Enardecimiento',
+    )
+    assert.equal(
+      conceal.mechanics.checks[0].detail,
+      'Inteligencia + Ofuscación · Dificultad 2–6',
+    )
+
+    assert.equal(
+      catsGrace.mechanics,
+      undefined,
+    )
+  },
+)

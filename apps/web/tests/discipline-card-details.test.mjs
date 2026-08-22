@@ -90,3 +90,93 @@ test(
     )
   },
 )
+
+test(
+  '025-A1-M3 muestra mecánicas como información sin añadir ejecución',
+  () => {
+    assert.match(
+      card,
+      /power\.mechanics/,
+    )
+    assert.match(
+      card,
+      />Coste</,
+    )
+    assert.match(
+      card,
+      />Duración</,
+    )
+    assert.match(
+      card,
+      />Pruebas</,
+    )
+    assert.match(
+      card,
+      />Modificadores</,
+    )
+    assert.match(
+      card,
+      />Límites</,
+    )
+
+    assert.doesNotMatch(
+      card,
+      /Usar Poder/,
+    )
+    assert.doesNotMatch(
+      card,
+      /rouseCheck|performRouse|disciplinePowerLevel/,
+    )
+  },
+)
+
+test(
+  '025-A1-M3 mantiene las mecánicas dentro del details accesible existente',
+  () => {
+    assert.match(
+      card,
+      /<details className="discipline-power-details">[\s\S]*discipline-power-mechanics/,
+    )
+  },
+)
+
+test(
+  '025-A1-M3 añade layout responsive para hechos mecánicos',
+  () => {
+    assert.match(
+      styles,
+      /\.discipline-power-mechanics__facts[\s\S]*grid-template-columns:/,
+    )
+    assert.match(
+      styles,
+      /@media \(max-width: 700px\)[\s\S]*\.discipline-power-mechanics__facts[\s\S]*grid-template-columns: 1fr/,
+    )
+  },
+)
+
+test(
+  '025-A1-M3 prioriza el resumen mecánico y evita duplicar descripciones',
+  () => {
+    assert.match(
+      card,
+      /power\.mechanics\?\.systemSummary/,
+    )
+    assert.match(
+      card,
+      /power\.mechanics\.systemSummary/,
+    )
+    assert.match(
+      card,
+      /: power\.summary \?/,
+    )
+
+    assert.doesNotMatch(
+      card,
+      /discipline-power-mechanics__summary/,
+    )
+    assert.doesNotMatch(
+      styles,
+      /\.discipline-power-mechanics__summary/,
+    )
+  },
+)

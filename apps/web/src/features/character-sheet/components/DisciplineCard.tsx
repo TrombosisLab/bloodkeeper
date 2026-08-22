@@ -51,13 +51,85 @@ export function DisciplineCard({
                   </summary>
 
                   <div className="discipline-power-details__content">
-                    {power.summary ? (
+                    {power.mechanics?.systemSummary ? (
+                      <p>{power.mechanics.systemSummary}</p>
+                    ) : power.summary ? (
                       <p>{power.summary}</p>
                     ) : (
                       <p>
                         Sin información adicional autorizada.
                       </p>
                     )}
+
+                    {power.mechanics ? (
+                      <section
+                        className="discipline-power-mechanics"
+                        aria-label={`Mecánicas de ${power.name}`}
+                      >
+                        <dl className="discipline-power-mechanics__facts">
+                          <div>
+                            <dt>Coste</dt>
+                            <dd>{power.mechanics.cost}</dd>
+                          </div>
+
+                          <div>
+                            <dt>Duración</dt>
+                            <dd>{power.mechanics.duration}</dd>
+                          </div>
+                        </dl>
+
+                        {power.mechanics.checks.length > 0 ? (
+                          <div className="discipline-power-mechanics__group">
+                            <strong>Pruebas</strong>
+
+                            <ul>
+                              {power.mechanics.checks.map(
+                                (check) => (
+                                  <li
+                                    key={`${check.label}-${check.detail}`}
+                                  >
+                                    <span>{check.label}</span>
+                                    <small>{check.detail}</small>
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          </div>
+                        ) : null}
+
+                        {power.mechanics.modifiers.length > 0 ? (
+                          <div className="discipline-power-mechanics__group">
+                            <strong>Modificadores</strong>
+
+                            <ul>
+                              {power.mechanics.modifiers.map(
+                                (modifier) => (
+                                  <li key={modifier}>
+                                    {modifier}
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          </div>
+                        ) : null}
+
+                        {power.mechanics.limits.length > 0 ? (
+                          <div className="discipline-power-mechanics__group">
+                            <strong>Límites</strong>
+
+                            <ul>
+                              {power.mechanics.limits.map(
+                                (limit) => (
+                                  <li key={limit}>
+                                    {limit}
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          </div>
+                        ) : null}
+                      </section>
+                    ) : null}
 
                     {power.sourceName ? (
                       <small>

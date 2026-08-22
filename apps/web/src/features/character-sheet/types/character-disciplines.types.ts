@@ -12,6 +12,20 @@ export interface CharacterDisciplineState {
   powerKeys: string[]
 }
 
+export interface DisciplinePowerMechanicCheckView {
+  label: string
+  detail: string
+}
+
+export interface DisciplinePowerMechanicsView {
+  systemSummary?: string
+  cost: string
+  duration: string
+  checks: DisciplinePowerMechanicCheckView[]
+  modifiers: string[]
+  limits: string[]
+}
+
 export interface DisciplinePowerView {
   key: string
   name: string
@@ -20,6 +34,7 @@ export interface DisciplinePowerView {
   sourceKey?: ContentSourceKey
   sourceName?: string
   sourcePage?: number
+  mechanics?: DisciplinePowerMechanicsView
   catalogStatus: CatalogReferenceStatus
 }
 
