@@ -827,7 +827,23 @@
     "summary": "Permite permanecer oculto al fundirse con el entorno mientras el vampiro evita llamar la atención.",
     "sourceKey": "core-v5-es",
     "active": true,
-    "sourcePage": 261
+    "sourcePage": 261,
+    "mechanics": {
+      "systemSummary": "Oculta al usuario mientras permanezca inmóvil; el efecto termina si se mueve o es detectado.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "scene",
+        "endConditions": [
+          "movement",
+          "detected"
+        ]
+      }
+    }
   },
   {
     "key": "obfuscate-silence-of-death",
@@ -837,7 +853,19 @@
     "summary": "Suprime los sonidos producidos por el vampiro y facilita actuar sin ser oído.",
     "sourceKey": "core-v5-es",
     "active": true,
-    "sourcePage": 261
+    "sourcePage": 261,
+    "mechanics": {
+      "systemSummary": "Suprime los sonidos producidos dentro del espacio personal del usuario durante la escena.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "scene"
+      }
+    }
   },
   {
     "key": "obfuscate-unseen-passage",
@@ -847,7 +875,23 @@
     "summary": "Permite desplazarse sin ser percibido mientras se mantengan las condiciones necesarias para conservar la ocultación.",
     "sourceKey": "core-v5-es",
     "active": true,
-    "sourcePage": 261
+    "sourcePage": 261,
+    "mechanics": {
+      "systemSummary": "Permite desplazarse oculto sin tirada propia mientras se mantengan las condiciones; termina si el usuario es detectado.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene",
+        "endConditions": [
+          "detected"
+        ]
+      }
+    }
   },
   {
     "key": "obfuscate-mask-of-a-thousand-faces",
@@ -857,7 +901,20 @@
     "summary": "Hace que los observadores perciban al vampiro con una apariencia anónima y poco memorable.",
     "sourceKey": "core-v5-es",
     "active": true,
-    "sourcePage": 262
+    "sourcePage": 262,
+    "mechanics": {
+      "systemSummary": "Hace que el usuario parezca un desconocido plausible y poco memorable sin requerir una prueba propia.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      }
+    }
   },
   {
     "key": "obfuscate-ghost-in-the-machine",
@@ -867,7 +924,31 @@
     "summary": "Extiende los efectos de Ofuscación frente a dispositivos y sistemas de observación tecnológica.",
     "sourceKey": "core-v5-es",
     "active": true,
-    "sourcePage": 262
+    "sourcePage": 262,
+    "mechanics": {
+      "systemSummary": "Extiende la Ofuscación activa a observación electrónica y aplica modificadores contra identificación y vigilancia automatizada.",
+      "activation": {
+        "kind": "enhancement"
+      },
+      "rouseCost": {
+        "kind": "inheritedFromBasePower"
+      },
+      "duration": {
+        "kind": "inheritedFromBasePower"
+      },
+      "modifiers": [
+        {
+          "kind": "difficulty",
+          "value": 3,
+          "contextKey": "recordedIdentification"
+        },
+        {
+          "kind": "dicePool",
+          "value": 3,
+          "contextKey": "automatedSurveillanceEvasion"
+        }
+      ]
+    }
   },
   {
     "key": "obfuscate-vanish",
@@ -882,7 +963,54 @@
       ]
     },
     "active": true,
-    "sourcePage": 262
+    "sourcePage": 262,
+    "mechanics": {
+      "systemSummary": "Permite iniciar ocultación bajo observación; frente a un mortal resuelve una contienda y sólo puede usarse una vez por escena.",
+      "activation": {
+        "kind": "enhancement"
+      },
+      "rouseCost": {
+        "kind": "inheritedFromBasePower"
+      },
+      "duration": {
+        "kind": "inheritedFromBasePower"
+      },
+      "checks": [
+        {
+          "key": "vanish-before-mortal-observer",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "discipline",
+              "key": "obfuscate"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "wits"
+              },
+              {
+                "kind": "skill",
+                "key": "awareness"
+              }
+            ]
+          }
+        }
+      ],
+      "limits": [
+        {
+          "kind": "perScene",
+          "count": 1
+        }
+      ]
+    }
   },
   {
     "key": "obfuscate-conceal",
@@ -898,7 +1026,69 @@
         "minimumLevel": 3
       }
     },
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Oculta un objeto inanimado con dificultad contextual; la duración aumenta con el margen y Auspex puede disputarlo.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "nightsByMargin",
+        "baseNights": 1
+      },
+      "checks": [
+        {
+          "key": "conceal-object",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "intelligence"
+            },
+            {
+              "kind": "discipline",
+              "key": "obfuscate"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty",
+            "min": 2,
+            "max": 6
+          }
+        },
+        {
+          "key": "see-concealed-object",
+          "role": "detection",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "discipline",
+              "key": "auspex"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "intelligence"
+              },
+              {
+                "kind": "discipline",
+                "key": "obfuscate"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "obfuscate-cloak-the-gathering",
@@ -908,7 +1098,25 @@
     "summary": "Permite extender determinados efectos de Ofuscación a varios acompañantes.",
     "sourceKey": "core-v5-es",
     "active": true,
-    "sourcePage": 263
+    "sourcePage": 263,
+    "mechanics": {
+      "systemSummary": "Extiende un Poder de Ofuscación conocido a compañeros voluntarios; los objetivos adicionales por encima de Astucia exigen más Controles.",
+      "activation": {
+        "kind": "extension"
+      },
+      "rouseCost": {
+        "kind": "additionalToBasePower",
+        "checks": 1,
+        "scaling": {
+          "kind": "perAdditionalTargetBeyondAttribute",
+          "attributeKey": "wits",
+          "checksPerTarget": 1
+        }
+      },
+      "duration": {
+        "kind": "inheritedFromBasePower"
+      }
+    }
   },
   {
     "key": "obfuscate-impostors-guise",
@@ -923,7 +1131,58 @@
       ]
     },
     "active": true,
-    "sourcePage": 263
+    "sourcePage": 263,
+    "mechanics": {
+      "systemSummary": "Imita a una persona concreta tras estudiarla; primero se comprueba el parecido y, si procede, la voz y los gestos.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "copy-appearance",
+          "role": "activation",
+          "visibility": "hidden",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "discipline",
+              "key": "obfuscate"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 4
+          }
+        },
+        {
+          "key": "imitate-voice-and-mannerisms",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "manipulation"
+            },
+            {
+              "kind": "skill",
+              "key": "performance"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-ashes-to-ashes",
