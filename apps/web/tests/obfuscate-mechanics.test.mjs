@@ -551,71 +551,32 @@ test(
 )
 
 test(
-  '025-A1-M2 Ofuscación permanece aislada de Disciplinas aún no mecanizadas',
-  () => {
+  '025-A1-M2 Ofuscación conserva sus mechanics al ampliar otras Disciplinas',
+  async () => {
+    const {
+      disciplinePowerDefinitions,
+    } = await import(
+      '../src/features/character-creation/data/discipline-power-definitions.ts'
+    )
+
     const obfuscate =
-      characterDisciplineCatalog.powers
-        .filter(
-          ({ disciplineKey }) =>
-            disciplineKey ===
-              'obfuscate',
-        )
-
-    const potence =
-      characterDisciplineCatalog.powers
-        .filter(
-          ({ disciplineKey }) =>
-            disciplineKey ===
-              'potence',
-        )
-
-    const notYetMechanized =
-      characterDisciplineCatalog.powers
-        .filter(
-          ({ disciplineKey }) =>
-            disciplineKey !==
-              'obfuscate' &&
-            disciplineKey !==
-              'potence',
-        )
+      disciplinePowerDefinitions.filter(
+        power =>
+          power.disciplineKey ===
+          'obfuscate',
+      )
 
     assert.equal(
       obfuscate.length,
       9,
     )
 
-    assert.equal(
+    assert.ok(
       obfuscate.every(
         power =>
-          power.mechanics !== undefined,
+          power.mechanics &&
+          !power.diceCheck,
       ),
-      true,
-    )
-
-    assert.equal(
-      potence.length,
-      9,
-    )
-
-    assert.equal(
-      potence.every(
-        power =>
-          power.mechanics !== undefined,
-      ),
-      true,
-    )
-
-    assert.equal(
-      notYetMechanized.length,
-      88,
-    )
-
-    assert.equal(
-      notYetMechanized.some(
-        power =>
-          power.mechanics !== undefined,
-      ),
-      false,
     )
   },
 )

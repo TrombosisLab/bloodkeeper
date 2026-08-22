@@ -463,52 +463,32 @@ test(
 )
 
 test(
-  '025-A2-M2 exactamente Ofuscación y Potencia tienen mechanics',
-  () => {
-    const withMechanics =
+  '025-A2-M2 Potencia conserva sus mechanics al ampliar otras Disciplinas',
+  async () => {
+    const {
+      disciplinePowerDefinitions,
+    } = await import(
+      '../src/features/character-creation/data/discipline-power-definitions.ts'
+    )
+
+    const potence =
       disciplinePowerDefinitions.filter(
         power =>
-          power.mechanics !== undefined,
+          power.disciplineKey ===
+          'potence',
       )
 
     assert.equal(
-      withMechanics.length,
-      18,
-    )
-
-    assert.deepEqual(
-      [
-        ...new Set(
-          withMechanics.map(
-            power =>
-              power.disciplineKey,
-          ),
-        ),
-      ].sort(),
-      [
-        'obfuscate',
-        'potence',
-      ],
-    )
-
-    const obfuscate =
-      disciplinePowerDefinitions.filter(
-        ({ disciplineKey }) =>
-          disciplineKey ===
-            'obfuscate',
-      )
-
-    assert.equal(
-      obfuscate.length,
+      potence.length,
       9,
     )
 
-    assert.equal(
-      obfuscate.every(
+    assert.ok(
+      potence.every(
         power =>
-          power.mechanics !== undefined,
+          power.mechanics &&
+          !power.diceCheck,
       ),
-      true,
     )
   },
 )

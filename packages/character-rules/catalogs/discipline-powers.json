@@ -754,7 +754,42 @@
     "summary": "Proyecta una presencia amenazante que dificulta enfrentarse o actuar contra el vampiro.",
     "sourceKey": "core-v5-es",
     "sourcePage": 267,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Proyecta una amenaza sobrenatural: añade Presencia a las tiradas de Intimidación y quien intente atacar al usuario debe superar Resolución + Compostura a dificultad 2.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "scene",
+        "endConditions": [
+          "voluntaryEnd"
+        ]
+      },
+      "checks": [
+        {
+          "key": "act-against-daunt",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            },
+            {
+              "kind": "attribute",
+              "key": "composure"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 2
+          }
+        }
+      ]
+    }
   },
   {
     "key": "presence-awe",
@@ -764,7 +799,51 @@
     "summary": "Hace al vampiro sobrenaturalmente atractivo y aumenta su capacidad de influir socialmente.",
     "sourceKey": "core-v5-es",
     "sourcePage": 267,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Vuelve al usuario fascinante y magnético, reforzando sus interacciones sociales pertinentes; quien advierta la influencia puede oponer Compostura + Inteligencia a Manipulación + Presencia. No se mantiene simultáneamente con Atemorizar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "scene",
+        "endConditions": [
+          "voluntaryEnd"
+        ]
+      },
+      "checks": [
+        {
+          "key": "resist-awe",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "manipulation"
+            },
+            {
+              "kind": "discipline",
+              "key": "presence"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "composure"
+              },
+              {
+                "kind": "attribute",
+                "key": "intelligence"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "presence-lingering-kiss",
@@ -774,7 +853,19 @@
     "summary": "Hace que el Beso resulte especialmente adictivo para los mortales que lo experimentan.",
     "sourceKey": "core-v5-es",
     "sourcePage": 268,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Puede aplicarse durante la alimentación para volver adictivo el Beso. La víctima intenta resistir semanalmente con Fuerza de Voluntad a una dificultad igual a la Presencia del usuario; tres éxitos semanales consecutivos o una victoria crítica rompen el efecto.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "untilResisted"
+      }
+    }
   },
   {
     "key": "presence-entrancement",
@@ -784,7 +875,50 @@
     "summary": "Concentra el magnetismo sobrenatural sobre una persona concreta y genera una fuerte fascinación.",
     "sourceKey": "core-v5-es",
     "sourcePage": 268,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Fija una fascinación intensa sobre un sujeto. Tras vencer la contienda, Presencia refuerza las reservas Sociales del usuario contra ese objetivo; un intento posterior fallido de renovar el efecto lo termina y protege al sujeto durante el resto de la noche.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "hoursByMargin",
+        "baseHours": 1
+      },
+      "checks": [
+        {
+          "key": "entrance-target",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "charisma"
+            },
+            {
+              "kind": "discipline",
+              "key": "presence"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "composure"
+              },
+              {
+                "kind": "attribute",
+                "key": "wits"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "presence-dread-gaze",
@@ -794,7 +928,50 @@
     "summary": "Revela brevemente la naturaleza depredadora del vampiro para infundir un miedo extremo.",
     "sourceKey": "core-v5-es",
     "sourcePage": 268,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Desata terror directo mediante una contienda de Carisma + Presencia contra Compostura + Resolución. El resultado determina la reacción de la víctima y una victoria crítica puede provocar Frenesí de terror a dificultad 3 en vampiros.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "turns",
+        "count": 1
+      },
+      "checks": [
+        {
+          "key": "terrify-target",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "charisma"
+            },
+            {
+              "kind": "discipline",
+              "key": "presence"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "composure"
+              },
+              {
+                "kind": "attribute",
+                "key": "resolve"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "presence-summon",
@@ -804,7 +981,49 @@
     "summary": "Permite llamar sobrenaturalmente a una persona con la que existe una conexión adecuada.",
     "sourceKey": "core-v5-es",
     "sourcePage": 269,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Llama a distancia a alguien que haya estado previamente bajo una influencia válida de Presencia o haya probado la Sangre del usuario. La llamada se resuelve con Manipulación + Presencia contra Compostura + Inteligencia.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "night"
+      },
+      "checks": [
+        {
+          "key": "summon-target",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "manipulation"
+            },
+            {
+              "kind": "discipline",
+              "key": "presence"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "composure"
+              },
+              {
+                "kind": "attribute",
+                "key": "intelligence"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "presence-irresistible-voice",
@@ -820,7 +1039,19 @@
         "minimumLevel": 1
       }
     },
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Potencia el uso de Dominación para transmitir órdenes mediante la voz sin necesidad de contacto visual; no permite hacerlo a través de transmisiones electrónicas.",
+      "activation": {
+        "kind": "enhancement"
+      },
+      "rouseCost": {
+        "kind": "inheritedFromBasePower"
+      },
+      "duration": {
+        "kind": "passive"
+      }
+    }
   },
   {
     "key": "presence-star-magnetism",
@@ -830,7 +1061,20 @@
     "summary": "Permite extender determinados efectos de Presencia a transmisiones en directo y comunicaciones.",
     "sourceKey": "core-v5-es",
     "sourcePage": 269,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Extiende a una transmisión en directo los efectos de Atemorizar, Fascinación o Encantamiento, pagando un Control de Enardecimiento adicional al coste normal del Poder utilizado.",
+      "activation": {
+        "kind": "extension"
+      },
+      "rouseCost": {
+        "kind": "additionalToBasePower",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "inheritedFromBasePower"
+      }
+    }
   },
   {
     "key": "presence-majesty",
@@ -840,7 +1084,49 @@
     "summary": "Amplifica la presencia sobrenatural del vampiro hasta un nivel abrumador para quienes lo contemplan.",
     "sourceKey": "core-v5-es",
     "sourcePage": 269,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Envuelve al usuario en una presencia abrumadora. Para actuar en su contra, una víctima debe superar con Compostura + Resolución la oposición de Carisma + Presencia; los resultados superiores intensifican el efecto.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 2
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "act-against-majesty",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "composure"
+            },
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "charisma"
+              },
+              {
+                "kind": "discipline",
+                "key": "presence"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "fortitude-resilience",
