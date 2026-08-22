@@ -295,6 +295,110 @@ export type CharacterRulesDisciplinePowerDicePoolTerm =
       readonly key: CharacterRulesDisciplineKey
     }
 
+export type CharacterRulesDisciplinePowerActivationKind =
+  | 'standalone'
+  | 'enhancement'
+  | 'extension'
+
+export type CharacterRulesDisciplinePowerRouseCost =
+  | {
+      readonly kind: 'none'
+    }
+  | {
+      readonly kind: 'fixed'
+      readonly checks: number
+    }
+  | {
+      readonly kind: 'inheritedFromBasePower'
+    }
+  | {
+      readonly kind: 'additionalToBasePower'
+      readonly checks: number
+      readonly scaling?: {
+        readonly kind:
+          'perAdditionalTargetBeyondAttribute'
+        readonly attributeKey:
+          CharacterRulesAttributeKey
+        readonly checksPerTarget: number
+      }
+    }
+
+export type CharacterRulesDisciplinePowerDuration =
+  | {
+      readonly kind: 'scene'
+      readonly endConditions?: readonly (
+        | 'movement'
+        | 'detected'
+      )[]
+    }
+  | {
+      readonly kind: 'inheritedFromBasePower'
+    }
+  | {
+      readonly kind: 'nightsByMargin'
+      readonly baseNights: number
+    }
+
+export type CharacterRulesDisciplinePowerCheckResolution =
+  | {
+      readonly kind: 'fixedDifficulty'
+      readonly value: number
+    }
+  | {
+      readonly kind: 'contextualDifficulty'
+      readonly min?: number
+      readonly max?: number
+    }
+  | {
+      readonly kind: 'opposed'
+      readonly opposingPool:
+        readonly CharacterRulesDisciplinePowerDicePoolTerm[]
+    }
+
+export interface CharacterRulesDisciplinePowerMechanicCheck {
+  readonly key: string
+  readonly role:
+    | 'activation'
+    | 'conditional'
+    | 'detection'
+  readonly visibility?: 'normal' | 'hidden'
+  readonly pool:
+    readonly CharacterRulesDisciplinePowerDicePoolTerm[]
+  readonly resolution:
+    CharacterRulesDisciplinePowerCheckResolution
+}
+
+export interface CharacterRulesDisciplinePowerModifier {
+  readonly kind:
+    | 'dicePool'
+    | 'difficulty'
+  readonly value: number
+  readonly contextKey: string
+}
+
+export interface CharacterRulesDisciplinePowerUsageLimit {
+  readonly kind: 'perScene'
+  readonly count: number
+}
+
+export interface CharacterRulesDisciplinePowerMechanics {
+  readonly systemSummary?: string
+  readonly activation: {
+    readonly kind:
+      CharacterRulesDisciplinePowerActivationKind
+  }
+  readonly rouseCost:
+    CharacterRulesDisciplinePowerRouseCost
+  readonly duration:
+    CharacterRulesDisciplinePowerDuration
+  readonly checks?:
+    readonly CharacterRulesDisciplinePowerMechanicCheck[]
+  readonly modifiers?:
+    readonly CharacterRulesDisciplinePowerModifier[]
+  readonly limits?:
+    readonly CharacterRulesDisciplinePowerUsageLimit[]
+}
+
 export interface CharacterRulesDisciplinePowerDefinition {
   readonly key: string
   readonly disciplineKey:
@@ -311,6 +415,8 @@ export interface CharacterRulesDisciplinePowerDefinition {
     readonly pool:
       readonly CharacterRulesDisciplinePowerDicePoolTerm[]
   }
+  readonly mechanics?:
+    CharacterRulesDisciplinePowerMechanics
 }
 
 export interface CharacterRulesBloodSorceryRitualDefinition {

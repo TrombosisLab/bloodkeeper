@@ -12,10 +12,62 @@ export type DisciplinePowerCatalogViolation =
   | 'POWER_ACTIVE_STATE_INVALID'
   | 'POWER_DICE_POOL_EMPTY'
   | 'POWER_DICE_POOL_TERM_DUPLICATED'
+  | 'POWER_DICE_CONTRACT_CONFLICT'
+  | 'POWER_MECHANICS_SUMMARY_EMPTY'
+  | 'POWER_MECHANICS_ROUSE_COUNT_INVALID'
+  | 'POWER_MECHANICS_DURATION_INVALID'
+  | 'POWER_MECHANICS_CHECK_KEY_EMPTY'
+  | 'POWER_MECHANICS_CHECK_KEY_DUPLICATED'
+  | 'POWER_MECHANICS_CHECK_POOL_EMPTY'
+  | 'POWER_MECHANICS_CHECK_POOL_TERM_DUPLICATED'
+  | 'POWER_MECHANICS_OPPOSING_POOL_EMPTY'
+  | 'POWER_MECHANICS_DIFFICULTY_INVALID'
+  | 'POWER_MECHANICS_MODIFIER_INVALID'
+  | 'POWER_MECHANICS_LIMIT_INVALID'
 
 export interface DisciplinePowerCatalogValidationResult {
   valid: boolean
   violations: DisciplinePowerCatalogViolation[]
+}
+
+function duplicatedPoolTerm(
+  pool: readonly {
+    kind: string
+    key: string
+  }[],
+): boolean {
+  const terms = new Set<string>()
+
+  for (const term of pool) {
+    const reference =
+      `${term.kind}:${term.key}`
+
+    if (terms.has(reference)) {
+      return true
+    }
+
+    terms.add(reference)
+  }
+
+  return false
+}
+
+function positiveInteger(
+  value: number,
+): boolean {
+  return (
+    Number.isInteger(value) &&
+    value >= 1
+  )
+}
+
+function positiveDifficulty(
+  value: number,
+): boolean {
+  return (
+    Number.isInteger(value) &&
+    value >= 1
+  )
 }
 
 export function isDisciplinePowerActive(
@@ -82,24 +134,219 @@ export function validateDisciplinePowerCatalog(
         )
       }
 
-      const poolTerms = new Set<string>()
+      if (
+        duplicatedPoolTerm(
+          definition.diceCheck.pool,
+        )
+      ) {
+        violations.push(
+          'POWER_DICE_POOL_TERM_DUPLICATED',
+        )
+      }
+    }
+
+    if (
+      definition.diceCheck &&
+      definition.mechanics?.checks
+    ) {
+      violations.push(
+        'POWER_DICE_CONTRACT_CONFLICT',
+      )
+    }
+
+    const mechanics =
+      definition.mechanics
+
+    if (mechanics) {
+      if (
+        mechanics.systemSummary !==
+          undefined &&
+        mechanics.systemSummary.trim()
+          .length === 0
+      ) {
+        violations.push(
+          'POWER_MECHANICS_SUMMARY_EMPTY',
+        )
+      }
+
+      const rouseCost =
+        mechanics.rouseCost
+
+      if (
+        (
+          rouseCost.kind === 'fixed' ||
+          rouseCost.kind ===
+            'additionalToBasePower'
+        ) &&
+        !positiveInteger(
+          rouseCost.checks,
+        )
+      ) {
+        violations.push(
+          'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+        )
+      }
+
+      if (
+        rouseCost.kind ===
+          'additionalToBasePower' &&
+        rouseCost.scaling &&
+        !positiveInteger(
+          rouseCost.scaling
+            .checksPerTarget,
+        )
+      ) {
+        violations.push(
+          'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+        )
+      }
+
+      if (
+        mechanics.duration.kind ===
+          'nightsByMargin' &&
+        !positiveInteger(
+          mechanics.duration.baseNights,
+        )
+      ) {
+        violations.push(
+          'POWER_MECHANICS_DURATION_INVALID',
+        )
+      }
+
+      const checkKeys =
+        new Set<string>()
 
       for (
-        const term of
-        definition.diceCheck.pool
+        const check of
+        mechanics.checks ?? []
       ) {
-        const termReference =
-          `${term.kind}:${term.key}`
-
-        if (
-          poolTerms.has(termReference)
-        ) {
+        if (check.key.trim().length === 0) {
           violations.push(
-            'POWER_DICE_POOL_TERM_DUPLICATED',
+            'POWER_MECHANICS_CHECK_KEY_EMPTY',
           )
         }
 
-        poolTerms.add(termReference)
+        if (checkKeys.has(check.key)) {
+          violations.push(
+            'POWER_MECHANICS_CHECK_KEY_DUPLICATED',
+          )
+        }
+
+        checkKeys.add(check.key)
+
+        if (check.pool.length === 0) {
+          violations.push(
+            'POWER_MECHANICS_CHECK_POOL_EMPTY',
+          )
+        }
+
+        if (
+          duplicatedPoolTerm(check.pool)
+        ) {
+          violations.push(
+            'POWER_MECHANICS_CHECK_POOL_TERM_DUPLICATED',
+          )
+        }
+
+        const resolution =
+          check.resolution
+
+        if (
+          resolution.kind ===
+            'fixedDifficulty' &&
+          !positiveDifficulty(
+            resolution.value,
+          )
+        ) {
+          violations.push(
+            'POWER_MECHANICS_DIFFICULTY_INVALID',
+          )
+        }
+
+        if (
+          resolution.kind ===
+            'contextualDifficulty'
+        ) {
+          const min =
+            resolution.min
+          const max =
+            resolution.max
+
+          if (
+            (
+              min !== undefined &&
+              !positiveDifficulty(min)
+            ) ||
+            (
+              max !== undefined &&
+              !positiveDifficulty(max)
+            ) ||
+            (
+              min !== undefined &&
+              max !== undefined &&
+              min > max
+            )
+          ) {
+            violations.push(
+              'POWER_MECHANICS_DIFFICULTY_INVALID',
+            )
+          }
+        }
+
+        if (
+          resolution.kind ===
+            'opposed'
+        ) {
+          if (
+            resolution.opposingPool
+              .length === 0
+          ) {
+            violations.push(
+              'POWER_MECHANICS_OPPOSING_POOL_EMPTY',
+            )
+          }
+
+          if (
+            duplicatedPoolTerm(
+              resolution.opposingPool,
+            )
+          ) {
+            violations.push(
+              'POWER_MECHANICS_CHECK_POOL_TERM_DUPLICATED',
+            )
+          }
+        }
+      }
+
+      for (
+        const modifier of
+        mechanics.modifiers ?? []
+      ) {
+        if (
+          !Number.isInteger(
+            modifier.value,
+          ) ||
+          modifier.value === 0 ||
+          modifier.contextKey.trim()
+            .length === 0
+        ) {
+          violations.push(
+            'POWER_MECHANICS_MODIFIER_INVALID',
+          )
+        }
+      }
+
+      for (
+        const limit of
+        mechanics.limits ?? []
+      ) {
+        if (
+          !positiveInteger(limit.count)
+        ) {
+          violations.push(
+            'POWER_MECHANICS_LIMIT_INVALID',
+          )
+        }
       }
     }
   }

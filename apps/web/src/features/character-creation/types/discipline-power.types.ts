@@ -45,12 +45,137 @@ export type DisciplinePowerDicePoolTermDefinition =
 
 export interface DisciplinePowerDiceCheckDefinition {
   /*
-   * Referencias estructuradas que el módulo
-   * de dados podrá consumir. Aquí no se suma
-   * la reserva ni se ejecuta ninguna tirada.
+   * Contrato simple histórico de SPEC-025-G.
+   * Se conserva para compatibilidad.
+   *
+   * Un Poder NO debe declarar a la vez
+   * diceCheck y mechanics.checks.
    */
   pool:
     DisciplinePowerDicePoolTermDefinition[]
+}
+
+export type DisciplinePowerActivationKind =
+  | 'standalone'
+  | 'enhancement'
+  | 'extension'
+
+export type DisciplinePowerRouseCostDefinition =
+  | {
+      kind: 'none'
+    }
+  | {
+      kind: 'fixed'
+      checks: number
+    }
+  | {
+      kind: 'inheritedFromBasePower'
+    }
+  | {
+      kind: 'additionalToBasePower'
+      checks: number
+      scaling?: {
+        kind:
+          'perAdditionalTargetBeyondAttribute'
+        attributeKey: AttributeKey
+        checksPerTarget: number
+      }
+    }
+
+export type DisciplinePowerDurationDefinition =
+  | {
+      kind: 'scene'
+      endConditions?: (
+        | 'movement'
+        | 'detected'
+      )[]
+    }
+  | {
+      kind: 'inheritedFromBasePower'
+    }
+  | {
+      kind: 'nightsByMargin'
+      baseNights: number
+    }
+
+export type DisciplinePowerCheckResolutionDefinition =
+  | {
+      kind: 'fixedDifficulty'
+      value: number
+    }
+  | {
+      kind: 'contextualDifficulty'
+      min?: number
+      max?: number
+    }
+  | {
+      kind: 'opposed'
+      opposingPool:
+        DisciplinePowerDicePoolTermDefinition[]
+    }
+
+export interface DisciplinePowerMechanicCheckDefinition {
+  key: string
+
+  role:
+    | 'activation'
+    | 'conditional'
+    | 'detection'
+
+  visibility?: 'normal' | 'hidden'
+
+  pool:
+    DisciplinePowerDicePoolTermDefinition[]
+
+  resolution:
+    DisciplinePowerCheckResolutionDefinition
+}
+
+export interface DisciplinePowerModifierDefinition {
+  kind:
+    | 'dicePool'
+    | 'difficulty'
+
+  value: number
+
+  /*
+   * Identificador corto del contexto mecánico.
+   * No es texto visible ni una reproducción
+   * de reglas del manual.
+   */
+  contextKey: string
+}
+
+export interface DisciplinePowerUsageLimitDefinition {
+  kind: 'perScene'
+  count: number
+}
+
+export interface DisciplinePowerMechanicsDefinition {
+  /*
+   * Resumen mecánico editorial propio,
+   * breve y apto para ficha.
+   */
+  systemSummary?: string
+
+  activation: {
+    kind: DisciplinePowerActivationKind
+  }
+
+  rouseCost:
+    DisciplinePowerRouseCostDefinition
+
+  duration:
+    DisciplinePowerDurationDefinition
+
+  checks?:
+    DisciplinePowerMechanicCheckDefinition[]
+
+  modifiers?:
+    DisciplinePowerModifierDefinition[]
+
+  limits?:
+    DisciplinePowerUsageLimitDefinition[]
 }
 
 export interface DisciplinePowerDefinition {
@@ -92,4 +217,7 @@ export interface DisciplinePowerDefinition {
 
   diceCheck?:
     DisciplinePowerDiceCheckDefinition
+
+  mechanics?:
+    DisciplinePowerMechanicsDefinition
 }
