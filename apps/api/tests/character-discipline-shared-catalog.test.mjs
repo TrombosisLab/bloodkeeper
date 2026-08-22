@@ -19,7 +19,7 @@ test(
     )
     assert.equal(
       characterDisciplineCatalog.powers.length,
-      105,
+      106,
     )
     assert.equal(
       characterDisciplineCatalog

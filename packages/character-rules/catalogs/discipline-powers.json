@@ -826,7 +826,8 @@
     "level": 1,
     "summary": "Permite permanecer oculto al fundirse con el entorno mientras el vampiro evita llamar la atención.",
     "sourceKey": "core-v5-es",
-    "active": true
+    "active": true,
+    "sourcePage": 261
   },
   {
     "key": "obfuscate-silence-of-death",
@@ -835,16 +836,18 @@
     "level": 1,
     "summary": "Suprime los sonidos producidos por el vampiro y facilita actuar sin ser oído.",
     "sourceKey": "core-v5-es",
-    "active": true
+    "active": true,
+    "sourcePage": 261
   },
   {
     "key": "obfuscate-unseen-passage",
     "disciplineKey": "obfuscate",
-    "name": "Paso Inadvertido",
+    "name": "Paso Invisible",
     "level": 2,
     "summary": "Permite desplazarse sin ser percibido mientras se mantengan las condiciones necesarias para conservar la ocultación.",
     "sourceKey": "core-v5-es",
-    "active": true
+    "active": true,
+    "sourcePage": 261
   },
   {
     "key": "obfuscate-mask-of-a-thousand-faces",
@@ -853,7 +856,8 @@
     "level": 3,
     "summary": "Hace que los observadores perciban al vampiro con una apariencia anónima y poco memorable.",
     "sourceKey": "core-v5-es",
-    "active": true
+    "active": true,
+    "sourcePage": 262
   },
   {
     "key": "obfuscate-ghost-in-the-machine",
@@ -862,12 +866,13 @@
     "level": 3,
     "summary": "Extiende los efectos de Ofuscación frente a dispositivos y sistemas de observación tecnológica.",
     "sourceKey": "core-v5-es",
-    "active": true
+    "active": true,
+    "sourcePage": 262
   },
   {
     "key": "obfuscate-vanish",
     "disciplineKey": "obfuscate",
-    "name": "Desvanecimiento",
+    "name": "Desvanecerse",
     "level": 4,
     "summary": "Permite desaparecer de la percepción incluso ante observadores que estaban prestando atención al vampiro.",
     "sourceKey": "core-v5-es",
@@ -876,39 +881,49 @@
         "obfuscate-cloak-of-shadows"
       ]
     },
+    "active": true,
+    "sourcePage": 262
+  },
+  {
+    "key": "obfuscate-conceal",
+    "disciplineKey": "obfuscate",
+    "name": "Ocultar",
+    "level": 4,
+    "summary": "Permite ocultar un objeto inanimado mediante Ofuscación, haciendo que los observadores tiendan a ignorarlo.",
+    "sourceKey": "core-v5-es",
+    "sourcePage": 262,
+    "requirements": {
+      "amalgam": {
+        "disciplineKey": "auspex",
+        "minimumLevel": 3
+      }
+    },
     "active": true
   },
   {
     "key": "obfuscate-cloak-the-gathering",
     "disciplineKey": "obfuscate",
-    "name": "Encubrimiento de la Asamblea",
+    "name": "Encubrimiento de la Concurrencia",
     "level": 5,
     "summary": "Permite extender determinados efectos de Ofuscación a varios acompañantes.",
     "sourceKey": "core-v5-es",
-    "requirements": {
-      "prerequisitePowerKeys": [
-        "obfuscate-unseen-passage"
-      ]
-    },
-    "active": true
+    "active": true,
+    "sourcePage": 263
   },
   {
     "key": "obfuscate-impostors-guise",
     "disciplineKey": "obfuscate",
-    "name": "Impostura",
+    "name": "Disfraz del Impostor",
     "level": 5,
     "summary": "Permite adoptar mediante Ofuscación la apariencia percibida de otra persona.",
     "sourceKey": "core-v5-es",
     "requirements": {
       "prerequisitePowerKeys": [
         "obfuscate-mask-of-a-thousand-faces"
-      ],
-      "amalgam": {
-        "disciplineKey": "presence",
-        "minimumLevel": 3
-      }
+      ]
     },
-    "active": true
+    "active": true,
+    "sourcePage": 263
   },
   {
     "key": "oblivion-ashes-to-ashes",
