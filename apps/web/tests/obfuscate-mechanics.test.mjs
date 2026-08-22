@@ -551,18 +551,67 @@ test(
 )
 
 test(
-  '025-A1-M2 ningún Poder ajeno a Ofuscación recibe mechanics en este bloque',
+  '025-A1-M2 Ofuscación permanece aislada de Disciplinas aún no mecanizadas',
   () => {
-    const foreign =
+    const obfuscate =
+      characterDisciplineCatalog.powers
+        .filter(
+          ({ disciplineKey }) =>
+            disciplineKey ===
+              'obfuscate',
+        )
+
+    const potence =
+      characterDisciplineCatalog.powers
+        .filter(
+          ({ disciplineKey }) =>
+            disciplineKey ===
+              'potence',
+        )
+
+    const notYetMechanized =
       characterDisciplineCatalog.powers
         .filter(
           ({ disciplineKey }) =>
             disciplineKey !==
-              'obfuscate',
+              'obfuscate' &&
+            disciplineKey !==
+              'potence',
         )
 
     assert.equal(
-      foreign.some(
+      obfuscate.length,
+      9,
+    )
+
+    assert.equal(
+      obfuscate.every(
+        power =>
+          power.mechanics !== undefined,
+      ),
+      true,
+    )
+
+    assert.equal(
+      potence.length,
+      9,
+    )
+
+    assert.equal(
+      potence.every(
+        power =>
+          power.mechanics !== undefined,
+      ),
+      true,
+    )
+
+    assert.equal(
+      notYetMechanized.length,
+      88,
+    )
+
+    assert.equal(
+      notYetMechanized.some(
         power =>
           power.mechanics !== undefined,
       ),

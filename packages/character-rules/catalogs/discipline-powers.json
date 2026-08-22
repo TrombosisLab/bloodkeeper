@@ -465,7 +465,19 @@
     "summary": "Permite causar daños devastadores a mortales con ataques sin armas.",
     "sourceKey": "core-v5-es",
     "sourcePage": 264,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Permite que los ataques sin armas causen daño agravado a mortales y reduce la protección de armadura según el nivel de Potencia.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "passive"
+      }
+    }
   },
   {
     "key": "potence-soaring-leap",
@@ -475,7 +487,19 @@
     "summary": "Permite realizar saltos extraordinarios gracias a una fuerza sobrenatural.",
     "sourceKey": "core-v5-es",
     "sourcePage": 264,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Permite saltar verticalmente hasta tres veces Potencia en metros y horizontalmente hasta cinco veces, sin carrerilla.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "passive"
+      }
+    }
   },
   {
     "key": "potence-prowess",
@@ -485,7 +509,20 @@
     "summary": "Aumenta de forma sobrenatural la fuerza física y el daño del usuario.",
     "sourceKey": "core-v5-es",
     "sourcePage": 264,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Durante la escena añade Potencia al daño sin armas y a las proezas de Fuerza, y la mitad de Potencia redondeada hacia arriba al daño de Pelea con Armas.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      }
+    }
   },
   {
     "key": "potence-uncanny-grip",
@@ -495,7 +532,40 @@
     "summary": "Permite trepar y aferrarse a superficies mediante una fuerza extraordinaria.",
     "sourceKey": "core-v5-es",
     "sourcePage": 264,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Permite escalar automáticamente superficies adecuadas y aferrarse a paredes o techos; deja rastros detectables con Inteligencia + Investigación a dificultad 2, salvo evidencias en vidrio que son obvias.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "detect-uncanny-grip-traces",
+          "role": "detection",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "intelligence"
+            },
+            {
+              "kind": "skill",
+              "key": "investigation"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 2
+          }
+        }
+      ]
+    }
   },
   {
     "key": "potence-brutal-feed",
@@ -505,7 +575,19 @@
     "summary": "Convierte la alimentación en una agresión física especialmente destructiva.",
     "sourceKey": "core-v5-es",
     "sourcePage": 265,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Acelera una alimentación brutal: cada punto de Ansia saciado causa 1 daño agravado a un mortal y superficial a un vampiro; en combate se aplica tras un mordisco de Pelea con éxito y la armadura no protege.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "feeding"
+      }
+    }
   },
   {
     "key": "potence-spark-of-rage",
@@ -521,7 +603,49 @@
         "minimumLevel": 3
       }
     },
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Permite añadir Potencia a intentos de irritar o incitar a la violencia; contra otro vampiro puede resolverse una contienda de Manipulación + Potencia contra Compostura + Inteligencia y, si gana, exige una prueba de Frenesí de furia a dificultad 3.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "incite-vampire-rage",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "manipulation"
+            },
+            {
+              "kind": "discipline",
+              "key": "potence"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "composure"
+              },
+              {
+                "kind": "attribute",
+                "key": "intelligence"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "potence-draught-of-might",
@@ -531,7 +655,24 @@
     "summary": "Permite transmitir temporalmente parte de la Potencia mediante la Sangre.",
     "sourceKey": "core-v5-es",
     "sourcePage": 265,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Quien bebe directamente Sangre por valor de un Control recibe Potencia temporal igual a la mitad de la del donante, redondeada hacia abajo, y sus Poderes sin Amalgamas hasta ese nivel.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "nightWithEndConditions",
+        "endConditions": [
+          "nextFeeding",
+          "hungerFive"
+        ]
+      }
+    }
   },
   {
     "key": "potence-fist-of-caine",
@@ -541,7 +682,20 @@
     "summary": "Permite infligir heridas extremadamente graves con ataques cuerpo a cuerpo.",
     "sourceKey": "core-v5-es",
     "sourcePage": 266,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Durante la escena, los ataques sin armas de Pelea pueden causar daño agravado a la Salud de mortales y seres sobrenaturales.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      }
+    }
   },
   {
     "key": "potence-earthshock",
@@ -551,7 +705,46 @@
     "summary": "Permite crear una onda de choque golpeando el suelo con fuerza sobrenatural.",
     "sourceKey": "core-v5-es",
     "sourcePage": 266,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Crea sin prueba propia una onda de choque de 5 m; los afectados tiran Destreza + Atletismo a dificultad 3, con consecuencias según el resultado, y sólo puede usarse una vez por escena.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 2
+      },
+      "duration": {
+        "kind": "singleUse"
+      },
+      "checks": [
+        {
+          "key": "resist-earthshock",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "dexterity"
+            },
+            {
+              "kind": "skill",
+              "key": "athletics"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 3
+          }
+        }
+      ],
+      "limits": [
+        {
+          "kind": "perScene",
+          "count": 1
+        }
+      ]
+    }
   },
   {
     "key": "presence-daunt",
