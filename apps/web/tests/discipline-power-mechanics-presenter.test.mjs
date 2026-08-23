@@ -377,3 +377,58 @@ test(
     }
   },
 )
+
+test(
+  '025-A9-M1E presenta un rango de Controles sin exponer keys internas',
+  () => {
+    const view =
+      presentDisciplinePowerMechanics(
+        {
+          systemSummary:
+            'Adopta una forma de niebla con coste variable.',
+          activation: {
+            kind: 'standalone',
+          },
+          rouseCost: {
+            kind: 'range',
+            minChecks: 1,
+            maxChecks: 3,
+          },
+          duration: {
+            kind: 'scene',
+            endConditions: [
+              'voluntaryEnd',
+            ],
+          },
+          checks: [],
+        },
+      )
+
+    assert.equal(
+      view.cost,
+      '1–3 Controles de Enardecimiento',
+    )
+
+    assert.equal(
+      view.duration,
+      'Una escena; termina al terminarlo voluntariamente',
+    )
+
+    const serialized =
+      JSON.stringify(view)
+
+    for (const forbidden of [
+      '"range"',
+      'minChecks',
+      'maxChecks',
+      'voluntaryEnd',
+    ]) {
+      assert.equal(
+        serialized.includes(
+          forbidden,
+        ),
+        false,
+      )
+    }
+  },
+)

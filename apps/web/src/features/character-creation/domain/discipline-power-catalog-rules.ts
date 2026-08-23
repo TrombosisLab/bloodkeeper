@@ -203,6 +203,24 @@ export function validateDisciplinePowerCatalog(
       }
 
       if (
+        rouseCost.kind === 'range' &&
+        (
+          !positiveInteger(
+            rouseCost.minChecks,
+          ) ||
+          !positiveInteger(
+            rouseCost.maxChecks,
+          ) ||
+          rouseCost.maxChecks <
+            rouseCost.minChecks
+        )
+      ) {
+        violations.push(
+          'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+        )
+      }
+
+      if (
         rouseCost.kind === 'perUnit'
       ) {
         if (

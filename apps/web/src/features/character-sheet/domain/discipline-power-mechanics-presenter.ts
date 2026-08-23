@@ -196,6 +196,12 @@ function formatRouseCost(
       )
     }
 
+    case 'range':
+      return (
+        `${cost.minChecks}–${cost.maxChecks} ` +
+        'Controles de Enardecimiento'
+      )
+
     case 'perUnit': {
       const checkLabel =
         formatCount(

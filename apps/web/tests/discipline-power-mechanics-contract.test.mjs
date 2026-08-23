@@ -609,3 +609,121 @@ test(
     }
   },
 )
+
+test(
+  '025-A9-M1E admite coste de Enardecimiento por rango',
+  () => {
+    const power = {
+      key: 'protean-range-valid',
+      disciplineKey: 'protean',
+      name: 'Range valid',
+      level: 5,
+      active: true,
+      sourceKey: 'core-v5-es',
+      sourcePage: 271,
+      description: 'test',
+      mechanics: {
+        systemSummary:
+          'Coste variable entre uno y tres Controles.',
+        activation: {
+          kind: 'standalone',
+        },
+        rouseCost: {
+          kind: 'range',
+          minChecks: 1,
+          maxChecks: 3,
+        },
+        duration: {
+          kind: 'scene',
+        },
+        checks: [],
+      },
+    }
+
+    assert.deepEqual(
+      validateDisciplinePowerCatalog(
+        [power],
+      ),
+      {
+        valid: true,
+        violations: [],
+      },
+    )
+  },
+)
+
+test(
+  '025-A9-M1E rechaza rangos de Enardecimiento inválidos',
+  () => {
+    const invalidRanges = [
+      {
+        minChecks: 0,
+        maxChecks: 3,
+      },
+      {
+        minChecks: 1,
+        maxChecks: 0,
+      },
+      {
+        minChecks: 3,
+        maxChecks: 1,
+      },
+      {
+        minChecks: -1,
+        maxChecks: 3,
+      },
+    ]
+
+    for (
+      const [
+        index,
+        range,
+      ] of invalidRanges.entries()
+    ) {
+      const power = {
+        key:
+          `protean-range-invalid-${index}`,
+        disciplineKey:
+          'protean',
+        name: 'Range invalid',
+        level: 5,
+        active: true,
+        sourceKey:
+          'core-v5-es',
+        sourcePage: 271,
+        description: 'test',
+        mechanics: {
+          systemSummary:
+            'Coste variable inválido.',
+          activation: {
+            kind: 'standalone',
+          },
+          rouseCost: {
+            kind: 'range',
+            ...range,
+          },
+          duration: {
+            kind: 'scene',
+          },
+          checks: [],
+        },
+      }
+
+      const result =
+        validateDisciplinePowerCatalog(
+          [power],
+        )
+
+      assert.equal(
+        result.valid,
+        false,
+      )
+
+      assert.ok(
+        result.violations.includes(
+          'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+        ),
+      )
+    }
+  },
+)
