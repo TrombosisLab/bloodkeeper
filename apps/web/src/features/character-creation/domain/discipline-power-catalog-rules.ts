@@ -130,6 +130,17 @@ function validateDisciplinePowerRouseCost(
   }
 
   if (
+    rouseCost.kind === 'atLeast' &&
+    !positiveInteger(
+      rouseCost.minChecks,
+    )
+  ) {
+    violations.push(
+      'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+    )
+  }
+
+  if (
     rouseCost.kind === 'range' &&
     (
       !positiveInteger(

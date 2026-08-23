@@ -322,6 +322,10 @@ export type CharacterRulesDisciplinePowerRouseCost =
         readonly CharacterRulesDisciplinePowerRouseCostExemption[]
     }
   | {
+      readonly kind: 'atLeast'
+      readonly minChecks: number
+    }
+  | {
       readonly kind: 'range'
       readonly minChecks: number
       readonly maxChecks: number

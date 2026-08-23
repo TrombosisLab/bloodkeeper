@@ -82,6 +82,10 @@ export type DisciplinePowerRouseCostDefinition =
         DisciplinePowerRouseCostExemption[]
     }
   | {
+      kind: 'atLeast'
+      minChecks: number
+    }
+  | {
       kind: 'range'
       minChecks: number
       maxChecks: number

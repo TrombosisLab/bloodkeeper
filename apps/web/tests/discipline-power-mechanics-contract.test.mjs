@@ -912,3 +912,114 @@ test(
     )
   },
 )
+
+test(
+  '025-A10-M1 admite coste mínimo abierto de Enardecimiento',
+  () => {
+    const catalog = [
+      {
+        key: 'blood-sorcery-at-least-valid',
+        disciplineKey: 'bloodSorcery',
+        name: 'At least valid',
+        level: 1,
+        sourceKey: 'core-v5-es',
+        sourcePage: 273,
+        description: 'test',
+        active: true,
+        mechanics: {
+          systemSummary:
+            'Coste de uno o más Controles.',
+          activation: {
+            kind: 'standalone',
+          },
+          rouseCost: {
+            kind: 'atLeast',
+            minChecks: 1,
+          },
+          duration: {
+            kind: 'singleUse',
+          },
+          checks: [],
+        },
+      },
+    ]
+
+    const result =
+      validateDisciplinePowerCatalog(
+        catalog,
+      )
+
+    assert.deepEqual(
+      result,
+      {
+        valid: true,
+        violations: [],
+      },
+    )
+  },
+)
+
+test(
+  '025-A10-M1 rechaza mínimos abiertos de Enardecimiento inválidos',
+  () => {
+    const invalidMinimums = [
+      0,
+      -1,
+      1.5,
+    ]
+
+    for (
+      const [
+        index,
+        minChecks,
+      ] of invalidMinimums.entries()
+    ) {
+      const catalog = [
+        {
+          key:
+            `blood-sorcery-at-least-invalid-${index}`,
+          disciplineKey:
+            'bloodSorcery',
+          name: 'At least invalid',
+          level: 1,
+          sourceKey:
+            'core-v5-es',
+          sourcePage: 273,
+          description: 'test',
+          active: true,
+          mechanics: {
+            systemSummary:
+              'Coste mínimo abierto inválido.',
+            activation: {
+              kind: 'standalone',
+            },
+            rouseCost: {
+              kind: 'atLeast',
+              minChecks,
+            },
+            duration: {
+              kind: 'singleUse',
+            },
+            checks: [],
+          },
+        },
+      ]
+
+      const result =
+        validateDisciplinePowerCatalog(
+          catalog,
+        )
+
+      assert.equal(
+        result.valid,
+        false,
+      )
+
+      assert.ok(
+        result.violations.includes(
+          'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+        ),
+      )
+    }
+  },
+)

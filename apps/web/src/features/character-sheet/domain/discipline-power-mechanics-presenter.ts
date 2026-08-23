@@ -195,6 +195,12 @@ function formatRouseCostDefinition(
       )
     }
 
+    case 'atLeast':
+      return (
+        `${cost.minChecks} o más ` +
+        'Controles de Enardecimiento'
+      )
+
     case 'range':
       return (
         `${cost.minChecks}–${cost.maxChecks} ` +

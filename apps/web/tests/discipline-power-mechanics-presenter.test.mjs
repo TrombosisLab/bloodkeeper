@@ -506,3 +506,64 @@ test(
     )
   },
 )
+
+test(
+  '025-A10-M1 presenta coste mínimo abierto de Enardecimiento',
+  () => {
+    for (
+      const [
+        minChecks,
+        expected,
+      ] of [
+        [
+          1,
+          '1 o más Controles de Enardecimiento',
+        ],
+        [
+          2,
+          '2 o más Controles de Enardecimiento',
+        ],
+      ]
+    ) {
+      const presented =
+        presentDisciplinePowerMechanics(
+          {
+            systemSummary:
+              'Coste mínimo abierto.',
+            activation: {
+              kind: 'standalone',
+            },
+            rouseCost: {
+              kind: 'atLeast',
+              minChecks,
+            },
+            duration: {
+              kind: 'singleUse',
+            },
+            checks: [],
+          },
+        )
+
+      assert.ok(presented)
+
+      assert.equal(
+        presented.cost,
+        expected,
+      )
+
+      assert.equal(
+        presented.cost.includes(
+          'atLeast',
+        ),
+        false,
+      )
+
+      assert.equal(
+        presented.cost.includes(
+          'minChecks',
+        ),
+        false,
+      )
+    }
+  },
+)
