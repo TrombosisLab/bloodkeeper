@@ -212,7 +212,7 @@ test(
 )
 
 test(
-  'Visión del Olvido no inventa una Ceremonia inicial',
+  'Vista del Olvido no inventa una Ceremonia inicial',
   () => {
     const result =
       validateDisciplinesStep(

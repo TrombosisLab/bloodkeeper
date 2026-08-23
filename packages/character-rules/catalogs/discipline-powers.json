@@ -3626,7 +3626,7 @@
   {
     "key": "oblivion-oblivions-sight",
     "disciplineKey": "oblivion",
-    "name": "Visión del Olvido",
+    "name": "Vista del Olvido",
     "level": 1,
     "summary": "Permite percibir manifestaciones sobrenaturales vinculadas con la muerte y los fantasmas.",
     "sourceKey": "players-guide-v5-es",

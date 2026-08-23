@@ -134,7 +134,7 @@ test(
         'Cenizas a las Cenizas',
         'El Grillete Vinculante',
         'Manto de Sombras',
-        'Visión del Olvido',
+        'Vista del Olvido',
       ],
     )
   },
