@@ -11,7 +11,7 @@ import {
 
 const powers =
   disciplinePowerDefinitions.filter(
-    (power) =>
+    power =>
       power.disciplineKey ===
       'dominate',
   )
@@ -19,7 +19,7 @@ const powers =
 function getPower(key) {
   const power =
     disciplinePowerDefinitions.find(
-      (candidate) =>
+      candidate =>
         candidate.key === key,
     )
 
@@ -32,7 +32,7 @@ function getPower(key) {
 }
 
 test(
-  'Dominación del manual básico contiene exactamente 9 poderes',
+  '025-A7-R3 Dominación CORE contiene exactamente 9 Poderes',
   () => {
     assert.equal(
       powers.length,
@@ -42,16 +42,17 @@ test(
 )
 
 test(
-  'la distribución por niveles de Dominación es correcta',
+  '025-A7-R3 la distribución CORE de Dominación es 2 2 2 1 2',
   () => {
     const distribution =
       Object.fromEntries(
         [1, 2, 3, 4, 5].map(
-          (level) => [
+          level => [
             level,
             powers.filter(
-              (power) =>
-                power.level === level,
+              power =>
+                power.level ===
+                level,
             ).length,
           ],
         ),
@@ -61,26 +62,234 @@ test(
       distribution,
       {
         1: 2,
-        2: 1,
+        2: 2,
         3: 2,
         4: 1,
-        5: 3,
+        5: 2,
       },
     )
   },
 )
 
 test(
-  'Dominación usa exclusivamente contenido core',
+  '025-A7-R3 Dominación CORE usa el inventario canónico reconciliado',
+  () => {
+    assert.deepEqual(
+      powers.map(
+        power => ({
+          key: power.key,
+          level: power.level,
+          name: power.name,
+          page: power.sourcePage,
+        }),
+      ),
+      [
+        {
+          key:
+            'dominate-cloud-memory',
+          level: 1,
+          name:
+            'Nublar la Memoria',
+          page: 255,
+        },
+        {
+          key:
+            'dominate-compel',
+          level: 1,
+          name: 'Compelir',
+          page: 255,
+        },
+        {
+          key:
+            'dominate-dementation',
+          level: 2,
+          name: 'Dementación',
+          page: 256,
+        },
+        {
+          key:
+            'dominate-mesmerize',
+          level: 2,
+          name: 'Mesmerismo',
+          page: 256,
+        },
+        {
+          key:
+            'dominate-submerged-directive',
+          level: 3,
+          name:
+            'Directriz Sumergida',
+          page: 257,
+        },
+        {
+          key:
+            'dominate-the-forgetful-mind',
+          level: 3,
+          name:
+            'Mente Olvidadiza',
+          page: 257,
+        },
+        {
+          key:
+            'dominate-rationalize',
+          level: 4,
+          name: 'Racionalizar',
+          page: 257,
+        },
+        {
+          key:
+            'dominate-terminal-decree',
+          level: 5,
+          name:
+            'Decreto Terminal',
+          page: 257,
+        },
+        {
+          key:
+            'dominate-mass-manipulation',
+          level: 5,
+          name:
+            'Manipulación en Masa',
+          page: 257,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  '025-A7-R3 Dementación requiere Ofuscación 2',
+  () => {
+    const dementation =
+      getPower(
+        'dominate-dementation',
+      )
+
+    assert.deepEqual(
+      dementation.requirements,
+      {
+        amalgam: {
+          disciplineKey:
+            'obfuscate',
+          minimumLevel: 2,
+        },
+      },
+    )
+  },
+)
+
+test(
+  '025-A7-R3 Dementación no es aprendible sin Ofuscación 2',
+  () => {
+    const dementation =
+      getPower(
+        'dominate-dementation',
+      )
+
+    const result =
+      canLearnDisciplinePower(
+        dementation,
+        [
+          {
+            key: 'dominate',
+            value: 2,
+            powerKeys: [
+              'dominate-compel',
+            ],
+          },
+          {
+            key: 'obfuscate',
+            value: 1,
+            powerKeys: [
+              'obfuscate-cloak-of-shadows',
+            ],
+          },
+        ],
+        [],
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+  },
+)
+
+test(
+  '025-A7-R3 Dementación es aprendible con Dominación 2 y Ofuscación 2',
+  () => {
+    const dementation =
+      getPower(
+        'dominate-dementation',
+      )
+
+    const result =
+      canLearnDisciplinePower(
+        dementation,
+        [
+          {
+            key: 'dominate',
+            value: 2,
+            powerKeys: [
+              'dominate-compel',
+            ],
+          },
+          {
+            key: 'obfuscate',
+            value: 2,
+            powerKeys: [
+              'obfuscate-cloak-of-shadows',
+              'obfuscate-unseen-passage',
+            ],
+          },
+        ],
+        [],
+      )
+
+    assert.equal(
+      result.valid,
+      true,
+    )
+  },
+)
+
+test(
+  '025-A7-R3 Sumisión Total deja de formar parte del CORE',
+  () => {
+    assert.equal(
+      disciplinePowerDefinitions.some(
+        power =>
+          power.key ===
+          'dominate-total-subjugation',
+      ),
+      false,
+    )
+
+    assert.equal(
+      powers.some(
+        power =>
+          power.name ===
+          'Sumisión Total',
+      ),
+      false,
+    )
+  },
+)
+
+test(
+  '025-A7-R3 Dominación usa exclusivamente fuente core y trazabilidad 255 a 257',
   () => {
     assert.equal(
       powers.every(
-        (power) =>
+        power =>
           power.sourceKey ===
-          'core-v5-es' &&
-          !power.key.includes(
-            '-dev-',
-          ),
+            'core-v5-es' &&
+          Number.isInteger(
+            power.sourcePage,
+          ) &&
+          power.sourcePage >= 255 &&
+          power.sourcePage <= 257 &&
+          power.active !== false,
       ),
       true,
     )
@@ -88,51 +297,11 @@ test(
 )
 
 test(
-  'los poderes de nivel 1 son Nublar la Memoria y Compelir',
-  () => {
-    assert.deepEqual(
-      powers
-        .filter(
-          (power) =>
-            power.level === 1,
-        )
-        .map(
-          (power) =>
-            power.name,
-        ),
-      [
-        'Nublar la Memoria',
-        'Compelir',
-      ],
-    )
-  },
-)
-
-test(
-  'Dominación cubre todos los niveles 1 a 5',
-  () => {
-    const levels = [
-      ...new Set(
-        powers.map(
-          (power) =>
-            power.level,
-        ),
-      ),
-    ].sort()
-
-    assert.deepEqual(
-      levels,
-      [1, 2, 3, 4, 5],
-    )
-  },
-)
-
-test(
-  'las claves de Dominación son únicas',
+  '025-A7-R3 las claves de Dominación son únicas',
   () => {
     const keys =
       powers.map(
-        (power) =>
+        power =>
           power.key,
       )
 
@@ -144,24 +313,7 @@ test(
 )
 
 test(
-  'todos los poderes tienen trazabilidad bibliográfica',
-  () => {
-    assert.equal(
-      powers.every(
-        (power) =>
-          Number.isInteger(
-            power.sourcePage,
-          ) &&
-          power.sourcePage >= 255 &&
-          power.sourcePage <= 257,
-      ),
-      true,
-    )
-  },
-)
-
-test(
-  'Posesión de Auspex reconoce Dominación 3 real',
+  '025-A7-R3 Posesión de Auspex sigue reconociendo Dominación 3',
   () => {
     const possession =
       getPower(
@@ -198,7 +350,7 @@ test(
 )
 
 test(
-  'Voz Irresistible reconoce Dominación 1 real',
+  '025-A7-R3 Voz Irresistible sigue reconociendo Dominación 1',
   () => {
     const irresistibleVoice =
       getPower(
@@ -233,37 +385,17 @@ test(
 )
 
 test(
-  'las relaciones cruzadas siguen rechazándose sin Dominación suficiente',
+  '025-A7-R3 Dominación permanece sin mechanics antes de A7-M2',
   () => {
-    const possession =
-      getPower(
-        'auspex-possession',
-      )
-
-    const result =
-      canLearnDisciplinePower(
-        possession,
-        [
-          {
-            key: 'auspex',
-            value: 5,
-            powerKeys: [],
-          },
-          {
-            key: 'dominate',
-            value: 2,
-            powerKeys: [
-              'dominate-compel',
-              'dominate-mesmerize',
-            ],
-          },
-        ],
-        [],
-      )
-
     assert.equal(
-      result.valid,
-      false,
+      powers.every(
+        power =>
+          power.mechanics ===
+            undefined &&
+          power.diceCheck ===
+            undefined,
+      ),
+      true,
     )
   },
 )

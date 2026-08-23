@@ -1304,6 +1304,22 @@
     "active": true
   },
   {
+    "key": "dominate-dementation",
+    "disciplineKey": "dominate",
+    "level": 2,
+    "name": "Dementación",
+    "summary": "Abruma la mente de la víctima con impulsos y percepciones desestabilizadoras mediante Dominación.",
+    "requirements": {
+      "amalgam": {
+        "disciplineKey": "obfuscate",
+        "minimumLevel": 2
+      }
+    },
+    "sourceKey": "core-v5-es",
+    "sourcePage": 256,
+    "active": true
+  },
+  {
     "key": "dominate-mesmerize",
     "disciplineKey": "dominate",
     "name": "Mesmerismo",
@@ -1314,29 +1330,29 @@
     "active": true
   },
   {
-    "key": "dominate-the-forgetful-mind",
-    "disciplineKey": "dominate",
-    "name": "La Mente Olvidadiza",
-    "level": 3,
-    "summary": "Permite alterar y reconstruir recuerdos del objetivo mediante manipulación sobrenatural.",
-    "sourceKey": "core-v5-es",
-    "sourcePage": 256,
-    "active": true
-  },
-  {
     "key": "dominate-submerged-directive",
     "disciplineKey": "dominate",
-    "name": "Instrucciones Subconscientes",
+    "name": "Directriz Sumergida",
     "level": 3,
     "summary": "Permite implantar una orden latente que se activa cuando se cumplen determinadas circunstancias.",
     "sourceKey": "core-v5-es",
-    "sourcePage": 256,
+    "sourcePage": 257,
+    "active": true
+  },
+  {
+    "key": "dominate-the-forgetful-mind",
+    "disciplineKey": "dominate",
+    "name": "Mente Olvidadiza",
+    "level": 3,
+    "summary": "Permite alterar y reconstruir recuerdos del objetivo mediante manipulación sobrenatural.",
+    "sourceKey": "core-v5-es",
+    "sourcePage": 257,
     "active": true
   },
   {
     "key": "dominate-rationalize",
     "disciplineKey": "dominate",
-    "name": "Racionalización",
+    "name": "Racionalizar",
     "level": 4,
     "summary": "Hace que el objetivo racionalice las acciones realizadas bajo Dominación como decisiones propias.",
     "sourceKey": "core-v5-es",
@@ -1356,19 +1372,9 @@
   {
     "key": "dominate-mass-manipulation",
     "disciplineKey": "dominate",
-    "name": "Manipulación Masiva",
+    "name": "Manipulación en Masa",
     "level": 5,
     "summary": "Permite extender determinados efectos de Dominación a múltiples objetivos simultáneamente.",
-    "sourceKey": "core-v5-es",
-    "sourcePage": 257,
-    "active": true
-  },
-  {
-    "key": "dominate-total-subjugation",
-    "disciplineKey": "dominate",
-    "name": "Sumisión Total",
-    "level": 5,
-    "summary": "Representa una forma extrema de control sobrenatural sobre la voluntad de un objetivo.",
     "sourceKey": "core-v5-es",
     "sourcePage": 257,
     "active": true
