@@ -3601,7 +3601,49 @@
     "summary": "Canaliza la entropía de Olvido sobre restos mortales y la materia muerta.",
     "sourceKey": "players-guide-v5-es",
     "sourcePage": 85,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Reduce un cadáver ordinario a ceniza sin tirada en 3 turnos. Contra un cadáver animado enfrenta Resistencia + Olvido a Resistencia + Medicina; Fortaleza puede sustituir Medicina al resistir. Con éxito tarda 5 turnos menos el margen, con un mínimo de 1; un crítico lo vuelve inmediato. Un fallo total provoca putrefacción sin desintegrarlo e impide repetir el Poder sobre ese cadáver. En cualquier Control de Enardecimiento de este Poder, un resultado de 1 o 10 causa además una Mácula, además de cualquier Ansia obtenida; si la Potencia de Sangre permite repetir el Control, puede elegirse cuál de los dos resultados conservar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "singleUse"
+      },
+      "checks": [
+        {
+          "key": "disintegrate-animated-corpse",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "stamina"
+            },
+            {
+              "kind": "discipline",
+              "key": "oblivion"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "stamina"
+              },
+              {
+                "kind": "skill",
+                "key": "medicine"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-binding-fetter",
@@ -3611,7 +3653,26 @@
     "summary": "Permite percibir vínculos sobrenaturales relacionados con los muertos y sus Grilletes.",
     "sourceKey": "players-guide-v5-es",
     "sourcePage": 85,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Revela el vínculo que ata a un espíritu a un lugar u objeto. Mientras está activo impone -2 dados a las tiradas de Consciencia, Astucia y Resolución afectadas por el Poder. No se estructura una tirada de activación que el sistema del Poder no fija.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "modifiers": [
+        {
+          "kind": "dicePool",
+          "value": -2,
+          "contextKey": "bindingFetterAffectedRolls"
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-shadow-cloak",
@@ -3621,7 +3682,31 @@
     "summary": "Manipula las sombras para envolver al vampiro y dificultar su percepción.",
     "sourceKey": "players-guide-v5-es",
     "sourcePage": 85,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Envuelve al usuario en sombras y concede +2 dados a Sigilo, además de +2 dados a Intimidación frente a mortales.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "passive"
+      },
+      "modifiers": [
+        {
+          "kind": "dicePool",
+          "value": 2,
+          "contextKey": "shadowCloakStealth"
+        },
+        {
+          "kind": "dicePool",
+          "value": 2,
+          "contextKey": "shadowCloakMortalIntimidation"
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-oblivions-sight",
@@ -3631,7 +3716,26 @@
     "summary": "Permite percibir manifestaciones sobrenaturales vinculadas con la muerte y los fantasmas.",
     "sourceKey": "players-guide-v5-es",
     "sourcePage": 85,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Ignora penalizadores por oscuridad, incluida la sobrenatural, mientras el usuario conserve los ojos. Permite ver fantasmas que no se oculten, sin permitir contacto físico. Los ojos se vuelven negros y las interacciones sociales con mortales sufren -2 dados mientras está activa.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "modifiers": [
+        {
+          "kind": "dicePool",
+          "value": -2,
+          "contextKey": "oblivionsSightMortalSocial"
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-cast-shadows",
@@ -3641,7 +3745,40 @@
     "summary": "Conjura una sombra sobrenatural que facilita la manifestación de otros Poderes de Olvido.",
     "sourceKey": "players-guide-v5-es",
     "sourcePage": 86,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Anima la sombra del usuario. Detectar la alteración exige Astucia + Consciencia a dificultad 3. Algunos efectos pueden alcanzar hasta dos veces la puntuación de Olvido y, dentro de la sombra, el daño a Fuerza de Voluntad en conflicto social aumenta en 1. En cualquier Control de Enardecimiento de este Poder, un resultado de 1 o 10 causa además una Mácula, además de cualquier Ansia obtenida; si la Potencia de Sangre permite repetir el Control, puede elegirse cuál de los dos resultados conservar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "detect-cast-shadow",
+          "role": "detection",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "skill",
+              "key": "awareness"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 3
+          }
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-arms-of-ahriman",
@@ -3657,7 +3794,57 @@
         "minimumLevel": 2
       }
     },
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Invoca brazos de sombra en un turno. Para agarrar o golpear usa Astucia + Olvido y la reserva puede dividirse entre varios brazos. El daño superficial añade la mitad de Potencia, redondeada hacia arriba. Mientras controla los brazos el usuario no realiza otras acciones. La luz brillante puede dañarlos; evitar ese daño durante un turno exige Astucia + Olvido a dificultad 3. En cualquier Control de Enardecimiento de este Poder, un resultado de 1 o 10 causa además una Mácula, además de cualquier Ansia obtenida; si la Potencia de Sangre permite repetir el Control, puede elegirse cuál de los dos resultados conservar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "control-shadow-arms",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "discipline",
+              "key": "oblivion"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        },
+        {
+          "key": "avoid-bright-light-damage",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "discipline",
+              "key": "oblivion"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 3
+          }
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-where-the-shroud-thins",
@@ -3667,7 +3854,41 @@
     "summary": "Permite percibir lugares donde la separación entre el mundo de los vivos y los muertos es especialmente débil.",
     "sourceKey": "players-guide-v5-es",
     "sourcePage": 87,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Examina la permeabilidad del Velo mediante Inteligencia + Olvido a dificultad 3. En cualquier Control de Enardecimiento de este Poder, un resultado de 1 o 10 causa además una Mácula, además de cualquier Ansia obtenida; si la Potencia de Sangre permite repetir el Control, puede elegirse cuál de los dos resultados conservar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "turns",
+        "count": 1
+      },
+      "checks": [
+        {
+          "key": "assess-shroud",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "intelligence"
+            },
+            {
+              "kind": "discipline",
+              "key": "oblivion"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 3
+          }
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-fatal-prediction",
@@ -3683,7 +3904,68 @@
         "minimumLevel": 2
       }
     },
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Pronostica la muerte de un mortal, incluido un Ghoul, mediante Resolución + Olvido contra Astucia + Ocultismo. El margen de éxito provoca daño agravado en algún momento de las siguientes 24 horas; una intervención puede evitarlo. Detectar el efecto exige Astucia + Ocultismo a dificultad 3. En cualquier Control de Enardecimiento de este Poder, un resultado de 1 o 10 causa además una Mácula, además de cualquier Ansia obtenida; si la Potencia de Sangre permite repetir el Control, puede elegirse cuál de los dos resultados conservar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "hours",
+        "count": 24
+      },
+      "checks": [
+        {
+          "key": "fatal-prediction",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            },
+            {
+              "kind": "discipline",
+              "key": "oblivion"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "wits"
+              },
+              {
+                "kind": "skill",
+                "key": "occult"
+              }
+            ]
+          }
+        },
+        {
+          "key": "detect-fatal-prediction",
+          "role": "detection",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "skill",
+              "key": "occult"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 3
+          }
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-aura-of-decay",
@@ -3693,7 +3975,74 @@
     "summary": "Extiende una influencia entrópica que acelera la decadencia y deteriora la materia y la vitalidad próximas.",
     "sourceKey": "players-guide-v5-es",
     "sourcePage": 88,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Activa un aura de podredumbre con Resistencia + Olvido a dificultad 3 en un radio de 5 metros. Un ser vivo resiste con Resistencia + Medicina contra el resultado de activación; Fortaleza puede sustituir Medicina. El margen causa daño superficial no reducible y una misma víctima sólo lo sufre una vez por escena. Consumir materia contaminada causa 2 de daño superficial no reducible por escena hasta recibir tratamiento de Inteligencia + Medicina a dificultad 3. El olor impone -2 dados sociales. En cualquier Control de Enardecimiento de este Poder, un resultado de 1 o 10 causa además una Mácula, además de cualquier Ansia obtenida; si la Potencia de Sangre permite repetir el Control, puede elegirse cuál de los dos resultados conservar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "activate-aura-of-decay",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "stamina"
+            },
+            {
+              "kind": "discipline",
+              "key": "oblivion"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 3
+          }
+        },
+        {
+          "key": "resist-aura-of-decay",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "stamina"
+            },
+            {
+              "kind": "discipline",
+              "key": "oblivion"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "stamina"
+              },
+              {
+                "kind": "skill",
+                "key": "medicine"
+              }
+            ]
+          }
+        }
+      ],
+      "modifiers": [
+        {
+          "kind": "dicePool",
+          "value": -2,
+          "contextKey": "auraOfDecaySocial"
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-passion-feast",
@@ -3709,7 +4058,48 @@
         "minimumLevel": 2
       }
     },
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Se alimenta de la pasión de un fantasma mediante Resolución + Olvido contra Resolución + Compostura. Con éxito inflige 1 daño agravado a la Fuerza de Voluntad del fantasma y reduce el Ansia del vampiro en 1. El Narrador puede imponer una Mácula según las circunstancias; SPEC-025 sólo presenta el efecto y no modifica Ansia ni Máculas.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "passive"
+      },
+      "checks": [
+        {
+          "key": "passion-feast",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            },
+            {
+              "kind": "discipline",
+              "key": "oblivion"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "resolve"
+              },
+              {
+                "kind": "attribute",
+                "key": "composure"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-shadow-perspective",
@@ -3719,7 +4109,20 @@
     "summary": "Permite proyectar los sentidos a través de una sombra visible y observar desde su perspectiva.",
     "sourceKey": "players-guide-v5-es",
     "sourcePage": 89,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Proyecta vista y oído a través de una sombra visible. La percepción remota es indetectable salvo por medios sobrenaturales y puede coexistir con los sentidos normales. En cualquier Control de Enardecimiento de este Poder, un resultado de 1 o 10 causa además una Mácula, además de cualquier Ansia obtenida; si la Potencia de Sangre permite repetir el Control, puede elegirse cuál de los dos resultados conservar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      }
+    }
   },
   {
     "key": "oblivion-shadow-servant",
@@ -3735,7 +4138,40 @@
         "minimumLevel": 1
       }
     },
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Permite dar órdenes mentales a un sirviente de sombra. La luz brillante puede dañarlo; evitar ese daño durante un turno exige Astucia + Olvido a dificultad 3. En cualquier Control de Enardecimiento de este Poder, un resultado de 1 o 10 causa además una Mácula, además de cualquier Ansia obtenida; si la Potencia de Sangre permite repetir el Control, puede elegirse cuál de los dos resultados conservar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "avoid-servant-bright-light-damage",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "discipline",
+              "key": "oblivion"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 3
+          }
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-touch",
@@ -3745,7 +4181,40 @@
     "summary": "Canaliza la entropía mediante el contacto para deteriorar gravemente una parte del cuerpo de la víctima.",
     "sourceKey": "players-guide-v5-es",
     "sourcePage": 89,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Un toque causa 2 de daño agravado y una lesión incapacitante. Si la víctima evita el contacto, se requiere establecer un agarre con Fuerza + Pelea; la dificultad u oposición depende del conflicto. El Narrador puede imponer Máculas según las circunstancias; SPEC-025 sólo presenta estos efectos. En cualquier Control de Enardecimiento de este Poder, un resultado de 1 o 10 causa además una Mácula, además de cualquier Ansia obtenida; si la Potencia de Sangre permite repetir el Control, puede elegirse cuál de los dos resultados conservar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "turns",
+        "count": 1
+      },
+      "checks": [
+        {
+          "key": "establish-oblivion-touch",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "strength"
+            },
+            {
+              "kind": "skill",
+              "key": "brawl"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-stygian-shroud",
@@ -3755,7 +4224,27 @@
     "summary": "Extiende una oscuridad sobrenatural que amortigua los sentidos y consume la vitalidad de quienes quedan atrapados.",
     "sourceKey": "players-guide-v5-es",
     "sourcePage": 89,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Tras concentrarse un turno crea oscuridad en un radio de dos veces la puntuación de Olvido. Quienes quedan dentro sufren -3 dados a todas las tiradas salvo que puedan ver en oscuridad sobrenatural; los mortales reciben 1 daño superficial por turno. En cualquier Control de Enardecimiento de este Poder, un resultado de 1 o 10 causa además una Mácula, además de cualquier Ansia obtenida; si la Potencia de Sangre permite repetir el Control, puede elegirse cuál de los dos resultados conservar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "modifiers": [
+        {
+          "kind": "dicePool",
+          "value": -3,
+          "contextKey": "insideStygianShroud"
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-necrotic-plague",
@@ -3765,7 +4254,50 @@
     "summary": "Imbuye a una víctima con una enfermedad sobrenatural capaz de deteriorar su cuerpo y propagarse en determinadas condiciones.",
     "sourceKey": "players-guide-v5-es",
     "sourcePage": 90,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Contagia mediante Inteligencia + Olvido contra Resistencia + Resistencia; Fortaleza puede sustituir la segunda Resistencia. Una víctima especialmente débil queda infectada automáticamente. La enfermedad causa 1 daño agravado al comienzo de cada escena durante tantas escenas como la puntuación de Olvido; un crítico puede volverla contagiosa. El Narrador puede imponer Máculas según las circunstancias; SPEC-025 no aplica daño ni Máculas. En cualquier Control de Enardecimiento de este Poder, un resultado de 1 o 10 causa además una Mácula, además de cualquier Ansia obtenida; si la Potencia de Sangre permite repetir el Control, puede elegirse cuál de los dos resultados conservar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "turns",
+        "count": 1
+      },
+      "checks": [
+        {
+          "key": "inflict-necrotic-plague",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "intelligence"
+            },
+            {
+              "kind": "discipline",
+              "key": "oblivion"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "stamina"
+              },
+              {
+                "kind": "attribute",
+                "key": "stamina"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-tenebrous-avatar",
@@ -3775,7 +4307,27 @@
     "summary": "Transforma al vampiro en una manifestación de sombra capaz de deslizarse por superficies y atravesar pequeñas aberturas.",
     "sourceKey": "players-guide-v5-es",
     "sourcePage": 90,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Adopta una forma de sombra en un turno, capaz de deslizarse por superficies y huecos. Puede envolver víctimas, que sufren -3 dados, asfixiarlas como bajo Manto Estigio y alimentarse de un mortal envuelto. El daño físico ordinario no afecta a esta forma; el fuego y la luz solar sí. En cualquier Control de Enardecimiento de este Poder, un resultado de 1 o 10 causa además una Mácula, además de cualquier Ansia obtenida; si la Potencia de Sangre permite repetir el Control, puede elegirse cuál de los dos resultados conservar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 2
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "modifiers": [
+        {
+          "kind": "dicePool",
+          "value": -3,
+          "contextKey": "envelopedByTenebrousAvatar"
+        }
+      ]
+    }
   },
   {
     "key": "oblivion-shadow-step",
@@ -3785,7 +4337,21 @@
     "summary": "Permite desaparecer dentro de una sombra y emerger desde otra sombra distante que el vampiro pueda percibir.",
     "sourceKey": "players-guide-v5-es",
     "sourcePage": 91,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Entra en una sombra y emerge en otra al turno siguiente. Puede llevar a otra persona; si no consiente debe estar sujeta antes del tránsito. Si este uso genera una Mácula, el pasajero también recibe una. SPEC-025 sólo presenta estas consecuencias. En cualquier Control de Enardecimiento de este Poder, un resultado de 1 o 10 causa además una Mácula, además de cualquier Ansia obtenida; si la Potencia de Sangre permite repetir el Control, puede elegirse cuál de los dos resultados conservar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "turns",
+        "count": 1
+      }
+    }
   },
   {
     "key": "oblivion-skuld-fulfilled",
@@ -3795,6 +4361,48 @@
     "summary": "Hace regresar enfermedades, lesiones o deterioros previamente superados por una víctima mortal o Ghoul.",
     "sourceKey": "players-guide-v5-es",
     "sourcePage": 91,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Reaviva una condición grave mediante Resistencia + Olvido contra Resistencia + Resistencia; Fortaleza puede sustituir la segunda Resistencia. En Ghouls puede reactivar el envejecimiento asociado a la Vitae. Un crítico puede matar y un fallo total impide volver a usar el Poder sobre ese individuo. La duración del efecto depende de la condición reactivada. En cualquier Control de Enardecimiento de este Poder, un resultado de 1 o 10 causa además una Mácula, además de cualquier Ansia obtenida; si la Potencia de Sangre permite repetir el Control, puede elegirse cuál de los dos resultados conservar.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 2
+      },
+      "duration": {
+        "kind": "singleUse"
+      },
+      "checks": [
+        {
+          "key": "fulfill-skuld",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "stamina"
+            },
+            {
+              "kind": "discipline",
+              "key": "oblivion"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "stamina"
+              },
+              {
+                "kind": "attribute",
+                "key": "stamina"
+              }
+            ]
+          }
+        }
+      ]
+    }
   }
 ]

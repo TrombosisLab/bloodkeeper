@@ -654,36 +654,6 @@ test(
   },
 )
 
-test(
-  '025-A10-M2 deja exactamente Olvido como Disciplina pendiente de mechanics',
-  () => {
-    const missing =
-      disciplinePowerDefinitions.filter(
-        power =>
-          power.mechanics ===
-          undefined,
-      )
-
-    assert.equal(
-      missing.length,
-      18,
-    )
-
-    assert.deepEqual(
-      [
-        ...new Set(
-          missing.map(
-            power =>
-              power.disciplineKey,
-          ),
-        ),
-      ],
-      [
-        'oblivion',
-      ],
-    )
-  },
-)
 
 test(
   '025-A10-M2 la Web recibe el catálogo compartido sin duplicación',
