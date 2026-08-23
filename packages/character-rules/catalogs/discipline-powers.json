@@ -344,7 +344,39 @@
     "summary": "Amplifica sobrenaturalmente uno o varios sentidos del vampiro.",
     "sourceKey": "core-v5-es",
     "sourcePage": 249,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Añade la puntuación de Auspex a las tiradas de percepción. Ante estímulos sensoriales extremos exige Astucia + Resolución a dificultad 3 o superior; un fallo impone -3 dados a las tiradas basadas en percepción durante el resto de la escena. Mantenerlo activo durante mucho tiempo puede requerir Fuerza de Voluntad a discreción del Narrador.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "untilDeactivated"
+      },
+      "checks": [
+        {
+          "key": "sensory-overload",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty",
+            "min": 3
+          }
+        }
+      ]
+    }
   },
   {
     "key": "auspex-sense-the-unseen",
@@ -354,7 +386,56 @@
     "summary": "Permite percibir fenómenos sobrenaturales que normalmente permanecerían ocultos.",
     "sourceKey": "core-v5-es",
     "sourcePage": 249,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Detecta presencias y efectos sobrenaturales ocultos. La detección pasiva usa una tirada oculta de Astucia + Auspex; una búsqueda deliberada usa Resolución + Auspex. Si el objetivo se oculta activamente, la detección puede convertirse en una contienda contra la reserva sobrenatural relevante del objetivo.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "passive"
+      },
+      "checks": [
+        {
+          "key": "passive-supernatural-detection",
+          "role": "detection",
+          "visibility": "hidden",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "discipline",
+              "key": "auspex"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        },
+        {
+          "key": "active-supernatural-search",
+          "role": "detection",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            },
+            {
+              "kind": "discipline",
+              "key": "auspex"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        }
+      ]
+    }
   },
   {
     "key": "auspex-premonition",
@@ -364,7 +445,53 @@
     "summary": "Proporciona destellos intuitivos de información sobre peligros o acontecimientos relevantes.",
     "sourceKey": "core-v5-es",
     "sourcePage": 250,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "El Narrador puede proporcionar una intuición espontánea sin coste. El usuario también puede provocar una premonición al concentrarse en un tema; en ese caso realiza un Control de Enardecimiento y tira Resolución + Auspex, y los éxitos determinan el nivel de información. El límite de una premonición por escena es una recomendación narrativa.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "conditional",
+        "cases": [
+          {
+            "when": "passiveUse",
+            "cost": {
+              "kind": "none"
+            }
+          },
+          {
+            "when": "activeUse",
+            "cost": {
+              "kind": "fixed",
+              "checks": 1
+            }
+          }
+        ]
+      },
+      "duration": {
+        "kind": "passive"
+      },
+      "checks": [
+        {
+          "key": "provoke-premonition",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            },
+            {
+              "kind": "discipline",
+              "key": "auspex"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        }
+      ]
+    }
   },
   {
     "key": "auspex-share-the-senses",
@@ -374,7 +501,40 @@
     "summary": "Permite experimentar a distancia las percepciones sensoriales de otro ser.",
     "sourceKey": "core-v5-es",
     "sourcePage": 250,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Permite percibir a través de uno o varios sentidos de otro ser. Sobre un extraño requiere línea de visión, pero puede funcionar a mayor distancia si el objetivo contiene Sangre del usuario. El objetivo suele ignorar la intrusión; Sentir lo Invisible puede detectarla. Un huésped no deseado puede expulsar al usuario mediante una contienda de Astucia + Resolución, y tras ser expulsado no puede intentarlo de nuevo hasta la noche siguiente.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "share-the-senses",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            },
+            {
+              "kind": "discipline",
+              "key": "auspex"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty",
+            "min": 3
+          }
+        }
+      ]
+    }
   },
   {
     "key": "auspex-scry-the-soul",
@@ -384,7 +544,67 @@
     "summary": "Permite observar aspectos sobrenaturales y emocionales profundos de un individuo.",
     "sourceKey": "core-v5-es",
     "sourcePage": 250,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Lee el aura y la psique de un individuo; una victoria permite obtener un número de respuestas veraces igual al margen y un crítico puede revelar información inesperada. También permite buscar una condición concreta en una multitud mediante una dificultad determinada por su tamaño, las distracciones y lo buscado.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "turns",
+        "count": 1
+      },
+      "checks": [
+        {
+          "key": "scry-individual",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "intelligence"
+            },
+            {
+              "kind": "discipline",
+              "key": "auspex"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "composure"
+              },
+              {
+                "kind": "skill",
+                "key": "subterfuge"
+              }
+            ]
+          }
+        },
+        {
+          "key": "scan-crowd",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "intelligence"
+            },
+            {
+              "kind": "discipline",
+              "key": "auspex"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        }
+      ]
+    }
   },
   {
     "key": "auspex-spirits-touch",
@@ -394,7 +614,40 @@
     "summary": "Permite obtener impresiones psíquicas asociadas a objetos o lugares mediante el contacto.",
     "sourceKey": "core-v5-es",
     "sourcePage": 251,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Obtiene impresiones psíquicas de un objeto o lugar mediante contacto. La dificultad depende de la información buscada; cada punto de margen permite percibir aproximadamente un poseedor adicional y nuevas circunstancias, desde las más recientes hacia atrás.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "turns",
+        "count": 1
+      },
+      "checks": [
+        {
+          "key": "spirits-touch",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "intelligence"
+            },
+            {
+              "kind": "discipline",
+              "key": "auspex"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        }
+      ]
+    }
   },
   {
     "key": "auspex-clairvoyance",
@@ -404,7 +657,53 @@
     "summary": "Extiende la percepción sobrenatural para obtener información de un área situada más allá de los sentidos normales.",
     "sourceKey": "core-v5-es",
     "sourcePage": 251,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Recopila información de un área mediante Inteligencia + Auspex. La dificultad depende de la seguridad y actividad; al usarlo en el propio Refugio se añade la puntuación de Refugio como dados. El margen determina aproximadamente cuántas preguntas pueden responderse y un crítico puede revelar algo importante. Para vigilar sucesos en curso el usuario debe permanecer en el área.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "conditional",
+        "cases": [
+          {
+            "when": "informationGathering",
+            "duration": {
+              "kind": "minutes"
+            }
+          },
+          {
+            "when": "surveillance",
+            "duration": {
+              "kind": "night"
+            }
+          }
+        ]
+      },
+      "checks": [
+        {
+          "key": "clairvoyance",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "intelligence"
+            },
+            {
+              "kind": "discipline",
+              "key": "auspex"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        }
+      ]
+    }
   },
   {
     "key": "auspex-possession",
@@ -420,7 +719,67 @@
         "minimumLevel": 3
       }
     },
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Sólo puede poseer mortales; un Ghoul debe estar Vinculado al usuario y se requiere contacto visual. Un fallo total vuelve al objetivo inmune a nuevos intentos durante el resto de la historia. El cuerpo del usuario queda en trance. El daño agravado, no poder mantenerse despierto durante el día o la muerte del sujeto pueden terminar la Posesión; la muerte del sujeto causa 3 niveles de daño agravado a la Fuerza de Voluntad. El daño agravado al sujeto exige Resolución + Auspex a dificultad 2 + daño recibido para mantener el control.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 2
+      },
+      "duration": {
+        "kind": "untilEnded"
+      },
+      "checks": [
+        {
+          "key": "possess-mortal",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            },
+            {
+              "kind": "discipline",
+              "key": "auspex"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "resolve"
+              },
+              {
+                "kind": "attribute",
+                "key": "intelligence"
+              }
+            ]
+          }
+        },
+        {
+          "key": "maintain-possession-after-aggravated-damage",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            },
+            {
+              "kind": "discipline",
+              "key": "auspex"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty",
+            "min": 2
+          }
+        }
+      ]
+    }
   },
   {
     "key": "auspex-telepathy",
@@ -430,7 +789,64 @@
     "summary": "Permite leer pensamientos y establecer comunicación mental sobrenatural.",
     "sourceKey": "core-v5-es",
     "sourcePage": 252,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Puede proyectar pensamientos a un mortal o vampiro en línea de visión sin tirada. Leer una mente normalmente usa Resolución + Auspex contra Astucia + Subterfugio; un mortal voluntario no exige tirada. Leer a un vampiro no voluntario cuesta además 1 punto de Fuerza de Voluntad. Un mayor margen alcanza recuerdos más profundos y un crítico ofrece una imagen coherente de pensamientos e intenciones actuales.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "conditional",
+        "cases": [
+          {
+            "when": "targetIsWilling",
+            "duration": {
+              "kind": "scene"
+            }
+          },
+          {
+            "when": "targetIsUnwilling",
+            "duration": {
+              "kind": "minutes",
+              "count": 1
+            }
+          }
+        ]
+      },
+      "checks": [
+        {
+          "key": "read-mind",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            },
+            {
+              "kind": "discipline",
+              "key": "auspex"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "wits"
+              },
+              {
+                "kind": "skill",
+                "key": "subterfuge"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "animalism-sense-the-beast",
