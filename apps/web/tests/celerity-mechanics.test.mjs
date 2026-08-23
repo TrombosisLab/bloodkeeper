@@ -424,38 +424,47 @@ test(
 )
 
 test(
-  '025-A4-M2 conserva mecánicas previas y deja el resto de Disciplinas sin mechanics',
+  '025-A4-M2 conserva sus mecánicas al ampliar futuras Disciplinas',
   () => {
-    const mechanized =
-      disciplinePowerDefinitions.filter(
-        power =>
-          power.mechanics !==
-          undefined,
-      )
-
-    assert.equal(
-      mechanized.length,
-      36,
-    )
-
-    const disciplines =
+    const expected =
       [
-        ...new Set(
-          mechanized.map(
-            power =>
-              power.disciplineKey,
-          ),
-        ),
-      ].sort()
-
-    assert.deepEqual(
-      disciplines,
-      [
-        'celerity',
         'obfuscate',
         'potence',
         'presence',
-      ],
+        'celerity',
+      ]
+
+    for (
+      const disciplineKey
+      of expected
+    ) {
+      const disciplinePowers =
+        disciplinePowerDefinitions.filter(
+          power =>
+            power.disciplineKey ===
+            disciplineKey,
+        )
+
+      assert.equal(
+        disciplinePowers.length,
+        9,
+      )
+
+      assert.ok(
+        disciplinePowers.every(
+          power =>
+            power.mechanics !==
+            undefined,
+        ),
+      )
+    }
+
+    assert.ok(
+      powers.every(
+        power =>
+          power.mechanics !==
+          undefined,
+      ),
     )
   },
 )

@@ -440,7 +440,48 @@
     "summary": "Permite percibir la naturaleza bestial, hostilidad y determinados impulsos sobrenaturales de otros seres.",
     "sourceKey": "core-v5-es",
     "sourcePage": 245,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Percibe hostilidad y la presencia de una Bestia sobrenatural. Un crítico aporta detalles adicionales sobre la criatura y su Ansia o Rabia; puede emplearse activa o pasivamente.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "passive"
+      },
+      "checks": [
+        {
+          "key": "sense-the-beast",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            },
+            {
+              "kind": "discipline",
+              "key": "animalism"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "composure"
+              },
+              {
+                "kind": "skill",
+                "key": "subterfuge"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "animalism-bond-famulus",
@@ -450,7 +491,43 @@
     "summary": "Crea un vínculo especial con un animal convertido en famulus y facilita otros usos de Animalismo.",
     "sourceKey": "core-v5-es",
     "sourcePage": 245,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Vincula un único animal como famulus tras alimentarlo con Sangre en tres noches distintas. Sin Susurros Salvajes, las órdenes posteriores usan Carisma + Trato con Animales, con dificultad base 2 que aumenta para instrucciones más complejas.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "perUnit",
+        "checks": 1,
+        "unit": "distinctNight",
+        "requiredUnits": 3
+      },
+      "duration": {
+        "kind": "untilEvent",
+        "event": "targetDeath"
+      },
+      "checks": [
+        {
+          "key": "command-famulus",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "charisma"
+            },
+            {
+              "kind": "skill",
+              "key": "animalKen"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty",
+            "min": 2
+          }
+        }
+      ]
+    }
   },
   {
     "key": "animalism-feral-whispers",
@@ -460,7 +537,60 @@
     "summary": "Permite comunicarse con animales y, según las circunstancias, convocarlos o solicitar su ayuda.",
     "sourceKey": "core-v5-es",
     "sourcePage": 246,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Permite comunicación bidireccional con animales del tipo elegido y puede persuadirlos o convocar a los que ya estén en el área. La comunicación simple no exige prueba; los servicios y la invocación dependen del contexto y el margen.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "perUnit",
+        "checks": 1,
+        "unit": "animalType",
+        "exemptions": [
+          "targetIsFamulus"
+        ]
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "persuade-animal-service",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "manipulation"
+            },
+            {
+              "kind": "discipline",
+              "key": "animalism"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        },
+        {
+          "key": "summon-animal-type",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "charisma"
+            },
+            {
+              "kind": "discipline",
+              "key": "animalism"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        }
+      ]
+    }
   },
   {
     "key": "animalism-unliving-hive",
@@ -476,7 +606,19 @@
         "minimumLevel": 2
       }
     },
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Extiende los Poderes de Animalismo restringidos a vertebrados a enjambres de insectos, tratados como una sola criatura, y permite Vincular un enjambre como famulus. Un enjambre tiene Salud 5 y 8 dados para resistir ataques; Pelea le causa daño superficial y el fuego o insecticida, agravado.",
+      "activation": {
+        "kind": "extension"
+      },
+      "rouseCost": {
+        "kind": "inheritedFromBasePower"
+      },
+      "duration": {
+        "kind": "passive"
+      }
+    }
   },
   {
     "key": "animalism-quell-the-beast",
@@ -486,7 +628,64 @@
     "summary": "Permite someter temporalmente los impulsos bestiales de un objetivo mediante la fuerza sobrenatural del vampiro.",
     "sourceKey": "core-v5-es",
     "sourcePage": 247,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Sofoca temporalmente la Bestia del objetivo. En mortales provoca apatía incapacitante durante la escena; en vampiros impide Arrebato de Sangre y críticos conflictivos, y un crítico también puede terminar un Frenesí.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "conditional",
+        "cases": [
+          {
+            "when": "targetIsMortal",
+            "duration": {
+              "kind": "scene"
+            }
+          },
+          {
+            "when": "targetIsVampire",
+            "duration": {
+              "kind": "turnsByMargin",
+              "baseTurns": 1
+            }
+          }
+        ]
+      },
+      "checks": [
+        {
+          "key": "quell-the-beast",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "charisma"
+            },
+            {
+              "kind": "discipline",
+              "key": "animalism"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "stamina"
+              },
+              {
+                "kind": "attribute",
+                "key": "resolve"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "animalism-animal-succulence",
@@ -496,7 +695,19 @@
     "summary": "Permite obtener mayor sustento de la sangre animal y beneficios especiales relacionados con el famulus.",
     "sourceKey": "core-v5-es",
     "sourcePage": 247,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "La sangre animal sacia 1 punto adicional de Ansia y, para esas penalizaciones de alimentación, cuenta la Potencia de Sangre como 2 niveles menor. Consumir el propio famulus sacia 4 Ansias sin eliminar la última y concede +2 a un Atributo asociado hasta la siguiente alimentación o Ansia 5.",
+      "activation": {
+        "kind": "enhancement"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "passive"
+      }
+    }
   },
   {
     "key": "animalism-subsume-the-spirit",
@@ -506,7 +717,57 @@
     "summary": "Permite transferir la mente del vampiro al cuerpo de un animal y controlarlo directamente.",
     "sourceKey": "core-v5-es",
     "sourcePage": 248,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Transfiere la mente al cuerpo de un animal. El cuerpo original queda inmóvil; sufrir daño en él termina el trance. La muerte del animal también lo termina y causa 1 daño agravado a la Fuerza de Voluntad.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1,
+        "exemptions": [
+          "targetIsFamulus"
+        ]
+      },
+      "duration": {
+        "kind": "outcomeBased",
+        "cases": [
+          {
+            "outcome": "normalSuccess",
+            "duration": {
+              "kind": "scene"
+            }
+          },
+          {
+            "outcome": "criticalSuccess",
+            "duration": {
+              "kind": "indefinite"
+            }
+          }
+        ]
+      },
+      "checks": [
+        {
+          "key": "subsume-the-spirit",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "manipulation"
+            },
+            {
+              "kind": "discipline",
+              "key": "animalism"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 4
+          }
+        }
+      ]
+    }
   },
   {
     "key": "animalism-animal-dominion",
@@ -516,7 +777,42 @@
     "summary": "Permite dominar grupos numerosos de animales como extensiones de la voluntad del vampiro.",
     "sourceKey": "core-v5-es",
     "sourcePage": 248,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Ordena a grupos de animales ya presentes que actúen como una extensión de la voluntad del vampiro. No invoca animales; la dificultad depende de la naturaleza de los animales y de la orden.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 2
+      },
+      "duration": {
+        "kind": "scene",
+        "endConditions": [
+          "orderCompleted"
+        ]
+      },
+      "checks": [
+        {
+          "key": "command-animal-group",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "charisma"
+            },
+            {
+              "kind": "discipline",
+              "key": "animalism"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        }
+      ]
+    }
   },
   {
     "key": "animalism-drawing-out-the-beast",
@@ -526,7 +822,50 @@
     "summary": "Permite proyectar la propia Bestia sobre otra persona y desplazar hacia ella sus impulsos más peligrosos.",
     "sourceKey": "core-v5-es",
     "sourcePage": 248,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Al desencadenarse un Frenesí de terror o furia, sustituye la tirada de resistencia por Astucia + Animalismo contra el objetivo. Si falla, el usuario entra en Frenesí; si vence, el objetivo lo sufre en su lugar. No puede transferir un Frenesí de hambre.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "untilEvent",
+        "event": "frenzyEnds"
+      },
+      "checks": [
+        {
+          "key": "draw-out-the-beast",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "discipline",
+              "key": "animalism"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "composure"
+              },
+              {
+                "kind": "attribute",
+                "key": "resolve"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "dominate-cloud-memory",

@@ -43,7 +43,7 @@ test(
     )
 
     assert.equal(
-      power.mechanics,
+      power.requirements,
       undefined,
     )
 
@@ -55,7 +55,7 @@ test(
 )
 
 test(
-  '025-A5-R1 Animalismo mantiene exactamente 9 Poderes sin poblar mechanics',
+  '025-A5-R1 Animalismo mantiene exactamente 9 Poderes sin diceCheck legacy',
   () => {
     const animalism =
       disciplinePowerDefinitions.filter(
@@ -67,14 +67,6 @@ test(
     assert.equal(
       animalism.length,
       9,
-    )
-
-    assert.ok(
-      animalism.every(
-        power =>
-          power.mechanics ===
-          undefined,
-      ),
     )
 
     assert.ok(
