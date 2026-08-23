@@ -2338,7 +2338,19 @@
     "summary": "Refuerza sobrenaturalmente la capacidad del vampiro para soportar daño físico.",
     "sourceKey": "core-v5-es",
     "sourcePage": 258,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Añade la puntuación de Fortaleza al registro máximo de Salud del personaje mientras conserve este Poder.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "passive"
+      }
+    }
   },
   {
     "key": "fortitude-unswayable-mind",
@@ -2348,7 +2360,19 @@
     "summary": "Refuerza la resistencia mental frente a coerción e influencia sobrenatural.",
     "sourceKey": "core-v5-es",
     "sourcePage": 258,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Añade la puntuación de Fortaleza a las reservas empleadas para resistir coacción, intimidación, seducción y otras influencias sobrenaturales que intenten alterar la mente.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "passive"
+      }
+    }
   },
   {
     "key": "fortitude-enduring-beasts",
@@ -2364,7 +2388,43 @@
         "minimumLevel": 1
       }
     },
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Extiende la resistencia sobrenatural de Fortaleza a animales. El famulus queda exento del Control de Enardecimiento; sobre otros animales se usa Resistencia + Animalismo a dificultad 3. El margen determina el alcance del efecto entre los animales afectados.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1,
+        "exemptions": [
+          "targetIsFamulus"
+        ]
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "fortify-other-animals",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "stamina"
+            },
+            {
+              "kind": "discipline",
+              "key": "animalism"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 3
+          }
+        }
+      ]
+    }
   },
   {
     "key": "fortitude-toughness",
@@ -2374,7 +2434,20 @@
     "summary": "Permite resistir mejor las heridas mediante una resistencia sobrenatural.",
     "sourceKey": "core-v5-es",
     "sourcePage": 259,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Durante la escena reduce el daño superficial recibido según la puntuación de Fortaleza, aplicando la reducción en el orden establecido por la regla antes de resolver el daño restante.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      }
+    }
   },
   {
     "key": "fortitude-defy-bane",
@@ -2384,7 +2457,40 @@
     "summary": "Permite resistir temporalmente fuentes de daño especialmente peligrosas para los vampiros.",
     "sourceKey": "core-v5-es",
     "sourcePage": 259,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Puede activarse como reacción al recibir daño agravado. Astucia + Supervivencia a dificultad 3 permite convertir una cantidad limitada de ese daño en superficial durante la escena; la capacidad disponible queda limitada por Fortaleza.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "defy-aggravated-damage",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "skill",
+              "key": "survival"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 3
+          }
+        }
+      ]
+    }
   },
   {
     "key": "fortitude-fortify-inner-facade",
@@ -2394,7 +2500,19 @@
     "summary": "Protege la mente frente a intentos sobrenaturales de leer pensamientos o descubrir secretos.",
     "sourceKey": "core-v5-es",
     "sourcePage": 259,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Refuerza la mente frente a intrusiones sobrenaturales. Aumenta la dificultad de los intentos pertinentes y, cuando existe una reserva de resistencia, añade la puntuación de Fortaleza.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "scene"
+      }
+    }
   },
   {
     "key": "fortitude-draught-of-endurance",
@@ -2404,7 +2522,24 @@
     "summary": "Permite transmitir temporalmente parte de Fortaleza mediante la Sangre.",
     "sourceKey": "core-v5-es",
     "sourcePage": 259,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "La Sangre transmite temporalmente Fortaleza al bebedor. El efecto dura una noche y, para vampiros, termina también con la siguiente alimentación o al alcanzar Ansia 5.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "nightWithEndConditions",
+        "endConditions": [
+          "nextFeeding",
+          "hungerFive"
+        ]
+      }
+    }
   },
   {
     "key": "fortitude-prowess-from-pain",
@@ -2414,7 +2549,20 @@
     "summary": "Convierte las heridas sufridas en una fuente de capacidad física sobrenatural.",
     "sourceKey": "core-v5-es",
     "sourcePage": 259,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Mientras dura el Poder ignora las penalizaciones derivadas del daño y permite elevar Atributos Físicos en función del daño sufrido, sujeto al límite propio del Poder.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      }
+    }
   },
   {
     "key": "fortitude-flesh-of-marble",
@@ -2424,7 +2572,20 @@
     "summary": "Endurece sobrenaturalmente el cuerpo hasta hacerlo extremadamente difícil de dañar.",
     "sourceKey": "core-v5-es",
     "sourcePage": 260,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Durante la escena puede ignorar la primera fuente de daño físico de cada turno, salvo las excepciones indicadas por la regla; un resultado crítico apropiado puede superar esta protección.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 2
+      },
+      "duration": {
+        "kind": "scene"
+      }
+    }
   },
   {
     "key": "protean-eyes-of-the-beast",

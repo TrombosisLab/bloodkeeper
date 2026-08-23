@@ -210,13 +210,11 @@ test(
 )
 
 test(
-  '025-A8-R3 Fortaleza sigue sin mechanics ni diceCheck antes de M1 M2',
+  '025-A8-R3 Fortaleza no usa diceCheck legacy',
   () => {
     assert.equal(
       powers.every(
         (power) =>
-          power.mechanics ===
-            undefined &&
           power.diceCheck ===
             undefined,
       ),
