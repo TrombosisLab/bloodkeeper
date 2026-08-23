@@ -385,13 +385,11 @@ test(
 )
 
 test(
-  '025-A7-R3 Dominación permanece sin mechanics antes de A7-M2',
+  '025-A7-R3 Dominación no usa diceCheck legacy',
   () => {
     assert.equal(
       powers.every(
         power =>
-          power.mechanics ===
-            undefined &&
           power.diceCheck ===
             undefined,
       ),

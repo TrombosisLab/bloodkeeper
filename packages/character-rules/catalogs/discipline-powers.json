@@ -1291,7 +1291,48 @@
     "summary": "Permite borrar o enturbiar recuerdos recientes mediante una orden sobrenatural.",
     "sourceKey": "core-v5-es",
     "sourcePage": 255,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Nubla el recuerdo inmediato del objetivo. Contra un mortal no preparado no exige tirada; si el objetivo se resiste o es un vampiro se resuelve Carisma + Dominación contra Astucia + Resolución. El cambio de memoria permanece indefinidamente.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "indefinite"
+      },
+      "checks": [
+        {
+          "key": "resist-cloud-memory",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "charisma"
+            },
+            {
+              "kind": "discipline",
+              "key": "dominate"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "wits"
+              },
+              {
+                "kind": "attribute",
+                "key": "resolve"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "dominate-compel",
@@ -1301,7 +1342,48 @@
     "summary": "Impone una orden breve e inmediata que el objetivo se ve sobrenaturalmente obligado a obedecer.",
     "sourceKey": "core-v5-es",
     "sourcePage": 255,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Impone una orden breve que debe poder ejecutarse en un turno. No exige tirada contra un mortal no preparado; la resistencia, el uso repetido en la misma escena, otro vampiro o una orden contraria a la naturaleza del objetivo requieren Carisma + Dominación contra Inteligencia + Resolución.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "resist-compel",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "charisma"
+            },
+            {
+              "kind": "discipline",
+              "key": "dominate"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "intelligence"
+              },
+              {
+                "kind": "attribute",
+                "key": "resolve"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "dominate-dementation",
@@ -1317,7 +1399,49 @@
     },
     "sourceKey": "core-v5-es",
     "sourcePage": 256,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Tras una conversación, permite atacar mentalmente durante la escena a un individuo por turno con Manipulación + Dominación contra Compostura + Inteligencia, causando daño superficial a la Fuerza de Voluntad. Afectar a varias víctimas exige un Control de Enardecimiento separado para cada una. Conserva la Amalgama de Ofuscación 2.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "dementation-attack",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "manipulation"
+            },
+            {
+              "kind": "discipline",
+              "key": "dominate"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "composure"
+              },
+              {
+                "kind": "attribute",
+                "key": "intelligence"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "dominate-mesmerize",
@@ -1327,7 +1451,52 @@
     "summary": "Permite implantar instrucciones verbales más complejas en la mente de un objetivo.",
     "sourceKey": "core-v5-es",
     "sourcePage": 256,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Implanta una orden compleja inmediata mientras se mantiene la mirada y puede darse la instrucción. Contra un mortal no preparado no exige tirada; cuando hay resistencia, otro vampiro o una orden contraria a la naturaleza del objetivo, el apartado Sistema usa Carisma + Dominación contra Inteligencia + Resolución. La línea de Reserva impresa usa Manipulación + Dominación; se conserva esa diferencia editorial en este resumen.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene",
+        "endConditions": [
+          "orderCompleted"
+        ]
+      },
+      "checks": [
+        {
+          "key": "resist-mesmerize",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "charisma"
+            },
+            {
+              "kind": "discipline",
+              "key": "dominate"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "intelligence"
+              },
+              {
+                "kind": "attribute",
+                "key": "resolve"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "dominate-submerged-directive",
@@ -1337,7 +1506,19 @@
     "summary": "Permite implantar una orden latente que se activa cuando se cumplen determinadas circunstancias.",
     "sourceKey": "core-v5-es",
     "sourcePage": 257,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Extiende Mesmerismo para implantar una sugestión latente ligada a un detonante específico. Usa el mismo sistema que Mesmerismo, no añade coste propio y sólo permite una sugestión por víctima. El Poder es pasivo y la orden implantada puede permanecer dormida hasta que ocurra el detonante.",
+      "activation": {
+        "kind": "extension"
+      },
+      "rouseCost": {
+        "kind": "inheritedFromBasePower"
+      },
+      "duration": {
+        "kind": "passive"
+      }
+    }
   },
   {
     "key": "dominate-the-forgetful-mind",
@@ -1347,7 +1528,49 @@
     "summary": "Permite alterar y reconstruir recuerdos del objetivo mediante manipulación sobrenatural.",
     "sourceKey": "core-v5-es",
     "sourcePage": 257,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Reescribe recuerdos mediante Manipulación + Dominación contra Inteligencia + Resolución. Cada punto de margen permite añadir o eliminar otro recuerdo; las alteraciones pueden debilitarse ante un interrogatorio minucioso y un resultado crítico produce una impronta especialmente sólida.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "indefinite"
+      },
+      "checks": [
+        {
+          "key": "rewrite-memory",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "manipulation"
+            },
+            {
+              "kind": "discipline",
+              "key": "dominate"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "intelligence"
+              },
+              {
+                "kind": "attribute",
+                "key": "resolve"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "dominate-rationalize",
@@ -1357,7 +1580,39 @@
     "summary": "Hace que el objetivo racionalice las acciones realizadas bajo Dominación como decisiones propias.",
     "sourceKey": "core-v5-es",
     "sourcePage": 257,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Hace que la víctima racionalice como propias las acciones realizadas bajo Dominación. No añade coste al Poder que mejora. Si se la presiona sobre su creencia, la propia víctima puede hacer Astucia + Consciencia a dificultad 5 para empezar a cuestionar esa explicación.",
+      "activation": {
+        "kind": "enhancement"
+      },
+      "rouseCost": {
+        "kind": "inheritedFromBasePower"
+      },
+      "duration": {
+        "kind": "indefinite"
+      },
+      "checks": [
+        {
+          "key": "question-rationalized-belief",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "skill",
+              "key": "awareness"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 5
+          }
+        }
+      ]
+    }
   },
   {
     "key": "dominate-terminal-decree",
@@ -1367,7 +1622,19 @@
     "summary": "Permite imponer órdenes que pueden conducir al objetivo a sufrir daños graves o incluso a la muerte.",
     "sourceKey": "core-v5-es",
     "sourcePage": 257,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Mejora las órdenes de Dominación para permitir instrucciones que conduzcan directamente al daño o la muerte. No añade coste de Ansia al Poder base, aunque puede tener consecuencias graves de Humanidad. Las órdenes terminales pasan a poder resistirse usando las tiradas indicadas por el Poder de Dominación empleado.",
+      "activation": {
+        "kind": "enhancement"
+      },
+      "rouseCost": {
+        "kind": "inheritedFromBasePower"
+      },
+      "duration": {
+        "kind": "passive"
+      }
+    }
   },
   {
     "key": "dominate-mass-manipulation",
@@ -1377,7 +1644,20 @@
     "summary": "Permite extender determinados efectos de Dominación a múltiples objetivos simultáneamente.",
     "sourceKey": "core-v5-es",
     "sourcePage": 257,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Extiende otro Poder de Dominación a un grupo cuyos miembros puedan ver los ojos del usuario. Exige un Control de Enardecimiento adicional al coste del Poder amplificado y cualquier tirada necesaria se resuelve contra el oponente más fuerte del grupo. La duración es la del Poder amplificado.",
+      "activation": {
+        "kind": "extension"
+      },
+      "rouseCost": {
+        "kind": "additionalToBasePower",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "inheritedFromBasePower"
+      }
+    }
   },
   {
     "key": "potence-lethal-body",
