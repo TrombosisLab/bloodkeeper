@@ -7,7 +7,39 @@
     "summary": "Permite analizar sobrenaturalmente una muestra de sangre y obtener información sobre su naturaleza.",
     "sourceKey": "core-v5-es",
     "sourcePage": 272,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Analiza una muestra de sangre con Resolución + Hechicería de Sangre a dificultad 3. Una victoria revela su naturaleza y rasgos sanguíneos relevantes; una victoria crítica aporta información adicional como Generación o señales de Diablerie.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "singleUse"
+      },
+      "checks": [
+        {
+          "key": "analyze-blood",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            },
+            {
+              "kind": "discipline",
+              "key": "bloodSorcery"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 3
+          }
+        }
+      ]
+    }
   },
   {
     "key": "blood-sorcery-corrosive-vitae",
@@ -17,7 +49,20 @@
     "summary": "Permite transformar la propia Vitae en una sustancia capaz de corroer materiales inertes.",
     "sourceKey": "core-v5-es",
     "sourcePage": 273,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Convierte Vitae propia en un agente corrosivo para materia inerte. Requiere al menos un Control; cada Control aumenta la cantidad afectada. La concentración inicial ocupa un turno y la corrosión ordinaria tarda aproximadamente cinco minutos, con variaciones según el material.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "atLeast",
+        "minChecks": 1
+      },
+      "duration": {
+        "kind": "singleUse"
+      }
+    }
   },
   {
     "key": "blood-sorcery-extinguish-vitae",
@@ -27,7 +72,76 @@
     "summary": "Debilita sobrenaturalmente la Sangre de otro vampiro y aumenta su Ansia.",
     "sourceKey": "core-v5-es",
     "sourcePage": 273,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Afecta a un vampiro en línea de visión mediante Inteligencia + Hechicería de Sangre contra Resistencia + Compostura. Una victoria aumenta su Ansia en 1 y una crítica en 2. Si la víctima ve al usuario, puede identificarlo con Inteligencia + Ocultismo contra Astucia + Subterfugio.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "singleUse"
+      },
+      "checks": [
+        {
+          "key": "extinguish-vitae",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "intelligence"
+            },
+            {
+              "kind": "discipline",
+              "key": "bloodSorcery"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "stamina"
+              },
+              {
+                "kind": "attribute",
+                "key": "composure"
+              }
+            ]
+          }
+        },
+        {
+          "key": "identify-afflicter",
+          "role": "detection",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "intelligence"
+            },
+            {
+              "kind": "skill",
+              "key": "occult"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "wits"
+              },
+              {
+                "kind": "skill",
+                "key": "subterfuge"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "blood-sorcery-blood-of-potency",
@@ -37,7 +151,39 @@
     "summary": "Concentra temporalmente la Sangre del vampiro para incrementar su Potencia de Sangre.",
     "sourceKey": "core-v5-es",
     "sourcePage": 273,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Tira Resolución + Hechicería de Sangre contra una dificultad igual a 2 + la Potencia de Sangre actual. Una victoria aumenta la Potencia de Sangre en 1 y una crítica en 2; el manual indica una duración de una escena o una noche. SPEC-025 sólo presenta esta regla y no modifica Potencia de Sangre.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "concentrate-blood-potency",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            },
+            {
+              "kind": "discipline",
+              "key": "bloodSorcery"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        }
+      ]
+    }
   },
   {
     "key": "blood-sorcery-scorpions-touch",
@@ -47,7 +193,66 @@
     "summary": "Transforma parte de la Vitae en un veneno sobrenatural capaz de afectar a mortales y vampiros.",
     "sourceKey": "core-v5-es",
     "sourcePage": 273,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Produce veneno sobrenatural con uno o más Controles. Cada Control proporciona una cantidad utilizable; puede cubrir un arma afilada o escupirse con Destreza + Atletismo. Tras el contacto se enfrenta Fuerza + Hechicería de Sangre a Resistencia + Ocultismo; los vampiros con Fortaleza pueden emplear Fortaleza en lugar de Ocultismo. El daño y la incapacitación dependen del margen y del tipo de víctima.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "atLeast",
+        "minChecks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "spit-poison",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "dexterity"
+            },
+            {
+              "kind": "skill",
+              "key": "athletics"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        },
+        {
+          "key": "resolve-poison",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "strength"
+            },
+            {
+              "kind": "discipline",
+              "key": "bloodSorcery"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "stamina"
+              },
+              {
+                "kind": "skill",
+                "key": "occult"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "blood-sorcery-theft-of-vitae",
@@ -57,7 +262,49 @@
     "summary": "Permite extraer sangre sobrenaturalmente de una víctima y atraerla hacia el vampiro.",
     "sourceKey": "core-v5-es",
     "sourcePage": 274,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Abre a distancia una herida arterial en un mortal visible mediante Astucia + Hechicería de Sangre contra Astucia + Ocultismo y permite alimentarse desde lejos. Mientras dura, el usuario sólo puede alimentarse; lo hace al doble de velocidad normal o al triple con una victoria crítica.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "feeding"
+      },
+      "checks": [
+        {
+          "key": "steal-vitae",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "discipline",
+              "key": "bloodSorcery"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "wits"
+              },
+              {
+                "kind": "skill",
+                "key": "occult"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "blood-sorcery-cauldron-of-blood",
@@ -67,7 +314,67 @@
     "summary": "Hace hervir sobrenaturalmente la sangre de una víctima dentro de su propio cuerpo.",
     "sourceKey": "core-v5-es",
     "sourcePage": 274,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Requiere un Control de Enardecimiento y además una o más Máculas. Tras tocar a la víctima, enfrenta Resolución + Hechicería de Sangre a Compostura + Ocultismo; los vampiros con Fortaleza pueden resistir con Compostura + Fortaleza. El margen determina daño agravado y, contra vampiros, también puede aumentar Ansia hasta 5. SPEC-025 no aplica estos cambios.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "turns",
+        "count": 1
+      },
+      "checks": [
+        {
+          "key": "establish-contact",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "dexterity"
+            },
+            {
+              "kind": "skill",
+              "key": "athletics"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        },
+        {
+          "key": "boil-blood",
+          "role": "activation",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            },
+            {
+              "kind": "discipline",
+              "key": "bloodSorcery"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "composure"
+              },
+              {
+                "kind": "skill",
+                "key": "occult"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "blood-sorcery-baals-caress",
@@ -77,7 +384,93 @@
     "summary": "Transforma la Vitae en un veneno sobrenatural extremadamente destructivo.",
     "sourceKey": "core-v5-es",
     "sourcePage": 275,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Utiliza el sistema y las restricciones de Toque de Escorpión con un veneno más destructivo. Requiere uno o más Controles; puede escupirse con Destreza + Atletismo y, tras impactar, enfrenta Fuerza + Hechicería de Sangre a Resistencia + Ocultismo. Los vampiros con Fortaleza pueden sustituir Ocultismo por Fortaleza. El daño es agravado y un vampiro dañado puede sufrir una segunda contienda relacionada con el Letargo al dormir.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "atLeast",
+        "minChecks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      },
+      "checks": [
+        {
+          "key": "spit-poison",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "dexterity"
+            },
+            {
+              "kind": "skill",
+              "key": "athletics"
+            }
+          ],
+          "resolution": {
+            "kind": "contextualDifficulty"
+          }
+        },
+        {
+          "key": "resolve-poison",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "strength"
+            },
+            {
+              "kind": "discipline",
+              "key": "bloodSorcery"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "stamina"
+              },
+              {
+                "kind": "skill",
+                "key": "occult"
+              }
+            ]
+          }
+        },
+        {
+          "key": "torpor-follow-up",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "strength"
+            },
+            {
+              "kind": "discipline",
+              "key": "bloodSorcery"
+            }
+          ],
+          "resolution": {
+            "kind": "opposed",
+            "opposingPool": [
+              {
+                "kind": "attribute",
+                "key": "stamina"
+              },
+              {
+                "kind": "skill",
+                "key": "occult"
+              }
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     "key": "celerity-cats-grace",
