@@ -112,6 +112,28 @@ function formatPool(
     .join(' + ')
 }
 
+function formatRouseExemptionSuffix(
+  exemptions:
+    readonly 'targetIsFamulus'[] | undefined,
+): string {
+  if (
+    !exemptions ||
+    exemptions.length === 0
+  ) {
+    return ''
+  }
+
+  if (
+    exemptions.includes(
+      'targetIsFamulus',
+    )
+  ) {
+    return '; sin coste sobre el famulus'
+  }
+
+  return ''
+}
+
 function formatRouseCost(
   mechanics: DisciplinePowerMechanicsDefinition,
 ): string {
@@ -121,12 +143,59 @@ function formatRouseCost(
     case 'none':
       return 'Sin Control de Enardecimiento'
 
-    case 'fixed':
-      return formatCount(
-        cost.checks,
-        'Control de Enardecimiento',
-        'Controles de Enardecimiento',
+    case 'fixed': {
+      const base =
+        formatCount(
+          cost.checks,
+          'Control de Enardecimiento',
+          'Controles de Enardecimiento',
+        )
+
+      return (
+        base +
+        formatRouseExemptionSuffix(
+          cost.exemptions,
+        )
       )
+    }
+
+    case 'perUnit': {
+      const checkLabel =
+        formatCount(
+          cost.checks,
+          'Control de Enardecimiento',
+          'Controles de Enardecimiento',
+        )
+
+      switch (cost.unit) {
+        case 'distinctNight': {
+          const base =
+            cost.requiredUnits
+              ? (
+                  `${checkLabel} en cada una de ` +
+                  `${cost.requiredUnits} noches distintas`
+                )
+              : (
+                  `${checkLabel} por noche distinta`
+                )
+
+          return (
+            base +
+            formatRouseExemptionSuffix(
+              cost.exemptions,
+            )
+          )
+        }
+
+        case 'animalType':
+          return (
+            `${checkLabel} por tipo de animal` +
+            formatRouseExemptionSuffix(
+              cost.exemptions,
+            )
+          )
+      }
+    }
 
     case 'inheritedFromBasePower':
       return 'Hereda el coste del Poder base'
@@ -176,6 +245,9 @@ function formatEndCondition(
     case 'voluntaryEnd':
       return 'al terminarlo voluntariamente'
 
+    case 'orderCompleted':
+      return 'al cumplirse la orden'
+
     default:
       return 'al cumplirse otra condición del Poder'
   }
@@ -192,6 +264,91 @@ function formatNightEndCondition(
 
     case 'hungerFive':
       return 'Ansia 5'
+  }
+}
+
+function formatUntilEvent(
+  event:
+    | 'targetDeath'
+    | 'frenzyEnds',
+): string {
+  switch (event) {
+    case 'targetDeath':
+      return 'Hasta la muerte del objetivo'
+
+    case 'frenzyEnds':
+      return 'Mientras dure el Frenesí'
+  }
+}
+
+function formatConditionalWhen(
+  condition:
+    | 'targetIsMortal'
+    | 'targetIsVampire',
+): string {
+  switch (condition) {
+    case 'targetIsMortal':
+      return 'Mortal'
+
+    case 'targetIsVampire':
+      return 'Vampiro'
+  }
+}
+
+function formatOutcome(
+  outcome:
+    | 'normalSuccess'
+    | 'criticalSuccess',
+): string {
+  switch (outcome) {
+    case 'normalSuccess':
+      return 'Éxito'
+
+    case 'criticalSuccess':
+      return 'Crítico'
+  }
+}
+
+function formatConditionalDuration(
+  duration:
+    | {
+        kind: 'scene'
+      }
+    | {
+        kind: 'turnsByMargin'
+        baseTurns: number
+      },
+): string {
+  switch (duration.kind) {
+    case 'scene':
+      return 'Una escena'
+
+    case 'turnsByMargin':
+      return (
+        `${formatCount(
+          duration.baseTurns,
+          'turno base',
+          'turnos base',
+        )}; aumenta según el margen`
+      )
+  }
+}
+
+function formatOutcomeDuration(
+  duration:
+    | {
+        kind: 'scene'
+      }
+    | {
+        kind: 'indefinite'
+      },
+): string {
+  switch (duration.kind) {
+    case 'scene':
+      return 'Una escena'
+
+    case 'indefinite':
+      return 'Indefinida'
   }
 }
 
@@ -249,6 +406,15 @@ function formatDuration(
         'turnos',
       )
 
+    case 'turnsByMargin':
+      return (
+        `${formatCount(
+          duration.baseTurns,
+          'turno base',
+          'turnos base',
+        )}; aumenta según el margen`
+      )
+
     case 'hoursByMargin':
       return (
         `${formatCount(
@@ -269,6 +435,38 @@ function formatDuration(
           'noches base',
         )}; aumenta según el margen`
       )
+
+    case 'indefinite':
+      return 'Indefinida'
+
+    case 'untilEvent':
+      return formatUntilEvent(
+        duration.event,
+      )
+
+    case 'conditional':
+      return duration.cases
+        .map(
+          item =>
+            `${formatConditionalWhen(
+              item.when,
+            )}: ${formatConditionalDuration(
+              item.duration,
+            )}`,
+        )
+        .join('; ')
+
+    case 'outcomeBased':
+      return duration.cases
+        .map(
+          item =>
+            `${formatOutcome(
+              item.outcome,
+            )}: ${formatOutcomeDuration(
+              item.duration,
+            )}`,
+        )
+        .join('; ')
   }
 }
 

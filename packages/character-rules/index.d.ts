@@ -300,6 +300,13 @@ export type CharacterRulesDisciplinePowerActivationKind =
   | 'enhancement'
   | 'extension'
 
+export type CharacterRulesDisciplinePowerRouseCostExemption =
+  'targetIsFamulus'
+
+export type CharacterRulesDisciplinePowerRouseCostUnit =
+  | 'distinctNight'
+  | 'animalType'
+
 export type CharacterRulesDisciplinePowerRouseCost =
   | {
       readonly kind: 'none'
@@ -307,6 +314,17 @@ export type CharacterRulesDisciplinePowerRouseCost =
   | {
       readonly kind: 'fixed'
       readonly checks: number
+      readonly exemptions?:
+        readonly CharacterRulesDisciplinePowerRouseCostExemption[]
+    }
+  | {
+      readonly kind: 'perUnit'
+      readonly checks: number
+      readonly unit:
+        CharacterRulesDisciplinePowerRouseCostUnit
+      readonly requiredUnits?: number
+      readonly exemptions?:
+        readonly CharacterRulesDisciplinePowerRouseCostExemption[]
     }
   | {
       readonly kind: 'inheritedFromBasePower'
@@ -323,14 +341,29 @@ export type CharacterRulesDisciplinePowerRouseCost =
       }
     }
 
+export type CharacterRulesDisciplinePowerSceneEndCondition =
+  | 'movement'
+  | 'detected'
+  | 'voluntaryEnd'
+  | 'orderCompleted'
+
+export type CharacterRulesDisciplinePowerUntilEvent =
+  | 'targetDeath'
+  | 'frenzyEnds'
+
+export type CharacterRulesDisciplinePowerConditionalWhen =
+  | 'targetIsMortal'
+  | 'targetIsVampire'
+
+export type CharacterRulesDisciplinePowerOutcome =
+  | 'normalSuccess'
+  | 'criticalSuccess'
+
 export type CharacterRulesDisciplinePowerDuration =
   | {
       readonly kind: 'scene'
-      readonly endConditions?: readonly (
-        | 'movement'
-        | 'detected'
-        | 'voluntaryEnd'
-      )[]
+      readonly endConditions?:
+        readonly CharacterRulesDisciplinePowerSceneEndCondition[]
     }
   | {
       readonly kind: 'passive'
@@ -359,6 +392,10 @@ export type CharacterRulesDisciplinePowerDuration =
       readonly count: number
     }
   | {
+      readonly kind: 'turnsByMargin'
+      readonly baseTurns: number
+    }
+  | {
       readonly kind: 'hoursByMargin'
       readonly baseHours: number
     }
@@ -368,6 +405,43 @@ export type CharacterRulesDisciplinePowerDuration =
   | {
       readonly kind: 'nightsByMargin'
       readonly baseNights: number
+    }
+  | {
+      readonly kind: 'indefinite'
+    }
+  | {
+      readonly kind: 'untilEvent'
+      readonly event:
+        CharacterRulesDisciplinePowerUntilEvent
+    }
+  | {
+      readonly kind: 'conditional'
+      readonly cases: readonly {
+        readonly when:
+          CharacterRulesDisciplinePowerConditionalWhen
+        readonly duration:
+          | {
+              readonly kind: 'scene'
+            }
+          | {
+              readonly kind: 'turnsByMargin'
+              readonly baseTurns: number
+            }
+      }[]
+    }
+  | {
+      readonly kind: 'outcomeBased'
+      readonly cases: readonly {
+        readonly outcome:
+          CharacterRulesDisciplinePowerOutcome
+        readonly duration:
+          | {
+              readonly kind: 'scene'
+            }
+          | {
+              readonly kind: 'indefinite'
+            }
+      }[]
     }
 
 export type CharacterRulesDisciplinePowerCheckResolution =

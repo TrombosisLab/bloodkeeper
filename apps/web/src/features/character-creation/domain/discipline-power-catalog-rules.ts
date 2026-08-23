@@ -176,7 +176,8 @@ export function validateDisciplinePowerCatalog(
         (
           rouseCost.kind === 'fixed' ||
           rouseCost.kind ===
-            'additionalToBasePower'
+            'additionalToBasePower' ||
+          rouseCost.kind === 'perUnit'
         ) &&
         !positiveInteger(
           rouseCost.checks,
@@ -201,6 +202,71 @@ export function validateDisciplinePowerCatalog(
         )
       }
 
+      if (
+        rouseCost.kind === 'perUnit'
+      ) {
+        if (
+          rouseCost.requiredUnits !==
+            undefined &&
+          !positiveInteger(
+            rouseCost.requiredUnits,
+          )
+        ) {
+          violations.push(
+            'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+          )
+        }
+
+        if (
+          rouseCost.requiredUnits !==
+            undefined &&
+          rouseCost.unit !==
+            'distinctNight'
+        ) {
+          violations.push(
+            'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+          )
+        }
+      }
+
+      const rouseExemptions =
+        (
+          rouseCost.kind === 'fixed' ||
+          rouseCost.kind === 'perUnit'
+        )
+          ? rouseCost.exemptions
+          : undefined
+
+      if (
+        rouseExemptions !== undefined
+      ) {
+        const allowedRouseExemptions =
+          new Set<string>([
+            'targetIsFamulus',
+          ])
+
+        if (
+          !Array.isArray(
+            rouseExemptions,
+          ) ||
+          rouseExemptions.length === 0 ||
+          new Set(
+            rouseExemptions,
+          ).size !==
+            rouseExemptions.length ||
+          rouseExemptions.some(
+            exemption =>
+              !allowedRouseExemptions.has(
+                exemption,
+              ),
+          )
+        ) {
+          violations.push(
+            'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+          )
+        }
+      }
+
       const duration =
         mechanics.duration
 
@@ -217,6 +283,7 @@ export function validateDisciplinePowerCatalog(
             'movement',
             'detected',
             'voluntaryEnd',
+            'orderCompleted',
           ])
 
         if (
@@ -275,6 +342,18 @@ export function validateDisciplinePowerCatalog(
 
       if (
         duration.kind ===
+          'turnsByMargin' &&
+        !positiveInteger(
+          duration.baseTurns,
+        )
+      ) {
+        violations.push(
+          'POWER_MECHANICS_DURATION_INVALID',
+        )
+      }
+
+      if (
+        duration.kind ===
           'nightWithEndConditions'
       ) {
         const endConditions =
@@ -299,6 +378,135 @@ export function validateDisciplinePowerCatalog(
                 condition,
               ),
           )
+        ) {
+          violations.push(
+            'POWER_MECHANICS_DURATION_INVALID',
+          )
+        }
+      }
+
+      if (
+        duration.kind === 'untilEvent'
+      ) {
+        const allowedEvents =
+          new Set<string>([
+            'targetDeath',
+            'frenzyEnds',
+          ])
+
+        if (
+          !allowedEvents.has(
+            duration.event,
+          )
+        ) {
+          violations.push(
+            'POWER_MECHANICS_DURATION_INVALID',
+          )
+        }
+      }
+
+      if (
+        duration.kind === 'conditional'
+      ) {
+        const cases =
+          duration.cases
+
+        const allowedConditions =
+          new Set<string>([
+            'targetIsMortal',
+            'targetIsVampire',
+          ])
+
+        const conditionKeys =
+          Array.isArray(cases)
+            ? cases.map(
+                item => item.when,
+              )
+            : []
+
+        const invalidChild =
+          Array.isArray(cases) &&
+          cases.some(
+            item =>
+              !(
+                item.duration.kind ===
+                  'scene' ||
+                (
+                  item.duration.kind ===
+                    'turnsByMargin' &&
+                  positiveInteger(
+                    item.duration.baseTurns,
+                  )
+                )
+              ),
+          )
+
+        if (
+          !Array.isArray(cases) ||
+          cases.length === 0 ||
+          new Set(
+            conditionKeys,
+          ).size !==
+            conditionKeys.length ||
+          conditionKeys.some(
+            condition =>
+              !allowedConditions.has(
+                condition,
+              ),
+          ) ||
+          invalidChild
+        ) {
+          violations.push(
+            'POWER_MECHANICS_DURATION_INVALID',
+          )
+        }
+      }
+
+      if (
+        duration.kind === 'outcomeBased'
+      ) {
+        const cases =
+          duration.cases
+
+        const allowedOutcomes =
+          new Set<string>([
+            'normalSuccess',
+            'criticalSuccess',
+          ])
+
+        const outcomeKeys =
+          Array.isArray(cases)
+            ? cases.map(
+                item => item.outcome,
+              )
+            : []
+
+        const invalidChild =
+          Array.isArray(cases) &&
+          cases.some(
+            item =>
+              !(
+                item.duration.kind ===
+                  'scene' ||
+                item.duration.kind ===
+                  'indefinite'
+              ),
+          )
+
+        if (
+          !Array.isArray(cases) ||
+          cases.length === 0 ||
+          new Set(
+            outcomeKeys,
+          ).size !==
+            outcomeKeys.length ||
+          outcomeKeys.some(
+            outcome =>
+              !allowedOutcomes.has(
+                outcome,
+              ),
+          ) ||
+          invalidChild
         ) {
           violations.push(
             'POWER_MECHANICS_DURATION_INVALID',

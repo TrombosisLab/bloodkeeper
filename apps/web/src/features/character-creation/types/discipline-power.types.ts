@@ -60,6 +60,13 @@ export type DisciplinePowerActivationKind =
   | 'enhancement'
   | 'extension'
 
+export type DisciplinePowerRouseCostExemption =
+  'targetIsFamulus'
+
+export type DisciplinePowerRouseCostUnit =
+  | 'distinctNight'
+  | 'animalType'
+
 export type DisciplinePowerRouseCostDefinition =
   | {
       kind: 'none'
@@ -67,6 +74,16 @@ export type DisciplinePowerRouseCostDefinition =
   | {
       kind: 'fixed'
       checks: number
+      exemptions?:
+        DisciplinePowerRouseCostExemption[]
+    }
+  | {
+      kind: 'perUnit'
+      checks: number
+      unit: DisciplinePowerRouseCostUnit
+      requiredUnits?: number
+      exemptions?:
+        DisciplinePowerRouseCostExemption[]
     }
   | {
       kind: 'inheritedFromBasePower'
@@ -82,14 +99,29 @@ export type DisciplinePowerRouseCostDefinition =
       }
     }
 
+export type DisciplinePowerSceneEndCondition =
+  | 'movement'
+  | 'detected'
+  | 'voluntaryEnd'
+  | 'orderCompleted'
+
+export type DisciplinePowerUntilEvent =
+  | 'targetDeath'
+  | 'frenzyEnds'
+
+export type DisciplinePowerConditionalWhen =
+  | 'targetIsMortal'
+  | 'targetIsVampire'
+
+export type DisciplinePowerOutcome =
+  | 'normalSuccess'
+  | 'criticalSuccess'
+
 export type DisciplinePowerDurationDefinition =
   | {
       kind: 'scene'
-      endConditions?: (
-        | 'movement'
-        | 'detected'
-        | 'voluntaryEnd'
-      )[]
+      endConditions?:
+        DisciplinePowerSceneEndCondition[]
     }
   | {
       kind: 'passive'
@@ -118,6 +150,10 @@ export type DisciplinePowerDurationDefinition =
       count: number
     }
   | {
+      kind: 'turnsByMargin'
+      baseTurns: number
+    }
+  | {
       kind: 'hoursByMargin'
       baseHours: number
     }
@@ -127,6 +163,40 @@ export type DisciplinePowerDurationDefinition =
   | {
       kind: 'nightsByMargin'
       baseNights: number
+    }
+  | {
+      kind: 'indefinite'
+    }
+  | {
+      kind: 'untilEvent'
+      event: DisciplinePowerUntilEvent
+    }
+  | {
+      kind: 'conditional'
+      cases: {
+        when: DisciplinePowerConditionalWhen
+        duration:
+          | {
+              kind: 'scene'
+            }
+          | {
+              kind: 'turnsByMargin'
+              baseTurns: number
+            }
+      }[]
+    }
+  | {
+      kind: 'outcomeBased'
+      cases: {
+        outcome: DisciplinePowerOutcome
+        duration:
+          | {
+              kind: 'scene'
+            }
+          | {
+              kind: 'indefinite'
+            }
+      }[]
     }
 
 export type DisciplinePowerCheckResolutionDefinition =
