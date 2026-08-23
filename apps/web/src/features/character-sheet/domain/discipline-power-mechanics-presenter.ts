@@ -522,6 +522,13 @@ function formatDuration(
         'turnos',
       )
 
+    case 'hours':
+      return formatCount(
+        duration.count,
+        'hora',
+        'horas',
+      )
+
     case 'turnsByMargin':
       return (
         `${formatCount(

@@ -435,6 +435,17 @@ export function validateDisciplinePowerCatalog(
       }
 
       if (
+        duration.kind === 'hours' &&
+        !positiveInteger(
+          duration.count,
+        )
+      ) {
+        violations.push(
+          'POWER_MECHANICS_DURATION_INVALID',
+        )
+      }
+
+      if (
         duration.kind ===
           'turnsByMargin' &&
         !positiveInteger(

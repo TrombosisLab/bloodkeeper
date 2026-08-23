@@ -182,6 +182,10 @@ export type DisciplinePowerDurationDefinition =
       count: number
     }
   | {
+      kind: 'hours'
+      count: number
+    }
+  | {
       kind: 'turnsByMargin'
       baseTurns: number
     }

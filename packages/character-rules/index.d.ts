@@ -424,6 +424,10 @@ export type CharacterRulesDisciplinePowerDuration =
       readonly count: number
     }
   | {
+      readonly kind: 'hours'
+      readonly count: number
+    }
+  | {
       readonly kind: 'turnsByMargin'
       readonly baseTurns: number
     }

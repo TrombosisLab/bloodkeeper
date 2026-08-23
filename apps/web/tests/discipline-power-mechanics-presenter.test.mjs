@@ -567,3 +567,38 @@ test(
     }
   },
 )
+
+test(
+  '025-A11-M1 presenta horas fijas en castellano sin exponer la key interna',
+  () => {
+    assert.equal(
+      presentSyntheticDuration(
+        {
+          kind: 'hours',
+          count: 1,
+        },
+      ),
+      '1 hora',
+    )
+
+    assert.equal(
+      presentSyntheticDuration(
+        {
+          kind: 'hours',
+          count: 24,
+        },
+      ),
+      '24 horas',
+    )
+
+    assert.doesNotMatch(
+      presentSyntheticDuration(
+        {
+          kind: 'hours',
+          count: 24,
+        },
+      ),
+      /hours|count/,
+    )
+  },
+)

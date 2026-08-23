@@ -1023,3 +1023,65 @@ test(
     }
   },
 )
+
+test(
+  '025-A11-M1 admite horas fijas positivas y rechaza conteos inválidos',
+  () => {
+    for (const count of [1, 24]) {
+      const power = {
+        ...basePower,
+        key: `fixed-hours-valid-${count}`,
+        mechanics: {
+          activation: {
+            kind: 'standalone',
+          },
+          rouseCost: {
+            kind: 'none',
+          },
+          duration: {
+            kind: 'hours',
+            count,
+          },
+        },
+      }
+
+      assert.deepEqual(
+        validateDisciplinePowerCatalog(
+          [power],
+        ),
+        {
+          valid: true,
+          violations: [],
+        },
+      )
+    }
+
+    for (const count of [0, -1, 1.5]) {
+      const power = {
+        ...basePower,
+        key: `fixed-hours-invalid-${count}`,
+        mechanics: {
+          activation: {
+            kind: 'standalone',
+          },
+          rouseCost: {
+            kind: 'none',
+          },
+          duration: {
+            kind: 'hours',
+            count,
+          },
+        },
+      }
+
+      assert.deepEqual(
+        validateDisciplinePowerCatalog(
+          [power],
+        ).violations,
+        [
+          'POWER_MECHANICS_DURATION_INVALID',
+        ],
+      )
+    }
+  },
+)
