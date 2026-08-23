@@ -208,6 +208,7 @@ test(
         {
           bloodPotency: 1,
           hunger: 2,
+          resonance: null,
         },
       )
       assert.equal(
