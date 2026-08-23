@@ -227,16 +227,11 @@ test(
 )
 
 test(
-  '025-A9-R3 Protean permanece sin mechanics ni diceCheck antes de M1 M2',
+  '025-A9-R3 Protean no usa diceCheck legacy',
   () => {
     for (
       const power of proteanPowers
     ) {
-      assert.equal(
-        power.mechanics,
-        undefined,
-      )
-
       assert.equal(
         power.diceCheck,
         undefined,

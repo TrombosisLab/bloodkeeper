@@ -2595,7 +2595,19 @@
     "summary": "Permite ver con claridad sobrenatural en la oscuridad y manifiesta rasgos depredadores en los ojos.",
     "sourceKey": "core-v5-es",
     "sourcePage": 269,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Permite ver con claridad sobrenatural incluso en oscuridad total y evita las penalizaciones visuales por falta de luz. Si muestra los ojos de la Bestia, obtiene +2 dados a Intimidación contra mortales mientras permanezcan activos.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "indefinite"
+      }
+    }
   },
   {
     "key": "protean-weight-of-the-feather",
@@ -2605,7 +2617,39 @@
     "summary": "Reduce sobrenaturalmente el peso efectivo del vampiro para evitar o mitigar determinados peligros físicos.",
     "sourceKey": "core-v5-es",
     "sourcePage": 269,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Reduce el peso efectivo del usuario hasta quedar casi ingrávido. Con preparación no requiere tirada; como reacción usa Astucia + Supervivencia a dificultad 3. Permite mitigar o evitar las consecuencias de una caída según la situación.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "indefinite"
+      },
+      "checks": [
+        {
+          "key": "react-to-fall",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "wits"
+            },
+            {
+              "kind": "skill",
+              "key": "survival"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 3
+          }
+        }
+      ]
+    }
   },
   {
     "key": "protean-feral-weapons",
@@ -2615,7 +2659,20 @@
     "summary": "Transforma partes del cuerpo en armas naturales sobrenaturales apropiadas para el combate.",
     "sourceKey": "core-v5-es",
     "sourcePage": 270,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Transforma dientes o uñas en armas sobrenaturales. Añade +2 al daño de Pelea, causa daño agravado a mortales y el daño superficial infligido a vampiros con estas armas no se reduce a la mitad.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene"
+      }
+    }
   },
   {
     "key": "protean-shapechange",
@@ -2625,7 +2682,23 @@
     "summary": "Permite adoptar una forma animal asociada a la naturaleza depredadora del vampiro.",
     "sourceKey": "core-v5-es",
     "sourcePage": 270,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "En un turno adopta una forma animal asociada al vampiro. Adquiere los Atributos Físicos, sentidos y capacidades naturales de la forma, sujeto a sus limitaciones; el Narrador decide qué Disciplinas pueden usarse. Puede terminar la transformación voluntariamente antes del fin de la escena.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene",
+        "endConditions": [
+          "voluntaryEnd"
+        ]
+      }
+    }
   },
   {
     "key": "protean-earth-meld",
@@ -2635,7 +2708,20 @@
     "summary": "Permite fundirse sobrenaturalmente con la tierra y permanecer oculto en ella.",
     "sourceKey": "core-v5-es",
     "sourcePage": 271,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "En un turno se hunde en tierra natural y deja atrás los objetos que no puedan acompañarlo. Permanece consciente salvo durante el sueño diurno y puede permanecer al menos un día o más, hasta emerger o ser perturbado.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "indefinite"
+      }
+    }
   },
   {
     "key": "protean-metamorphosis",
@@ -2651,6 +2737,22 @@
       "prerequisitePowerKeys": [
         "protean-shapechange"
       ]
+    },
+    "mechanics": {
+      "systemSummary": "Usa el mismo sistema que Cambiar de Forma y amplía las formas animales disponibles. La transformación cuesta un Control de Enardecimiento, dura una escena y puede finalizarse voluntariamente.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "fixed",
+        "checks": 1
+      },
+      "duration": {
+        "kind": "scene",
+        "endConditions": [
+          "voluntaryEnd"
+        ]
+      }
     }
   },
   {
@@ -2662,7 +2764,39 @@
     "sourceKey": "core-v5-es",
     "sourcePage": 271,
     "active": true,
-    "description": "Vuelve el corazón difícil de localizar y permite al vampiro liberarse de una estaca mediante esfuerzo físico y mental."
+    "description": "Vuelve el corazón difícil de localizar y permite al vampiro liberarse de una estaca mediante esfuerzo físico y mental.",
+    "mechanics": {
+      "systemSummary": "El corazón resulta difícil de localizar: fuera de combate, clavarlo con una estaca aumenta la dificultad en +3; en combate sólo una victoria crítica apropiada alcanza el corazón. Si queda estacado puede hacer 1 Control de Enardecimiento y Fuerza + Resolución a dificultad 5 una vez por hora para expulsar la estaca; no puede intentarlo con Ansia 5.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "none"
+      },
+      "duration": {
+        "kind": "passive"
+      },
+      "checks": [
+        {
+          "key": "expel-stake",
+          "role": "conditional",
+          "pool": [
+            {
+              "kind": "attribute",
+              "key": "strength"
+            },
+            {
+              "kind": "attribute",
+              "key": "resolve"
+            }
+          ],
+          "resolution": {
+            "kind": "fixedDifficulty",
+            "value": 5
+          }
+        }
+      ]
+    }
   },
   {
     "key": "protean-mist-form",
@@ -2672,7 +2806,24 @@
     "summary": "Permite transformar el cuerpo en una nube de niebla sobrenatural.",
     "sourceKey": "core-v5-es",
     "sourcePage": 271,
-    "active": true
+    "active": true,
+    "mechanics": {
+      "systemSummary": "Se transforma en niebla. La transformación tarda normalmente 3 turnos; cada Control de Enardecimiento adicional por encima del primero reduce ese tiempo en 1 turno. Puede hacer entre 1 y 3 Controles, dura una escena y puede finalizarse voluntariamente.",
+      "activation": {
+        "kind": "standalone"
+      },
+      "rouseCost": {
+        "kind": "range",
+        "minChecks": 1,
+        "maxChecks": 3
+      },
+      "duration": {
+        "kind": "scene",
+        "endConditions": [
+          "voluntaryEnd"
+        ]
+      }
+    }
   },
   {
     "key": "obfuscate-cloak-of-shadows",
