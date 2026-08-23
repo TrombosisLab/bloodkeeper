@@ -727,3 +727,188 @@ test(
     }
   },
 )
+
+test(
+  '025-A9-M1H admite coste de Enardecimiento y límite por hora en un check',
+  () => {
+    const result =
+      validateDisciplinePowerCatalog(
+        [
+          {
+            ...basePower,
+            key:
+              'test-check-cost-and-hour-limit',
+            mechanics: {
+              activation: {
+                kind: 'standalone',
+              },
+              rouseCost: {
+                kind: 'none',
+              },
+              duration: {
+                kind: 'passive',
+              },
+              checks: [
+                {
+                  key: 'conditional-action',
+                  role: 'conditional',
+                  pool: [
+                    {
+                      kind: 'attribute',
+                      key: 'strength',
+                    },
+                    {
+                      kind: 'attribute',
+                      key: 'resolve',
+                    },
+                  ],
+                  resolution: {
+                    kind: 'fixedDifficulty',
+                    value: 5,
+                  },
+                  rouseCost: {
+                    kind: 'fixed',
+                    checks: 1,
+                  },
+                  limits: [
+                    {
+                      kind: 'perHour',
+                      count: 1,
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      )
+
+    assert.deepEqual(
+      result,
+      {
+        valid: true,
+        violations: [],
+      },
+    )
+  },
+)
+
+test(
+  '025-A9-M1H rechaza coste de Enardecimiento inválido dentro de un check',
+  () => {
+    const result =
+      validateDisciplinePowerCatalog(
+        [
+          {
+            ...basePower,
+            key:
+              'test-invalid-check-cost',
+            mechanics: {
+              activation: {
+                kind: 'standalone',
+              },
+              rouseCost: {
+                kind: 'none',
+              },
+              duration: {
+                kind: 'passive',
+              },
+              checks: [
+                {
+                  key: 'conditional-action',
+                  role: 'conditional',
+                  pool: [
+                    {
+                      kind: 'attribute',
+                      key: 'strength',
+                    },
+                  ],
+                  resolution: {
+                    kind: 'fixedDifficulty',
+                    value: 5,
+                  },
+                  rouseCost: {
+                    kind: 'fixed',
+                    checks: 0,
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+
+    assert.equal(
+      result.violations.includes(
+        'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+      ),
+      true,
+    )
+  },
+)
+
+test(
+  '025-A9-M1H rechaza límite horario inválido dentro de un check',
+  () => {
+    const result =
+      validateDisciplinePowerCatalog(
+        [
+          {
+            ...basePower,
+            key:
+              'test-invalid-check-hour-limit',
+            mechanics: {
+              activation: {
+                kind: 'standalone',
+              },
+              rouseCost: {
+                kind: 'none',
+              },
+              duration: {
+                kind: 'passive',
+              },
+              checks: [
+                {
+                  key: 'conditional-action',
+                  role: 'conditional',
+                  pool: [
+                    {
+                      kind: 'attribute',
+                      key: 'strength',
+                    },
+                  ],
+                  resolution: {
+                    kind: 'fixedDifficulty',
+                    value: 5,
+                  },
+                  limits: [
+                    {
+                      kind: 'perHour',
+                      count: 0,
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      )
+
+    assert.equal(
+      result.valid,
+      false,
+    )
+
+    assert.equal(
+      result.violations.includes(
+        'POWER_MECHANICS_LIMIT_INVALID',
+      ),
+      true,
+    )
+  },
+)

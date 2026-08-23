@@ -432,3 +432,77 @@ test(
     }
   },
 )
+
+test(
+  '025-A9-M1H presenta coste y límite horario asociados a un check',
+  () => {
+    const view =
+      presentDisciplinePowerMechanics(
+        {
+          activation: {
+            kind: 'standalone',
+          },
+          rouseCost: {
+            kind: 'none',
+          },
+          duration: {
+            kind: 'passive',
+          },
+          checks: [
+            {
+              key: 'expel-stake',
+              role: 'conditional',
+              pool: [
+                {
+                  kind: 'attribute',
+                  key: 'strength',
+                },
+                {
+                  kind: 'attribute',
+                  key: 'resolve',
+                },
+              ],
+              resolution: {
+                kind: 'fixedDifficulty',
+                value: 5,
+              },
+              rouseCost: {
+                kind: 'fixed',
+                checks: 1,
+              },
+              limits: [
+                {
+                  kind: 'perHour',
+                  count: 1,
+                },
+              ],
+            },
+          ],
+        },
+      )
+
+    assert.equal(
+      view.cost,
+      'Sin Control de Enardecimiento',
+    )
+
+    assert.equal(
+      view.checks[0].detail,
+      'Fuerza + Resolución · Dificultad 5 · 1 Control de Enardecimiento · 1 vez por hora',
+    )
+
+    assert.equal(
+      view.checks[0].detail.includes(
+        'expel-stake',
+      ),
+      false,
+    )
+
+    assert.equal(
+      view.checks[0].detail.includes(
+        'perHour',
+      ),
+      false,
+    )
+  },
+)

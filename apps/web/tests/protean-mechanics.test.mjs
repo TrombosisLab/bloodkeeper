@@ -396,6 +396,16 @@ test(
             kind: 'fixedDifficulty',
             value: 5,
           },
+          rouseCost: {
+            kind: 'fixed',
+            checks: 1,
+          },
+          limits: [
+            {
+              kind: 'perHour',
+              count: 1,
+            },
+          ],
         },
       ],
     )

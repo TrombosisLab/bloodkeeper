@@ -516,6 +516,10 @@ export interface CharacterRulesDisciplinePowerMechanicCheck {
     readonly CharacterRulesDisciplinePowerDicePoolTerm[]
   readonly resolution:
     CharacterRulesDisciplinePowerCheckResolution
+  readonly rouseCost?:
+    CharacterRulesDisciplinePowerRouseCost
+  readonly limits?:
+    readonly CharacterRulesDisciplinePowerUsageLimit[]
 }
 
 export interface CharacterRulesDisciplinePowerModifier {
@@ -527,7 +531,9 @@ export interface CharacterRulesDisciplinePowerModifier {
 }
 
 export interface CharacterRulesDisciplinePowerUsageLimit {
-  readonly kind: 'perScene'
+  readonly kind:
+    | 'perScene'
+    | 'perHour'
   readonly count: number
 }
 

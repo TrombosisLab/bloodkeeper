@@ -275,6 +275,12 @@ export interface DisciplinePowerMechanicCheckDefinition {
 
   resolution:
     DisciplinePowerCheckResolutionDefinition
+
+  rouseCost?:
+    DisciplinePowerRouseCostDefinition
+
+  limits?:
+    DisciplinePowerUsageLimitDefinition[]
 }
 
 export interface DisciplinePowerModifierDefinition {
@@ -293,7 +299,9 @@ export interface DisciplinePowerModifierDefinition {
 }
 
 export interface DisciplinePowerUsageLimitDefinition {
-  kind: 'perScene'
+  kind:
+    | 'perScene'
+    | 'perHour'
   count: number
 }
 

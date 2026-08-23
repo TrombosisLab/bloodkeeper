@@ -171,11 +171,10 @@ function formatConditionalRouseCost(
   }
 }
 
-function formatRouseCost(
-  mechanics: DisciplinePowerMechanicsDefinition,
+function formatRouseCostDefinition(
+  cost:
+    DisciplinePowerMechanicsDefinition['rouseCost'],
 ): string {
-  const cost = mechanics.rouseCost
-
   switch (cost.kind) {
     case 'none':
       return 'Sin Control de Enardecimiento'
@@ -285,6 +284,15 @@ function formatRouseCost(
       )
     }
   }
+}
+
+
+function formatRouseCost(
+  mechanics: DisciplinePowerMechanicsDefinition,
+): string {
+  return formatRouseCostDefinition(
+    mechanics.rouseCost,
+  )
 }
 
 function formatEndCondition(
@@ -711,11 +719,47 @@ function formatLimit(
         'veces por escena',
       )
 
+    case 'perHour':
+      return formatCount(
+        limit.count,
+        'vez por hora',
+        'veces por hora',
+      )
+
     default:
       throw new Error(
         'Tipo de límite mecánico no soportado',
       )
   }
+}
+
+
+function formatCheckMetadataSuffix(
+  check:
+    DisciplinePowerMechanicCheckDefinition,
+): string {
+  const metadata: string[] = []
+
+  if (check.rouseCost) {
+    metadata.push(
+      formatRouseCostDefinition(
+        check.rouseCost,
+      ),
+    )
+  }
+
+  for (
+    const limit of
+    check.limits ?? []
+  ) {
+    metadata.push(
+      formatLimit(limit),
+    )
+  }
+
+  return metadata.length > 0
+    ? ` · ${metadata.join(' · ')}`
+    : ''
 }
 
 export function presentDisciplinePowerMechanics(
@@ -731,7 +775,19 @@ export function presentDisciplinePowerMechanics(
       formatDuration(mechanics),
     checks:
       mechanics.checks?.map(
-        formatCheck,
+        check => {
+          const view =
+            formatCheck(check)
+
+          return {
+            ...view,
+            detail:
+              view.detail +
+              formatCheckMetadataSuffix(
+                check,
+              ),
+          }
+        },
       ) ?? [],
     modifiers:
       mechanics.modifiers?.map(

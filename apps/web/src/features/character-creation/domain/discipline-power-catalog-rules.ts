@@ -92,6 +92,182 @@ export function getActiveDisciplinePowers(
   )
 }
 
+function validateDisciplinePowerRouseCost(
+  rouseCost:
+    NonNullable<
+      DisciplinePowerDefinition['mechanics']
+    >['rouseCost'],
+  violations: string[],
+): void {
+  if (
+    (
+      rouseCost.kind === 'fixed' ||
+      rouseCost.kind ===
+        'additionalToBasePower' ||
+      rouseCost.kind === 'perUnit'
+    ) &&
+    !positiveInteger(
+      rouseCost.checks,
+    )
+  ) {
+    violations.push(
+      'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+    )
+  }
+
+  if (
+    rouseCost.kind ===
+      'additionalToBasePower' &&
+    rouseCost.scaling &&
+    !positiveInteger(
+      rouseCost.scaling
+        .checksPerTarget,
+    )
+  ) {
+    violations.push(
+      'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+    )
+  }
+
+  if (
+    rouseCost.kind === 'range' &&
+    (
+      !positiveInteger(
+        rouseCost.minChecks,
+      ) ||
+      !positiveInteger(
+        rouseCost.maxChecks,
+      ) ||
+      rouseCost.maxChecks <
+        rouseCost.minChecks
+    )
+  ) {
+    violations.push(
+      'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+    )
+  }
+
+  if (
+    rouseCost.kind === 'perUnit'
+  ) {
+    if (
+      rouseCost.requiredUnits !==
+        undefined &&
+      !positiveInteger(
+        rouseCost.requiredUnits,
+      )
+    ) {
+      violations.push(
+        'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+      )
+    }
+
+    if (
+      rouseCost.requiredUnits !==
+        undefined &&
+      rouseCost.unit !==
+        'distinctNight'
+    ) {
+      violations.push(
+        'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+      )
+    }
+  }
+
+  if (
+    rouseCost.kind === 'conditional'
+  ) {
+    const cases =
+      rouseCost.cases
+
+    const allowedConditions =
+      new Set<string>([
+        'passiveUse',
+        'activeUse',
+      ])
+
+    const conditionKeys =
+      Array.isArray(cases)
+        ? cases.map(
+            item => item.when,
+          )
+        : []
+
+    const invalidChild =
+      Array.isArray(cases) &&
+      cases.some(
+        item =>
+          !(
+            item.cost.kind === 'none' ||
+            (
+              item.cost.kind === 'fixed' &&
+              positiveInteger(
+                item.cost.checks,
+              )
+            )
+          ),
+      )
+
+    if (
+      !Array.isArray(cases) ||
+      cases.length === 0 ||
+      new Set(
+        conditionKeys,
+      ).size !==
+        conditionKeys.length ||
+      conditionKeys.some(
+        condition =>
+          !allowedConditions.has(
+            condition,
+          ),
+      ) ||
+      invalidChild
+    ) {
+      violations.push(
+        'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+      )
+    }
+  }
+
+  const rouseExemptions =
+    (
+      rouseCost.kind === 'fixed' ||
+      rouseCost.kind === 'perUnit'
+    )
+      ? rouseCost.exemptions
+      : undefined
+
+  if (
+    rouseExemptions !== undefined
+  ) {
+    const allowedRouseExemptions =
+      new Set<string>([
+        'targetIsFamulus',
+      ])
+
+    if (
+      !Array.isArray(
+        rouseExemptions,
+      ) ||
+      rouseExemptions.length === 0 ||
+      new Set(
+        rouseExemptions,
+      ).size !==
+        rouseExemptions.length ||
+      rouseExemptions.some(
+        exemption =>
+          !allowedRouseExemptions.has(
+            exemption,
+          ),
+      )
+    ) {
+      violations.push(
+        'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+      )
+    }
+  }
+}
+
 export function validateDisciplinePowerCatalog(
   definitions:
     readonly DisciplinePowerDefinition[],
@@ -169,176 +345,10 @@ export function validateDisciplinePowerCatalog(
         )
       }
 
-      const rouseCost =
-        mechanics.rouseCost
-
-      if (
-        (
-          rouseCost.kind === 'fixed' ||
-          rouseCost.kind ===
-            'additionalToBasePower' ||
-          rouseCost.kind === 'perUnit'
-        ) &&
-        !positiveInteger(
-          rouseCost.checks,
-        )
-      ) {
-        violations.push(
-          'POWER_MECHANICS_ROUSE_COUNT_INVALID',
-        )
-      }
-
-      if (
-        rouseCost.kind ===
-          'additionalToBasePower' &&
-        rouseCost.scaling &&
-        !positiveInteger(
-          rouseCost.scaling
-            .checksPerTarget,
-        )
-      ) {
-        violations.push(
-          'POWER_MECHANICS_ROUSE_COUNT_INVALID',
-        )
-      }
-
-      if (
-        rouseCost.kind === 'range' &&
-        (
-          !positiveInteger(
-            rouseCost.minChecks,
-          ) ||
-          !positiveInteger(
-            rouseCost.maxChecks,
-          ) ||
-          rouseCost.maxChecks <
-            rouseCost.minChecks
-        )
-      ) {
-        violations.push(
-          'POWER_MECHANICS_ROUSE_COUNT_INVALID',
-        )
-      }
-
-      if (
-        rouseCost.kind === 'perUnit'
-      ) {
-        if (
-          rouseCost.requiredUnits !==
-            undefined &&
-          !positiveInteger(
-            rouseCost.requiredUnits,
-          )
-        ) {
-          violations.push(
-            'POWER_MECHANICS_ROUSE_COUNT_INVALID',
-          )
-        }
-
-        if (
-          rouseCost.requiredUnits !==
-            undefined &&
-          rouseCost.unit !==
-            'distinctNight'
-        ) {
-          violations.push(
-            'POWER_MECHANICS_ROUSE_COUNT_INVALID',
-          )
-        }
-      }
-
-      if (
-        rouseCost.kind === 'conditional'
-      ) {
-        const cases =
-          rouseCost.cases
-
-        const allowedConditions =
-          new Set<string>([
-            'passiveUse',
-            'activeUse',
-          ])
-
-        const conditionKeys =
-          Array.isArray(cases)
-            ? cases.map(
-                item => item.when,
-              )
-            : []
-
-        const invalidChild =
-          Array.isArray(cases) &&
-          cases.some(
-            item =>
-              !(
-                item.cost.kind === 'none' ||
-                (
-                  item.cost.kind === 'fixed' &&
-                  positiveInteger(
-                    item.cost.checks,
-                  )
-                )
-              ),
-          )
-
-        if (
-          !Array.isArray(cases) ||
-          cases.length === 0 ||
-          new Set(
-            conditionKeys,
-          ).size !==
-            conditionKeys.length ||
-          conditionKeys.some(
-            condition =>
-              !allowedConditions.has(
-                condition,
-              ),
-          ) ||
-          invalidChild
-        ) {
-          violations.push(
-            'POWER_MECHANICS_ROUSE_COUNT_INVALID',
-          )
-        }
-      }
-
-      const rouseExemptions =
-        (
-          rouseCost.kind === 'fixed' ||
-          rouseCost.kind === 'perUnit'
-        )
-          ? rouseCost.exemptions
-          : undefined
-
-      if (
-        rouseExemptions !== undefined
-      ) {
-        const allowedRouseExemptions =
-          new Set<string>([
-            'targetIsFamulus',
-          ])
-
-        if (
-          !Array.isArray(
-            rouseExemptions,
-          ) ||
-          rouseExemptions.length === 0 ||
-          new Set(
-            rouseExemptions,
-          ).size !==
-            rouseExemptions.length ||
-          rouseExemptions.some(
-            exemption =>
-              !allowedRouseExemptions.has(
-                exemption,
-              ),
-          )
-        ) {
-          violations.push(
-            'POWER_MECHANICS_ROUSE_COUNT_INVALID',
-          )
-        }
-      }
+      validateDisciplinePowerRouseCost(
+        mechanics.rouseCost,
+        violations,
+      )
 
       const duration =
         mechanics.duration
@@ -636,6 +646,28 @@ export function validateDisciplinePowerCatalog(
         }
 
         checkKeys.add(check.key)
+
+        if (check.rouseCost) {
+          validateDisciplinePowerRouseCost(
+            check.rouseCost,
+            violations,
+          )
+        }
+
+        for (
+          const limit of
+          check.limits ?? []
+        ) {
+          if (
+            !positiveInteger(
+              limit.count,
+            )
+          ) {
+            violations.push(
+              'POWER_MECHANICS_LIMIT_INVALID',
+            )
+          }
+        }
 
         if (check.pool.length === 0) {
           violations.push(
