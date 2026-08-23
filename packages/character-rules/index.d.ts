@@ -307,6 +307,10 @@ export type CharacterRulesDisciplinePowerRouseCostUnit =
   | 'distinctNight'
   | 'animalType'
 
+export type CharacterRulesDisciplinePowerRouseCostConditionalWhen =
+  | 'passiveUse'
+  | 'activeUse'
+
 export type CharacterRulesDisciplinePowerRouseCost =
   | {
       readonly kind: 'none'
@@ -325,6 +329,21 @@ export type CharacterRulesDisciplinePowerRouseCost =
       readonly requiredUnits?: number
       readonly exemptions?:
         readonly CharacterRulesDisciplinePowerRouseCostExemption[]
+    }
+  | {
+      readonly kind: 'conditional'
+      readonly cases: readonly {
+        readonly when:
+          CharacterRulesDisciplinePowerRouseCostConditionalWhen
+        readonly cost:
+          | {
+              readonly kind: 'none'
+            }
+          | {
+              readonly kind: 'fixed'
+              readonly checks: number
+            }
+      }[]
     }
   | {
       readonly kind: 'inheritedFromBasePower'
@@ -354,6 +373,10 @@ export type CharacterRulesDisciplinePowerUntilEvent =
 export type CharacterRulesDisciplinePowerConditionalWhen =
   | 'targetIsMortal'
   | 'targetIsVampire'
+  | 'targetIsWilling'
+  | 'targetIsUnwilling'
+  | 'informationGathering'
+  | 'surveillance'
 
 export type CharacterRulesDisciplinePowerOutcome =
   | 'normalSuccess'
@@ -410,6 +433,16 @@ export type CharacterRulesDisciplinePowerDuration =
       readonly kind: 'indefinite'
     }
   | {
+      readonly kind: 'untilDeactivated'
+    }
+  | {
+      readonly kind: 'untilEnded'
+    }
+  | {
+      readonly kind: 'minutes'
+      readonly count?: number
+    }
+  | {
       readonly kind: 'untilEvent'
       readonly event:
         CharacterRulesDisciplinePowerUntilEvent
@@ -426,6 +459,13 @@ export type CharacterRulesDisciplinePowerDuration =
           | {
               readonly kind: 'turnsByMargin'
               readonly baseTurns: number
+            }
+          | {
+              readonly kind: 'minutes'
+              readonly count?: number
+            }
+          | {
+              readonly kind: 'night'
             }
       }[]
     }

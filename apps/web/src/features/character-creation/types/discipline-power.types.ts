@@ -67,6 +67,10 @@ export type DisciplinePowerRouseCostUnit =
   | 'distinctNight'
   | 'animalType'
 
+export type DisciplinePowerRouseCostConditionalWhen =
+  | 'passiveUse'
+  | 'activeUse'
+
 export type DisciplinePowerRouseCostDefinition =
   | {
       kind: 'none'
@@ -84,6 +88,21 @@ export type DisciplinePowerRouseCostDefinition =
       requiredUnits?: number
       exemptions?:
         DisciplinePowerRouseCostExemption[]
+    }
+  | {
+      kind: 'conditional'
+      cases: {
+        when:
+          DisciplinePowerRouseCostConditionalWhen
+        cost:
+          | {
+              kind: 'none'
+            }
+          | {
+              kind: 'fixed'
+              checks: number
+            }
+      }[]
     }
   | {
       kind: 'inheritedFromBasePower'
@@ -112,6 +131,10 @@ export type DisciplinePowerUntilEvent =
 export type DisciplinePowerConditionalWhen =
   | 'targetIsMortal'
   | 'targetIsVampire'
+  | 'targetIsWilling'
+  | 'targetIsUnwilling'
+  | 'informationGathering'
+  | 'surveillance'
 
 export type DisciplinePowerOutcome =
   | 'normalSuccess'
@@ -168,6 +191,16 @@ export type DisciplinePowerDurationDefinition =
       kind: 'indefinite'
     }
   | {
+      kind: 'untilDeactivated'
+    }
+  | {
+      kind: 'untilEnded'
+    }
+  | {
+      kind: 'minutes'
+      count?: number
+    }
+  | {
       kind: 'untilEvent'
       event: DisciplinePowerUntilEvent
     }
@@ -182,6 +215,13 @@ export type DisciplinePowerDurationDefinition =
           | {
               kind: 'turnsByMargin'
               baseTurns: number
+            }
+          | {
+              kind: 'minutes'
+              count?: number
+            }
+          | {
+              kind: 'night'
             }
       }[]
     }

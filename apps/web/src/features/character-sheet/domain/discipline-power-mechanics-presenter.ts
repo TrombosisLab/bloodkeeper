@@ -134,6 +134,43 @@ function formatRouseExemptionSuffix(
   return ''
 }
 
+function formatRouseConditionalWhen(
+  condition:
+    | 'passiveUse'
+    | 'activeUse',
+): string {
+  switch (condition) {
+    case 'passiveUse':
+      return 'Uso pasivo'
+
+    case 'activeUse':
+      return 'Uso activo'
+  }
+}
+
+function formatConditionalRouseCost(
+  cost:
+    | {
+        kind: 'none'
+      }
+    | {
+        kind: 'fixed'
+        checks: number
+      },
+): string {
+  switch (cost.kind) {
+    case 'none':
+      return 'Sin Control de Enardecimiento'
+
+    case 'fixed':
+      return formatCount(
+        cost.checks,
+        'Control de Enardecimiento',
+        'Controles de Enardecimiento',
+      )
+  }
+}
+
 function formatRouseCost(
   mechanics: DisciplinePowerMechanicsDefinition,
 ): string {
@@ -196,6 +233,18 @@ function formatRouseCost(
           )
       }
     }
+
+    case 'conditional':
+      return cost.cases
+        .map(
+          item =>
+            `${formatRouseConditionalWhen(
+              item.when,
+            )}: ${formatConditionalRouseCost(
+              item.cost,
+            )}`,
+        )
+        .join('; ')
 
     case 'inheritedFromBasePower':
       return 'Hereda el coste del Poder base'
@@ -284,7 +333,11 @@ function formatUntilEvent(
 function formatConditionalWhen(
   condition:
     | 'targetIsMortal'
-    | 'targetIsVampire',
+    | 'targetIsVampire'
+    | 'targetIsWilling'
+    | 'targetIsUnwilling'
+    | 'informationGathering'
+    | 'surveillance',
 ): string {
   switch (condition) {
     case 'targetIsMortal':
@@ -292,6 +345,18 @@ function formatConditionalWhen(
 
     case 'targetIsVampire':
       return 'Vampiro'
+
+    case 'targetIsWilling':
+      return 'Objetivo voluntario'
+
+    case 'targetIsUnwilling':
+      return 'Objetivo no voluntario'
+
+    case 'informationGathering':
+      return 'Recopilar información'
+
+    case 'surveillance':
+      return 'Vigilancia'
   }
 }
 
@@ -309,6 +374,22 @@ function formatOutcome(
   }
 }
 
+function formatMinutes(
+  count: number | undefined,
+): string {
+  if (count === undefined) {
+    return 'Unos minutos'
+  }
+
+  return (
+    `Aproximadamente ${formatCount(
+      count,
+      'minuto',
+      'minutos',
+    )}`
+  )
+}
+
 function formatConditionalDuration(
   duration:
     | {
@@ -317,6 +398,13 @@ function formatConditionalDuration(
     | {
         kind: 'turnsByMargin'
         baseTurns: number
+      }
+    | {
+        kind: 'minutes'
+        count?: number
+      }
+    | {
+        kind: 'night'
       },
 ): string {
   switch (duration.kind) {
@@ -331,6 +419,14 @@ function formatConditionalDuration(
           'turnos base',
         )}; aumenta según el margen`
       )
+
+    case 'minutes':
+      return formatMinutes(
+        duration.count,
+      )
+
+    case 'night':
+      return 'Una noche'
   }
 }
 
@@ -438,6 +534,17 @@ function formatDuration(
 
     case 'indefinite':
       return 'Indefinida'
+
+    case 'untilDeactivated':
+      return 'Hasta desactivarlo'
+
+    case 'untilEnded':
+      return 'Hasta que termine'
+
+    case 'minutes':
+      return formatMinutes(
+        duration.count,
+      )
 
     case 'untilEvent':
       return formatUntilEvent(

@@ -229,6 +229,61 @@ export function validateDisciplinePowerCatalog(
         }
       }
 
+      if (
+        rouseCost.kind === 'conditional'
+      ) {
+        const cases =
+          rouseCost.cases
+
+        const allowedConditions =
+          new Set<string>([
+            'passiveUse',
+            'activeUse',
+          ])
+
+        const conditionKeys =
+          Array.isArray(cases)
+            ? cases.map(
+                item => item.when,
+              )
+            : []
+
+        const invalidChild =
+          Array.isArray(cases) &&
+          cases.some(
+            item =>
+              !(
+                item.cost.kind === 'none' ||
+                (
+                  item.cost.kind === 'fixed' &&
+                  positiveInteger(
+                    item.cost.checks,
+                  )
+                )
+              ),
+          )
+
+        if (
+          !Array.isArray(cases) ||
+          cases.length === 0 ||
+          new Set(
+            conditionKeys,
+          ).size !==
+            conditionKeys.length ||
+          conditionKeys.some(
+            condition =>
+              !allowedConditions.has(
+                condition,
+              ),
+          ) ||
+          invalidChild
+        ) {
+          violations.push(
+            'POWER_MECHANICS_ROUSE_COUNT_INVALID',
+          )
+        }
+      }
+
       const rouseExemptions =
         (
           rouseCost.kind === 'fixed' ||
@@ -353,6 +408,18 @@ export function validateDisciplinePowerCatalog(
       }
 
       if (
+        duration.kind === 'minutes' &&
+        duration.count !== undefined &&
+        !positiveInteger(
+          duration.count,
+        )
+      ) {
+        violations.push(
+          'POWER_MECHANICS_DURATION_INVALID',
+        )
+      }
+
+      if (
         duration.kind ===
           'nightWithEndConditions'
       ) {
@@ -415,6 +482,10 @@ export function validateDisciplinePowerCatalog(
           new Set<string>([
             'targetIsMortal',
             'targetIsVampire',
+            'targetIsWilling',
+            'targetIsUnwilling',
+            'informationGathering',
+            'surveillance',
           ])
 
         const conditionKeys =
@@ -431,6 +502,19 @@ export function validateDisciplinePowerCatalog(
               !(
                 item.duration.kind ===
                   'scene' ||
+                item.duration.kind ===
+                  'night' ||
+                (
+                  item.duration.kind ===
+                    'minutes' &&
+                  (
+                    item.duration.count ===
+                      undefined ||
+                    positiveInteger(
+                      item.duration.count,
+                    )
+                  )
+                ) ||
                 (
                   item.duration.kind ===
                     'turnsByMargin' &&
