@@ -5,75 +5,178 @@ import {
   disciplinePowerDefinitions,
 } from '../src/features/character-creation/data/discipline-power-definitions.ts'
 
-const powers =
+const proteanPowers =
   disciplinePowerDefinitions.filter(
-    (power) =>
+    power =>
       power.disciplineKey ===
       'protean',
   )
 
+const byKey =
+  new Map(
+    proteanPowers.map(
+      power => [
+        power.key,
+        power,
+      ],
+    ),
+  )
+
 test(
-  'Protean del manual básico contiene exactamente 8 poderes',
+  '025-A9-R3 Protean CORE contiene exactamente 8 Poderes',
   () => {
     assert.equal(
-      powers.length,
+      proteanPowers.length,
       8,
     )
   },
 )
 
 test(
-  'la distribución por niveles de Protean es correcta',
+  '025-A9-R3 la distribución CORE de Protean es 2 1 2 1 2',
   () => {
-    const distribution =
-      Object.fromEntries(
-        [1, 2, 3, 4, 5].map(
-          (level) => [
-            level,
-            powers.filter(
-              (power) =>
-                power.level === level,
-            ).length,
-          ],
-        ),
+    const counts =
+      new Map()
+
+    for (const power of proteanPowers) {
+      counts.set(
+        power.level,
+        (counts.get(power.level) ?? 0) + 1,
       )
+    }
 
     assert.deepEqual(
-      distribution,
+      [...counts.entries()].sort(
+        ([left]) => left,
+      ),
+      [
+        [1, 2],
+        [2, 1],
+        [3, 2],
+        [4, 1],
+        [5, 2],
+      ],
+    )
+  },
+)
+
+test(
+  '025-A9-R3 Protean usa el inventario CORE canónico reconciliado',
+  () => {
+    assert.deepEqual(
+      proteanPowers.map(
+        power => ({
+          key: power.key,
+          name: power.name,
+          level: power.level,
+          sourcePage:
+            power.sourcePage,
+        }),
+      ),
+      [
+        {
+          key:
+            'protean-eyes-of-the-beast',
+          name:
+            'Ojos de la Bestia',
+          level: 1,
+          sourcePage: 269,
+        },
+        {
+          key:
+            'protean-weight-of-the-feather',
+          name:
+            'Peso de la Pluma',
+          level: 1,
+          sourcePage: 269,
+        },
+        {
+          key:
+            'protean-feral-weapons',
+          name:
+            'Armas Salvajes',
+          level: 2,
+          sourcePage: 270,
+        },
+        {
+          key:
+            'protean-shapechange',
+          name:
+            'Cambiar de Forma',
+          level: 3,
+          sourcePage: 270,
+        },
+        {
+          key:
+            'protean-earth-meld',
+          name:
+            'Fusión con la Tierra',
+          level: 3,
+          sourcePage: 271,
+        },
+        {
+          key:
+            'protean-metamorphosis',
+          name:
+            'Metamorfosis',
+          level: 4,
+          sourcePage: 271,
+        },
+        {
+          key:
+            'protean-unfettered-heart',
+          name:
+            'Corazón Liberado',
+          level: 5,
+          sourcePage: 271,
+        },
+        {
+          key:
+            'protean-mist-form',
+          name:
+            'Forma de Niebla',
+          level: 5,
+          sourcePage: 271,
+        },
+      ],
+    )
+  },
+)
+
+test(
+  '025-A9-R3 Metamorfosis requiere Cambiar de Forma',
+  () => {
+    const metamorphosis =
+      byKey.get(
+        'protean-metamorphosis',
+      )
+
+    assert.ok(metamorphosis)
+
+    assert.deepEqual(
+      metamorphosis.requirements,
       {
-        1: 2,
-        2: 1,
-        3: 2,
-        4: 1,
-        5: 2,
+        prerequisitePowerKeys: [
+          'protean-shapechange',
+        ],
       },
     )
   },
 )
 
 test(
-  'todos los poderes de Protean usan la fuente core',
+  '025-A9-R3 retira Forma Horrenda y Corazón de la Oscuridad del CORE',
   () => {
     assert.equal(
-      powers.every(
-        (power) =>
-          power.sourceKey ===
-          'core-v5-es',
+      byKey.has(
+        'protean-horrid-form',
       ),
-      true,
+      false,
     )
-  },
-)
 
-test(
-  'Protean no conserva poderes DEV',
-  () => {
     assert.equal(
-      powers.some(
-        (power) =>
-          power.key.includes(
-            '-dev-',
-          ),
+      byKey.has(
+        'protean-heart-of-darkness',
       ),
       false,
     )
@@ -81,95 +184,63 @@ test(
 )
 
 test(
-  'los poderes de nivel 1 son Ojos de la Bestia y Peso de la Pluma',
+  '025-A9-R3 Protean usa exclusivamente fuente core y páginas 269 a 271',
   () => {
-    assert.deepEqual(
-      powers
-        .filter(
-          (power) =>
-            power.level === 1,
-        )
-        .map(
-          (power) =>
-            power.name,
-        ),
-      [
-        'Ojos de la Bestia',
-        'Peso de la Pluma',
-      ],
-    )
+    for (
+      const power of proteanPowers
+    ) {
+      assert.equal(
+        power.sourceKey,
+        'core-v5-es',
+      )
+
+      assert.ok(
+        power.sourcePage >= 269 &&
+          power.sourcePage <= 271,
+      )
+    }
   },
 )
 
 test(
-  'Armas Salvajes es el poder de nivel 2',
-  () => {
-    assert.deepEqual(
-      powers
-        .filter(
-          (power) =>
-            power.level === 2,
-        )
-        .map(
-          (power) =>
-            power.name,
-        ),
-      [
-        'Armas Salvajes',
-      ],
-    )
-  },
-)
-
-test(
-  'Protean cubre todos los niveles 1 a 5',
-  () => {
-    const levels =
-      [
-        ...new Set(
-          powers.map(
-            (power) =>
-              power.level,
-          ),
-        ),
-      ].sort()
-
-    assert.deepEqual(
-      levels,
-      [1, 2, 3, 4, 5],
-    )
-  },
-)
-
-test(
-  'todos los poderes de Protean tienen trazabilidad bibliográfica',
-  () => {
-    assert.equal(
-      powers.every(
-        (power) =>
-          Number.isInteger(
-            power.sourcePage,
-          ) &&
-          power.sourcePage >= 270 &&
-          power.sourcePage <= 272,
-      ),
-      true,
-    )
-  },
-)
-
-test(
-  'las claves de Protean son únicas',
+  '025-A9-R3 las keys de Protean son únicas y no contienen DEV',
   () => {
     const keys =
-      powers.map(
-        (power) =>
-          power.key,
+      proteanPowers.map(
+        power => power.key,
       )
 
     assert.equal(
       new Set(keys).size,
       keys.length,
     )
+
+    assert.equal(
+      keys.some(
+        key =>
+          key.toLowerCase()
+            .includes('dev'),
+      ),
+      false,
+    )
+  },
+)
+
+test(
+  '025-A9-R3 Protean permanece sin mechanics ni diceCheck antes de M1 M2',
+  () => {
+    for (
+      const power of proteanPowers
+    ) {
+      assert.equal(
+        power.mechanics,
+        undefined,
+      )
+
+      assert.equal(
+        power.diceCheck,
+        undefined,
+      )
+    }
   },
 )

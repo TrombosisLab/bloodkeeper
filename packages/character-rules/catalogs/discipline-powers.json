@@ -2594,7 +2594,7 @@
     "level": 1,
     "summary": "Permite ver con claridad sobrenatural en la oscuridad y manifiesta rasgos depredadores en los ojos.",
     "sourceKey": "core-v5-es",
-    "sourcePage": 270,
+    "sourcePage": 269,
     "active": true
   },
   {
@@ -2604,7 +2604,7 @@
     "level": 1,
     "summary": "Reduce sobrenaturalmente el peso efectivo del vampiro para evitar o mitigar determinados peligros físicos.",
     "sourceKey": "core-v5-es",
-    "sourcePage": 270,
+    "sourcePage": 269,
     "active": true
   },
   {
@@ -2613,6 +2613,16 @@
     "name": "Armas Salvajes",
     "level": 2,
     "summary": "Transforma partes del cuerpo en armas naturales sobrenaturales apropiadas para el combate.",
+    "sourceKey": "core-v5-es",
+    "sourcePage": 270,
+    "active": true
+  },
+  {
+    "key": "protean-shapechange",
+    "disciplineKey": "protean",
+    "name": "Cambiar de Forma",
+    "level": 3,
+    "summary": "Permite adoptar una forma animal asociada a la naturaleza depredadora del vampiro.",
     "sourceKey": "core-v5-es",
     "sourcePage": 270,
     "active": true
@@ -2628,34 +2638,31 @@
     "active": true
   },
   {
-    "key": "protean-shapechange",
+    "key": "protean-metamorphosis",
     "disciplineKey": "protean",
     "name": "Metamorfosis",
-    "level": 3,
-    "summary": "Permite adoptar una forma animal asociada a la naturaleza depredadora del vampiro.",
-    "sourceKey": "core-v5-es",
-    "sourcePage": 271,
-    "active": true
-  },
-  {
-    "key": "protean-horrid-form",
-    "disciplineKey": "protean",
-    "name": "Forma Horrenda",
     "level": 4,
     "summary": "Transforma el cuerpo en una forma monstruosa especialmente poderosa y aterradora.",
     "sourceKey": "core-v5-es",
-    "sourcePage": 272,
-    "active": true
+    "sourcePage": 271,
+    "active": true,
+    "description": "Amplía Cambiar de Forma para permitir formas animales adicionales, manteniendo las reglas generales del Poder base.",
+    "requirements": {
+      "prerequisitePowerKeys": [
+        "protean-shapechange"
+      ]
+    }
   },
   {
-    "key": "protean-heart-of-darkness",
+    "key": "protean-unfettered-heart",
     "disciplineKey": "protean",
-    "name": "Corazón de la Oscuridad",
+    "name": "Corazón Liberado",
     "level": 5,
     "summary": "Permite alterar sobrenaturalmente la ubicación del corazón para dificultar su destrucción.",
     "sourceKey": "core-v5-es",
-    "sourcePage": 272,
-    "active": true
+    "sourcePage": 271,
+    "active": true,
+    "description": "Vuelve el corazón difícil de localizar y permite al vampiro liberarse de una estaca mediante esfuerzo físico y mental."
   },
   {
     "key": "protean-mist-form",
@@ -2664,7 +2671,7 @@
     "level": 5,
     "summary": "Permite transformar el cuerpo en una nube de niebla sobrenatural.",
     "sourceKey": "core-v5-es",
-    "sourcePage": 272,
+    "sourcePage": 271,
     "active": true
   },
   {
