@@ -2343,11 +2343,27 @@
   {
     "key": "fortitude-unswayable-mind",
     "disciplineKey": "fortitude",
-    "name": "Mente Inquebrantable",
+    "name": "Mente Imperturbable",
     "level": 1,
     "summary": "Refuerza la resistencia mental frente a coerción e influencia sobrenatural.",
     "sourceKey": "core-v5-es",
     "sourcePage": 258,
+    "active": true
+  },
+  {
+    "key": "fortitude-enduring-beasts",
+    "disciplineKey": "fortitude",
+    "name": "Bestias Resistentes",
+    "level": 2,
+    "summary": "Extiende parte de la resistencia sobrenatural del vampiro a animales afectados por su Animalismo.",
+    "sourceKey": "core-v5-es",
+    "sourcePage": 258,
+    "requirements": {
+      "amalgam": {
+        "disciplineKey": "animalism",
+        "minimumLevel": 1
+      }
+    },
     "active": true
   },
   {
@@ -2357,13 +2373,13 @@
     "level": 2,
     "summary": "Permite resistir mejor las heridas mediante una resistencia sobrenatural.",
     "sourceKey": "core-v5-es",
-    "sourcePage": 258,
+    "sourcePage": 259,
     "active": true
   },
   {
     "key": "fortitude-defy-bane",
     "disciplineKey": "fortitude",
-    "name": "Desafiar la Perdición",
+    "name": "Desafiar Prohibición",
     "level": 3,
     "summary": "Permite resistir temporalmente fuentes de daño especialmente peligrosas para los vampiros.",
     "sourceKey": "core-v5-es",
@@ -2383,9 +2399,19 @@
   {
     "key": "fortitude-draught-of-endurance",
     "disciplineKey": "fortitude",
-    "name": "Sorbo de Resistencia",
+    "name": "Sorbo de Aguante",
     "level": 4,
     "summary": "Permite transmitir temporalmente parte de Fortaleza mediante la Sangre.",
+    "sourceKey": "core-v5-es",
+    "sourcePage": 259,
+    "active": true
+  },
+  {
+    "key": "fortitude-prowess-from-pain",
+    "disciplineKey": "fortitude",
+    "name": "Arrojo por el Dolor",
+    "level": 5,
+    "summary": "Convierte las heridas sufridas en una fuente de capacidad física sobrenatural.",
     "sourceKey": "core-v5-es",
     "sourcePage": 259,
     "active": true
@@ -2396,26 +2422,6 @@
     "name": "Carne de Mármol",
     "level": 5,
     "summary": "Endurece sobrenaturalmente el cuerpo hasta hacerlo extremadamente difícil de dañar.",
-    "sourceKey": "core-v5-es",
-    "sourcePage": 259,
-    "active": true
-  },
-  {
-    "key": "fortitude-prowess-from-pain",
-    "disciplineKey": "fortitude",
-    "name": "Proeza del Dolor",
-    "level": 5,
-    "summary": "Convierte las heridas sufridas en una fuente de capacidad física sobrenatural.",
-    "sourceKey": "core-v5-es",
-    "sourcePage": 260,
-    "active": true
-  },
-  {
-    "key": "fortitude-skin-of-the-sarcophagus",
-    "disciplineKey": "fortitude",
-    "name": "Piel de Sarcófago",
-    "level": 5,
-    "summary": "Representa una manifestación extrema de resistencia sobrenatural.",
     "sourceKey": "core-v5-es",
     "sourcePage": 260,
     "active": true
