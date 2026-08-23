@@ -52,6 +52,20 @@ function duplicatedPoolTerm(
   return false
 }
 
+function repeatedAttributePair(
+  pool: readonly {
+    kind: string
+    key: string
+  }[],
+): boolean {
+  return (
+    pool.length === 2 &&
+    pool[0]?.kind === 'attribute' &&
+    pool[1]?.kind === 'attribute' &&
+    pool[0]?.key === pool[1]?.key
+  )
+}
+
 function positiveInteger(
   value: number,
 ): boolean {
@@ -765,6 +779,9 @@ export function validateDisciplinePowerCatalog(
 
           if (
             duplicatedPoolTerm(
+              resolution.opposingPool,
+            ) &&
+            !repeatedAttributePair(
               resolution.opposingPool,
             )
           ) {
