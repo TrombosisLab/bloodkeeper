@@ -52,7 +52,7 @@ confirmadas.
 | SPEC-031 | [SPEC-031 – CHRONICLE_PARTICIPANTS_AND_CHARACTERS](SPEC-031_CHRONICLE_PARTICIPANTS_AND_CHARACTERS_v1.0.md) | 1.0 | Aprobado | Cerrada | Participación contextual, múltiples narradores, asociación de personajes, permisos y preservación histórica validados. |
 | SPEC-032 | [SPEC-032 – CHRONICLE_NPCS](SPEC-032_CHRONICLE_NPCS_v1.0.md) | 1.0 | Aprobado | Cerrada | Pendiente de auditoría contra código y tests. |
 | SPEC-033 | [SPEC-033 – CHRONICLE_LOCATIONS](SPEC-033_CHRONICLE_LOCATIONS_v1.0.md) | 1.0 | Aprobado | Cerrada | Pendiente de auditoría contra código y tests. |
-| SPEC-034 | [SPEC-034 – CHRONICLE_EVENTS_AND_TIMELINE](SPEC-034_CHRONICLE_EVENTS_AND_TIMELINE_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
+| SPEC-034 | [SPEC-034 – CHRONICLE_EVENTS_AND_TIMELINE](SPEC-034_CHRONICLE_EVENTS_AND_TIMELINE_v1.0.md) | 1.0 | Aprobado | Cerrada | CRUD de eventos, fechas narrativas opcionales, orden temporal estable, reordenación, archivado, privacidad del narrador y permisos validados; relaciones, estados futuros y sharing quedan fuera de esta primera implementación. |
 | SPEC-035 | [SPEC-035 – CHRONICLE_SESSIONS](SPEC-035_CHRONICLE_SESSIONS_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-036 | [SPEC-036 – DICE_MODULE](SPEC-036_DICE_MODULE_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
 | SPEC-037 | [SPEC-037 – DICE_POOLS_AND_ROLLS](SPEC-037_DICE_POOLS_AND_ROLLS_v1.0.md) | 1.0 | Aprobado | No clasificada operativamente | Pendiente de auditoría contra código y tests. |
