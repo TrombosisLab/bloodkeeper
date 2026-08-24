@@ -164,6 +164,7 @@ unexpected_scripts="$(
     -not -path './scripts/*' \
     -not -path './install.sh' \
     -not -path './apps/backup/worker.sh' \
+    -not -path './apps/backup/scheduler.sh' \
     -not -path './.git/*' \
     -not -path '*/node_modules/*' \
     -not -path '*/dist/*' \

@@ -190,7 +190,7 @@ test(
 
       const listed =
         await fetch(
-          `${api}/users?limit=50&offset=0`,
+            `${api}/users?limit=50&offset=0`,
           {
             headers: {
               Cookie: adminCookie,
@@ -205,9 +205,41 @@ test(
 
       const listedBody =
         await listed.json()
+      const listedUsers =
+        [...listedBody.items]
+
+      let nextOffset =
+        listedBody.nextOffset
+
+      while (nextOffset !== null) {
+        const page =
+          await fetch(
+            `${api}/users?limit=50&offset=${nextOffset}`,
+            {
+              headers: {
+                Cookie: adminCookie,
+              },
+            },
+          )
+
+        assert.equal(
+          page.status,
+          200,
+        )
+
+        const pageBody =
+          await page.json()
+
+        listedUsers.push(
+          ...pageBody.items,
+        )
+        nextOffset =
+          pageBody.nextOffset
+      }
+
 
       assert.equal(
-        listedBody.items.some(
+        listedUsers.some(
           (user) =>
             user.id ===
               createdBody.id &&

@@ -70,32 +70,30 @@ Destino y espejo explícitos:
 
 ## Programación
 
+La distribución portable programa las copias dentro de Docker mediante el
+servicio backup-scheduler. El scheduler escribe una solicitud en el volumen
+Docker compartido y backup-worker ejecuta el dump, los checksums y la
+retención.
 
-La programación con `crontab` de esta sección pertenece al adaptador
-source-build y no es instalada por `install.sh`. En la distribución
-portable, las solicitudes manuales se procesan dentro de Docker; no se
-crea ninguna tarea dependiente del sistema operativo anfitrión.
+La configuración predeterminada es una copia completa diaria a las 03:00 UTC
+con conservación de los siete conjuntos completos más recientes. Puede
+personalizarse con BLOODKEEPER_BACKUP_SCHEDULE_HOUR y
+BLOODKEEPER_BACKUP_SCHEDULE_MINUTE en .env. No se requiere crontab, systemd
+ni ningún programador del sistema operativo anfitrión.
 
-La política inicial es:
+El adaptador source-build conserva install-backup-schedule.sh para
+instalaciones históricas, pero no forma parte del flujo portable.
 
-- una copia completa diaria a las 03:00, hora local;
-- conservación de los siete conjuntos completos más recientes;
-- registro en `backup.log` dentro del destino;
-- una sola ejecución simultánea mediante bloqueo;
-- espejo externo cuando exista una ruta disponible.
+Comprobación contractual:
 
-Instalar o revisar la tarea:
+./scripts/check-backup-recovery.sh
 
-```bash
-./scripts/install-backup-schedule.sh --install
-./scripts/install-backup-schedule.sh --status
-```
+Prueba completa real:
 
-Eliminarla:
+./scripts/check-backup-recovery.sh --with-full-backup
 
-```bash
-./scripts/install-backup-schedule.sh --remove
-```
+La prueba completa crea un paquete, restaura el dump en una base temporal
+y no sustituye la base activa.
 
 No se aplican copias incrementales en esta fase: el volumen actual es
 pequeño y una estrategia incremental añadiría complejidad y riesgo sin
@@ -223,3 +221,33 @@ Conservar junto a cada paquete:
 - registro de la tarea programada;
 - resultado periódico de `check-backup-recovery.sh`;
 - al menos una copia reciente fuera de la VM.
+
+## Recuperación desde servidor limpio
+
+La recuperación desde servidor limpio requiere un checkout Git nuevo, Docker
+operativo, el paquete completo y su checksum fuera de la máquina Docker. Tras
+restaurar PostgreSQL se vuelven a comprobar los servicios y `/api/health`.
+
+## Adaptador source-build histórico
+
+Las instalaciones históricas que necesiten preparar el entorno mediante el
+flujo source-build pueden usar el adaptador:
+
+./scripts/bootstrap-server.sh
+
+Este adaptador no es un requisito de la distribución portable, que utiliza
+Docker Compose y los servicios contenidos en el proyecto.
+
+## Aplicación de una restauración validada
+
+Cuando la recuperación deba aplicar el dump lógico sobre la base de datos
+de destino, el procedimiento operativo utiliza:
+
+./scripts/restore.sh --apply
+
+La operación se realiza únicamente después de verificar la copia y confirmar
+el destino de restauración.
+
+La validación final de los servicios restaurados se ejecuta con:
+
+./scripts/check.sh

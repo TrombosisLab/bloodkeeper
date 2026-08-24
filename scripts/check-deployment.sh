@@ -148,9 +148,17 @@ grep -Fq '## Recuperación desde servidor limpio' \
   docs/RECOVERY.md ||
   die "Falta el procedimiento de recuperación desde servidor limpio."
 
-grep -Fq 'Ubuntu Server 24.04 LTS.' \
-  docs/RECOVERY.md ||
-  die "La recuperación no identifica el servidor Ubuntu LTS."
+grep -Fq 'distribución portable' docs/RECOVERY.md ||
+  die "La recuperación no documenta la distribución portable."
+
+grep -Fqi 'no se requiere crontab' docs/RECOVERY.md ||
+  die "La recuperación depende indebidamente del host."
+
+grep -Fq 'backup-worker' compose.yaml ||
+  die "Falta el ejecutor Docker de backups."
+
+grep -Fq 'backup-scheduler' compose.yaml ||
+  die "Falta el scheduler Docker de backups."
 
 grep -Fq './scripts/restore-full.sh' \
   docs/RECOVERY.md ||

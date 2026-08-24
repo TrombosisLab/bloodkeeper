@@ -168,6 +168,43 @@ services:
         max-size: "10m"
         max-file: "5"
 
+  backup-scheduler:
+    container_name: v5r-backup-scheduler
+    build:
+      context: .
+      dockerfile: apps/backup/scheduler.Dockerfile
+    init: true
+    user: "1000:1000"
+    read_only: true
+    network_mode: none
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    environment:
+      BACKUP_REQUEST_DIR: /requests
+      BACKUP_SCHEDULE_HOUR: ${BLOODKEEPER_BACKUP_SCHEDULE_HOUR:-3}
+      BACKUP_SCHEDULE_MINUTE: ${BLOODKEEPER_BACKUP_SCHEDULE_MINUTE:-0}
+    volumes:
+      - backup_requests:/requests
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=4m
+    depends_on:
+      backup-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "test", "-f", "/tmp/backup-scheduler.ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
   postgres:
     image: postgres:17-alpine
 

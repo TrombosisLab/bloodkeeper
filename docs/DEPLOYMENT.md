@@ -114,3 +114,24 @@ Los secretos permanecen en `.env`, ignorado por Git. Docker Compose exige
 `DATABASE_URL`, `POSTGRES_DB`, `POSTGRES_USER` y `POSTGRES_PASSWORD`. Las
 variables de puertos tienen valores seguros por defecto y
 pueden personalizarse localmente.
+
+## Contrato operativo SPEC-006
+
+Antes de una actualización o de una recuperación se conserva una copia previa
+del sistema mediante el flujo source-build:
+
+```bash
+./scripts/backup.sh
+```
+
+La copia se verifica antes de considerarla utilizable:
+
+```bash
+./scripts/restore.sh --verify
+```
+
+## Recuperación desde servidor limpio
+
+La recuperación desde servidor limpio parte de un checkout Git nuevo, conserva
+los paquetes fuera de la máquina Docker y vuelve a validar los health checks
+después de levantar los servicios.

@@ -109,13 +109,27 @@ do
   echo "✓ $file"
 done
 
-crontab -l |
-  grep -Fq '# BEGIN BLOODKEEPER SPEC-007 FULL BACKUP' ||
-  die "La copia completa no está programada."
+test -f apps/backup/worker.sh ||
+  die "Falta el worker portable de backups."
 
-crontab -l |
-  grep -Fq 'scripts/backup-full.sh' ||
-  die "La tarea programada no usa backup-full.sh."
+test -f apps/backup/scheduler.sh ||
+  die "Falta el scheduler portable de backups."
+
+grep -Fq '  backup-scheduler:' compose.yaml ||
+  die "Falta el servicio backup-scheduler en Compose."
+
+grep -Fq 'dockerfile: apps/backup/scheduler.Dockerfile' compose.yaml ||
+  die "Falta la imagen Docker del scheduler."
+
+grep -Fq 'backup_requests:/requests' compose.yaml ||
+  die "Falta el volumen de solicitudes del scheduler."
+
+if grep -RE 'crontab|systemd|docker.sock' apps/backup/scheduler.sh compose.yaml >/dev/null 2>&1; then
+  die "El scheduler portable no debe depender del host."
+fi
+
+bash -n apps/backup/scheduler.sh
+echo "Scheduler Docker portable validado"
 
 echo "✓ Tarea diaria instalada"
 
