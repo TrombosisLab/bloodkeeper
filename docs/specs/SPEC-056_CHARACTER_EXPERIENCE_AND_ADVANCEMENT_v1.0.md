@@ -77,10 +77,13 @@ Como regla V5 de referencia:
 - En crónicas de progreso más rápido puede conceder 2 puntos por personaje al
   final de cada sesión.
 
-La aplicación no concederá Experiencia automáticamente por el mero cambio de
-estado de una sesión.
+Al completar explícitamente una sesión, la aplicación concederá 1 punto de
+Experiencia a cada personaje registrado en su asistencia. Registrar o editar
+la asistencia por sí solo no concederá Experiencia.
 
-Toda concesión será una operación explícita y autorizada del Narrador.
+La finalización seguirá siendo una operación explícita y autorizada del
+Narrador. Las concesiones adicionales por final de historia o ritmo rápido
+seguirán siendo operaciones explícitas y autorizadas.
 
 Cuando exista una sesión asociada, la concesión podrá referenciarla. El final
 de una historia podrá registrarse como motivo de concesión sin obligar a crear
@@ -305,14 +308,16 @@ explícita contra SPEC-017/SPEC-018 antes de habilitarse; no se inferirá.
 Tras SPEC-035, una sesión podrá servir como origen de concesiones de
 Experiencia.
 
-La interfaz del Narrador podrá permitir conceder Experiencia a los personajes
-participantes de forma individual o controlada en grupo.
+Al completar una sesión, cada personaje registrado en su asistencia recibirá
+automáticamente la concesión estándar de 1 punto de Experiencia por sesión
+jugada.
 
-Completar una sesión no deberá producir automáticamente una concesión
-irreversible.
+La operación deberá impedir duplicados accidentales, conservar quién realizó
+la finalización y tolerar reintentos sin volver a conceder el mismo punto. Una
+corrección posterior se registrará como un nuevo movimiento trazable.
 
-La operación deberá impedir duplicados accidentales y conservar quién realizó
-la concesión.
+La interfaz del Narrador podrá permitir concesiones adicionales de forma
+individual o controlada en grupo cuando corresponda otro motivo autorizado.
 
 ## Integración con la ficha
 

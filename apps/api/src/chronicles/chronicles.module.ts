@@ -1,6 +1,12 @@
 import {
   Module,
 } from '@nestjs/common'
+import {
+  CHARACTER_EXPERIENCE_REPOSITORY,
+} from '../characters/application/character-experience.repository'
+import {
+  PrismaCharacterExperienceRepository,
+} from '../characters/infrastructure/prisma-character-experience.repository'
 
 import {
   UsersModule,
@@ -374,6 +380,13 @@ import {
         CHRONICLE_SESSION_ATTENDANCE_REPOSITORY,
       useExisting:
         PrismaChronicleSessionAttendanceRepository,
+    },
+    PrismaCharacterExperienceRepository,
+    {
+      provide:
+        CHARACTER_EXPERIENCE_REPOSITORY,
+      useExisting:
+        PrismaCharacterExperienceRepository,
     },
     PrismaChronicleSessionContextRepository,
     {

@@ -238,7 +238,7 @@ export function ChronicleSessionAttendancePanel({
           ? 'Marca los personajes activos que participan en esta Sesión.'
           : 'Esta Sesión está archivada: la asistencia se conserva en modo de solo lectura.'}
         {' '}
-        Registrar asistencia no concede Experiencia automáticamente.
+        Al completar la Sesión, cada personaje presente recibe 1 punto de Experiencia.
       </p>
 
       {operationError !== null ? (

@@ -19,6 +19,9 @@ import {
   ChronicleSessionNotFoundError,
   UpdateChronicleSessionUseCase,
 } from '../dist/chronicles/application/update-chronicle-session.use-case.js'
+import {
+  CharacterExperienceDuplicateError,
+} from '../dist/characters/application/character-experience.repository.js'
 
 const chronicleId =
   '11111111-1111-4111-8111-111111111111'
@@ -192,6 +195,91 @@ test(
       await new CompleteChronicleSessionUseCase(
         repository(snapshot('completed')),
         participants(),
+      ).execute(
+        narratorId,
+        chronicleId,
+        sessionId,
+      )
+    assert.equal(already.status, 'completed')
+  },
+)
+
+test(
+  'Completar sesion concede 1 XP a cada personaje presente sin duplicar',
+  async () => {
+    const characterIds = [
+      '44444444-4444-4444-8444-444444444444',
+      '55555555-5555-4555-8555-555555555555',
+    ]
+    const attendance = {
+      async listBySessionId() {
+        return {
+          items: characterIds.map(
+            (characterId) => ({
+              sessionId,
+              characterId,
+              createdAt: new Date(0),
+            }),
+          ),
+          nextOffset: null,
+        }
+      },
+    }
+    const grants = []
+    const experience = {
+      async appendGrant(data) {
+        grants.push(data)
+      },
+    }
+
+    await new CompleteChronicleSessionUseCase(
+      repository(),
+      participants(),
+      attendance,
+      experience,
+    ).execute(
+      narratorId,
+      chronicleId,
+      sessionId,
+    )
+
+    assert.equal(grants.length, 2)
+    assert.deepEqual(
+      grants.map((grant) => ({
+        characterId: grant.characterId,
+        actorId: grant.actorId,
+        chronicleId: grant.chronicleId,
+        sessionId: grant.sessionId,
+        amount: grant.amount,
+        reason: grant.reason,
+        deduplicationKey:
+          grant.deduplicationKey,
+      })),
+      characterIds.map((characterId) => ({
+        characterId,
+        actorId: narratorId,
+        chronicleId,
+        sessionId,
+        amount: 1,
+        reason: 'session_played',
+        deduplicationKey:
+          `grant:session:${sessionId}:session_played`,
+      })),
+    )
+
+    const duplicateExperience = {
+      async appendGrant(data) {
+        throw new CharacterExperienceDuplicateError(
+          data.characterId,
+        )
+      },
+    }
+    const already =
+      await new CompleteChronicleSessionUseCase(
+        repository(snapshot('completed')),
+        participants(),
+        attendance,
+        duplicateExperience,
       ).execute(
         narratorId,
         chronicleId,

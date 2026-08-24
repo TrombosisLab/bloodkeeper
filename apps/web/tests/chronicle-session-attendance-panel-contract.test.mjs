@@ -117,7 +117,7 @@ test(
 )
 
 test(
-  'Attendance A2 hace ARCHIVED solo lectura y no inventa XP automatico',
+  'Attendance A2 hace ARCHIVED solo lectura y explica el XP al completar',
   () => {
     assert.match(
       attendance,
@@ -129,7 +129,7 @@ test(
     )
     assert.match(
       attendance,
-      /no concede Experiencia automáticamente/,
+      /Al completar la Sesión, cada personaje presente recibe 1 punto de Experiencia/,
     )
     assert.doesNotMatch(
       attendance,
