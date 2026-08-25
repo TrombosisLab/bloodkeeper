@@ -165,3 +165,9 @@ Se incluirán pruebas para:
 - Sin lógica duplicada.
 - Preparado para creación, evolución y dados.
 - Respeto a las restricciones de contenido protegido.
+
+## Adendas implementadas
+
+Las ampliaciones mecánicas A1–A11 se consolidan en
+[SPEC-025 — Adendas A1–A11: mecánicas de Disciplinas](SPEC-025_ADDENDA_A1_A11_DISCIPLINE_MECHANICS_v1.0.md).
+El documento enlazado registra el cierre 106/106 y su trazabilidad automatizada.

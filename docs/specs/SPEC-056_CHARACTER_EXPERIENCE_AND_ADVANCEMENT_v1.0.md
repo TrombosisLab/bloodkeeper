@@ -78,8 +78,9 @@ Como regla V5 de referencia:
   final de cada sesión.
 
 Al completar explícitamente una sesión, la aplicación concederá 1 punto de
-Experiencia a cada personaje registrado en su asistencia. Registrar o editar
-la asistencia por sí solo no concederá Experiencia.
+Experiencia a cada personaje registrado en su asistencia. La asistencia solo
+podrá modificarse mientras la sesión permanezca en preparación y quedará
+cerrada al completarla.
 
 La finalización seguirá siendo una operación explícita y autorizada del
 Narrador. Las concesiones adicionales por final de historia o ritmo rápido

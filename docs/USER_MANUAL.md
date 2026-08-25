@@ -201,9 +201,9 @@ permiso, la ficha muestra:
 
 La acción **Evolucionar personaje** abre las compras permitidas por el sistema.
 
-Al completar una sesión, cada personaje registrado en su asistencia recibe
-automáticamente 1 punto de Experiencia. Registrar o modificar la asistencia no
-lo concede por sí solo, y repetir la finalización no duplica el movimiento.
+La asistencia puede modificarse mientras la sesión está en preparación. Al
+completarla se cierra y cada personaje presente recibe automáticamente 1 punto
+de Experiencia. Repetir la finalización no duplica el movimiento.
 
 La interfaz solicita al backend una previsualización del coste y de la validez
 antes de confirmar la compra. El usuario no introduce manualmente el coste.

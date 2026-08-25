@@ -52,7 +52,7 @@ export class ChronicleSessionAttendanceSessionNotEditableError
   extends Error {
   constructor(sessionId: string) {
     super(
-      `Archived Chronicle session attendance is immutable: ${sessionId}`,
+      `Chronicle session attendance is immutable after completion: ${sessionId}`,
     )
     this.name =
       'ChronicleSessionAttendanceSessionNotEditableError'
@@ -90,7 +90,7 @@ async function requireSession(
 
   if (
     requireEditable &&
-    session.status === 'archived'
+    session.status !== 'preparation'
   ) {
     throw new ChronicleSessionAttendanceSessionNotEditableError(
       sessionId,

@@ -121,7 +121,7 @@ export function CharacterBloodExperience({
   return (
     <section
       className="sheet-section blood-experience-section"
-      aria-labelledby="blood-experience-title"
+      aria-labelledby="blood-resonance-title"
       data-blood-resonance="persisted"
     >
       <div className="section-title">
@@ -130,7 +130,7 @@ export function CharacterBloodExperience({
             Sangre
           </p>
 
-          <h2 id="blood-experience-title">
+          <h2 id="blood-resonance-title">
             Resonancia
           </h2>
         </div>

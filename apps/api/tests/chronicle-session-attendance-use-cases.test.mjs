@@ -229,7 +229,7 @@ test(
     const chronicleId = randomUUID()
     const current = session({
       chronicleId,
-      status: 'completed',
+      status: 'preparation',
     })
     const actor =
       membership('narrator')
@@ -253,11 +253,10 @@ test(
 )
 
 test(
-  'Attendance puede añadir y retirar en PREPARATION o COMPLETED',
+  'Attendance puede añadir y retirar solo en PREPARATION',
   async () => {
     for (const status of [
       'preparation',
-      'completed',
     ]) {
       const chronicleId =
         randomUUID()
@@ -307,6 +306,63 @@ test(
           ([name]) => name === 'remove',
         ),
         true,
+      )
+    }
+  },
+)
+
+test(
+  'Attendance bloquea escritura en COMPLETED y ARCHIVED',
+  async () => {
+    for (const status of [
+      'completed',
+      'archived',
+    ]) {
+      const chronicleId =
+        randomUUID()
+      const current =
+        session({
+          chronicleId,
+          status,
+        })
+      const actor =
+        membership('narrator')
+      const characterId =
+        randomUUID()
+      const attendances =
+        attendanceRepository()
+
+      await assert.rejects(
+        new AddChronicleSessionAttendanceUseCase(
+          attendances,
+          sessionRepository(current),
+          participantRepository(actor),
+        ).execute(
+          actor.userId,
+          chronicleId,
+          current.id,
+          characterId,
+        ),
+        ChronicleSessionAttendanceSessionNotEditableError,
+      )
+
+      await assert.rejects(
+        new RemoveChronicleSessionAttendanceUseCase(
+          attendances,
+          sessionRepository(current),
+          participantRepository(actor),
+        ).execute(
+          actor.userId,
+          chronicleId,
+          current.id,
+          characterId,
+        ),
+        ChronicleSessionAttendanceSessionNotEditableError,
+      )
+
+      assert.equal(
+        attendances.calls.length,
+        0,
       )
     }
   },

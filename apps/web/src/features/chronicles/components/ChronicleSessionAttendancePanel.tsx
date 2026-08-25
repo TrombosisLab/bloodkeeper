@@ -132,7 +132,7 @@ export function ChronicleSessionAttendancePanel({
     )
 
   const editable =
-    session.status !== 'archived'
+    session.status === 'preparation'
 
   const visibleCharacters =
     associatedCharacters.filter(
@@ -236,9 +236,11 @@ export function ChronicleSessionAttendancePanel({
       <p className="chronicle-session-attendance__help">
         {editable
           ? 'Marca los personajes activos que participan en esta Sesión.'
-          : 'Esta Sesión está archivada: la asistencia se conserva en modo de solo lectura.'}
+          : session.status === 'completed'
+            ? 'Esta Sesión está completada: la asistencia se conserva en modo de solo lectura.'
+            : 'Esta Sesión está archivada: la asistencia se conserva en modo de solo lectura.'}
         {' '}
-        Al completar la Sesión, cada personaje presente recibe 1 punto de Experiencia.
+        La asistencia se cierra al completar la Sesión y cada personaje presente recibe 1 punto de Experiencia.
       </p>
 
       {operationError !== null ? (

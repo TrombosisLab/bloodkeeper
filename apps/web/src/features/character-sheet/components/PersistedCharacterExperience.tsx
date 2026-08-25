@@ -85,8 +85,23 @@ const reasonLabels: Readonly<Record<string, string>> = {
   session_played: 'Sesión jugada',
   story_end: 'Final de historia',
   fast_session: 'Sesión con progreso rápido',
+  advancement_purchase: 'Compra de evolución',
+  advancement_purchase_dyscrasia:
+    'Compra de evolución con Discrasia',
   purchase: 'Compra de evolución',
 }
+
+const purchasableDisciplineDefinitions =
+  disciplineDefinitions.filter(
+    (discipline) =>
+      discipline.active !== false &&
+      disciplinePowerDefinitions.some(
+        (power) =>
+          power.active !== false &&
+          power.disciplineKey ===
+            discipline.key,
+      ),
+  )
 
 const movementLabels: Readonly<Record<CharacterExperienceMovement['type'], string>> = {
   grant: 'Concesión',
@@ -218,9 +233,13 @@ export function PersistedCharacterExperience({
   const [showEvolution, setShowEvolution] = useState(false)
   const [kind, setKind] = useState<CharacterAdvancementKind>('attribute')
   const [primaryKey, setPrimaryKey] = useState<string>(attributeDefinitions[0]?.key ?? '')
-  const [disciplineKey, setDisciplineKey] = useState<string>(disciplineDefinitions[0]?.key ?? '')
+  const [disciplineKey, setDisciplineKey] =
+    useState<string>(
+      purchasableDisciplineDefinitions[0]?.key ??
+        '',
+    )
   const [powerKey, setPowerKey] = useState(
-    disciplinePowerDefinitions.find((item) => item.disciplineKey === disciplineDefinitions[0]?.key)?.key ?? '',
+    disciplinePowerDefinitions.find((item) => item.disciplineKey === purchasableDisciplineDefinitions[0]?.key)?.key ?? '',
   )
   const [specialtyName, setSpecialtyName] = useState('')
   const [advantageMode, setAdvantageMode] = useState<'new' | 'existing'>('new')
@@ -550,7 +569,7 @@ export function PersistedCharacterExperience({
                         setPowerKey(disciplinePowerDefinitions.find((item) => item.disciplineKey === next && item.active !== false)?.key ?? '')
                         resetPreview()
                       }}>
-                        {disciplineDefinitions.filter((item) => item.active !== false).map((item) => <option key={item.key} value={item.key}>{item.name}</option>)}
+                        {purchasableDisciplineDefinitions.map((item) => <option key={item.key} value={item.key}>{item.name}</option>)}
                       </select>
                     </label>
                     <label>

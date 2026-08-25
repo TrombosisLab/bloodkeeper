@@ -117,11 +117,11 @@ test(
 )
 
 test(
-  'Attendance A2 hace ARCHIVED solo lectura y explica el XP al completar',
+  'Attendance A2 cierra asistencia en COMPLETED y ARCHIVED y explica el XP',
   () => {
     assert.match(
       attendance,
-      /session\.status !== 'archived'/,
+      /session\.status === 'preparation'/,
     )
     assert.match(
       attendance,
@@ -129,7 +129,11 @@ test(
     )
     assert.match(
       attendance,
-      /Al completar la Sesión, cada personaje presente recibe 1 punto de Experiencia/,
+      /completada/,
+    )
+    assert.match(
+      attendance,
+      /La asistencia se cierra al completar la Sesión y cada personaje presente recibe 1 punto de Experiencia/,
     )
     assert.doesNotMatch(
       attendance,
