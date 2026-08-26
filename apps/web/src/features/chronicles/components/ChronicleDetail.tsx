@@ -43,6 +43,14 @@ import {
 } from './ChronicleEventPanel'
 
 import {
+  ChronicleStoryWorkspace,
+} from './ChronicleStoryWorkspace'
+
+import {
+  ChronicleSharedStoryWorkspace,
+} from './ChronicleSharedStoryWorkspace'
+
+import {
   ChronicleSessionPanel,
 } from './ChronicleSessionPanel'
 
@@ -81,8 +89,9 @@ const characterStatusLabels = {
 type ChronicleDetailSection =
   | 'summary'
   | 'participants'
+  | 'stories'
   | 'sessions'
-  | 'story'
+  | 'timeline'
   | 'resources'
 
 interface ChronicleDetailProps {
@@ -432,6 +441,13 @@ export function ChronicleDetail({
     'narrator'
 
   const canManageEvents =
+    currentMembership?.role ===
+    'narrator'
+
+  const canViewStories =
+    currentMembership !== undefined
+
+  const canManageStories =
     currentMembership?.role ===
     'narrator'
 
@@ -932,6 +948,24 @@ export function ChronicleDetail({
             Participantes
           </button>
 
+          {canViewStories ? (
+            <button
+              id="chronicle-section-stories-tab"
+              type="button"
+              role="tab"
+              aria-selected={activeSection === 'stories'}
+              aria-controls="chronicle-section-stories-panel"
+              className={
+                activeSection === 'stories'
+                  ? 'chronicle-detail__section-tab chronicle-detail__section-tab--active'
+                  : 'chronicle-detail__section-tab'
+              }
+              onClick={() => setActiveSection('stories')}
+            >
+              Historias
+            </button>
+          ) : null}
+
           {canManageSessions ? (
             <button
               id="chronicle-section-sessions-tab"
@@ -952,19 +986,19 @@ export function ChronicleDetail({
 
           {canManageEvents ? (
             <button
-              id="chronicle-section-story-tab"
+              id="chronicle-section-timeline-tab"
               type="button"
               role="tab"
-              aria-selected={activeSection === 'story'}
-              aria-controls="chronicle-section-story-panel"
+              aria-selected={activeSection === 'timeline'}
+              aria-controls="chronicle-section-timeline-panel"
               className={
-                activeSection === 'story'
+                activeSection === 'timeline'
                   ? 'chronicle-detail__section-tab chronicle-detail__section-tab--active'
                   : 'chronicle-detail__section-tab'
               }
-              onClick={() => setActiveSection('story')}
+              onClick={() => setActiveSection('timeline')}
             >
-              Historia
+              Cronología
             </button>
           ) : null}
 
@@ -1285,15 +1319,19 @@ export function ChronicleDetail({
       </div>
 
       <div
-        id="chronicle-section-story-panel"
-        hidden={activeSection !== 'story'}
+        id="chronicle-section-stories-panel"
+        hidden={activeSection !== 'stories'}
       >
-        {canManageEvents ? (
-        <ChronicleEventPanel
-          chronicleId={chronicleId}
-        />
-      ) : null}
-
+        {canManageStories ? (
+          <ChronicleStoryWorkspace
+            chronicleId={chronicleId}
+            associatedCharacters={associatedCharacters}
+          />
+        ) : canViewStories ? (
+          <ChronicleSharedStoryWorkspace
+            chronicleId={chronicleId}
+          />
+        ) : null}
       </div>
 
       <div
@@ -1311,6 +1349,18 @@ export function ChronicleDetail({
 </>
       ) : null}
 
+      </div>
+
+      <div
+        id="chronicle-section-timeline-panel"
+        hidden={activeSection !== 'timeline'}
+      >
+        {canManageEvents ? (
+          <ChronicleEventPanel
+            chronicleId={chronicleId}
+            active={activeSection === 'timeline'}
+          />
+        ) : null}
       </div>
 
       <section

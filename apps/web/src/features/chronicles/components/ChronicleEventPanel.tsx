@@ -16,18 +16,68 @@ import {
   createChronicleGateway,
 } from '../infrastructure/chronicle.api.ts'
 
+import {
+  createChronicleStoryGateway,
+} from '../infrastructure/chronicle-story.api.ts'
+
 import type {
   ChronicleEventApiSnapshot,
   CreateChronicleEventApiRequest,
 } from '../types/chronicle-api.types.ts'
+
+import type {
+  ChronicleStoryApiSnapshot,
+} from '../types/chronicle-story-api.types.ts'
 
 import './chronicle-event-panel.css'
 
 const gateway =
   createChronicleGateway()
 
+const storyGateway =
+  createChronicleStoryGateway()
+
 interface ChronicleEventPanelProps {
   readonly chronicleId: string
+  readonly active: boolean
+}
+
+interface StoryTimelineTransition {
+  readonly id: string
+  readonly storyId: string
+  readonly title: string
+  readonly kind: 'activated' | 'completed'
+  readonly occurredAt: string
+}
+
+function orderStoryTransitions(
+  transitions: readonly StoryTimelineTransition[],
+): readonly StoryTimelineTransition[] {
+  const ordered: StoryTimelineTransition[] = []
+
+  for (const transition of transitions) {
+    let position = 0
+    const occurredAt = new Date(
+      transition.occurredAt,
+    ).getTime()
+
+    while (
+      position < ordered.length &&
+      new Date(
+        ordered[position]?.occurredAt ?? '',
+      ).getTime() >= occurredAt
+    ) {
+      position += 1
+    }
+
+    ordered.splice(
+      position,
+      0,
+      transition,
+    )
+  }
+
+  return ordered
 }
 
 interface EventFormState {
@@ -183,12 +233,20 @@ function operationErrorMessage(
 
 export function ChronicleEventPanel({
   chronicleId,
+  active,
 }: ChronicleEventPanelProps) {
   const [
     events,
     setEvents,
   ] = useState<
     readonly ChronicleEventApiSnapshot[]
+  >([])
+
+  const [
+    stories,
+    setStories,
+  ] = useState<
+    readonly ChronicleStoryApiSnapshot[]
   >([])
 
   const [
@@ -248,12 +306,20 @@ export function ChronicleEventPanel({
     setOperationError(null)
 
     try {
-      const loadedEvents =
-        await gateway.events(
+      const [
+        loadedEvents,
+        loadedStories,
+      ] = await Promise.all([
+        gateway.events(
           chronicleId,
-        )
+        ),
+        storyGateway.list(
+          chronicleId,
+        ),
+      ])
 
       setEvents(loadedEvents)
+      setStories(loadedStories.items)
 
       if (loadedEvents.length > 0) {
         setSelectedEvent(
@@ -280,8 +346,10 @@ export function ChronicleEventPanel({
     setSelectedEvent(null)
     setEditingEventId(null)
     setEditForm(emptyForm)
-    void loadEvents()
-  }, [chronicleId])
+    if (active) {
+      void loadEvents()
+    }
+  }, [chronicleId, active])
 
   function updateCreateField(
     field: keyof EventFormState,
@@ -528,6 +596,30 @@ export function ChronicleEventPanel({
       setOperationId(null)
     }
   }
+
+  const storyTransitions =
+    orderStoryTransitions(
+      stories.flatMap((story) => [
+      ...(story.startedAt === null
+        ? []
+        : [{
+            id: `${story.id}:activated`,
+            storyId: story.id,
+            title: story.title,
+            kind: 'activated' as const,
+            occurredAt: story.startedAt,
+          }]),
+      ...(story.completedAt === null
+        ? []
+        : [{
+            id: `${story.id}:completed`,
+            storyId: story.id,
+            title: story.title,
+            kind: 'completed' as const,
+            occurredAt: story.completedAt,
+          }]),
+      ]),
+    )
 
   const activeEvents =
     events.filter(
@@ -813,6 +905,27 @@ export function ChronicleEventPanel({
           {operationError}
         </p>
       ) : null}
+
+      <section className="chronicle-event-panel__story-transitions" aria-labelledby="chronicle-story-transitions-title">
+        <div className="chronicle-event-panel__story-transitions-heading">
+          <div><span>Derivado del ciclo de vida</span><h3 id="chronicle-story-transitions-title">Transiciones de Historias</h3></div>
+          <strong>{storyTransitions.length}</strong>
+        </div>
+        {storyTransitions.length === 0 ? (
+          <p>Aquí aparecerán automáticamente las activaciones y cierres de Historias.</p>
+        ) : (
+          <div className="chronicle-event-panel__story-transition-list">
+            {storyTransitions.map((transition) => (
+              <article key={transition.id}>
+                <span aria-hidden="true">{transition.kind === 'activated' ? '◇' : '♜'}</span>
+                <div><small>{transition.kind === 'activated' ? 'Historia activada' : 'Historia completada'}</small><strong>{transition.title}</strong></div>
+                <time dateTime={transition.occurredAt}>{technicalDate(transition.occurredAt)}</time>
+              </article>
+            ))}
+          </div>
+        )}
+        <small className="chronicle-event-panel__story-transition-note">Estas entradas proceden de la Historia y no crean Sucesos duplicados.</small>
+      </section>
 
       <div className="chronicle-event-panel__workspace">
         <aside

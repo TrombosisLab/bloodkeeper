@@ -23,7 +23,8 @@ test(
       'summary',
       'participants',
       'sessions',
-      'story',
+      'stories',
+      'timeline',
       'resources',
     ]) {
       assert.match(
@@ -50,7 +51,11 @@ test(
     )
     assert.match(
       detail,
-      /hidden=\{activeSection !== 'story'\}/,
+      /hidden=\{activeSection !== 'stories'\}/,
+    )
+    assert.match(
+      detail,
+      /hidden=\{activeSection !== 'timeline'\}/,
     )
     assert.match(
       detail,

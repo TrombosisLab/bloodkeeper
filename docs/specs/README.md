@@ -80,6 +80,8 @@ confirmadas.
 | SPEC-058 | [SPEC-058 – CHARACTER_BLOOD_RESONANCE_AND_DYSCRASIA](SPEC-058_CHARACTER_BLOOD_RESONANCE_AND_DYSCRASIA_v1.0.md) | 1.0 | Aprobado | Cerrada | Resonancias, Temperamentos, afinidades especiales y Discrasias V5 persistidas e integradas con Sangre, Dados, Disciplinas, Experiencia, Historial y ficha; regresión API/Web, runtime y separación visual validados. |
 
 | SPEC-059 | [SPEC-059 – ROUSE_CHECKS_AND_BLOOD_QUICK_ACTIONS](SPEC-059_ROUSE_CHECKS_AND_BLOOD_QUICK_ACTIONS_v1.0.md) | 1.0 | Aprobado | Cerrada | Control de Enardecimiento persistente e idempotente, acción rápida de ficha y Rubor de la Vida contextual con exención canónica por Discrasia; API/Web, migraciones y runtime validados, con integraciones futuras diferidas hasta disponer de consumidores canónicos. |
+| SPEC-060 | [SPEC-060 - CHRONICLE_STORIES_AND_NARRATIVE_ARCS](SPEC-060_CHRONICLE_STORIES_AND_NARRATIVE_ARCS_v1.0.md) | 1.0 | Aprobado | Cerrada | Historias y arcos narrativos con hitos, relaciones, cierre idempotente de experiencia, proyeccion compartida segura para participantes, controles de publicacion y cronologia derivada validados en Docker. |
+| SPEC-061 | [SPEC-061 – CHRONICLE_OPERATIONAL_WORKSPACES](SPEC-061_CHRONICLE_OPERATIONAL_WORKSPACES_v1.0.md) | 1.0 | Aprobado | Pendiente | Rediseño integral de Resumen, Participantes, Sesiones, Cronología y Recursos mediante espacios operativos relacionados, accesibles y exclusivamente Docker. |
 
 ## Versiones archivadas
 

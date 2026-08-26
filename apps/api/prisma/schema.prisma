@@ -204,6 +204,9 @@ enum InventoryItemStatus {
 }
 
 model User {
+  createdChronicleStories ChronicleStory[] @relation("ChronicleStoryCreatedBy")
+  completedStoryMilestones ChronicleStoryMilestone[] @relation("ChronicleStoryMilestoneCompletedBy")
+  storyCompletionOperations ChronicleStoryCompletionOperation[] @relation("ChronicleStoryCompletionActor")
   id           String            @id @default(uuid()) @db.Uuid
   username     String            @unique
   displayName  String
@@ -254,6 +257,7 @@ model Chronicle {
   name        String
   description String?
   status      ChronicleStatus @default(PREPARATION)
+  experiencePace ChronicleExperiencePace @default(STANDARD)
   createdAt   DateTime        @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime        @updatedAt @db.Timestamptz(3)
 
@@ -263,6 +267,7 @@ model Chronicle {
   locations    ChronicleLocation[]     @relation("ChronicleLocationChronicle")
   events       ChronicleEvent[]        @relation("ChronicleEventChronicle")
   sessions     ChronicleSession[]      @relation("ChronicleSessionChronicle")
+  stories      ChronicleStory[]        @relation("ChronicleStoryChronicle")
   diceRolls    DiceRollRecord[]         @relation("DiceRollChronicle")
 
   @@index([narratorId])
@@ -322,9 +327,11 @@ model ChronicleNpc {
 
   chronicle Chronicle @relation("ChronicleNpcChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   contextLinks ChronicleSessionNpc[] @relation("ChronicleSessionNpcNpc")
+  storyLinks   ChronicleStoryNpc[] @relation("ChronicleStoryNpcNpc")
 
   @@index([chronicleId, status])
   @@index([chronicleId, detailLevel])
+  @@unique([id, chronicleId])
   @@map("chronicle_npcs")
 }
 
@@ -347,6 +354,7 @@ model ChronicleLocation {
 
   chronicle Chronicle @relation("ChronicleLocationChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   contextLinks ChronicleSessionLocation[] @relation("ChronicleSessionLocationLocation")
+  storyLinks   ChronicleStoryLocation[] @relation("ChronicleStoryLocationLocation")
 
   parentLocation ChronicleLocation?  @relation("ChronicleLocationHierarchy", fields: [parentLocationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   childLocations ChronicleLocation[] @relation("ChronicleLocationHierarchy")
@@ -354,6 +362,7 @@ model ChronicleLocation {
   @@index([chronicleId, status])
   @@index([chronicleId, parentLocationId])
   @@index([parentLocationId])
+  @@unique([id, chronicleId])
   @@map("chronicle_locations")
 }
 
@@ -377,10 +386,12 @@ model ChronicleEvent {
 
   chronicle Chronicle @relation("ChronicleEventChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   contextLinks ChronicleSessionEvent[] @relation("ChronicleSessionEventEvent")
+  storyLinks   ChronicleStoryEvent[] @relation("ChronicleStoryEventEvent")
 
   @@index([chronicleId, status])
   @@index([chronicleId, timelineOrder])
   @@index([chronicleId, realDate])
+  @@unique([id, chronicleId])
   @@map("chronicle_events")
 }
 
@@ -391,6 +402,7 @@ model ChronicleSession {
     title         String?
     realDate      DateTime?              @db.Timestamptz(3)
     status        ChronicleSessionStatus @default(PREPARATION)
+    experiencePaceSnapshot ChronicleExperiencePace?
     summary       String?
     narratorNotes String?
     createdAt     DateTime               @default(now()) @db.Timestamptz(3)
@@ -403,10 +415,12 @@ model ChronicleSession {
     eventLinks          ChronicleSessionEvent[] @relation("ChronicleSessionEventSession")
     npcLinks            ChronicleSessionNpc[] @relation("ChronicleSessionNpcSession")
     locationLinks       ChronicleSessionLocation[] @relation("ChronicleSessionLocationSession")
+    storyLinks          ChronicleStorySession[] @relation("ChronicleStorySessionSession")
 
     @@index([chronicleId, status])
     @@index([chronicleId, sessionNumber])
     @@index([chronicleId, realDate])
+    @@unique([id, chronicleId])
     @@map("chronicle_sessions")
 }
 
@@ -524,6 +538,7 @@ model CharacterExperienceMovement {
   characterId        String                       @db.Uuid
   actorId            String                       @db.Uuid
   sessionId          String?                      @db.Uuid
+  storyId            String?                      @db.Uuid
   type               CharacterExperienceMovementType
   component          CharacterExperienceComponent
   amount             Int
@@ -537,6 +552,7 @@ model CharacterExperienceMovement {
   character Character @relation("CharacterExperienceCharacter", fields: [characterId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   actor     User      @relation("CharacterExperienceActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   session   ChronicleSession? @relation("CharacterExperienceSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  story     ChronicleStory? @relation("CharacterExperienceStory", fields: [storyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   corrects  CharacterExperienceMovement? @relation("CharacterExperienceCorrection", fields: [correctsMovementId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   corrections CharacterExperienceMovement[] @relation("CharacterExperienceCorrection")
 
@@ -544,6 +560,8 @@ model CharacterExperienceMovement {
   @@index([characterId, createdAt])
   @@index([actorId, createdAt])
   @@index([sessionId])
+  @@index([storyId])
+  @@unique([characterId, storyId])
   @@index([correctsMovementId])
   @@map("character_experience_movements")
 }
@@ -560,6 +578,7 @@ model Character {
 
   owner     User       @relation("CharacterOwner", fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   chronicle Chronicle? @relation("CharacterChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  storyLinks ChronicleStoryCharacter[] @relation("ChronicleStoryCharacterCharacter")
 
   identity      CharacterIdentity?
   creationState CharacterCreationState?
@@ -590,6 +609,7 @@ model Character {
   @@index([ownerId])
   @@index([chronicleId])
   @@index([status])
+  @@unique([id, chronicleId])
   @@map("characters")
 }
 
@@ -992,4 +1012,209 @@ model CharacterHistoryEntry {
 
   @@index([characterId])
   @@map("character_history_entries")
+}
+
+enum ChronicleExperiencePace {
+  STANDARD
+  FAST
+}
+
+enum ChronicleStoryType {
+  MAIN_ARC
+  SECONDARY_ARC
+  PERSONAL_ARC
+}
+
+enum ChronicleStoryVisibility {
+  NARRATOR_ONLY
+  CHRONICLE_PARTICIPANTS
+}
+
+enum ChronicleStoryStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum ChronicleStoryMilestoneKey {
+  HOOK
+  FIRST_TURN
+  REVELATION
+  CLIMAX
+  RESOLUTION
+}
+
+model ChronicleStory {
+  id              String                   @id @default(uuid()) @db.Uuid
+  chronicleId     String                   @db.Uuid
+  createdById     String                   @db.Uuid
+  title           String
+  type            ChronicleStoryType       @default(MAIN_ARC)
+  premise         String?
+  stakes          String?
+  resolution      String?
+  narratorNotes   String?
+  sharedSummary   String?
+  visibility      ChronicleStoryVisibility @default(NARRATOR_ONLY)
+  status          ChronicleStoryStatus     @default(PLANNED)
+  sortOrder       Int
+  revision        Int                      @default(1)
+  startedAt       DateTime?                @db.Timestamptz(3)
+  completedAt     DateTime?                @db.Timestamptz(3)
+  archivedAt      DateTime?                @db.Timestamptz(3)
+  createdAt       DateTime                 @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime                 @updatedAt @db.Timestamptz(3)
+
+  chronicle Chronicle @relation("ChronicleStoryChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  createdBy User @relation("ChronicleStoryCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  milestones ChronicleStoryMilestone[] @relation("ChronicleStoryMilestoneStory")
+  reminders ChronicleStoryReminder[] @relation("ChronicleStoryReminderStory")
+  sessionLinks ChronicleStorySession[] @relation("ChronicleStorySessionStory")
+  eventLinks ChronicleStoryEvent[] @relation("ChronicleStoryEventStory")
+  characterLinks ChronicleStoryCharacter[] @relation("ChronicleStoryCharacterStory")
+  npcLinks ChronicleStoryNpc[] @relation("ChronicleStoryNpcStory")
+  locationLinks ChronicleStoryLocation[] @relation("ChronicleStoryLocationStory")
+  completionOperation ChronicleStoryCompletionOperation? @relation("ChronicleStoryCompletionStory")
+  experienceMovements CharacterExperienceMovement[] @relation("CharacterExperienceStory")
+
+  @@unique([id, chronicleId])
+  @@unique([chronicleId, sortOrder])
+  @@index([chronicleId, status, sortOrder])
+  @@index([createdById, createdAt])
+  @@map("chronicle_stories")
+}
+
+model ChronicleStoryMilestone {
+  id            String                     @id @default(uuid()) @db.Uuid
+  storyId       String                     @db.Uuid
+  chronicleId   String                     @db.Uuid
+  key           ChronicleStoryMilestoneKey
+  sortOrder     Int
+  note          String?
+  completedAt   DateTime?                  @db.Timestamptz(3)
+  completedById String?                    @db.Uuid
+  revision      Int                        @default(1)
+  createdAt     DateTime                   @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime                   @updatedAt @db.Timestamptz(3)
+
+  story ChronicleStory @relation("ChronicleStoryMilestoneStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  completedBy User? @relation("ChronicleStoryMilestoneCompletedBy", fields: [completedById], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([storyId, key])
+  @@unique([storyId, sortOrder])
+  @@index([chronicleId, storyId])
+  @@index([completedById])
+  @@map("chronicle_story_milestones")
+}
+
+model ChronicleStoryReminder {
+  id          String   @id @default(uuid()) @db.Uuid
+  storyId     String   @db.Uuid
+  chronicleId String   @db.Uuid
+  text        String
+  sortOrder   Int
+  resolvedAt  DateTime? @db.Timestamptz(3)
+  revision    Int      @default(1)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  story ChronicleStory @relation("ChronicleStoryReminderStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([storyId, sortOrder])
+  @@index([chronicleId, storyId])
+  @@map("chronicle_story_reminders")
+}
+
+model ChronicleStorySession {
+  storyId      String   @db.Uuid
+  sessionId    String   @db.Uuid
+  chronicleId  String   @db.Uuid
+  progressNotes String?
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+
+  story ChronicleStory @relation("ChronicleStorySessionStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  session ChronicleSession @relation("ChronicleStorySessionSession", fields: [sessionId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+
+  @@id([storyId, sessionId])
+  @@index([sessionId])
+  @@index([chronicleId, storyId])
+  @@map("chronicle_story_session_links")
+}
+
+model ChronicleStoryEvent {
+  storyId     String   @db.Uuid
+  eventId     String   @db.Uuid
+  chronicleId String   @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  story ChronicleStory @relation("ChronicleStoryEventStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  event ChronicleEvent @relation("ChronicleStoryEventEvent", fields: [eventId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+
+  @@id([storyId, eventId])
+  @@index([eventId])
+  @@index([chronicleId, storyId])
+  @@map("chronicle_story_event_links")
+}
+
+model ChronicleStoryCharacter {
+  storyId     String   @db.Uuid
+  characterId String   @db.Uuid
+  chronicleId String   @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  story ChronicleStory @relation("ChronicleStoryCharacterStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  character Character @relation("ChronicleStoryCharacterCharacter", fields: [characterId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+
+  @@id([storyId, characterId])
+  @@index([characterId])
+  @@index([chronicleId, storyId])
+  @@map("chronicle_story_character_links")
+}
+
+model ChronicleStoryNpc {
+  storyId     String   @db.Uuid
+  npcId       String   @db.Uuid
+  chronicleId String   @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  story ChronicleStory @relation("ChronicleStoryNpcStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  npc ChronicleNpc @relation("ChronicleStoryNpcNpc", fields: [npcId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+
+  @@id([storyId, npcId])
+  @@index([npcId])
+  @@index([chronicleId, storyId])
+  @@map("chronicle_story_npc_links")
+}
+
+model ChronicleStoryLocation {
+  storyId     String   @db.Uuid
+  locationId  String   @db.Uuid
+  chronicleId String   @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  story ChronicleStory @relation("ChronicleStoryLocationStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  location ChronicleLocation @relation("ChronicleStoryLocationLocation", fields: [locationId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+
+  @@id([storyId, locationId])
+  @@index([locationId])
+  @@index([chronicleId, storyId])
+  @@map("chronicle_story_location_links")
+}
+
+model ChronicleStoryCompletionOperation {
+  id            String   @id @default(uuid()) @db.Uuid
+  storyId       String   @unique @db.Uuid
+  operationId   String   @unique @db.Uuid
+  actorId       String   @db.Uuid
+  eligibleCount Int
+  grantedCount  Int
+  skippedCount  Int
+  completedAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  story ChronicleStory @relation("ChronicleStoryCompletionStory", fields: [storyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  actor User @relation("ChronicleStoryCompletionActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([actorId, completedAt])
+  @@map("chronicle_story_completion_operations")
 }

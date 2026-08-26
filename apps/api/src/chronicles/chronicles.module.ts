@@ -262,6 +262,35 @@ import {
   ChronicleController,
 } from './presentation/chronicle.controller'
 
+import {
+  CHRONICLE_STORY_REPOSITORY,
+} from './application/chronicle-story.repository'
+
+import {
+  ActivateChronicleStoryUseCase,
+  ArchiveChronicleStoryUseCase,
+  CreateChronicleStoryReminderUseCase,
+  CreateChronicleStoryUseCase,
+  ListChronicleStoriesUseCase,
+  ListSharedChronicleStoriesUseCase,
+  LoadChronicleStoryUseCase,
+  RemoveChronicleStoryReminderUseCase,
+  ReplaceChronicleStoryContextUseCase,
+  UpdateChronicleStorySessionProgressUseCase,
+  CompleteChronicleStoryUseCase,
+  UpdateChronicleStoryMilestoneUseCase,
+  UpdateChronicleStoryReminderUseCase,
+  UpdateChronicleStoryUseCase,
+} from './application/chronicle-story.use-cases'
+
+import {
+  PrismaChronicleStoryRepository,
+} from './infrastructure/prisma-chronicle-story.repository'
+
+import {
+  ChronicleStoryController,
+} from './presentation/chronicle-story.controller'
+
 @Module({
   imports: [
     UsersModule,
@@ -274,6 +303,7 @@ import {
     ChronicleSessionController,
     ChronicleSessionAttendanceController,
     ChronicleSessionContextController,
+    ChronicleStoryController,
   ],
   providers: [
     PrismaChronicleRepository,
@@ -368,6 +398,27 @@ import {
     ReorderChronicleEventsUseCase,
     ArchiveChronicleEventUseCase,
     PrismaChronicleSessionRepository,
+    PrismaChronicleStoryRepository,
+    {
+      provide:
+        CHRONICLE_STORY_REPOSITORY,
+      useExisting:
+        PrismaChronicleStoryRepository,
+    },
+    ListChronicleStoriesUseCase,
+    ListSharedChronicleStoriesUseCase,
+    LoadChronicleStoryUseCase,
+    CreateChronicleStoryUseCase,
+    UpdateChronicleStoryUseCase,
+    ActivateChronicleStoryUseCase,
+    ArchiveChronicleStoryUseCase,
+    UpdateChronicleStoryMilestoneUseCase,
+    CreateChronicleStoryReminderUseCase,
+    UpdateChronicleStoryReminderUseCase,
+    RemoveChronicleStoryReminderUseCase,
+    ReplaceChronicleStoryContextUseCase,
+    UpdateChronicleStorySessionProgressUseCase,
+    CompleteChronicleStoryUseCase,
     {
       provide:
         CHRONICLE_SESSION_REPOSITORY,
@@ -460,6 +511,7 @@ import {
   ],
   exports: [
     CHRONICLE_PARTICIPANT_REPOSITORY,
+    CHRONICLE_STORY_REPOSITORY,
     CHRONICLE_SESSION_REPOSITORY,
     CHRONICLE_SESSION_ATTENDANCE_REPOSITORY,
     CreateChronicleUseCase,

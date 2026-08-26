@@ -352,3 +352,21 @@
     width: 100%;
   }
 }
+
+
+.chronicle-event-panel__story-transitions { margin-top: var(--space-4); border: 1px solid var(--color-border-default); border-radius: var(--radius-xl); background: var(--color-surface-translucent); padding: var(--space-4); }
+.chronicle-event-panel__story-transitions-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.chronicle-event-panel__story-transitions-heading span { display: block; margin-bottom: 0.35rem; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; }
+.chronicle-event-panel__story-transitions-heading > strong { border-radius: var(--radius-pill); background: var(--color-surface-emphasis); padding: 0.35rem 0.65rem; }
+.chronicle-event-panel__story-transitions > p { margin: var(--space-3) 0; opacity: 0.72; }
+.chronicle-event-panel__story-transition-list { display: grid; gap: var(--space-2); margin-top: var(--space-3); }
+.chronicle-event-panel__story-transition-list article { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--space-3); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-control); background: var(--color-surface-translucent); padding: var(--space-3); }
+.chronicle-event-panel__story-transition-list article > span { display: grid; width: 2rem; height: 2rem; place-items: center; border-radius: 50%; background: var(--color-surface-emphasis); color: var(--color-danger); }
+.chronicle-event-panel__story-transition-list article > div { display: grid; gap: 0.2rem; }
+.chronicle-event-panel__story-transition-list small, .chronicle-event-panel__story-transition-list time, .chronicle-event-panel__story-transition-note { font-size: var(--font-size-sm); opacity: 0.72; }
+.chronicle-event-panel__story-transition-note { display: block; margin-top: var(--space-3); }
+
+@media (max-width: 760px) {
+  .chronicle-event-panel__story-transition-list article { grid-template-columns: auto minmax(0, 1fr); }
+  .chronicle-event-panel__story-transition-list time { grid-column: 2; }
+}
