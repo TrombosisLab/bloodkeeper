@@ -13,6 +13,7 @@ import {
 
 import {
   ChronicleNpcDetailLevel as PrismaChronicleNpcDetailLevel,
+  Prisma as PrismaClient,
   ChronicleNpcStatus as PrismaChronicleNpcStatus,
 } from '@prisma/client'
 
@@ -30,6 +31,7 @@ import type {
 
 import type {
   ChronicleNpc,
+  ChronicleNpcDeepProfile,
   ChronicleNpcDetailLevel,
   ChronicleNpcStatus,
   CreateChronicleNpcData,
@@ -49,10 +51,22 @@ const statusFromPrisma = {
 const detailLevelFromPrisma = {
   [PrismaChronicleNpcDetailLevel.SIMPLE]:
     'simple',
+  [PrismaChronicleNpcDetailLevel.DEEP]:
+    'deep',
 } as const satisfies Record<
   PrismaChronicleNpcDetailLevel,
   ChronicleNpcDetailLevel
 >
+
+function jsonProfile(value: ChronicleNpcDeepProfile | null | undefined): PrismaClient.InputJsonValue | PrismaClient.NullableJsonNullValueInput {
+  return value === null || value === undefined
+    ? PrismaClient.JsonNull
+    : value as unknown as PrismaClient.InputJsonValue
+}
+
+function profileFromPrisma(value: unknown): ChronicleNpcDeepProfile | null {
+  return value === null ? null : value as ChronicleNpcDeepProfile
+}
 
 function toDomain(
   row: PrismaChronicleNpcRecord,
@@ -70,6 +84,7 @@ function toDomain(
       detailLevelFromPrisma[
         row.detailLevel
       ],
+    deepProfile: profileFromPrisma(row.deepProfile),
     createdAt: new Date(row.createdAt),
     updatedAt: new Date(row.updatedAt),
   }
@@ -148,8 +163,10 @@ export class PrismaChronicleNpcRepository
           notes: data.notes,
           status:
             PrismaChronicleNpcStatus.ACTIVE,
-          detailLevel:
-            PrismaChronicleNpcDetailLevel.SIMPLE,
+          detailLevel: data.deepProfile === undefined || data.deepProfile === null
+            ? PrismaChronicleNpcDetailLevel.SIMPLE
+            : PrismaChronicleNpcDetailLevel.DEEP,
+          deepProfile: jsonProfile(data.deepProfile),
         },
       })
 
@@ -193,6 +210,14 @@ export class PrismaChronicleNpcRepository
             ? {}
             : {
                 notes: data.notes,
+              }),
+          ...(data.deepProfile === undefined
+            ? {}
+            : {
+                deepProfile: jsonProfile(data.deepProfile),
+                detailLevel: data.deepProfile === null
+                  ? PrismaChronicleNpcDetailLevel.SIMPLE
+                  : PrismaChronicleNpcDetailLevel.DEEP,
               }),
         },
       })

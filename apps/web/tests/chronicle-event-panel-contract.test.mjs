@@ -77,20 +77,12 @@ test(
 )
 
 test(
-  '034-C lista usa orden backend y no ordena por fechas',
+  '034-C conserva el orden backend y SPEC-061 permite una lectura alternativa',
   () => {
-    assert.match(
-      panel,
-      /events\.map/,
-    )
-    assert.match(
-      panel,
-      /timelineOrder/,
-    )
-    assert.doesNotMatch(
-      panel,
-      /\.sort\([\s\S]*realDate|\.sort\([\s\S]*narrativeTimeLabel/,
-    )
+    assert.match(panel, /visibleEvents\.map/)
+    assert.match(panel, /timelineOrder/)
+    assert.match(panel, /timelineView === 'narrative'/)
+    assert.match(panel, /new Date\(left\.realDate\)/)
   },
 )
 
@@ -226,11 +218,11 @@ test(
 )
 
 test(
-  '034-C no adelanta filtros sharing relaciones estados ni timeline gráfica',
+  '034-C no adelanta sharing ni relaciones fuera de SPEC-061',
   () => {
     assert.doesNotMatch(
       panel,
-      /Buscar|Filtrar|Compartir|characterId|npcId|locationId|sessionId|Planificado|Ocurrido|drag|drop|canvas|svg/i,
+      /Compartir|characterId|npcId|locationId|sessionId|Planificado|Ocurrido|drag|drop|canvas|svg/i,
     )
   },
 )

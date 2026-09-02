@@ -1,6 +1,7 @@
 import {
   Module,
 } from '@nestjs/common'
+import { ChronicleResourceController } from './presentation/chronicle-resource.controller'
 import {
   CHARACTER_EXPERIENCE_REPOSITORY,
 } from '../characters/application/character-experience.repository'
@@ -183,6 +184,10 @@ import {
 import {
   ChronicleEventController,
 } from './presentation/chronicle-event.controller'
+import { ManageChronicleParticipantNotesUseCase } from './application/manage-chronicle-participant-notes.use-case'
+import { ChronicleParticipantNotesController } from './presentation/chronicle-participant-notes.controller'
+import { ManageChronicleEventRelationsUseCase } from './application/manage-chronicle-event-relations.use-case'
+import { ChronicleEventRelationsController } from './presentation/chronicle-event-relations.controller'
 
 import {
   CHRONICLE_SESSION_REPOSITORY,
@@ -290,22 +295,35 @@ import {
 import {
   ChronicleStoryController,
 } from './presentation/chronicle-story.controller'
+import { LoadChronicleSessionWorkspaceUseCase } from './application/load-chronicle-session-workspace.use-case'
+import { ManageChronicleSessionWorkspaceUseCase } from './application/manage-chronicle-session-workspace.use-case'
+import { ChronicleSessionWorkspaceController } from './presentation/chronicle-session-workspace.controller'
+import { ChronicleSessionParticipantNotesController } from './presentation/chronicle-session-participant-notes.controller'
 
 @Module({
   imports: [
     UsersModule,
   ],
   controllers: [
+    ChronicleResourceController,
+    ChronicleParticipantNotesController,
     ChronicleController,
     ChronicleNpcController,
     ChronicleLocationController,
     ChronicleEventController,
+    ChronicleEventRelationsController,
     ChronicleSessionController,
     ChronicleSessionAttendanceController,
     ChronicleSessionContextController,
     ChronicleStoryController,
+    ChronicleSessionWorkspaceController,
+    ChronicleSessionParticipantNotesController,
   ],
   providers: [
+    ManageChronicleParticipantNotesUseCase,
+    ManageChronicleEventRelationsUseCase,
+    LoadChronicleSessionWorkspaceUseCase,
+    ManageChronicleSessionWorkspaceUseCase,
     PrismaChronicleRepository,
     {
       provide: CHRONICLE_REPOSITORY,

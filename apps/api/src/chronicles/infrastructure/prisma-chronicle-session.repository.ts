@@ -56,6 +56,9 @@ function toDomain(
     status: statusFromPrisma[row.status],
     summary: row.summary,
     narratorNotes: row.narratorNotes,
+    objective: row.objective,
+    plannedSummary: row.plannedSummary,
+    revision: row.revision,
     createdAt: new Date(row.createdAt),
     updatedAt: new Date(row.updatedAt),
   }
@@ -124,6 +127,8 @@ export class PrismaChronicleSessionRepository
           realDate: data.realDate,
           summary: data.summary,
           narratorNotes: data.narratorNotes,
+          objective: data.objective,
+          plannedSummary: data.plannedSummary,
           status:
             PrismaChronicleSessionStatus.PREPARATION,
         },
@@ -167,6 +172,9 @@ export class PrismaChronicleSessionRepository
                 narratorNotes:
                   data.narratorNotes,
               }),
+          ...(data.objective === undefined ? {} : { objective: data.objective }),
+          ...(data.plannedSummary === undefined ? {} : { plannedSummary: data.plannedSummary }),
+          revision: { increment: 1 },
         },
       })
 

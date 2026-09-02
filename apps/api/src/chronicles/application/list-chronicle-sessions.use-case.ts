@@ -17,7 +17,7 @@ import {
 } from './chronicle-participant.repository'
 
 import {
-  assertChronicleSessionNarrator,
+  ChronicleSessionPermissionError,
 } from './chronicle-session-permission'
 
 import type {
@@ -48,15 +48,31 @@ export class ListChronicleSessionsUseCase {
     chronicleId: string,
     query: OffsetPaginationQuery,
   ): Promise<OffsetPage<ChronicleSession>> {
-    await assertChronicleSessionNarrator(
-      this.participants,
-      actorUserId,
-      chronicleId,
-    )
+    const membership =
+      await this.participants.findActiveMembership(
+        chronicleId,
+        actorUserId,
+      )
 
-    return this.sessions.listByChronicleId(
+    if (membership === null) {
+      throw new ChronicleSessionPermissionError()
+    }
+
+    const page = await this.sessions.listByChronicleId(
       chronicleId,
       query,
     )
+
+    if (membership.role === 'narrator') {
+      return page
+    }
+
+    return {
+      ...page,
+      items: page.items.map((session) => ({
+        ...session,
+        narratorNotes: null,
+      })),
+    }
   }
 }

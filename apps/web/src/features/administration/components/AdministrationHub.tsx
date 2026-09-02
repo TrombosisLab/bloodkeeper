@@ -33,6 +33,8 @@ import type {
   AdministrationUser,
 } from '../types/user-administration.types'
 
+import { LifecycleTrashPanel } from './LifecycleTrashPanel'
+
 import './administration-hub.css'
 
 const userApi =
@@ -53,6 +55,7 @@ const roles:
 
 type AdministrationTab =
   | 'users'
+  | 'trash'
   | 'system'
   | 'backups'
 
@@ -584,6 +587,19 @@ export function AdministrationHub() {
         <button
           type="button"
           className={
+            activeTab === 'trash'
+              ? 'administration-hub__tab administration-hub__tab--active'
+              : 'administration-hub__tab'
+          }
+          aria-pressed={activeTab === 'trash'}
+          onClick={() => setActiveTab('trash')}
+        >
+          Archivo y papelera
+        </button>
+
+        <button
+          type="button"
+          className={
             activeTab === 'system'
               ? 'administration-hub__tab administration-hub__tab--active'
               : 'administration-hub__tab'
@@ -931,6 +947,10 @@ export function AdministrationHub() {
             ) : null}
           </article>
         </div>
+      ) : null}
+
+      {activeTab === 'trash' ? (
+        <LifecycleTrashPanel />
       ) : null}
 
       {activeTab === 'system' ? (

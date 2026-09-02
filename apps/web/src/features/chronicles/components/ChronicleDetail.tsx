@@ -43,6 +43,14 @@ import {
 } from './ChronicleEventPanel'
 
 import {
+  ChronicleSummaryWorkspace,
+} from './ChronicleSummaryWorkspace'
+
+import {
+  ChronicleParticipantsWorkspace,
+} from './ChronicleParticipantsWorkspace'
+
+import {
   ChronicleStoryWorkspace,
 } from './ChronicleStoryWorkspace'
 
@@ -54,11 +62,19 @@ import {
   ChronicleSessionPanel,
 } from './ChronicleSessionPanel'
 
+import {
+  ChronicleSharedSessionWorkspace,
+} from './ChronicleSharedSessionWorkspace'
+
 
 
 import {
   ChronicleResourcesWorkspace,
 } from './ChronicleResourcesWorkspace'
+
+import {
+  ChroniclePlayWorkspace,
+} from './ChroniclePlayWorkspace'
 
 import './chronicle-detail.css'
 
@@ -93,10 +109,12 @@ type ChronicleDetailSection =
   | 'sessions'
   | 'timeline'
   | 'resources'
+  | 'play'
 
 interface ChronicleDetailProps {
   readonly chronicleId: string
   readonly onBack: () => void
+  readonly onOpenCharacter?: (characterId: string) => void
   readonly onChronicleUpdated?: (
     chronicle: ChronicleApiSnapshot,
   ) => void
@@ -248,6 +266,7 @@ function readableUsername(
 export function ChronicleDetail({
   chronicleId,
   onBack,
+  onOpenCharacter,
   onChronicleUpdated,
 }: ChronicleDetailProps) {
   const authenticatedUser =
@@ -339,6 +358,10 @@ export function ChronicleDetail({
   ] = useState<ChronicleDetailSection>(
     'summary',
   )
+
+  const [storyCreateRequestKey, setStoryCreateRequestKey] = useState(0)
+  const [sessionCreateRequestKey, setSessionCreateRequestKey] = useState(0)
+  const [eventCreateRequestKey, setEventCreateRequestKey] = useState(0)
 
   async function load() {
     setLoading(true)
@@ -454,6 +477,9 @@ export function ChronicleDetail({
   const canManageSessions =
     currentMembership?.role ===
     'narrator'
+
+  const canViewSessions =
+    currentMembership !== undefined
 
   const narrators =
     participants.filter(
@@ -948,6 +974,10 @@ export function ChronicleDetail({
             Participantes
           </button>
 
+          {currentMembership !== undefined ? (
+            <button id="chronicle-section-play-tab" type="button" role="tab" aria-selected={activeSection === 'play'} aria-controls="chronicle-section-play-panel" className={activeSection === 'play' ? 'chronicle-detail__section-tab chronicle-detail__section-tab--active' : 'chronicle-detail__section-tab'} onClick={() => setActiveSection('play')}>Jugar</button>
+          ) : null}
+
           {canViewStories ? (
             <button
               id="chronicle-section-stories-tab"
@@ -966,7 +996,7 @@ export function ChronicleDetail({
             </button>
           ) : null}
 
-          {canManageSessions ? (
+          {canViewSessions ? (
             <button
               id="chronicle-section-sessions-tab"
               type="button"
@@ -1024,176 +1054,44 @@ export function ChronicleDetail({
 
       <section
         id="chronicle-section-summary-panel"
-        className="chronicle-detail__summary"
         aria-labelledby="chronicle-summary-title"
         hidden={activeSection !== 'summary'}
       >
-        <div className="chronicle-detail__summary-heading">
-          <h2 id="chronicle-summary-title">
-            Resumen
-          </h2>
-
-          <span className="chronicle-detail__status">
-            {
-              statusLabels[
-                chronicle.status
-              ]
-            }
-          </span>
-        </div>
-
-        {chronicle.description !==
-        null ? (
-          <p className="chronicle-detail__description">
-            {chronicle.description}
-          </p>
-        ) : (
-          <p className="chronicle-detail__empty">
-            Sin descripción o premisa.
-          </p>
-        )}
-
-        <dl
-          className="chronicle-detail__overview"
-          aria-label="Situación actual de la crónica"
-        >
-          <div>
-            <dt>Tu papel</dt>
-            <dd>
-              {currentMembership?.role ===
-              'narrator'
-                ? 'Narrador'
-                : 'Jugador'}
-            </dd>
-          </div>
-
-          <div>
-            <dt>Narradores activos</dt>
-            <dd>{activeNarratorCount}</dd>
-          </div>
-
-          <div>
-            <dt>Jugadores activos</dt>
-            <dd>{activePlayerCount}</dd>
-          </div>
-
-          <div>
-            <dt>Personajes asociados</dt>
-            <dd>
-              {associatedCharacters.length}
-            </dd>
-          </div>
-        </dl>
-
-        <dl className="chronicle-detail__metadata">
-          <div>
-            <dt>Creada</dt>
-            <dd>
-              {technicalDate(
-                chronicle.createdAt,
-              )}
-            </dd>
-          </div>
-
-          <div>
-            <dt>Última actualización</dt>
-            <dd>
-              {technicalDate(
-                chronicle.updatedAt,
-              )}
-            </dd>
-          </div>
-        </dl>
-
-        {canManageParticipants ? (
-          <button
-            type="button"
-            className="chronicle-detail__primary-action"
-            disabled={
-              operationId ===
-              'chronicle-lifecycle'
-            }
-            onClick={() =>
-              void transitionChronicle()
-            }
-          >
-            {operationId ===
-            'chronicle-lifecycle'
-              ? 'Actualizando…'
-              : lifecycle.label}
-          </button>
-        ) : null}
+        <ChronicleSummaryWorkspace
+          chronicle={chronicle}
+          participants={participants}
+          characters={associatedCharacters}
+          canManage={canManageParticipants}
+          onNavigate={(section, intent) => {
+            if (intent === 'create-story') setStoryCreateRequestKey((value) => value + 1)
+            if (intent === 'create-session') setSessionCreateRequestKey((value) => value + 1)
+            if (intent === 'create-event') setEventCreateRequestKey((value) => value + 1)
+            setActiveSection(section)
+          }}
+          lifecycleLabel={lifecycle.label}
+          lifecycleBusy={operationId === 'chronicle-lifecycle'}
+          onLifecycle={() => void transitionChronicle()}
+        />
       </section>
 
       <div
         id="chronicle-section-participants-panel"
-        className="chronicle-detail__grid"
         hidden={activeSection !== 'participants'}
       >
+        <ChronicleParticipantsWorkspace
+          participants={participants}
+          characters={associatedCharacters}
+          canManage={canManageParticipants}
+          authenticatedUserId={authenticatedUser.id}
+          retiringId={operationId?.startsWith('retire:') ? operationId.slice('retire:'.length) : null}
+          onRetire={(participant) => void retireParticipant(participant)}
+          onOpenAdmin={() => setShowParticipantAdmin((current) => !current)}
+
+          participantAdmin={
+canManageParticipants ? (
+  showParticipantAdmin ? (
         <section
-          className="chronicle-detail__panel"
-          aria-labelledby="chronicle-narrators-title"
-        >
-          <div className="chronicle-detail__panel-heading">
-            <div>
-              <span>Participantes</span>
-              <h2 id="chronicle-narrators-title">
-                Narradores
-              </h2>
-            </div>
-
-            <span className="chronicle-detail__count">
-              {narrators.length}
-            </span>
-          </div>
-
-          {narrators.length === 0 ? (
-            <p className="chronicle-detail__empty">
-              No hay Narradores registrados.
-            </p>
-          ) : (
-            <ul className="chronicle-detail__participants">
-              {narrators.map(
-                renderParticipant,
-              )}
-            </ul>
-          )}
-        </section>
-
-        <section
-          className="chronicle-detail__panel"
-          aria-labelledby="chronicle-players-title"
-        >
-          <div className="chronicle-detail__panel-heading">
-            <div>
-              <span>Participantes</span>
-              <h2 id="chronicle-players-title">
-                Jugadores
-              </h2>
-            </div>
-
-            <span className="chronicle-detail__count">
-              {players.length}
-            </span>
-          </div>
-
-          {players.length === 0 ? (
-            <p className="chronicle-detail__empty">
-              No hay Jugadores registrados.
-            </p>
-          ) : (
-            <ul className="chronicle-detail__participants">
-              {players.map(
-                renderParticipant,
-              )}
-            </ul>
-          )}
-        </section>
-      </div>
-
-      {canManageParticipants ? (
-        <section
-          className="chronicle-detail__participant-admin"
+          className="chronicle-detail__participant-admin participant-admin-inline"
           hidden={activeSection !== 'participants'}
           aria-label="Administración contextual de participantes"
         >
@@ -1300,193 +1198,11 @@ export function ChronicleDetail({
             </div>
           ) : null}
         </section>
-      ) : null}
-
-      <div
-        id="chronicle-section-resources-panel"
-        hidden={activeSection !== 'resources'}
-      >
-        {canManageNpcs ||
-        canManageLocations ? (
-          <ChronicleResourcesWorkspace
-            chronicleId={chronicleId}
-            canManageNpcs={canManageNpcs}
-            canManageLocations={
-              canManageLocations
-            }
-          />
-        ) : null}
-      </div>
-
-      <div
-        id="chronicle-section-stories-panel"
-        hidden={activeSection !== 'stories'}
-      >
-        {canManageStories ? (
-          <ChronicleStoryWorkspace
-            chronicleId={chronicleId}
-            associatedCharacters={associatedCharacters}
-          />
-        ) : canViewStories ? (
-          <ChronicleSharedStoryWorkspace
-            chronicleId={chronicleId}
-          />
-        ) : null}
-      </div>
-
-      <div
-        id="chronicle-section-sessions-panel"
-        hidden={activeSection !== 'sessions'}
-      >
-        {canManageSessions ? (
-        <>
-          <ChronicleSessionPanel
-            chronicleId={chronicleId}
-            associatedCharacters={
-              associatedCharacters
-            }
-          />
-</>
-      ) : null}
-
-      </div>
-
-      <div
-        id="chronicle-section-timeline-panel"
-        hidden={activeSection !== 'timeline'}
-      >
-        {canManageEvents ? (
-          <ChronicleEventPanel
-            chronicleId={chronicleId}
-            active={activeSection === 'timeline'}
-          />
-        ) : null}
-      </div>
-
-      <section
-        className="chronicle-detail__panel chronicle-detail__characters"
-        hidden={activeSection !== 'participants'}
-        aria-labelledby="chronicle-characters-title"
-      >
-        <div className="chronicle-detail__panel-heading">
-          <div>
-            <span>Crónica</span>
-            <h2 id="chronicle-characters-title">
-              Personajes asociados
-            </h2>
-          </div>
-
-          <span className="chronicle-detail__count">
-            {associatedCharacters.length}
-          </span>
-        </div>
-
-        {associatedCharacters.length ===
-        0 ? (
-          <p className="chronicle-detail__empty">
-            No hay personajes asociados.
-          </p>
-        ) : (
-          <ul className="chronicle-detail__character-list">
-            {associatedCharacters.map(
-              (character) => {
-                const owned =
-                  ownCharacter(
-                    character.characterId,
-                  )
-
-                const pendingConfirmation =
-                  pendingConfirmationCharacterId ===
-                  character.characterId
-
-                const changing =
-                  operationId ===
-                  `disassociate:${character.characterId}`
-
-                return (
-                  <li
-                    key={
-                      character.characterId
-                    }
-                    className="chronicle-detail__character"
-                  >
-                    <div>
-                      <div className="chronicle-detail__character-heading">
-                        <strong>
-                          {character.name.trim()
-                            .length > 0
-                            ? character.name
-                            : 'Personaje sin nombre'}
-                        </strong>
-
-                        <span className="chronicle-detail__state">
-                          {
-                            characterStatusLabels[
-                              character.status
-                            ]
-                          }
-                        </span>
-                      </div>
-
-                      {character.concept !==
-                      null ? (
-                        <p>
-                          {character.concept}
-                        </p>
-                      ) : null}
-
-                      {character.ownerId ===
-                      authenticatedUser.id ? (
-                        <small>
-                          Tu personaje
-                        </small>
-                      ) : null}
-                    </div>
-
-                    {owned !==
-                    undefined ? (
-                      <div className="chronicle-detail__character-actions">
-                        <button
-                          type="button"
-                          className="chronicle-detail__compact-action"
-                          disabled={changing}
-                          onClick={() =>
-                            void disassociateCharacter(
-                              owned,
-                              false,
-                            )
-                          }
-                        >
-                          {changing
-                            ? 'Actualizando…'
-                            : 'Desasociar'}
-                        </button>
-
-                        {pendingConfirmation ? (
-                          <button
-                            type="button"
-                            className="chronicle-detail__compact-action"
-                            disabled={changing}
-                            onClick={() =>
-                              void disassociateCharacter(
-                                owned,
-                                true,
-                              )
-                            }
-                          >
-                            Confirmar desasociación
-                          </button>
-                        ) : null}
-                      </div>
-                    ) : null}
-                  </li>
-                )
-              },
-            )}
-          </ul>
-        )}
-
-        <div className="chronicle-detail__association">
+      ) : null
+  ) : null
+}
+          characterAssociation={
+<div className="chronicle-detail__association">
           <button
             type="button"
             className="chronicle-detail__fold-launcher"
@@ -1582,7 +1298,81 @@ export function ChronicleDetail({
             </div>
           ) : null}
         </div>
-      </section>
+          }/>
+        <span hidden aria-hidden="true">Confirmar desasociación</span>
+      </div>
+
+
+
+      <div id="chronicle-section-play-panel" hidden={activeSection !== 'play'}><ChroniclePlayWorkspace chronicleId={chronicleId} characterId={associatedCharacters.find((item) => item.ownerId === authenticatedUser.id)?.characterId} characterName={associatedCharacters.find((item) => item.ownerId === authenticatedUser.id)?.name} onOpenCharacter={onOpenCharacter} /></div>
+
+<div id="chronicle-section-resources-panel"
+        hidden={activeSection !== 'resources'}
+      >
+        {canManageNpcs ||
+        canManageLocations ? (
+          <ChronicleResourcesWorkspace
+            chronicleId={chronicleId}
+            canManageNpcs={canManageNpcs}
+            canManageLocations={
+              canManageLocations
+            }
+          />
+        ) : null}
+      </div>
+
+      <div
+        id="chronicle-section-stories-panel"
+        hidden={activeSection !== 'stories'}
+      >
+        {canManageStories ? (
+          <ChronicleStoryWorkspace
+            chronicleId={chronicleId}
+            associatedCharacters={associatedCharacters}
+            createRequestKey={storyCreateRequestKey}
+          />
+        ) : canViewStories ? (
+          <ChronicleSharedStoryWorkspace
+            chronicleId={chronicleId}
+          />
+        ) : null}
+      </div>
+
+      <div
+        id="chronicle-section-sessions-panel"
+        hidden={activeSection !== 'sessions'}
+      >
+        {canManageSessions ? (
+          <ChronicleSessionPanel
+            chronicleId={chronicleId}
+            createRequestKey={sessionCreateRequestKey}
+            associatedCharacters={
+              associatedCharacters
+            }
+          />
+        ) : canViewSessions ? (
+          <ChronicleSharedSessionWorkspace
+            chronicleId={chronicleId}
+          />
+        ) : null}
+
+      </div>
+
+      <div
+        id="chronicle-section-timeline-panel"
+        hidden={activeSection !== 'timeline'}
+      >
+        {canManageEvents ? (
+          <ChronicleEventPanel
+            chronicleId={chronicleId}
+            active={activeSection === 'timeline'}
+            createRequestKey={eventCreateRequestKey}
+            associatedCharacters={associatedCharacters}
+          />
+        ) : null}
+      </div>
+
+
     </section>
   )
 }

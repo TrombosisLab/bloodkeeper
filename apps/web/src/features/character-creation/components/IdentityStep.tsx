@@ -1,3 +1,4 @@
+import { V5VisualMark } from '../../v5-visuals/V5VisualMark'
 import type {
   ChangeEvent,
 } from 'react'
@@ -233,6 +234,8 @@ export function IdentityStep({
                     updateClan(clan.key)
                   }
                 >
+                  <V5VisualMark kind="clan-symbol" value={clan.key} className="clan-card-selector__visual" decorative />
+
                   <span className="clan-card-selector__kind">
                     {clan.kind === 'thinBlood'
                       ? 'Sangre débil'

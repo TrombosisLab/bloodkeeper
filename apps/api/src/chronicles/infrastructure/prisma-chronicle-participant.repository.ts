@@ -95,6 +95,8 @@ function toDomain(
     displayName: row.user.displayName,
     role: roleFromPrisma[row.role],
     status: statusFromPrisma[row.status],
+    narratorNotes: row.narratorNotes,
+    revision: row.revision,
     createdAt: new Date(row.createdAt),
     updatedAt: new Date(row.updatedAt),
   }
@@ -319,6 +321,19 @@ export class PrismaChronicleParticipantRepository
           PrismaChronicleParticipantStatus.ACTIVE,
       },
     })
+  }
+
+  async updateNarratorNotes(
+    data: import('../domain/chronicle-participant.types').UpdateChronicleParticipantNarratorNotesData,
+  ): Promise<ChronicleParticipant> {
+    const updated = await this.database.chronicleParticipant.updateMany({
+      where: { id: data.participantId, chronicleId: data.chronicleId, revision: data.expectedRevision },
+      data: { narratorNotes: data.narratorNotes, revision: { increment: 1 } },
+    })
+    if (updated.count !== 1) throw new ChronicleParticipantWriteConflictError(data.participantId)
+    const row = await this.database.chronicleParticipant.findFirst({ where: { id: data.participantId, chronicleId: data.chronicleId }, include: withUser })
+    if (row === null) throw new ChronicleParticipantWriteConflictError(data.participantId)
+    return toDomain(row)
   }
 
   async retire(

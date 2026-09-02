@@ -593,7 +593,7 @@ export function ChronicleSessionContextPanel({
           <h4
             id={`chronicle-session-context-${session.id}`}
           >
-            Contexto de la Sesión
+            Contexto de la Sesión · Recursos preparados
           </h4>
         </div>
 
@@ -677,7 +677,9 @@ export function ChronicleSessionContextPanel({
           className="chronicle-session-context-panel__form"
           onSubmit={saveContext}
         >
-          <fieldset
+          <details className="chronicle-session-context-panel__resource-fold chronicle-session-context-panel__resource-fold--events">
+            <summary><span>Eventos</span><strong>{eventIds.length} vinculados</strong><small>Abrir selector</small></summary>
+<fieldset
             className="chronicle-session-context-panel__group chronicle-session-context-panel__group--events"
             disabled={
               readOnly ||
@@ -698,8 +700,11 @@ export function ChronicleSessionContextPanel({
               'No hay Eventos activos disponibles.',
             )}
           </fieldset>
+          </details>
 
-          <fieldset
+          <details className="chronicle-session-context-panel__resource-fold chronicle-session-context-panel__resource-fold--npcs">
+            <summary><span>PNJ</span><strong>{npcIds.length} vinculados</strong><small>Abrir selector</small></summary>
+<fieldset
             className="chronicle-session-context-panel__group chronicle-session-context-panel__group--npcs"
             disabled={
               readOnly ||
@@ -720,8 +725,11 @@ export function ChronicleSessionContextPanel({
               'No hay PNJ activos disponibles.',
             )}
           </fieldset>
+          </details>
 
-          <fieldset
+          <details className="chronicle-session-context-panel__resource-fold chronicle-session-context-panel__resource-fold--locations">
+            <summary><span>Localizaciones</span><strong>{locationIds.length} vinculados</strong><small>Abrir selector</small></summary>
+<fieldset
             className="chronicle-session-context-panel__group chronicle-session-context-panel__group--locations"
             disabled={
               readOnly ||
@@ -742,6 +750,7 @@ export function ChronicleSessionContextPanel({
               'No hay Localizaciones activas disponibles.',
             )}
           </fieldset>
+          </details>
 
           {!readOnly ? (
             <div className="chronicle-session-context-panel__footer">

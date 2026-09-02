@@ -1,3 +1,4 @@
+import { V5VisualMark } from '../../v5-visuals/V5VisualMark'
 import type {
   CharacterIdentity as CharacterIdentityData,
 } from '../types/character-sheet.types'
@@ -56,6 +57,7 @@ export function CharacterIdentity({
 
         {!human ? (
           <div className="clan-mark">
+            <V5VisualMark kind="clan-symbol" value={character.clan} decorative />
             <span>Clan</span>
             <strong>
               {transitionalValue(

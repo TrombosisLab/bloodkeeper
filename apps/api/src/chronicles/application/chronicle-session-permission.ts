@@ -31,3 +31,12 @@ export async function assertChronicleSessionNarrator(
     throw new ChronicleSessionPermissionError()
   }
 }
+
+export async function assertChronicleSessionParticipant(
+  participants: ChronicleParticipantRepository,
+  actorUserId: string,
+  chronicleId: string,
+): Promise<void> {
+  const membership = await participants.findActiveMembership(chronicleId, actorUserId)
+  if (!membership) throw new ChronicleSessionPermissionError()
+}

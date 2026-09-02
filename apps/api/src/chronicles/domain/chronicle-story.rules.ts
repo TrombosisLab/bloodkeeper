@@ -39,7 +39,7 @@ export function canTransitionChronicleStory(
 ): boolean {
   return (
     (from === 'planned' && (to === 'active' || to === 'archived')) ||
-    (from === 'active' && (to === 'completed' || to === 'archived')) ||
+    (from === 'active' && to === 'completed') ||
     (from === 'completed' && to === 'archived')
   )
 }

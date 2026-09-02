@@ -73,6 +73,10 @@ export interface ChronicleParticipantRepository {
     chronicleId: string,
   ): Promise<number>
 
+  updateNarratorNotes(
+    data: import('../domain/chronicle-participant.types').UpdateChronicleParticipantNarratorNotesData,
+  ): Promise<ChronicleParticipant>
+
   retire(
     chronicleId: string,
     participantId: string,

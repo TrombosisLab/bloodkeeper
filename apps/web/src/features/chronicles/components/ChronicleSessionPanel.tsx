@@ -36,8 +36,12 @@ import {
 } from './ChronicleSessionAttendancePanel'
 
 import {
-  ChronicleSessionContextPanel,
-} from './ChronicleSessionContextPanel'
+  ChronicleSessionPreparationWorkspace,
+} from './ChronicleSessionPreparationWorkspace'
+
+import {
+  ChronicleSessionOperationalSidebar,
+} from './ChronicleSessionOperationalSidebar'
 
 import './chronicle-session-panel.css'
 
@@ -80,6 +84,7 @@ const emptyForm: SessionFormState = {
 
 interface ChronicleSessionPanelProps {
   readonly chronicleId: string
+  readonly createRequestKey?: number
   readonly associatedCharacters:
     readonly ChronicleCharacterApiSummary[]
 }
@@ -265,6 +270,7 @@ function sessionSummaryLabel(
 
 export function ChronicleSessionPanel({
   chronicleId,
+  createRequestKey = 0,
   associatedCharacters,
 }: ChronicleSessionPanelProps) {
   const [
@@ -309,6 +315,13 @@ export function ChronicleSessionPanel({
     emptyForm,
   )
 
+  useEffect(() => {
+    if (createRequestKey > 0) {
+      setCreateForm(emptyForm)
+      setShowCreateForm(true)
+    }
+  }, [createRequestKey])
+
   const [
     editingSessionId,
     setEditingSessionId,
@@ -332,7 +345,7 @@ export function ChronicleSessionPanel({
     activeWorkspaceSection,
     setActiveWorkspaceSection,
   ] = useState<SessionWorkspaceSection>(
-    'summary',
+    'preparation',
   )
 
   async function loadSessions() {
@@ -405,6 +418,13 @@ export function ChronicleSessionPanel({
   useEffect(() => {
     void loadSessions()
   }, [chronicleId])
+
+  // Carga inicial: la sesion mas reciente abre el workspace operativo.
+  useEffect(() => {
+    if (selectedSession === null && sessions.length > 0) {
+      void consultSession(sessions[0].id)
+    }
+  }, [sessions])
 
   function updateCreateField(
     field: keyof SessionFormState,
@@ -524,7 +544,7 @@ export function ChronicleSessionPanel({
         ),
       )
       setActiveWorkspaceSection(
-        'summary',
+        'preparation',
       )
       setEditingSessionId(null)
       setEditForm(emptyForm)
@@ -1275,8 +1295,8 @@ export function ChronicleSessionPanel({
                 }
                 className="chronicle-session-panel__workspace-panel"
               >
-                <ChronicleSessionContextPanel
-                  key={`context:${selectedSession.id}`}
+                <ChronicleSessionPreparationWorkspace
+                  key={`preparation:${selectedSession.id}`}
                   chronicleId={chronicleId}
                   session={selectedSession}
                 />
@@ -1333,7 +1353,25 @@ export function ChronicleSessionPanel({
             </>
           )}
         </div>
-      </div>
+
+        {selectedSession !== null ? (
+          <ChronicleSessionOperationalSidebar
+            chronicleId={chronicleId}
+            session={selectedSession}
+            characterCount={associatedCharacters.length}
+            activeSection={activeWorkspaceSection}
+            onOpenSection={setActiveWorkspaceSection}
+            onEditNotes={() => {
+              setActiveWorkspaceSection('summary')
+              beginEdit(selectedSession)
+            }}
+            onComplete={() => void completeSession(selectedSession.id)}
+            completing={operationId === `session-complete:${selectedSession.id}`}
+          />
+        ) : null}
+
+
+        </div>
     </section>
   )
 }

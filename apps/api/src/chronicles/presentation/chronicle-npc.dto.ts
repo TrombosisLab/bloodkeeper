@@ -1,5 +1,6 @@
 import type {
   ChronicleNpc,
+  ChronicleNpcDeepProfile,
   CreateChronicleNpcData,
   UpdateChronicleNpcData,
 } from '../domain/chronicle-npc.types'
@@ -22,7 +23,8 @@ export interface ChronicleNpcResponseDto {
   readonly narrativeRole: string | null
   readonly notes: string | null
   readonly status: 'active' | 'archived'
-  readonly detailLevel: 'simple'
+  readonly detailLevel: 'simple' | 'deep'
+  readonly deepProfile: ChronicleNpcDeepProfile | null
   readonly createdAt: string
   readonly updatedAt: string
 }
@@ -98,12 +100,21 @@ function optionalText(
     : trimmed
 }
 
+function profileText(value: Record<string, unknown>, key: string): string | null { return value[key] === undefined ? null : optionalText(value[key], 'body.deepProfile.' + key) }
+function profileList(value: Record<string, unknown>, key: string): readonly string[] { const item = value[key]; if (item === undefined) return []; if (!Array.isArray(item) || item.some(entry => typeof entry !== 'string' || entry.trim().length === 0)) throw new InvalidChronicleNpcRequestError('body.deepProfile.' + key + ' must be a list of text'); return [...new Map(item.map(entry => [entry.trim().toLocaleLowerCase('es'), entry.trim()] as const)).values()] }
+function profileRating(value: Record<string, unknown>, key: string): number { const item = value[key]; if (item === undefined) return 0; if (typeof item !== 'number' || !Number.isInteger(item) || item < 0 || item > 5) throw new InvalidChronicleNpcRequestError('body.deepProfile.' + key + ' must be an integer from 0 to 5'); return item }
+function attributeRating(value: Record<string, unknown>, key: string): number { const item = value[key]; if (item === undefined) return 1; if (typeof item !== 'number' || !Number.isInteger(item) || item < 1 || item > 5) throw new InvalidChronicleNpcRequestError('body.deepProfile.attributes.' + key + ' must be an integer from 1 to 5'); return item }
+function profileAttributes(value: Record<string, unknown>) { const raw = value.attributes === undefined ? {} : record(value.attributes); return { strength:attributeRating(raw,'strength'), dexterity:attributeRating(raw,'dexterity'), stamina:attributeRating(raw,'stamina'), charisma:attributeRating(raw,'charisma'), manipulation:attributeRating(raw,'manipulation'), composure:attributeRating(raw,'composure'), intelligence:attributeRating(raw,'intelligence'), wits:attributeRating(raw,'wits'), resolve:attributeRating(raw,'resolve') } }
+function profileDisciplines(value: Record<string, unknown>) { const raw = value.disciplineDetails; if (raw === undefined) return profileList(value,'disciplines').map(name => ({ name, rating:1, powers:[] })); if (!Array.isArray(raw)) throw new InvalidChronicleNpcRequestError('body.deepProfile.disciplineDetails must be a list'); return raw.map((entry,index) => { const item=record(entry); const name=requiredText(item.name,`body.deepProfile.disciplineDetails.${index}.name`); const rating=profileRating(item,'rating'); if (rating < 1) throw new InvalidChronicleNpcRequestError(`body.deepProfile.disciplineDetails.${index}.rating must be from 1 to 5`); return { name, rating, powers:profileList(item,'powers') } }) }
+function deepProfile(value: unknown): ChronicleNpcDeepProfile | null { if (value === null) return null; const item = record(value); const disciplineDetails=profileDisciplines(item); return { alias:profileText(item,'alias'), clan:profileText(item,'clan'), generation:profileText(item,'generation'), sire:profileText(item,'sire'), sect:profileText(item,'sect'), title:profileText(item,'title'), territory:profileText(item,'territory'), domain:profileText(item,'domain'), faction:profileText(item,'faction'), influence:profileRating(item,'influence'), resources:profileRating(item,'resources'), traits:profileList(item,'traits'), disciplines:disciplineDetails.map(entry=>entry.name), attributes:profileAttributes(item), disciplineDetails, allies:profileList(item,'allies'), rivals:profileList(item,'rivals'), history:profileText(item,'history') } }
+
 const editableFields = [
   'name',
   'category',
   'description',
   'narrativeRole',
   'notes',
+  'deepProfile',
 ] as const
 
 function supportedKeys(
@@ -171,6 +182,7 @@ export function parseCreateChronicleNpcRequest(
             value.notes,
             'body.notes',
           ),
+    deepProfile: value.deepProfile === undefined ? undefined : deepProfile(value.deepProfile),
   }
 }
 
@@ -232,6 +244,7 @@ export function parseUpdateChronicleNpcRequest(
             'body.notes',
           ),
         }),
+    ...(value.deepProfile === undefined ? {} : { deepProfile: deepProfile(value.deepProfile) }),
   }
 }
 
@@ -249,6 +262,7 @@ export function toChronicleNpcResponse(
     notes: npc.notes,
     status: npc.status,
     detailLevel: npc.detailLevel,
+    deepProfile: npc.deepProfile,
     createdAt:
       npc.createdAt.toISOString(),
     updatedAt:

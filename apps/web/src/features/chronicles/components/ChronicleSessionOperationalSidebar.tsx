@@ -1,0 +1,19 @@
+import { useEffect, useState } from 'react'
+import type { ChronicleSessionApiSnapshot } from '../types/chronicle-api.types.ts'
+import { sessionWorkspaceApi } from '../infrastructure/chronicle-session-workspace.api.ts'
+import type { SessionWorkspaceSnapshot } from '../infrastructure/chronicle-session-workspace.api.ts'
+import './chronicle-session-operational-sidebar.css'
+type Section = 'summary' | 'preparation' | 'attendance' | 'dice'
+interface Props { readonly chronicleId: string; readonly session: ChronicleSessionApiSnapshot; readonly characterCount: number; readonly activeSection: Section; readonly onOpenSection: (section: Section) => void; readonly onEditNotes: () => void; readonly onComplete: () => void; readonly completing: boolean }
+export function ChronicleSessionOperationalSidebar({ chronicleId, session, characterCount, activeSection, onOpenSection, onEditNotes, onComplete, completing }: Props) {
+ const [workspace, setWorkspace] = useState<SessionWorkspaceSnapshot | null>(null)
+ useEffect(() => { let active = true; void sessionWorkspaceApi.load(chronicleId, session.id).then((value) => { if (active) setWorkspace(value) }).catch(() => { if (active) setWorkspace(null) }); return () => { active = false } }, [chronicleId, session.id])
+ const scenes = workspace?.scenes.length ?? 0; const prepared = workspace?.progress.completed ?? 0; const total = workspace?.progress.total ?? 0; const canComplete = session.status === 'preparation' && scenes > 0
+ return <aside className="session-operational-sidebar" aria-label="Contexto operativo de la sesion">
+  <section className="session-operational-sidebar__summary"><header><span>*</span><h3>Resumen</h3></header><div className="session-operational-sidebar__metrics"><div><strong>{scenes}</strong><small>Escenas</small></div><div><strong>{prepared}/{total}</strong><small>Preparacion</small></div><div><strong>{characterCount}</strong><small>Participantes</small></div></div></section>
+  <section className="session-operational-sidebar__attendance"><header><span>*</span><h3>Asistencia prevista</h3></header><p>{characterCount === 0 ? 'No hay personajes asociados a esta cronica.' : `${characterCount} personaje${characterCount === 1 ? '' : 's'} disponible${characterCount === 1 ? '' : 's'} para la sesion.`}</p><button type="button" className={activeSection === 'attendance' ? 'is-current' : ''} onClick={() => onOpenSection('attendance')}>Gestionar asistencia <span aria-hidden="true">&gt;</span></button></section>
+  <section className="session-operational-sidebar__notes"><header><span>*</span><div><small>Solo Narrador</small><h3>Notas del Narrador</h3></div></header><p>{session.narratorNotes ?? 'Notas privadas, ideas y recordatorios...'}</p><button type="button" className={activeSection === 'summary' ? 'is-current' : ''} onClick={onEditNotes}>Editar notas <span aria-hidden="true">&gt;</span></button></section>
+  <section className="session-operational-sidebar__privacy"><header><span>*</span><h3>Privacidad</h3></header><p>Las notas y la preparacion de esta sesion solo son visibles para el Narrador.</p></section>
+  <section className="session-operational-sidebar__closure"><header><span>*</span><h3>Cierre de sesion</h3></header><p>{session.status === 'completed' ? 'Sesion completada. La experiencia se aplico segun las reglas de asistencia.' : 'Completa los requisitos para cerrar la sesion y otorgar experiencia.'}</p><ul><li className={scenes > 0 ? 'is-ready' : ''}>Al menos una escena preparada</li><li className={total > 0 && prepared === total ? 'is-ready' : ''}>Lista de preparacion completada</li><li className={session.status === 'completed' ? 'is-ready' : ''}>Sesion marcada como completada</li></ul><button type="button" disabled={!canComplete || completing || session.status !== 'preparation'} onClick={onComplete}>{session.status === 'completed' ? 'Sesion completada' : completing ? 'Completando...' : 'Completar sesion +1 PX'}</button></section>
+ </aside>
+}

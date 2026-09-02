@@ -63,6 +63,8 @@ import { PersistedCharacterValidation } from './PersistedCharacterValidation'
 import { PersistedCharacterEmbrace } from './PersistedCharacterEmbrace'
 import { PersistedInitialVampireTransition } from './PersistedInitialVampireTransition'
 
+import { PersistedCharacterPdfExport } from './PersistedCharacterPdfExport'
+
 import type {
   CharacterBlushOfLifeResult,
 } from '../types/character-blush-of-life-persistence.types'
@@ -420,6 +422,12 @@ export function CharacterSheet({
                 ? 'Finalizar edición'
                 : 'Editar estados'}
             </button>
+          ) : null}
+
+          {characterId !== undefined ? (
+            <PersistedCharacterPdfExport
+              characterId={characterId}
+            />
           ) : null}
 
           <div className="sheet-header__edition">

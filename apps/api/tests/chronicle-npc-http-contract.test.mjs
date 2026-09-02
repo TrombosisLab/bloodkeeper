@@ -85,7 +85,7 @@ test(
 )
 
 test(
-  '032-B DTO limita primera versión a campos de PNJ simple',
+  '062 DTO admite PNJ simple y dossier profundo sin relaciones ajenas',
   () => {
     for (const field of [
       'name',
@@ -93,6 +93,7 @@ test(
       'description',
       'narrativeRole',
       'notes',
+      'deepProfile',
     ]) {
       assert.match(
         dto,
@@ -102,7 +103,17 @@ test(
 
     assert.doesNotMatch(
       dto,
-      /locationId|eventId|sessionId|characterId|attributes|skills|disciplines/,
+      /locationId|eventId|sessionId|characterId/,
+    )
+
+    assert.match(
+      dto,
+      /profileAttributes/,
+    )
+
+    assert.match(
+      dto,
+      /profileDisciplines/,
     )
   },
 )

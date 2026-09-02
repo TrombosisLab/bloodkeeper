@@ -147,8 +147,9 @@
 .chronicle-session-panel__workspace-layout {
   display: grid;
   grid-template-columns:
-    minmax(16rem, 0.30fr)
-    minmax(0, 1fr);
+    minmax(16rem, 0.27fr)
+    minmax(0, 1fr)
+    minmax(17rem, 0.32fr);
   gap: var(--space-4);
   margin-top: var(--space-5);
 }
@@ -493,3 +494,9 @@
     padding: var(--space-3);
   }
 }
+
+/* Sesiones: composicion alineada con Historias */
+.chronicle-session-panel{margin-top:0;border:0;border-radius:0;background:transparent;box-shadow:none;padding:0}.chronicle-session-panel__heading{padding:0 0 .8rem;border-bottom:1px solid var(--color-border-subtle)}.chronicle-session-panel__workspace-layout{grid-template-columns:minmax(15rem,.85fr) minmax(0,2.5fr) minmax(17rem,1.1fr);gap:.65rem;margin-top:.65rem}.chronicle-session-panel__browser,.chronicle-session-panel__workspace{border-radius:4px;background:linear-gradient(145deg,rgba(24,27,30,.98),rgba(16,18,20,.98))}.chronicle-session-panel__browser{max-height:none;padding:.7rem}.chronicle-session-panel__workspace-heading{padding:.95rem 1rem}.chronicle-session-panel__workspace-heading h3{font-family:Georgia,serif;font-size:1.35rem}.chronicle-session-panel__workspace-tabs{padding:0 .85rem;gap:.25rem}.chronicle-session-panel__workspace-tab{min-width:0;border:0!important;border-bottom:2px solid transparent!important;background:transparent!important;padding:.7rem .6rem!important}.chronicle-session-panel__workspace-tab--active{border-bottom-color:#d6455b!important;background:transparent!important;box-shadow:none!important}.chronicle-session-panel__workspace-panel{padding:.65rem}.chronicle-session-panel__workspace-empty{min-height:32rem}@media(max-width:1180px){.chronicle-session-panel__workspace-layout{grid-template-columns:minmax(14rem,.8fr) minmax(0,2fr)}.session-operational-sidebar{grid-column:1/-1;grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:760px){.chronicle-session-panel__workspace-layout{display:block}.chronicle-session-panel__browser,.chronicle-session-panel__workspace,.session-operational-sidebar{margin-bottom:.65rem}.session-operational-sidebar{grid-template-columns:1fr}}
+
+/* Sesiones referencia: tres columnas sin desborde */
+.chronicle-session-panel{width:100%;max-width:none;min-width:0}.chronicle-session-panel__workspace-layout{width:100%;min-width:0;grid-template-columns:minmax(15rem,.74fr) minmax(0,2.2fr) minmax(17rem,.86fr)!important;gap:.7rem}.chronicle-session-panel__browser,.chronicle-session-panel__workspace,.session-operational-sidebar{min-width:0;max-width:100%}.chronicle-session-panel__workspace-panel{min-width:0;overflow:hidden}@media(max-width:1180px){.chronicle-session-panel__workspace-layout{grid-template-columns:minmax(14rem,.72fr) minmax(0,1.8fr)!important}.session-operational-sidebar{grid-column:1/-1}}

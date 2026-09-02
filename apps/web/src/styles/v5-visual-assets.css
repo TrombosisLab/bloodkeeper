@@ -1,0 +1,19 @@
+.v5-visual-mark { display:inline-flex; flex:0 0 auto; width:2.75rem; height:2.75rem; align-items:center; justify-content:center; vertical-align:middle; }
+.v5-visual-mark--clan-symbol,.v5-visual-mark--clan-logo { background:currentColor; -webkit-mask:var(--v5-visual-url) center/contain no-repeat; mask:var(--v5-visual-url) center/contain no-repeat; color:#c89b57; }
+.v5-visual-mark--clan-logo { width:8rem; height:3rem; }
+.v5-visual-mark--discipline { object-fit:contain; filter:drop-shadow(0 0 .35rem rgba(188,42,63,.25)); }
+.v5-visual-mark--fallback { border:1px solid rgba(188,42,63,.45); border-radius:50%; color:#d8b36a; font:700 .75rem/1 sans-serif; }
+.clan-card-selector__visual { width:4.25rem; height:4.25rem; margin:0 auto .25rem; color:#c99e5c; transition:color .18s ease,transform .18s ease; }
+.clan-card-selector__card:hover .clan-card-selector__visual,.clan-card-selector__card--selected .clan-card-selector__visual { color:#e2465c; transform:scale(1.04); }
+.discipline-editor-card__title { display:flex; align-items:center; gap:.8rem; min-width:0; }
+.discipline-editor-card__visual { width:3.25rem; height:3.25rem; }
+.clan-mark { display:grid !important; grid-template-columns:3.25rem minmax(0,1fr); column-gap:.75rem; align-items:center; }
+.clan-mark .v5-visual-mark { grid-row:1 / span 2; width:3.25rem; height:3.25rem; color:#d1a15c; }
+.discipline-card__title { display:flex; align-items:center; gap:.85rem; min-width:0; }
+.discipline-card__visual { width:3.5rem; height:3.5rem; }
+.npc-dossier__portrait .v5-visual-mark { width:100%; height:100%; color:#d5a65b; }
+.npc-dossier__discipline-title { display:flex; align-items:center; gap:.65rem; }
+.npc-dossier__discipline-title .v5-visual-mark { width:2.5rem; height:2.5rem; }
+.chronicle-play__clan-identity { display:flex; align-items:center; gap:.8rem; margin:.35rem 0 .8rem; }
+.chronicle-play__clan-identity .v5-visual-mark { width:3rem; height:3rem; color:#d1a15c; }
+@media (max-width:720px) { .v5-visual-mark--clan-logo{width:6rem}.clan-card-selector__visual{width:3.5rem;height:3.5rem}.discipline-editor-card__visual{width:2.75rem;height:2.75rem} }

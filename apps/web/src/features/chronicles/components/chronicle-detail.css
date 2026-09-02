@@ -421,3 +421,6 @@
     padding: var(--space-3);
   }
 }
+
+/* Sesiones referencia: permitir ancho operativo */
+.chronicle-detail:has(.chronicle-session-panel),.chronicle-detail__sections:has(.chronicle-session-panel){width:100%;max-width:none;min-width:0}

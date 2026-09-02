@@ -9,7 +9,7 @@ import {
   CHRONICLE_PARTICIPANT_REPOSITORY,
 } from './chronicle-participant.repository'
 import {
-  assertChronicleSessionNarrator,
+  ChronicleSessionPermissionError,
 } from './chronicle-session-permission'
 import type {
   ChronicleSessionRepository,
@@ -37,15 +37,31 @@ export class LoadChronicleSessionUseCase {
     chronicleId: string,
     sessionId: string,
   ): Promise<ChronicleSession | null> {
-    await assertChronicleSessionNarrator(
-      this.participants,
-      actorUserId,
-      chronicleId,
-    )
+    const membership =
+      await this.participants.findActiveMembership(
+        chronicleId,
+        actorUserId,
+      )
 
-    return this.sessions.findById(
+    if (membership === null) {
+      throw new ChronicleSessionPermissionError()
+    }
+
+    const session = await this.sessions.findById(
       chronicleId,
       sessionId,
     )
+
+    if (
+      session === null ||
+      membership.role === 'narrator'
+    ) {
+      return session
+    }
+
+    return {
+      ...session,
+      narratorNotes: null,
+    }
   }
 }

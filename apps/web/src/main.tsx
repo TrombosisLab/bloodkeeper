@@ -41,6 +41,7 @@ import './styles/character-list-buttons.css';
 import './styles/app-shell-responsive.css';
 import './styles/bloodkeeper-visual-system.css';
 
+import './styles/v5-visual-assets.css'
 function App() {
   const authenticatedUser =
     useAuthenticatedUser()
@@ -232,6 +233,11 @@ function App() {
           canCreateChronicles={
             canCreateChronicles
           }
+          onOpenCharacter={(characterId) => {
+            setCreationCharacterId(characterId)
+            setShowDemoSheet(false)
+            navigateTo('characters')
+          }}
         />
       ) : view === 'characters' ? (
         creationCharacterId === null &&

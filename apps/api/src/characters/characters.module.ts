@@ -242,6 +242,49 @@ import {
   CharacterAdvancementController,
 } from './presentation/character-advancement.controller'
 
+import {
+  CHARACTER_SHEET_PDF_RENDERER,
+} from './application/character-sheet-pdf.types'
+
+import type {
+  CharacterSheetPdfRenderer,
+} from './application/character-sheet-pdf.types'
+
+import {
+  ExportCharacterSheetPdfUseCase,
+} from './application/export-character-sheet-pdf.use-case'
+
+import {
+  PdfLibCharacterSheetPdfRenderer,
+} from './infrastructure/character-sheet-pdf.renderer'
+
+import {
+  CharacterSheetPdfController,
+} from './presentation/character-sheet-pdf.controller'
+
+const characterSheetPdfProviders = [
+  {
+    provide: ExportCharacterSheetPdfUseCase,
+    inject: [
+      CHARACTER_DRAFT_REPOSITORY,
+      CHARACTER_SECONDARY_REPOSITORY,
+      CHARACTER_EXPERIENCE_REPOSITORY,
+      CHARACTER_SHEET_PDF_RENDERER,
+    ],
+    useFactory: (
+      characters: PrismaCharacterDraftRepository,
+      secondary: CharacterSecondaryRepository,
+      experience: CharacterExperienceRepository,
+      renderer: CharacterSheetPdfRenderer,
+    ) => new ExportCharacterSheetPdfUseCase(
+      characters,
+      secondary,
+      experience,
+      renderer,
+    ),
+  },
+]
+
 const advancementUseCaseProviders = [
   {
     provide: PreviewCharacterAdvancementUseCase,
@@ -630,6 +673,7 @@ const useCaseProviders = [
     CharacterValidationController,
     CharacterExperienceController,
     CharacterAdvancementController,
+    CharacterSheetPdfController,
   ],
   providers: [
     PrismaCharacterDraftRepository,
@@ -637,6 +681,11 @@ const useCaseProviders = [
     PrismaCharacterBlushOfLifeRepository,
     PrismaCharacterSecondaryRepository,
     PrismaCharacterExperienceRepository,
+    PdfLibCharacterSheetPdfRenderer,
+    {
+      provide: CHARACTER_SHEET_PDF_RENDERER,
+      useExisting: PdfLibCharacterSheetPdfRenderer,
+    },
     {
       provide: CHARACTER_RULES_CATALOG,
       useValue: characterRulesCatalog,
@@ -686,6 +735,7 @@ const useCaseProviders = [
         PrismaCharacterExperienceRepository,
     },
     ...experienceUseCaseProviders,
+    ...characterSheetPdfProviders,
     ...advancementUseCaseProviders,
     ...useCaseProviders,
   ],

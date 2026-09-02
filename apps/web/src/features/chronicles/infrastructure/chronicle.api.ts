@@ -791,7 +791,8 @@ export function parseChronicleNpcResponse(
       value.status === 'active' ||
       value.status === 'archived'
     ) ||
-    value.detailLevel !== 'simple' ||
+    !(value.detailLevel === 'simple' || value.detailLevel === 'deep') ||
+    !(value.deepProfile === undefined || value.deepProfile === null || isRecord(value.deepProfile)) ||
     !validTimestamp(value.createdAt) ||
     !validTimestamp(value.updatedAt)
   ) {
@@ -808,6 +809,7 @@ export function parseChronicleNpcResponse(
     notes: value.notes,
     status: value.status,
     detailLevel: value.detailLevel,
+    deepProfile: value.deepProfile === undefined ? null : value.deepProfile as ChronicleNpcApiSnapshot['deepProfile'],
     createdAt: value.createdAt,
     updatedAt: value.updatedAt,
   }

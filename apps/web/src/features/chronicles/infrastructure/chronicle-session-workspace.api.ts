@@ -1,0 +1,15 @@
+export type SessionWorkStatus = 'pending' | 'completed'
+export interface SessionWorkspaceScene { readonly id:string; readonly title:string; readonly purpose:string|null; readonly narrativePhase:string|null; readonly intensity:number|null; readonly sortOrder:number; readonly status:SessionWorkStatus; readonly revision:number }
+export interface SessionWorkspacePreparationItem { readonly id:string; readonly text:string; readonly sortOrder:number; readonly status:SessionWorkStatus; readonly revision:number }
+export interface SessionWorkspaceSnapshot { readonly sessionId:string; readonly scenes:readonly SessionWorkspaceScene[]; readonly preparationItems:readonly SessionWorkspacePreparationItem[]; readonly progress:{readonly completed:number;readonly total:number;readonly percentage:number} }
+type SceneInput={readonly title:string;readonly purpose:string|null;readonly narrativePhase:string|null;readonly intensity:number|null;readonly completed:boolean}
+type PreparationInput={readonly text:string;readonly completed:boolean}
+async function response<T>(request:Promise<Response>):Promise<T>{const result=await request;const value=await result.json().catch(()=>null);if(!result.ok)throw new Error(typeof value?.code==='string'?value.code:'SESSION_WORKSPACE_REQUEST_FAILED');return value as T}
+function endpoint(chronicleId:string,sessionId:string){return `/api/chronicles/${chronicleId}/sessions/${sessionId}/workspace`}
+export const sessionWorkspaceApi={
+ load:(chronicleId:string,sessionId:string)=>response<SessionWorkspaceSnapshot>(fetch(endpoint(chronicleId,sessionId),{credentials:'include',headers:{Accept:'application/json'}})),
+ createScene:(chronicleId:string,sessionId:string,input:SceneInput)=>response<SessionWorkspaceScene>(fetch(`${endpoint(chronicleId,sessionId)}/scenes`,{method:'POST',credentials:'include',headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify(input)})),
+ updateScene:(chronicleId:string,sessionId:string,sceneId:string,expectedRevision:number,input:SceneInput)=>response<SessionWorkspaceScene>(fetch(`${endpoint(chronicleId,sessionId)}/scenes/${sceneId}`,{method:'PATCH',credentials:'include',headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({...input,expectedRevision})})),
+ createPreparationItem:(chronicleId:string,sessionId:string,input:PreparationInput)=>response<SessionWorkspacePreparationItem>(fetch(`${endpoint(chronicleId,sessionId)}/preparation-items`,{method:'POST',credentials:'include',headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify(input)})),
+ updatePreparationItem:(chronicleId:string,sessionId:string,itemId:string,expectedRevision:number,input:PreparationInput)=>response<SessionWorkspacePreparationItem>(fetch(`${endpoint(chronicleId,sessionId)}/preparation-items/${itemId}`,{method:'PATCH',credentials:'include',headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({...input,expectedRevision})})),
+}

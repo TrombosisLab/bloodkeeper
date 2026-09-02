@@ -100,7 +100,7 @@ test(
 )
 
 test(
-  '032-C creación rápida usa sólo campos de PNJ simple',
+  '062 conserva el alta rápida y permite activar el dossier profundo',
   () => {
     for (const label of [
       'Nombre',
@@ -115,9 +115,14 @@ test(
       )
     }
 
+    assert.match(
+      panel,
+      /Crear dossier profundo con Atributos, Disciplinas, Relaciones e Historial/,
+    )
+
     assert.doesNotMatch(
       panel,
-      /Atributos|Habilidades|Salud|Voluntad|Disciplinas/,
+      /Habilidades|Salud|Voluntad/,
     )
   },
 )
@@ -191,11 +196,21 @@ test(
 )
 
 test(
-  '032-C no adelanta búsqueda ni contenido vampírico desarrollado',
+  '062 integra búsqueda externa y dossier sin duplicar la ficha de Personaje',
   () => {
+    assert.match(
+      panel,
+      /query = ''/,
+    )
+
+    assert.match(
+      panel,
+      /ChronicleNpcDeepDossier/,
+    )
+
     assert.doesNotMatch(
       panel,
-      /Buscar|Filtrar|Atributos|Habilidades|Salud|Voluntad|Disciplinas/,
+      /Habilidades|Salud|Voluntad/,
     )
   },
 )

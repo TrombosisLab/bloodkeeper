@@ -189,7 +189,7 @@ test(
 )
 
 test(
-  '032-A no adelanta relaciones salvo contexto de Sesión aprobado por 035-D',
+  '032-A admite el enlace Evento-PNJ aprobado por SPEC-061 sin adelantar otras relaciones',
   () => {
     const npc = block(
       schema,
@@ -203,7 +203,7 @@ test(
 
     assert.doesNotMatch(
       npc,
-      /location|event|characterId|attribute|skill|discipline|health|willpower/i,
+      /location|characterId|attribute|skill|discipline|health|willpower/i,
     )
 
     assert.doesNotMatch(

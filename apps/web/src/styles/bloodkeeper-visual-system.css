@@ -1339,3 +1339,814 @@ select:focus {
   }
 }
 /* BLOODKEEPER_CLAN_CARDS_V1_END */
+
+/* CHRONICLE_UNIFIED_VISUAL_SYSTEM_V1_START */
+/*
+ * Capa visual canonica para todos los espacios de Cronicas.
+ * Resumen y Participantes son la referencia de densidad y jerarquia.
+ * La capa esta cargada al final y limitada a .chronicle-detail.
+ */
+
+.chronicle-detail {
+  --chronicle-gap: var(--space-3);
+  --chronicle-panel-radius: var(--radius-md);
+  --chronicle-control-radius: var(--radius-control);
+  --chronicle-panel-padding: 0.8rem;
+  --chronicle-browser-width: 15rem;
+  --chronicle-context-width: 18rem;
+  width: min(1540px, calc(100% - 1rem));
+  max-width: 1540px;
+}
+
+.chronicle-detail__sections {
+  min-width: 0;
+}
+
+.chronicle-detail__section-tabs {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  min-height: 3.45rem;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-top: 1px solid var(--color-border-subtle);
+  border-bottom: 1px solid var(--color-border-default);
+  background: var(--color-surface-translucent);
+  scrollbar-width: thin;
+}
+
+.chronicle-detail__section-tab {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: var(--chronicle-control-radius);
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.chronicle-detail__section-tab:hover {
+  border-color: var(--color-border-default);
+  background: var(--color-surface-emphasis);
+}
+
+.chronicle-detail__section-tab--active,
+.chronicle-detail__section-tab[aria-selected='true'] {
+  border-color: var(--color-border-accent);
+  background: var(--color-surface-emphasis);
+  box-shadow: inset 0 -2px 0 var(--color-border-accent);
+}
+
+.chronicle-detail__section-tab:focus-visible {
+  outline: 2px solid var(--color-border-accent);
+  outline-offset: 2px;
+}
+
+#chronicle-section-summary-panel,
+#chronicle-section-participants-panel,
+#chronicle-section-play-panel,
+#chronicle-section-stories-panel,
+#chronicle-section-sessions-panel,
+#chronicle-section-timeline-panel,
+#chronicle-section-resources-panel {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  container: chronicle-panel / inline-size;
+}
+
+#chronicle-section-summary-panel > section,
+#chronicle-section-participants-panel > section,
+#chronicle-section-play-panel > section,
+#chronicle-section-stories-panel > section,
+#chronicle-section-sessions-panel > section,
+#chronicle-section-timeline-panel > section,
+#chronicle-section-resources-panel > section {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  margin: 0;
+  transform: none;
+}
+
+.chronicle-detail :where(.chronicle-summary-workspace,
+  .chronicle-participants-workspace,
+  .chronicle-play-workspace,
+  .story-workspace) {
+  display: grid;
+  grid-template-columns:
+    minmax(13.5rem, var(--chronicle-browser-width))
+    minmax(0, 1fr)
+    minmax(15.5rem, var(--chronicle-context-width)) !important;
+  gap: var(--chronicle-gap);
+  margin-top: 0;
+}
+
+.chronicle-detail .chronicle-session-panel__workspace-layout,
+.chronicle-detail .chronicle-event-panel__workspace {
+  display: grid;
+  grid-template-columns:
+    minmax(13.5rem, var(--chronicle-browser-width))
+    minmax(0, 1fr)
+    minmax(15.5rem, var(--chronicle-context-width)) !important;
+  gap: var(--chronicle-gap);
+  margin-top: var(--chronicle-gap);
+  align-items: start;
+}
+
+.chronicle-detail .chronicle-resources-workspace__canvas {
+  display: grid;
+  grid-template-columns: minmax(13.5rem, var(--chronicle-browser-width)) minmax(0, 1fr) !important;
+  gap: var(--chronicle-gap);
+  align-items: start;
+}
+
+.chronicle-detail__sections :where(*, *::before, *::after) {
+  box-sizing: border-box;
+}
+
+.chronicle-detail__sections :where(article, section, aside, div, form, fieldset, label) {
+  min-width: 0;
+}
+
+.chronicle-detail :where(
+  .chronicle-summary-workspace__rail,
+  .chronicle-summary-workspace__center,
+  .chronicle-participants-workspace__browser,
+  .chronicle-participants-workspace__detail,
+  .chronicle-participants-workspace__side,
+  .chronicle-play-workspace__rail,
+  .chronicle-play-workspace__main,
+  .chronicle-play-workspace__character) {
+  min-width: 0;
+}
+
+.chronicle-detail :where(
+  .chronicle-summary-workspace__rail,
+  .chronicle-participants-workspace__browser,
+  .chronicle-play-workspace__rail,
+  .story-browser,
+  .chronicle-session-panel__browser,
+  .chronicle-event-panel__browser,
+  .chronicle-resources-workspace__navigator) {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.chronicle-detail :where(
+  .chronicle-summary-workspace__rail,
+  .chronicle-summary-workspace__center,
+  .chronicle-participants-workspace__browser,
+  .chronicle-participants-workspace__detail,
+  .chronicle-participants-workspace__side,
+  .chronicle-play-workspace__main) {
+  display: grid;
+  align-content: start;
+  gap: var(--chronicle-gap);
+}
+
+.chronicle-detail__sections :where(h1, h2, h3, h4) {
+  margin-block: 0;
+  color: var(--color-text-primary);
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.15;
+}
+
+.chronicle-detail__sections h1 {
+  font-size: 2rem;
+}
+
+.chronicle-detail__sections h2 {
+  font-size: 1.25rem;
+}
+
+.chronicle-detail__sections h3 {
+  font-size: 1rem;
+}
+
+.chronicle-detail__sections h4 {
+  font-size: 0.95rem;
+}
+
+.chronicle-detail__sections :where(p, li, dt, dd, label, input, select, textarea, button) {
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.chronicle-detail__sections :where(input, select, textarea, button) {
+  min-width: 0;
+  max-width: 100%;
+  border-radius: var(--chronicle-control-radius);
+}
+
+.chronicle-detail__sections :where(
+  input:not([type='checkbox']):not([type='radio']),
+  select,
+  textarea) {
+  width: 100%;
+}
+
+.chronicle-detail__sections button {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.85rem;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.chronicle-detail__sections button[role='switch'] {
+  min-height: 1.25rem;
+  padding: 0;
+  border-radius: 999px;
+}
+
+.chronicle-detail :where(
+  .summary-card,
+  .participant-card,
+  .chronicle-play-workspace__rail,
+  .chronicle-play-workspace__hero,
+  .chronicle-play-workspace__scene,
+  .chronicle-play-workspace__vampire,
+  .chronicle-play-workspace__notes > article,
+  .chronicle-play-workspace__character,
+  .dice-roll-panel,
+  .dice-history-panel,
+  .story-browser__new,
+  .story-browser,
+  .story-detail,
+  .story-sidebar > section,
+  .chronicle-session-panel__create,
+  .chronicle-session-panel__browser,
+  .chronicle-session-panel__workspace,
+  .chronicle-session-panel__detail-section,
+  .session-preparation__brief,
+  .session-preparation__main,
+  .session-preparation__scenes,
+  .session-preparation__checklist,
+  .chronicle-session-context-panel,
+  .session-operational-sidebar > section,
+  .chronicle-event-panel__create,
+  .chronicle-event-panel__browser,
+  .chronicle-event-panel__timeline,
+  .chronicle-event-panel__detail,
+  .chronicle-event-relations,
+  .chronicle-resources-workspace__navigator,
+  .chronicle-npc-panel__create,
+  .chronicle-npc-panel__browser,
+  .chronicle-location-panel__create,
+  .chronicle-location-panel__browser,
+  .chronicle-resource-catalog__create,
+  .chronicle-resource-catalog__browser,
+  .chronicle-location-panel__detail,
+  .chronicle-resource-catalog__detail,
+  .npc-dossier__hero,
+  .npc-dossier__tabs,
+  .npc-dossier__body,
+  .npc-dossier__wide-card,
+  .npc-dossier__private,
+  .npc-dossier__context) {
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--chronicle-panel-radius);
+  background: var(--color-surface-translucent);
+  box-shadow: none;
+}
+
+.chronicle-detail :where(
+  .summary-card,
+  .participant-card,
+  .chronicle-play-workspace__rail,
+  .chronicle-play-workspace__hero,
+  .chronicle-play-workspace__scene,
+  .chronicle-play-workspace__vampire,
+  .chronicle-play-workspace__notes > article,
+  .chronicle-play-workspace__character,
+  .dice-roll-panel,
+  .dice-history-panel,
+  .story-browser__new,
+  .story-sidebar > section,
+  .chronicle-session-panel__create,
+  .chronicle-session-panel__detail-section,
+  .session-preparation__brief,
+  .session-preparation__main,
+  .session-preparation__scenes,
+  .session-preparation__checklist,
+  .chronicle-session-context-panel,
+  .session-operational-sidebar > section,
+  .chronicle-event-panel__create,
+  .chronicle-event-relations,
+  .chronicle-npc-panel__create,
+  .chronicle-location-panel__create,
+  .chronicle-resource-catalog__create,
+  .npc-dossier__hero,
+  .npc-dossier__body,
+  .npc-dossier__wide-card,
+  .npc-dossier__private,
+  .npc-dossier__context) {
+  padding: var(--chronicle-panel-padding);
+}
+
+.chronicle-detail :where(
+  .story-browser,
+  .story-detail,
+  .chronicle-session-panel__browser,
+  .chronicle-session-panel__workspace,
+  .chronicle-event-panel__browser,
+  .chronicle-event-panel__timeline,
+  .chronicle-event-panel__detail,
+  .chronicle-resources-workspace__navigator,
+  .chronicle-npc-panel__browser,
+  .chronicle-location-panel__browser,
+  .chronicle-resource-catalog__browser) {
+  overflow: hidden;
+}
+
+.chronicle-detail :where(
+  .participant-list button,
+  .participant-list li,
+  .story-card,
+  .story-browser__list,
+  .chronicle-session-panel__select,
+  .chronicle-session-panel__browser-heading,
+  .chronicle-session-panel__workspace-tab,
+  .chronicle-event-panel__select,
+  .chronicle-npc-panel__select,
+  .chronicle-location-panel__select) {
+  overflow-wrap: anywhere;
+}
+
+.chronicle-detail :where(
+  .participant-list li,
+  .participant-list button,
+  .story-browser__filters,
+  .story-browser__list,
+  .story-card) {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.chronicle-detail .story-browser__filters {
+  overflow-x: hidden;
+}
+
+.chronicle-detail :where(
+  .summary-eyebrow,
+  .participant-eyebrow,
+  .story-browser__heading > span:first-child,
+  .chronicle-session-panel__heading > div > span,
+  .chronicle-event-panel__heading > div > span,
+  .chronicle-resources-workspace__navigator small,
+  .npc-dossier__identity > small) {
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.chronicle-detail :where(
+  .summary-status,
+  .participant-role,
+  .story-status,
+  .chronicle-session-panel__state,
+  .chronicle-event-panel__state,
+  .npc-dossier__status) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.chronicle-detail .dice-roll-panel__form,
+.chronicle-detail .chronicle-play-workspace__dice form {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+}
+
+.chronicle-detail .chronicle-play-workspace__vampire-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+}
+
+.chronicle-detail .chronicle-play-workspace__notes {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+}
+
+.chronicle-detail .chronicle-play-workspace__notes > article {
+  overflow: hidden;
+}
+
+.chronicle-detail .chronicle-play-workspace__vampire-grid :where(
+  .blush-of-life__heading,
+  .rouse-check__toolbar,
+  .blood-feeding__toolbar) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.chronicle-detail .chronicle-play-workspace__vampire-grid :where(
+  .character-sheet__action-button,
+  .rouse-check__action,
+  .blood-feeding__toggle) {
+  width: 100%;
+}
+
+.chronicle-detail .story-workspace {
+  --story-bg: var(--color-canvas);
+  --story-panel: var(--color-surface-translucent);
+  --story-panel-soft: var(--color-surface-raised);
+  --story-line: var(--color-border-default);
+  --story-line-soft: var(--color-border-subtle);
+  --story-red: var(--color-accent);
+  --story-red-bright: var(--color-border-accent);
+  --story-gold: var(--color-warning);
+  --story-text: var(--color-text-primary);
+  --story-muted: var(--color-text-secondary);
+}
+
+.chronicle-detail .story-workspace :where(
+  .story-browser,
+  .story-detail,
+  .story-sidebar > section,
+  .story-card,
+  .story-section,
+  .story-side-card) {
+  border-radius: var(--chronicle-panel-radius);
+}
+
+.chronicle-detail :where(
+  .chronicle-session-panel,
+  .chronicle-event-panel,
+  .chronicle-resources-workspace) {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.chronicle-detail :where(
+  .chronicle-session-panel__workspace-tabs,
+  .npc-dossier__tabs,
+  .chronicle-resources-workspace__tabs) {
+  gap: var(--space-1);
+  border-radius: var(--chronicle-panel-radius);
+}
+
+.chronicle-detail :where(
+  .chronicle-session-panel__workspace-tabs,
+  .npc-dossier__tabs) {
+  display: flex;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+.chronicle-detail :where(
+  .chronicle-session-panel__workspace-tab,
+  .npc-dossier__tabs button) {
+  flex: 1 0 6.5rem;
+  white-space: nowrap;
+}
+
+.chronicle-detail :where(
+  .chronicle-session-panel__workspace-tab,
+  .npc-dossier__tabs button,
+  .chronicle-resources-workspace__tab) {
+  min-height: 2.5rem;
+  border-radius: var(--chronicle-control-radius);
+}
+
+.chronicle-detail .chronicle-resources-workspace__tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.chronicle-detail .chronicle-resources-workspace__tab {
+  width: 100%;
+  padding-inline: 0.55rem;
+}
+
+.chronicle-detail :where(
+  .chronicle-location-panel__workspace,
+  .chronicle-resource-catalog__workspace) {
+  display: grid;
+  grid-template-columns: minmax(13.5rem, 15rem) minmax(0, 1fr);
+  gap: var(--chronicle-gap);
+  margin-top: var(--chronicle-gap);
+  align-items: start;
+}
+
+.chronicle-detail .npc-dossier__lower-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.chronicle-detail :where(
+  .npc-dossier__summary-grid,
+  .npc-dossier__editor-grid,
+  .npc-dossier__context) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.chronicle-detail :where(
+  .summary-block-grid,
+  .participant-form-grid,
+  .story-premise-grid,
+  .story-compact-grid,
+  .story-modal__grid,
+  .chronicle-session-panel__fields,
+  .chronicle-session-panel__detail-grid,
+  .chronicle-session-panel__detail-meta-grid,
+  .chronicle-event-panel__fields,
+  .chronicle-event-panel__detail-grid,
+  .chronicle-location-panel__fields,
+  .chronicle-location-panel__detail-grid,
+  .chronicle-resource-catalog__fields,
+  .chronicle-resource-catalog__detail-grid) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.chronicle-detail .session-preparation__side {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)) !important;
+  gap: var(--chronicle-gap);
+}
+
+.chronicle-detail .chronicle-session-context-panel__form {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)) !important;
+}
+
+.chronicle-detail :where(
+  .chronicle-session-context-panel__form,
+  .chronicle-session-context-panel__options,
+  .chronicle-event-relations__groups) {
+  min-width: 0;
+}
+
+.chronicle-detail :where(
+  .chronicle-session-context-panel__resource-fold,
+  .chronicle-session-context-panel__group,
+  .chronicle-event-relations__group) {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.chronicle-detail :where(
+  .story-empty,
+  .participant-empty,
+  .chronicle-session-panel__detail-empty,
+  .session-preparation__empty,
+  .chronicle-event-panel__detail-empty,
+  .chronicle-resource-catalog__empty-list,
+  .chronicle-resource-catalog__detail-empty) {
+  display: grid;
+  min-height: 10rem;
+  place-items: center;
+  padding: var(--space-4);
+  border: 1px dashed var(--color-border-default);
+  border-radius: var(--chronicle-panel-radius);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+@container chronicle-panel (max-width: 72rem) {
+  .chronicle-summary-workspace,
+  .chronicle-participants-workspace,
+  .chronicle-play-workspace,
+  .story-workspace,
+  .chronicle-session-panel__workspace-layout,
+  .chronicle-event-panel__workspace {
+    grid-template-columns: minmax(13.5rem, var(--chronicle-browser-width)) minmax(0, 1fr) !important;
+  }
+
+  .chronicle-summary-workspace__rail--right,
+  .chronicle-participants-workspace__side,
+  .story-sidebar,
+  .session-operational-sidebar {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--chronicle-gap);
+  }
+
+  .chronicle-play-workspace__character,
+  .chronicle-event-panel__detail {
+    grid-column: 1 / -1;
+  }
+
+  .chronicle-play-workspace__character {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--chronicle-gap);
+  }
+
+  .chronicle-play-workspace__character > header {
+    grid-column: 1 / -1;
+  }
+}
+
+@container chronicle-panel (max-width: 48rem) {
+  .chronicle-summary-workspace,
+  .chronicle-participants-workspace,
+  .chronicle-play-workspace,
+  .story-workspace,
+  .chronicle-session-panel__workspace-layout,
+  .chronicle-event-panel__workspace,
+  .chronicle-resources-workspace__canvas {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .chronicle-summary-workspace__rail--right,
+  .chronicle-participants-workspace__side,
+  .chronicle-play-workspace__character,
+  .story-sidebar,
+  .session-operational-sidebar,
+  .chronicle-event-panel__detail {
+    grid-column: auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .chronicle-detail__section-tabs {
+    justify-content: flex-start;
+  }
+
+  .chronicle-location-panel__workspace,
+  .chronicle-resource-catalog__workspace,
+  .session-preparation__brief,
+  .session-preparation__scene-form,
+  .npc-dossier__summary-grid,
+  .npc-dossier__editor-grid,
+  .npc-dossier__context,
+  .session-preparation__side,
+  .chronicle-session-context-panel__form {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .chronicle-session-context-panel__footer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .chronicle-session-context-panel__footer button {
+    width: 100%;
+    min-width: 0;
+    justify-self: stretch;
+  }
+
+  .chronicle-session-context-panel__resource-fold[open] {
+    grid-column: auto;
+  }
+}
+
+/* CHRONICLE_UNIFIED_VISUAL_SYSTEM_V1_END */
+
+/* BK_CHRONICLE_VISUAL_POLISH_START */
+
+/* Los nombres extensos conservan la jerarquia de la tarjeta sin ensancharla. */
+.chronicle-detail .participant-list__topline,
+.chronicle-detail .participant-list__topline strong {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.chronicle-detail .participant-list__topline strong {
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
+
+/* El rail de Jugar respeta siempre el ancho canonico de la columna. */
+.chronicle-detail .chronicle-play-workspace__rail > * {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.chronicle-detail .chronicle-play-workspace__session-card,
+.chronicle-detail .chronicle-play-workspace__session-list,
+.chronicle-detail .chronicle-play-workspace__rail-action {
+  overflow: hidden;
+}
+
+.chronicle-detail .chronicle-play-workspace__session-card :where(strong, b),
+.chronicle-detail .chronicle-play-workspace__session-list :where(strong, span) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Las cuatro areas de Sesiones caben sin scroll horizontal espurio. */
+.chronicle-detail .chronicle-session-panel__browser,
+.chronicle-detail .chronicle-session-panel__browser-heading,
+.chronicle-detail .chronicle-session-panel__browser-heading h3 {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.chronicle-detail .chronicle-session-panel__browser-heading h3 {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.chronicle-detail .chronicle-session-panel__browser-heading > span {
+  flex: 0 0 auto;
+}
+
+.chronicle-detail .chronicle-session-panel__workspace-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.chronicle-detail .chronicle-session-panel__workspace-tab {
+  width: 100%;
+  min-width: 0;
+  padding-inline: 0.45rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* El selector de Recursos mantiene su matriz y contiene etiquetas largas. */
+.chronicle-detail .chronicle-resources-workspace__navigator,
+.chronicle-detail .chronicle-resources-workspace__navigator > *,
+.chronicle-detail .chronicle-resources-workspace__tabs,
+.chronicle-detail .chronicle-resources-workspace__tab,
+.chronicle-detail .chronicle-resources-workspace__tab span {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.chronicle-detail .chronicle-resources-workspace__tabs {
+  width: 100%;
+  overflow: hidden;
+}
+
+.chronicle-detail .chronicle-resources-workspace__tab {
+  gap: 0.25rem;
+  padding-inline: 0.45rem;
+  overflow: hidden;
+}
+
+.chronicle-detail .chronicle-resources-workspace__tab span {
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+}
+
+.chronicle-detail .chronicle-resources-workspace__tab i {
+  flex: 0 0 auto;
+}
+
+@container chronicle-panel (max-width: 72rem) {
+  .chronicle-detail .chronicle-session-panel__browser-heading h3 {
+    font-size: 1rem;
+    line-height: 1.1;
+  }
+
+  .chronicle-detail .chronicle-session-panel__workspace-tab {
+    font-size: 0.82rem;
+  }
+
+  .chronicle-detail .chronicle-resources-workspace__tab {
+    font-size: 0.75rem;
+  }
+
+  .chronicle-detail .chronicle-resources-workspace__tab i {
+    display: none;
+  }
+}
+
+@container chronicle-panel (max-width: 48rem) {
+  .chronicle-detail .chronicle-session-panel__workspace-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chronicle-detail .chronicle-resources-workspace__tabs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* BK_CHRONICLE_VISUAL_POLISH_END */

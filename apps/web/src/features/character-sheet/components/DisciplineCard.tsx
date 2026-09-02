@@ -1,3 +1,4 @@
+import { V5VisualMark } from '../../v5-visuals/V5VisualMark'
 import { DotRating } from '../../../components/ui/DotRating'
 
 import type {
@@ -14,7 +15,9 @@ export function DisciplineCard({
   return (
     <article className="discipline-card">
       <header className="discipline-card__header">
-        <div>
+        <div className="discipline-card__title">
+          <V5VisualMark kind="discipline" value={discipline.key} className="discipline-card__visual" decorative />
+          <div>
           <span className="discipline-card__kicker">
             {discipline.catalogStatus === 'resolved'
               ? 'Disciplina'
@@ -22,6 +25,7 @@ export function DisciplineCard({
           </span>
 
           <h3>{discipline.name}</h3>
+          </div>
         </div>
 
         <DotRating

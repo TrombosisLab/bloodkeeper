@@ -132,7 +132,7 @@ test(
   () => {
     assert.match(
       sessions,
-      /workspace-preparation-panel[\s\S]*ChronicleSessionContextPanel/,
+      /workspace-preparation-panel[\s\S]*ChronicleSessionPreparationWorkspace/,
     )
     assert.match(
       sessions,

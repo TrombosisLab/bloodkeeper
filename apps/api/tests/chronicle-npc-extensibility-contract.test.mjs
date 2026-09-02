@@ -156,21 +156,33 @@ test(
 )
 
 test(
-  '032-D ampliar detalle no exige duplicar el dominio completo de Personajes',
+  '062 amplía el perfil profundo sin convertir el PNJ en un Personaje completo',
   () => {
     assert.doesNotMatch(
       npcModel,
-      /attributes|skills|health|willpower|disciplines|dice/i,
+      /attributes|skills|health|willpower|dice/i,
     )
 
-    assert.doesNotMatch(
+    assert.match(
       domain,
-      /attributes|skills|health|willpower|disciplines|dice/i,
+      /ChronicleNpcAttributes/,
     )
 
-    assert.doesNotMatch(
+    assert.match(
       dto,
-      /attributes|skills|health|willpower|disciplines|dice/i,
+      /profileAttributes/,
+    )
+
+    for (const source of [domain, dto]) {
+      assert.doesNotMatch(
+        source,
+        /skills|health|willpower|dice/i,
+      )
+    }
+
+    assert.match(
+      domain,
+      /disciplineDetails/,
     )
   },
 )

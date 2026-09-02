@@ -25,6 +25,9 @@ export interface ChronicleSessionResponseDto {
     | 'archived'
   readonly summary: string | null
   readonly narratorNotes: string | null
+  readonly objective: string | null
+  readonly plannedSummary: string | null
+  readonly revision: number
   readonly createdAt: string
   readonly updatedAt: string
 }
@@ -130,6 +133,8 @@ const editableFields = [
   'realDate',
   'summary',
   'narratorNotes',
+  'objective',
+  'plannedSummary',
 ] as const
 
 function supportedEditableKeys(
@@ -198,6 +203,14 @@ export function parseCreateChronicleSessionRequest(
             value.narratorNotes,
             'body.narratorNotes',
           ),
+    objective:
+      value.objective === undefined
+        ? null
+        : optionalText(value.objective, 'body.objective'),
+    plannedSummary:
+      value.plannedSummary === undefined
+        ? null
+        : optionalText(value.plannedSummary, 'body.plannedSummary'),
   }
 }
 
@@ -262,6 +275,12 @@ export function parseUpdateChronicleSessionRequest(
               'body.narratorNotes',
             ),
         }),
+    ...(value.objective === undefined
+      ? {}
+      : { objective: optionalText(value.objective, 'body.objective') }),
+    ...(value.plannedSummary === undefined
+      ? {}
+      : { plannedSummary: optionalText(value.plannedSummary, 'body.plannedSummary') }),
   }
 }
 
@@ -280,6 +299,9 @@ export function toChronicleSessionResponse(
     status: session.status,
     summary: session.summary,
     narratorNotes: session.narratorNotes,
+    objective: session.objective,
+    plannedSummary: session.plannedSummary,
+    revision: session.revision,
     createdAt:
       session.createdAt.toISOString(),
     updatedAt:

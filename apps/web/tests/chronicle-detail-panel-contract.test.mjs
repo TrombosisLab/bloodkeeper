@@ -1,5 +1,13 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+
+const panel = await readFile(
+  new URL(
+    '../src/features/chronicles/components/ChronicleDetail.tsx',
+    import.meta.url,
+  ),
+  'utf8',
+)
 import { readFile } from 'node:fs/promises'
 
 const list =
@@ -63,38 +71,9 @@ test(
 test(
   '030-D materializa un panel individual con Resumen real',
   () => {
-    assert.match(
-      detail,
-      /gateway\.get/,
-    )
-    assert.match(
-      detail,
-      /aria-labelledby="chronicle-detail-title"/,
-    )
-    assert.match(
-      detail,
-      />\s*Resumen\s*</,
-    )
-    assert.match(
-      detail,
-      /chronicle\.name/,
-    )
-    assert.match(
-      detail,
-      /chronicle\.description/,
-    )
-    assert.match(
-      detail,
-      /chronicle\.status/,
-    )
-    assert.match(
-      detail,
-      /chronicle\.createdAt/,
-    )
-    assert.match(
-      detail,
-      /chronicle\.updatedAt/,
-    )
+    assert.match(panel, /ChronicleSummaryWorkspace/)
+    assert.match(panel, /participants={participants}/)
+    assert.match(panel, /characters={associatedCharacters}/)
   },
 )
 

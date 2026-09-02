@@ -12,6 +12,9 @@ export interface ChronicleSession {
   readonly status: ChronicleSessionStatus
   readonly summary: string | null
   readonly narratorNotes: string | null
+  readonly objective: string | null
+  readonly plannedSummary: string | null
+  readonly revision: number
   readonly createdAt: Date
   readonly updatedAt: Date
 }
@@ -23,6 +26,8 @@ export interface CreateChronicleSessionData {
   readonly realDate: Date | null
   readonly summary: string | null
   readonly narratorNotes: string | null
+  readonly objective?: string | null
+  readonly plannedSummary?: string | null
 }
 
 export interface UpdateChronicleSessionData {
@@ -33,4 +38,6 @@ export interface UpdateChronicleSessionData {
   readonly realDate?: Date | null
   readonly summary?: string | null
   readonly narratorNotes?: string | null
+  readonly objective?: string | null
+  readonly plannedSummary?: string | null
 }

@@ -80,6 +80,9 @@ test('SPEC-060-E presents real attendance eligibility and explicit closure confi
   assert.match(workspace, /getRandomValues/)
   assert.doesNotMatch(workspace, /crypto\.randomUUID/)
   assert.match(gateway, /CompleteChronicleStoryApiRequest/)
+  assert.match(workspace, /selected\.status === 'planned' \|\| selected\.status === 'completed'/)
+  assert.match(workspace, /hasCompletedClosure/)
+  assert.doesNotMatch(workspace, /\{!readOnly \? <button type="button" className="story-archive"/)
 })
 
 test('SPEC-060-E respects the global page limit without hiding narrative context', () => {

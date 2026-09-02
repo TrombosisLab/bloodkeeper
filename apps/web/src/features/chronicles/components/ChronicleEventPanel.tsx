@@ -21,9 +21,14 @@ import {
 } from '../infrastructure/chronicle-story.api.ts'
 
 import type {
+  ChronicleCharacterApiSummary,
   ChronicleEventApiSnapshot,
   CreateChronicleEventApiRequest,
 } from '../types/chronicle-api.types.ts'
+
+import {
+  ChronicleEventRelationsPanel,
+} from './ChronicleEventRelationsPanel'
 
 import type {
   ChronicleStoryApiSnapshot,
@@ -40,6 +45,8 @@ const storyGateway =
 interface ChronicleEventPanelProps {
   readonly chronicleId: string
   readonly active: boolean
+  readonly createRequestKey?: number
+  readonly associatedCharacters: readonly ChronicleCharacterApiSummary[]
 }
 
 interface StoryTimelineTransition {
@@ -234,6 +241,8 @@ function operationErrorMessage(
 export function ChronicleEventPanel({
   chronicleId,
   active,
+  createRequestKey = 0,
+  associatedCharacters,
 }: ChronicleEventPanelProps) {
   const [
     events,
@@ -280,6 +289,13 @@ export function ChronicleEventPanel({
     emptyForm,
   )
 
+  useEffect(() => {
+    if (active && createRequestKey > 0) {
+      setCreateForm(emptyForm)
+      setShowCreateForm(true)
+    }
+  }, [active, createRequestKey])
+
   const [
     editingEventId,
     setEditingEventId,
@@ -300,6 +316,10 @@ export function ChronicleEventPanel({
   ] = useState<
     ChronicleEventApiSnapshot | null
   >(null)
+
+  const [timelineQuery, setTimelineQuery] = useState('')
+  const [timelineStatus, setTimelineStatus] = useState<'all' | 'active' | 'archived'>('all')
+  const [timelineView, setTimelineView] = useState<'narrative' | 'real'>('narrative')
 
   async function loadEvents() {
     setLoading(true)
@@ -627,6 +647,19 @@ export function ChronicleEventPanel({
         event.status === 'active',
     )
 
+  const visibleEvents = events
+    .filter((event) => timelineStatus === 'all' || event.status === timelineStatus)
+    .filter((event) => {
+      const query = timelineQuery.trim().toLocaleLowerCase('es-ES')
+      return query.length === 0 || [event.title, event.description, event.narrativeTimeLabel].some((value) => value?.toLocaleLowerCase('es-ES').includes(query))
+    })
+    .sort((left, right) => {
+      if (timelineView === 'narrative') return left.timelineOrder - right.timelineOrder
+      const leftTime = left.realDate === null ? Number.MAX_SAFE_INTEGER : new Date(left.realDate).getTime()
+      const rightTime = right.realDate === null ? Number.MAX_SAFE_INTEGER : new Date(right.realDate).getTime()
+      return leftTime - rightTime || left.timelineOrder - right.timelineOrder
+    })
+
   async function moveEvent(
     eventId: string,
     direction: -1 | 1,
@@ -833,11 +866,13 @@ export function ChronicleEventPanel({
         className="chronicle-event-panel__create-launcher"
         aria-expanded={showCreateForm}
         aria-controls="chronicle-event-create-panel"
-        onClick={() =>
+        onClick={() => {
+          setOperationError(null)
+          setCreateForm(emptyForm)
           setShowCreateForm(
             (current) => !current,
           )
-        }
+        }}
       >
         <span>
           <strong>Crear Evento</strong>
@@ -933,8 +968,14 @@ export function ChronicleEventPanel({
           aria-label="Historia de la crónica"
         >
           <div className="chronicle-event-panel__browser-heading">
-            <h3>Historia</h3>
-            <span>{events.length}</span>
+            <h3>Cronología</h3>
+            <span>{visibleEvents.length}</span>
+          </div>
+
+          <div className="chronicle-event-panel__timeline-controls">
+            <label><span className="sr-only">Buscar sucesos</span><input value={timelineQuery} onChange={(event) => setTimelineQuery(event.target.value)} placeholder="Buscar sucesos" /></label>
+            <select value={timelineStatus} onChange={(event) => setTimelineStatus(event.target.value as 'all' | 'active' | 'archived')} aria-label="Filtrar estado"><option value="all">Todos los estados</option><option value="active">Activos</option><option value="archived">Archivados</option></select>
+            <div className="chronicle-event-panel__view-switch" role="group" aria-label="Vista temporal"><button type="button" aria-pressed={timelineView === 'narrative'} onClick={() => setTimelineView('narrative')}>Narrativa</button><button type="button" aria-pressed={timelineView === 'real'} onClick={() => setTimelineView('real')}>Fecha real</button></div>
           </div>
 
           {loading ? (
@@ -944,13 +985,13 @@ export function ChronicleEventPanel({
             >
               Cargando Eventos…
             </ViewStateStatus>
-          ) : events.length === 0 ? (
+          ) : visibleEvents.length === 0 ? (
             <p className="chronicle-event-panel__empty">
-              No hay Eventos registrados en esta crónica.
+              No hay sucesos con estos filtros.
             </p>
           ) : (
             <ul className="chronicle-event-panel__list">
-              {events.map(
+              {visibleEvents.map(
                 (event) => {
                   const selected =
                     selectedEvent?.id ===
@@ -1020,6 +1061,27 @@ export function ChronicleEventPanel({
             </ul>
           )}
         </aside>
+
+        <main className="chronicle-event-panel__timeline" aria-label="Linea temporal narrativa">
+          <header className="chronicle-event-panel__timeline-heading">
+            <div><span>LINEA TEMPORAL</span><h3>Cronologia narrativa</h3></div>
+            <div className="chronicle-event-panel__timeline-tools"><span>Narrativa</span><span>Fecha real</span></div>
+          </header>
+          <ol className="chronicle-event-panel__timeline-list">
+            {events.map((event) => {
+              const selected = selectedEvent?.id === event.id
+              return <li key={event.id} className={selected ? 'chronicle-event-panel__timeline-item chronicle-event-panel__timeline-item--selected' : 'chronicle-event-panel__timeline-item'}>
+                <span className="chronicle-event-panel__timeline-marker">{event.status === 'active' ? event.timelineOrder + 1 : '-'}</span>
+                <button type="button" onClick={() => void consultEvent(event.id)} aria-pressed={selected}>
+                  <span className="chronicle-event-panel__timeline-label">{event.narrativeTimeLabel ?? 'Actualidad'}</span>
+                  <strong>{event.title}</strong>
+                  <small>{event.description ?? 'Sin descripcion narrativa.'}</small>
+                  <footer><span>{realDateLabel(event.realDate)}</span><span className={'chronicle-event-panel__timeline-state chronicle-event-panel__timeline-state--' + event.status}>{eventStatusLabels[event.status]}</span></footer>
+                </button>
+              </li>
+            })}
+          </ol>
+        </main>
 
         <div className="chronicle-event-panel__detail">
           {selectedEvent === null ? (
@@ -1179,6 +1241,13 @@ export function ChronicleEventPanel({
                       </dd>
                     </div>
                   </dl>
+
+                  <ChronicleEventRelationsPanel
+                    key={`relations:${selectedEvent.id}`}
+                    chronicleId={chronicleId}
+                    event={selectedEvent}
+                    associatedCharacters={associatedCharacters}
+                  />
 
                   {selectedEvent.status ===
                   'active' ? (

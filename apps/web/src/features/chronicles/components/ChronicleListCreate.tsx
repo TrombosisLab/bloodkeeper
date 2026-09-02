@@ -101,10 +101,12 @@ function errorMessage(
 
 interface ChronicleListCreateProps {
   readonly canCreateChronicles: boolean
+  readonly onOpenCharacter?: (characterId: string) => void
 }
 
 export function ChronicleListCreate({
   canCreateChronicles,
+  onOpenCharacter,
 }: ChronicleListCreateProps) {
   const [
     chronicles,
@@ -336,6 +338,7 @@ export function ChronicleListCreate({
     return (
       <ChronicleDetail
         chronicleId={selectedChronicleId}
+        onOpenCharacter={onOpenCharacter}
         onBack={() =>
           setSelectedChronicleId(null)
         }

@@ -44,7 +44,10 @@ test('SPEC-060-A valida título, edición y lifecycle base', () => {
   assert.equal(canEditChronicleStory('active'), true)
   assert.equal(canEditChronicleStory('completed'), false)
   assert.equal(canTransitionChronicleStory('planned', 'active'), true)
+  assert.equal(canTransitionChronicleStory('planned', 'archived'), true)
   assert.equal(canTransitionChronicleStory('active', 'completed'), true)
+  assert.equal(canTransitionChronicleStory('active', 'archived'), false)
+  assert.equal(canTransitionChronicleStory('completed', 'archived'), true)
   assert.equal(canTransitionChronicleStory('completed', 'active'), false)
 })
 

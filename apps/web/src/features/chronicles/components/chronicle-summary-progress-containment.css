@@ -1,0 +1,7 @@
+.summary-stage-track::after {
+  right: 8%;
+  width: auto;
+  clip-path: inset(
+    0 calc(100% - var(--summary-progress)) 0 0
+  );
+}

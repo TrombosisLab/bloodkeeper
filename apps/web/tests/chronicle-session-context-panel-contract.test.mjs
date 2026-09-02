@@ -36,7 +36,7 @@ test(
   () => {
     assert.match(
       sessionPanel,
-      /selectedSession !== null[\s\S]*ChronicleSessionContextPanel/,
+      /selectedSession !== null[\s\S]*ChronicleSessionPreparationWorkspace/,
     )
     assert.match(
       sessionPanel,

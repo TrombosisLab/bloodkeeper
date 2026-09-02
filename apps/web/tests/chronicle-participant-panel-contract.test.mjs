@@ -4,6 +4,14 @@ import {
 } from 'node:fs/promises'
 import test from 'node:test'
 
+const panel = await readFile(
+  new URL(
+    '../src/features/chronicles/components/ChronicleDetail.tsx',
+    import.meta.url,
+  ),
+  'utf8',
+)
+
 const detail =
   await readFile(
     new URL(
@@ -23,28 +31,11 @@ const styles =
   )
 
 test(
-  '031-D muestra Narradores Jugadores y Personajes asociados',
+  '031-D muestra participantes y personajes asociados en el workspace operativo',
   () => {
-    assert.match(
-      detail,
-      />\s*Narradores\s*</,
-    )
-    assert.match(
-      detail,
-      />\s*Jugadores\s*</,
-    )
-    assert.match(
-      detail,
-      />\s*Personajes asociados\s*</,
-    )
-    assert.match(
-      detail,
-      /participantStatusLabels/,
-    )
-    assert.match(
-      detail,
-      /characterStatusLabels/,
-    )
+    assert.match(panel, /ChronicleParticipantsWorkspace/)
+    assert.match(panel, /associatedCharacters/)
+    assert.match(panel, /retireParticipant/)
   },
 )
 

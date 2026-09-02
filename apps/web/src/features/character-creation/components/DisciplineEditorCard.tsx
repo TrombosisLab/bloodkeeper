@@ -1,3 +1,4 @@
+import { V5VisualMark } from '../../v5-visuals/V5VisualMark'
 import type {
   DisciplineKey,
 } from '../types/discipline.types'
@@ -45,12 +46,15 @@ export function DisciplineEditorCard({
       }
     >
       <header className="discipline-editor-card__heading">
-        <div>
+        <div className="discipline-editor-card__title">
+          <V5VisualMark kind="discipline" value={disciplineKey} className="discipline-editor-card__visual" decorative />
+          <div>
           <span>
             Disciplina de clan
           </span>
 
           <h3>{name}</h3>
+          </div>
         </div>
 
         <strong>

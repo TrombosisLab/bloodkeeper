@@ -72,6 +72,12 @@ export type ChronicleNpcApiStatus =
   | 'active'
   | 'archived'
 
+export interface ChronicleNpcAttributesApiSnapshot { readonly strength:number; readonly dexterity:number; readonly stamina:number; readonly charisma:number; readonly manipulation:number; readonly composure:number; readonly intelligence:number; readonly wits:number; readonly resolve:number }
+
+export interface ChronicleNpcDisciplineApiSnapshot { readonly name:string; readonly rating:number; readonly powers:readonly string[] }
+
+export interface ChronicleNpcDeepProfileApiSnapshot { readonly alias:string|null; readonly clan:string|null; readonly generation:string|null; readonly sire:string|null; readonly sect:string|null; readonly title:string|null; readonly territory:string|null; readonly domain:string|null; readonly faction:string|null; readonly influence:number; readonly resources:number; readonly traits:readonly string[]; readonly disciplines:readonly string[]; readonly attributes:ChronicleNpcAttributesApiSnapshot; readonly disciplineDetails:readonly ChronicleNpcDisciplineApiSnapshot[]; readonly allies:readonly string[]; readonly rivals:readonly string[]; readonly history:string|null }
+
 export interface ChronicleNpcApiSnapshot {
   readonly id: string
   readonly chronicleId: string
@@ -81,7 +87,8 @@ export interface ChronicleNpcApiSnapshot {
   readonly narrativeRole: string | null
   readonly notes: string | null
   readonly status: ChronicleNpcApiStatus
-  readonly detailLevel: 'simple'
+  readonly detailLevel: 'simple' | 'deep'
+  readonly deepProfile: ChronicleNpcDeepProfileApiSnapshot | null
   readonly createdAt: string
   readonly updatedAt: string
 }
@@ -92,6 +99,7 @@ export interface CreateChronicleNpcApiRequest {
   readonly description: string | null
   readonly narrativeRole: string | null
   readonly notes: string | null
+  readonly deepProfile?: ChronicleNpcDeepProfileApiSnapshot | null
 }
 
 export interface UpdateChronicleNpcApiRequest {
@@ -100,6 +108,7 @@ export interface UpdateChronicleNpcApiRequest {
   readonly description?: string | null
   readonly narrativeRole?: string | null
   readonly notes?: string | null
+  readonly deepProfile?: ChronicleNpcDeepProfileApiSnapshot | null
 }
 
 export type ChronicleLocationApiStatus =
