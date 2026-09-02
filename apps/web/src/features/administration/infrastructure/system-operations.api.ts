@@ -1,5 +1,6 @@
 import type {
   SystemOperationsDiagnostics,
+  SystemStorageUsage,
 } from '../types/system-operations.types'
 
 export class SystemOperationsApiError
@@ -20,6 +21,14 @@ export class SystemOperationsApiError
 
 export function createSystemOperationsGateway() {
   return {
+    async storage(): Promise<SystemStorageUsage> {
+      const response = await fetch('/api/administration/system/storage', { credentials: 'include' })
+      if (!response.ok) {
+        throw new SystemOperationsApiError(response.status, 'SYSTEM_STORAGE_REQUEST_FAILED')
+      }
+      return await response.json()
+    },
+
     async diagnostics(): Promise<SystemOperationsDiagnostics> {
       const response = await fetch(
         '/api/administration/system/diagnostics',

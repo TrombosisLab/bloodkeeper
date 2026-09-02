@@ -26,6 +26,7 @@ import type {
 
 import type {
   SystemOperationsDiagnostics,
+  SystemStorageUsage,
 } from '../types/system-operations.types'
 
 import type {
@@ -57,6 +58,7 @@ type AdministrationTab =
   | 'users'
   | 'trash'
   | 'system'
+  | 'storage'
   | 'backups'
 
 function diagnosticLabel(
@@ -201,6 +203,9 @@ export function AdministrationHub() {
       SystemOperationsDiagnostics | null
     >(null)
 
+  const [storageLoading, setStorageLoading] = useState(true)
+  const [storage, setStorage] = useState<SystemStorageUsage | null>(null)
+
   const [
     backupStatusLoading,
     setBackupStatusLoading,
@@ -304,6 +309,18 @@ export function AdministrationHub() {
       }
     }
 
+  const loadStorage = async () => {
+    setStorageLoading(true)
+    try {
+      setStorage(await systemApi.storage())
+    } catch {
+      setStorage(null)
+      setMessage('No se pudo medir el almacenamiento persistente.')
+    } finally {
+      setStorageLoading(false)
+    }
+  }
+
   const loadBackupStatus =
     async () => {
       setBackupStatusLoading(
@@ -362,6 +379,7 @@ export function AdministrationHub() {
   const refresh = () => {
     void loadUsers()
     void loadDiagnostics()
+    void loadStorage()
     void loadBackupStatus()
   }
 
@@ -614,6 +632,19 @@ export function AdministrationHub() {
           }
         >
           Sistema
+        </button>
+
+        <button
+          type="button"
+          className={
+            activeTab === 'storage'
+              ? 'administration-hub__tab administration-hub__tab--active'
+              : 'administration-hub__tab'
+          }
+          aria-pressed={activeTab === 'storage'}
+          onClick={() => setActiveTab('storage')}
+        >
+          Almacenamiento
         </button>
 
         <button
@@ -1031,6 +1062,33 @@ export function AdministrationHub() {
             reinicios continúan gestionándose mediante los
             scripts SSH existentes.
           </p>
+        </article>
+      ) : null}
+
+      {activeTab === 'storage' ? (
+        <article className="administration-hub__card administration-hub__operations-card">
+          <div className="administration-hub__card-heading">
+            <div><p className="eyebrow">ALMACENAMIENTO</p><h2>Espacio persistente usado</h2></div>
+          </div>
+          {storageLoading ? (
+            <p>Calculando espacio…</p>
+          ) : storage === null ? (
+            <p>La medición no está disponible.</p>
+          ) : (
+            <>
+              <div className="administration-hub__storage-total">
+                <span>Total gestionado</span>
+                <strong>{(storage.totalBytes / 1024 / 1024).toFixed(1) + ' MB'}</strong>
+              </div>
+              <dl className="administration-hub__diagnostics administration-hub__diagnostics--cards">
+                <div><dt>Base de datos</dt><dd>{(storage.databaseBytes / 1024 / 1024).toFixed(1) + ' MB'}</dd></div>
+                <div><dt>Retratos</dt><dd>{(storage.portraitBytes / 1024 / 1024).toFixed(1) + ' MB'} · {storage.portraitCount}</dd></div>
+                <div><dt>Copias de seguridad</dt><dd>{(storage.backupBytes / 1024 / 1024).toFixed(1) + ' MB'} · {storage.backupFiles} archivos</dd></div>
+                <div><dt>Medido</dt><dd>{dateLabel(storage.measuredAt)}</dd></div>
+              </dl>
+              <p className="administration-hub__system-note">El total suma PostgreSQL y las copias. Los retratos ya están dentro de PostgreSQL y no se cuentan dos veces. No incluye imágenes Docker, código ni logs del host.</p>
+            </>
+          )}
         </article>
       ) : null}
 

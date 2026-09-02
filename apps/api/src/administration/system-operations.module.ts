@@ -7,6 +7,7 @@ import { BackupStatusService } from './backup-status.service'
 import { SystemOperationsController } from './system-operations.controller'
 import { LifecycleTrashController } from './lifecycle-trash.controller'
 import { LifecycleTrashService } from './lifecycle-trash.service'
+import { StorageUsageController } from './storage-usage.controller'
 
 @Module({
   imports: [DatabaseModule],
@@ -15,6 +16,7 @@ import { LifecycleTrashService } from './lifecycle-trash.service'
     BackupStatusController,
     BackupRequestController,
     LifecycleTrashController,
+    StorageUsageController,
   ],
   providers: [
     BackupStatusService,

@@ -68,6 +68,10 @@ services:
         source: backup_requests
         target: /run/bloodkeeper-backup-requests
         read_only: false
+      - type: volume
+        source: backup_archives
+        target: /backups
+        read_only: true
 
     ports:
       - "127.0.0.1:3000:3000"

@@ -494,6 +494,7 @@ export function CharacterSheet({
       ) : null}
 
       <CharacterIdentity
+        characterId={characterId}
         character={
           model?.identity ??
           demoCharacter
@@ -659,10 +660,6 @@ export function CharacterSheet({
             />
           ) : null}
 
-          <PersistedCharacterValidation
-            characterId={characterId}
-          />
-
           <PersistedCharacterLifecycle
             characterId={characterId}
           />
@@ -676,6 +673,12 @@ export function CharacterSheet({
       ) : (
         <CharacterSecondary />
       )}
+
+      {characterId ? (
+        <PersistedCharacterValidation
+          characterId={characterId}
+        />
+      ) : null}
     </article>
   )
 }

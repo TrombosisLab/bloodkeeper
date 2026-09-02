@@ -262,6 +262,8 @@ import {
   CharacterSheetPdfController,
 } from './presentation/character-sheet-pdf.controller'
 
+import { CharacterPortraitController } from './presentation/character-portrait.controller'
+
 const characterSheetPdfProviders = [
   {
     provide: ExportCharacterSheetPdfUseCase,
@@ -673,6 +675,7 @@ const useCaseProviders = [
     CharacterValidationController,
     CharacterExperienceController,
     CharacterAdvancementController,
+    CharacterPortraitController,
     CharacterSheetPdfController,
   ],
   providers: [

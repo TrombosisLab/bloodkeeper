@@ -1,0 +1,80 @@
+.character-portrait {
+  display: grid;
+  gap: 0.65rem;
+  width: min(100%, 15rem);
+}
+
+.character-portrait__frame {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid rgba(190, 52, 73, 0.58);
+  border-radius: 0.75rem;
+  background: linear-gradient(145deg, rgba(38, 16, 20, 0.95), rgba(10, 10, 11, 0.98));
+}
+
+.character-portrait__frame img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.character-portrait__fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.75rem;
+  color: var(--gold, #c7a45a);
+  text-align: center;
+}
+
+.character-portrait__fallback svg,
+.character-portrait__fallback img {
+  width: 5rem;
+  height: 5rem;
+  object-fit: contain;
+}
+
+.character-portrait__actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+}
+
+.character-portrait__actions button {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid rgba(190, 52, 73, 0.45);
+  border-radius: 0.6rem;
+  background: rgba(25, 20, 21, 0.96);
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.character-portrait small,
+.character-portrait p {
+  margin: 0;
+  color: var(--muted, #ad9f9f);
+  font-size: 0.75rem;
+}
+
+.identity-section__portrait-layout {
+  display: grid;
+  grid-template-columns: minmax(11rem, 15rem) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 760px) {
+  .identity-section__portrait-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .character-portrait {
+    width: min(100%, 13rem);
+  }
+}

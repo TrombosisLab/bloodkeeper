@@ -648,12 +648,26 @@ model Character {
   experienceMovements CharacterExperienceMovement[] @relation("CharacterExperienceCharacter")
   diceRolls           DiceRollRecord[] @relation("DiceRollCharacter")
   sessionAttendances  ChronicleSessionAttendance[] @relation("ChronicleSessionAttendanceCharacter")
+  portrait            CharacterPortrait?
 
   @@index([ownerId])
   @@index([chronicleId])
   @@index([status])
   @@unique([id, chronicleId])
   @@map("characters")
+}
+
+model CharacterPortrait {
+  characterId String   @id @db.Uuid
+  mimeType    String
+  byteSize    Int
+  sha256      String
+  data        Bytes
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("character_portraits")
 }
 
 model CharacterIdentity {

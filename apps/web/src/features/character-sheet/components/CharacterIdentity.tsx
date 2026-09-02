@@ -8,8 +8,10 @@ import type {
 } from '../types/character-sheet-model.types'
 
 import { IdentityField } from './IdentityField'
+import { CharacterPortrait } from './CharacterPortrait'
 
 interface CharacterIdentityProps {
+  characterId?: string
   character: CharacterIdentityData
   profilePhase?: CharacterProfilePhase
 }
@@ -30,6 +32,7 @@ function transitionalValue(
 }
 
 export function CharacterIdentity({
+  characterId,
   character,
   profilePhase,
 }: CharacterIdentityProps) {
@@ -69,7 +72,9 @@ export function CharacterIdentity({
         ) : null}
       </div>
 
-      <div className="identity-grid">
+      <div className="identity-section__portrait-layout">
+        <CharacterPortrait characterId={characterId} name={character.name} clan={character.clan} />
+        <div className="identity-grid">
         <IdentityField
           label="Concepto"
           value={character.concept}
@@ -130,6 +135,7 @@ export function CharacterIdentity({
           value={character.desire}
           featured
         />
+        </div>
       </div>
     </section>
   )

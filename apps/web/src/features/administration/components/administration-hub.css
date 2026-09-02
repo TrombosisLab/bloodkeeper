@@ -424,3 +424,17 @@
   background: var(--color-surface-emphasis);
   opacity: 1;
 }
+
+.administration-hub__storage-total {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.5rem 0 1rem;
+  padding: 1.1rem;
+  border: 1px solid rgba(190, 52, 73, 0.48);
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, rgba(63, 20, 28, 0.8), rgba(18, 18, 20, 0.96));
+}
+.administration-hub__storage-total span { color: var(--muted, #b1a5a5); }
+.administration-hub__storage-total strong { color: #f04a64; font-size: clamp(1.5rem, 4vw, 2.4rem); }
