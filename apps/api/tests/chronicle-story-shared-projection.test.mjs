@@ -41,7 +41,6 @@ test('SPEC-060-F shared DTO contains no private Story surfaces', () => {
   for (const privateField of [
     'narratorNotes',
     'reminders',
-    'sessions',
     'events',
     'characters',
     'npcs',
@@ -52,4 +51,8 @@ test('SPEC-060-F shared DTO contains no private Story surfaces', () => {
   ]) {
     assert.doesNotMatch(projection, new RegExp(privateField))
   }
+
+  assert.match(projection, /readonly sessionIds: readonly string\[\]/)
+  assert.match(projection, /sessionIds: story\.sessions\.map\(\(session\) => session\.id\)/)
+  assert.doesNotMatch(projection, /readonly sessions:/)
 })

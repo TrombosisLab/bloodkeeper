@@ -237,6 +237,15 @@ export interface ChronicleSessionContextLocationApiSnapshot {
   readonly parentLocationId: string | null
 }
 
+export interface ChronicleSessionContextResourceApiSnapshot {
+  readonly id: string
+  readonly kind: 'document' | 'artifact' | 'organization'
+  readonly name: string
+  readonly summary: string | null
+  readonly status: 'active' | 'archived'
+  readonly visibility: 'narrator_only' | 'chronicle_participants'
+}
+
 export interface ChronicleSessionContextApiSnapshot {
   readonly sessionId: string
   readonly events:
@@ -245,12 +254,15 @@ export interface ChronicleSessionContextApiSnapshot {
     readonly ChronicleSessionContextNpcApiSnapshot[]
   readonly locations:
     readonly ChronicleSessionContextLocationApiSnapshot[]
+  readonly resources:
+    readonly ChronicleSessionContextResourceApiSnapshot[]
 }
 
 export interface ReplaceChronicleSessionContextApiRequest {
   readonly eventIds: readonly string[]
   readonly npcIds: readonly string[]
   readonly locationIds: readonly string[]
+  readonly resourceIds?: readonly string[]
 }
 
 

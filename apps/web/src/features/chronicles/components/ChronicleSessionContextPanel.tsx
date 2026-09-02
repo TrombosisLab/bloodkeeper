@@ -47,6 +47,31 @@ interface ContextOption {
     | 'archived'
 }
 
+interface ChronicleResourceOption {
+  readonly id: string
+  readonly kind: 'document' | 'artifact' | 'organization'
+  readonly name: string
+  readonly summary: string | null
+  readonly status: 'active' | 'archived'
+  readonly visibility: 'narrator_only' | 'chronicle_participants'
+}
+
+const resourceKindLabel = {
+  document: 'Documento',
+  artifact: 'Artefacto',
+  organization: 'Organización',
+} as const
+
+async function loadAllResources(chronicleId: string): Promise<readonly ChronicleResourceOption[]> {
+  const response = await fetch(`/api/chronicles/${chronicleId}/resources?limit=100&offset=0`, {
+    credentials: 'include',
+    headers: { Accept: 'application/json' },
+  })
+  if (!response.ok) throw new Error('RESOURCE_REQUEST_FAILED')
+  const value = await response.json() as { readonly items?: readonly ChronicleResourceOption[] }
+  return value.items ?? []
+}
+
 function contextErrorMessage(
   error: unknown,
 ): string {
@@ -257,6 +282,8 @@ export function ChronicleSessionContextPanel({
     readonly ContextOption[]
   >([])
 
+  const [resourceOptions, setResourceOptions] = useState<readonly ContextOption[]>([])
+
   const [
     eventIds,
     setEventIds,
@@ -277,6 +304,8 @@ export function ChronicleSessionContextPanel({
   ] = useState<
     readonly string[]
   >([])
+
+  const [resourceIds, setResourceIds] = useState<readonly string[]>([])
 
   const [
     loading,
@@ -312,6 +341,7 @@ export function ChronicleSessionContextPanel({
           events,
           npcs,
           locations,
+          resources,
         ] =
           await Promise.all([
             gateway.sessionContext(
@@ -327,6 +357,7 @@ export function ChronicleSessionContextPanel({
             gateway.locations(
               chronicleId,
             ),
+            loadAllResources(chronicleId),
           ])
 
         if (cancelled) {
@@ -355,6 +386,7 @@ export function ChronicleSessionContextPanel({
               location.id,
           ),
         )
+        setResourceIds(loadedContext.resources.map((resource) => resource.id))
 
         setEventOptions(
           mergeOptions(
@@ -416,6 +448,27 @@ export function ChronicleSessionContextPanel({
               ),
           ),
         )
+
+        setResourceOptions(
+          mergeOptions(
+            resources
+              .filter((resource) => resource.status === 'active')
+              .map((resource) => ({
+                id: resource.id,
+                label: resource.name,
+                detail: `${resourceKindLabel[resource.kind]} · ${resource.visibility === 'chronicle_participants' ? 'Compartido' : 'Solo Narrador'}`,
+                status: resource.status,
+              })),
+            loadedContext.resources
+              .filter((resource) => resource.status === 'archived')
+              .map((resource) => ({
+                id: resource.id,
+                label: resource.name,
+                detail: `${resourceKindLabel[resource.kind]} · ${resource.visibility === 'chronicle_participants' ? 'Compartido' : 'Solo Narrador'}`,
+                status: resource.status,
+              })),
+          ),
+        )
       } catch (
         operationError: unknown
       ) {
@@ -467,6 +520,7 @@ export function ChronicleSessionContextPanel({
             eventIds,
             npcIds,
             locationIds,
+            resourceIds,
           },
         )
 
@@ -489,6 +543,7 @@ export function ChronicleSessionContextPanel({
             item.id,
         ),
       )
+      setResourceIds(updated.resources.map((item) => item.id))
     } catch (
       operationError: unknown
     ) {
@@ -604,6 +659,7 @@ export function ChronicleSessionContextPanel({
                 context.events.length +
                 context.npcs.length +
                 context.locations.length
+                + context.resources.length
               )}
         </span>
       </div>
@@ -622,6 +678,12 @@ export function ChronicleSessionContextPanel({
           <small>
             {eventOptions.length} en el selector
           </small>
+        </article>
+
+        <article className="chronicle-session-context-panel__summary-card chronicle-session-context-panel__summary-card--resources">
+          <span>Documentos y recursos</span>
+          <strong>{resourceIds.length} seleccionados</strong>
+          <small>{resourceOptions.length} en el selector</small>
         </article>
 
         <article
@@ -750,6 +812,14 @@ export function ChronicleSessionContextPanel({
               'No hay Localizaciones activas disponibles.',
             )}
           </fieldset>
+          </details>
+
+          <details className="chronicle-session-context-panel__resource-fold chronicle-session-context-panel__resource-fold--resources">
+            <summary><span>Documentos, artefactos y organizaciones</span><strong>{resourceIds.length} vinculados</strong><small>Abrir selector</small></summary>
+            <fieldset className="chronicle-session-context-panel__group chronicle-session-context-panel__group--resources" disabled={readOnly || saving}>
+              <legend><span>Recursos narrativos</span><small>{resourceIds.length} / {resourceOptions.length}</small></legend>
+              {optionList(resourceOptions, resourceIds, setResourceIds, 'No hay recursos activos disponibles.')}
+            </fieldset>
           </details>
 
           {!readOnly ? (

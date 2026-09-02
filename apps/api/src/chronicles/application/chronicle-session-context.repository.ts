@@ -12,6 +12,7 @@ export type ChronicleSessionContextResourceKind =
   | 'event'
   | 'npc'
   | 'location'
+  | 'resource'
 
 export class ChronicleSessionContextReferenceError
   extends Error {

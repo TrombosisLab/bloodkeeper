@@ -46,6 +46,14 @@ export interface ChronicleSessionContextResponseDto {
     readonly parentLocationId:
       string | null
   }[]
+  readonly resources: readonly {
+    readonly id: string
+    readonly kind: 'document' | 'artifact' | 'organization'
+    readonly name: string
+    readonly summary: string | null
+    readonly status: 'active' | 'archived'
+    readonly visibility: 'narrator_only' | 'chronicle_participants'
+  }[]
 }
 
 const uuidPattern =
@@ -116,6 +124,7 @@ export function parseReplaceChronicleSessionContextRequest(
       'eventIds',
       'npcIds',
       'locationIds',
+      'resourceIds',
     ])
 
   if (
@@ -128,7 +137,7 @@ export function parseReplaceChronicleSessionContextRequest(
     )
   }
 
-  for (const field of allowed) {
+  for (const field of ['eventIds', 'npcIds', 'locationIds']) {
     if (!(field in value)) {
       throw new InvalidChronicleSessionContextRequestError(
         `body.${field} is required`,
@@ -153,6 +162,11 @@ export function parseReplaceChronicleSessionContextRequest(
       uuidArray(
         value.locationIds,
         'body.locationIds',
+      ),
+    resourceIds:
+      uuidArray(
+        value.resourceIds ?? [],
+        'body.resourceIds',
       ),
   }
 }
@@ -205,6 +219,17 @@ export function toChronicleSessionContextResponse(
             location.category,
           parentLocationId:
             location.parentLocationId,
+        }),
+      ),
+    resources:
+      (context.resources ?? []).map(
+        (resource) => ({
+          id: resource.id,
+          kind: resource.kind,
+          name: resource.name,
+          summary: resource.summary,
+          status: resource.status,
+          visibility: resource.visibility,
         }),
       ),
   }

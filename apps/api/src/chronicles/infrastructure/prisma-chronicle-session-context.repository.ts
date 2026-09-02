@@ -28,6 +28,7 @@ import type {
   ChronicleSessionContextEvent,
   ChronicleSessionContextLocation,
   ChronicleSessionContextNpc,
+  ChronicleSessionContextResource,
   ReplaceChronicleSessionContextData,
 } from '../domain/chronicle-session-context.types'
 
@@ -121,6 +122,29 @@ function sortLocations(
   )
 }
 
+function resourceKind(value: string): 'document' | 'artifact' | 'organization' {
+  if (value === 'DOCUMENT') return 'document'
+  if (value === 'ARTIFACT') return 'artifact'
+  return 'organization'
+}
+
+function resourceVisibility(value: string): 'narrator_only' | 'chronicle_participants' {
+  return value === 'chronicle_participants'
+    ? 'chronicle_participants'
+    : 'narrator_only'
+}
+
+function sortResources(
+  items: readonly ChronicleSessionContextResource[],
+): readonly ChronicleSessionContextResource[] {
+  return [...items].sort(
+    (left, right) =>
+      left.kind.localeCompare(right.kind) ||
+      left.name.localeCompare(right.name, 'es') ||
+      left.id.localeCompare(right.id),
+  )
+}
+
 @Injectable()
 export class PrismaChronicleSessionContextRepository
   implements ChronicleSessionContextRepository {
@@ -152,6 +176,7 @@ export class PrismaChronicleSessionContextRepository
       eventLinks,
       npcLinks,
       locationLinks,
+      resourceLinks,
     ] = await Promise.all([
       this.database.chronicleSessionEvent.findMany({
         where: {
@@ -198,6 +223,21 @@ export class PrismaChronicleSessionContextRepository
               status: true,
               category: true,
               parentLocationId: true,
+            },
+          },
+        },
+      }),
+      this.database.chronicleSessionResource.findMany({
+        where: { sessionId },
+        select: {
+          resource: {
+            select: {
+              id: true,
+              kind: true,
+              name: true,
+              summary: true,
+              status: true,
+              visibility: true,
             },
           },
         },
@@ -260,12 +300,25 @@ export class PrismaChronicleSessionContextRepository
             }),
           ),
         ),
+      resources:
+        sortResources(
+          resourceLinks.map(({ resource }) => ({
+            id: resource.id,
+            kind: resourceKind(String(resource.kind)),
+            name: resource.name,
+            summary: resource.summary,
+            status: resource.status === 'archived' ? 'archived' : 'active',
+            visibility: resourceVisibility(resource.visibility),
+          })),
+        ),
     }
   }
 
   async replace(
     data: ReplaceChronicleSessionContextData,
   ): Promise<ChronicleSessionContext | null> {
+    const resourceIds = data.resourceIds ?? []
+
     return this.database.$transaction(
       async (transaction) => {
         const session =
@@ -298,6 +351,7 @@ export class PrismaChronicleSessionContextRepository
           events,
           npcs,
           locations,
+          resources,
         ] = await Promise.all([
           transaction.chronicleEvent.findMany({
             where: {
@@ -348,6 +402,20 @@ export class PrismaChronicleSessionContextRepository
               parentLocationId: true,
             },
           }),
+          transaction.chronicleResource.findMany({
+            where: {
+              chronicleId: data.chronicleId,
+              id: { in: [...resourceIds] },
+            },
+            select: {
+              id: true,
+              kind: true,
+              name: true,
+              summary: true,
+              status: true,
+              visibility: true,
+            },
+          }),
         ])
 
         invalidReference(
@@ -371,6 +439,11 @@ export class PrismaChronicleSessionContextRepository
             (location) => location.id,
           ),
         )
+        invalidReference(
+          'resource',
+          resourceIds,
+          resources.map((resource) => resource.id),
+        )
 
         await Promise.all([
           transaction.chronicleSessionEvent.deleteMany({
@@ -390,6 +463,9 @@ export class PrismaChronicleSessionContextRepository
               sessionId:
                 data.sessionId,
             },
+          }),
+          transaction.chronicleSessionResource.deleteMany({
+            where: { sessionId: data.sessionId },
           }),
         ])
 
@@ -431,6 +507,15 @@ export class PrismaChronicleSessionContextRepository
                   locationId,
                 }),
               ),
+          })
+        }
+
+        if (resourceIds.length > 0) {
+          await transaction.chronicleSessionResource.createMany({
+            data: resourceIds.map((resourceId) => ({
+              sessionId: data.sessionId,
+              resourceId,
+            })),
           })
         }
 
@@ -497,6 +582,17 @@ export class PrismaChronicleSessionContextRepository
                     location.parentLocationId,
                 }),
               ),
+            ),
+          resources:
+            sortResources(
+              resources.map((resource) => ({
+                id: resource.id,
+                kind: resourceKind(String(resource.kind)),
+                name: resource.name,
+                summary: resource.summary,
+                status: resource.status === 'archived' ? 'archived' : 'active',
+                visibility: resourceVisibility(resource.visibility),
+              })),
             ),
         }
       },

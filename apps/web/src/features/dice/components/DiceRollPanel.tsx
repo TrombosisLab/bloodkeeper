@@ -412,8 +412,8 @@ export function DiceRollPanel({
                 )
               }}
             >
-              <option value="contextual">Contextual</option>
-              <option value="private">Privada</option>
+              <option value="contextual">Visible para toda la crónica</option>
+              <option value="private">Solo tú y el Narrador</option>
             </select>
           </label>
         ) : null}

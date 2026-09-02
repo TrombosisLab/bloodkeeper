@@ -52,6 +52,7 @@ function parseStory(value: unknown): ChronicleStoryApiSnapshot {
     typeof item.sortOrder !== 'number' ||
     typeof item.revision !== 'number' ||
     !Array.isArray(item.milestones) ||
+    !(item.sessionIds === undefined || Array.isArray(item.sessionIds)) ||
     !Array.isArray(item.reminders) ||
     !Array.isArray(item.sessions) ||
     !Array.isArray(item.events) ||
@@ -63,7 +64,10 @@ function parseStory(value: unknown): ChronicleStoryApiSnapshot {
   ) {
     throw new ChronicleStoryApiError(502, 'INVALID_CHRONICLE_STORY_RESPONSE')
   }
-  return item as unknown as ChronicleStoryApiSnapshot
+  return {
+    ...item,
+    sessionIds: Array.isArray(item.sessionIds) ? item.sessionIds : [],
+  } as unknown as ChronicleStoryApiSnapshot
 }
 
 function parseSharedStory(value: unknown): ChronicleSharedStoryApiSnapshot {
@@ -85,7 +89,10 @@ function parseSharedStory(value: unknown): ChronicleSharedStoryApiSnapshot {
   ) {
     throw new ChronicleStoryApiError(502, 'INVALID_SHARED_CHRONICLE_STORY_RESPONSE')
   }
-  return item as unknown as ChronicleSharedStoryApiSnapshot
+  return {
+    ...item,
+    sessionIds: Array.isArray(item.sessionIds) ? item.sessionIds : [],
+  } as unknown as ChronicleSharedStoryApiSnapshot
 }
 
 async function responseError(response: Response): Promise<ChronicleStoryApiError> {

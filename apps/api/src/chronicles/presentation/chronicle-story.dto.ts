@@ -844,6 +844,7 @@ export interface SharedChronicleStoryResponseDto {
     readonly completed: boolean
     readonly completedAt: string | null
   }[]
+  readonly sessionIds: readonly string[]
   readonly startedAt: string | null
   readonly completedAt: string | null
   readonly createdAt: string
@@ -873,6 +874,7 @@ export function toSharedChronicleStoryResponse(
         ? null
         : milestone.completedAt.toISOString(),
     })),
+    sessionIds: story.sessions.map((session) => session.id),
     startedAt: story.startedAt === null
       ? null
       : story.startedAt.toISOString(),

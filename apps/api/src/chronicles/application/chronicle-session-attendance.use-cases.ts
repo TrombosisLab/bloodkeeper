@@ -17,6 +17,7 @@ import type {
 
 import {
   assertChronicleSessionNarrator,
+  assertChronicleSessionParticipant,
 } from './chronicle-session-permission'
 
 import {
@@ -140,7 +141,7 @@ export class ListChronicleSessionAttendancesUseCase {
   ): Promise<
     OffsetPage<ChronicleSessionAttendance>
   > {
-    await assertChronicleSessionNarrator(
+    await assertChronicleSessionParticipant(
       this.participants,
       actorUserId,
       chronicleId,

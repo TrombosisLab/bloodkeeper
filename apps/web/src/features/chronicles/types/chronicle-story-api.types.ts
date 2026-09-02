@@ -192,6 +192,7 @@ export interface ChronicleSharedStoryApiSnapshot {
     readonly completed: boolean
     readonly completedAt: string | null
   }[]
+  readonly sessionIds: readonly string[]
   readonly startedAt: string | null
   readonly completedAt: string | null
   readonly createdAt: string

@@ -191,6 +191,24 @@
   gap: var(--space-3);
 }
 
+.chronicle-session-context-panel__summary {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.chronicle-session-context-panel__summary-card--resources {
+  border-top-color: #b84f73;
+}
+
+.chronicle-session-context-panel__resource-fold--resources > summary {
+  border-color: rgba(184, 79, 115, 0.55);
+}
+
+@media (max-width: 980px) {
+  .chronicle-session-context-panel__summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .chronicle-session-context-panel__summary-card {
   display: grid;
   gap: 0.3rem;

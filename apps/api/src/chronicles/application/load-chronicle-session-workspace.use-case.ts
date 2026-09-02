@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { ChronicleSessionWorkStatus } from '@prisma/client'
 import { DatabaseService } from '../../database/database.service'
 import { CHRONICLE_PARTICIPANT_REPOSITORY } from './chronicle-participant.repository'
-import { assertChronicleSessionNarrator } from './chronicle-session-permission'
+import { ChronicleSessionPermissionError } from './chronicle-session-permission'
 import type { ChronicleParticipantRepository } from './chronicle-participant.repository'
 
 export interface ChronicleSessionWorkspaceItem {
@@ -36,7 +36,8 @@ export class LoadChronicleSessionWorkspaceUseCase {
     @Inject(CHRONICLE_PARTICIPANT_REPOSITORY) private readonly participants: ChronicleParticipantRepository,
   ) {}
   async execute(actorUserId: string, chronicleId: string, sessionId: string): Promise<ChronicleSessionWorkspace | null> {
-    await assertChronicleSessionNarrator(this.participants, actorUserId, chronicleId)
+    const membership = await this.participants.findActiveMembership(chronicleId, actorUserId)
+    if (membership === null) throw new ChronicleSessionPermissionError()
     const session = await this.database.chronicleSession.findFirst({ where: { id: sessionId, chronicleId }, select: { id: true } })
     if (session === null) return null
     const [scenes, preparationItems] = await Promise.all([
@@ -45,11 +46,22 @@ export class LoadChronicleSessionWorkspaceUseCase {
     ])
     const completed = preparationItems.filter((item) => item.status === ChronicleSessionWorkStatus.COMPLETED).length
     const total = preparationItems.length
+    const visibleScenes = membership.role === 'narrator'
+      ? scenes
+      : (() => {
+          const current = scenes.find((scene) => scene.status === ChronicleSessionWorkStatus.PENDING)
+            ?? [...scenes].reverse().find((scene) => scene.status === ChronicleSessionWorkStatus.COMPLETED)
+          return current === undefined ? [] : [current]
+        })()
     return {
       sessionId: session.id,
-      scenes: scenes.map((scene) => ({ id: scene.id, title: scene.title, purpose: scene.purpose, narrativePhase: scene.narrativePhase, intensity: scene.intensity, sortOrder: scene.sortOrder, status: status(scene.status), revision: scene.revision })),
-      preparationItems: preparationItems.map((item) => ({ id: item.id, text: item.text, sortOrder: item.sortOrder, status: status(item.status), revision: item.revision })),
-      progress: { completed, total, percentage: total === 0 ? 0 : Math.round((completed / total) * 100) },
+      scenes: visibleScenes.map((scene) => ({ id: scene.id, title: scene.title, purpose: scene.purpose, narrativePhase: scene.narrativePhase, intensity: scene.intensity, sortOrder: scene.sortOrder, status: status(scene.status), revision: scene.revision })),
+      preparationItems: membership.role === 'narrator'
+        ? preparationItems.map((item) => ({ id: item.id, text: item.text, sortOrder: item.sortOrder, status: status(item.status), revision: item.revision }))
+        : [],
+      progress: membership.role === 'narrator'
+        ? { completed, total, percentage: total === 0 ? 0 : Math.round((completed / total) * 100) }
+        : { completed: 0, total: 0, percentage: 0 },
     }
   }
 }

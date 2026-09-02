@@ -110,12 +110,12 @@ export class ApplyCharacterBloodResonanceUseCase {
       'ownerId' | 'chronicleId'
     >,
   ): Promise<void> {
-    if (character.chronicleId === null) {
-      if (character.ownerId !== actorUserId) {
-        throw new CharacterBloodResonancePermissionError()
-      }
-
+    if (character.ownerId === actorUserId) {
       return
+    }
+
+    if (character.chronicleId === null) {
+      throw new CharacterBloodResonancePermissionError()
     }
 
     const membership =

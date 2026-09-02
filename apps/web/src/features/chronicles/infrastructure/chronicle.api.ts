@@ -698,6 +698,28 @@ function parseChronicleSessionContextLocationResponse(
   }
 }
 
+function parseChronicleSessionContextResourceResponse(value: unknown) {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== 'string' ||
+    !['document', 'artifact', 'organization'].includes(String(value.kind)) ||
+    typeof value.name !== 'string' ||
+    !isStringOrNull(value.summary) ||
+    !validContextResourceStatus(value.status) ||
+    !['narrator_only', 'chronicle_participants'].includes(String(value.visibility))
+  ) {
+    return invalidResponse()
+  }
+  return {
+    id: value.id,
+    kind: value.kind as 'document' | 'artifact' | 'organization',
+    name: value.name,
+    summary: value.summary,
+    status: value.status,
+    visibility: value.visibility as 'narrator_only' | 'chronicle_participants',
+  }
+}
+
 export function parseChronicleSessionContextResponse(
   value: unknown,
 ): ChronicleSessionContextApiSnapshot {
@@ -706,7 +728,8 @@ export function parseChronicleSessionContextResponse(
     typeof value.sessionId !== 'string' ||
     !Array.isArray(value.events) ||
     !Array.isArray(value.npcs) ||
-    !Array.isArray(value.locations)
+    !Array.isArray(value.locations) ||
+    !(value.resources === undefined || Array.isArray(value.resources))
   ) {
     return invalidResponse()
   }
@@ -724,6 +747,10 @@ export function parseChronicleSessionContextResponse(
     locations:
       value.locations.map(
         parseChronicleSessionContextLocationResponse,
+      ),
+    resources:
+      (value.resources ?? []).map(
+        parseChronicleSessionContextResourceResponse,
       ),
   }
 }

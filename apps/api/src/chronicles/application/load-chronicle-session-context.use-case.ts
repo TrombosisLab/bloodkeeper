@@ -12,7 +12,7 @@ import {
 } from './chronicle-session-context.repository'
 
 import {
-  assertChronicleSessionNarrator,
+  ChronicleSessionPermissionError,
 } from './chronicle-session-permission'
 
 import type {
@@ -47,15 +47,27 @@ export class LoadChronicleSessionContextUseCase {
     chronicleId: string,
     sessionId: string,
   ): Promise<ChronicleSessionContext | null> {
-    await assertChronicleSessionNarrator(
-      this.participants,
-      actorUserId,
+    const membership = await this.participants.findActiveMembership(
       chronicleId,
+      actorUserId,
     )
+    if (membership === null) {
+      throw new ChronicleSessionPermissionError()
+    }
 
-    return this.contexts.findBySessionId(
+    const context = await this.contexts.findBySessionId(
       chronicleId,
       sessionId,
     )
+    if (context === null || membership.role === 'narrator') {
+      return context
+    }
+
+    return {
+      ...context,
+      resources: (context.resources ?? []).filter(
+        (resource) => resource.visibility === 'chronicle_participants',
+      ),
+    }
   }
 }
