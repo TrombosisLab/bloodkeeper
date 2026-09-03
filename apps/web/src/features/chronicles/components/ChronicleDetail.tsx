@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useRef,
   useState,
 } from 'react'
 
@@ -362,6 +363,12 @@ export function ChronicleDetail({
   const [storyCreateRequestKey, setStoryCreateRequestKey] = useState(0)
   const [sessionCreateRequestKey, setSessionCreateRequestKey] = useState(0)
   const [eventCreateRequestKey, setEventCreateRequestKey] = useState(0)
+
+  const coverInput = useRef<HTMLInputElement>(null)
+  const [coverVersion, setCoverVersion] = useState(0)
+  const [coverAvailable, setCoverAvailable] = useState(true)
+  const [coverBusy, setCoverBusy] = useState(false)
+  const [coverMessage, setCoverMessage] = useState('')
 
   async function load() {
     setLoading(true)
@@ -893,6 +900,44 @@ export function ChronicleDetail({
     )
   }
 
+  const uploadCover = async (file: File | null) => {
+    if (file === null) return
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 3 * 1024 * 1024) {
+      setCoverMessage('Usa JPEG, PNG o WebP de hasta 3 MB.')
+      return
+    }
+    setCoverBusy(true)
+    setCoverMessage('')
+    try {
+      const response = await fetch('/api/chronicles/' + chronicleId + '/cover', { method: 'PUT', credentials: 'include', headers: { 'Content-Type': file.type }, body: file })
+      if (!response.ok) throw new Error('cover-upload-failed')
+      setCoverAvailable(true)
+      setCoverVersion((value) => value + 1)
+      setCoverMessage('Portada actualizada.')
+    } catch {
+      setCoverMessage('No se pudo guardar la portada.')
+    } finally {
+      setCoverBusy(false)
+    }
+  }
+
+  const removeCover = async () => {
+    if (!window.confirm('Quitar la portada de la cronica?')) return
+    setCoverBusy(true)
+    setCoverMessage('')
+    try {
+      const response = await fetch('/api/chronicles/' + chronicleId + '/cover', { method: 'DELETE', credentials: 'include' })
+      if (!response.ok) throw new Error('cover-remove-failed')
+      setCoverAvailable(false)
+      setCoverVersion((value) => value + 1)
+      setCoverMessage('Se vuelve a mostrar la marca V5.')
+    } catch {
+      setCoverMessage('No se pudo quitar la portada.')
+    } finally {
+      setCoverBusy(false)
+    }
+  }
+
   const lifecycle =
     lifecycleAction(
       chronicle.status,
@@ -905,22 +950,27 @@ export function ChronicleDetail({
       data-view-state="content"
     >
       <header className="chronicle-detail__header">
-        <div>
-          <span className="chronicle-detail__eyebrow">
-            Crónica
-          </span>
-
-          <h1 id="chronicle-detail-title">
-            {chronicle.name}
-          </h1>
+        <div className="chronicle-detail__header-main">
+          <div className="chronicle-detail__cover" aria-hidden="true">
+            <span>V5</span>
+            {coverAvailable ? <img src={'/api/chronicles/' + chronicleId + '/cover?v=' + coverVersion} alt="" onError={() => setCoverAvailable(false)} /> : null}
+          </div>
+          <div>
+            <span className="chronicle-detail__eyebrow">CRONICA</span>
+            <h1 id="chronicle-detail-title">{chronicle.name}</h1>
+            {coverMessage ? <small className="chronicle-detail__cover-message" role="status">{coverMessage}</small> : null}
+          </div>
         </div>
-
-        <button
-          type="button"
-          onClick={onBack}
-        >
-          Volver a crónicas
-        </button>
+        <div className="chronicle-detail__header-actions">
+          {chronicle.narratorId === authenticatedUser.id ? (
+            <>
+              <input ref={coverInput} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(event) => { const file = event.currentTarget.files?.[0] ?? null; event.currentTarget.value = ''; void uploadCover(file) }} />
+              <button type="button" disabled={coverBusy} onClick={() => coverInput.current?.click()}>{coverAvailable ? 'Cambiar portada' : 'Subir portada'}</button>
+              {coverAvailable ? <button type="button" disabled={coverBusy} onClick={() => void removeCover()}>Quitar portada</button> : null}
+            </>
+          ) : null}
+          <button type="button" onClick={onBack}>Volver a cronicas</button>
+        </div>
       </header>
 
       {operationError !== null ? (

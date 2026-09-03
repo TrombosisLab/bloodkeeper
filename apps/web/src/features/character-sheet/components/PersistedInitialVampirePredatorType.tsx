@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import {
   useMemo,
   useState,
@@ -199,7 +200,7 @@ export function PersistedInitialVampirePredatorType({
                 key={option.value}
                 value={option.value}
               >
-                {option.label}
+                {displayValue(option.label, '')}
               </option>
             ),
           )}
@@ -256,11 +257,11 @@ export function PersistedInitialVampirePredatorType({
                     key={power.key}
                     value={power.key}
                   >
-                    {power.disciplineName}
+                    {displayValue(power.disciplineName, 'Disciplina')}
                     {' · '}
-                    {power.name}
+                    {displayValue(power.name, 'Poder')}
                     {' · nivel '}
-                    {power.level}
+                    {displayValue(power.level)}
                   </option>
                 ),
               )}

@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import { V5VisualMark } from '../../v5-visuals/V5VisualMark'
 import { DotRating } from '../../../components/ui/DotRating'
 
@@ -24,12 +25,12 @@ export function DisciplineCard({
               : 'Referencia no disponible'}
           </span>
 
-          <h3>{discipline.name}</h3>
+          <h3>{displayValue(discipline.name, 'Disciplina')}</h3>
           </div>
         </div>
 
         <DotRating
-          label={discipline.name}
+          label={displayValue(discipline.name, 'Disciplina')}
           value={discipline.value}
         />
       </header>
@@ -45,7 +46,7 @@ export function DisciplineCard({
               <li key={power.key}>
                 <details className="discipline-power-details">
                   <summary>
-                    <span>{power.name}</span>
+                    <span>{displayValue(power.name, 'Poder')}</span>
 
                     <small>
                       {power.level === null
@@ -56,9 +57,9 @@ export function DisciplineCard({
 
                   <div className="discipline-power-details__content">
                     {power.mechanics?.systemSummary ? (
-                      <p>{power.mechanics.systemSummary}</p>
+                      <p>{displayValue(power.mechanics.systemSummary, '')}</p>
                     ) : power.summary ? (
-                      <p>{power.summary}</p>
+                      <p>{displayValue(power.summary, '')}</p>
                     ) : (
                       <p>
                         Sin información adicional autorizada.
@@ -68,17 +69,17 @@ export function DisciplineCard({
                     {power.mechanics ? (
                       <section
                         className="discipline-power-mechanics"
-                        aria-label={`Mecánicas de ${power.name}`}
+                        aria-label={`Mecánicas de ${displayValue(power.name, 'Poder')}`}
                       >
                         <dl className="discipline-power-mechanics__facts">
                           <div>
                             <dt>Coste</dt>
-                            <dd>{power.mechanics.cost}</dd>
+                            <dd>{displayValue(power.mechanics.cost, '')}</dd>
                           </div>
 
                           <div>
                             <dt>Duración</dt>
-                            <dd>{power.mechanics.duration}</dd>
+                            <dd>{displayValue(power.mechanics.duration, '')}</dd>
                           </div>
                         </dl>
 
@@ -90,10 +91,10 @@ export function DisciplineCard({
                               {power.mechanics.checks.map(
                                 (check) => (
                                   <li
-                                    key={`${check.label}-${check.detail}`}
+                                    key={`${displayValue(check.label, 'Comprobacion')}-${displayValue(check.detail, '')}`}
                                   >
-                                    <span>{check.label}</span>
-                                    <small>{check.detail}</small>
+                                    <span>{displayValue(check.label, 'Comprobacion')}</span>
+                                    <small>{displayValue(check.detail, '')}</small>
                                   </li>
                                 ),
                               )}
@@ -108,8 +109,8 @@ export function DisciplineCard({
                             <ul>
                               {power.mechanics.modifiers.map(
                                 (modifier) => (
-                                  <li key={modifier}>
-                                    {modifier}
+                                  <li key={displayValue(modifier, '')}>
+                                    {displayValue(modifier, '')}
                                   </li>
                                 ),
                               )}
@@ -124,8 +125,8 @@ export function DisciplineCard({
                             <ul>
                               {power.mechanics.limits.map(
                                 (limit) => (
-                                  <li key={limit}>
-                                    {limit}
+                                  <li key={displayValue(limit, '')}>
+                                    {displayValue(limit, '')}
                                   </li>
                                 ),
                               )}

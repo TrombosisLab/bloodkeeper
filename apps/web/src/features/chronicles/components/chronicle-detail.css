@@ -424,3 +424,6 @@
 
 /* Sesiones referencia: permitir ancho operativo */
 .chronicle-detail:has(.chronicle-session-panel),.chronicle-detail__sections:has(.chronicle-session-panel){width:100%;max-width:none;min-width:0}
+
+
+.chronicle-detail__header-main{display:flex;align-items:center;gap:1rem;min-width:0}.chronicle-detail__cover{position:relative;display:flex;align-items:flex-end;justify-content:flex-end;flex:0 0 6rem;height:6rem;overflow:hidden;border:1px solid var(--color-border-accent);border-radius:var(--radius-control);background:radial-gradient(circle at 65% 25%,var(--color-accent-fill) 0,var(--color-surface-emphasis) 34%,var(--color-control-surface) 75%);color:var(--color-text-muted);font-family:Georgia,serif;font-size:1.8rem;font-weight:700;padding:.45rem}.chronicle-detail__cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.chronicle-detail__cover-message{display:block;margin-top:.35rem;color:var(--color-text-muted)}.chronicle-detail__header-actions{display:flex;align-items:center;justify-content:flex-end;gap:.5rem;flex-wrap:wrap}.chronicle-detail__header-actions button{white-space:nowrap}@media(max-width:760px){.chronicle-detail__header{align-items:stretch;flex-direction:column}.chronicle-detail__header-actions{justify-content:flex-start}.chronicle-detail__cover{flex-basis:5rem;height:5rem;width:5rem}}

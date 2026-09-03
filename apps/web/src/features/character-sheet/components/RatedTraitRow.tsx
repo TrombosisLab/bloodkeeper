@@ -1,8 +1,22 @@
+import { displayValue } from './displayValue'
 import { DotRating } from '../../../components/ui/DotRating'
 
 import type {
   RatedTrait,
 } from '../types/character-advantages.types'
+
+function traitDisplayName(value: unknown): string {
+  if (typeof value === 'string' && value.trim() !== '') return value
+  if (typeof value === 'number') return String(value)
+  if (typeof value === 'object' && value !== null) {
+    const record = value as Record<string, unknown>
+    for (const key of ['label', 'name', 'key']) {
+      const candidate = record[key]
+      if (typeof candidate === 'string' && candidate.trim() !== '') return candidate
+    }
+  }
+  return 'Rasgo sin nombre'
+}
 
 interface RatedTraitRowProps {
   trait: RatedTrait
@@ -24,27 +38,27 @@ export function RatedTraitRow({
       <details className="rated-trait__details">
         <summary>
           <div className="rated-trait__identity">
-            <span>{trait.name}</span>
+            <span>{traitDisplayName(trait.name)}</span>
 
             {trait.detail && (
-              <small>{trait.detail}</small>
+              <small>{displayValue(trait.detail, '')}</small>
             )}
           </div>
 
           <DotRating
-            label={trait.name}
+            label={traitDisplayName(trait.name)}
             value={trait.value}
           />
         </summary>
 
         <div className="rated-trait__metadata">
-          <span>{trait.categoryLabel}</span>
-          <span>{trait.functionalTypeLabel}</span>
-          <span>{trait.originLabel}</span>
+          <span>{displayValue(trait.categoryLabel, '')}</span>
+          <span>{displayValue(trait.functionalTypeLabel, '')}</span>
+          <span>{displayValue(trait.originLabel, '')}</span>
 
           {trait.sourceLabel ? (
             <span>
-              {trait.sourceLabel}
+              {displayValue(trait.sourceLabel, '')}
               {trait.sourcePage
                 ? ` · p. ${trait.sourcePage}`
                 : ''}
@@ -57,7 +71,7 @@ export function RatedTraitRow({
 
           {trait.narrativeStatus === 'pending' ? (
             <span className="rated-trait__narrative-pending">
-              {trait.narrativeStatusLabel}
+              {displayValue(trait.narrativeStatusLabel, '')}
             </span>
           ) : null}
         </div>

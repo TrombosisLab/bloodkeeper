@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import type {
   CharacterHumanityState,
   HumanityBoxState,
@@ -108,7 +109,7 @@ export function HumanityTrack({
               className="humanity-box__symbol"
               aria-hidden="true"
             >
-              {getBoxSymbol(boxState)}
+              {displayValue(getBoxSymbol(boxState), '')}
             </span>
           </span>
         ))}

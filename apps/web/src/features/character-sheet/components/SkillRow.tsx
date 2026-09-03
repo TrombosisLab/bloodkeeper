@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import { DotRating } from '../../../components/ui/DotRating'
 
 interface SkillRowProps {
@@ -15,18 +16,18 @@ export function SkillRow({
     <div className="skill-row">
       <div className="skill-row__identity">
         <span className="skill-row__label">
-          {label}
+          {displayValue(label, 'Habilidad')}
         </span>
 
         {specialties.length > 0 && (
           <span className="skill-row__specialties">
-            {specialties.join(' · ')}
+            {displayValue(specialties.join(' · '), '')}
           </span>
         )}
       </div>
 
       <DotRating
-        label={label}
+        label={displayValue(label, 'Habilidad')}
         value={value}
       />
     </div>

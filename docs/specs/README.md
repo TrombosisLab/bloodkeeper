@@ -92,3 +92,5 @@ confirmadas.
 No debe cambiarse un estado operativo por inferencia. Toda modificación
 requiere auditoría contra la SPEC, el código y los tests, o una decisión
 expresa del usuario.
+
+| SPEC-070 | [SPEC-070 - CONTEXTUAL_PLAYER_HOME](SPEC-070_CONTEXTUAL_PLAYER_HOME_v1.0.md) | 1.0 | Aprobado | Pendiente | Inicio contextual por crónica y personaje, con continuidad persistida y proyección segura para participantes. |

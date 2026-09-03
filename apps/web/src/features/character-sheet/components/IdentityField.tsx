@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 interface IdentityFieldProps {
   label: string
   value: string
@@ -22,7 +23,7 @@ export function IdentityField({
       </span>
 
       <strong className="identity-field__value">
-        {value}
+        {displayValue(value)}
       </strong>
     </div>
   )

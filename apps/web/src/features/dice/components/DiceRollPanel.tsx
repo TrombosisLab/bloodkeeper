@@ -46,6 +46,47 @@ type PreparedCommand =
 
 const defaultGateway = createDiceGateway()
 
+function diceTraitText(value: unknown, fallback = ''): string {
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'bigint') return String(value)
+  if (value !== null && typeof value === 'object') {
+    const record = value as Record<string, unknown>
+    if ('label' in record) return diceTraitText(record.label, fallback)
+    if ('name' in record) return diceTraitText(record.name, fallback)
+    if ('key' in record) return diceTraitText(record.key, fallback)
+  }
+  return fallback
+}
+
+function normalizeDiceTraitOptions(
+  values: readonly DiceTraitOption[],
+): readonly DiceTraitOption[] {
+  const normalized: DiceTraitOption[] = []
+  const seen = new Set<string>()
+
+  function visit(value: unknown): void {
+    if (Array.isArray(value)) {
+      value.forEach(visit)
+      return
+    }
+    if (value === null || typeof value !== 'object') return
+
+    const record = value as Record<string, unknown>
+    for (const nestedKey of ['attributes', 'skills', 'items', 'options']) {
+      if (Array.isArray(record[nestedKey])) visit(record[nestedKey])
+    }
+
+    const key = diceTraitText(record.key)
+    const label = diceTraitText(record.label ?? record.name)
+    if (key === '' || label === '' || seen.has(key)) return
+    seen.add(key)
+    normalized.push({ key, label })
+  }
+
+  visit(values)
+  return normalized
+}
+
 const specialResultLabels: Readonly<
   Record<Exclude<DiceRollSpecialResult, 'none'>, string>
 > = {
@@ -118,6 +159,14 @@ export function DiceRollPanel({
   skills = [],
   gateway = defaultGateway,
 }: DiceRollPanelProps) {
+  const normalizedAttributes = useMemo(
+    () => normalizeDiceTraitOptions(attributes),
+    [attributes],
+  )
+  const normalizedSkills = useMemo(
+    () => normalizeDiceTraitOptions(skills),
+    [skills],
+  )
   const [pool, setPool] = useState('3')
   const [hunger, setHunger] = useState('1')
   const [modifier, setModifier] = useState('0')
@@ -127,7 +176,7 @@ export function DiceRollPanel({
   const [visibility, setVisibility] =
     useState<'contextual' | 'private'>('contextual')
   const [attribute, setAttribute] = useState(
-    attributes[0]?.key ?? '',
+    normalizedAttributes[0]?.key ?? '',
   )
   const [skill, setSkill] = useState('')
   const [preview, setPreview] =
@@ -160,8 +209,8 @@ export function DiceRollPanel({
     const traitKey = separator === -1
       ? key
       : key.slice(separator + 1)
-    return attributes.find((option) => option.key === traitKey)?.label
-      ?? skills.find((option) => option.key === traitKey)?.label
+    return normalizedAttributes.find((option) => option.key === traitKey)?.label
+      ?? normalizedSkills.find((option) => option.key === traitKey)?.label
       ?? fallback
   }
 
@@ -320,9 +369,9 @@ export function DiceRollPanel({
                   setAttribute(event.target.value)
                 }}
               >
-                {attributes.map((option) => (
+                {normalizedAttributes.map((option) => (
                   <option key={option.key} value={option.key}>
-                    {option.label}
+                    {diceTraitText(option.label, option.key)}
                   </option>
                 ))}
               </select>
@@ -337,9 +386,9 @@ export function DiceRollPanel({
                 }}
               >
                 <option value="">Sin habilidad</option>
-                {skills.map((option) => (
+                {normalizedSkills.map((option) => (
                   <option key={option.key} value={option.key}>
-                    {option.label}
+                    {diceTraitText(option.label, option.key)}
                   </option>
                 ))}
               </select>

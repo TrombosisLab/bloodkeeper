@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import { ChangeEvent, useRef, useState } from 'react'
 
 import { V5VisualMark } from '../../v5-visuals/V5VisualMark'
@@ -85,7 +86,7 @@ export function CharacterPortrait({
         ) : (
           <div className="character-portrait__fallback">
             <V5VisualMark kind="clan-symbol" value={clan} decorative />
-            <span>{clan || 'Sin clan'}</span>
+            <span>{displayValue(clan, 'Sin clan')}</span>
           </div>
         )}
       </div>

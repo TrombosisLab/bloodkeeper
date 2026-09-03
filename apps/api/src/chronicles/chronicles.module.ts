@@ -299,6 +299,7 @@ import { LoadChronicleSessionWorkspaceUseCase } from './application/load-chronic
 import { ManageChronicleSessionWorkspaceUseCase } from './application/manage-chronicle-session-workspace.use-case'
 import { ChronicleSessionWorkspaceController } from './presentation/chronicle-session-workspace.controller'
 import { ChronicleSessionParticipantNotesController } from './presentation/chronicle-session-participant-notes.controller'
+import { ChronicleCoverController } from './presentation/chronicle-cover.controller'
 
 @Module({
   imports: [
@@ -318,6 +319,7 @@ import { ChronicleSessionParticipantNotesController } from './presentation/chron
     ChronicleStoryController,
     ChronicleSessionWorkspaceController,
     ChronicleSessionParticipantNotesController,
+    ChronicleCoverController,
   ],
   providers: [
     ManageChronicleParticipantNotesUseCase,

@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import {
   useMemo,
   useState,
@@ -201,7 +202,7 @@ export function PersistedCharacterEmbrace({
                 : 'assertive'
             }
           >
-            {message}
+            {displayValue(message, '')}
           </p>
         ) : null}
 

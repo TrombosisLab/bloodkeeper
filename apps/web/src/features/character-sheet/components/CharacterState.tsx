@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import { demoState } from '../data/demo-state'
 
 import type {
@@ -87,7 +88,7 @@ export function CharacterState({
       <div className="section-title">
         <div>
           <p className="section-kicker">
-            {phaseKicker(profilePhase)}
+            {displayValue(phaseKicker(profilePhase), '')}
           </p>
 
           <h2 id="state-title">
@@ -112,7 +113,7 @@ export function CharacterState({
             <div>
               <span>Humanidad</span>
               <strong>
-                {humanity.value}
+                {displayValue(humanity.value)}
               </strong>
             </div>
 
@@ -140,7 +141,7 @@ export function CharacterState({
               <div>
                 <span>Hambre</span>
                 <strong>
-                  {hunger}
+                  {displayValue(hunger)}
                 </strong>
               </div>
 
@@ -168,7 +169,7 @@ export function CharacterState({
               <div>
                 <span>Potencia de Sangre</span>
                 <strong>
-                  {resolvedBloodPotency}
+                  {displayValue(resolvedBloodPotency)}
                 </strong>
               </div>
 
@@ -179,7 +180,7 @@ export function CharacterState({
               <span>PS</span>
 
               <strong>
-                {resolvedBloodPotency}
+                {displayValue(resolvedBloodPotency)}
               </strong>
             </div>
           </div>

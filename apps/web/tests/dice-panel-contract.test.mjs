@@ -36,12 +36,9 @@ test('036-D presenta resultado estructurado y Dados de Hambre', () => {
   assert.match(styles, /dice-roll-result__die--hunger/)
 })
 
-test('036-D integra manual en Inicio y personaje junto a ficha persistida', () => {
-  assert.match(main, /mode="manual"/)
-  assert.match(main, /mode="character"/)
-  assert.match(main, /characterId=\{creationCharacterId\}/)
-  assert.match(main, /attributeDefinitions/)
-  assert.match(main, /skillDefinitions/)
+test('036-D mantiene el panel de dados independiente del Inicio contextual', () => {
+  assert.doesNotMatch(main, /mode="manual"|mode="character"/)
+  assert.match(main, /<Dashboard/)
 })
 
 test('036-D conserva controles accesibles y resultado anunciado', () => {

@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import {
   useMemo,
   useState,
@@ -467,7 +468,7 @@ export function PersistedCharacterFeeding({
                           key={resonance.key}
                           value={resonance.key}
                         >
-                          {resonance.name}
+                          {displayValue(resonance.name, 'Resonancia')}
                         </option>
                       ),
                     )}
@@ -499,7 +500,7 @@ export function PersistedCharacterFeeding({
                           key={item.key}
                           value={item.key}
                         >
-                          {item.name}
+                          {displayValue(item.name, 'Alimento')}
                         </option>
                       ),
                     )}
@@ -525,10 +526,10 @@ export function PersistedCharacterFeeding({
                     index + 1,
                 ).map((value) => (
                   <option
-                    key={value}
+                    key={displayValue(value)}
                     value={value}
                   >
-                    {value}
+                    {displayValue(value)}
                   </option>
                 ))}
               </select>
@@ -559,7 +560,7 @@ export function PersistedCharacterFeeding({
                         key={definition.key}
                         value={definition.key}
                       >
-                        {definition.name}
+                        {displayValue(definition.name, 'Dyscrasia')}
                       </option>
                     ),
                   )}
@@ -569,7 +570,7 @@ export function PersistedCharacterFeeding({
               {selectedDyscrasia !== null ? (
                 <>
                   <p>
-                    {selectedDyscrasia.summary}
+                    {displayValue(selectedDyscrasia.summary, '')}
                   </p>
 
                   <label>
@@ -641,7 +642,7 @@ export function PersistedCharacterFeeding({
           }
           aria-live="polite"
         >
-          {message}
+          {displayValue(message, '')}
         </p>
       ) : null}
     </div>

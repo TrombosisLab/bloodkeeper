@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import {
   useEffect,
   useMemo,
@@ -131,7 +132,7 @@ export function PersistedCharacterValidation({
         ) : null}
 
         {message !== null ? (
-          <p role="alert">{message}</p>
+          <p role="alert">{displayValue(message, '')}</p>
         ) : null}
 
         {report !== null ? (
@@ -167,13 +168,13 @@ export function PersistedCharacterValidation({
           {report.sections.map((section) => (
             <li
               key={section.section}
-              className={`validation-section__item validation-section__item--${section.state}`}
+              className={`validation-section__item validation-section__item--${displayValue(section.state, '')}`}
             >
               <div>
                 <strong>
-                  {sectionLabels[section.section]}
+                  {displayValue(sectionLabels[section.section], '')}
                 </strong>
-                <span>{section.state}</span>
+                <span>{displayValue(section.state, '')}</span>
               </div>
 
               {section.issues.length > 0 ? (
@@ -183,7 +184,7 @@ export function PersistedCharacterValidation({
                       <li
                         key={`${issue.code}-${issue.field ?? 'section'}-${index}`}
                       >
-                        {issue.message}
+                        {displayValue(issue.message, '')}
                       </li>
                     ),
                   )}

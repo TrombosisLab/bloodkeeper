@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import { useState } from 'react'
 
 import type {
@@ -410,14 +411,14 @@ export function CharacterSecondary({
           className="secondary-edit-notice"
           role="status"
         >
-          {status.message}
+          {displayValue(status.message, '')}
 
           {status.actionLabel && status.onAction ? (
             <button
               type="button"
               onClick={status.onAction}
             >
-              {status.actionLabel}
+              {displayValue(status.actionLabel, '')}
             </button>
           ) : null}
         </p>
@@ -576,25 +577,25 @@ export function CharacterSecondary({
                 key={item.id}
               >
                 <strong>
-                  {item.name}
+                  {displayValue(item.name, 'Sin nombre')}
                   {item.quantity > 1
                     ? ` ×${item.quantity}`
                     : ''}
                 </strong>
 
                 {item.description && (
-                  <span>{item.description}</span>
+                  <span>{displayValue(item.description, '')}</span>
                 )}
 
                 <span>
-                  {item.category ?? 'Sin categoría'}
+                  {displayValue(item.category, 'Sin categoria')}
                   {item.status === 'archived'
                     ? ' · Archivado'
                     : ''}
                 </span>
 
                 {item.notes && (
-                  <span>{item.notes}</span>
+                  <span>{displayValue(item.notes, '')}</span>
                 )}
 
                 {editing ? (
@@ -701,7 +702,7 @@ export function CharacterSecondary({
             <ul className="notes-list">
               {secondary.notes.map((note) => (
                 <li key={note.id}>
-                  {note.content}
+                  {displayValue(note.content, '')}
 
                   {editing ? (
                     <div className="secondary-item-actions">
@@ -809,9 +810,9 @@ export function CharacterSecondary({
                 className="history-entry"
                 key={entry.id}
               >
-                <strong>{entry.title}</strong>
+                <strong>{displayValue(entry.title, 'Registro')}</strong>
 
-                <p>{entry.description}</p>
+                <p>{displayValue(entry.description, '')}</p>
 
                 {editing ? (
                   <div className="secondary-item-actions">

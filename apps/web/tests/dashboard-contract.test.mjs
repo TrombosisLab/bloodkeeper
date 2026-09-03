@@ -116,61 +116,24 @@ test('SPEC-013 ofrece Inicio en la navegación persistente', () => {
   )
 })
 
-test('SPEC-013 muestra acceso real a Personajes sin fingir un listado', () => {
-  assert.match(
-    dashboardSource,
-    /onNavigateCharacters/,
-  )
-  assert.match(
-    dashboardSource,
-    />\s*Ir a Personajes\s*</,
-  )
-  assert.doesNotMatch(
-    dashboardSource,
-    /personajes recientes|personajes activos/i,
-  )
-  assert.doesNotMatch(
-    dashboardSource,
-    /\/api\/characters/,
-  )
+test('SPEC-013 muestra el acceso contextual a la ficha de personaje', () => {
+  assert.match(dashboardSource, /onNavigateCharacters/)
+  assert.match(dashboardSource, /dashboard-character-panel/)
+  assert.match(dashboardSource, /Abrir ficha/)
 })
 
-test('SPEC-013 muestra el resumen de Crónicas a participantes autenticados', () => {
-  assert.match(
-    dashboardSource,
-    /canAccessChronicles\s*\?\s*\(/,
-  )
-  assert.match(
-    dashboardSource,
-    /await gateway\.listPage\(\{/,
-  )
-  assert.match(
-    mainSource,
-    /canAccessChronicles=\{[\s\S]*canAccessChronicles/,
-  )
-  assert.match(
-    mainSource,
-    /onNavigateChronicles=\{\(\) =>[\s\S]*navigateTo\('chronicles'\)/,
-  )
+test('SPEC-013 carga el contexto de cronica y personaje desde el endpoint vigente', () => {
+  assert.equal(dashboardSource.includes('/api/dashboard/context?'), true)
+  assert.match(dashboardSource, /selectedChronicleId/)
+  assert.match(dashboardSource, /selectedCharacterId/)
+  assert.match(mainSource, /<Dashboard/)
 })
 
-test('SPEC-013 resume Crónicas sin duplicar su módulo completo', () => {
-  assert.match(
-    dashboardSource,
-    /\.slice\(0, 3\)/,
-  )
-  assert.match(
-    dashboardSource,
-    /Tus crónicas/,
-  )
-  assert.doesNotMatch(
-    dashboardSource,
-    /Nueva crónica/,
-  )
-  assert.doesNotMatch(
-    dashboardSource,
-    /<form/,
-  )
+test('SPEC-013 muestra tarjetas seleccionables sin duplicar el modulo de cronicas', () => {
+  assert.match(dashboardSource, /Tus cronicas activas/)
+  assert.match(dashboardSource, /data.chronicles.map/)
+  assert.match(dashboardSource, /Cambiar cronica/)
+  assert.doesNotMatch(dashboardSource, /<form/)
 })
 
 test('SPEC-013 representa carga vacío error contenido y reintento', () => {
@@ -269,112 +232,34 @@ test('SPEC-013 personaliza la entrada sin crear componentes genéricos', () => {
     )
   }
 })
-test(
-  'UX Inicio compacta Personajes como acceso directo sin cambiar navegación',
-  () => {
-    assert.match(
-      dashboardSource,
-      /dashboard-panel--characters/,
-    )
-    assert.match(
-      dashboardSource,
-      /dashboard-panel__characters-action/,
-    )
-    assert.match(
-      dashboardSource,
-      /onClick=\{onNavigateCharacters\}/,
-    )
-    assert.match(
-      dashboardStyles,
-      /\.dashboard-panel--characters\s*\{[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*auto/,
-    )
-    assert.match(
-      dashboardStyles,
-      /\.dashboard-panel__characters-action[\s\S]*width:\s*auto/,
-    )
-  },
-)
+test('UX Inicio presenta el panel contextual del personaje', () => {
+  assert.match(dashboardSource, /dashboard-character-panel/)
+  assert.match(dashboardSource, /dashboard-panel__wide-action/)
+  assert.match(dashboardSource, /onClick={onNavigateCharacters}/)
+  assert.match(dashboardStyles, /dashboard-character-panel__content/)
+})
 
-test(
-  'UX Inicio densifica las tres crónicas de resumen sin inventar paginación',
-  () => {
-    assert.match(
-      dashboardSource,
-      /limit:\s*3/,
-    )
-    assert.match(
-      dashboardSource,
-      /\.slice\(0,\s*3\)/,
-    )
-    assert.match(
-      dashboardStyles,
-      /\.dashboard-chronicles\s*\{[\s\S]*gap:\s*0\.5rem/,
-    )
-    assert.match(
-      dashboardStyles,
-      /\.dashboard-chronicles article\s*\{[\s\S]*padding:\s*0\.65rem 0\.75rem/,
-    )
-    assert.doesNotMatch(
-      dashboardSource,
-      /Cargar más crónicas|chroniclesNextOffset|loadMoreChronicles/,
-    )
-  },
-)
+test('UX Inicio permite seleccionar todas las cronicas devueltas por el contexto', () => {
+  assert.match(dashboardSource, /dashboard-chronicle-cards/)
+  assert.match(dashboardSource, /data.chronicles.map/)
+  assert.doesNotMatch(dashboardSource, /slice(0,s*3)|limit:s*3/)
+})
 
-test(
-  'UX Inicio conserva responsive y no introduce contenido ficticio',
-  () => {
-    assert.match(
-      dashboardStyles,
-      /@media \(max-width:\s*600px\)[\s\S]*dashboard-panel--characters[\s\S]*grid-template-columns:\s*1fr/,
-    )
-    assert.doesNotMatch(
-      dashboardSource,
-      /Actividad reciente|Estadísticas|Métricas|Buscar crónicas|Filtrar crónicas/,
-    )
-  },
-)
+test('UX Inicio conserva responsive y no inventa contenido', () => {
+  assert.match(dashboardStyles, /@media/)
+  assert.match(dashboardStyles, /dashboard-character-panel__content/)
+  assert.match(dashboardStyles, /dashboard-chronicle-cards/)
+  assert.doesNotMatch(dashboardSource, /Actividad reciente|Estadisticas|Metricas|Buscar cronicas|Filtrar cronicas/)
+})
 
-test(
-  'UX Inicio alinea Tirada manual e Historial con el Dashboard sin tocar Dados',
-  () => {
-    assert.match(
-      mainSource,
-      /<Dashboard[\s\S]*<DiceRollPanel mode="manual" \/>[\s\S]*<DiceHistoryPanel \/>/,
-    )
-    assert.match(
-      dashboardStyles,
-      /\.dashboard \+ \.dice-roll-panel\s*\{[\s\S]*width:\s*auto[\s\S]*max-width:\s*none/,
-    )
-    assert.match(
-      dashboardStyles,
-      /\.dashboard[\s\S]*\+ \.dice-roll-panel[\s\S]*\+ \.dice-history-panel\s*\{[\s\S]*margin:/,
-    )
-    assert.match(
-      dashboardStyles,
-      /\.dashboard\s*\{[\s\S]*padding-bottom:\s*0\.75rem/,
-    )
-    assert.doesNotMatch(
-      mainSource,
-      /dashboard-dice-wrapper|dashboard-workspace-wrapper/,
-    )
-  },
-)
+test('UX Inicio mantiene Dados fuera del dashboard contextual', () => {
+  assert.doesNotMatch(mainSource, /<DiceRollPanel|<DiceHistoryPanel/)
+  assert.match(dashboardSource, /dashboard-previous/)
+  assert.match(dashboardSource, /dashboard-pending/)
+})
 
-test(
-  'UX Inicio alinea la altura de Personajes con Crónicas sin rellenar contenido',
-  () => {
-    assert.match(
-      dashboardStyles,
-      /\.dashboard-panel--characters\s*\{[\s\S]*align-self:\s*stretch/,
-    )
-    assert.match(
-      dashboardStyles,
-      /\.dashboard-panel--characters\s*\{[\s\S]*align-content:\s*start/,
-    )
-    assert.doesNotMatch(
-      dashboardSource,
-      /Personajes recientes|Personajes activos|Último personaje|Estadísticas/,
-    )
-  },
-)
+test('UX Inicio usa la rejilla primaria actual sin rellenar contenido ficticio', () => {
+  assert.match(dashboardStyles, /dashboard-primary-grid/)
+  assert.match(dashboardStyles, /dashboard-secondary-grid/)
+  assert.doesNotMatch(dashboardSource, /Personajes recientes|Personajes activos|Ultimo personaje|Estadisticas/)
+})

@@ -42,8 +42,8 @@ test('037-C muestra desglose transparente sin calcular reglas', () => {
 
 test('037-C presenta nombres visibles sin filtrar claves internas', () => {
   assert.match(panel, /function presentedComponentLabel/)
-  assert.match(panel, /attributes\.find/)
-  assert.match(panel, /skills\.find/)
+  assert.match(panel, /normalizedAttributes\.find/)
+  assert.match(panel, /normalizedSkills\.find/)
   assert.match(panel, /presentedComponentLabel\(/)
 })
 

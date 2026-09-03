@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import {
   useCallback,
   useEffect,
@@ -246,7 +247,7 @@ export function PersistedCharacterLifecycle({
                 : 'alert'
             }
           >
-            {message}
+            {displayValue(message, '')}
           </p>
         ) : null}
 

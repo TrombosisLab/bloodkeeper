@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import { V5VisualMark } from '../../v5-visuals/V5VisualMark'
 import type {
   CharacterIdentity as CharacterIdentityData,
@@ -54,13 +55,13 @@ export function CharacterIdentity({
           </p>
 
           <h2 id="identity-title">
-            {character.name}
+            {displayValue(character.name, 'Personaje')}
           </h2>
         </div>
 
         {!human ? (
           <div className="clan-mark">
-            <V5VisualMark kind="clan-symbol" value={character.clan} decorative />
+            <V5VisualMark kind="clan-symbol" value={displayValue(character.clan)} decorative />
             <span>Clan</span>
             <strong>
               {transitionalValue(
@@ -73,7 +74,7 @@ export function CharacterIdentity({
       </div>
 
       <div className="identity-section__portrait-layout">
-        <CharacterPortrait characterId={characterId} name={character.name} clan={character.clan} />
+        <CharacterPortrait characterId={characterId} name={displayValue(character.name, 'Personaje')} clan={displayValue(character.clan)} />
         <div className="identity-grid">
         <IdentityField
           label="Concepto"

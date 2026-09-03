@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import {
   useRef,
   useState,
@@ -90,9 +91,9 @@ function BlushResult({
         </span>
         <span>
           Hambre{' '}
-          {result.hungerBefore}
+          {displayValue(result.hungerBefore)}
           {' → '}
-          {result.hungerAfter}
+          {displayValue(result.hungerAfter)}
         </span>
       </div>
     )
@@ -127,9 +128,9 @@ function BlushResult({
               ]
                 .filter(Boolean)
                 .join(' ')}
-              key={`${index}-${roll}`}
+              key={`${index}-${displayValue(roll)}`}
             >
-              {roll}
+              {displayValue(roll)}
             </span>
           ),
         )}
@@ -137,9 +138,9 @@ function BlushResult({
 
       <span>
         Hambre{' '}
-        {result.rouse.hungerBefore}
+        {displayValue(result.rouse.hungerBefore)}
         {' → '}
-        {result.rouse.hungerAfter}
+        {displayValue(result.rouse.hungerAfter)}
       </span>
     </div>
   )
@@ -320,7 +321,7 @@ export function PersistedCharacterBlushOfLife({
           role="status"
           aria-live="polite"
         >
-          {message}
+          {displayValue(message, '')}
         </p>
       ) : null}
 

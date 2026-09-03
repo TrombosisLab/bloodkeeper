@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import {
   demoNarrativeState,
 } from '../data/demo-convictions'
@@ -45,7 +46,7 @@ export function CharacterNarrative({
             {narrative.convictions.map(
               (conviction) => (
                 <li key={conviction.key}>
-                  {conviction.text}
+                  {displayValue(conviction.text, 'Conviccion')}
                 </li>
               ),
             )}
@@ -66,11 +67,11 @@ export function CharacterNarrative({
                   key={touchstone.key}
                 >
                   <strong>
-                    {touchstone.name}
+                    {displayValue(touchstone.name, 'Sin nombre')}
                   </strong>
 
                   <span>
-                    {touchstone.relation}
+                    {displayValue(touchstone.relation, 'Relacion')}
                   </span>
                 </div>
               ),
@@ -85,7 +86,7 @@ export function CharacterNarrative({
           </header>
 
           <p>
-            {narrative.notes}
+            {displayValue(narrative.notes, '')}
           </p>
         </div>
       </div>

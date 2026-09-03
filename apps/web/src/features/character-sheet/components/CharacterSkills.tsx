@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import { demoSkills } from '../data/demo-skills'
 
 import type {
@@ -40,13 +41,13 @@ export function CharacterSkills({
             className="skill-category"
             key={category.key}
           >
-            <h3>{category.label}</h3>
+            <h3>{displayValue(category.label, 'Categoria')}</h3>
 
             <div className="skill-category__rows">
               {category.skills.map((skill) => (
                 <SkillRow
                   key={skill.key}
-                  label={skill.label}
+                  label={displayValue(skill.label, 'Habilidad')}
                   value={skill.value}
                   specialties={
                     skill.specialties

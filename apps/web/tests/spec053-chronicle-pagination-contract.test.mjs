@@ -75,20 +75,8 @@ test(
   },
 )
 
-test(
-  'SPEC-053-C1 Dashboard limita su resumen a tres',
-  () => {
-    assert.match(
-      dashboard,
-      /gateway\.listPage\(\{/,
-    )
-    assert.match(
-      dashboard,
-      /limit: 3/,
-    )
-    assert.match(
-      dashboard,
-      /relevantChronicles\([\s\S]*page\.items/,
-    )
-  },
-)
+test('SPEC-053-C1 Dashboard usa el contexto vigente sin limite artificial', () => {
+  assert.equal(dashboard.includes('/api/dashboard/context?'), true)
+  assert.match(dashboard, /data.chronicles.map/)
+  assert.doesNotMatch(dashboard, /gateway.listPage|limit:s*3/)
+})

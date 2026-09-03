@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import { demoAttributes } from '../data/demo-attributes'
 
 import type {
@@ -64,7 +65,7 @@ export function CharacterAttributes({
             key={category.key}
           >
             <h3>
-              {category.label}
+              {displayValue(category.label, 'Categoria')}
             </h3>
 
             <div className="attribute-category__rows">
@@ -72,7 +73,7 @@ export function CharacterAttributes({
                 (attribute) => (
                   <AttributeRow
                     key={attribute.key}
-                    label={attribute.label}
+                    label={displayValue(attribute.label, 'Atributo')}
                     value={attribute.value}
                   />
                 ),

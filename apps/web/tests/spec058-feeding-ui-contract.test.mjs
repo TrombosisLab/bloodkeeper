@@ -203,7 +203,7 @@ test('058 UI vive dentro del bloque de Resonancia y recarga tras éxito', () => 
   )
   assert.match(
     blood,
-    /\{actions\}/,
+    /renderSafeNode\(actions\)/,
   )
 
   assert.match(

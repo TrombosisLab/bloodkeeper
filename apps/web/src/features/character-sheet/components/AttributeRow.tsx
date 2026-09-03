@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import { DotRating } from '../../../components/ui/DotRating'
 
 interface AttributeRowProps {
@@ -12,11 +13,11 @@ export function AttributeRow({
   return (
     <div className="attribute-row">
       <span className="attribute-row__label">
-        {label}
+        {displayValue(label, 'Atributo')}
       </span>
 
       <DotRating
-        label={label}
+        label={displayValue(label, 'Atributo')}
         value={value}
       />
     </div>

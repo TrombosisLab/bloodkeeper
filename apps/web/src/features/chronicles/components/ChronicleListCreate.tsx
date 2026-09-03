@@ -290,6 +290,11 @@ export function ChronicleListCreate({
     return (
       <li key={chronicle.id}>
         <article className="chronicle-card">
+          <div className="chronicle-card__cover" aria-hidden="true">
+            <span>V5</span>
+            <img src={'/api/chronicles/' + chronicle.id + '/cover'} alt="" onError={(event) => { event.currentTarget.style.display = 'none' }} />
+          </div>
+
           <div className="chronicle-card__heading">
             <h3>
               {chronicle.name}

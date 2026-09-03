@@ -1,3 +1,4 @@
+import { renderSafeNode } from './renderSafeNode'
 import type {
   ReactNode,
 } from 'react'
@@ -175,7 +176,7 @@ export function CharacterBloodExperience({
             </div>
           </div>
 
-          {actions}
+          {renderSafeNode(actions)}
         </>
       )}
     </section>

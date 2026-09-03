@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import {
   useMemo,
   useState,
@@ -154,8 +155,8 @@ export function PersistedInitialVampireThinBloodState({
         <ul className="creation-step-errors">
           {resolution.errors.map(
             (error) => (
-              <li key={error}>
-                {error}
+              <li key={displayValue(error, '')}>
+                {displayValue(error, '')}
               </li>
             ),
           )}

@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import {
   useMemo,
   useRef,
@@ -259,14 +260,14 @@ export function PersistedCharacterRouseCheck({
             <div>
               <span>Último Control</span>
               <strong>
-                {resultLabel(result)}
+                {displayValue(resultLabel(result), '')}
               </strong>
             </div>
 
             <span>
               Hambre {result.hungerBefore}
               {' → '}
-              {result.hungerAfter}
+              {displayValue(result.hungerAfter)}
             </span>
           </div>
 
@@ -277,7 +278,7 @@ export function PersistedCharacterRouseCheck({
             {result.rolls.map(
               (roll, index) => (
                 <span
-                  key={`${index}:${roll}`}
+                  key={`${index}:${displayValue(roll)}`}
                   className={
                     roll ===
                     result.selectedResult
@@ -288,10 +289,10 @@ export function PersistedCharacterRouseCheck({
                       : 'rouse-check__die'
                   }
                   aria-label={
-                    `Dado ${index + 1}: ${roll}`
+                    `Dado ${index + 1}: ${displayValue(roll)}`
                   }
                 >
-                  {roll}
+                  {displayValue(roll)}
                 </span>
               ),
             )}
@@ -301,7 +302,7 @@ export function PersistedCharacterRouseCheck({
             <small>
               Resultado usado:
               {' '}
-              {result.selectedResult}
+              {displayValue(result.selectedResult, '')}
             </small>
           ) : null}
         </div>
@@ -313,7 +314,7 @@ export function PersistedCharacterRouseCheck({
           role="status"
           aria-live="polite"
         >
-          <span>{message}</span>
+          <span>{displayValue(message, '')}</span>
 
           {submission === 'conflict' &&
           onConflictReload !== undefined ? (

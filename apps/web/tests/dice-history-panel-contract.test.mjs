@@ -61,10 +61,10 @@ test('039-C ofrece filtros de origen y descripcion', () => {
   assert.match(panel, /type="search"/)
 })
 
-test('039-C integra historial propio y de personaje sin sobrecargar ficha', () => {
-  assert.equal((main.match(/<DiceHistoryPanel/g) ?? []).length, 2)
-  assert.match(main, /characterId=\{creationCharacterId\}/)
-  assert.match(main, /contextLabel="Historial del personaje"/)
+test('039-C mantiene el historial de dados fuera de Inicio y dentro de Sesiones', () => {
+  assert.doesNotMatch(main, /<DiceHistoryPanel/)
+  assert.match(sessions, /Historial de la/)
+  assert.match(sessions, /workspaceTab/)
 })
 
 test('039-C integra dados de Sesion dentro del workspace seleccionado', () => {

@@ -1,3 +1,5 @@
+import { renderSafeNode } from './renderSafeNode'
+import { displayValue } from './displayValue'
 import {
   useMemo,
   useRef,
@@ -441,7 +443,7 @@ export function CharacterSheet({
           className="sheet-phase-notice"
           role="status"
         >
-          {phaseNotice}
+          {renderSafeNode(phaseNotice)}
         </p>
       ) : null}
 

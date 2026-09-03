@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import type {
   RatedTrait,
 } from '../types/character-advantages.types'
@@ -20,8 +21,8 @@ export function TraitGroup({
   return (
     <div className="trait-group">
       <header className="trait-group__header">
-        <span>{subtitle}</span>
-        <h3>{title}</h3>
+        <span>{displayValue(subtitle, '')}</span>
+        <h3>{displayValue(title, '')}</h3>
       </header>
 
       <div className="trait-group__content">

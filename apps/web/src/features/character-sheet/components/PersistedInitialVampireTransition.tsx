@@ -1,3 +1,4 @@
+import { displayValue } from './displayValue'
 import {
   useMemo,
   useState,
@@ -324,7 +325,7 @@ export function PersistedInitialVampireTransition({
             role="alert"
             aria-live="assertive"
           >
-            {message}
+            {displayValue(message, '')}
           </p>
         ) : null}
 
@@ -382,7 +383,7 @@ export function PersistedInitialVampireTransition({
                       key={key}
                       value={key}
                     >
-                      {getClanName(key)}
+                      {displayValue(getClanName(key), '')}
                     </option>
                   ))}
                 </select>
@@ -457,10 +458,10 @@ export function PersistedInitialVampireTransition({
                   {generationOptions.map(
                     (option) => (
                       <option
-                        key={option}
+                        key={displayValue(option)}
                         value={option}
                       >
-                        {option}.ª
+                        {displayValue(option)}.ª
                       </option>
                     ),
                   )}
@@ -641,10 +642,10 @@ export function PersistedInitialVampireTransition({
                       {bloodPotencyOptions.map(
                         (value) => (
                           <option
-                            key={value}
+                            key={displayValue(value)}
                             value={value}
                           >
-                            {value}
+                            {displayValue(value)}
                           </option>
                         ),
                       )}
@@ -672,10 +673,10 @@ export function PersistedInitialVampireTransition({
                       {initialVampireHungerOptions.map(
                         (value) => (
                           <option
-                            key={value}
+                            key={displayValue(value)}
                             value={value}
                           >
-                            {value}
+                            {displayValue(value)}
                           </option>
                         ),
                       )}
@@ -783,7 +784,7 @@ export function PersistedInitialVampireTransition({
                             key={choice.key}
                             value={choice.key}
                           >
-                            {choice.name}
+                            {displayValue(choice.name, 'Eleccion')}
                           </option>
                         ),
                       )}
@@ -816,10 +817,10 @@ export function PersistedInitialVampireTransition({
                         ?.ratingOptions.map(
                           (rating) => (
                             <option
-                              key={rating}
+                              key={displayValue(rating)}
                               value={rating}
                             >
-                              {rating}
+                              {displayValue(rating)}
                             </option>
                           ),
                         )}
@@ -920,14 +921,14 @@ export function PersistedInitialVampireTransition({
                             key={choice.key}
                             value={choice.key}
                           >
-                            {choice.name}
+                            {displayValue(choice.name, 'Eleccion')}
                             {' · '}
                             {
                               choice
                                 .selectedPowerCount
                             }
                             {' / '}
-                            {choice.rating}
+                            {displayValue(choice.rating)}
                           </option>
                         ),
                       )}
@@ -961,9 +962,9 @@ export function PersistedInitialVampireTransition({
                               key={power.key}
                               value={power.key}
                             >
-                              {power.name}
+                              {displayValue(power.name, 'Poder')}
                               {' · nivel '}
-                              {power.level}
+                              {displayValue(power.level)}
                             </option>
                           ),
                         )}
