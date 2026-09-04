@@ -1,3 +1,4 @@
+import { CharacterListPortrait } from "./CharacterListPortrait"
 import {
   useEffect,
   useState,
@@ -262,7 +263,9 @@ export function CharacterList({
                   key={character.characterId}
                   className="character-list-card"
                 >
-                  <div className="character-list-card__body">
+                  <CharacterListPortrait characterId={character.characterId} />
+
+                   <div className="character-list-card__body">
                     <div className="character-list-card__identity">
                       <span className="character-list-card__status">
                         {

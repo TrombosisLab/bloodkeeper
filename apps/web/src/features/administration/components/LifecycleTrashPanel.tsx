@@ -34,6 +34,7 @@ export function LifecycleTrashPanel() {
   const [busy, setBusy] = useState<string | null>(null)
   const [message, setMessage] = useState('')
   const [details, setDetails] = useState<LifecycleTrashDependencies | null>(null)
+  const [view, setView] = useState<"archive" | "trash">("trash")
 
   const load = async (
     selectedKind: '' | LifecycleTrashKind = kind,
@@ -114,6 +115,10 @@ export function LifecycleTrashPanel() {
     }
   }
 
+  const archivedChronicles = counts.chronicle ?? 0
+  const archivedResources = ["character", "npc", "location", "resource", "story", "session", "event"].reduce((total, key) => total + (counts[key as LifecycleTrashKind] ?? 0), 0)
+  const trashCount = items.filter((value) => value.status !== "archived").length
+  const visibleItems = items.filter((value) => view === "trash" ? value.status !== "archived" : value.status === "archived")
   return (
     <section className="lifecycle-trash">
       <header className="lifecycle-trash__header">
@@ -121,12 +126,16 @@ export function LifecycleTrashPanel() {
         <span>{items.length}</span>
       </header>
 
-      <div className="lifecycle-trash__counts" aria-label="Elementos archivados por tipo">
-        {kinds.filter((value): value is { value: LifecycleTrashKind; label: string } => value.value !== '').map((value) => (
-          <button key={value.value} type="button" className={kind === value.value ? 'is-active' : ''} onClick={() => { setKind(value.value); void load(value.value, query, updatedFrom, updatedTo) }}>
-            <span>{value.label}</span><strong>{counts[value.value] ?? 0}</strong>
-          </button>
-        ))}
+      <div className="lifecycle-trash__overview lifecycle-trash__counts" aria-label="Resumen del archivo y la papelera">
+        <article><span className="lifecycle-trash__overview-icon">▣</span><div><small>Archivados</small><strong>{archivedChronicles}</strong><span>Crónicas</span></div></article>
+        <article><span className="lifecycle-trash__overview-icon lifecycle-trash__overview-icon--success">♙</span><div><small>Archivados</small><strong>{archivedResources}</strong><span>Personajes y recursos</span></div></article>
+        <article><span className="lifecycle-trash__overview-icon lifecycle-trash__overview-icon--danger">♜</span><div><small>Papelera</small><strong>{trashCount}</strong><span>Elementos en papelera</span></div></article>
+        <article><span className="lifecycle-trash__overview-icon lifecycle-trash__overview-icon--warning">◷</span><div><small>Retención automática</small><strong>—</strong><span>Según política del sistema</span></div></article>
+      </div>
+
+      <div className="lifecycle-trash__view-tabs" role="tablist" aria-label="Vista del ciclo de vida">
+        <button type="button" role="tab" aria-selected={view === "archive"} className={view === "archive" ? "is-active" : ""} onClick={() => setView("archive")}>Archivados</button>
+        <button type="button" role="tab" aria-selected={view === "trash"} className={view === "trash" ? "is-active" : ""} onClick={() => setView("trash")}>Papelera</button>
       </div>
 
       <form className="lifecycle-trash__filters" onSubmit={search}>
@@ -143,13 +152,17 @@ export function LifecycleTrashPanel() {
 
       <div className="lifecycle-trash__layout">
         <article className="lifecycle-trash__list">
-          {loading ? <p>Cargando archivo…</p> : items.length === 0 ? <p className="lifecycle-trash__empty">No hay elementos archivados o desactivados.</p> : items.map((value) => (
-            <div className="lifecycle-trash__item" key={value.kind + ':' + value.id}>
-              <div><small>{kindLabel(value.kind)}</small><strong>{value.label}</strong><span>{value.context ?? 'Sin contexto adicional'}</span></div>
+          {loading ? <p>Cargando archivo…</p> : visibleItems.length === 0 ? <p className="lifecycle-trash__empty">No hay elementos archivados o desactivados.</p> : visibleItems.map((value) => (
+            <div className="lifecycle-trash__item" key={value.kind + ":" + value.id}>
+              <span className="lifecycle-trash__item-icon" aria-hidden="true">{kindLabel(value.kind).slice(0, 1)}</span>
+              <div className="lifecycle-trash__item-main"><strong>{value.label}</strong><span>{value.context ?? "Sin contexto adicional"}</span></div>
+              <span className="lifecycle-trash__item-kind">{kindLabel(value.kind)}</span>
+              <span className="lifecycle-trash__item-date">{new Date(value.updatedAt).toLocaleString("es-ES")}</span>
+              <span className="lifecycle-trash__item-retention">{value.status === "archived" ? "Archivado" : "En papelera"}</span>
               <div className="lifecycle-trash__actions">
                 <button type="button" disabled={busy === value.id} onClick={() => void inspect(value)}>Dependencias</button>
                 <button type="button" disabled={!value.canRestore || busy === value.id} onClick={() => void restore(value)}>Restaurar</button>
-                {value.kind !== 'participant' && value.canPurge ? <button type="button" className="lifecycle-trash__purge" disabled={busy === value.id} onClick={() => void purge(value)}>Eliminar definitivamente</button> : null}
+                {value.kind !== "participant" && value.canPurge ? <button type="button" className="lifecycle-trash__purge" disabled={busy === value.id} onClick={() => void purge(value)}>Eliminar definitivamente</button> : null}
               </div>
             </div>
           ))}

@@ -1,0 +1,165 @@
+/* BloodKeeper: capa visual comun persistente para espacios principales. */
+html {
+  scrollbar-gutter: stable;
+}
+
+:root {
+  --bk-primary-max-width: 1320px;
+  --bk-primary-inline-gap: clamp(1rem, 2.1vw, 2rem);
+  --bk-primary-top-gap: 1.25rem;
+  --bk-primary-bottom-gap: 3rem;
+  --bk-primary-section-gap: 1rem;
+  --bk-primary-header-min-height: 9.5rem;
+  --bk-primary-header-padding: clamp(1.35rem, 2.6vw, 2rem);
+  --bk-primary-radius: var(--radius-xl, 1rem);
+  --bk-primary-border: var(--color-border-default, #403134);
+  --bk-primary-surface: var(--color-surface-translucent, #141112);
+  --bk-primary-shadow: var(--shadow-raised, 0 18px 45px rgb(0 0 0 / .16));
+}
+
+body .dashboard,
+body .character-list-workspace,
+body .administration-hub,
+body .chronicle-workspace {
+  box-sizing: border-box;
+  width: min(100%, var(--bk-primary-max-width));
+  max-width: var(--bk-primary-max-width);
+  margin: var(--bk-primary-top-gap) auto var(--bk-primary-bottom-gap);
+}
+
+body .dashboard,
+body .character-list-workspace,
+body .administration-hub {
+  gap: var(--bk-primary-section-gap);
+}
+
+/* Elimina los rellenos heredados distintos del marco de cada ruta. */
+@media (min-width: 900px) {
+  body main.application-content:has(> .dashboard),
+  body main.application-content:has(> .character-list-workspace),
+  body main.application-content:has(> .administration-hub),
+  body main.application-content:has(> .chronicle-workspace) {
+    padding: 0;
+  }
+
+  body .dashboard {
+    padding: 0;
+  }
+}
+
+body .dashboard__hero,
+body .character-list-workspace__header,
+body .administration-hub__header,
+body .chronicle-workspace__header {
+  box-sizing: border-box;
+  min-height: var(--bk-primary-header-min-height);
+  padding: var(--bk-primary-header-padding);
+  border: 1px solid var(--bk-primary-border);
+  border-radius: var(--bk-primary-radius);
+  background: var(--bk-primary-surface);
+  box-shadow: var(--bk-primary-shadow);
+}
+
+body .dashboard__hero,
+body .character-list-workspace__header,
+body .administration-hub__header {
+  align-items: center;
+}
+
+body .dashboard__hero h1,
+body .character-list-workspace__header h1,
+body .administration-hub__header h1,
+body .chronicle-workspace__header h1 {
+  margin: 0;
+  font-size: clamp(2.25rem, 3.1vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -.02em;
+}
+
+body .dashboard__hero p,
+body .character-list-workspace__header p,
+body .administration-hub__header p,
+body .chronicle-workspace__header p {
+  margin: .65rem 0 0;
+  max-width: 68ch;
+  color: var(--color-text-secondary, #c6b9b2);
+  line-height: 1.45;
+}
+
+body .dashboard__eyebrow,
+body .character-list-workspace__eyebrow,
+body .chronicle-workspace__eyebrow,
+body .administration-hub__header .eyebrow {
+  display: block;
+  margin: 0 0 .5rem;
+  color: var(--color-text-muted, #8f817b);
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .13em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+body .dashboard-panel,
+body .character-list,
+body .administration-hub__card,
+body .chronicle-create,
+body .chronicle-list {
+  box-sizing: border-box;
+  border-color: var(--bk-primary-border);
+  border-radius: var(--bk-primary-radius);
+  background: var(--bk-primary-surface);
+  box-shadow: var(--bk-primary-shadow);
+}
+
+body .dashboard-panel h2,
+body .character-list__heading h2,
+body .administration-hub__card h2,
+body .chronicle-create h2,
+body .chronicle-list h2 {
+  line-height: 1.15;
+}
+
+body .dashboard__hero > *,
+body .character-list-workspace__header > *,
+body .administration-hub__header > *,
+body .chronicle-workspace__header > * {
+  min-width: 0;
+}
+
+@media (max-width: 899px) {
+  body .dashboard,
+  body .character-list-workspace,
+  body .administration-hub,
+  body .chronicle-workspace {
+    width: calc(100% - 2rem);
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  body .dashboard__hero,
+  body .character-list-workspace__header,
+  body .administration-hub__header,
+  body .chronicle-workspace__header {
+    min-height: 0;
+    padding: 1.25rem;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  body .dashboard__hero h1,
+  body .character-list-workspace__header h1,
+  body .administration-hub__header h1,
+  body .chronicle-workspace__header h1 {
+    font-size: clamp(2rem, 8vw, 2.5rem);
+  }
+}
+
+@media (max-width: 560px) {
+  body .dashboard,
+  body .character-list-workspace,
+  body .administration-hub,
+  body .chronicle-workspace {
+    width: calc(100% - 1rem);
+  }
+}

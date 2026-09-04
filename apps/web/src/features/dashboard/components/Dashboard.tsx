@@ -243,10 +243,21 @@ export function Dashboard({
             <div className="dashboard-chronicle-cards">
               {data.chronicles.map((chronicle) => {
                 const active = chronicle.id === selectedId
+                const cardCharacterCount = numberValue(chronicle.characterCount, 0)
+                const cardCharacterName = active
+                  ? text(selectedCharacter?.name, 'Sin personaje asociado')
+                  : cardCharacterCount === 0
+                    ? 'Sin personaje asociado'
+                    : cardCharacterCount === 1
+                      ? '1 personaje asociado'
+                      : `${cardCharacterCount} personajes asociados`
+                const cardCharacterMeta = active
+                  ? text(selectedCharacter?.clan, 'Clan sin registrar')
+                  : 'Selecciona para consultar'
                 return (
                   <button type="button" key={chronicle.id} className={'dashboard-chronicle-card' + (active ? ' is-selected' : '')} onClick={() => { setSelectedChronicleId(chronicle.id); setSelectedCharacterId(null) }} aria-pressed={active}>
                     <span className="dashboard-chronicle-card__image" aria-hidden="true"><span>V5</span><img src={'/api/chronicles/' + chronicle.id + '/cover'} alt="" onError={(event) => { event.currentTarget.style.display = 'none' }} /></span>
-                    <span className="dashboard-chronicle-card__body"><strong>{chronicle.name}</strong><em>{text(selectedCharacter?.name, 'Sin personaje')}</em><span className="dashboard-chronicle-card__meta">{text(selectedCharacter?.clan, 'Clan sin registrar')}</span><span className="dashboard-badge">{statusLabel(chronicle.status)}</span></span>
+                    <span className="dashboard-chronicle-card__body"><strong>{chronicle.name}</strong><em>{cardCharacterName}</em><span className="dashboard-chronicle-card__meta">{cardCharacterMeta}</span><span className="dashboard-badge">{statusLabel(chronicle.status)}</span></span>
                     <span className="dashboard-chronicle-card__arrow" aria-hidden="true">{active ? '✓' : '›'}</span>
                   </button>
                 )

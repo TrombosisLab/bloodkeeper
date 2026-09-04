@@ -99,6 +99,19 @@ function errorMessage(
   return 'No se pudo completar la operación.'
 }
 
+function dateLabel(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return "Sin fecha"
+  }
+
+  return new Intl.DateTimeFormat("es-ES", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date)
+}
+
 interface ChronicleListCreateProps {
   readonly canCreateChronicles: boolean
   readonly onOpenCharacter?: (characterId: string) => void
@@ -136,6 +149,7 @@ export function ChronicleListCreate({
     submitting,
     setSubmitting,
   ] = useState(false)
+  const [createOpen, setCreateOpen] = useState(false)
   const [
     selectedChronicleId,
     setSelectedChronicleId,
@@ -274,6 +288,21 @@ export function ChronicleListCreate({
         chronicle.status === 'archived',
     )
 
+  const latestChronicle =
+    habitualChronicles.length === 0
+      ? null
+      : [...habitualChronicles].sort(
+          (left, right) =>
+            new Date(right.updatedAt).getTime() -
+            new Date(left.updatedAt).getTime(),
+        )[0]
+  const activeChronicleCount = chronicles.filter(
+    (chronicle) => chronicle.status === "active",
+  ).length
+  const preparationChronicleCount = chronicles.filter(
+    (chronicle) => chronicle.status === "preparation",
+  ).length
+
   const viewState =
     loading
       ? 'loading'
@@ -286,53 +315,66 @@ export function ChronicleListCreate({
   function renderChronicle(
     chronicle: ChronicleApiSnapshot,
   ) {
-
     return (
       <li key={chronicle.id}>
-        <article className="chronicle-card">
+        <article className={
+          "chronicle-card chronicle-card--visual chronicle-card--" +
+          chronicle.status
+        }>
           <div className="chronicle-card__cover" aria-hidden="true">
             <span>V5</span>
-            <img src={'/api/chronicles/' + chronicle.id + '/cover'} alt="" onError={(event) => { event.currentTarget.style.display = 'none' }} />
+            <img
+              src={"/api/chronicles/" + chronicle.id + "/cover"}
+              alt=""
+              onError={(event) => {
+                event.currentTarget.style.display = "none"
+              }}
+            />
           </div>
 
-          <div className="chronicle-card__heading">
-            <h3>
-              {chronicle.name}
-            </h3>
-            <span>
-              {
-                statusLabels[
+          <div className="chronicle-card__body">
+            <div className="chronicle-card__heading">
+              <div>
+                <span className={
+                  "chronicle-card__status chronicle-card__status--" +
                   chronicle.status
-                ]
-              }
-            </span>
-          </div>
+                }>
+                  {statusLabels[chronicle.status]}
+                </span>
+                <h3>{chronicle.name}</h3>
+              </div>
+              <span className="chronicle-card__arrow" aria-hidden="true">
+                →
+              </span>
+            </div>
 
-          {chronicle.description !==
-          null ? (
-            <p>
-              {
-                chronicle.description
-              }
-            </p>
-          ) : (
-            <p className="chronicle-card__empty">
-              Sin descripción.
-            </p>
-          )}
+            {chronicle.description !== null ? (
+              <p>{chronicle.description}</p>
+            ) : (
+              <p className="chronicle-card__empty">
+                Sin descripción.
+              </p>
+            )}
+
+            <div className="chronicle-card__meta">
+              <span>
+                Actualizada <strong>{dateLabel(chronicle.updatedAt)}</strong>
+              </span>
+              <span>
+                Estado <strong>{statusLabels[chronicle.status]}</strong>
+              </span>
+            </div>
+          </div>
 
           <div className="chronicle-card__actions">
             <button
               type="button"
               onClick={() =>
-                setSelectedChronicleId(
-                  chronicle.id,
-                )
+                setSelectedChronicleId(chronicle.id)
               }
             >
-              Abrir crónica
+              Abrir crónica <span aria-hidden="true">→</span>
             </button>
-
           </div>
         </article>
       </li>
@@ -374,22 +416,87 @@ export function ChronicleListCreate({
           </span>
           <h1>Crónicas</h1>
           <p>
-            Consulta las crónicas en las que
-            participas y gestiona únicamente
-            las acciones permitidas por tu rol.
+            Gestiona tus partidas y continúa donde lo dejaste.
           </p>
         </div>
+
+        {canCreateChronicles ? (
+          <button
+            type="button"
+            className="chronicle-workspace__primary-action"
+            aria-expanded={createOpen}
+            aria-controls="chronicle-create-panel"
+            onClick={() => setCreateOpen((current) => !current)}
+          >
+            + Nueva crónica
+          </button>
+        ) : null}
       </header>
 
-      <div className="chronicle-workspace__grid">
-        {canCreateChronicles ? (
+      <section className="chronicle-overview" aria-label="Resumen de crónicas">
+        <div className="chronicle-overview__stat">
+          <span>Crónicas</span>
+          <strong>{chronicles.length}</strong>
+        </div>
+        <div className="chronicle-overview__stat chronicle-overview__stat--active">
+          <span>Activas</span>
+          <strong>{activeChronicleCount}</strong>
+        </div>
+        <div className="chronicle-overview__stat chronicle-overview__stat--preparation">
+          <span>En preparación</span>
+          <strong>{preparationChronicleCount}</strong>
+        </div>
+      </section>
+
+      {latestChronicle !== null ? (
+        <section className="chronicle-continue" aria-labelledby="chronicle-continue-title">
+          <div className="chronicle-continue__cover" aria-hidden="true">
+            <span>V5</span>
+            <img
+              src={"/api/chronicles/" + latestChronicle.id + "/cover"}
+              alt=""
+              onError={(event) => {
+                event.currentTarget.style.display = "none"
+              }}
+            />
+          </div>
+          <div className="chronicle-continue__body">
+            <span className="chronicle-workspace__eyebrow">
+              Continuar donde lo dejaste
+            </span>
+            <h2 id="chronicle-continue-title">
+              {latestChronicle.name}
+              <span> · Última actualización {dateLabel(latestChronicle.updatedAt)}</span>
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSelectedChronicleId(latestChronicle.id)}
+          >
+            Entrar en crónica <span aria-hidden="true">→</span>
+          </button>
+        </section>
+      ) : null}
+
+      {canCreateChronicles && createOpen ? (
         <section
+          id="chronicle-create-panel"
           className="chronicle-create"
           aria-labelledby="chronicle-create-title"
         >
-          <h2 id="chronicle-create-title">
-            Nueva crónica
-          </h2>
+          <div className="chronicle-create__heading">
+            <div>
+              <h2 id="chronicle-create-title">Nueva crónica</h2>
+              <p>Añade una crónica y empieza a organizar tu partida.</p>
+            </div>
+            <button
+              type="button"
+              className="chronicle-create__close"
+              onClick={() => setCreateOpen(false)}
+            >
+              Cerrar
+            </button>
+          </div>
 
           <form onSubmit={submit}>
             <label>
@@ -397,11 +504,7 @@ export function ChronicleListCreate({
               <input
                 name="chronicleName"
                 value={name}
-                onChange={(event) =>
-                  setName(
-                    event.target.value,
-                  )
-                }
+                onChange={(event) => setName(event.target.value)}
                 required
                 autoComplete="off"
               />
@@ -412,34 +515,23 @@ export function ChronicleListCreate({
               <textarea
                 name="chronicleDescription"
                 value={description}
-                onChange={(event) =>
-                  setDescription(
-                    event.target.value,
-                  )
-                }
-                rows={5}
+                onChange={(event) => setDescription(event.target.value)}
+                rows={4}
               />
             </label>
 
             <button
               type="submit"
-              disabled={
-                submitting ||
-                name.trim().length === 0
-              }
+              disabled={submitting || name.trim().length === 0}
             >
-              {submitting
-                ? 'Creando…'
-                : 'Crear crónica'}
+              {submitting ? "Creando…" : "Crear crónica"}
             </button>
           </form>
 
           {error !== null ? (
             <p
               className="chronicle-message chronicle-message--error"
-              data-view-state={
-                failureState ?? 'error'
-              }
+              data-view-state={failureState ?? "error"}
               role="alert"
               aria-live="assertive"
             >
@@ -447,92 +539,73 @@ export function ChronicleListCreate({
             </p>
           ) : null}
         </section>
-        ) : null}
+      ) : null}
 
-        <section
-          className="chronicle-list"
-          aria-labelledby="chronicle-list-title"
-        >
-          <div className="chronicle-list__heading">
-            <h2 id="chronicle-list-title">
-              Tus crónicas
-            </h2>
-
-            <button
-              type="button"
-              onClick={() =>
-                void loadChronicles()
-              }
-              disabled={loading}
-            >
-              Actualizar
-            </button>
+      <section
+        className="chronicle-list"
+        aria-labelledby="chronicle-list-title"
+      >
+        <div className="chronicle-list__heading">
+          <div>
+            <span className="chronicle-workspace__eyebrow">Tus partidas</span>
+            <h2 id="chronicle-list-title">Tus crónicas</h2>
           </div>
-
-          {loading ? (
-            <ViewStateStatus
-              state="loading"
-              className="chronicle-message"
-            >
-              Cargando crónicas…
-            </ViewStateStatus>
-          ) : chronicles.length === 0 ? (
-            <ViewStateStatus
-              state="empty"
-              className="chronicle-message"
-            >
-              Todavía no has creado ninguna crónica.
-            </ViewStateStatus>
-          ) : habitualChronicles.length === 0 ? (
-            <ViewStateStatus
-              state="empty"
-              className="chronicle-message"
-            >
-              No hay crónicas activas o en preparación.
-            </ViewStateStatus>
-          ) : (
-            <ul className="chronicle-cards">
-              {habitualChronicles.map(
-                renderChronicle,
-              )}
-            </ul>
-          )}
-
-          {!loading &&
-          archivedChronicles.length > 0 ? (
-            <section
-              aria-labelledby="chronicle-archived-title"
-            >
-              <h2 id="chronicle-archived-title">
-                Archivadas
-              </h2>
-
-              <ul className="chronicle-cards">
-                {archivedChronicles.map(
-                  renderChronicle,
-                )}
-              </ul>
-            </section>
-          ) : null}
-        </section>
-      </div>
-
-        {!loading &&
-        error === null &&
-        chronicles.length > 0 &&
-        chroniclesNextOffset !== null ? (
           <button
             type="button"
-            onClick={() =>
-              void loadMoreChronicles()
-            }
-            disabled={loadingMore}
+            onClick={() => void loadChronicles()}
+            disabled={loading}
           >
-            {loadingMore
-              ? 'Cargando más…'
-              : 'Cargar más crónicas'}
+            Actualizar
           </button>
+        </div>
+
+        {loading ? (
+          <ViewStateStatus state="loading" className="chronicle-message">
+            Cargando crónicas…
+          </ViewStateStatus>
+        ) : chronicles.length === 0 ? (
+          <ViewStateStatus state="empty" className="chronicle-message">
+            Todavía no has creado ninguna crónica.
+          </ViewStateStatus>
+        ) : habitualChronicles.length === 0 ? (
+          <ViewStateStatus state="empty" className="chronicle-message">
+            No hay crónicas activas o en preparación.
+          </ViewStateStatus>
+        ) : (
+          <ul className="chronicle-cards">
+            {habitualChronicles.map(renderChronicle)}
+          </ul>
+        )}
+
+        {!loading && archivedChronicles.length > 0 ? (
+          <section
+            className="chronicle-archived"
+            aria-labelledby="chronicle-archived-title"
+          >
+            <div className="chronicle-list__heading">
+              <h2 id="chronicle-archived-title">Archivadas</h2>
+            </div>
+            <ul className="chronicle-cards">
+              {archivedChronicles.map(renderChronicle)}
+            </ul>
+          </section>
         ) : null}
-</section>
+      </section>
+
+      {!loading &&
+      error === null &&
+      chronicles.length > 0 &&
+      chroniclesNextOffset !== null ? (
+        <button
+          type="button"
+          className="chronicle-load-more"
+          onClick={() => void loadMoreChronicles()}
+          disabled={loadingMore}
+        >
+          {loadingMore ? "Cargando más…" : "Cargar más crónicas"}
+        </button>
+      ) : null}
+    </section>
   )
+
 }

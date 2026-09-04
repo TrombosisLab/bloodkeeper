@@ -38,6 +38,7 @@ import './styles/app-shell-responsive.css';
 import './styles/bloodkeeper-visual-system.css';
 
 import './styles/v5-visual-assets.css'
+import './styles/primary-workspaces.css'
 function App() {
   const authenticatedUser =
     useAuthenticatedUser()

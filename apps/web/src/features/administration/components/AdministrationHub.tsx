@@ -158,6 +158,10 @@ export function AdministrationHub() {
     setShowCreateAccount,
   ] = useState(false)
 
+  const [userQuery, setUserQuery] = useState("")
+  const [userStatusFilter, setUserStatusFilter] = useState("all")
+  const [userRoleFilter, setUserRoleFilter] = useState<"all" | AdministrationRole>("all")
+
   const [
     users,
     setUsers,
@@ -544,6 +548,21 @@ export function AdministrationHub() {
     }
   }
 
+  const normalizedUserQuery = userQuery.trim().toLocaleLowerCase()
+  const visibleAdministrationUsers = users.filter((user) => {
+    if (userStatusFilter !== "all" && user.status !== userStatusFilter) return false
+    if (userRoleFilter !== "all" && !user.roles.includes(userRoleFilter)) return false
+    if (normalizedUserQuery.length === 0) return true
+    return [user.username, user.displayName, user.roles.join(" ")]
+      .join(" ")
+      .toLocaleLowerCase()
+      .includes(normalizedUserQuery)
+  })
+  const activeAdministrationUsers = users.filter((user) => user.status === "active").length
+  const disabledAdministrationUsers = users.length - activeAdministrationUsers
+  const narratorAdministrationUsers = users.filter((user) => user.roles.includes("narrator")).length
+  const administratorAdministrationUsers = users.filter((user) => user.roles.includes("admin")).length
+
   return (
     <section className="administration-hub">
       <header className="administration-hub__header">
@@ -669,36 +688,7 @@ export function AdministrationHub() {
 
       {activeTab === 'users' ? (
         <div className="administration-hub__workspace">
-          <button
-            type="button"
-            className="administration-hub__create-launcher"
-            aria-expanded={
-              showCreateAccount
-            }
-            aria-controls="administration-create-account"
-            onClick={() =>
-              setShowCreateAccount(
-                (current) =>
-                  !current,
-              )
-            }
-          >
-            <span>
-              <strong>
-                Crear cuenta
-              </strong>
 
-              <small>
-                Alta manual de un usuario con sus roles iniciales.
-              </small>
-            </span>
-
-            <span aria-hidden="true">
-              {showCreateAccount
-                ? '−'
-                : '+'}
-            </span>
-          </button>
 
           {showCreateAccount ? (
             <article
@@ -809,15 +799,56 @@ export function AdministrationHub() {
                   ADMINISTRACIÓN
                 </p>
 
-                <h2>
-                  Usuarios y cuentas
+                <h2 aria-label="Usuarios y cuentas">
+                  Usuarios
                 </h2>
               </div>
 
-              <span className="administration-hub__count">
-                {users.length}
-              </span>
+            <button
+              type="button"
+              className="administration-hub__create-user-button"
+              aria-expanded={showCreateAccount}
+              aria-controls="administration-create-account"
+              onClick={() => setShowCreateAccount((current) => !current)}
+            >
+              <span aria-hidden="true">+</span>
+              Crear usuario
+            </button>
+
             </div>
+
+            <div className="administration-hub__user-metrics" aria-label="Resumen de cuentas">
+              <div><span>Total</span><strong>{users.length}</strong></div>
+              <div><span>Activos</span><strong>{activeAdministrationUsers}</strong></div>
+              <div><span>Desactivados</span><strong>{disabledAdministrationUsers}</strong></div>
+              <div><span>Narradores</span><strong>{narratorAdministrationUsers}</strong></div>
+              <div><span>Administradores</span><strong>{administratorAdministrationUsers}</strong></div>
+            </div>
+
+            <form className="administration-hub__user-filters" onSubmit={(event) => event.preventDefault()}>
+              <label>
+                Buscar usuario
+                <input value={userQuery} onChange={(event) => setUserQuery(event.target.value)} placeholder="Buscar usuario..." />
+              </label>
+              <label>
+                Estado
+                <select id="user-status-filter" value={userStatusFilter} onChange={(event) => setUserStatusFilter(event.target.value)}>
+                  <option value="all">Todos</option>
+                  <option value="active">Activos</option>
+                  <option value="disabled">Desactivados</option>
+                </select>
+              </label>
+              <label>
+                Rol
+                <select id="user-role-filter" value={userRoleFilter} onChange={(event) => setUserRoleFilter(event.target.value as "all" | AdministrationRole)}>
+                  <option value="all">Todos</option>
+                  <option value="admin">Administradores</option>
+                  <option value="narrator">Narradores</option>
+                  <option value="player">Jugadores</option>
+                </select>
+              </label>
+              <button type="button" className="administration-hub__compact-action administration-hub__compact-action--secondary" onClick={() => { setUserQuery(""); setUserStatusFilter("all"); setUserRoleFilter("all") }} disabled={userQuery.length === 0 && userStatusFilter === "all" && userRoleFilter === "all"}>Limpiar</button>
+            </form>
 
             {loading ? (
               <p>
@@ -829,128 +860,46 @@ export function AdministrationHub() {
               </p>
             ) : (
               <div className="administration-hub__user-list">
-                {users.map(
+                <div className="administration-hub__user-list-head" aria-hidden="true"><span>Usuario</span><span>Estado</span><span>Roles</span><span>Último acceso</span><span>Acciones</span></div>
+                {visibleAdministrationUsers.map(
                   (user) => {
-                    const username =
-                      readableUsername(
-                        user.username,
-                      )
+                    const username = readableUsername(user.username)
+                    const initials = user.displayName.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase()
+                    const updatedAt = new Date(user.updatedAt).toLocaleString("es-ES")
 
                     return (
-                      <div
-                        className="administration-hub__user"
-                        key={
-                          user.id
-                        }
-                      >
+                      <div className="administration-hub__user" key={user.id}>
                         <div className="administration-hub__identity">
-                          <strong>
-                            {
-                              user.displayName
-                            }
-                          </strong>
-
-                          {username !==
-                          null ? (
-                            <span>
-                              {
-                                username
-                              }
-                            </span>
-                          ) : null}
+                          <span className="administration-hub__avatar" aria-hidden="true">{initials || "?"}</span>
+                          <div>
+                            <strong>{user.displayName}</strong>
+                            {username !== null ? <span>{username}</span> : null}
+                          </div>
                         </div>
 
-                        <span
-                          className={
-                            user.status ===
-                            'active'
-                              ? 'administration-hub__status administration-hub__status--active'
-                              : 'administration-hub__status'
-                          }
-                        >
-                          {statusLabel(
-                            user.status,
-                          )}
+                        <span className={user.status === "active" ? "administration-hub__status administration-hub__status--active" : "administration-hub__status"}>
+                          {statusLabel(user.status)}
                         </span>
 
-                        <div
-                          className="administration-hub__roles administration-hub__roles--user"
-                          aria-label={`Roles de ${user.displayName}`}
-                        >
-                          {roles.map(
-                            (
-                              role,
-                            ) => (
-                              <label
-                                key={
-                                  role
-                                }
-                                className={
-                                  user.roles.includes(
-                                    role,
-                                  )
-                                    ? 'administration-hub__role-toggle administration-hub__role-toggle--active'
-                                    : 'administration-hub__role-toggle'
-                                }
-                              >
-                                <input
-                                  checked={
-                                    user.roles.includes(
-                                      role,
-                                    )
-                                  }
-                                  onChange={() =>
-                                    void toggleRole(
-                                      user,
-                                      role,
-                                    )
-                                  }
-                                  type="checkbox"
-                                />
-
-                                <span>
-                                  {
-                                    role
-                                  }
-                                </span>
-                              </label>
-                            ),
-                          )}
+                        <div className="administration-hub__roles administration-hub__roles--user administration-hub__role-badges" aria-label={"Roles de " + user.displayName}>
+                          {user.roles.map((role) => <span className="administration-hub__role-badge" key={role}>{role}</span>)}
                         </div>
 
-                        <div className="administration-hub__actions">
-                          <button
-                            type="button"
-                            className={
-                              user.status ===
-                              'active'
-                                ? 'administration-hub__compact-action administration-hub__compact-action--danger'
-                                : 'administration-hub__compact-action administration-hub__compact-action--success'
-                            }
-                            onClick={() =>
-                              void status(
-                                user,
-                              )
-                            }
-                          >
-                            {user.status ===
-                            'active'
-                              ? 'Desactivar'
-                              : 'Activar'}
-                          </button>
+                        <span className="administration-hub__last-access" title={user.updatedAt}>{updatedAt}</span>
 
-                          <button
-                            type="button"
-                            className="administration-hub__compact-action administration-hub__compact-action--secondary"
-                            onClick={() =>
-                              void reset(
-                                user,
-                              )
-                            }
-                          >
-                            Restablecer contraseña
-                          </button>
-                        </div>
+                        <details className="administration-hub__user-menu">
+                          <summary aria-label={"Acciones de " + user.displayName}>⋯</summary>
+                          <div className="administration-hub__actions administration-hub__user-menu-actions">
+                            <strong>Roles</strong>
+                            {roles.map((role) => <label className="administration-hub__role-toggle administration-hub__role-toggle--menu" key={role}><input checked={user.roles.includes(role)} onChange={() => void toggleRole(user, role)} type="checkbox" /><span>{role}</span></label>)}
+                            <button type="button" className={user.status === "active" ? "administration-hub__compact-action administration-hub__compact-action--danger" : "administration-hub__compact-action administration-hub__compact-action--success"} onClick={() => void status(user)}>
+                              {user.status === "active" ? "Desactivar" : "Activar"}
+                            </button>
+                            <button type="button" className="administration-hub__compact-action administration-hub__compact-action--secondary" onClick={() => void reset(user)}>
+                              Restablecer contraseña
+                            </button>
+                          </div>
+                        </details>
                       </div>
                     )
                   },
@@ -984,241 +933,102 @@ export function AdministrationHub() {
         <LifecycleTrashPanel />
       ) : null}
 
-      {activeTab === 'system' ? (
-        <article className="administration-hub__card administration-hub__operations-card">
+      {activeTab === "system" ? (
+        <article aria-label="Operaciones del sistema" className="administration-hub__card administration-hub__system-card">
           <div className="administration-hub__card-heading">
             <div>
-              <p className="eyebrow">
-                SISTEMA
-              </p>
-
-              <h2>
-                Operaciones del sistema
-              </h2>
+              <p className="eyebrow">SISTEMA</p>
+              <h2>Estado del sistema</h2>
+              <p>Comprueba el estado operativo de los servicios gestionados por BloodKeeper.</p>
             </div>
+            <button type="button" onClick={() => void loadDiagnostics()} disabled={diagnosticsLoading}>{diagnosticsLoading ? "Comprobando…" : "Comprobar sistema"}</button>
           </div>
-
-          {diagnosticsLoading ? (
-            <p>
-              Comprobando estado…
-            </p>
-          ) : diagnostics ===
-            null ? (
-            <p>
-              El diagnóstico no está disponible.
-            </p>
-          ) : (
-            <dl className="administration-hub__diagnostics administration-hub__diagnostics--cards">
-              <div>
-                <dt>
-                  Aplicación
-                </dt>
-                <dd>
-                  {diagnostics.status ===
-                  'ok'
-                    ? 'Operativa'
-                    : 'Estado degradado'}
-                </dd>
+          {diagnosticsLoading ? <p className="administration-hub__system-loading">Comprobando estado…</p> : diagnostics === null ? <p className="administration-hub__notice">El diagnóstico no está disponible.</p> : (
+            <>
+              <div className="administration-hub__system-status-grid" aria-label="Estado de los servicios">
+                <article className="administration-hub__system-status administration-hub__system-status--ok"><span className="administration-hub__system-status-icon" aria-hidden="true">&lt;&gt;</span><div><small>API</small><strong>{diagnosticLabel(diagnostics.services.api)}</strong><span>Servicio de aplicación</span></div></article>
+                <article className={diagnostics.services.database === "ok" ? "administration-hub__system-status administration-hub__system-status--ok" : "administration-hub__system-status administration-hub__system-status--warning"}><span className="administration-hub__system-status-icon" aria-hidden="true">◉</span><div><small>Base de datos</small><strong>{diagnosticLabel(diagnostics.services.database)}</strong><span>Persistencia PostgreSQL</span></div></article>
+                <article className={storage === null ? "administration-hub__system-status administration-hub__system-status--warning" : "administration-hub__system-status administration-hub__system-status--ok"}><span className="administration-hub__system-status-icon" aria-hidden="true">▱</span><div><small>Almacenamiento</small><strong>{storage === null ? "No disponible" : "Operativo"}</strong><span>{storage === null ? "Medición pendiente" : sizeLabel(storage.totalBytes)}</span></div></article>
+                <article className={backupStatus?.status === "ok" ? "administration-hub__system-status administration-hub__system-status--ok" : "administration-hub__system-status administration-hub__system-status--warning"}><span className="administration-hub__system-status-icon" aria-hidden="true">◷</span><div><small>Copias de seguridad</small><strong>{backupStatus === null ? "No disponible" : backupStatusLabel(backupStatus.status)}</strong><span>{backupStatus === null ? "Estado pendiente" : dateLabel(backupStatus.lastRunAt)}</span></div></article>
               </div>
-
-              <div>
-                <dt>API</dt>
-                <dd>
-                  {diagnosticLabel(
-                    diagnostics
-                      .services.api,
-                  )}
-                </dd>
+              <div className="administration-hub__system-columns">
+                <section className="administration-hub__system-panel"><div className="administration-hub__system-panel-heading"><div><p className="eyebrow">OPERACIÓN</p><h3>Configuración general</h3></div><span className="administration-hub__system-badge">Solo lectura</span></div><dl className="administration-hub__system-rows"><div><dt>Aplicación</dt><dd>{diagnostics.application}</dd></div><div><dt>Versión</dt><dd>{diagnostics.version}</dd></div><div><dt>Zona horaria</dt><dd>Europe/Madrid</dd></div><div><dt>Mantenimiento</dt><dd>Gestionado por SSH</dd></div></dl></section>
+                <section className="administration-hub__system-panel"><div className="administration-hub__system-panel-heading"><div><p className="eyebrow">ACCESO</p><h3>Seguridad y sesiones</h3></div><span className="administration-hub__system-badge administration-hub__system-badge--success">Protegido</span></div><dl className="administration-hub__system-rows"><div><dt>Autenticación</dt><dd>Sesión autenticada</dd></div><div><dt>Operaciones de host</dt><dd>{diagnostics.hostMaintenance}</dd></div><div><dt>Base de datos</dt><dd>{diagnosticLabel(diagnostics.services.database)}</dd></div><div><dt>Última comprobación</dt><dd>{dateLabel(diagnostics.timestamp)}</dd></div></dl></section>
               </div>
-
-              <div>
-                <dt>
-                  PostgreSQL
-                </dt>
-                <dd>
-                  {diagnosticLabel(
-                    diagnostics
-                      .services
-                      .database,
-                  )}
-                </dd>
-              </div>
-
-              <div>
-                <dt>
-                  Versión
-                </dt>
-                <dd>
-                  {
-                    diagnostics.version
-                  }
-                </dd>
-              </div>
-            </dl>
+              <section className="administration-hub__system-log"><div className="administration-hub__system-panel-heading"><div><p className="eyebrow">ACTIVIDAD</p><h3>Registro de estado</h3></div><span>{dateLabel(diagnostics.timestamp)}</span></div><div className="administration-hub__system-log-row"><span className="administration-hub__system-log-icon" aria-hidden="true">✓</span><span><strong>Comprobación del sistema</strong><small>{diagnostics.application} · versión {diagnostics.version}</small></span><strong className="administration-hub__system-result">{diagnostics.status === "ok" ? "Éxito" : "Estado degradado"}</strong></div></section>
+              <p className="administration-hub__system-note">Los contenedores, recursos del host, logs Docker y reinicios continúan gestionándose mediante los scripts SSH existentes.</p>
+            </>
           )}
-
-          <p className="administration-hub__system-note">
-            Contenedores, recursos del host, logs Docker y
-            reinicios continúan gestionándose mediante los
-            scripts SSH existentes.
-          </p>
         </article>
       ) : null}
-
-      {activeTab === 'storage' ? (
-        <article className="administration-hub__card administration-hub__operations-card">
+      {activeTab === "storage" ? (
+        <article className="administration-hub__card administration-hub__storage-card">
           <div className="administration-hub__card-heading">
-            <div><p className="eyebrow">ALMACENAMIENTO</p><h2>Espacio persistente usado</h2></div>
+            <div>
+              <p className="eyebrow">ALMACENAMIENTO</p>
+              <h2>Almacenamiento</h2>
+              <p>Espacio persistente usado por los datos gestionados por BloodKeeper.</p>
+            </div>
           </div>
-          {storageLoading ? (
-            <p>Calculando espacio…</p>
-          ) : storage === null ? (
-            <p>La medición no está disponible.</p>
-          ) : (
+          {storageLoading ? <p className="administration-hub__system-loading">Calculando espacio…</p> : storage === null ? <p className="administration-hub__notice">La medición no está disponible.</p> : (
             <>
               <div className="administration-hub__storage-total">
-                <span>Total gestionado</span>
-                <strong>{(storage.totalBytes / 1024 / 1024).toFixed(1) + ' MB'}</strong>
+                <div><span>Espacio usado</span><strong>{(storage.totalBytes / 1024 / 1024).toFixed(1) + " MB"}</strong><small>Datos persistentes gestionados</small></div>
+                <div className="administration-hub__storage-state"><strong>Medición actualizada</strong><span>{dateLabel(storage.measuredAt)}</span></div>
               </div>
-              <dl className="administration-hub__diagnostics administration-hub__diagnostics--cards">
-                <div><dt>Base de datos</dt><dd>{(storage.databaseBytes / 1024 / 1024).toFixed(1) + ' MB'}</dd></div>
-                <div><dt>Retratos</dt><dd>{(storage.portraitBytes / 1024 / 1024).toFixed(1) + ' MB'} · {storage.portraitCount}</dd></div>
-                <div><dt>Copias de seguridad</dt><dd>{(storage.backupBytes / 1024 / 1024).toFixed(1) + ' MB'} · {storage.backupFiles} archivos</dd></div>
-                <div><dt>Medido</dt><dd>{dateLabel(storage.measuredAt)}</dd></div>
-              </dl>
-              <p className="administration-hub__system-note">El total suma PostgreSQL y las copias. Los retratos ya están dentro de PostgreSQL y no se cuentan dos veces. No incluye imágenes Docker, código ni logs del host.</p>
+              <div className="administration-hub__storage-breakdown" aria-label="Desglose del almacenamiento">
+                <article><span className="administration-hub__storage-icon">▤</span><div><small>Base de datos</small><strong>{(storage.databaseBytes / 1024 / 1024).toFixed(1) + " MB"}</strong><span>{storage.totalBytes > 0 ? Math.round(storage.databaseBytes / storage.totalBytes * 100) : 0}% del total</span><i><b style={{ width: `${storage.totalBytes > 0 ? Math.min(100, storage.databaseBytes / storage.totalBytes * 100) : 0}%` }} /></i></div></article>
+                <article><span className="administration-hub__storage-icon">▧</span><div><small>Retratos de personajes</small><strong>{(storage.portraitBytes / 1024 / 1024).toFixed(1) + " MB"}</strong><span>{storage.portraitCount} archivos · {storage.totalBytes > 0 ? Math.round(storage.portraitBytes / storage.totalBytes * 100) : 0}% del total</span><i><b style={{ width: `${storage.totalBytes > 0 ? Math.min(100, storage.portraitBytes / storage.totalBytes * 100) : 0}%` }} /></i></div></article>
+                <article><span className="administration-hub__storage-icon">▱</span><div><small>Copias de seguridad</small><strong>{(storage.backupBytes / 1024 / 1024).toFixed(1) + " MB"}</strong><span>{storage.backupFiles} archivos · {storage.totalBytes > 0 ? Math.round(storage.backupBytes / storage.totalBytes * 100) : 0}% del total</span><i><b style={{ width: `${storage.totalBytes > 0 ? Math.min(100, storage.backupBytes / storage.totalBytes * 100) : 0}%` }} /></i></div></article>
+              </div>
+              <div className="administration-hub__storage-columns">
+                <section className="administration-hub__storage-panel"><div className="administration-hub__system-panel-heading"><div><p className="eyebrow">MEDICIÓN</p><h3>Resumen del espacio</h3></div><span className="administration-hub__system-badge administration-hub__system-badge--success">Actualizado</span></div><dl className="administration-hub__system-rows"><div><dt>Alcance</dt><dd>{storage.scope}</dd></div><div><dt>Retratos almacenados</dt><dd>{storage.portraitCount}</dd></div><div><dt>Copias contabilizadas</dt><dd>{storage.backupFiles}</dd></div><div><dt>Última medición</dt><dd>{dateLabel(storage.measuredAt)}</dd></div></dl></section>
+                <section className="administration-hub__storage-panel"><div className="administration-hub__system-panel-heading"><div><p className="eyebrow">ALCANCE</p><h3>Política de almacenamiento</h3></div></div><div className="administration-hub__storage-policy"><p>La medición incluye PostgreSQL y las copias persistentes.</p><p>Los retratos ya están incluidos en la base de datos y no se cuentan dos veces.</p><p>No incluye imágenes Docker, código ni logs del host.</p></div></section>
+              </div>
+              <p className="administration-hub__system-note">El almacenamiento y las copias permanecen contenidos dentro del entorno Docker. La administración del host continúa realizándose mediante los scripts SSH existentes.</p>
             </>
           )}
         </article>
       ) : null}
-
-      {activeTab === 'backups' ? (
-        <article className="administration-hub__card administration-hub__backup-card">
+      {activeTab === "backups" ? (
+        <article className="administration-hub__card administration-hub__backup-card administration-hub__backup-card--polished">
           <div className="administration-hub__card-heading">
             <div>
-              <p className="eyebrow">
-                SEGURIDAD
-              </p>
-
-              <h2>
-                Copias de seguridad
-              </h2>
+              <p className="eyebrow">SEGURIDAD</p>
+              <h2>Copias de seguridad</h2>
+              <p>Consulta el último estado disponible y solicita una copia manual cuando lo necesites.</p>
             </div>
           </div>
-
           {backupStatusLoading ? (
-            <p>
-              Comprobando copias…
-            </p>
-          ) : backupStatus ===
-            null ? (
-            <p>
-              El estado de las copias no está disponible.
-            </p>
+            <p className="administration-hub__system-loading">Comprobando copias…</p>
+          ) : backupStatus === null ? (
+            <p className="administration-hub__notice">El estado de las copias no está disponible.</p>
           ) : (
             <>
-              <dl className="administration-hub__diagnostics administration-hub__diagnostics--cards">
-                <div>
-                  <dt>
-                    Última ejecución
-                  </dt>
-                  <dd>
-                    {backupStatusLabel(
-                      backupStatus.status,
-                    )}
-                  </dd>
+              <section className="administration-hub__backup-summary" aria-label="Última copia">
+                <div className="administration-hub__backup-result">
+                  <span className="administration-hub__backup-result-icon" aria-hidden="true">✓</span>
+                  <div><span>Última copia</span><strong>{backupStatusLabel(backupStatus.status)}</strong><small>{dateLabel(backupStatus.lastRunAt)}</small></div>
                 </div>
-
-                <div>
-                  <dt>
-                    Fecha de ejecución
-                  </dt>
-                  <dd>
-                    {dateLabel(
-                      backupStatus.lastRunAt,
-                    )}
-                  </dd>
-                </div>
-
-                <div>
-                  <dt>
-                    Última copia correcta
-                  </dt>
-                  <dd>
-                    {dateLabel(
-                      backupStatus.lastSuccessfulBackupAt,
-                    )}
-                  </dd>
-                </div>
-
-                <div>
-                  <dt>
-                    Integridad
-                  </dt>
-                  <dd>
-                    {integrityLabel(
-                      backupStatus.integrity,
-                    )}
-                  </dd>
-                </div>
-
-                <div>
-                  <dt>
-                    Archivo
-                  </dt>
-                  <dd>
-                    {backupStatus.archiveName ??
-                      'No disponible'}
-                  </dd>
-                </div>
-
-                <div>
-                  <dt>
-                    Tamaño
-                  </dt>
-                  <dd>
-                    {sizeLabel(
-                      backupStatus.sizeBytes,
-                    )}
-                  </dd>
-                </div>
-              </dl>
-
-              {backupStatus.error !==
-              null ? (
-                <p
-                  className="administration-hub__notice"
-                  role="status"
-                >
-                  {
-                    backupStatus.error
-                  }
-                </p>
-              ) : null}
+                <div className="administration-hub__backup-summary-metric"><span>Tamaño</span><strong>{sizeLabel(backupStatus.sizeBytes)}</strong></div>
+                <div className="administration-hub__backup-summary-metric"><span>Integridad</span><strong>{integrityLabel(backupStatus.integrity)}</strong></div>
+                <div className="administration-hub__backup-action administration-hub__backup-action--summary"><button type="button" onClick={() => { void requestManualBackup() }} disabled={backupRequestPending}>{backupRequestPending ? "Solicitando copia…" : "Crear copia ahora"}</button></div>
+              </section>
+              {backupStatus.error !== null ? <p className="administration-hub__notice administration-hub__backup-error" role="status">{backupStatus.error}</p> : null}
+              <div className="administration-hub__backup-columns">
+                <section className="administration-hub__backup-panel">
+                  <div className="administration-hub__system-panel-heading"><div><p className="eyebrow">ESTADO</p><h3>Estado de la copia</h3></div><span className="administration-hub__system-badge administration-hub__system-badge--success">Disponible</span></div>
+                  <dl className="administration-hub__system-rows"><div><dt>Última ejecución</dt><dd>{dateLabel(backupStatus.lastRunAt)}</dd></div><div><dt>Última copia correcta</dt><dd>{dateLabel(backupStatus.lastSuccessfulBackupAt)}</dd></div><div><dt>Integridad</dt><dd>{integrityLabel(backupStatus.integrity)}</dd></div></dl>
+                </section>
+                <section className="administration-hub__backup-panel">
+                  <div className="administration-hub__system-panel-heading"><div><p className="eyebrow">ARCHIVO GENERADO</p><h3>Detalles de la copia</h3></div></div>
+                  <dl className="administration-hub__system-rows"><div><dt>Archivo</dt><dd>{backupStatus.archiveName ?? "No disponible"}</dd></div><div><dt>Tamaño</dt><dd>{sizeLabel(backupStatus.sizeBytes)}</dd></div></dl>
+                </section>
+              </div>
+              <div className="administration-hub__backup-warning" role="note"><strong>Restauración protegida</strong><span>La restauración reemplaza los datos actuales y continúa realizándose exclusivamente por SSH.</span></div>
             </>
           )}
-
-          <div className="administration-hub__backup-action">
-            <button
-              type="button"
-              onClick={() => {
-                void requestManualBackup()
-              }}
-              disabled={
-                backupRequestPending
-              }
-            >
-              {backupRequestPending
-                ? 'Solicitando copia…'
-                : 'Crear copia ahora'}
-            </button>
-          </div>
-
-          <p className="administration-hub__system-note">
-            La copia manual usa el mismo procedimiento
-            controlado del servidor. La restauración
-            continúa realizándose exclusivamente por SSH.
-          </p>
+          <p className="administration-hub__system-note">Las copias permanecen contenidas dentro del entorno Docker. La restauración continúa realizándose exclusivamente por SSH.</p>
         </article>
       ) : null}
     </section>
