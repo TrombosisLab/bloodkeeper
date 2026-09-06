@@ -12,6 +12,7 @@ const hashByView:
       '#/characters/create',
     chronicles: '#/chronicles',
     administration: '#/administration',
+    notebook: '#/notebook',
   }
 
 export function hashForAppView(
@@ -36,6 +37,9 @@ export function appViewFromHash(
         ? 'administration'
         : 'dashboard'
 
+    case '#/notebook':
+      return permissions.canAccessChronicles ? 'notebook' : 'dashboard'
+
     case '#/chronicles':
       return permissions.canAccessChronicles
         ? 'chronicles'
@@ -56,9 +60,17 @@ export function sectionForAppView(
     return 'dashboard'
   }
 
-  return view === 'chronicles'
-    ? 'chronicles'
-    : view === 'administration'
-      ? 'administration'
-      : 'characters'
+  if (view === 'chronicles') {
+    return 'chronicles'
+  }
+
+  if (view === 'notebook') {
+    return 'notebook'
+  }
+
+  if (view === 'administration') {
+    return 'administration'
+  }
+
+  return 'characters'
 }

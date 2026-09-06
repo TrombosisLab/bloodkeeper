@@ -172,6 +172,21 @@ export function AppNavigation({
         {canAccessChronicles ? (
           <button
             type="button"
+            aria-current={activeSection === 'notebook' ? 'page' : undefined}
+            onClick={() => selectSection('notebook')}
+          >
+            <span>Cuaderno</span>
+            <small>Notas y referencias</small>
+          </button>
+        ) : null}
+        {/* NOTEBOOK_CONTEXTUAL_NAV_V1 */}
+        {activeSection === 'notebook' ? <div className="app-navigation__notebook-subnav" aria-label="Secciones del Cuaderno">{[
+          ['ALL', 'Resumen'], ['ALL', 'Notas'], ['SESSION', 'Sesiones'], ['NPC', 'PNJ'], ['LOCATION', 'Localizaciones'], ['ORGANIZATION', 'Organizaciones'], ['ARTIFACT', 'Artefactos'], ['DOCUMENT', 'Documentos'],
+        ].map(([section, label]) => <button type="button" key={label} onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section, label } }))}>{label}</button>)}</div> : null}
+
+        {canAccessChronicles ? (
+          <button
+            type="button"
             aria-current={
               activeSection === 'chronicles'
                 ? 'page'

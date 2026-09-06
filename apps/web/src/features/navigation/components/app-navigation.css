@@ -123,3 +123,6 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* NOTEBOOK_CONTEXTUAL_NAV_V1 */
+.app-navigation__notebook-subnav{display:grid;gap:2px;margin:-2px 8px 8px 22px;padding:7px 0 7px 13px;border-left:1px solid rgba(207,64,87,.45)}.app-navigation__notebook-subnav button{border:0;background:transparent;color:#938681;padding:5px 7px;text-align:left;font-size:11px;cursor:pointer}.app-navigation__notebook-subnav button:hover,.app-navigation__notebook-subnav button:focus-visible{color:#f0dfd8;background:rgba(74,28,37,.38)}

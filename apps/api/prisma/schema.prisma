@@ -219,6 +219,9 @@ model User {
   sessions                AuthSession[]
   ownedCharacters         Character[]            @relation("CharacterOwner")
   chronicleParticipations ChronicleParticipant[] @relation("ChronicleParticipantUser")
+  authoredChronicleNotes ChronicleNote[] @relation("ChronicleNoteAuthor")
+  chronicleNoteAudiences ChronicleNoteAudience[] @relation("ChronicleNoteAudienceUser")
+  notebookFavorites ChronicleNoteFavorite[]
   experienceMovements     CharacterExperienceMovement[] @relation("CharacterExperienceActor")
   executedDiceRolls       DiceRollRecord[] @relation("DiceRollActor")
   rouseCheckOperations    CharacterRouseCheckOperation[] @relation("RouseCheckActor")
@@ -276,6 +279,7 @@ model Chronicle {
   sessionPreparationItems ChronicleSessionPreparationItem[] @relation("ChronicleSessionPreparationChronicle")
   sessionParticipantNotes ChronicleSessionParticipantNote[] @relation("ChronicleSessionParticipantNoteChronicle")
   coverImage ChronicleCoverImage?
+  notebookNotes ChronicleNote[] @relation("ChronicleNoteChronicle")
 
   @@index([narratorId])
   @@index([status])
@@ -453,6 +457,7 @@ model ChronicleSession {
     scenes ChronicleSessionScene[] @relation("ChronicleSessionSceneSession")
     preparationItems ChronicleSessionPreparationItem[] @relation("ChronicleSessionPreparationSession")
     participantNotes ChronicleSessionParticipantNote[] @relation("ChronicleSessionParticipantNoteSession")
+  notebookNotes ChronicleNote[] @relation("ChronicleNoteSession")
 
     @@index([chronicleId, status])
     @@index([chronicleId, sessionNumber])
@@ -480,6 +485,84 @@ model ChronicleSessionParticipantNote {
   @@index([chronicleId, sessionId])
   @@index([authorUserId])
   @@map("chronicle_session_participant_notes")
+}
+
+enum ChronicleNoteVisibility {
+  PRIVATE
+  CHRONICLE
+  SELECTED_PLAYERS
+}
+
+enum ChronicleNoteStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model ChronicleNote {
+  id           String                @id @default(uuid()) @db.Uuid
+  chronicleId  String                @db.Uuid
+  sessionId    String?               @db.Uuid
+  authorUserId String                @db.Uuid
+  title        String
+  content      String
+  visibility   ChronicleNoteVisibility @default(CHRONICLE)
+  status       ChronicleNoteStatus   @default(ACTIVE)
+  pinned       Boolean               @default(false)
+  tags         String[]              @default([])
+  revision     Int                   @default(1)
+  createdAt    DateTime              @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime              @updatedAt @db.Timestamptz(3)
+
+  chronicle Chronicle @relation("ChronicleNoteChronicle", fields: [chronicleId], references: [id], onDelete: Cascade)
+  session   ChronicleSession? @relation("ChronicleNoteSession", fields: [sessionId], references: [id], onDelete: SetNull)
+  author    User @relation("ChronicleNoteAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
+  references ChronicleNoteReference[] @relation("ChronicleNoteReferenceNote")
+  audiences ChronicleNoteAudience[] @relation("ChronicleNoteAudienceNote")
+  favorites ChronicleNoteFavorite[]
+
+  @@index([chronicleId, status, updatedAt])
+  @@index([chronicleId, sessionId, status])
+  @@index([authorUserId, status])
+  @@map("chronicle_notes")
+}
+
+model ChronicleNoteFavorite {
+  noteId String @db.Uuid
+  userId String @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  note ChronicleNote @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([noteId, userId])
+  @@index([userId])
+  @@map("chronicle_note_favorites")
+}
+
+model ChronicleNoteReference {
+  id         String   @id @default(uuid()) @db.Uuid
+  noteId     String   @db.Uuid
+  targetType String
+  targetId   String   @db.Uuid
+  label      String?
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+
+  note ChronicleNote @relation("ChronicleNoteReferenceNote", fields: [noteId], references: [id], onDelete: Cascade)
+
+  @@unique([noteId, targetType, targetId])
+  @@index([targetType, targetId])
+  @@map("chronicle_note_references")
+}
+
+model ChronicleNoteAudience {
+  noteId    String   @db.Uuid
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  note ChronicleNote @relation("ChronicleNoteAudienceNote", fields: [noteId], references: [id], onDelete: Cascade)
+  user User @relation("ChronicleNoteAudienceUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([noteId, userId])
+  @@index([userId])
+  @@map("chronicle_note_audiences")
 }
 
 model ChronicleSessionEvent {

@@ -15,6 +15,7 @@ import { CharacterSheet } from './features/character-sheet/components/CharacterS
 import { PersistedCharacterSheet } from './features/character-sheet/components/PersistedCharacterSheet'
 import { ChronicleListCreate } from './features/chronicles/components/ChronicleListCreate'
 import { Dashboard } from './features/dashboard/components/Dashboard'
+import { NotebookWorkspace } from './features/notebook/components/NotebookWorkspace'
 import { AppBreadcrumbs } from './features/navigation/components/AppBreadcrumbs'
 import { AppNavigation } from './features/navigation/components/AppNavigation'
 import {
@@ -161,6 +162,10 @@ function App() {
 
       case 'characters':
         navigateTo('characters')
+        return
+
+      case 'notebook':
+        navigateTo('notebook')
     }
   }
 
@@ -199,8 +204,9 @@ function App() {
         />
       }
     >
-      {view === 'administration' &&
-      canAccessAdministration ? (
+      {view === 'notebook' && canAccessChronicles ? (
+        <NotebookWorkspace />
+      ) : view === 'administration' && canAccessAdministration ? (
         <AdministrationHub />
       ) : view === 'dashboard' ? (
         <>
