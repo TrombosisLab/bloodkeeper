@@ -14,6 +14,7 @@ import { CharacterList } from './features/character-list/components/CharacterLis
 import { CharacterSheet } from './features/character-sheet/components/CharacterSheet'
 import { PersistedCharacterSheet } from './features/character-sheet/components/PersistedCharacterSheet'
 import { ChronicleListCreate } from './features/chronicles/components/ChronicleListCreate'
+import { PlayHub } from './features/chronicles/components/PlayHub'
 import { Dashboard } from './features/dashboard/components/Dashboard'
 import { NotebookWorkspace } from './features/notebook/components/NotebookWorkspace'
 import { AppBreadcrumbs } from './features/navigation/components/AppBreadcrumbs'
@@ -166,6 +167,10 @@ function App() {
 
       case 'notebook':
         navigateTo('notebook')
+        return
+
+      case 'play':
+        navigateTo('play')
     }
   }
 
@@ -204,7 +209,9 @@ function App() {
         />
       }
     >
-      {view === 'notebook' && canAccessChronicles ? (
+      {view === 'play' && canAccessChronicles ? (
+        <PlayHub onOpenCharacter={(characterId) => { setCreationCharacterId(characterId); setShowDemoSheet(false); navigateTo('characters') }} />
+      ) : view === 'notebook' && canAccessChronicles ? (
         <NotebookWorkspace />
       ) : view === 'administration' && canAccessAdministration ? (
         <AdministrationHub />

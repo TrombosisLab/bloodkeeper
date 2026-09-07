@@ -116,6 +116,7 @@ interface ChronicleDetailProps {
   readonly chronicleId: string
   readonly onBack: () => void
   readonly onOpenCharacter?: (characterId: string) => void
+  readonly initialSection?: ChronicleDetailSection
   readonly onChronicleUpdated?: (
     chronicle: ChronicleApiSnapshot,
   ) => void
@@ -269,6 +270,7 @@ export function ChronicleDetail({
   onBack,
   onOpenCharacter,
   onChronicleUpdated,
+  initialSection,
 }: ChronicleDetailProps) {
   const authenticatedUser =
     useAuthenticatedUser()
@@ -357,7 +359,7 @@ export function ChronicleDetail({
     activeSection,
     setActiveSection,
   ] = useState<ChronicleDetailSection>(
-    'summary',
+    initialSection ?? 'summary',
   )
 
   const [storyCreateRequestKey, setStoryCreateRequestKey] = useState(0)
@@ -1023,10 +1025,6 @@ export function ChronicleDetail({
           >
             Participantes
           </button>
-
-          {currentMembership !== undefined ? (
-            <button id="chronicle-section-play-tab" type="button" role="tab" aria-selected={activeSection === 'play'} aria-controls="chronicle-section-play-panel" className={activeSection === 'play' ? 'chronicle-detail__section-tab chronicle-detail__section-tab--active' : 'chronicle-detail__section-tab'} onClick={() => setActiveSection('play')}>Jugar</button>
-          ) : null}
 
           {canViewStories ? (
             <button

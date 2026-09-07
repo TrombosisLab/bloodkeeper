@@ -170,6 +170,10 @@ export function AppNavigation({
         ) : null}
 
         {canAccessChronicles ? (
+          <button type="button" aria-current={activeSection === 'play' ? 'page' : undefined} onClick={() => selectSection('play')}><span>Jugar</span><small>Mesa de juego</small></button>
+        ) : null}
+
+        {canAccessChronicles ? (
           <button
             type="button"
             aria-current={activeSection === 'notebook' ? 'page' : undefined}

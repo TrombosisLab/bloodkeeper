@@ -115,11 +115,17 @@ function dateLabel(value: string): string {
 interface ChronicleListCreateProps {
   readonly canCreateChronicles: boolean
   readonly onOpenCharacter?: (characterId: string) => void
+  readonly openChronicleId?: string | null
+  readonly initialDetailSection?: 'play'
+  readonly onBackFromOpened?: () => void
 }
 
 export function ChronicleListCreate({
   canCreateChronicles,
   onOpenCharacter,
+  openChronicleId,
+  initialDetailSection,
+  onBackFromOpened,
 }: ChronicleListCreateProps) {
   const [
     chronicles,
@@ -242,6 +248,10 @@ export function ChronicleListCreate({
   useEffect(() => {
     void loadChronicles()
   }, [])
+
+  useEffect(() => {
+    if (openChronicleId) setSelectedChronicleId(openChronicleId)
+  }, [openChronicleId])
 
   async function submit(
     event: FormEvent<HTMLFormElement>,
@@ -385,10 +395,12 @@ export function ChronicleListCreate({
     return (
       <ChronicleDetail
         chronicleId={selectedChronicleId}
+        initialSection={initialDetailSection}
         onOpenCharacter={onOpenCharacter}
-        onBack={() =>
-          setSelectedChronicleId(null)
-        }
+        onBack={() => {
+          if (onBackFromOpened) onBackFromOpened()
+          else setSelectedChronicleId(null)
+        }}
         onChronicleUpdated={(
           updated,
         ) =>

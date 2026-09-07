@@ -5,6 +5,7 @@ export type AppView =
   | 'chronicles'
   | 'administration'
   | 'notebook'
+  | 'play'
 
 export type AppSection =
   | 'dashboard'
@@ -12,6 +13,7 @@ export type AppSection =
   | 'chronicles'
   | 'administration'
   | 'notebook'
+  | 'play'
 
 export interface AppNavigationPermissions {
   readonly canAccessChronicles: boolean
