@@ -20,6 +20,7 @@ function Details({ value, depth = 0 }: { value: unknown; depth?: number }) {
 }
 export function NotebookResourceDetails({ resource }: { resource: NotebookResourcePreview }) {
   return <>
+    {resource.imageUrl && <img className="nb2-resource-image" src={resource.imageUrl} alt={'Imagen de ' + resource.label} />}
     {resource.targetType === 'SESSION' && <dl className="nb2-definition"><div><dt>Sesión</dt><dd>{resource.sessionNumber ?? 'Sin numerar'}</dd></div><div><dt>Fecha</dt><dd>{resource.sessionDate ? new Date(resource.sessionDate).toLocaleString('es-ES') : 'Sin fecha programada'}</dd></div></dl>}
     {resource.deepProfile !== null && resource.deepProfile !== undefined && <section className="nb2-dossier"><h3>Dossier del PNJ</h3><p className="nb2-muted">Información reservada al narrador.</p><Details value={resource.deepProfile} /></section>}
     {resource.metadata !== null && resource.metadata !== undefined && <section className="nb2-dossier"><h3>Información adicional del recurso</h3><p className="nb2-muted">Información reservada al narrador.</p><Details value={resource.metadata} /></section>}

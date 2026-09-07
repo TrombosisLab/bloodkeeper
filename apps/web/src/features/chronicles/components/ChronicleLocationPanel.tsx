@@ -22,6 +22,7 @@ import type {
 } from '../types/chronicle-api.types.ts'
 
 import './chronicle-location-panel.css'
+import { ChronicleEntityImage } from './ChronicleEntityImage'
 
 const gateway =
   createChronicleGateway()
@@ -868,6 +869,7 @@ export function ChronicleLocationPanel({
                 </form>
               ) : (
                 <>
+                  <ChronicleEntityImage key={selectedLocation.id} chronicleId={chronicleId} assetType="LOCATION" assetId={selectedLocation.id} label={selectedLocation.name} />
                   <dl className="chronicle-location-panel__detail-grid">
                     <div>
                       <dt>Tipo o categoría</dt>

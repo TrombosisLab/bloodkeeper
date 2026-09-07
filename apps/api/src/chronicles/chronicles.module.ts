@@ -2,6 +2,7 @@ import {
   Module,
 } from '@nestjs/common'
 import { ChronicleResourceController } from './presentation/chronicle-resource.controller'
+import { ChronicleAssetImageController } from './presentation/chronicle-asset-image.controller'
 import {
   CHARACTER_EXPERIENCE_REPOSITORY,
 } from '../characters/application/character-experience.repository'
@@ -308,6 +309,7 @@ import { ChronicleCoverController } from './presentation/chronicle-cover.control
   ],
   controllers: [
     ChronicleResourceController,
+    ChronicleAssetImageController,
     ChronicleParticipantNotesController,
     ChronicleController,
     ChronicleNpcController,

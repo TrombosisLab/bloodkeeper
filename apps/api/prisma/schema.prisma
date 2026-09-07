@@ -1478,6 +1478,20 @@ model ChronicleResource {
   @@map("chronicle_resources")
 }
 
+model ChronicleAssetImage {
+  assetType String
+  entityId  String   @db.Uuid
+  mimeType  String
+  byteSize  Int
+  sha256    String
+  data      Bytes
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  @@id([assetType, entityId])
+  @@index([entityId])
+  @@map("chronicle_asset_images")
+}
+
 model ChronicleSessionResource {
   sessionId String @db.Uuid
   resourceId String @db.Uuid

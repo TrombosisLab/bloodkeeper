@@ -26,4 +26,5 @@ export type NotebookResourcePreview = {
   readonly narratorDetails: string | null; readonly privateNotice: string
   readonly deepProfile: unknown; readonly metadata: unknown; readonly canViewPrivateDetails: boolean
   readonly sessionDate: string | null; readonly sessionNumber: number | null; readonly parentLocationId: string | null
+  readonly imageUrl: string | null
 }

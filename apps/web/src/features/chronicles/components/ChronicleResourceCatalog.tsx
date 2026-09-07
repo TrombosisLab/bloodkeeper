@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import './chronicle-resource-catalog.css'
+import { ChronicleEntityImage } from './ChronicleEntityImage'
 
 export type ChronicleResourceCatalogKind = 'document' | 'artifact' | 'organization'
 export type ChronicleResourceOrder = 'name' | 'recent'
@@ -192,6 +193,7 @@ export function ChronicleResourceCatalog({ chronicleId, kind, query, order, onCo
       <main className="chronicle-resource-catalog__detail">
         {selected === null ? <div className="chronicle-resource-catalog__detail-empty"><span>{copy.singular.toLocaleUpperCase('es')}</span><h3>Selecciona una entrada</h3><p>Abre un elemento del listado o crea el primer recurso de esta categoría.</p></div> : editing ? <form className="chronicle-resource-catalog__edit" onSubmit={update}><header><div><small>DETALLE DEL {copy.singular.toLocaleUpperCase('es')}</small><h3>Editar {selected.name}</h3></div></header><div className="chronicle-resource-catalog__fields">{fields}</div><div className="chronicle-resource-catalog__actions"><button type="submit" disabled={busy}>{busy ? 'Guardando…' : 'Guardar cambios'}</button><button type="button" onClick={closeForms}>Cancelar</button></div></form> : <>
           <header className="chronicle-resource-catalog__detail-heading"><div><small>DETALLE DEL {copy.singular.toLocaleUpperCase('es')}</small><h3>{selected.name}</h3></div><div><span>{selected.status === 'active' ? 'Activo' : 'Archivado'}</span><button type="button" onClick={beginEdit}>Editar</button></div></header>
+          <ChronicleEntityImage key={selected.id} chronicleId={chronicleId} assetType="RESOURCE" assetId={selected.id} label={selected.name} />
           <div className="chronicle-resource-catalog__detail-grid"><article className="is-wide"><h4>Descripción narrativa</h4><p>{selected.summary ?? 'Sin resumen.'}</p></article><article className="is-private"><small>SOLO NARRADOR</small><h4>Notas privadas</h4><p>{selected.narratorNotes ?? 'Sin notas.'}</p></article><article><h4>Estado del recurso</h4><dl><dt>Tipo</dt><dd>{copy.singular}</dd><dt>Estado</dt><dd>{selected.status === 'active' ? 'Activo' : 'Archivado'}</dd><dt>Visibilidad</dt><dd>{selected.visibility === 'chronicle_participants' ? 'Compartido' : 'Solo Narrador'}</dd></dl></article><article><h4>Registro</h4><dl><dt>Creado</dt><dd>{displayDate(selected.createdAt)}</dd><dt>Actualizado</dt><dd>{displayDate(selected.updatedAt)}</dd></dl></article></div>
           {selected.status === 'active' ? <footer className="chronicle-resource-catalog__actions"><button type="button" disabled={busy} onClick={() => void archive()}>Archivar</button></footer> : null}
         </>}

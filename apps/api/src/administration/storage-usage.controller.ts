@@ -58,7 +58,7 @@ export class StorageUsageController {
   async storage(@Req() request: StorageRequest) {
     administrator(request)
 
-    const [databaseRows, portraits, backups] = await Promise.all([
+    const [databaseRows, portraits, resourceImages, backups] = await Promise.all([
       this.database.$queryRaw<DatabaseSizeRow[]>`
         SELECT pg_database_size(current_database()) AS bytes
       `,
@@ -66,17 +66,24 @@ export class StorageUsageController {
         _sum: { byteSize: true },
         _count: { characterId: true },
       }),
+      this.database.chronicleAssetImage.aggregate({
+        _sum: { byteSize: true },
+        _count: { entityId: true },
+      }),
       directoryUsage(process.env.BACKUP_ARCHIVE_DIR ?? '/backups'),
     ])
 
     const databaseBytes = Number(databaseRows[0]?.bytes ?? 0)
     const portraitBytes = portraits._sum.byteSize ?? 0
+    const resourceImageBytes = resourceImages._sum.byteSize ?? 0
 
     return {
       totalBytes: databaseBytes + backups.bytes,
       databaseBytes,
       portraitBytes,
       portraitCount: portraits._count.characterId,
+      resourceImageBytes,
+      resourceImageCount: resourceImages._count.entityId,
       backupBytes: backups.bytes,
       backupFiles: backups.files,
       scope: 'managed-persistent-data',

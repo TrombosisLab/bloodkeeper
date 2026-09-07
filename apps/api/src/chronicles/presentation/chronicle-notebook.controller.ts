@@ -133,6 +133,8 @@ export class ChronicleNotebookController {
     if (!model || typeof model.findFirst !== 'function') throw new NotFoundException({ code: 'NOTE_REFERENCE_NOT_FOUND' })
     const row = await model.findFirst({ where: { id: targetId, chronicleId, ...(modelName === 'chronicleResource' ? { status: 'active', ...(targetType === 'RESOURCE' ? {} : { kind: targetType }), ...(narrator ? {} : { visibility: 'chronicle_participants' }) } : {}) } })
     if (!row) throw new NotFoundException({ code: 'NOTE_REFERENCE_NOT_FOUND' })
+    const imageType = targetType === 'NPC' || targetType === 'LOCATION' ? targetType : 'RESOURCE'
+    const image = await db.chronicleAssetImage.findUnique({ where: { assetType_entityId: { assetType: imageType, entityId: targetId } }, select: { updatedAt: true } })
     const label = row.name ?? row.title ?? row.alias ?? row.label ?? 'Recurso'
     const description = row.description ?? row.summary ?? row.premise ?? row.objective ?? null
     const category = row.category ?? row.type ?? row.kind ?? targetType
@@ -154,6 +156,7 @@ export class ChronicleNotebookController {
       sessionDate: targetType === 'SESSION' ? row.realDate ?? null : null,
       sessionNumber: targetType === 'SESSION' ? row.sessionNumber ?? null : null,
       parentLocationId: targetType === 'LOCATION' ? row.parentLocationId ?? null : null,
+      imageUrl: image ? '/api/chronicles/' + chronicleId + '/assets/' + imageType + '/' + targetId + '/image?v=' + image.updatedAt.getTime() : null,
       privateNotice: 'La información privada del Narrador no se muestra a los jugadores.'
     }
   }
