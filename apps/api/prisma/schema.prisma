@@ -231,6 +231,7 @@ model User {
 
   @@index([status])
   @@map("users")
+  libraryResources LibraryResource[] @relation("LibraryResourceOwner")
 }
 
 model AuthSession {
@@ -285,6 +286,7 @@ model Chronicle {
   @@index([status])
   @@map("chronicles")
   resources ChronicleResource[]
+  libraryResourceBindings ChronicleResourceBinding[]
 }
 
 model ChronicleCoverImage {
@@ -1514,4 +1516,47 @@ model UserDashboardContext {
   user User @relation(fields:[userId],references:[id],onDelete:Cascade,onUpdate:Cascade)
   @@index([chronicleId])
   @@map("user_dashboard_contexts")
+}
+
+
+// Recurso canónico reutilizable del narrador.
+model LibraryResource {
+  id            String   @id @default(uuid()) @db.Uuid
+  ownerId       String   @db.Uuid
+  kind          String
+  name          String
+  summary       String?
+  narratorNotes String?
+  metadata      Json?
+  legacyType    String?
+  legacyId      String?  @db.Uuid
+  status        String   @default("active")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  owner         User     @relation("LibraryResourceOwner", fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  bindings      ChronicleResourceBinding[]
+
+  @@unique([legacyType, legacyId])
+  @@index([ownerId, kind, status])
+  @@map("library_resources")
+}
+
+// Contexto local del recurso sin duplicar su ficha base.
+model ChronicleResourceBinding {
+  id             String   @id @default(uuid()) @db.Uuid
+  chronicleId    String   @db.Uuid
+  resourceId     String   @db.Uuid
+  visibility     String   @default("narrator_only")
+  chronicleNotes String?
+  localLabel     String?
+  status         String   @default("attached")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  chronicle      Chronicle @relation(fields: [chronicleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  resource       LibraryResource @relation(fields: [resourceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([chronicleId, resourceId])
+  @@index([chronicleId, status])
+  @@index([resourceId, status])
+  @@map("chronicle_resource_bindings")
 }

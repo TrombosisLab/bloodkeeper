@@ -3,6 +3,7 @@ import {
 } from '@nestjs/common'
 import { ChronicleResourceController } from './presentation/chronicle-resource.controller'
 import { ChronicleAssetImageController } from './presentation/chronicle-asset-image.controller'
+import { LibraryResourceController } from './presentation/library-resource.controller'
 import {
   CHARACTER_EXPERIENCE_REPOSITORY,
 } from '../characters/application/character-experience.repository'
@@ -309,6 +310,7 @@ import { ChronicleCoverController } from './presentation/chronicle-cover.control
   ],
   controllers: [
     ChronicleResourceController,
+    LibraryResourceController,
     ChronicleAssetImageController,
     ChronicleParticipantNotesController,
     ChronicleController,

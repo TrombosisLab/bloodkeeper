@@ -1,4 +1,5 @@
 export type AppView =
+  | 'resources'
   | 'dashboard'
   | 'characters'
   | 'character-creation'
@@ -8,6 +9,7 @@ export type AppView =
   | 'play'
 
 export type AppSection =
+  | 'resources'
   | 'dashboard'
   | 'characters'
   | 'chronicles'

@@ -13,6 +13,7 @@ interface AppNavigationProps {
   readonly 'aria-label': string
   readonly activeSection: AppSection
   readonly canAccessChronicles: boolean
+  readonly canCreateChronicles: boolean
   readonly canAccessAdministration: boolean
   readonly onNavigate: (
     section: AppSection,
@@ -26,6 +27,7 @@ export function AppNavigation({
   'aria-label': navigationLabel,
   activeSection,
   canAccessChronicles,
+  canCreateChronicles,
   canAccessAdministration,
   onNavigate,
 }: AppNavigationProps) {
@@ -171,6 +173,10 @@ export function AppNavigation({
 
         {canAccessChronicles ? (
           <button type="button" aria-current={activeSection === 'play' ? 'page' : undefined} onClick={() => selectSection('play')}><span>Jugar</span><small>Mesa de juego</small></button>
+        ) : null}
+
+        {canCreateChronicles ? (
+          <button type="button" aria-current={activeSection === 'resources' ? 'page' : undefined} onClick={() => selectSection('resources')}><span>Recursos</span><small>Biblioteca reutilizable</small></button>
         ) : null}
 
         {canAccessChronicles ? (
