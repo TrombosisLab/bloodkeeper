@@ -2278,3 +2278,47 @@ dialog.nb2-modal.nb2-wide{width:min(940px,calc(100vw - 48px));padding:28px 30px;
     mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.55) 3%, #000 9%, #000 91%, rgba(0,0,0,.55) 97%, transparent 100%) !important;
   }
 }
+
+/* Resumen: fundido superior independiente del contenido. */
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book::after {
+  content: '' !important;
+  position: absolute !important;
+  z-index: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  left: 0 !important;
+  height: 12% !important;
+  pointer-events: none !important;
+  background: linear-gradient(
+    180deg,
+    #09090a 0%,
+    rgba(9,9,10,.86) 12%,
+    rgba(9,9,10,.5) 38%,
+    rgba(9,9,10,.16) 70%,
+    transparent 100%
+  ) !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+@media (max-width:1120px) {
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book::after {
+    height: 9% !important;
+    background: linear-gradient(
+      180deg,
+      #09090a 0%,
+      rgba(9,9,10,.75) 16%,
+      rgba(9,9,10,.28) 55%,
+      transparent 100%
+    ) !important;
+  }
+}
+
+@media (max-width:560px) {
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book::after {
+    height: 7% !important;
+  }
+}
