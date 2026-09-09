@@ -245,20 +245,28 @@ export function NotebookWorkspace() {
     <nav className="nb2-sections" aria-label="Secciones del cuaderno"><div>{(['SUMMARY', 'NOTES', 'SESSION', 'TAGS'] as Section[]).map((item) => <button aria-pressed={section === item} key={item} onClick={() => navigate(item)}>{labels[item]}</button>)}</div><div aria-label="Catálogo de recursos">{resourceSections.map((item) => <button aria-pressed={section === item} key={item} onClick={() => navigate(item)}>{labels[item]}</button>)}</div></nav>
     {error && <p role="alert" className="nb2-error">{error}</p>}{warning && <p role="status" className="nb2-warning">{warning}</p>}
     {loading ? <p role="status">Cargando cuaderno…</p> : !chronicleId ? <p>No participas en ninguna crónica.</p> : <>
-      {section === 'SUMMARY' && <section className="nb2-panel nb2-summary-diary">
-  <div className="nb2-diary-sheet">
-    <div className="nb2-diary-kicker">DIARIO DE LA CRÓNICA</div>
-    <div className="nb2-diary-content">
-      <div className="nb2-diary-sheet">
-    <div className="nb2-diary-kicker">DIARIO DE LA CRÓNICA</div>
-    <div className="nb2-diary-content">
-      <h2>Resumen de la crónica</h2><p>{chronicles.find((item) => item.id === chronicleId)?.description || 'Sin descripción.'}</p><div className="nb2-summary"><button onClick={() => navigate('NOTES')}>{notes.length}<span>Entradas accesibles</span></button><button onClick={() => navigate('SESSION')}>{sessions.length}<span>Sesiones cargadas</span></button><button onClick={() => navigate('TAGS')}>{tagEntries.length}<span>Etiquetas</span></button></div><h3>Últimas entradas</h3>{notes.slice(0, 5).map((note) => <button className="nb2-row" key={note.id} onClick={() => showNote(note)}><strong>{note.title}</strong><span>{note.author.displayName} · {date(note.updatedAt)}</span></button>)}
-    </div>
-  </div>
-    </div>
-  </div>
-</section>}
-      {section === 'TAGS' && <section className="nb2-panel"><h2>Explorar por etiquetas</h2><p>Encuentra las entradas que comparten una etiqueta dentro de esta crónica.</p><div className="nb2-tag-cloud">{tagEntries.map(([key, item]) => <button key={key} onClick={() => filterTag(item.label)}>#{item.label}<span>{item.count}</span></button>)}</div>{!tagEntries.length && <p>Añade etiquetas al crear o editar una nota para organizar el cuaderno.</p>}</section>}
+      {section === 'SUMMARY' && <section className="nb2-summary-book" aria-labelledby="nb2-summary-title">
+        <div className="nb2-summary-book__page nb2-summary-book__page--left">
+          <small className="nb2-summary-book__eyebrow">DIARIO DE LA CRÓNICA</small>
+          <h2 id="nb2-summary-title">{chronicles.find((item) => item.id === chronicleId)?.name || 'Crónica'}</h2>
+          <p className="nb2-summary-book__description">{chronicles.find((item) => item.id === chronicleId)?.description || 'Sin descripción.'}</p>
+          <div className="nb2-summary-book__stats" aria-label="Resumen de actividad">
+            <button type="button" onClick={() => navigate('NOTES')}><strong>{notes.length}</strong><span>Entradas accesibles</span></button>
+            <button type="button" onClick={() => navigate('SESSION')}><strong>{sessions.length}</strong><span>Sesiones cargadas</span></button>
+            <button type="button" onClick={() => navigate('TAGS')}><strong>{tagEntries.length}</strong><span>Etiquetas</span></button>
+          </div>
+          <p className="nb2-summary-book__motto">Las historias también se recuerdan.</p>
+        </div>
+        <div className="nb2-summary-book__page nb2-summary-book__page--right">
+          <header className="nb2-summary-book__heading"><small>MEMORIA RECIENTE</small><h3>Últimas entradas</h3></header>
+          <div className="nb2-summary-book__entries">
+            {notes.slice(0, 5).map((note) => <button className="nb2-summary-book__entry" type="button" key={note.id} onClick={() => showNote(note)}><strong>{note.title}</strong><span>{note.author.displayName} · {date(note.updatedAt)}</span><em>→</em></button>)}
+            {!notes.length && <p>No hay entradas disponibles todavía.</p>}
+          </div>
+          <p className="nb2-summary-book__closing">Aquí también se construye la historia.</p>
+        </div>
+      </section>}
+      {section === 'TAGS'  && <section className="nb2-panel"><h2>Explorar por etiquetas</h2><p>Encuentra las entradas que comparten una etiqueta dentro de esta crónica.</p><div className="nb2-tag-cloud">{tagEntries.map(([key, item]) => <button key={key} onClick={() => filterTag(item.label)}>#{item.label}<span>{item.count}</span></button>)}</div>{!tagEntries.length && <p>Añade etiquetas al crear o editar una nota para organizar el cuaderno.</p>}</section>}
       {section === 'SESSION' && <NotebookSessionTimeline chronicleId={chronicleId} sessions={sessions} notes={notes} canManage={canManage} onShowSessionNotes={(id) => { setSessionFilter(id); setSection('NOTES'); setFilter('ALL'); setSearch('') }} />}
       {resourceSections.includes(section as ResourceType) && <section className="nb2-panel"><div className="nb2-panel-heading"><h2>{labels[section]}</h2><label>Buscar recurso<input type="search" value={search} onChange={(event) => setSearch(event.target.value)} /></label></div><div className="nb2-catalog">{cards.filter((item) => item.targetType === section && (item.label + ' ' + item.description).toLocaleLowerCase('es').includes(search.toLocaleLowerCase('es'))).map((item) => <article key={item.targetId} className="nb2-resource-card"><small>{item.category || labels[section]}{item.restricted ? ' · Solo narrador' : ''}</small><h3>{item.label}</h3><p>{item.description || 'Sin descripción.'}</p><span>{notes.filter((note) => note.references.some((ref) => ref.targetId === item.targetId && ref.targetType === item.targetType)).length} anotaciones accesibles</span><footer><button onClick={() => void openResource(item, true)}>Abrir ficha completa</button><button onClick={() => startNote(item)}>Añadir nota</button></footer></article>)}</div>{!cards.some((item) => item.targetType === section) && <p>No hay {labels[section]?.toLowerCase()} disponibles para tu cuenta en esta crónica.</p>}</section>}
       {section === 'NOTES' && <section className="nb2-notes">

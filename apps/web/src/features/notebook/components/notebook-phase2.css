@@ -1571,1328 +1571,277 @@ dialog.nb2-modal.nb2-wide{width:min(940px,calc(100vw - 48px));padding:28px 30px;
   }
 }
 
-/* Resumen: diario de campaña actual, usando solo datos que ya existen. */
-.nb2-workspace:has(.nb2-panel > h2) {
-  background:
-    radial-gradient(circle at 72% 18%, rgba(109, 58, 42, .14), transparent 32%),
-    linear-gradient(135deg, #0b0a0b 0%, #151012 52%, #0d0c0d 100%) !important;
+
+/* Resumen del Cuaderno: doble página limpia sobre el activo 1664 × 936. */
+.nb2-workspace:has(.nb2-summary-book) {
+  position: relative;
+  background: #09090a;
 }
 
-/* La cabecera actúa como cubierta actual de la crónica seleccionada. */
-.nb2-workspace:has(.nb2-panel > h2) .nb2-header {
-  position: relative !important;
-  min-height: 214px !important;
-  overflow: hidden !important;
-  border-bottom: 1px solid rgba(181, 112, 74, .38) !important;
-  background: #151011 !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-header__cover {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  opacity: .62 !important;
-  pointer-events: none !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-header__cover::after {
-  content: '' !important;
-  position: absolute !important;
-  inset: 0 !important;
-  background: linear-gradient(90deg, rgba(11, 9, 10, .98) 0%, rgba(11, 9, 10, .86) 35%, rgba(11, 9, 10, .26) 72%, rgba(11, 9, 10, .62) 100%) !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-header__cover img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  object-position: center !important;
-  filter: saturate(.74) sepia(.12) contrast(.9) !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-header__cover span,
-.nb2-workspace:has(.nb2-panel > h2) .nb2-header__cover em {
-  position: relative !important;
-  z-index: 1 !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-header__copy,
-.nb2-workspace:has(.nb2-panel > h2) .nb2-header__controls {
-  position: relative !important;
-  z-index: 2 !important;
+.nb2-summary-book {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8.8%;
+  position: relative;
+  width: min(1420px, calc(100% - 36px));
+  aspect-ratio: 1664 / 936;
+  min-height: 0;
+  margin: 24px auto 46px;
+  padding: 6.9% 8.6% 7.4%;
+  border: 0;
+  border-radius: 0;
+  background: url('/assets/notebook-summary-diary-background.png') center / 100% 100% no-repeat;
+  box-shadow: 0 28px 62px rgba(0, 0, 0, .5);
+  color: #34261e;
+  overflow: visible;
 }
 
-/* Las secciones conservan sus rutas, pero visualmente parecen separadores de diario. */
-.nb2-workspace:has(.nb2-panel > h2) .nb2-sections {
-  position: relative !important;
-  z-index: 4 !important;
-  background: rgba(10, 9, 10, .78) !important;
-  border-bottom: 1px solid rgba(181, 112, 74, .34) !important;
-  padding: 12px 18px 10px !important;
+.nb2-summary-book__page {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
-.nb2-workspace:has(.nb2-panel > h2) .nb2-sections > div:first-child {
+
+.nb2-summary-book__eyebrow,
+.nb2-summary-book__heading small {
+  color: #7a2c39;
+  font: 700 clamp(8px, .72vw, 11px)/1.2 Georgia, serif;
+  letter-spacing: .18em;
+}
+
+.nb2-summary-book__page--left h2 {
+  max-width: 12ch;
+  margin: 1.4% 0 2.8%;
+  color: #30211a;
+  font: 700 clamp(25px, 3.1vw, 48px)/1.02 Georgia, serif;
+  overflow-wrap: anywhere;
+}
+
+.nb2-summary-book__description {
+  max-width: 45ch;
+  margin: 0;
+  color: #4f392c;
+  font: italic clamp(12px, 1.05vw, 16px)/1.55 Georgia, serif;
+}
+
+.nb2-summary-book__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4%;
+  margin-top: auto;
+  padding: 3.5% 0;
+  border-top: 1px solid rgba(87, 54, 35, .4);
+  border-bottom: 1px solid rgba(87, 54, 35, .4);
+}
+
+.nb2-summary-book__stats button {
+  display: block;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #692734;
+  text-align: left;
+}
+
+.nb2-summary-book__stats button:hover {
+  color: #9b3044;
+  background: transparent;
+  transform: translateY(-1px);
+}
+
+.nb2-summary-book__stats strong {
+  display: block;
+  font: 700 clamp(20px, 2vw, 31px)/1 Georgia, serif;
+}
+
+.nb2-summary-book__stats span {
+  display: block;
+  margin-top: 5px;
+  color: #5e4637;
+  font: 700 clamp(7px, .68vw, 10px)/1.25 Georgia, serif;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.nb2-summary-book__motto,
+.nb2-summary-book__closing {
+  margin: 3.2% 0 0;
+  color: rgba(73, 52, 40, .72);
+  font: italic clamp(10px, .85vw, 13px)/1.4 Georgia, serif;
+}
+
+.nb2-summary-book__heading {
+  padding-bottom: 2.8%;
+  border-bottom: 1px solid rgba(87, 54, 35, .42);
+}
+
+.nb2-summary-book__heading h3 {
+  margin: 1% 0 0;
+  color: #33231c;
+  font: 700 clamp(22px, 2.25vw, 35px)/1.05 Georgia, serif;
+}
+
+.nb2-summary-book__entries {
+  display: grid;
+  align-content: start;
+  margin-top: 2.5%;
+}
+
+.nb2-summary-book__entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: baseline;
+  gap: 12px;
+  width: 100%;
+  min-height: 0;
+  padding: clamp(8px, 1.15vw, 16px) 2px;
+  border: 0;
+  border-bottom: 1px dashed rgba(87, 54, 35, .38);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #34261e;
+  text-align: left;
+}
+
+.nb2-summary-book__entry:hover {
+  background: rgba(111, 37, 49, .06);
+}
+
+.nb2-summary-book__entry strong {
+  overflow: hidden;
+  font: 700 clamp(12px, 1.15vw, 17px)/1.25 Georgia, serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nb2-summary-book__entry span {
+  color: #6b5342;
+  font: clamp(8px, .78vw, 11px)/1.25 Georgia, serif;
+  white-space: nowrap;
+}
+
+.nb2-summary-book__entry em {
+  color: #7a2c39;
+  font-style: normal;
+}
+
+.nb2-summary-book__closing {
+  margin-top: auto;
+  text-align: right;
+}
+
+/* Marcapáginas funcionales: permanecen fuera del libro y no generan cajas sobre el papel. */
+.nb2-workspace:has(.nb2-summary-book) > .nb2-sections {
   display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 8px !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-sections > div:first-child button {
-  min-height: 38px !important;
-  padding: 8px 18px 8px 14px !important;
-  border: 1px solid rgba(192, 154, 116, .4) !important;
-  border-radius: 2px 13px 13px 2px !important;
-  background: linear-gradient(90deg, #bda788, #e1d0ad) !important;
-  color: #34251e !important;
-  box-shadow: 2px 3px 0 rgba(47, 24, 20, .28) !important;
-  font-family: Georgia, serif !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-sections > div:first-child button[aria-pressed="true"] {
-  background: linear-gradient(90deg, #6d2330, #9f3c4c) !important;
-  color: #fff0de !important;
-  border-color: #b95a67 !important;
-  transform: translateY(-1px) !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-sections > div:nth-child(2) {
-  margin-top: 10px !important;
-  opacity: .78 !important;
+  flex-direction: column;
+  position: absolute;
+  z-index: 6;
+  top: clamp(250px, 21vw, 350px);
+  right: max(0px, calc((100% - 1420px) / 2 - 14px));
+  width: 126px;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
-/* La portada/resumen se convierte en una página de diario, no en un panel de tarjetas. */
-.nb2-workspace:has(.nb2-panel > h2) .nb2-panel {
-  position: relative !important;
-  margin: 22px auto 34px !important;
-  max-width: 1120px !important;
-  min-height: 560px !important;
-  padding: clamp(28px, 4vw, 54px) clamp(24px, 5vw, 76px) !important;
-  border: 1px solid rgba(126, 82, 53, .72) !important;
-  border-radius: 3px !important;
-  background:
-    radial-gradient(circle at 83% 18%, rgba(255, 250, 227, .54), transparent 30%),
-    repeating-linear-gradient(0deg, rgba(99, 65, 38, .035) 0 1px, transparent 1px 5px),
-    linear-gradient(135deg, #e6d1aa 0%, #f3e4c4 46%, #d8ba8d 100%) !important;
-  box-shadow: 0 18px 44px rgba(0,0,0,.38), inset 0 0 0 5px rgba(77, 43, 25, .08) !important;
-  color: #34251e !important;
-  overflow: hidden !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-panel::before {
-  content: 'DIARIO DE LA CRÓNICA' !important;
-  display: block !important;
-  margin-bottom: 13px !important;
-  color: #8f3b43 !important;
-  font: 700 11px/1.2 Georgia, serif !important;
-  letter-spacing: .18em !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-panel h2 {
-  margin: 0 0 10px !important;
-  color: #38251e !important;
-  font: 700 clamp(30px, 4vw, 52px)/1.02 Georgia, serif !important;
-  letter-spacing: -.02em !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-panel > p {
-  max-width: 700px !important;
-  margin: 0 0 30px !important;
-  color: #5b4435 !important;
-  font: italic 18px/1.55 Georgia, serif !important;
+.nb2-workspace:has(.nb2-summary-book) > .nb2-sections > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* Los contadores pasan a ser anotaciones de la portada. */
-.nb2-workspace:has(.nb2-panel > h2) .nb2-summary {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 24px !important;
-  margin: 0 0 36px !important;
-  padding: 20px 0 !important;
-  border-top: 1px solid rgba(111, 69, 40, .45) !important;
-  border-bottom: 1px solid rgba(111, 69, 40, .45) !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-summary button {
-  display: flex !important;
-  align-items: baseline !important;
-  gap: 10px !important;
-  min-width: 150px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  color: #6e2735 !important;
-  font: 700 28px Georgia, serif !important;
-  text-align: left !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-summary button span {
-  color: #624a3a !important;
-  font: 600 12px/1.2 Georgia, serif !important;
-  text-transform: uppercase !important;
-  letter-spacing: .07em !important;
+.nb2-workspace:has(.nb2-summary-book) > .nb2-sections > div + div {
+  margin-top: 14px;
 }
 
-/* Últimas entradas como líneas de diario consultables. */
-.nb2-workspace:has(.nb2-panel > h2) .nb2-panel h3 {
-  margin: 0 0 12px !important;
-  color: #432c24 !important;
-  font: 700 25px Georgia, serif !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-panel .nb2-row {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: baseline !important;
-  width: 100% !important;
-  min-height: 49px !important;
-  padding: 12px 3px !important;
-  border: 0 !important;
-  border-bottom: 1px dashed rgba(101, 66, 43, .48) !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: #33251e !important;
-  text-align: left !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-panel .nb2-row:hover {
-  background: rgba(112, 37, 49, .08) !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-panel .nb2-row strong {
-  font: 700 18px Georgia, serif !important;
-}
-.nb2-workspace:has(.nb2-panel > h2) .nb2-panel .nb2-row span {
-  color: #735b4a !important;
-  font: 13px/1.3 Georgia, serif !important;
+.nb2-workspace:has(.nb2-summary-book) > .nb2-sections button {
+  width: 126px;
+  min-height: 34px;
+  padding: 8px 10px 8px 14px;
+  border: 1px solid rgba(94, 59, 39, .5);
+  border-radius: 0 10px 10px 0;
+  background: rgba(220, 201, 164, .94);
+  box-shadow: 3px 3px 0 rgba(40, 23, 18, .18);
+  color: #392920;
+  font: 700 11px Georgia, serif;
+  text-align: left;
 }
 
-@media (max-width: 760px) {
-  .nb2-workspace:has(.nb2-panel > h2) .nb2-header { min-height: 178px !important; }
-  .nb2-workspace:has(.nb2-panel > h2) .nb2-panel { margin: 14px 10px 24px !important; padding: 28px 20px 32px !important; }
-  .nb2-workspace:has(.nb2-panel > h2) .nb2-summary { gap: 14px !important; }
-  .nb2-workspace:has(.nb2-panel > h2) .nb2-summary button { min-width: 0 !important; flex: 1 1 28% !important; display: block !important; }
-  .nb2-workspace:has(.nb2-panel > h2) .nb2-summary button span { display: block !important; margin-top: 4px !important; }
-  .nb2-workspace:has(.nb2-panel > h2) .nb2-panel .nb2-row { display: block !important; }
-  .nb2-workspace:has(.nb2-panel > h2) .nb2-panel .nb2-row span { display: block !important; margin-top: 4px !important; }
+.nb2-workspace:has(.nb2-summary-book) > .nb2-sections > div:first-child button[aria-pressed='true'] {
+  background: #762b39;
+  border-color: #b85a69;
+  color: #fff0dc;
 }
 
-/* Estructura editorial real del Resumen: una portada de diario con navegación integrada. */
-.nb2-summary-diary {
-  max-width: 1260px !important;
-  margin: 24px auto 42px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  overflow: visible !important;
-}
-.nb2-diary-sheet {
-  position: relative !important;
-  min-height: 720px !important;
-  padding: 48px 190px 58px 72px !important;
-  border: 1px solid rgba(123, 76, 47, .72) !important;
-  border-radius: 3px !important;
-  background: radial-gradient(circle at 82% 14%, rgba(255, 249, 225, .6), transparent 30%), repeating-linear-gradient(0deg, rgba(93, 59, 34, .038) 0 1px, transparent 1px 5px), linear-gradient(135deg, #e3cda2 0%, #f5e5c2 44%, #d6b787 100%) !important;
-  box-shadow: 0 22px 48px rgba(0,0,0,.42), inset 0 0 0 5px rgba(70, 39, 23, .08) !important;
-  color: #34251e !important;
-}
-.nb2-diary-sheet::before {
-  content: '' !important;
-  position: absolute !important;
-  left: 25px !important;
-  top: 24px !important;
-  bottom: 24px !important;
-  width: 1px !important;
-  background: linear-gradient(180deg, transparent, rgba(102, 51, 43, .5) 12%, rgba(102, 51, 43, .5) 88%, transparent) !important;
-  box-shadow: 9px 0 0 rgba(84, 49, 31, .08) !important;
-}
-.nb2-diary-kicker {
-  margin-bottom: 16px !important;
-  color: #8b3541 !important;
-  font: 700 11px/1.2 Georgia, serif !important;
-  letter-spacing: .2em !important;
-}
-.nb2-diary-sheet > .nb2-header__cover {
-  position: relative !important;
-  display: block !important;
-  width: 100% !important;
-  height: 210px !important;
-  margin: 0 0 26px !important;
-  overflow: hidden !important;
-  border: 1px solid rgba(92, 54, 31, .5) !important;
-  background: #3b2925 !important;
-  box-shadow: 0 7px 14px rgba(52, 28, 20, .22) !important;
-}
-.nb2-diary-sheet > .nb2-header__cover::after {
-  content: '' !important;
-  position: absolute !important;
-  inset: 0 !important;
-  background: linear-gradient(180deg, rgba(17, 14, 15, .05), rgba(17, 14, 15, .66)) !important;
-}
-.nb2-diary-sheet > .nb2-header__cover img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  object-position: center !important;
-  filter: saturate(.78) sepia(.1) contrast(.9) !important;
-}
-.nb2-diary-sheet > .nb2-header__cover span {
-  position: absolute !important;
-  z-index: 1 !important;
-  left: 26px !important;
-  bottom: 22px !important;
-  color: #fff0d9 !important;
-  font: 700 clamp(28px, 4vw, 48px)/1.05 Georgia, serif !important;
-  text-shadow: 0 2px 4px rgba(21, 12, 10, .8) !important;
-}
-.nb2-diary-sheet > .nb2-header__cover em { display: none !important; }
-.nb2-diary-content > h2 {
-  margin: 0 0 10px !important;
-  color: #3a281f !important;
-  font: 700 clamp(28px, 4vw, 44px)/1.08 Georgia, serif !important;
-}
-.nb2-diary-content > p {
-  max-width: 760px !important;
-  margin: 0 0 26px !important;
-  color: #604839 !important;
-  font: italic 17px/1.55 Georgia, serif !important;
-}
-.nb2-diary-content .nb2-summary {
-  display: flex !important;
-  gap: 28px !important;
-  flex-wrap: wrap !important;
-  margin: 0 0 34px !important;
-  padding: 19px 0 !important;
-  border-top: 1px solid rgba(104, 64, 39, .46) !important;
-  border-bottom: 1px solid rgba(104, 64, 39, .46) !important;
-}
-.nb2-diary-content .nb2-summary button {
-  display: flex !important;
-  align-items: baseline !important;
-  gap: 9px !important;
-  min-width: 145px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  color: #752b3a !important;
-  font: 700 29px Georgia, serif !important;
-  text-align: left !important;
-}
-.nb2-diary-content .nb2-summary button span {
-  color: #654a38 !important;
-  font: 700 11px/1.2 Georgia, serif !important;
-  letter-spacing: .07em !important;
-  text-transform: uppercase !important;
-}
-.nb2-diary-content > h3 {
-  margin: 0 0 10px !important;
-  color: #452d24 !important;
-  font: 700 26px Georgia, serif !important;
-}
-.nb2-diary-content .nb2-row {
-  display: flex !important;
-  align-items: baseline !important;
-  justify-content: space-between !important;
-  width: 100% !important;
-  min-height: 48px !important;
-  padding: 12px 2px !important;
-  border: 0 !important;
-  border-bottom: 1px dashed rgba(104, 64, 39, .48) !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: #33251e !important;
-  text-align: left !important;
-}
-.nb2-diary-content .nb2-row:hover { background: rgba(116, 39, 51, .08) !important; }
-.nb2-diary-content .nb2-row strong { font: 700 18px Georgia, serif !important; }
-.nb2-diary-content .nb2-row span { color: #735b49 !important; font: 13px Georgia, serif !important; }
-
-/* La navegación funcional se presenta como marcapáginas unidos al borde derecho. */
-.nb2-diary-sheet > .nb2-sections {
-  position: absolute !important;
-  z-index: 6 !important;
-  top: 104px !important;
-  right: -42px !important;
-  width: 165px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-}
-.nb2-diary-sheet > .nb2-sections > div:first-child,
-.nb2-diary-sheet > .nb2-sections > div:nth-child(2) {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 8px !important;
-  margin: 0 !important;
-}
-.nb2-diary-sheet > .nb2-sections > div:nth-child(2) { margin-top: 18px !important; }
-.nb2-diary-sheet > .nb2-sections button {
-  width: 165px !important;
-  min-height: 38px !important;
-  padding: 9px 12px 9px 16px !important;
-  border: 1px solid rgba(119, 82, 52, .55) !important;
-  border-radius: 0 13px 13px 0 !important;
-  background: linear-gradient(90deg, #bba27e, #e2cfaa) !important;
-  color: #3b2b24 !important;
-  box-shadow: 3px 3px 0 rgba(57, 31, 23, .2) !important;
-  font: 700 13px Georgia, serif !important;
-  text-align: left !important;
-}
-.nb2-diary-sheet > .nb2-sections > div:first-child button[aria-pressed="true"] {
-  background: linear-gradient(90deg, #6e2432, #a64653) !important;
-  color: #fff0dc !important;
-  border-color: #bd6470 !important;
-  transform: translateX(4px) !important;
-}
-.nb2-diary-sheet > .nb2-sections > div:nth-child(2) button {
-  min-height: 32px !important;
-  background: rgba(234, 216, 182, .76) !important;
-  font-size: 12px !important;
-}
-
-/* El menú sigue fuera del panel para conservar su contexto TypeScript y su navegación. */
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections {
-  position: absolute !important;
-  z-index: 8 !important;
-  top: 318px !important;
-  right: clamp(12px, 5%, 70px) !important;
-  width: 165px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:first-child,
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:nth-child(2) {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 8px !important;
-  margin: 0 !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:nth-child(2) {
-  margin-top: 18px !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections button {
-  width: 165px !important;
-  min-height: 38px !important;
-  padding: 9px 12px 9px 16px !important;
-  border: 1px solid rgba(119, 82, 52, .55) !important;
-  border-radius: 0 13px 13px 0 !important;
-  background: linear-gradient(90deg, #bba27e, #e2cfaa) !important;
-  color: #3b2b24 !important;
-  box-shadow: 3px 3px 0 rgba(57, 31, 23, .2) !important;
-  font: 700 13px Georgia, serif !important;
-  text-align: left !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:first-child button[aria-pressed="true"] {
-  background: linear-gradient(90deg, #6e2432, #a64653) !important;
-  color: #fff0dc !important;
-  border-color: #bd6470 !important;
-  transform: translateX(4px) !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:nth-child(2) button {
-  min-height: 32px !important;
-  background: rgba(234, 216, 182, .76) !important;
-  font-size: 12px !important;
-}
-
-@media (max-width: 760px) {
-  .nb2-diary-sheet { min-height: 0 !important; padding: 30px 22px 34px !important; }
-  .nb2-diary-sheet::before { left: 12px !important; }
-  .nb2-diary-sheet > .nb2-header__cover { height: 160px !important; }
-  .nb2-diary-sheet > .nb2-header__cover span { left: 16px !important; bottom: 16px !important; font-size: 28px !important; }
-  .nb2-diary-sheet > .nb2-sections { position: relative !important; top: auto !important; right: auto !important; width: 100% !important; margin-top: 30px !important; }
-  .nb2-diary-sheet > .nb2-sections > div:first-child,
-  .nb2-diary-sheet > .nb2-sections > div:nth-child(2) { flex-direction: row !important; flex-wrap: wrap !important; }
-  .nb2-diary-sheet > .nb2-sections button { width: auto !important; min-height: 34px !important; border-radius: 0 10px 10px 0 !important; }
-  .nb2-diary-content .nb2-summary { gap: 15px !important; }
-  .nb2-diary-content .nb2-summary button { min-width: 0 !important; flex: 1 1 26% !important; display: block !important; }
-  .nb2-diary-content .nb2-summary button span { display: block !important; margin-top: 4px !important; }
-  .nb2-diary-content .nb2-row { display: block !important; }
-  .nb2-diary-content .nb2-row span { display: block !important; margin-top: 4px !important; }
-}
-
-@media (max-width: 760px) {
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections {
-    position: relative !important;
-    top: auto !important;
-    right: auto !important;
-    width: 100% !important;
-    margin: 18px 0 0 !important;
+@media (max-width: 900px) {
+  .nb2-summary-book {
+    gap: 7%;
+    width: calc(100% - 20px);
+    margin-top: 16px;
+    padding-left: 7.8%;
+    padding-right: 7.8%;
   }
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:first-child,
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:nth-child(2) {
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
+  .nb2-workspace:has(.nb2-summary-book) > .nb2-sections {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: auto;
+    margin: 14px 10px 0;
   }
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections button {
-    width: auto !important;
-    min-height: 34px !important;
+  .nb2-workspace:has(.nb2-summary-book) > .nb2-sections > div {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .nb2-workspace:has(.nb2-summary-book) > .nb2-sections button {
+    width: auto;
   }
 }
 
-/* La imagen vive en la cabecera del componente; se recoloca visualmente dentro de la portada. */
-.nb2-workspace:has(.nb2-summary-diary) {
-  position: relative !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-header {
-  position: static !important;
-  overflow: visible !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-header__cover {
-  position: absolute !important;
-  z-index: 7 !important;
-  top: 230px !important;
-  left: clamp(24px, 12%, 150px) !important;
-  right: clamp(150px, 19%, 240px) !important;
-  width: auto !important;
-  height: 210px !important;
-  opacity: 1 !important;
-  margin: 0 !important;
-  border: 1px solid rgba(92, 54, 31, .5) !important;
-  background: #3b2925 !important;
-  box-shadow: 0 7px 14px rgba(52, 28, 20, .22) !important;
-  overflow: hidden !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-header__cover::after {
-  content: '' !important;
-  position: absolute !important;
-  inset: 0 !important;
-  background: linear-gradient(180deg, rgba(17, 14, 15, .05), rgba(17, 14, 15, .66)) !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-header__cover img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  filter: saturate(.78) sepia(.1) contrast(.9) !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-header__cover span {
-  position: absolute !important;
-  z-index: 1 !important;
-  left: 26px !important;
-  bottom: 22px !important;
-  color: #fff0d9 !important;
-  font: 700 clamp(28px, 4vw, 48px)/1.05 Georgia, serif !important;
-  text-shadow: 0 2px 4px rgba(21, 12, 10, .8) !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-header__cover em { display: none !important; }
-.nb2-workspace:has(.nb2-summary-diary) .nb2-diary-sheet { padding-top: 290px !important; }
-@media (max-width: 760px) {
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-header__cover {
-    top: 205px !important;
-    left: 22px !important;
-    right: 22px !important;
-    height: 160px !important;
+@media (max-width: 620px) {
+  .nb2-summary-book {
+    display: block;
+    aspect-ratio: auto;
+    min-height: 760px;
+    padding: 46px 28px 58px;
+    background-size: auto 100%;
+    background-position: 77% center;
+    overflow: hidden;
   }
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-header__cover span { left: 16px !important; bottom: 16px !important; font-size: 28px !important; }
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-diary-sheet { padding-top: 220px !important; }
-}
-
-/* Estructura editorial real del Resumen: una portada de diario con navegación integrada. */
-.nb2-summary-diary {
-  max-width: 1260px !important;
-  margin: 24px auto 42px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  overflow: visible !important;
-}
-.nb2-diary-sheet {
-  position: relative !important;
-  min-height: 720px !important;
-  padding: 48px 190px 58px 72px !important;
-  border: 1px solid rgba(123, 76, 47, .72) !important;
-  border-radius: 3px !important;
-  background: radial-gradient(circle at 82% 14%, rgba(255, 249, 225, .6), transparent 30%), repeating-linear-gradient(0deg, rgba(93, 59, 34, .038) 0 1px, transparent 1px 5px), linear-gradient(135deg, #e3cda2 0%, #f5e5c2 44%, #d6b787 100%) !important;
-  box-shadow: 0 22px 48px rgba(0,0,0,.42), inset 0 0 0 5px rgba(70, 39, 23, .08) !important;
-  color: #34251e !important;
-}
-.nb2-diary-sheet::before {
-  content: '' !important;
-  position: absolute !important;
-  left: 25px !important;
-  top: 24px !important;
-  bottom: 24px !important;
-  width: 1px !important;
-  background: linear-gradient(180deg, transparent, rgba(102, 51, 43, .5) 12%, rgba(102, 51, 43, .5) 88%, transparent) !important;
-  box-shadow: 9px 0 0 rgba(84, 49, 31, .08) !important;
-}
-.nb2-diary-kicker {
-  margin-bottom: 16px !important;
-  color: #8b3541 !important;
-  font: 700 11px/1.2 Georgia, serif !important;
-  letter-spacing: .2em !important;
-}
-.nb2-diary-sheet > .nb2-header__cover {
-  position: relative !important;
-  display: block !important;
-  width: 100% !important;
-  height: 210px !important;
-  margin: 0 0 26px !important;
-  overflow: hidden !important;
-  border: 1px solid rgba(92, 54, 31, .5) !important;
-  background: #3b2925 !important;
-  box-shadow: 0 7px 14px rgba(52, 28, 20, .22) !important;
-}
-.nb2-diary-sheet > .nb2-header__cover::after {
-  content: '' !important;
-  position: absolute !important;
-  inset: 0 !important;
-  background: linear-gradient(180deg, rgba(17, 14, 15, .05), rgba(17, 14, 15, .66)) !important;
-}
-.nb2-diary-sheet > .nb2-header__cover img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  object-position: center !important;
-  filter: saturate(.78) sepia(.1) contrast(.9) !important;
-}
-.nb2-diary-sheet > .nb2-header__cover span {
-  position: absolute !important;
-  z-index: 1 !important;
-  left: 26px !important;
-  bottom: 22px !important;
-  color: #fff0d9 !important;
-  font: 700 clamp(28px, 4vw, 48px)/1.05 Georgia, serif !important;
-  text-shadow: 0 2px 4px rgba(21, 12, 10, .8) !important;
-}
-.nb2-diary-sheet > .nb2-header__cover em { display: none !important; }
-.nb2-diary-content > h2 {
-  margin: 0 0 10px !important;
-  color: #3a281f !important;
-  font: 700 clamp(28px, 4vw, 44px)/1.08 Georgia, serif !important;
-}
-.nb2-diary-content > p {
-  max-width: 760px !important;
-  margin: 0 0 26px !important;
-  color: #604839 !important;
-  font: italic 17px/1.55 Georgia, serif !important;
-}
-.nb2-diary-content .nb2-summary {
-  display: flex !important;
-  gap: 28px !important;
-  flex-wrap: wrap !important;
-  margin: 0 0 34px !important;
-  padding: 19px 0 !important;
-  border-top: 1px solid rgba(104, 64, 39, .46) !important;
-  border-bottom: 1px solid rgba(104, 64, 39, .46) !important;
-}
-.nb2-diary-content .nb2-summary button {
-  display: flex !important;
-  align-items: baseline !important;
-  gap: 9px !important;
-  min-width: 145px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  color: #752b3a !important;
-  font: 700 29px Georgia, serif !important;
-  text-align: left !important;
-}
-.nb2-diary-content .nb2-summary button span {
-  color: #654a38 !important;
-  font: 700 11px/1.2 Georgia, serif !important;
-  letter-spacing: .07em !important;
-  text-transform: uppercase !important;
-}
-.nb2-diary-content > h3 {
-  margin: 0 0 10px !important;
-  color: #452d24 !important;
-  font: 700 26px Georgia, serif !important;
-}
-.nb2-diary-content .nb2-row {
-  display: flex !important;
-  align-items: baseline !important;
-  justify-content: space-between !important;
-  width: 100% !important;
-  min-height: 48px !important;
-  padding: 12px 2px !important;
-  border: 0 !important;
-  border-bottom: 1px dashed rgba(104, 64, 39, .48) !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: #33251e !important;
-  text-align: left !important;
-}
-.nb2-diary-content .nb2-row:hover { background: rgba(116, 39, 51, .08) !important; }
-.nb2-diary-content .nb2-row strong { font: 700 18px Georgia, serif !important; }
-.nb2-diary-content .nb2-row span { color: #735b49 !important; font: 13px Georgia, serif !important; }
-
-/* La navegación funcional se presenta como marcapáginas unidos al borde derecho. */
-.nb2-diary-sheet > .nb2-sections {
-  position: absolute !important;
-  z-index: 6 !important;
-  top: 104px !important;
-  right: -42px !important;
-  width: 165px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-}
-.nb2-diary-sheet > .nb2-sections > div:first-child,
-.nb2-diary-sheet > .nb2-sections > div:nth-child(2) {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 8px !important;
-  margin: 0 !important;
-}
-.nb2-diary-sheet > .nb2-sections > div:nth-child(2) { margin-top: 18px !important; }
-.nb2-diary-sheet > .nb2-sections button {
-  width: 165px !important;
-  min-height: 38px !important;
-  padding: 9px 12px 9px 16px !important;
-  border: 1px solid rgba(119, 82, 52, .55) !important;
-  border-radius: 0 13px 13px 0 !important;
-  background: linear-gradient(90deg, #bba27e, #e2cfaa) !important;
-  color: #3b2b24 !important;
-  box-shadow: 3px 3px 0 rgba(57, 31, 23, .2) !important;
-  font: 700 13px Georgia, serif !important;
-  text-align: left !important;
-}
-.nb2-diary-sheet > .nb2-sections > div:first-child button[aria-pressed="true"] {
-  background: linear-gradient(90deg, #6e2432, #a64653) !important;
-  color: #fff0dc !important;
-  border-color: #bd6470 !important;
-  transform: translateX(4px) !important;
-}
-.nb2-diary-sheet > .nb2-sections > div:nth-child(2) button {
-  min-height: 32px !important;
-  background: rgba(234, 216, 182, .76) !important;
-  font-size: 12px !important;
-}
-
-/* El menú sigue fuera del panel para conservar su contexto TypeScript y su navegación. */
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections {
-  position: absolute !important;
-  z-index: 8 !important;
-  top: 318px !important;
-  right: clamp(12px, 5%, 70px) !important;
-  width: 165px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:first-child,
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:nth-child(2) {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 8px !important;
-  margin: 0 !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:nth-child(2) {
-  margin-top: 18px !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections button {
-  width: 165px !important;
-  min-height: 38px !important;
-  padding: 9px 12px 9px 16px !important;
-  border: 1px solid rgba(119, 82, 52, .55) !important;
-  border-radius: 0 13px 13px 0 !important;
-  background: linear-gradient(90deg, #bba27e, #e2cfaa) !important;
-  color: #3b2b24 !important;
-  box-shadow: 3px 3px 0 rgba(57, 31, 23, .2) !important;
-  font: 700 13px Georgia, serif !important;
-  text-align: left !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:first-child button[aria-pressed="true"] {
-  background: linear-gradient(90deg, #6e2432, #a64653) !important;
-  color: #fff0dc !important;
-  border-color: #bd6470 !important;
-  transform: translateX(4px) !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:nth-child(2) button {
-  min-height: 32px !important;
-  background: rgba(234, 216, 182, .76) !important;
-  font-size: 12px !important;
-}
-
-@media (max-width: 760px) {
-  .nb2-diary-sheet { min-height: 0 !important; padding: 30px 22px 34px !important; }
-  .nb2-diary-sheet::before { left: 12px !important; }
-  .nb2-diary-sheet > .nb2-header__cover { height: 160px !important; }
-  .nb2-diary-sheet > .nb2-header__cover span { left: 16px !important; bottom: 16px !important; font-size: 28px !important; }
-  .nb2-diary-sheet > .nb2-sections { position: relative !important; top: auto !important; right: auto !important; width: 100% !important; margin-top: 30px !important; }
-  .nb2-diary-sheet > .nb2-sections > div:first-child,
-  .nb2-diary-sheet > .nb2-sections > div:nth-child(2) { flex-direction: row !important; flex-wrap: wrap !important; }
-  .nb2-diary-sheet > .nb2-sections button { width: auto !important; min-height: 34px !important; border-radius: 0 10px 10px 0 !important; }
-  .nb2-diary-content .nb2-summary { gap: 15px !important; }
-  .nb2-diary-content .nb2-summary button { min-width: 0 !important; flex: 1 1 26% !important; display: block !important; }
-  .nb2-diary-content .nb2-summary button span { display: block !important; margin-top: 4px !important; }
-  .nb2-diary-content .nb2-row { display: block !important; }
-  .nb2-diary-content .nb2-row span { display: block !important; margin-top: 4px !important; }
-}
-
-@media (max-width: 760px) {
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections {
-    position: relative !important;
-    top: auto !important;
-    right: auto !important;
-    width: 100% !important;
-    margin: 18px 0 0 !important;
+  .nb2-summary-book__page--right {
+    margin-top: 34px;
   }
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:first-child,
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:nth-child(2) {
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
+  .nb2-summary-book__description {
+    font-size: 14px;
   }
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections button {
-    width: auto !important;
-    min-height: 34px !important;
+  .nb2-summary-book__stats {
+    margin-top: 28px;
   }
-}
-
-/* La imagen vive en la cabecera del componente; se recoloca visualmente dentro de la portada. */
-.nb2-workspace:has(.nb2-summary-diary) {
-  position: relative !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-header {
-  position: static !important;
-  overflow: visible !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-header__cover {
-  position: absolute !important;
-  z-index: 7 !important;
-  top: 230px !important;
-  left: clamp(24px, 12%, 150px) !important;
-  right: clamp(150px, 19%, 240px) !important;
-  width: auto !important;
-  height: 210px !important;
-  opacity: 1 !important;
-  margin: 0 !important;
-  border: 1px solid rgba(92, 54, 31, .5) !important;
-  background: #3b2925 !important;
-  box-shadow: 0 7px 14px rgba(52, 28, 20, .22) !important;
-  overflow: hidden !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-header__cover::after {
-  content: '' !important;
-  position: absolute !important;
-  inset: 0 !important;
-  background: linear-gradient(180deg, rgba(17, 14, 15, .05), rgba(17, 14, 15, .66)) !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-header__cover img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  filter: saturate(.78) sepia(.1) contrast(.9) !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-header__cover span {
-  position: absolute !important;
-  z-index: 1 !important;
-  left: 26px !important;
-  bottom: 22px !important;
-  color: #fff0d9 !important;
-  font: 700 clamp(28px, 4vw, 48px)/1.05 Georgia, serif !important;
-  text-shadow: 0 2px 4px rgba(21, 12, 10, .8) !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-header__cover em { display: none !important; }
-.nb2-workspace:has(.nb2-summary-diary) .nb2-diary-sheet { padding-top: 290px !important; }
-@media (max-width: 760px) {
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-header__cover {
-    top: 205px !important;
-    left: 22px !important;
-    right: 22px !important;
-    height: 160px !important;
+  .nb2-summary-book__heading {
+    margin-top: 0;
   }
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-header__cover span { left: 16px !important; bottom: 16px !important; font-size: 28px !important; }
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-diary-sheet { padding-top: 220px !important; }
-}
-
-/* Resumen: fondo real de diario, con datos funcionales encima. */
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary {
-  position: relative !important;
-  max-width: 1280px !important;
-  min-height: 760px !important;
-  margin: 28px auto 48px !important;
-  padding: 64px 7% 76px !important;
-  border: 1px solid rgba(110, 73, 47, .72) !important;
-  border-radius: 5px !important;
-  background-color: #d9c09a !important;
-  background-image: linear-gradient(rgba(226, 204, 165, .08), rgba(226, 204, 165, .08)), url('/assets/notebook-summary-diary-background.png') !important;
-  background-size: cover !important;
-  background-position: center center !important;
-  box-shadow: 0 24px 56px rgba(0, 0, 0, .42), inset 0 0 0 5px rgba(54, 33, 23, .1) !important;
-  color: #33251e !important;
-  overflow: visible !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary::before {
-  content: '' !important;
-  position: absolute !important;
-  inset: 12px !important;
-  pointer-events: none !important;
-  border: 1px solid rgba(93, 58, 37, .36) !important;
-  box-shadow: inset 0 0 34px rgba(77, 42, 25, .18) !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > * {
-  position: relative !important;
-  z-index: 1 !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary h2 {
-  max-width: 720px !important;
-  margin: 0 0 10px !important;
-  color: #33231c !important;
-  font: 700 clamp(30px, 4vw, 52px)/1.08 Georgia, serif !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary p {
-  color: #563f30 !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-summary {
-  display: flex !important;
-  gap: 32px !important;
-  margin: 26px 0 32px !important;
-  padding: 18px 0 !important;
-  border-top: 1px solid rgba(91, 57, 36, .46) !important;
-  border-bottom: 1px solid rgba(91, 57, 36, .46) !important;
-  background: transparent !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-summary button {
-  min-width: 130px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  color: #762d3a !important;
-  font: 700 28px Georgia, serif !important;
-  text-align: left !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-summary button span {
-  display: block !important;
-  margin-top: 5px !important;
-  color: #624a39 !important;
-  font: 700 10px/1.2 Georgia, serif !important;
-  letter-spacing: .08em !important;
-  text-transform: uppercase !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary h3 {
-  margin: 0 0 10px !important;
-  color: #453025 !important;
-  font: 700 25px Georgia, serif !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-row {
-  display: flex !important;
-  justify-content: space-between !important;
-  width: 100% !important;
-  padding: 13px 4px !important;
-  border: 0 !important;
-  border-bottom: 1px dashed rgba(91, 57, 36, .48) !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: #33251e !important;
-  text-align: left !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-row:hover {
-  background: rgba(117, 43, 58, .08) !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-row strong {
-  font: 700 18px Georgia, serif !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-row span {
-  color: #745b48 !important;
-  font: 13px Georgia, serif !important;
-}
-
-/* Marcapáginas reales, sin alterar la lógica de navegación. */
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections {
-  position: absolute !important;
-  z-index: 5 !important;
-  top: 330px !important;
-  right: clamp(8px, 4vw, 54px) !important;
-  width: 150px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 8px !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div + div { margin-top: 16px !important; }
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections button {
-  width: 150px !important;
-  min-height: 36px !important;
-  padding: 9px 12px 9px 15px !important;
-  border: 1px solid rgba(101, 65, 42, .5) !important;
-  border-radius: 0 12px 12px 0 !important;
-  background: rgba(225, 207, 171, .92) !important;
-  color: #392a21 !important;
-  box-shadow: 3px 3px 0 rgba(50, 29, 21, .18) !important;
-  font: 700 12px Georgia, serif !important;
-  text-align: left !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:first-child button[aria-pressed="true"] {
-  background: #792f3d !important;
-  color: #f8ead3 !important;
-  border-color: #b65c68 !important;
-}
-
-@media (max-width: 760px) {
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary {
-    min-height: 0 !important;
-    margin: 16px 10px 34px !important;
-    padding: 38px 24px 44px !important;
-    background-size: auto 100% !important;
-    background-position: 72% center !important;
+  .nb2-summary-book__entry {
+    grid-template-columns: minmax(0, 1fr) auto;
   }
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-summary {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 12px !important;
+  .nb2-summary-book__entry span {
+    grid-column: 1;
+    margin-top: 3px;
   }
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-summary button {
-    min-width: 0 !important;
-    font-size: 24px !important;
+  .nb2-summary-book__entry em {
+    grid-column: 2;
+    grid-row: 1 / span 2;
   }
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections {
-    position: relative !important;
-    top: auto !important;
-    right: auto !important;
-    width: auto !important;
-    margin: 18px 10px 0 !important;
+  .nb2-summary-book__motto,
+  .nb2-summary-book__closing {
+    display: none;
   }
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div {
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
-  }
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections button {
-    width: auto !important;
-    min-height: 34px !important;
-  }
-}
-
-/* Resumen: fondo real de diario, con datos funcionales encima. */
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary {
-  position: relative !important;
-  max-width: 1280px !important;
-  min-height: 760px !important;
-  margin: 28px auto 48px !important;
-  padding: 64px 7% 76px !important;
-  border: 1px solid rgba(110, 73, 47, .72) !important;
-  border-radius: 5px !important;
-  background-color: #d9c09a !important;
-  background-image: linear-gradient(rgba(226, 204, 165, .08), rgba(226, 204, 165, .08)), url('/assets/notebook-summary-diary-background.png') !important;
-  background-size: cover !important;
-  background-position: center center !important;
-  box-shadow: 0 24px 56px rgba(0, 0, 0, .42), inset 0 0 0 5px rgba(54, 33, 23, .1) !important;
-  color: #33251e !important;
-  overflow: visible !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary::before {
-  content: '' !important;
-  position: absolute !important;
-  inset: 12px !important;
-  pointer-events: none !important;
-  border: 1px solid rgba(93, 58, 37, .36) !important;
-  box-shadow: inset 0 0 34px rgba(77, 42, 25, .18) !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > * {
-  position: relative !important;
-  z-index: 1 !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary h2 {
-  max-width: 720px !important;
-  margin: 0 0 10px !important;
-  color: #33231c !important;
-  font: 700 clamp(30px, 4vw, 52px)/1.08 Georgia, serif !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary p {
-  color: #563f30 !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-summary {
-  display: flex !important;
-  gap: 32px !important;
-  margin: 26px 0 32px !important;
-  padding: 18px 0 !important;
-  border-top: 1px solid rgba(91, 57, 36, .46) !important;
-  border-bottom: 1px solid rgba(91, 57, 36, .46) !important;
-  background: transparent !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-summary button {
-  min-width: 130px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  color: #762d3a !important;
-  font: 700 28px Georgia, serif !important;
-  text-align: left !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-summary button span {
-  display: block !important;
-  margin-top: 5px !important;
-  color: #624a39 !important;
-  font: 700 10px/1.2 Georgia, serif !important;
-  letter-spacing: .08em !important;
-  text-transform: uppercase !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary h3 {
-  margin: 0 0 10px !important;
-  color: #453025 !important;
-  font: 700 25px Georgia, serif !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-row {
-  display: flex !important;
-  justify-content: space-between !important;
-  width: 100% !important;
-  padding: 13px 4px !important;
-  border: 0 !important;
-  border-bottom: 1px dashed rgba(91, 57, 36, .48) !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: #33251e !important;
-  text-align: left !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-row:hover {
-  background: rgba(117, 43, 58, .08) !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-row strong {
-  font: 700 18px Georgia, serif !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-row span {
-  color: #745b48 !important;
-  font: 13px Georgia, serif !important;
-}
-
-/* Marcapáginas reales, sin alterar la lógica de navegación. */
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections {
-  position: absolute !important;
-  z-index: 5 !important;
-  top: 330px !important;
-  right: clamp(8px, 4vw, 54px) !important;
-  width: 150px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 8px !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div + div { margin-top: 16px !important; }
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections button {
-  width: 150px !important;
-  min-height: 36px !important;
-  padding: 9px 12px 9px 15px !important;
-  border: 1px solid rgba(101, 65, 42, .5) !important;
-  border-radius: 0 12px 12px 0 !important;
-  background: rgba(225, 207, 171, .92) !important;
-  color: #392a21 !important;
-  box-shadow: 3px 3px 0 rgba(50, 29, 21, .18) !important;
-  font: 700 12px Georgia, serif !important;
-  text-align: left !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:first-child button[aria-pressed="true"] {
-  background: #792f3d !important;
-  color: #f8ead3 !important;
-  border-color: #b65c68 !important;
-}
-
-@media (max-width: 760px) {
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary {
-    min-height: 0 !important;
-    margin: 16px 10px 34px !important;
-    padding: 38px 24px 44px !important;
-    background-size: auto 100% !important;
-    background-position: 72% center !important;
-  }
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-summary {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 12px !important;
-  }
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary .nb2-summary button {
-    min-width: 0 !important;
-    font-size: 24px !important;
-  }
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections {
-    position: relative !important;
-    top: auto !important;
-    right: auto !important;
-    width: auto !important;
-    margin: 18px 10px 0 !important;
-  }
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div {
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
-  }
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections button {
-    width: auto !important;
-    min-height: 34px !important;
-  }
-}
-
-/* Resumen: una doble página de diario. Los datos siguen siendo los controles existentes. */
-.nb2-workspace:has(.nb2-summary-diary) {
-  position: relative !important;
-  background: #09090a !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-  grid-template-rows: auto auto 1fr !important;
-  column-gap: clamp(42px, 7vw, 112px) !important;
-  row-gap: 18px !important;
-  position: relative !important;
-  isolation: isolate !important;
-  max-width: 1420px !important;
-  min-height: 770px !important;
-  margin: 28px auto 50px !important;
-  padding: clamp(54px, 6vw, 92px) clamp(42px, 8vw, 128px) clamp(54px, 6vw, 86px) !important;
-  border: 1px solid rgba(96, 62, 40, .72) !important;
-  border-radius: 6px !important;
-  background: url('/assets/notebook-summary-diary-background.png') center / cover no-repeat !important;
-  box-shadow: 0 28px 60px rgba(0, 0, 0, .48), inset 0 0 0 5px rgba(49, 30, 20, .12) !important;
-  color: #33251e !important;
-  overflow: hidden !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary::before {
-  content: 'DIARIO DE LA CRÓNICA' !important;
-  grid-column: 1 !important;
-  grid-row: 1 !important;
-  align-self: end !important;
-  color: #7e303d !important;
-  font: 700 11px/1 Georgia, serif !important;
-  letter-spacing: .2em !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > * {
-  position: relative !important;
-  z-index: 1 !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > h2 {
-  grid-column: 1 !important;
-  grid-row: 2 !important;
-  margin: 0 !important;
-  color: #2f211b !important;
-  font: 700 clamp(30px, 4vw, 50px)/1.05 Georgia, serif !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > p {
-  grid-column: 1 !important;
-  grid-row: 3 !important;
-  align-self: start !important;
-  max-width: 46ch !important;
-  margin: 0 !important;
-  color: #553e30 !important;
-  font: italic 17px/1.55 Georgia, serif !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > .nb2-summary {
-  grid-column: 1 !important;
-  grid-row: 3 !important;
-  align-self: end !important;
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: 12px !important;
-  margin: 0 !important;
-  padding: 18px 0 !important;
-  border-top: 1px solid rgba(94, 59, 38, .44) !important;
-  border-bottom: 1px solid rgba(94, 59, 38, .44) !important;
-  background: transparent !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > .nb2-summary button {
-  display: block !important;
-  min-width: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  color: #702a38 !important;
-  font: 700 27px/1 Georgia, serif !important;
-  text-align: left !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > .nb2-summary button span {
-  display: block !important;
-  margin-top: 5px !important;
-  color: #624a38 !important;
-  font: 700 9px/1.25 Georgia, serif !important;
-  letter-spacing: .08em !important;
-  text-transform: uppercase !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > h3 {
-  grid-column: 2 !important;
-  grid-row: 1 !important;
-  align-self: end !important;
-  margin: 0 !important;
-  padding-bottom: 10px !important;
-  border-bottom: 1px solid rgba(94, 59, 38, .46) !important;
-  color: #39281f !important;
-  font: 700 clamp(22px, 2.4vw, 30px)/1.1 Georgia, serif !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > .nb2-row {
-  grid-column: 2 !important;
-  display: flex !important;
-  align-items: baseline !important;
-  justify-content: space-between !important;
-  width: 100% !important;
-  min-height: 48px !important;
-  padding: 12px 3px !important;
-  border: 0 !important;
-  border-bottom: 1px dashed rgba(94, 59, 38, .42) !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: #33251e !important;
-  text-align: left !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > .nb2-row:hover {
-  background: rgba(114, 38, 50, .08) !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > .nb2-row strong {
-  font: 700 18px Georgia, serif !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > .nb2-row span {
-  color: #705845 !important;
-  font: 13px Georgia, serif !important;
-}
-
-/* Los botones existentes se convierten en tiras del borde sin cambiar sus eventos. */
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections {
-  position: absolute !important;
-  z-index: 5 !important;
-  top: 320px !important;
-  right: clamp(4px, 3.6vw, 58px) !important;
-  width: 154px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 8px !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div + div { margin-top: 16px !important; }
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections button {
-  width: 154px !important;
-  min-height: 36px !important;
-  padding: 9px 13px 9px 15px !important;
-  border: 1px solid rgba(100, 62, 41, .56) !important;
-  border-radius: 0 12px 12px 0 !important;
-  background: rgba(227, 211, 177, .94) !important;
-  color: #382920 !important;
-  box-shadow: 3px 3px 0 rgba(44, 27, 19, .2) !important;
-  font: 700 12px Georgia, serif !important;
-  text-align: left !important;
-}
-.nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div:first-child button[aria-pressed="true"] {
-  background: #792d3b !important;
-  border-color: #bd6170 !important;
-  color: #fff0da !important;
-}
-
-@media (max-width: 760px) {
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary {
-    display: block !important;
-    min-height: 720px !important;
-    margin: 14px 10px 30px !important;
-    padding: 42px 24px 46px !important;
-    background-size: auto 100% !important;
-    background-position: 74% center !important;
-  }
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary::before {
-    display: block !important;
-    margin-bottom: 12px !important;
-  }
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > h2,
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > p,
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > .nb2-summary,
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > h3,
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > .nb2-row {
-    display: block !important;
-    margin-top: 20px !important;
-  }
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > .nb2-summary {
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 10px !important;
-  }
-  .nb2-workspace:has(.nb2-summary-diary) .nb2-summary-diary > .nb2-row span { margin-top: 5px !important; }
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections {
-    position: relative !important;
-    top: auto !important;
-    right: auto !important;
-    width: auto !important;
-    margin: 16px 10px 0 !important;
-  }
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections > div { flex-direction: row !important; flex-wrap: wrap !important; }
-  .nb2-workspace:has(.nb2-summary-diary) > .nb2-sections button { width: auto !important; }
 }
