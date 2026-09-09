@@ -54,7 +54,7 @@ export function NotebookWorkspace() {
   const [canManage, setCanManage] = useState(false)
   const [selectedId, setSelectedId] = useState('')
   const [mobileReader, setMobileReader] = useState(false)
-  const [section, setSection] = useState<Section>('NOTES')
+  const [section, setSection] = useState<Section>('SUMMARY')
   const [filter, setFilter] = useState<Filter>('ALL')
   const [tag, setTag] = useState('')
   const [search, setSearch] = useState('')
