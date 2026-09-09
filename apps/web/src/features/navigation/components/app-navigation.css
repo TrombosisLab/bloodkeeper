@@ -126,3 +126,58 @@
 
 /* NOTEBOOK_CONTEXTUAL_NAV_V1 */
 .app-navigation__notebook-subnav{display:grid;gap:2px;margin:-2px 8px 8px 22px;padding:7px 0 7px 13px;border-left:1px solid rgba(207,64,87,.45)}.app-navigation__notebook-subnav button{border:0;background:transparent;color:#938681;padding:5px 7px;text-align:left;font-size:11px;cursor:pointer}.app-navigation__notebook-subnav button:hover,.app-navigation__notebook-subnav button:focus-visible{color:#f0dfd8;background:rgba(74,28,37,.38)}
+
+/* NOTEBOOK_REFERENCE_NAV_POLISH_V1 */
+.app-navigation__notebook-subnav{display:grid;gap:10px;margin:0 8px 10px 21px;padding:9px 0 10px 13px;border-left:1px solid rgba(207,64,87,.46)}.app-navigation__notebook-subnav button{min-height:0;padding:5px 7px;border:0!important;border-radius:0!important;background:transparent!important;color:#a99b95;font-size:11px;font-weight:400!important}.app-navigation__notebook-subnav button:hover,.app-navigation__notebook-subnav button:focus-visible{color:#f2e5de;background:rgba(74,28,37,.4)!important}
+
+/* NOTEBOOK_NAVIGATION_GROUPED_V3 */
+.app-navigation__notebook-subnav{display:grid;gap:12px;margin:0 8px 11px 21px;padding:9px 0 11px 13px;border-left:1px solid rgba(207,64,87,.46)}
+.app-navigation__notebook-subnav section{display:grid;gap:2px}.app-navigation__notebook-subnav strong{display:block;padding:3px 7px;color:#c79b66;font-size:9px;letter-spacing:.14em}.app-navigation__notebook-subnav button{min-height:0!important;padding:5px 7px!important;border:0!important;border-radius:0!important;background:transparent!important;color:#a99b95!important;font-size:11px!important;font-weight:400!important;box-shadow:none!important}.app-navigation__notebook-subnav button:hover,.app-navigation__notebook-subnav button:focus-visible{color:#f2e5de!important;background:rgba(74,28,37,.4)!important}
+
+/* NOTEBOOK_SIDEBAR_SUBNAV_OVERLAP_FIX_V1: el panel de sesión no tapa las últimas opciones del submenú. */
+@media(min-width:901px){
+  .app-navigation-shell{height:100dvh!important;max-height:100dvh!important;min-height:100dvh!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+  .app-navigation__heading{flex:0 0 auto!important}
+  .app-navigation{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;padding-bottom:190px!important;scrollbar-width:thin!important;scrollbar-color:#6f3745 transparent!important}
+  .app-navigation__notebook-subnav{padding-bottom:18px!important}
+}
+@media(max-width:900px){.app-navigation{padding-bottom:12px!important}}
+
+/* NOTEBOOK_SIDEBAR_PRIMARY_ROW_SPACING_V1: cada sección principal conserva título, subtítulo y foco dentro de su fila. */
+.app-navigation>button{display:grid!important;grid-template-rows:auto auto!important;align-content:center!important;align-items:center!important;min-height:58px!important;height:auto!important;padding:10px 12px!important;gap:3px!important;line-height:1.2!important;border:1px solid transparent!important;border-radius:9px!important;overflow:visible!important}
+.app-navigation>button>span{display:block!important;line-height:1.2!important}
+.app-navigation>button>small{display:block!important;line-height:1.2!important;margin:0!important}
+.app-navigation>button:focus-visible{outline:2px solid #db7080!important;outline-offset:1px!important}
+.app-navigation>button[aria-current='page']{border-color:rgba(214,70,91,.85)!important;box-shadow:inset 3px 0 #dc5269!important}
+.app-navigation__notebook-subnav{margin-top:0!important;margin-bottom:12px!important;padding-top:4px!important}
+.app-navigation__notebook-subnav button{min-height:29px!important;padding:6px 7px!important;line-height:1.2!important}
+@media(min-width:901px){.app-navigation{gap:4px!important}.app-navigation>button{min-height:60px!important}}
+@media(max-width:900px){.app-navigation>button{min-height:54px!important}}
+
+/* NOTEBOOK_COMPLETE_VISUAL_REVIEW_V1: coherencia del submenú y espacio inferior reservado. */
+@media(min-width:901px){.app-navigation__notebook-subnav{padding-bottom:18px!important;margin-bottom:12px!important}.app-navigation__notebook-subnav button{min-height:29px!important;padding:6px 7px!important;line-height:1.2!important}}
+
+/* NOTEBOOK_VISUAL_SYSTEM_COMPLETE_V1: navegación con espacio inferior real. */
+@media (min-width: 901px) {
+  .app-navigation-shell {
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+  }
+  .app-navigation {
+    min-height: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    padding-bottom: 190px !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(131, 60, 76, .72) transparent !important;
+  }
+  .app-navigation__notebook-subnav {
+    margin-bottom: 18px !important;
+    padding-bottom: 14px !important;
+  }
+}
+@media (max-width: 900px) {
+  .app-navigation { padding-bottom: 118px !important; }
+}
