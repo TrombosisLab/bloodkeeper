@@ -2070,3 +2070,161 @@ dialog.nb2-modal.nb2-wide{width:min(940px,calc(100vw - 48px));padding:28px 30px;
     margin-top: 26px !important;
   }
 }
+
+/* Responsive final del diario: doble página amplia y página única estrecha. */
+.nb2-workspace:has(.nb2-summary-book) {
+  min-height: calc(100vh - 56px) !important;
+  overflow-x: clip !important;
+  background: radial-gradient(ellipse at 52% 16%, rgba(76,48,38,.16), transparent 45%), #09090a !important;
+}
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__motto {
+  display: none !important;
+}
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__stats > button span {
+  color: #4e382b !important;
+  font-size: clamp(8px,.72vw,11px) !important;
+  line-height: 1.25 !important;
+  text-shadow: 0 1px rgba(255,246,219,.48) !important;
+}
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__entry span {
+  color: #614a39 !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px rgba(255,246,219,.38) !important;
+}
+
+/* Pestañas de papel más estrechas y sin aspecto de botón redondeado. */
+.nb2-workspace:has(.nb2-summary-book) > .nb2-sections > div:first-child > button {
+  width: 92px !important;
+  min-width: 92px !important;
+  min-height: 30px !important;
+  padding: 7px 8px 7px 15px !important;
+  border-radius: 0 3px 3px 0 !important;
+  clip-path: polygon(8px 0,100% 0,100% 100%,8px 100%,0 50%) !important;
+  background: repeating-linear-gradient(0deg,rgba(81,54,35,.04) 0 1px,transparent 1px 4px),#dac49b !important;
+  box-shadow: none !important;
+  font-size: 10px !important;
+}
+.nb2-workspace:has(.nb2-summary-book) > .nb2-sections > div:first-child button[aria-pressed='true'] {
+  background: repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px),#742a38 !important;
+}
+
+@media (min-width:1121px) {
+  .nb2-workspace:has(.nb2-summary-book) > .nb2-sections {
+    width: 92px !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book {
+    width: min(1500px,calc(100% - 8px)) !important;
+  }
+}
+
+/* Con el lateral abierto, dos páginas dejan de ser legibles por debajo de 1120px. */
+@media (max-width:1120px) {
+  .nb2-workspace:has(.nb2-summary-book) > .nb2-header {
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) !important;
+    gap: 12px !important;
+    min-height: 0 !important;
+    padding: 22px 28px 24px !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-header__copy h1 {
+    max-width: none !important;
+    font-size: clamp(32px,5vw,43px) !important;
+    white-space: normal !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-header__controls {
+    display: flex !important;
+    width: min(100%,620px) !important;
+    flex-wrap: wrap !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-header__cover {
+    position: absolute !important;
+    inset: 0 0 0 auto !important;
+    width: 45% !important;
+    height: 100% !important;
+    opacity: .25 !important;
+    pointer-events: none !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) > .nb2-sections {
+    display: flex !important;
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    width: auto !important;
+    margin: 12px 10px 0 !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) > .nb2-sections > div:first-child {
+    display: grid !important;
+    grid-template-columns: repeat(4,minmax(0,1fr)) !important;
+    width: 100% !important;
+    gap: 5px !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) > .nb2-sections > div:first-child > button {
+    width: 100% !important;
+    min-width: 0 !important;
+    clip-path: none !important;
+    border-radius: 4px !important;
+    padding: 8px 6px !important;
+    text-align: center !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book {
+    display: block !important;
+    width: min(760px,calc(100% - 12px)) !important;
+    min-height: 820px !important;
+    aspect-ratio: auto !important;
+    margin: 8px auto 22px !important;
+    padding: clamp(42px,7vw,66px) clamp(28px,8vw,64px) 58px !important;
+    background-size: auto 100% !important;
+    background-position: 75% center !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page {
+    width: 100% !important;
+    max-width: 590px !important;
+    margin: 0 auto !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page--left h2 {
+    max-width: 14ch !important;
+    font-size: clamp(34px,6.5vw,48px) !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__description {
+    font-size: 15px !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__stats {
+    margin-top: 32px !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page--right {
+    margin-top: 42px !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__heading h3 {
+    font-size: clamp(26px,5vw,35px) !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__entry strong {
+    font-size: 16px !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__entry span {
+    font-size: 11px !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__closing {
+    display: none !important;
+  }
+}
+
+@media (max-width:560px) {
+  .nb2-workspace:has(.nb2-summary-book) > .nb2-header {
+    padding: 18px 16px 20px !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-header__controls {
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) auto !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-header__controls label {
+    grid-column: 1/-1 !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book {
+    min-height: 780px !important;
+    padding: 38px 24px 46px !important;
+    background-position: 76% center !important;
+  }
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__stats {
+    gap: 8px !important;
+  }
+}
