@@ -2228,3 +2228,53 @@ dialog.nb2-modal.nb2-wide{width:min(940px,calc(100vw - 48px));padding:28px 30px;
     gap: 8px !important;
   }
 }
+
+/* Resumen: pestañas retiradas y fondo fundido en los laterales. */
+.nb2-workspace:has(.nb2-summary-book) > .nb2-sections {
+  display: none !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book {
+  isolation: isolate !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* La imagen vive en una capa independiente para no afectar jamás al texto. */
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book::before {
+  content: '' !important;
+  position: absolute !important;
+  z-index: 0 !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background-image: url('/assets/notebook-summary-diary-background.png') !important;
+  background-position: center !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.35) 2.5%, #000 7.5%, #000 92.5%, rgba(0,0,0,.35) 97.5%, transparent 100%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.35) 2.5%, #000 7.5%, #000 92.5%, rgba(0,0,0,.35) 97.5%, transparent 100%) !important;
+  filter: drop-shadow(0 22px 34px rgba(0,0,0,.38)) !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+@media (max-width:1120px) {
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book::before {
+    background-size: auto 100% !important;
+    background-position: 75% center !important;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.45) 4%, #000 11%, #000 89%, rgba(0,0,0,.45) 96%, transparent 100%) !important;
+    mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.45) 4%, #000 11%, #000 89%, rgba(0,0,0,.45) 96%, transparent 100%) !important;
+  }
+}
+
+@media (max-width:560px) {
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book::before {
+    background-position: 76% center !important;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.55) 3%, #000 9%, #000 91%, rgba(0,0,0,.55) 97%, transparent 100%) !important;
+    mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.55) 3%, #000 9%, #000 91%, rgba(0,0,0,.55) 97%, transparent 100%) !important;
+  }
+}
