@@ -180,3 +180,92 @@
     width: auto;
   }
 }
+
+/* GLOBAL_CHRONICLE_HEADER_CONTEXT_V1 */
+/* La cabecera conserva su estructura; solo añade la portada del contexto global. */
+:where(.app-header, .app-topbar, [data-app-header]) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+:where(.app-header, .app-topbar, [data-app-header])::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 0 auto;
+  width: min(46%, 44rem);
+  pointer-events: none;
+  opacity: 0;
+  background-image: var(--app-active-chronicle-cover);
+  background-position: center;
+  background-size: cover;
+  transition: opacity .25s ease;
+}
+:root[data-active-chronicle] :where(.app-header, .app-topbar, [data-app-header])::after {
+  opacity: .52;
+}
+:where(.app-header, .app-topbar, [data-app-header])::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 0 auto;
+  width: min(56%, 52rem);
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(12,12,14,.98) 0%, rgba(12,12,14,.78) 32%, rgba(12,12,14,.14) 100%), linear-gradient(0deg, rgba(8,8,9,.58), transparent 55%);
+}
+:where(.app-header, .app-topbar, [data-app-header]) > * {
+  position: relative;
+  z-index: 2;
+}
+@media (max-width: 760px) {
+  :where(.app-header, .app-topbar, [data-app-header])::after { width: 62%; opacity: .38; }
+  :where(.app-header, .app-topbar, [data-app-header])::before { width: 78%; }
+}
+
+/* UNIFIED_GLOBAL_HEADER_EXCEPT_NOTEBOOK_V1 */
+/* La cabecera visual se comparte en toda la aplicación salvo en Cuaderno. */
+.app-header:not(.app-header--notebook) {
+  grid-template-columns: minmax(180px, 15%) minmax(0, 1fr) minmax(190px, 22%) !important;
+  column-gap: 0 !important;
+  background: linear-gradient(90deg, rgba(14,10,13,.98) 0%, rgba(17,10,14,.92) 22%, rgba(14,10,13,.72) 44%, rgba(10,8,10,.66) 100%) !important;
+}
+.app-header:not(.app-header--notebook) .app-header__page-context {
+  grid-column: 2 !important;
+  padding-left: clamp(18px, 1.7vw, 30px) !important;
+  padding-right: clamp(18px, 2.6vw, 48px) !important;
+  border-left: 1px solid rgba(196,145,77,.30) !important;
+  min-height: 58px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+.app-header:not(.app-header--notebook) .app-header__status {
+  grid-column: 3 !important;
+  justify-self: end !important;
+  padding-right: clamp(22px, 2.8vw, 52px) !important;
+}
+.app-header:not(.app-header--notebook)::after {
+  width: min(82%, 1380px) !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% auto !important;
+  background-position: right center !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.12) 14%, rgba(0,0,0,.78) 35%, #000 53%, #000 100%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.12) 14%, rgba(0,0,0,.78) 35%, #000 53%, #000 100%) !important;
+}
+.app-header:not(.app-header--notebook)::before {
+  width: min(82%, 1380px) !important;
+  background: linear-gradient(90deg, rgba(14,10,13,.08) 0%, rgba(14,10,13,.04) 25%, rgba(10,8,10,.16) 58%, rgba(10,8,10,.60) 100%) !important;
+}
+@media (max-width: 900px) {
+  .app-header:not(.app-header--notebook) {
+    grid-template-columns: minmax(150px, 20%) minmax(0, 1fr) !important;
+  }
+  .app-header:not(.app-header--notebook) .app-header__page-context {
+    padding-left: 14px !important;
+    padding-right: 16px !important;
+  }
+  .app-header:not(.app-header--notebook)::after,
+  .app-header:not(.app-header--notebook)::before {
+    width: 78% !important;
+  }
+}

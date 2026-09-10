@@ -421,31 +421,7 @@ export function ChronicleListCreate({
 
   return (
     <section className="chronicle-workspace">
-      <header className="chronicle-workspace__header">
-        <div>
-          <span className="chronicle-workspace__eyebrow">
-            Crónicas
-          </span>
-          <h1>Crónicas</h1>
-          <p>
-            Gestiona tus partidas y continúa donde lo dejaste.
-          </p>
-        </div>
-
-        {canCreateChronicles ? (
-          <button
-            type="button"
-            className="chronicle-workspace__primary-action"
-            aria-expanded={createOpen}
-            aria-controls="chronicle-create-panel"
-            onClick={() => setCreateOpen((current) => !current)}
-          >
-            + Nueva crónica
-          </button>
-        ) : null}
-      </header>
-
-      <section className="chronicle-overview" aria-label="Resumen de crónicas">
+<section className="chronicle-overview" aria-label="Resumen de crónicas">
         <div className="chronicle-overview__stat">
           <span>Crónicas</span>
           <strong>{chronicles.length}</strong>
@@ -621,3 +597,7 @@ export function ChronicleListCreate({
   )
 
 }
+
+// REDUNDANT_WORKSPACE_SUBHEADERS_V1
+
+// REDUNDANT_WORKSPACE_SUBHEADERS_V2

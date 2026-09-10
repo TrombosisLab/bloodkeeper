@@ -12,10 +12,10 @@ export type NotebookNote = {
 }
 export type NotebookPage = { readonly items: readonly NotebookNote[]; readonly canManage: boolean; readonly viewerUserId: string }
 export type NotebookContextNpc = { readonly id: string; readonly name: string; readonly category: string | null; readonly description: string | null; readonly narrativeRole: string | null; readonly detailLevel: string }
-export type NotebookContextLocation = { readonly id: string; readonly name: string; readonly category: string | null; readonly description: string | null; readonly parentLocationId: string | null }
+export type NotebookContextLocation = { readonly id: string; readonly name: string; readonly category: string | null; readonly description: string | null; readonly parentLocationId: string | null; readonly imageUrl?: string }
 export type NotebookContext = {
   readonly npcs: readonly NotebookContextNpc[]; readonly locations: readonly NotebookContextLocation[]
-  readonly resources: readonly { id: string; kind: 'ORGANIZATION' | 'ARTIFACT' | 'DOCUMENT'; name: string; summary: string | null; visibility: string }[]
+  readonly resources: readonly { id: string; kind: 'ORGANIZATION' | 'ARTIFACT' | 'DOCUMENT'; name: string; summary: string | null; visibility: string; locationId: string | null }[]
   readonly players: readonly NotebookPlayer[]; readonly viewerUserId: string
 }
 export type NotebookResourcePreview = {

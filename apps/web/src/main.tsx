@@ -195,7 +195,7 @@ function App() {
           ? 'application-content'
           : undefined
       }
-      header={<AppHeader />}
+      header={<AppHeader displayName={authenticatedUser.displayName} />}
       navigation={
         <AppNavigation
           aria-label="Secciones principales"
@@ -354,3 +354,5 @@ ReactDOM.createRoot(
     </AuthenticationGate>
   </React.StrictMode>,
 )
+
+// UNIFIED_DASHBOARD_HEADER_V1

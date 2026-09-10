@@ -97,7 +97,7 @@ export function AppNavigation({
     >
       <div className="app-navigation__heading">
         <div>
-          <span>BloodKeeper</span>
+          
           <strong>Secciones</strong>
         </div>
 
@@ -189,10 +189,12 @@ export function AppNavigation({
             <small>Notas y referencias</small>
           </button>
         ) : null}
-        {/* NOTEBOOK_CONTEXTUAL_NAV_V1 */}
-        {activeSection === 'notebook' ? <div className="app-navigation__notebook-subnav" aria-label="Secciones del Cuaderno">{[
-          ['ALL', 'Resumen'], ['ALL', 'Notas'], ['SESSION', 'Sesiones'], ['TAGS', 'Etiquetas'], ['NPC', 'PNJ'], ['LOCATION', 'Localizaciones'], ['ORGANIZATION', 'Organizaciones'], ['ARTIFACT', 'Artefactos'], ['DOCUMENT', 'Documentos'],
-        ].map(([section, label]) => <button type="button" key={label} onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section, label } }))}>{label}</button>)}</div> : null}
+        {/* NOTEBOOK_NAVIGATION_GROUPED_V3 */}
+        {activeSection === 'notebook' ? <div className="app-navigation__notebook-subnav" aria-label="Secciones del Cuaderno">
+          <section><strong>DIARIO</strong><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'ALL', label: 'Resumen' } }))}>Resumen</button><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'ALL', label: 'Notas' } }))}>Notas</button><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'SESSION', label: 'Sesiones' } }))}>Sesiones</button></section>
+          <section><strong>ARCHIVO DE LA CRÓNICA</strong><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'NPC', label: 'PNJ' } }))}>PNJ</button><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'LOCATION', label: 'Localizaciones' } }))}>Localizaciones</button><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'ORGANIZATION', label: 'Organizaciones' } }))}>Organizaciones</button><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'ARTIFACT', label: 'Artefactos' } }))}>Artefactos</button><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'DOCUMENT', label: 'Documentos' } }))}>Documentos</button></section>
+          <section><strong>EXPLORAR</strong><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'TAGS', label: 'Etiquetas' } }))}>Etiquetas</button></section>
+        </div> : null}
 
         {canAccessChronicles ? (
           <button
@@ -214,3 +216,5 @@ export function AppNavigation({
     </aside>
   )
 }
+
+// UNIFIED_DASHBOARD_HEADER_V2

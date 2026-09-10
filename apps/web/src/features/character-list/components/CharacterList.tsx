@@ -182,18 +182,10 @@ export function CharacterList({
 
   return (
     <section className="character-list-workspace">
-      <header className="character-list-workspace__header">
-        <div>
-          <span className="character-list-workspace__eyebrow">
-            Personajes
-          </span>
-          <h1>Tus personajes</h1>
-          <p>
-            Consulta tus personajes guardados,
-            abre su ficha o continúa un borrador.
-          </p>
-        </div>
-
+<section
+        className="character-list"
+        aria-labelledby="character-list-title"
+      >
         <div className="character-list-workspace__actions">
           <button
             type="button"
@@ -210,13 +202,8 @@ export function CharacterList({
             Crear personaje
           </button>
         </div>
-      </header>
 
-      <section
-        className="character-list"
-        aria-labelledby="character-list-title"
-      >
-        <div className="character-list__heading">
+      <div className="character-list__heading">
           <h2 id="character-list-title">
             Guardados
           </h2>
@@ -362,3 +349,5 @@ export function CharacterList({
     </section>
   )
 }
+
+// REDUNDANT_WORKSPACE_SUBHEADERS_V2

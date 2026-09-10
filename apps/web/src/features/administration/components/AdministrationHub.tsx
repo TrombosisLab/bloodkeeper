@@ -565,31 +565,7 @@ export function AdministrationHub() {
 
   return (
     <section className="administration-hub">
-      <header className="administration-hub__header">
-        <div>
-          <p className="eyebrow">
-            ADMINISTRACIÓN
-          </p>
-
-          <h1>
-            Centro administrativo
-          </h1>
-
-          <p>
-            Gestiona cuentas, accesos
-            y operaciones del sistema.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={refresh}
-        >
-          Actualizar
-        </button>
-      </header>
-
-      {message ? (
+{message ? (
         <p
           className="administration-hub__notice"
           role="status"
@@ -1034,3 +1010,5 @@ export function AdministrationHub() {
     </section>
   )
 }
+
+// ADMINISTRATION_SUBHEADER_REMOVED_V3
