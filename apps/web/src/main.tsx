@@ -354,3 +354,5 @@ ReactDOM.createRoot(
 // UNIFIED_DASHBOARD_HEADER_V1
 
 // APPLICATION_CONTENT_ALL_PAGES_V2
+
+import './dossier-dots';
