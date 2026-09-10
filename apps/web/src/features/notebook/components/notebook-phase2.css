@@ -3021,3 +3021,126 @@ dialog.nb2-modal.nb2-wide{width:min(940px,calc(100vw - 48px));padding:28px 30px;
     border-radius: 14px !important;
   }
 }
+
+/* NOTEBOOK_VISUAL_COMPOSITION_V1 */
+/* Primera pasada visual: jerarquía clara entre título, controles y portada. */
+.nb2-workspace {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 14px clamp(16px, 2.2vw, 34px) 38px !important;
+  box-sizing: border-box;
+}
+
+.nb2-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(430px, auto) !important;
+  align-items: center !important;
+  gap: 24px !important;
+  min-height: 132px !important;
+  padding: 20px clamp(22px, 3vw, 38px) !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+}
+
+.nb2-header__copy {
+  position: relative !important;
+  z-index: 3 !important;
+  min-width: 0 !important;
+}
+
+.nb2-header__copy h1 {
+  max-width: 520px !important;
+  margin-bottom: 8px !important;
+}
+
+.nb2-header__copy p {
+  max-width: 540px !important;
+}
+
+.nb2-header__controls {
+  position: relative !important;
+  z-index: 4 !important;
+  display: grid !important;
+  grid-template-columns: minmax(170px, 220px) auto auto !important;
+  align-items: end !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+  padding: 10px 12px !important;
+  border: 1px solid rgba(120, 73, 77, 0.72) !important;
+  border-radius: 12px !important;
+  background: rgba(13, 11, 12, 0.82) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(5px) !important;
+}
+
+.nb2-header__controls label {
+  min-width: 0 !important;
+}
+
+.nb2-header__controls select {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.nb2-header__controls button {
+  white-space: nowrap !important;
+}
+
+.nb2-header__cover {
+  z-index: 0 !important;
+  opacity: 0.72 !important;
+  isolation: isolate !important;
+}
+
+.nb2-header__cover img {
+  opacity: 0.72 !important;
+  filter: saturate(0.72) contrast(1.08) brightness(0.68) !important;
+}
+
+.nb2-header__cover::after {
+  z-index: 1 !important;
+  background: linear-gradient(90deg, #101012 0%, rgba(16, 16, 18, 0.92) 28%, rgba(10, 10, 11, 0.42) 68%, rgba(10, 10, 11, 0.62) 100%), linear-gradient(0deg, rgba(8, 8, 9, 0.76), transparent 68%) !important;
+}
+
+.nb2-header__cover span,
+.nb2-header__cover em {
+  z-index: 2 !important;
+  opacity: 0.58 !important;
+  text-shadow: 0 2px 9px #000 !important;
+}
+
+.nb2-summary-book {
+  margin-top: 20px !important;
+}
+
+@media (max-width: 1120px) {
+  .nb2-header {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .nb2-header__controls {
+    justify-self: stretch !important;
+    width: min(100%, 620px) !important;
+    margin-left: auto !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .nb2-workspace {
+    padding: 10px 12px 26px !important;
+  }
+
+  .nb2-header {
+    gap: 16px !important;
+    padding: 18px 16px !important;
+  }
+
+  .nb2-header__controls {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .nb2-header__controls label {
+    grid-column: 1 / -1 !important;
+  }
+}

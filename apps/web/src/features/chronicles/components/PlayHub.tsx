@@ -1,3 +1,5 @@
+import { createPortal } from 'react-dom'
+/* REMOVE_PLAY_RESOURCES_SUBHEADERS_V1 */
 import { useEffect, useMemo, useState } from 'react'
 import { createChronicleGateway } from '../infrastructure/chronicle.api'
 import type { ChronicleApiSnapshot } from '../types/chronicle-api.types'
@@ -65,16 +67,17 @@ export function PlayHub({ onOpenCharacter }: PlayHubProps) {
 
   return (
     <section className="play-hub">
-      <header className="play-hub__header">
-        <div>
-          <small>JUGAR</small>
-          <h1>Tu mesa de juego</h1>
-          <p>Elige una crónica activa para entrar directamente en la mesa.</p>
-        </div>
+      {typeof document !== 'undefined' && document.getElementById('app-header-page-actions')
+        ? createPortal(
+            <div className="play-hub__actions">
         <button disabled={loading} onClick={() => void loadChronicles()} type="button">
           Actualizar
         </button>
-      </header>
+      </div>,
+            document.getElementById('app-header-page-actions')!,
+          )
+        : null}
+
 
       {loading ? <p className="play-hub__status">Cargando crónicas activas…</p> : null}
       {!loading && error ? <p className="play-hub__error" role="alert">{error}</p> : null}
@@ -125,3 +128,5 @@ export function PlayHub({ onOpenCharacter }: PlayHubProps) {
     </section>
   )
 }
+
+// PLAY_REFRESH_HEADER_ACTIONS_V1

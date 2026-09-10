@@ -385,6 +385,7 @@ model ChronicleLocation {
   updatedAt        DateTime                @updatedAt @db.Timestamptz(3)
 
   chronicle Chronicle @relation("ChronicleLocationChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  resourceLinks ChronicleResource[] @relation("ChronicleResourceLocation")
   contextLinks ChronicleSessionLocation[] @relation("ChronicleSessionLocationLocation")
   storyLinks   ChronicleStoryLocation[] @relation("ChronicleStoryLocationLocation")
   eventLinks ChronicleEventLocation[] @relation("ChronicleEventLocationLocation")
@@ -1464,6 +1465,7 @@ enum ChronicleResourceKind {
 model ChronicleResource {
   id String @id @default(uuid()) @db.Uuid
   chronicleId String @db.Uuid
+  locationId String? @map("location_id") @db.Uuid
   kind ChronicleResourceKind
   name String
   summary String?
@@ -1474,6 +1476,7 @@ model ChronicleResource {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   chronicle Chronicle @relation(fields: [chronicleId], references: [id], onDelete: Cascade)
+  location ChronicleLocation? @relation("ChronicleResourceLocation", fields: [locationId], references: [id], onDelete: SetNull)
   sessionLinks ChronicleSessionResource[] @relation("ChronicleSessionResourceResource")
   @@index([chronicleId, kind, status])
   @@index([chronicleId, visibility, status])

@@ -269,3 +269,924 @@
     width: 78% !important;
   }
 }
+
+/* CHARACTER_HEADER_ACTIONS_V3 */
+.app-header:not(.app-header--notebook) .app-header__page-actions {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  justify-self: end !important;
+  align-self: center !important;
+  display: flex !important;
+  gap: 10px !important;
+  z-index: 4 !important;
+  margin-right: clamp(150px, 16vw, 250px) !important;
+}
+.app-header:not(.app-header--notebook) .app-header__page-actions:empty {
+  display: none !important;
+}
+.app-header:not(.app-header--notebook) .app-header__page-context {
+  padding-right: clamp(220px, 25vw, 360px) !important;
+}
+@media (max-width: 900px) {
+  .app-header:not(.app-header--notebook) .app-header__page-actions {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    justify-self: start !important;
+    margin: 4px 0 0 16px !important;
+  }
+  .app-header:not(.app-header--notebook) .app-header__page-context {
+    padding-right: 16px !important;
+  }
+}
+
+/* CHARACTER_HEADER_ACTIONS_RIGHT_V4 */
+/* Las acciones se separan del título y ocupan el lateral derecho de la cabecera. */
+.app-header:not(.app-header--notebook) .app-header__page-actions {
+  position: absolute !important;
+  right: clamp(24px, 2.4vw, 48px) !important;
+  bottom: 18px !important;
+  margin: 0 !important;
+  display: flex !important;
+  gap: 10px !important;
+  z-index: 5 !important;
+}
+.app-header:not(.app-header--notebook) .app-header__page-context {
+  padding-right: 24px !important;
+}
+@media (max-width: 900px) {
+  .app-header:not(.app-header--notebook) .app-header__page-actions {
+    position: static !important;
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    justify-self: end !important;
+    margin: 4px 16px 0 0 !important;
+  }
+}
+
+/* CHARACTER_HEADER_ACTIONS_STYLE_V1 */
+/* Acciones sobrias, integradas en la paleta de la cabecera. */
+.app-header:not(.app-header--notebook) .app-header__page-actions button {
+  min-height: 38px !important;
+  padding: 0 17px !important;
+  border: 1px solid rgba(180, 139, 108, .42) !important;
+  border-radius: 7px !important;
+  background: rgba(17, 13, 15, .82) !important;
+  color: #eee4db !important;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, .22) !important;
+  font-weight: 600 !important;
+  transition: background-color .18s ease, border-color .18s ease, transform .18s ease !important;
+}
+.app-header:not(.app-header--notebook) .app-header__page-actions button:hover {
+  border-color: rgba(208, 154, 112, .70) !important;
+  background: rgba(39, 23, 26, .90) !important;
+  transform: translateY(-1px) !important;
+}
+.app-header:not(.app-header--notebook) .app-header__page-actions .character-list-workspace__primary {
+  border-color: rgba(158, 71, 86, .72) !important;
+  background: rgba(83, 29, 45, .78) !important;
+  color: #f5e9e0 !important;
+}
+.app-header:not(.app-header--notebook) .app-header__page-actions .character-list-workspace__primary:hover {
+  border-color: rgba(193, 91, 107, .86) !important;
+  background: rgba(105, 37, 54, .88) !important;
+}
+
+/* APPLICATION_CONTENT_FULL_WIDTH_V1 */
+/* El shell ocupa todo el ancho; cada feature conserva sus propios límites internos. */
+.application-content {
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: 0 !important;
+}
+
+/* Superficies de trabajo que deben aprovechar todo el espacio disponible. */
+.application-content > :where(
+  .dashboard,
+  .character-list-workspace,
+  .chronicle-workspace,
+  .administration-hub,
+  .resource-library-workspace,
+  .play-workspace,
+  .chronicle-session-panel
+) {
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: 0 !important;
+}
+
+/* Cuaderno conserva su composición de libro y no se fuerza a ancho completo. */
+.application-content > .nb2-workspace {
+  width: auto;
+  max-width: none;
+}
+
+@media (max-width: 899px) {
+  .application-content {
+    width: 100% !important;
+    padding-inline: 16px !important;
+  }
+}
+
+/* APPLICATION_CONTENT_ALL_PAGES_V2 */
+/* Todas las páginas usan el shell ancho; Cuaderno conserva su papel propio. */
+.application-content {
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: 0 !important;
+}
+.application-content--notebook {
+  width: min(1440px, 100%) !important;
+  max-width: 1440px !important;
+  margin-inline: auto !important;
+}
+
+/* GLOBAL_PAGE_VISUAL_SYSTEM_V1 */
+/* Envolvente común para todas las pantallas salvo Cuaderno. */
+:where(
+  .dashboard,
+  .chronicle-workspace,
+  .character-list-workspace,
+  .administration-hub,
+  .play-hub,
+  .resource-library-reference
+) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: clamp(16px, 2vw, 28px) clamp(16px, 2.4vw, 38px) 40px !important;
+  box-sizing: border-box;
+}
+
+:where(
+  .dashboard,
+  .chronicle-workspace,
+  .character-list-workspace,
+  .administration-hub,
+  .play-hub,
+  .resource-library-reference
+) > * {
+  max-width: none;
+}
+
+:where(
+  .dashboard,
+  .chronicle-workspace,
+  .character-list-workspace,
+  .administration-hub,
+  .play-hub,
+  .resource-library-reference
+) :where(
+  .chronicle-overview,
+  .chronicle-continue,
+  .chronicle-list,
+  .character-list-workspace__list,
+  .administration-hub__workspace,
+  .play-hub__grid,
+  .resource-category-rail,
+  .resource-showcase,
+  .resource-gallery
+) {
+  width: 100%;
+  max-width: none;
+}
+
+:where(
+  .chronicle-workspace__header,
+  .character-list-workspace__header,
+  .administration-hub__header,
+  .play-hub__header,
+  .resource-library-reference__header
+) {
+  max-width: none !important;
+}
+
+.app-header:not(.app-header--notebook) .app-header__page-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+}
+
+@media (max-width: 760px) {
+  :where(
+    .dashboard,
+    .chronicle-workspace,
+    .character-list-workspace,
+    .administration-hub,
+    .play-hub,
+    .resource-library-reference
+  ) {
+    padding: 14px 14px 28px !important;
+  }
+}
+
+
+/* NOTEBOOK_GLOBAL_HEADER_V2 */
+/* Cuaderno comparte la cabecera global; el libro comienza directamente debajo. */
+.app-header .app-header__page-actions .nb2-header__controls {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls label {
+  display: grid !important;
+  gap: 3px !important;
+  min-width: 190px !important;
+  color: #b9aaa4 !important;
+  font-size: 10px !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls select {
+  width: 220px !important;
+  min-height: 38px !important;
+  border: 1px solid rgba(119, 73, 77, .8) !important;
+  border-radius: 9px !important;
+  background: rgba(12, 10, 11, .88) !important;
+  color: #f1e8e3 !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls button {
+  min-height: 38px !important;
+  white-space: nowrap !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls .nb2-primary {
+  border-color: #c0475a !important;
+  background: linear-gradient(135deg, #8d2940, #b33e52) !important;
+}
+.nb2-workspace {
+  padding-top: 12px !important;
+}
+.nb2-workspace > .nb2-header,
+.nb2-workspace > .nb2-header__cover {
+  display: none !important;
+}
+@media (max-width: 980px) {
+  .app-header .app-header__page-actions .nb2-header__controls { gap: 7px !important; }
+  .app-header .app-header__page-actions .nb2-header__controls label { min-width: 150px !important; }
+  .app-header .app-header__page-actions .nb2-header__controls select { width: 170px !important; }
+}
+@media (max-width: 700px) {
+  .app-header .app-header__page-actions .nb2-header__controls label { min-width: 0 !important; }
+  .app-header .app-header__page-actions .nb2-header__controls select { width: 150px !important; }
+}
+
+
+/* NOTEBOOK_GLOBAL_HEADER_V4 */
+/* Cuaderno comparte la cabecera global; el libro comienza directamente debajo. */
+.app-header .app-header__page-actions .nb2-header__controls {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls label {
+  display: grid !important;
+  gap: 3px !important;
+  min-width: 190px !important;
+  color: #b9aaa4 !important;
+  font-size: 10px !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls select {
+  width: 220px !important;
+  min-height: 38px !important;
+  border: 1px solid rgba(119, 73, 77, .8) !important;
+  border-radius: 9px !important;
+  background: rgba(12, 10, 11, .88) !important;
+  color: #f1e8e3 !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls button {
+  min-height: 38px !important;
+  white-space: nowrap !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls .nb2-primary {
+  border-color: #c0475a !important;
+  background: linear-gradient(135deg, #8d2940, #b33e52) !important;
+}
+.nb2-workspace { padding-top: 12px !important; }
+.nb2-workspace > .nb2-header,
+.nb2-workspace > .nb2-header__cover { display: none !important; }
+@media (max-width: 980px) {
+  .app-header .app-header__page-actions .nb2-header__controls { gap: 7px !important; }
+  .app-header .app-header__page-actions .nb2-header__controls label { min-width: 150px !important; }
+  .app-header .app-header__page-actions .nb2-header__controls select { width: 170px !important; }
+}
+@media (max-width: 700px) {
+  .app-header .app-header__page-actions .nb2-header__controls label { min-width: 0 !important; }
+  .app-header .app-header__page-actions .nb2-header__controls select { width: 150px !important; }
+}
+
+
+/* NOTEBOOK_GLOBAL_HEADER_V5 */
+/* La cabecera de Cuaderno comparte visualmente la franja global sin tocar su JSX. */
+.application-content--notebook {
+  padding-top: 0 !important;
+}
+.application-content--notebook .nb2-workspace {
+  width: 100% !important;
+  max-width: none !important;
+  padding: 0 0 38px !important;
+}
+.application-content--notebook .nb2-header {
+  position: relative !important;
+  z-index: 15 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  width: 100% !important;
+  height: 68px !important;
+  min-height: 68px !important;
+  margin: -68px 0 0 !important;
+  padding: 8px clamp(16px, 2.6vw, 42px) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+.application-content--notebook .nb2-header > div:first-child,
+.application-content--notebook .nb2-header .nb2-header__copy,
+.application-content--notebook .nb2-header .nb2-header__cover {
+  display: none !important;
+}
+.application-content--notebook .nb2-header__controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.application-content--notebook .nb2-header label {
+  display: grid !important;
+  gap: 3px !important;
+  min-width: 190px !important;
+  color: #b9aaa4 !important;
+  font-size: 10px !important;
+}
+.application-content--notebook .nb2-header label select {
+  width: 220px !important;
+  min-height: 38px !important;
+  border: 1px solid rgba(119, 73, 77, .8) !important;
+  border-radius: 9px !important;
+  background: rgba(12, 10, 11, .88) !important;
+  color: #f1e8e3 !important;
+}
+.application-content--notebook .nb2-header > button,
+.application-content--notebook .nb2-header__controls button {
+  min-height: 38px !important;
+  white-space: nowrap !important;
+}
+.application-content--notebook .nb2-header .nb2-primary {
+  border-color: #c0475a !important;
+  background: linear-gradient(135deg, #8d2940, #b33e52) !important;
+}
+.application-content--notebook .nb2-sections {
+  margin-top: 0 !important;
+}
+@media (max-width: 760px) {
+  .application-content--notebook .nb2-header {
+    height: auto !important;
+    min-height: 68px !important;
+    margin-top: -68px !important;
+    padding: 10px 12px !important;
+    flex-wrap: wrap !important;
+  }
+  .application-content--notebook .nb2-header label { min-width: 0 !important; }
+  .application-content--notebook .nb2-header label select { width: 160px !important; }
+}
+
+
+/* NOTEBOOK_GLOBAL_HEADER_V6 */
+/* Una sola franja superior: el título vive en AppHeader y los controles en la cabecera existente. */
+.application-content--notebook { padding-top: 0 !important; }
+.application-content--notebook .nb2-workspace { width: 100% !important; max-width: none !important; padding: 0 0 38px !important; }
+.application-content--notebook .nb2-header {
+  position: relative !important;
+  z-index: 15 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  width: 100% !important;
+  height: 68px !important;
+  min-height: 68px !important;
+  margin: -68px 0 0 !important;
+  padding: 8px clamp(16px, 2.6vw, 42px) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+.application-content--notebook .nb2-header > div:first-child,
+.application-content--notebook .nb2-header .nb2-header__copy,
+.application-content--notebook .nb2-header .nb2-header__cover { display: none !important; }
+.application-content--notebook .nb2-header__controls { display: flex !important; align-items: center !important; gap: 10px !important; padding: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important; }
+.application-content--notebook .nb2-header label { display: grid !important; gap: 3px !important; min-width: 190px !important; color: #b9aaa4 !important; font-size: 10px !important; }
+.application-content--notebook .nb2-header label select { width: 220px !important; min-height: 38px !important; border: 1px solid rgba(119,73,77,.8) !important; border-radius: 9px !important; background: rgba(12,10,11,.88) !important; color: #f1e8e3 !important; }
+.application-content--notebook .nb2-header > button,
+.application-content--notebook .nb2-header__controls button { min-height: 38px !important; white-space: nowrap !important; }
+.application-content--notebook .nb2-header .nb2-primary { border-color: #c0475a !important; background: linear-gradient(135deg,#8d2940,#b33e52) !important; }
+.application-content--notebook .nb2-sections { margin-top: 0 !important; }
+@media (max-width: 760px) {
+  .application-content--notebook .nb2-header { height: auto !important; min-height: 68px !important; margin-top: -68px !important; padding: 10px 12px !important; flex-wrap: wrap !important; }
+  .application-content--notebook .nb2-header label { min-width: 0 !important; }
+  .application-content--notebook .nb2-header label select { width: 160px !important; }
+}
+
+
+/* NOTEBOOK_GLOBAL_HEADER_V7 */
+/* Cabecera única: título en AppHeader y controles alineados en la franja superior. */
+.application-content--notebook { padding-top: 0 !important; }
+.application-content--notebook .nb2-workspace { width: 100% !important; max-width: none !important; padding: 0 0 38px !important; }
+.application-content--notebook .nb2-header {
+  position: relative !important; z-index: 15 !important; display: flex !important; align-items: center !important; justify-content: flex-end !important; gap: 10px !important; width: 100% !important; height: 68px !important; min-height: 68px !important; margin: -68px 0 0 !important; padding: 8px clamp(16px,2.6vw,42px) !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; overflow: visible !important;
+}
+.application-content--notebook .nb2-header > div:first-child,
+.application-content--notebook .nb2-header .nb2-header__copy,
+.application-content--notebook .nb2-header .nb2-header__cover { display: none !important; }
+.application-content--notebook .nb2-header label { display: grid !important; gap: 3px !important; min-width: 190px !important; color: #b9aaa4 !important; font-size: 10px !important; }
+.application-content--notebook .nb2-header label select { width: 220px !important; min-height: 38px !important; border: 1px solid rgba(119,73,77,.8) !important; border-radius: 9px !important; background: rgba(12,10,11,.88) !important; color: #f1e8e3 !important; }
+.application-content--notebook .nb2-header > button { min-height: 38px !important; white-space: nowrap !important; }
+.application-content--notebook .nb2-header .nb2-primary { border-color: #c0475a !important; background: linear-gradient(135deg,#8d2940,#b33e52) !important; }
+@media (max-width: 760px) { .application-content--notebook .nb2-header { height:auto !important; min-height:68px !important; margin-top:-68px !important; padding:10px 12px !important; flex-wrap:wrap !important; } .application-content--notebook .nb2-header label { min-width:0 !important; } .application-content--notebook .nb2-header label select { width:160px !important; } }
+
+/* NOTEBOOK_GLOBAL_HEADER_V8 */
+/* La cabecera global real mide 160px: los controles deben compartir su centro vertical. */
+.application-content--notebook .nb2-header {
+  height: 160px !important;
+  min-height: 160px !important;
+  margin-top: -160px !important;
+  align-items: center !important;
+  padding: 0 clamp(16px, 2.6vw, 42px) !important;
+}
+
+.application-content--notebook .nb2-header label {
+  flex: 0 0 220px !important;
+  width: 220px !important;
+  min-width: 220px !important;
+}
+
+.application-content--notebook .nb2-header label select {
+  width: 220px !important;
+}
+
+.application-content--notebook .nb2-header > button,
+.application-content--notebook .nb2-header__controls button {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  padding: 9px 18px !important;
+}
+
+.application-content--notebook .nb2-header > button.nb2-primary {
+  min-width: 150px !important;
+}
+
+.application-content--notebook .nb2-header > button:not(.nb2-primary) {
+  min-width: 132px !important;
+}
+
+@media (max-width: 900px) {
+  .application-content--notebook .nb2-header {
+    height: 128px !important;
+    min-height: 128px !important;
+    margin-top: -128px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .application-content--notebook .nb2-header {
+    height: auto !important;
+    min-height: 160px !important;
+    margin-top: -160px !important;
+    align-content: center !important;
+  }
+}
+
+/* NOTEBOOK_BOOK_POSITION_V9 */
+/* El libro es la superficie de trabajo: no se desplaza, recorta ni redimensiona. */
+.application-content--notebook .nb2-workspace {
+  position: relative !important;
+}
+
+/* Solo los controles se superponen a la zona derecha de la cabecera global. */
+.application-content--notebook .nb2-header {
+  position: absolute !important;
+  z-index: 30 !important;
+  top: -160px !important;
+  right: clamp(28px, 3vw, 56px) !important;
+  left: auto !important;
+  display: flex !important;
+  width: auto !important;
+  height: 160px !important;
+  min-height: 160px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.application-content--notebook .nb2-header::before,
+.application-content--notebook .nb2-header::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+}
+
+.application-content--notebook .nb2-header label {
+  flex: 0 0 220px !important;
+  width: 220px !important;
+  min-width: 220px !important;
+  margin: 0 !important;
+}
+
+.application-content--notebook .nb2-header label select {
+  width: 220px !important;
+}
+
+.application-content--notebook .nb2-header > button,
+.application-content--notebook .nb2-header__controls button {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 9px 18px !important;
+}
+
+.application-content--notebook .nb2-header > button.nb2-primary {
+  min-width: 150px !important;
+}
+
+.application-content--notebook .nb2-header > button:not(.nb2-primary) {
+  min-width: 132px !important;
+}
+
+@media (max-width: 1180px) {
+  .application-content--notebook .nb2-header {
+    top: -128px !important;
+    right: 18px !important;
+    height: 128px !important;
+    min-height: 128px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .application-content--notebook .nb2-header {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 10px 12px !important;
+    flex-wrap: wrap !important;
+    background: rgba(12, 10, 11, .96) !important;
+  }
+}
+
+/* NOTEBOOK_HEADER_BUTTONS_V10 */
+/* Mismas proporciones y lenguaje visual que las acciones del resto de la aplicación. */
+.application-content--notebook .nb2-header button,
+.application-content--notebook .nb2-header__controls button {
+  flex: 0 0 148px !important;
+  inline-size: 148px !important;
+  width: 148px !important;
+  min-width: 148px !important;
+  max-width: 148px !important;
+  block-size: 40px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 14px !important;
+  border-radius: 9px !important;
+  box-shadow: none !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+}
+
+.application-content--notebook .nb2-header button.nb2-primary,
+.application-content--notebook .nb2-header__controls button.nb2-primary {
+  border: 1px solid rgba(185, 65, 86, .82) !important;
+  background: linear-gradient(180deg, rgba(111, 35, 53, .96), rgba(87, 27, 43, .96)) !important;
+  color: #f3e7e2 !important;
+}
+
+.application-content--notebook .nb2-header button:not(.nb2-primary),
+.application-content--notebook .nb2-header__controls button:not(.nb2-primary) {
+  border: 1px solid rgba(107, 77, 78, .78) !important;
+  background: rgba(18, 15, 16, .9) !important;
+  color: #eee2dc !important;
+}
+
+.application-content--notebook .nb2-header button.nb2-primary:hover:not(:disabled),
+.application-content--notebook .nb2-header__controls button.nb2-primary:hover:not(:disabled) {
+  border-color: rgba(207, 76, 99, .92) !important;
+  background: linear-gradient(180deg, rgba(127, 39, 59, .98), rgba(99, 30, 47, .98)) !important;
+}
+
+.application-content--notebook .nb2-header button:not(.nb2-primary):hover:not(:disabled),
+.application-content--notebook .nb2-header__controls button:not(.nb2-primary):hover:not(:disabled) {
+  border-color: rgba(145, 93, 94, .86) !important;
+  background: rgba(29, 23, 24, .96) !important;
+}
+
+@media (max-width: 760px) {
+  .application-content--notebook .nb2-header button,
+  .application-content--notebook .nb2-header__controls button {
+    flex-basis: 136px !important;
+    inline-size: 136px !important;
+    width: 136px !important;
+    min-width: 136px !important;
+    max-width: 136px !important;
+  }
+}
+
+
+/* NOTEBOOK_CONTROLS_RIGHT_V11 */
+/* Selector y acciones forman un único grupo compacto en el extremo derecho. */
+.application-content--notebook .nb2-header {
+  right: clamp(18px, 2vw, 32px) !important;
+  left: auto !important;
+  width: 430px !important;
+  min-width: 430px !important;
+  max-width: 430px !important;
+  justify-content: flex-start !important;
+  column-gap: 10px !important;
+}
+
+.application-content--notebook .nb2-header__controls {
+  display: flex !important;
+  width: 430px !important;
+  min-width: 430px !important;
+  max-width: 430px !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+}
+
+.application-content--notebook .nb2-header label {
+  flex: 0 0 220px !important;
+  width: 220px !important;
+  min-width: 220px !important;
+  max-width: 220px !important;
+}
+
+.application-content--notebook .nb2-header button.nb2-primary {
+  flex: 0 0 148px !important;
+  inline-size: 148px !important;
+  width: 148px !important;
+  min-width: 148px !important;
+  max-width: 148px !important;
+}
+
+.application-content--notebook .nb2-header button.nb2-refresh-button {
+  display: inline-flex !important;
+  flex: 0 0 42px !important;
+  inline-size: 42px !important;
+  width: 42px !important;
+  min-width: 42px !important;
+  max-width: 42px !important;
+  padding: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.application-content--notebook .nb2-refresh-icon {
+  display: block !important;
+  width: 19px !important;
+  height: 19px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 1.8 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+@media (max-width: 900px) {
+  .application-content--notebook .nb2-header,
+  .application-content--notebook .nb2-header__controls {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
+
+/* NOTEBOOK_CONTROLS_OVERFLOW_V12 */
+/* Neutraliza la cuadrícula histórica que expulsaba las acciones fuera de la cabecera. */
+.application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  grid-template-columns: none !important;
+  grid-template-rows: none !important;
+  width: 430px !important;
+  min-width: 430px !important;
+  max-width: 430px !important;
+  padding: 0 !important;
+  gap: 10px !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  overflow: visible !important;
+}
+
+.application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header > label {
+  display: grid !important;
+  flex: 0 0 220px !important;
+  width: 220px !important;
+  min-width: 220px !important;
+  max-width: 220px !important;
+  grid-column: auto !important;
+}
+
+.application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header > .nb2-primary {
+  display: inline-flex !important;
+  flex: 0 0 148px !important;
+  width: 148px !important;
+  min-width: 148px !important;
+  max-width: 148px !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header > .nb2-refresh-button {
+  display: inline-flex !important;
+  flex: 0 0 42px !important;
+  width: 42px !important;
+  min-width: 42px !important;
+  max-width: 42px !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+@media (max-width: 900px) {
+  .application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 42px !important;
+    grid-template-rows: auto auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 12px 14px !important;
+    gap: 10px !important;
+  }
+
+  .application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header > label {
+    grid-column: 1 / -1 !important;
+    width: min(100%, 260px) !important;
+    min-width: 0 !important;
+    max-width: 260px !important;
+  }
+
+  .application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header > .nb2-primary {
+    grid-column: 1 !important;
+  }
+
+  .application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header > .nb2-refresh-button {
+    grid-column: 2 !important;
+  }
+}
+
+
+/* NOTEBOOK_BUTTONS_BASELINE_V13 */
+/* Los botones se alinean con la caja del selector, no con su etiqueta superior. */
+.application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header > button {
+  position: relative !important;
+  top: 7px !important;
+  gap: 6px !important;
+  text-align: center !important;
+}
+
+.application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header > .nb2-refresh-button {
+  line-height: 0 !important;
+}
+
+.application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header .nb2-refresh-icon {
+  width: 21px !important;
+  height: 21px !important;
+  stroke-width: 1.9 !important;
+}
+
+@media (max-width: 900px) {
+  .application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header > button {
+    top: 0 !important;
+  }
+}
+
+
+/* NOTEBOOK_GROUPED_CONTROLS_V14 */
+/* Un contenedor común permite alinear la base del selector y de las dos acciones. */
+.application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header {
+  display: flex !important;
+  width: 430px !important;
+  min-width: 430px !important;
+  max-width: 430px !important;
+  align-items: center !important;
+}
+
+.application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header > .nb2-header__controls {
+  position: static !important;
+  z-index: auto !important;
+  display: flex !important;
+  flex: 0 0 430px !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  width: 430px !important;
+  min-width: 430px !important;
+  max-width: 430px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header > .nb2-header__controls > label {
+  flex: 0 0 220px !important;
+  width: 220px !important;
+  min-width: 220px !important;
+  max-width: 220px !important;
+  margin: 0 !important;
+}
+
+.application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header > .nb2-header__controls > button {
+  position: static !important;
+  top: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  align-self: flex-end !important;
+}
+
+@media (max-width: 900px) {
+  .application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+
+  .application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header > .nb2-header__controls {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 42px !important;
+    grid-template-rows: auto auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    gap: 10px !important;
+  }
+
+  .application-content--notebook .nb2-workspace:has(.nb2-summary-book) > .nb2-header > .nb2-header__controls > label {
+    grid-column: 1 / -1 !important;
+    width: min(100%, 260px) !important;
+    min-width: 0 !important;
+    max-width: 260px !important;
+  }
+}
+
+/* NOTEBOOK_NPC_IMAGE_CROP_V15 */
+/* Las ilustraciones de PNJ son verticales: se reserva más altura y se prioriza el rostro. */
+.application-content--notebook .nb2-resource-card:has(> .nb2-resource-card__image[src*="/NPC/"]) > .nb2-resource-card__image {
+  display: block !important;
+  width: 100% !important;
+  height: 240px !important;
+  min-height: 240px !important;
+  aspect-ratio: auto !important;
+  object-fit: cover !important;
+  object-position: 50% 18% !important;
+  border-radius: 0 !important;
+}
+
+@media (max-width: 520px) {
+  .application-content--notebook .nb2-resource-card:has(> .nb2-resource-card__image[src*="/NPC/"]) > .nb2-resource-card__image {
+    height: 230px !important;
+    min-height: 230px !important;
+  }
+}

@@ -22,3 +22,253 @@
 .resource-gallery__pager button{width:2rem;height:2rem;border:1px solid #735048;background:#171113;color:#e9d7b8;cursor:pointer}
 .resource-gallery__pager button:disabled{opacity:.35;cursor:default}
 @media(max-width:900px){.resource-gallery > .resource-gallery__cards{display:flex;overflow:hidden}.resource-gallery__cards button{min-width:210px}}
+
+/* REMOVE_PLAY_RESOURCES_SUBHEADERS_V1 */
+.play-hub__actions,
+.resource-library-reference__actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 2.5rem;
+  margin: 0 0 1rem;
+}
+
+@media (max-width: 700px) {
+  .play-hub__actions,
+  .resource-library-reference__actions {
+    justify-content: flex-start;
+  }
+}
+
+/* RESOURCES_VISUAL_STYLE_V2 */
+/* Solo se modifica el contenido de Recursos; cabecera global y menú lateral intactos. */
+.resource-library-reference {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: clamp(16px, 2vw, 28px) clamp(16px, 2.4vw, 38px) 40px !important;
+  box-sizing: border-box;
+}
+
+.resource-library-reference .resource-category-rail {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 14px !important;
+}
+
+.resource-library-reference .resource-category-rail button {
+  min-height: 70px;
+  border: 1px solid rgba(108, 61, 69, 0.82);
+  border-radius: 12px;
+  background: linear-gradient(145deg, #171214, #100d0e);
+  color: #e9e2de;
+  box-shadow: none;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.resource-library-reference .resource-category-rail button:hover {
+  border-color: rgba(177, 59, 79, 0.9);
+  transform: translateY(-1px);
+}
+
+.resource-library-reference .resource-category-rail button.is-active {
+  border-color: #bd4355;
+  background: linear-gradient(145deg, #3d151b, #241114);
+  box-shadow: inset 0 -3px 0 #bd4355;
+}
+
+.resource-library-reference .resource-showcase {
+  display: grid;
+  grid-template-columns: minmax(210px, 280px) minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid rgba(85, 52, 59, 0.9);
+  border-radius: 14px;
+  background: #100d0e;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.16);
+}
+
+.resource-library-reference .resource-tree {
+  min-width: 0;
+  border: 0;
+  border-right: 1px solid rgba(85, 52, 59, 0.82);
+  background: #130f10;
+}
+
+.resource-library-reference .resource-tree h2 {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid rgba(85, 52, 59, 0.72);
+  color: #caa36a;
+  letter-spacing: 0.08em;
+}
+
+.resource-library-reference .resource-tree button {
+  border-radius: 0 8px 8px 0;
+  color: #e8e0dc;
+}
+
+.resource-library-reference .resource-tree button.is-active {
+  background: #4a171f;
+  box-shadow: inset 3px 0 #d3485b;
+}
+
+.resource-library-reference .resource-preview {
+  min-width: 0;
+  background: #100d0e;
+}
+
+.resource-library-reference .resource-preview__image {
+  background: #0c0a0b;
+}
+
+.resource-library-reference .resource-preview__image img {
+  border-radius: 10px;
+}
+
+.resource-library-reference .resource-preview__copy {
+  padding: clamp(22px, 3vw, 40px);
+}
+
+.resource-library-reference .resource-preview__copy dl {
+  border-color: rgba(85, 52, 59, 0.8);
+}
+
+.resource-library-reference .resource-gallery {
+  overflow: hidden;
+  margin-top: 14px;
+  border: 1px solid rgba(85, 52, 59, 0.9);
+  border-radius: 14px;
+  background: #100d0e;
+}
+
+.resource-library-reference .resource-gallery h2 {
+  padding: 16px 20px 10px;
+  color: #caa36a;
+}
+
+.resource-library-reference .resource-gallery > div {
+  gap: 12px;
+  padding: 0 16px 16px;
+}
+
+.resource-library-reference .resource-gallery button {
+  overflow: hidden;
+  border: 1px solid rgba(85, 52, 59, 0.82);
+  border-radius: 10px;
+  background: #171214;
+}
+
+.resource-library-reference .resource-gallery button.is-active {
+  border-color: #bd4355;
+  background: #3d151b;
+}
+
+.resource-library-reference .resource-button {
+  border: 1px solid rgba(108, 61, 69, 0.9);
+  border-radius: 10px;
+  background: #171214;
+  color: #eee7e2;
+}
+
+.resource-library-reference .resource-button:hover {
+  border-color: #bd4355;
+}
+
+.resource-library-reference .resource-button--primary {
+  border-color: #b94155;
+  background: linear-gradient(135deg, #7a2335, #a93449);
+  color: #fff4f2;
+}
+
+.resource-library-reference .resource-button--danger {
+  border-color: rgba(167, 57, 72, 0.82);
+  background: #241114;
+}
+
+@media (max-width: 980px) {
+  .resource-library-reference .resource-category-rail {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .resource-library-reference .resource-showcase {
+    grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .resource-library-reference .resource-category-rail {
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .resource-library-reference .resource-category-rail button {
+    min-width: 170px;
+  }
+
+  .resource-library-reference .resource-showcase {
+    display: block;
+  }
+
+  .resource-library-reference .resource-tree {
+    border-right: 0;
+    border-bottom: 1px solid rgba(85, 52, 59, 0.82);
+  }
+}
+
+/* RESOURCES_COMPACT_WORKSPACE_V1 */
+/* Reduce espacio estructural sin modificar la cabecera global ni el menú lateral. */
+.application-content:has(.resource-library-reference) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 14px 0 32px !important;
+}
+
+.resource-library-reference {
+  padding-top: 10px !important;
+  padding-bottom: 24px !important;
+}
+
+.resource-library-reference .resource-category-rail {
+  margin-bottom: 12px !important;
+}
+
+.resource-library-reference .resource-showcase,
+.resource-library-reference .resource-preview,
+.resource-library-reference .resource-gallery {
+  min-height: 0 !important;
+  height: auto !important;
+}
+
+.resource-library-reference .resource-showcase {
+  align-items: stretch;
+}
+
+.resource-library-reference .resource-gallery {
+  align-self: start;
+  margin-top: 12px !important;
+}
+
+.resource-library-reference .resource-gallery > div {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 280px)) !important;
+  justify-content: start !important;
+  align-items: start !important;
+  min-height: 0 !important;
+  padding: 0 16px 14px !important;
+}
+
+.resource-library-reference .resource-gallery button {
+  min-height: 0 !important;
+  height: auto !important;
+}
+
+@media (max-width: 720px) {
+  .application-content:has(.resource-library-reference) {
+    padding: 10px 0 24px !important;
+  }
+
+  .resource-library-reference {
+    padding: 8px 12px 20px !important;
+  }
+}

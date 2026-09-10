@@ -190,11 +190,7 @@ function App() {
           />
         ) : null
       }
-      contentClassName={
-        view === 'characters'
-          ? 'application-content'
-          : undefined
-      }
+      contentClassName={view === 'notebook' ? 'application-content application-content--notebook' : 'application-content'}
       header={<AppHeader displayName={authenticatedUser.displayName} />}
       navigation={
         <AppNavigation
@@ -356,3 +352,5 @@ ReactDOM.createRoot(
 )
 
 // UNIFIED_DASHBOARD_HEADER_V1
+
+// APPLICATION_CONTENT_ALL_PAGES_V2

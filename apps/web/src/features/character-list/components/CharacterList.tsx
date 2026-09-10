@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import { CharacterListPortrait } from "./CharacterListPortrait"
 import {
   useEffect,
@@ -182,11 +183,9 @@ export function CharacterList({
 
   return (
     <section className="character-list-workspace">
-<section
-        className="character-list"
-        aria-labelledby="character-list-title"
-      >
-        <div className="character-list-workspace__actions">
+      {typeof document !== 'undefined' && document.getElementById('app-header-page-actions')
+        ? createPortal(
+            <div className="character-list-workspace__actions">
           <button
             type="button"
             onClick={onOpenDemo}
@@ -201,12 +200,17 @@ export function CharacterList({
           >
             Crear personaje
           </button>
-        </div>
+        </div>,
+            document.getElementById('app-header-page-actions')!,
+          )
+        : null}
+<section
+        className="character-list"
+        aria-labelledby="character-list-title"
+      >
+
 
       <div className="character-list__heading">
-          <h2 id="character-list-title">
-            Guardados
-          </h2>
 
           <button
             type="button"
@@ -351,3 +355,5 @@ export function CharacterList({
 }
 
 // REDUNDANT_WORKSPACE_SUBHEADERS_V2
+
+// CHARACTER_HEADER_ACTIONS_V3

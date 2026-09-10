@@ -242,7 +242,19 @@ export function NotebookWorkspace() {
   }
 
   return <main className="nb2-workspace">
-        <header className="nb2-header nb2-header--fixed" style={{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(460px,650px)',alignItems:'center',gap:24}}><div className="nb2-header__copy"><h1 style={{whiteSpace:'normal',overflow:'visible',wordBreak:'normal'}}>Cuaderno de la crónica</h1><p>Notas. Ideas. Conexiones. Todo deja huella.</p></div><div className="nb2-header__controls"><label>Crónica activa<select aria-label="Crónica activa" value={chronicleId} disabled={loading || composer} onChange={(event) => (rememberNotebookChronicle(event.target.value), setChronicleId(event.target.value))}>{chronicles.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label><button className="nb2-primary" disabled={!chronicleId || loading} onClick={() => startNote()}>✎ Nueva nota</button><button disabled={loading} onClick={() => setRevision((value) => value + 1)}>Actualizar</button></div><div className="nb2-header__cover" aria-hidden="true"><img src={'/api/chronicles/' + chronicleId + '/cover?revision=' + revision} alt="" onError={(event) => { event.currentTarget.style.display = 'none' }} /><span>{chronicles.find((item) => item.id === chronicleId)?.name || 'BloodKeeper'}</span><em>SIEMPRE VIGILA</em></div></header>
+    <header className="nb2-header">
+      <div><small>CRÓNICAS · CUADERNO</small><h1>Cuaderno de la crónica</h1></div>
+      <div className="nb2-header__controls">
+      <label>Crónica activa<select aria-label="Crónica activa" value={chronicleId} disabled={loading || composer} onChange={(event) => { setChronicleId(event.target.value); setTag(''); setSearch(''); setSessionFilter(''); setSelectedId('') }}>{chronicles.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+      <button className="nb2-primary" disabled={!chronicleId || loading} onClick={() => startNote()}>✎ Nueva nota</button>
+      <button disabled={loading} onClick={() => setRevision((value) => value + 1)} className="nb2-refresh-button" aria-label="Actualizar" title="Actualizar"><svg className="nb2-refresh-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M21 12a9 9 0 0 0-15-6.7L3 8" />
+        <path d="M3 3v5h5" />
+        <path d="M3 12a9 9 0 0 0 15 6.7L21 16" />
+        <path d="M16 16h5v5" />
+      </svg></button>
+    </div>
+    </header>
     <nav className="nb2-sections" aria-label="Secciones del cuaderno"><div>{(['SUMMARY', 'NOTES', 'SESSION', 'TAGS'] as Section[]).map((item) => <button aria-pressed={section === item} key={item} onClick={() => navigate(item)}>{labels[item]}</button>)}</div><div aria-label="Catálogo de recursos">{resourceSections.map((item) => <button aria-pressed={section === item} key={item} onClick={() => navigate(item)}>{labels[item]}</button>)}</div></nav>
     {error && <p role="alert" className="nb2-error">{error}</p>}{warning && <p role="status" className="nb2-warning">{warning}</p>}
     {loading ? <p role="status">Cargando cuaderno…</p> : !chronicleId ? <p>No participas en ninguna crónica.</p> : <>
@@ -289,3 +301,11 @@ export function NotebookWorkspace() {
 }
 
 // GLOBAL_CHRONICLE_HEADER_CONTEXT_V1
+
+// NOTEBOOK_GLOBAL_HEADER_V2
+
+// NOTEBOOK_GLOBAL_HEADER_V4
+
+// NOTEBOOK_GLOBAL_HEADER_V6
+
+// NOTEBOOK_GLOBAL_HEADER_V7

@@ -109,14 +109,14 @@ export class ChronicleNotebookController {
       db.chronicleResource.findMany({
         where: { chronicleId, status: 'active', ...(narrator ? {} : { visibility: 'chronicle_participants' }) },
         orderBy: { name: 'asc' },
-        select: { id: true, kind: true, name: true, summary: true, visibility: true },
+        select: { id: true, kind: true, name: true, summary: true, visibility: true, locationId: true },
       }),
       db.chronicleParticipant.findMany({
         where: { chronicleId, status: 'ACTIVE', role: 'PLAYER' },
         select: { user: { select: { id: true, displayName: true, username: true } } },
       }),
     ])
-    return { npcs, locations, resources, players: participants.map((item: any) => item.user), viewerUserId: userId }
+    return { npcs, locations: locations.map((location: any) => ({ ...location, imageUrl: '/api/chronicles/' + chronicleId + '/assets/LOCATION/' + location.id + '/image' })), resources, players: participants.map((item: any) => item.user), viewerUserId: userId }
   }
 
 
