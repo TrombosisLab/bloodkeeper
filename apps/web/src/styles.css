@@ -1699,3 +1699,44 @@
 .app-header__page-actions .chronicle-workspace__primary-action:hover {
   background: rgba(177, 48, 70, .96) !important;
 }
+
+
+/* CHARACTER_LIST_REFRESH_HEADER_V1 */
+/* La recarga de la lista comparte la cabecera con Crear y Demo. */
+.app-header:not(.app-header--notebook) #app-header-page-actions > .character-list-workspace__refresh {
+  min-width: 0 !important;
+}
+.app-header:not(.app-header--notebook) #app-header-page-actions > .character-list-workspace__refresh:disabled {
+  opacity: .62 !important;
+  cursor: wait !important;
+}
+@media (max-width: 900px) {
+  .app-header:not(.app-header--notebook) #app-header-page-actions {
+    min-width: 0 !important;
+    max-width: calc(100vw - 32px) !important;
+    flex-wrap: wrap !important;
+    gap: 7px !important;
+  }
+  .app-header:not(.app-header--notebook) #app-header-page-actions > .character-list-workspace__actions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 7px !important;
+    min-width: 0 !important;
+  }
+  .app-header:not(.app-header--notebook) #app-header-page-actions > .character-list-workspace__actions > button,
+  .app-header:not(.app-header--notebook) #app-header-page-actions > .character-list-workspace__refresh {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
+@media (max-width: 520px) {
+  .app-header:not(.app-header--notebook) #app-header-page-actions > .character-list-workspace__actions,
+  .app-header:not(.app-header--notebook) #app-header-page-actions > .character-list-workspace__refresh {
+    width: 100% !important;
+  }
+  .app-header:not(.app-header--notebook) #app-header-page-actions > .character-list-workspace__actions > button,
+  .app-header:not(.app-header--notebook) #app-header-page-actions > .character-list-workspace__refresh {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+  }
+}

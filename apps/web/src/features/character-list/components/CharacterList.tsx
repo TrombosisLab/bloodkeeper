@@ -183,6 +183,22 @@ export function CharacterList({
 
   return (
     <section className="character-list-workspace">
+      {/* CHARACTER_LIST_REFRESH_HEADER_V1 */}
+      {typeof document !== 'undefined' &&
+      document.getElementById('app-header-page-actions') !== null
+        ? createPortal(
+            <button
+              type="button"
+              className="character-list-workspace__refresh"
+              onClick={() => void loadCharacters()}
+              disabled={loading}
+            >
+              Actualizar
+            </button>,
+            document.getElementById('app-header-page-actions')!,
+          )
+        : null}
+
       {typeof document !== 'undefined' && document.getElementById('app-header-page-actions')
         ? createPortal(
             <div className="character-list-workspace__actions">
@@ -212,15 +228,6 @@ export function CharacterList({
 
       <div className="character-list__heading">
 
-          <button
-            type="button"
-            onClick={() =>
-              void loadCharacters()
-            }
-            disabled={loading}
-          >
-            Actualizar
-          </button>
         </div>
 
         {loading ? (
