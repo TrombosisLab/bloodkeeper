@@ -17,3 +17,451 @@
 .chronicle-play__clan-identity { display:flex; align-items:center; gap:.8rem; margin:.35rem 0 .8rem; }
 .chronicle-play__clan-identity .v5-visual-mark { width:3rem; height:3rem; color:#d1a15c; }
 @media (max-width:720px) { .v5-visual-mark--clan-logo{width:6rem}.clan-card-selector__visual{width:3.5rem;height:3.5rem}.discipline-editor-card__visual{width:2.75rem;height:2.75rem} }
+
+/* CHARACTER_SHEET_IDENTITY_FLEX_V10
+   El retrato permanece a la izquierda y la zona derecha no genera columnas implícitas. */
+.identity-section {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.identity-header-layout {
+  display: grid !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  grid-template-columns: minmax(11rem, 15rem) minmax(0, 1fr) !important;
+  align-items: stretch !important;
+  min-height: calc(100vh - 170px) !important;
+}
+
+.identity-header-layout > .character-portrait {
+  width: 100% !important;
+  max-width: none !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  align-self: stretch !important;
+}
+
+.identity-header-layout > .character-portrait .character-portrait__frame {
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.identity-header-main {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-flow: row nowrap !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  direction: ltr !important;
+}
+
+.identity-header-main > .identity-heading {
+  order: 1 !important;
+  flex: 0 0 clamp(13rem, 24%, 21rem) !important;
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 18px 20px !important;
+  position: relative !important;
+  display: block !important;
+  border: 0 !important;
+  border-right: 1px solid rgba(190, 52, 73, 0.3) !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+  float: none !important;
+  transform: none !important;
+}
+
+.identity-header-main > .identity-grid {
+  order: 2 !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+  float: none !important;
+  transform: none !important;
+}
+
+.identity-heading__name {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding-left: 5.7rem !important;
+}
+
+.identity-heading__name .section-kicker {
+  display: none !important;
+}
+
+.identity-heading__name h2 {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  font-size: clamp(1.6rem, 2.4vw, 2.8rem) !important;
+  line-height: 1.05 !important;
+}
+
+.identity-header-main > .identity-heading .clan-mark {
+  display: block !important;
+  min-width: 0 !important;
+  text-align: left !important;
+}
+
+.identity-header-main > .identity-heading .clan-mark .v5-visual-mark {
+  position: absolute !important;
+  left: 20px !important;
+  top: 18px !important;
+  width: 4.8rem !important;
+  height: 4.8rem !important;
+}
+
+.identity-header-main > .identity-heading .clan-mark span,
+.identity-header-main > .identity-heading .clan-mark strong {
+  position: absolute !important;
+  left: 5.7rem !important;
+  bottom: 20px !important;
+  margin: 0 !important;
+}
+
+.identity-header-main > .identity-heading .clan-mark span {
+  color: var(--muted, #ad9f9f);
+  font-size: 0.52rem !important;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.identity-header-main > .identity-heading .clan-mark strong {
+  left: calc(5.7rem + 45px) !important;
+  color: var(--accent, #d8b36a);
+  font: 700 0.84rem/1 Georgia, serif;
+}
+
+.identity-header-main .identity-grid .identity-field {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 12px !important;
+  overflow: hidden !important;
+  border-right: 1px solid rgba(190, 52, 73, 0.2) !important;
+  border-bottom: 1px solid rgba(190, 52, 73, 0.2) !important;
+}
+
+.identity-header-main .identity-grid .identity-field__label {
+  margin-bottom: 5px !important;
+  font-size: 0.5rem !important;
+  line-height: 1.1 !important;
+}
+
+.identity-header-main .identity-grid .identity-field__value {
+  display: -webkit-box !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: clamp(0.7rem, 0.86vw, 0.95rem) !important;
+  line-height: 1.18 !important;
+  overflow-wrap: anywhere;
+}
+
+.identity-section:not([data-profile-phase="HUMAN"]) .identity-grid > :nth-child(1) { grid-area: 1 / 1 / 2 / 2 !important; }
+.identity-section:not([data-profile-phase="HUMAN"]) .identity-grid > :nth-child(2) { grid-area: 1 / 2 / 2 / 3 !important; }
+.identity-section:not([data-profile-phase="HUMAN"]) .identity-grid > :nth-child(3) { grid-area: 1 / 3 / 2 / 4 !important; }
+.identity-section:not([data-profile-phase="HUMAN"]) .identity-grid > :nth-child(4) { grid-area: 2 / 1 / 3 / 3 !important; }
+.identity-section:not([data-profile-phase="HUMAN"]) .identity-grid > :nth-child(5) { display: none !important; }
+.identity-section:not([data-profile-phase="HUMAN"]) .identity-grid > :nth-child(6) { grid-area: 1 / 4 / 2 / 5 !important; }
+.identity-section:not([data-profile-phase="HUMAN"]) .identity-grid > :nth-child(7) { grid-area: 1 / 5 / 2 / 6 !important; }
+.identity-section:not([data-profile-phase="HUMAN"]) .identity-grid > :nth-child(8) { grid-area: 2 / 3 / 3 / 6 !important; }
+
+@media (max-width: 760px) {
+  .identity-header-layout {
+    grid-template-columns: 1fr !important;
+    min-height: 0 !important;
+  }
+
+  .identity-header-layout > .character-portrait {
+    height: min(20rem, 70vw) !important;
+  }
+
+  .identity-header-main {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+  }
+
+  .identity-header-main > .identity-heading {
+    order: 1 !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 7rem !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+
+  .identity-header-main > .identity-grid {
+    order: 2 !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: auto !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+
+  .identity-section:not([data-profile-phase="HUMAN"]) .identity-grid > .identity-field {
+    grid-area: auto !important;
+  }
+}
+
+/* CHARACTER_SHEET_IDENTITY_PARENT_V11
+   La sección no puede ser display: contents: debe contener la cabecera completa. */
+.identity-section {
+  display: grid !important;
+  grid-column: 1 / -1 !important;
+  grid-row: auto !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: auto !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+.identity-section > .identity-header-layout {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+@media (max-width: 760px) {
+  .identity-section {
+    grid-column: 1 !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* CHARACTER_SHEET_IDENTITY_TITLE_V12
+   El nombre debe quedar dentro de su columna, sin invadir los datos. */
+.identity-header-main > .identity-heading {
+  flex-basis: clamp(20rem, 30%, 26rem) !important;
+}
+
+.identity-heading__name {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.identity-heading__name h2 {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: clamp(1.35rem, 2.2vw, 2.4rem) !important;
+}
+
+@media (max-width: 760px) {
+  .identity-header-main > .identity-heading {
+    flex-basis: auto !important;
+  }
+
+  .identity-heading__name h2 {
+    font-size: clamp(1.5rem, 7vw, 2.2rem) !important;
+  }
+}
+
+/* CHARACTER_SHEET_IDENTITY_FULL_NAME_V13
+   El nombre completo cabe en su bloque sin invadir los datos. */
+.identity-heading__name h2 {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  font-size: clamp(1.5rem, 1.9vw, 2.15rem) !important;
+  letter-spacing: -0.015em !important;
+}
+
+@media (max-width: 760px) {
+  .identity-heading__name h2 {
+    font-size: clamp(1.5rem, 7vw, 2.2rem) !important;
+  }
+}
+
+/* CHARACTER_SHEET_IDENTITY_COMPACT_RIGHT_V14
+   El retrato conserva su altura; el contenido de la derecha no se estira. */
+.identity-header-main {
+  align-self: start !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+.identity-header-main > .identity-heading {
+  align-self: start !important;
+  height: 9.25rem !important;
+  min-height: 9.25rem !important;
+}
+
+.identity-header-main > .identity-grid {
+  align-self: start !important;
+  height: 9.25rem !important;
+  min-height: 9.25rem !important;
+  grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.identity-header-main .identity-grid .identity-field {
+  padding: 10px 12px !important;
+}
+
+@media (max-width: 760px) {
+  .identity-header-main {
+    height: auto !important;
+  }
+
+  .identity-header-main > .identity-heading,
+  .identity-header-main > .identity-grid {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+}
+
+/* CHARACTER_SHEET_RIGHT_COLUMN_V15
+   Retrato en la izquierda; cabecera, estado, pestañas y vista a la derecha. */
+.character-sheet.character-sheet--dashboard {
+  display: grid !important;
+  grid-template-columns: minmax(15rem, 24%) minmax(0, 1fr) !important;
+  grid-template-rows: auto auto auto minmax(0, 1fr) !important;
+  align-items: stretch !important;
+  min-width: 0 !important;
+}
+
+.character-sheet.character-sheet--dashboard > .character-sheet__identity-stage,
+.character-sheet.character-sheet--dashboard .identity-section,
+.character-sheet.character-sheet--dashboard .identity-header-layout {
+  display: contents !important;
+}
+
+.character-sheet.character-sheet--dashboard .character-portrait {
+  grid-column: 1 !important;
+  grid-row: 1 / 5 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  align-self: stretch !important;
+}
+
+.character-sheet.character-sheet--dashboard .identity-header-main {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  height: auto !important;
+  min-width: 0 !important;
+  align-self: start !important;
+}
+
+.character-sheet.character-sheet--dashboard > .character-sheet__compact-state-strip {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  align-self: start !important;
+}
+
+.character-sheet.character-sheet--dashboard > .character-sheet__section-nav {
+  grid-column: 2 !important;
+  grid-row: 3 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.character-sheet.character-sheet--dashboard > .character-sheet__active-view {
+  grid-column: 2 !important;
+  grid-row: 4 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  align-self: start !important;
+}
+
+@media (max-width: 760px) {
+  .character-sheet.character-sheet--dashboard {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto auto auto !important;
+  }
+
+  .character-sheet.character-sheet--dashboard > .character-sheet__identity-stage,
+  .character-sheet.character-sheet--dashboard .identity-section {
+    display: grid !important;
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .character-sheet.character-sheet--dashboard .identity-header-layout {
+    display: grid !important;
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .character-sheet.character-sheet--dashboard .character-portrait,
+  .character-sheet.character-sheet--dashboard .identity-header-main,
+  .character-sheet.character-sheet--dashboard > .character-sheet__compact-state-strip,
+  .character-sheet.character-sheet--dashboard > .character-sheet__section-nav,
+  .character-sheet.character-sheet--dashboard > .character-sheet__active-view {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+}
+
+/* CHARACTER_SHEET_IDENTITY_NAME_WRAP_V16
+   El nombre completo se muestra en dos líneas dentro de la cabecera. */
+.identity-heading__name {
+  overflow: visible !important;
+}
+
+.identity-heading__name h2 {
+  width: min(100%, 15rem) !important;
+  max-width: 15rem !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  line-height: 0.98 !important;
+  text-wrap: balance !important;
+}
+
+@media (max-width: 760px) {
+  .identity-heading__name h2 {
+    width: min(100%, 17rem) !important;
+    max-width: 17rem !important;
+  }
+}

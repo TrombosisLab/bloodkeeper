@@ -153,17 +153,20 @@ export class CharacterDraftApiError
   readonly status: number
   readonly code: string
   readonly violations: readonly unknown[]
+  readonly serverMessage: string | null
 
   constructor(
     status: number,
     code: string,
     violations: readonly unknown[] = [],
+    serverMessage: string | null = null,
   ) {
     super(code)
     this.name = 'CharacterDraftApiError'
     this.status = status
     this.code = code
     this.violations = [...violations]
+    this.serverMessage = serverMessage
   }
 }
 
@@ -918,6 +921,7 @@ async function responseError(
   let code =
     'CHARACTER_DRAFT_REQUEST_FAILED'
   let violations: readonly unknown[] = []
+  let serverMessage: string | null = null
 
   try {
     const body: unknown =
@@ -926,6 +930,10 @@ async function responseError(
     if (isRecord(body)) {
       if (typeof body.code === 'string') {
         code = body.code
+      }
+
+      if (typeof body.message === 'string') {
+        serverMessage = body.message.trim()
       }
 
       if (Array.isArray(body.violations)) {
@@ -940,6 +948,7 @@ async function responseError(
     response.status,
     code,
     violations,
+    serverMessage,
   )
 }
 

@@ -77,6 +77,10 @@ import {
 } from './application/list-chronicle-characters.use-case'
 
 import {
+  LoadChronicleCharacterUseCase,
+} from './application/load-chronicle-character.use-case'
+
+import {
   LoadCharacterAttributeSkillRatingsUseCase,
 } from './application/load-character-attribute-skill-ratings.use-case'
 
@@ -741,6 +745,21 @@ const useCaseProviders = [
     ...characterSheetPdfProviders,
     ...advancementUseCaseProviders,
     ...useCaseProviders,
+    {
+      provide: LoadChronicleCharacterUseCase,
+      inject: [
+        CHARACTER_DRAFT_REPOSITORY,
+        CHRONICLE_PARTICIPANT_REPOSITORY,
+      ],
+      useFactory: (
+        repository: PrismaCharacterDraftRepository,
+        participants: ChronicleParticipantRepository,
+      ) =>
+        new LoadChronicleCharacterUseCase(
+          repository,
+          participants,
+        ),
+    },
   ],
   exports: [
     CHARACTER_SECONDARY_REPOSITORY,

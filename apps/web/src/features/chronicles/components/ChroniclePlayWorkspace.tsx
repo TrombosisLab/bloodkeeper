@@ -25,7 +25,7 @@ interface Props {
   readonly chronicleId: string
   readonly characterId?: string
   readonly characterName?: string
-  readonly onOpenCharacter?: (characterId: string) => void
+  readonly onOpenCharacter?: (characterId: string, chronicleId?: string) => void
 }
 
 const chronicleGateway = createChronicleGateway()
@@ -352,7 +352,7 @@ export function ChroniclePlayWorkspace({ chronicleId, characterId, characterName
     <aside className="chronicle-play-workspace__character">
       <header><small>MI PERSONAJE</small><h2>{actualCharacterName}</h2></header>
       <div className="chronicle-play-character__portrait">{characterId && !portraitFailed ? <img src={`/api/characters/${characterId}/portrait`} alt={`Retrato de ${actualCharacterName}`} onError={() => setPortraitFailed(true)} /> : <V5VisualMark kind="clan-symbol" value={clan} decorative />}</div>
-      {characterId && onOpenCharacter ? <button type="button" onClick={() => onOpenCharacter(characterId)}>Abrir ficha completa</button> : null}
+      {characterId && onOpenCharacter ? <button type="button" onClick={() => onOpenCharacter(characterId, chronicleId)}>Abrir ficha completa</button> : null}
       <div className="chronicle-play-character__tracks"><Track label="Hambre" display={`${hunger}/5`} /><Track label="Salud" display={health} /><Track label="Fuerza de voluntad" display={willpower} /><Track label="Humanidad" display={humanity} fallbackMaximum={10} /></div>
       <article><h3>Información del personaje</h3><div className="chronicle-play__clan-identity"><V5VisualMark kind="clan-symbol" value={clan} decorative /><p>Clan: {clan}</p></div><p>Concepto: {value(model, 'identity.concept', 'concept')}</p><p>Resonancia: {value(model, 'blood.resonance.temperament', 'state.blood.resonance.temperament', 'blood.resonance.key')}</p><p>Condiciones activas: {value(model, 'state.conditions.summary', 'conditions.summary')}</p></article>
       <article className="chronicle-play-character__disciplines"><h3>Disciplinas</h3>{disciplines.length ? <div>{disciplines.map((discipline) => <span key={discipline}><V5VisualMark kind="discipline" value={discipline} decorative /><small>{discipline}</small></span>)}</div> : <p>Consulta la ficha completa.</p>}</article>

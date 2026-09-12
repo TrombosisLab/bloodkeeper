@@ -1,8 +1,10 @@
 import React, {
   useEffect,
+  useMemo,
   useState,
 } from 'react'
 import ReactDOM from 'react-dom/client'
+import { createPortal } from 'react-dom'
 
 import { AdministrationHub } from './features/administration/components/AdministrationHub'
 import { AppLayout } from './components/layout/AppLayout'
@@ -13,6 +15,7 @@ import { CharacterCreationWizard } from './features/character-creation/component
 import { CharacterList } from './features/character-list/components/CharacterList'
 import { CharacterSheet } from './features/character-sheet/components/CharacterSheet'
 import { PersistedCharacterSheet } from './features/character-sheet/components/PersistedCharacterSheet'
+import { createChronicleCharacterReadGateways } from './features/character-sheet/infrastructure/chronicle-character-read.api'
 import { ChronicleListCreate } from './features/chronicles/components/ChronicleListCreate'
 import { PlayHub } from './features/chronicles/components/PlayHub'
 import { ResourceLibrary } from './features/resources/components/ResourceLibrary'
@@ -49,10 +52,12 @@ function App() {
   const canAccessAdministration = authenticatedUser?.roles.includes('admin') ?? false
   const canAccessChronicles = true
 
+  // CHRONICLE_CREATE_ACTION_ROLE_NORMALIZATION_V1
+  const normalizedRoles = authenticatedUser.roles.map((role) => role.toLowerCase())
+
   const canCreateChronicles =
-    authenticatedUser.roles.includes(
-      'narrator',
-    )
+    normalizedRoles.includes('narrator') ||
+    normalizedRoles.includes('admin')
 
   const [view, setView] =
     useState<AppView>(() =>
@@ -68,6 +73,13 @@ function App() {
   const [
     creationCharacterId,
     setCreationCharacterId,
+  ] = useState<string | null>(null)
+
+  /* CHRONICLE_CHARACTER_SHEET_CONTEXT_V28 */
+  /* CHRONICLE_CHARACTER_SHEET_RUNTIME_V29 */
+  const [
+    characterReadChronicleId,
+    setCharacterReadChronicleId,
   ] = useState<string | null>(null)
 
   const [
@@ -179,6 +191,16 @@ function App() {
     }
   }
 
+  const characterReadGateways = useMemo(
+    () =>
+      characterReadChronicleId === null
+        ? null
+        : createChronicleCharacterReadGateways(
+            characterReadChronicleId,
+          ),
+    [characterReadChronicleId],
+  )
+
   return (
     <AppLayout
       breadcrumbs={
@@ -215,7 +237,10 @@ function App() {
       {view === 'resources' && canCreateChronicles ? (
         <ResourceLibrary />
       ) : view === 'play' && canAccessChronicles ? (
-        <PlayHub onOpenCharacter={(characterId) => { setCreationCharacterId(characterId); setShowDemoSheet(false); navigateTo('characters') }} />
+        <PlayHub onOpenCharacter={(characterId: string, chronicleId?: string) => {
+            setCreationCharacterId(characterId)
+            setCharacterReadChronicleId(chronicleId ?? null)
+            ; setShowDemoSheet(false); navigateTo('characters') }} />
       ) : view === 'notebook' && canAccessChronicles ? (
         <NotebookWorkspace />
       ) : view === 'administration' && canAccessAdministration ? (
@@ -262,6 +287,7 @@ function App() {
               setCreationCharacterId(
                 characterId,
               )
+              setCharacterReadChronicleId(null)
               setShowDemoSheet(false)
             }}
             onContinueCreation={(
@@ -289,30 +315,31 @@ function App() {
           />
         ) : (
           <>
-            <div className="sheet-toolbar">
-              <div>
-                <span className="sheet-toolbar__eyebrow">
-                  Personajes
-                </span>
+            {/* BLOODKEEPER_CHARACTER_SHEET_HEADER_ACTIONS_V15 */}
+            {typeof document !== 'undefined' &&
+            document.getElementById('app-header-page-actions') !== null
+              ? createPortal(
+                  <div className="sheet-toolbar sheet-toolbar--character">
+                    <button
+                      type="button"
+                      className="sheet-toolbar__action"
+                      onClick={() => {
+                        setCreationCharacterId(null)
+                        setShowDemoSheet(false)
+                      }}
+                    >
+                      Volver a personajes
+                    </button>
 
-                <strong>
-                  {showDemoSheet
-                    ? 'Ficha de demostración'
-                    : 'Personaje persistido'}
-                </strong>
-              </div>
-
-              <button
-                type="button"
-                className="sheet-toolbar__action"
-                onClick={() => {
-                  setCreationCharacterId(null)
-                  setShowDemoSheet(false)
-                }}
-              >
-                Volver a personajes
-              </button>
-            </div>
+                    <div
+                      id="character-sheet-page-actions"
+                      className="sheet-toolbar__actions"
+                      aria-label="Acciones de la ficha"
+                    />
+                  </div>,
+                  document.getElementById('app-header-page-actions')!,
+                )
+              : null}
 
             {showDemoSheet ? (
               <CharacterSheet />
@@ -322,7 +349,12 @@ function App() {
               <PersistedCharacterSheet
                 characterId={
                   creationCharacterId
-                }
+                }{...(characterReadGateways === null
+                  ? {}
+                  : {
+                      gateway: characterReadGateways.character,
+                      profilePhaseGateway: characterReadGateways.profilePhase,
+                    })}
               />
 </>
             ) : null}

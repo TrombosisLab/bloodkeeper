@@ -1682,3 +1682,20 @@
     min-height: 14px !important;
   }
 }
+
+/* CHRONICLE_CREATE_ACTION_GLOBAL_HEADER_V3 */
+.app-header__page-actions .chronicle-workspace__primary-action {
+  min-height: 40px !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 9px 16px !important;
+  border: 1px solid rgba(205, 78, 98, .72) !important;
+  border-radius: 8px !important;
+  background: rgba(151, 39, 59, .9) !important;
+  color: #fff4ef !important;
+  font: 700 .92rem/1 system-ui, sans-serif !important;
+  white-space: nowrap !important;
+}
+.app-header__page-actions .chronicle-workspace__primary-action:hover {
+  background: rgba(177, 48, 70, .96) !important;
+}

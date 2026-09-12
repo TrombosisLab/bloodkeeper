@@ -54,8 +54,9 @@ import type {
 
 interface PersistedCharacterSheetProps {
   characterId: string
-  gateway?: CharacterDraftGateway
+  gateway?: Pick<CharacterDraftGateway, 'load'>
   profilePhaseGateway?: CharacterProfilePhaseGateway
+  readOnly?: boolean
 }
 
 type LoadState =
@@ -103,6 +104,7 @@ export function PersistedCharacterSheet({
   characterId,
   gateway,
   profilePhaseGateway,
+  readOnly = false,
 }: PersistedCharacterSheetProps) {
   const resolvedGateway =
     useMemo(
@@ -213,6 +215,7 @@ export function PersistedCharacterSheet({
           loadState.model.characterId
         }
         model={loadState.model}
+        readOnly={readOnly}
         lastRouseCheckResult={
           lastRouseCheckResult
         }

@@ -1,0 +1,671 @@
+@import './styles/design-system.css';
+@import './styles/base-and-sheet-header.css';
+@import './styles/character-sheet.css';
+@import './styles/character-sheet-buttons.css';
+@import './styles/character-experience.css';
+@import './styles/character-experience-buttons.css';
+@import './styles/character-creation.css';
+@import './styles/character-creation-buttons.css';
+
+
+/* SPEC-UI-VISUAL-NORMALIZATION-20260811
+ * Primera pasada de coherencia visual.
+ * Alcance: controles, navegación, listados, formularios de crónica y sesión.
+ * No sustituye todavía la migración completa a componentes visuales.
+ */
+:root {
+  --ui-bg: #0b0a0a;
+  --ui-surface: #141112;
+  --ui-surface-raised: #1b1617;
+  --ui-control: #0f0d0d;
+  --ui-border: #3a2c2f;
+  --ui-border-accent: #733943;
+  --ui-accent: #742e39;
+  --ui-accent-hover: #8e3f4a;
+  --ui-accent-soft: rgb(117 39 51 / 0.18);
+  --ui-text: #e9e3de;
+  --ui-text-muted: #9b8e89;
+  --ui-success: #72b783;
+  --ui-radius: 10px;
+  --ui-control-height: 42px;
+}
+
+/* Navegación: eliminar estilos nativos y reservar el acento para la sección activa. */
+.app-navigation-shell nav button,
+.app-navigation__toggle {
+  appearance: none;
+  font: inherit;
+  border-radius: var(--ui-radius);
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease,
+    transform 160ms ease;
+}
+
+.app-navigation-shell nav button {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ui-text-muted);
+}
+
+.app-navigation-shell nav button:hover,
+.app-navigation-shell nav button:focus-visible {
+  border-color: var(--ui-border);
+  background: rgb(255 255 255 / 0.035);
+  color: var(--ui-text);
+}
+
+.app-navigation-shell nav button[aria-current='page'] {
+  border-color: var(--ui-border-accent);
+  background: linear-gradient(90deg, rgb(117 39 51 / 0.42), rgb(76 32 39 / 0.55));
+  box-shadow: inset 3px 0 0 var(--color-accent-rule);
+  color: var(--ui-text);
+}
+
+.app-navigation__toggle {
+  border: 1px solid var(--ui-border);
+  background: var(--ui-surface-raised);
+  color: var(--ui-text);
+}
+
+/* Botones de las pantallas antiguas: todos comparten altura, radio y jerarquía. */
+.dashboard button,
+.character-list-workspace button,
+.chronicle-list-create button,
+.chronicle-detail button {
+  min-height: var(--ui-control-height);
+  padding: 0.62rem 1rem;
+  border: 1px solid var(--ui-border-accent);
+  border-radius: var(--ui-radius);
+  background: linear-gradient(180deg, var(--ui-accent-hover), var(--ui-accent));
+  color: var(--ui-text);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.1;
+  box-shadow: 0 5px 16px rgb(0 0 0 / 0.16);
+}
+
+.dashboard button:hover,
+.character-list-workspace button:hover,
+.chronicle-list-create button:hover,
+.chronicle-detail button:hover {
+  border-color: var(--color-accent-border);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.dashboard button:focus-visible,
+.character-list-workspace button:focus-visible,
+.chronicle-list-create button:focus-visible,
+.chronicle-detail button:focus-visible,
+.app-navigation__toggle:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.dashboard button:disabled,
+.character-list-workspace button:disabled,
+.chronicle-list-create button:disabled,
+.chronicle-detail button:disabled {
+  cursor: not-allowed;
+  filter: saturate(0.45);
+  opacity: 0.48;
+  transform: none;
+}
+
+/* Campos administrativos: superficie neutra; el rojo queda para foco y acción. */
+.chronicle-detail input,
+.chronicle-detail textarea,
+.chronicle-detail select {
+  min-height: var(--ui-control-height);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+  background: var(--ui-control);
+  color: var(--ui-text);
+  font: inherit;
+}
+
+.chronicle-detail input,
+.chronicle-detail textarea {
+  padding: 0.68rem 0.8rem;
+}
+
+.chronicle-detail select {
+  padding: 0.55rem 2.25rem 0.55rem 0.8rem;
+}
+
+.chronicle-detail input::placeholder,
+.chronicle-detail textarea::placeholder {
+  color: var(--ui-text-muted);
+}
+
+.chronicle-detail input:focus,
+.chronicle-detail textarea:focus,
+.chronicle-detail select:focus {
+  border-color: var(--color-accent-border);
+  box-shadow: 0 0 0 3px var(--color-focus-soft);
+  outline: none;
+}
+
+/* Tarjetas de listado: una superficie compartida y estados más legibles. */
+.character-list-card,
+.chronicle-list-create article {
+  border-color: var(--ui-border);
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.025), var(--ui-accent-soft));
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.13);
+}
+
+/* La cuenta no debe tapar acciones ni texto. En escritorio vive en la navegación; en
+ * móvil conserva una banda inferior y deja espacio para que el contenido no quede oculto. */
+.authentication-session {
+  z-index: 20;
+}
+
+@media (min-width: 900px) {
+  .authentication-session {
+    right: auto;
+    bottom: 1rem;
+    left: 1rem;
+    width: min(15rem, calc(100% - 2rem));
+  }
+}
+
+@media (max-width: 899px) {
+  body {
+    padding-bottom: 6rem;
+  }
+
+  .authentication-session {
+    right: 0.75rem;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    width: auto;
+  }
+}
+
+/* GLOBAL_CHRONICLE_HEADER_CONTEXT_V1 */
+/* La cabecera conserva su estructura; solo añade la portada del contexto global. */
+:where(.app-header, .app-topbar, [data-app-header]) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+:where(.app-header, .app-topbar, [data-app-header])::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 0 auto;
+  width: min(46%, 44rem);
+  pointer-events: none;
+  opacity: 0;
+  background-image: var(--app-active-chronicle-cover);
+  background-position: center;
+  background-size: cover;
+  transition: opacity .25s ease;
+}
+:root[data-active-chronicle] :where(.app-header, .app-topbar, [data-app-header])::after {
+  opacity: .52;
+}
+:where(.app-header, .app-topbar, [data-app-header])::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 0 auto;
+  width: min(56%, 52rem);
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(12,12,14,.98) 0%, rgba(12,12,14,.78) 32%, rgba(12,12,14,.14) 100%), linear-gradient(0deg, rgba(8,8,9,.58), transparent 55%);
+}
+:where(.app-header, .app-topbar, [data-app-header]) > * {
+  position: relative;
+  z-index: 2;
+}
+@media (max-width: 760px) {
+  :where(.app-header, .app-topbar, [data-app-header])::after { width: 62%; opacity: .38; }
+  :where(.app-header, .app-topbar, [data-app-header])::before { width: 78%; }
+}
+
+/* UNIFIED_GLOBAL_HEADER_EXCEPT_NOTEBOOK_V1 */
+/* La cabecera visual se comparte en toda la aplicación salvo en Cuaderno. */
+.app-header:not(.app-header--notebook) {
+  grid-template-columns: minmax(180px, 15%) minmax(0, 1fr) minmax(190px, 22%) !important;
+  column-gap: 0 !important;
+  background: linear-gradient(90deg, rgba(14,10,13,.98) 0%, rgba(17,10,14,.92) 22%, rgba(14,10,13,.72) 44%, rgba(10,8,10,.66) 100%) !important;
+}
+.app-header:not(.app-header--notebook) .app-header__page-context {
+  grid-column: 2 !important;
+  padding-left: clamp(18px, 1.7vw, 30px) !important;
+  padding-right: clamp(18px, 2.6vw, 48px) !important;
+  border-left: 1px solid rgba(196,145,77,.30) !important;
+  min-height: 58px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+.app-header:not(.app-header--notebook) .app-header__status {
+  grid-column: 3 !important;
+  justify-self: end !important;
+  padding-right: clamp(22px, 2.8vw, 52px) !important;
+}
+.app-header:not(.app-header--notebook)::after {
+  width: min(82%, 1380px) !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% auto !important;
+  background-position: right center !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.12) 14%, rgba(0,0,0,.78) 35%, #000 53%, #000 100%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.12) 14%, rgba(0,0,0,.78) 35%, #000 53%, #000 100%) !important;
+}
+.app-header:not(.app-header--notebook)::before {
+  width: min(82%, 1380px) !important;
+  background: linear-gradient(90deg, rgba(14,10,13,.08) 0%, rgba(14,10,13,.04) 25%, rgba(10,8,10,.16) 58%, rgba(10,8,10,.60) 100%) !important;
+}
+@media (max-width: 900px) {
+  .app-header:not(.app-header--notebook) {
+    grid-template-columns: minmax(150px, 20%) minmax(0, 1fr) !important;
+  }
+  .app-header:not(.app-header--notebook) .app-header__page-context {
+    padding-left: 14px !important;
+    padding-right: 16px !important;
+  }
+  .app-header:not(.app-header--notebook)::after,
+  .app-header:not(.app-header--notebook)::before {
+    width: 78% !important;
+  }
+}
+
+/* CHARACTER_HEADER_ACTIONS_V3 */
+.app-header:not(.app-header--notebook) .app-header__page-actions {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  justify-self: end !important;
+  align-self: center !important;
+  display: flex !important;
+  gap: 10px !important;
+  z-index: 4 !important;
+  margin-right: clamp(150px, 16vw, 250px) !important;
+}
+.app-header:not(.app-header--notebook) .app-header__page-actions:empty {
+  display: none !important;
+}
+.app-header:not(.app-header--notebook) .app-header__page-context {
+  padding-right: clamp(220px, 25vw, 360px) !important;
+}
+@media (max-width: 900px) {
+  .app-header:not(.app-header--notebook) .app-header__page-actions {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    justify-self: start !important;
+    margin: 4px 0 0 16px !important;
+  }
+  .app-header:not(.app-header--notebook) .app-header__page-context {
+    padding-right: 16px !important;
+  }
+}
+
+/* CHARACTER_HEADER_ACTIONS_RIGHT_V4 */
+/* Las acciones se separan del título y ocupan el lateral derecho de la cabecera. */
+.app-header:not(.app-header--notebook) .app-header__page-actions {
+  position: absolute !important;
+  right: clamp(24px, 2.4vw, 48px) !important;
+  bottom: 18px !important;
+  margin: 0 !important;
+  display: flex !important;
+  gap: 10px !important;
+  z-index: 5 !important;
+}
+.app-header:not(.app-header--notebook) .app-header__page-context {
+  padding-right: 24px !important;
+}
+@media (max-width: 900px) {
+  .app-header:not(.app-header--notebook) .app-header__page-actions {
+    position: static !important;
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    justify-self: end !important;
+    margin: 4px 16px 0 0 !important;
+  }
+}
+
+/* CHARACTER_HEADER_ACTIONS_STYLE_V1 */
+/* Acciones sobrias, integradas en la paleta de la cabecera. */
+.app-header:not(.app-header--notebook) .app-header__page-actions button {
+  min-height: 38px !important;
+  padding: 0 17px !important;
+  border: 1px solid rgba(180, 139, 108, .42) !important;
+  border-radius: 7px !important;
+  background: rgba(17, 13, 15, .82) !important;
+  color: #eee4db !important;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, .22) !important;
+  font-weight: 600 !important;
+  transition: background-color .18s ease, border-color .18s ease, transform .18s ease !important;
+}
+.app-header:not(.app-header--notebook) .app-header__page-actions button:hover {
+  border-color: rgba(208, 154, 112, .70) !important;
+  background: rgba(39, 23, 26, .90) !important;
+  transform: translateY(-1px) !important;
+}
+.app-header:not(.app-header--notebook) .app-header__page-actions .character-list-workspace__primary {
+  border-color: rgba(158, 71, 86, .72) !important;
+  background: rgba(83, 29, 45, .78) !important;
+  color: #f5e9e0 !important;
+}
+.app-header:not(.app-header--notebook) .app-header__page-actions .character-list-workspace__primary:hover {
+  border-color: rgba(193, 91, 107, .86) !important;
+  background: rgba(105, 37, 54, .88) !important;
+}
+
+/* APPLICATION_CONTENT_FULL_WIDTH_V1 */
+/* El shell ocupa todo el ancho; cada feature conserva sus propios límites internos. */
+.application-content {
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: 0 !important;
+}
+
+/* Superficies de trabajo que deben aprovechar todo el espacio disponible. */
+.application-content > :where(
+  .dashboard,
+  .character-list-workspace,
+  .chronicle-workspace,
+  .administration-hub,
+  .resource-library-workspace,
+  .play-workspace,
+  .chronicle-session-panel
+) {
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: 0 !important;
+}
+
+/* Cuaderno conserva su composición de libro y no se fuerza a ancho completo. */
+.application-content > .nb2-workspace {
+  width: auto;
+  max-width: none;
+}
+
+@media (max-width: 899px) {
+  .application-content {
+    width: 100% !important;
+    padding-inline: 16px !important;
+  }
+}
+
+/* APPLICATION_CONTENT_ALL_PAGES_V2 */
+/* Todas las páginas usan el shell ancho; Cuaderno conserva su papel propio. */
+.application-content {
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: 0 !important;
+}
+.application-content--notebook {
+  width: min(1440px, 100%) !important;
+  max-width: 1440px !important;
+  margin-inline: auto !important;
+}
+
+/* GLOBAL_PAGE_VISUAL_SYSTEM_V1 */
+/* Envolvente común para todas las pantallas salvo Cuaderno. */
+:where(
+  .dashboard,
+  .chronicle-workspace,
+  .character-list-workspace,
+  .administration-hub,
+  .play-hub,
+  .resource-library-reference
+) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: clamp(16px, 2vw, 28px) clamp(16px, 2.4vw, 38px) 40px !important;
+  box-sizing: border-box;
+}
+
+:where(
+  .dashboard,
+  .chronicle-workspace,
+  .character-list-workspace,
+  .administration-hub,
+  .play-hub,
+  .resource-library-reference
+) > * {
+  max-width: none;
+}
+
+:where(
+  .dashboard,
+  .chronicle-workspace,
+  .character-list-workspace,
+  .administration-hub,
+  .play-hub,
+  .resource-library-reference
+) :where(
+  .chronicle-overview,
+  .chronicle-continue,
+  .chronicle-list,
+  .character-list-workspace__list,
+  .administration-hub__workspace,
+  .play-hub__grid,
+  .resource-category-rail,
+  .resource-showcase,
+  .resource-gallery
+) {
+  width: 100%;
+  max-width: none;
+}
+
+:where(
+  .chronicle-workspace__header,
+  .character-list-workspace__header,
+  .administration-hub__header,
+  .play-hub__header,
+  .resource-library-reference__header
+) {
+  max-width: none !important;
+}
+
+.app-header:not(.app-header--notebook) .app-header__page-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+}
+
+@media (max-width: 760px) {
+  :where(
+    .dashboard,
+    .chronicle-workspace,
+    .character-list-workspace,
+    .administration-hub,
+    .play-hub,
+    .resource-library-reference
+  ) {
+    padding: 14px 14px 28px !important;
+  }
+}
+
+
+/* NOTEBOOK_GLOBAL_HEADER_V2 */
+/* Cuaderno comparte la cabecera global; el libro comienza directamente debajo. */
+.app-header .app-header__page-actions .nb2-header__controls {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls label {
+  display: grid !important;
+  gap: 3px !important;
+  min-width: 190px !important;
+  color: #b9aaa4 !important;
+  font-size: 10px !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls select {
+  width: 220px !important;
+  min-height: 38px !important;
+  border: 1px solid rgba(119, 73, 77, .8) !important;
+  border-radius: 9px !important;
+  background: rgba(12, 10, 11, .88) !important;
+  color: #f1e8e3 !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls button {
+  min-height: 38px !important;
+  white-space: nowrap !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls .nb2-primary {
+  border-color: #c0475a !important;
+  background: linear-gradient(135deg, #8d2940, #b33e52) !important;
+}
+.nb2-workspace {
+  padding-top: 12px !important;
+}
+.nb2-workspace > .nb2-header,
+.nb2-workspace > .nb2-header__cover {
+  display: none !important;
+}
+@media (max-width: 980px) {
+  .app-header .app-header__page-actions .nb2-header__controls { gap: 7px !important; }
+  .app-header .app-header__page-actions .nb2-header__controls label { min-width: 150px !important; }
+  .app-header .app-header__page-actions .nb2-header__controls select { width: 170px !important; }
+}
+@media (max-width: 700px) {
+  .app-header .app-header__page-actions .nb2-header__controls label { min-width: 0 !important; }
+  .app-header .app-header__page-actions .nb2-header__controls select { width: 150px !important; }
+}
+
+
+/* NOTEBOOK_GLOBAL_HEADER_V4 */
+/* Cuaderno comparte la cabecera global; el libro comienza directamente debajo. */
+.app-header .app-header__page-actions .nb2-header__controls {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls label {
+  display: grid !important;
+  gap: 3px !important;
+  min-width: 190px !important;
+  color: #b9aaa4 !important;
+  font-size: 10px !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls select {
+  width: 220px !important;
+  min-height: 38px !important;
+  border: 1px solid rgba(119, 73, 77, .8) !important;
+  border-radius: 9px !important;
+  background: rgba(12, 10, 11, .88) !important;
+  color: #f1e8e3 !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls button {
+  min-height: 38px !important;
+  white-space: nowrap !important;
+}
+.app-header .app-header__page-actions .nb2-header__controls .nb2-primary {
+  border-color: #c0475a !important;
+  background: linear-gradient(135deg, #8d2940, #b33e52) !important;
+}
+.nb2-workspace { padding-top: 12px !important; }
+.nb2-workspace > .nb2-header,
+.nb2-workspace > .nb2-header__cover { display: none !important; }
+@media (max-width: 980px) {
+  .app-header .app-header__page-actions .nb2-header__controls { gap: 7px !important; }
+  .app-header .app-header__page-actions .nb2-header__controls label { min-width: 150px !important; }
+  .app-header .app-header__page-actions .nb2-header__controls select { width: 170px !important; }
+}
+@media (max-width: 700px) {
+  .app-header .app-header__page-actions .nb2-header__controls label { min-width: 0 !important; }
+  .app-header .app-header__page-actions .nb2-header__controls select { width: 150px !important; }
+}
+
+
+/* NOTEBOOK_GLOBAL_HEADER_V5 */
+/* La cabecera de Cuaderno comparte visualmente la franja global sin tocar su JSX. */
+.application-content--notebook {
+  padding-top: 0 !important;
+}
+.application-content--notebook .nb2-workspace {
+  width: 100% !important;
+  max-width: none !important;
+  padding: 0 0 38px !important;
+}
+.application-content--notebook .nb2-header {
+  position: relative !important;
+  z-index: 15 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  width: 100% !important;
+  height: 68px !important;
+  min-height: 68px !important;
+  margin: -68px 0 0 !important;
+  padding: 8px clamp(16px, 2.6vw, 42px) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+.application-content--notebook .nb2-header > div:first-child,
+.application-content--notebook .nb2-header .nb2-header__copy,
+.application-content--notebook .nb2-header .nb2-header__cover {
+  display: none !important;
+}
+.application-content--notebook .nb2-header__controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.application-content--notebook .nb2-header label {
+  display: grid !important;
+  gap: 3px !important;
+  min-width: 190px !important;
+  color: #b9aaa4 !important;
+  font-size: 10px !important;
+}
+.application-content--notebook .nb2-header label select {
+  width: 220px !important;
+  min-height: 38px !important;
+  border: 1px solid rgba(119, 73, 77, .8) !important;
+  border-radius: 9px !important;
+  background: rgba(12, 10, 11, .88) !important;
+  color: #f1e8e3 !important;
+}
+.application-content--notebook .nb2-header > button,
+.application-content--notebook .nb2-header__controls button {
+  min-height: 38px !important;
+  white-space: nowrap !important;
+}
+.application-content--notebook .nb2-header .nb2-primary {
+  border-color: #c0475a !important;
+  background: linear-gradient(135deg, #8d2940, #b33e52) !important;
+}
+.application-content--notebook .nb2-sections {
+  margin-top: 0 !important;
+}
+@media (max-width: 760px) {
+  .application-content--notebook .nb2-header {
+    height: auto !important;
+    min-height: 68px !important;
+    margin-top: -68px !important;
+    padding: 10px 12px !important;
+    flex-wrap: wrap !important;
+  }
+  .application-content--notebook .nb2-header label { min-width: 0 !important; }
+  .application-content--notebook .nb2-header label select { width: 160px !important; }
+}

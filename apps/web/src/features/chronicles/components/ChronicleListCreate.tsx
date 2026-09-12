@@ -1,3 +1,5 @@
+import { useAuthenticatedUser } from '../../authentication/context/authentication.context'
+import { createPortal } from 'react-dom'
 import {
   useEffect,
   useState,
@@ -114,7 +116,7 @@ function dateLabel(value: string): string {
 
 interface ChronicleListCreateProps {
   readonly canCreateChronicles: boolean
-  readonly onOpenCharacter?: (characterId: string) => void
+  readonly onOpenCharacter?: (characterId: string, chronicleId?: string) => void
   readonly openChronicleId?: string | null
   readonly initialDetailSection?: 'play'
   readonly onBackFromOpened?: () => void
@@ -127,6 +129,14 @@ export function ChronicleListCreate({
   initialDetailSection,
   onBackFromOpened,
 }: ChronicleListCreateProps) {
+  const authenticatedUser = useAuthenticatedUser()
+  const canCurrentUserCreateChronicles =
+    canCreateChronicles ||
+    authenticatedUser.roles.some((role) => {
+      const normalizedRole = String(role).trim().toLowerCase()
+      return normalizedRole === 'narrator' || normalizedRole === 'admin'
+    })
+
   const [
     chronicles,
     setChronicles,
@@ -421,6 +431,23 @@ export function ChronicleListCreate({
 
   return (
     <section className="chronicle-workspace">
+      {canCurrentUserCreateChronicles &&
+      typeof document !== 'undefined' &&
+      document.getElementById('app-header-page-actions')
+        ? createPortal(
+            <button
+              type="button"
+              className="chronicle-workspace__primary-action"
+              aria-expanded={createOpen}
+              aria-controls="chronicle-create-panel"
+              onClick={() => setCreateOpen((current) => !current)}
+            >
+              + Nueva crónica
+            </button>,
+            document.getElementById('app-header-page-actions')!,
+          )
+        : null}
+
 <section className="chronicle-overview" aria-label="Resumen de crónicas">
         <div className="chronicle-overview__stat">
           <span>Crónicas</span>
@@ -466,7 +493,7 @@ export function ChronicleListCreate({
         </section>
       ) : null}
 
-      {canCreateChronicles && createOpen ? (
+      {canCurrentUserCreateChronicles && createOpen ? (
         <section
           id="chronicle-create-panel"
           className="chronicle-create"
@@ -601,3 +628,5 @@ export function ChronicleListCreate({
 // REDUNDANT_WORKSPACE_SUBHEADERS_V1
 
 // REDUNDANT_WORKSPACE_SUBHEADERS_V2
+
+// CHRONICLE_CREATE_ACTION_GLOBAL_HEADER_V3

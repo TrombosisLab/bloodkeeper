@@ -226,6 +226,11 @@ export function CharacterCreationWizard({
   ] = useState(0)
 
   const [
+    persistenceError,
+    setPersistenceError,
+  ] = useState<unknown>(null)
+
+  const [
     hasUnsavedChanges,
     setHasUnsavedChanges,
   ] = useState(false)
@@ -321,6 +326,7 @@ export function CharacterCreationWizard({
   const persistenceMessage =
     messageForCharacterDraftPersistenceState(
       persistenceState,
+      persistenceError,
     )
 
   const canRetryPersistence =
@@ -345,6 +351,7 @@ export function CharacterCreationWizard({
   useEffect(() => {
     if (characterId === null) {
       setPersistenceState('ready')
+      setPersistenceError(null)
       return
     }
 
@@ -413,6 +420,7 @@ export function CharacterCreationWizard({
         setReviewRevision(null)
         setReviewState('idle')
         setReviewMessage(null)
+        setPersistenceError(null)
         setHasUnsavedChanges(
           normalizationChanged,
         )
@@ -429,6 +437,7 @@ export function CharacterCreationWizard({
             error,
           ),
         )
+        setPersistenceError(error)
       })
 
     return () => {
@@ -448,6 +457,7 @@ export function CharacterCreationWizard({
     }
 
     setPersistenceState('saving')
+    setPersistenceError(null)
 
     try {
       const persisted =
@@ -471,6 +481,7 @@ export function CharacterCreationWizard({
       setShowValidation(false)
       setHasUnsavedChanges(false)
       setPersistenceState('ready')
+      setPersistenceError(null)
       onCharacterPersisted?.(
         persisted.characterId,
       )
@@ -482,6 +493,7 @@ export function CharacterCreationWizard({
           error,
         ),
       )
+      setPersistenceError(error)
 
       return null
     }
@@ -526,10 +538,12 @@ export function CharacterCreationWizard({
 
     if (persistedCharacterId === null) {
       setPersistenceState('ready')
+      setPersistenceError(null)
       return
     }
 
     loadedCharacterIdRef.current = null
+    setPersistenceError(null)
     setReloadVersion(
       (version) => version + 1,
     )

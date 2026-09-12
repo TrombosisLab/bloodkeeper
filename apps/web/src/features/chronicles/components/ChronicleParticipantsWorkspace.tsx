@@ -3,6 +3,8 @@ import type { ReactNode } from 'react'
 
 import { chronicleParticipantNotesApi } from '../infrastructure/chronicle-participant-notes.api'
 import { createCharacterExperienceGateway } from '../../character-sheet/infrastructure/character-experience.api.ts'
+import { PersistedCharacterSheet } from '../../character-sheet/components/PersistedCharacterSheet'
+import { createChronicleCharacterReadGateways } from '../../character-sheet/infrastructure/chronicle-character-read.api'
 import { createChronicleGateway } from '../infrastructure/chronicle.api.ts'
 import { createChronicleStoryGateway } from '../infrastructure/chronicle-story.api.ts'
 import type {
@@ -20,6 +22,7 @@ const storyGateway = createChronicleStoryGateway()
 const experienceGateway = createCharacterExperienceGateway()
 
 interface Props {
+  readonly chronicleId: string
   readonly participants: readonly ChronicleParticipantApiSnapshot[]
   readonly characters: readonly ChronicleCharacterApiSummary[]
   readonly canManage: boolean
@@ -58,6 +61,7 @@ function dateLabel(value: string): string {
 }
 
 export function ChronicleParticipantsWorkspace({
+  chronicleId,
   participants,
   characters,
   canManage,
@@ -81,6 +85,12 @@ export function ChronicleParticipantsWorkspace({
   const [attendanceFilter, setAttendanceFilter] = useState<'all' | 'attended' | 'absent'>('all')
   const [experience, setExperience] = useState<{ readonly total: number; readonly available: number } | null>(null)
   const [experienceError, setExperienceError] = useState(false)
+  const [openedCharacterId, setOpenedCharacterId] = useState<string | null>(null)
+
+  const characterReadGateways = useMemo(
+    () => createChronicleCharacterReadGateways(chronicleId),
+    [chronicleId],
+  )
 
   const visible = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase('es-ES')
@@ -324,9 +334,31 @@ export function ChronicleParticipantsWorkspace({
                     <div><strong>{character.name || 'Personaje sin nombre'}</strong><span>{character.concept ?? 'Sin concepto definido'}</span><small>{character.status}</small></div>
                   </div>
                 ) : <p>Sin personaje asociado a esta crónica.</p>}
+                {canManage && character ? (
+                  <button className="participant-secondary-button" type="button" onClick={() => setOpenedCharacterId(character.characterId)}>Abrir ficha</button>
+                ) : null}
                 {selected.userId === authenticatedUserId ? characterAssociation : null}
               </section>
             </div>
+
+            {openedCharacterId !== null && canManage ? (
+              <section className="participant-card participant-card--character-sheet" aria-labelledby="participant-character-sheet-title">
+                <div className="participant-card__heading">
+                  <div>
+                    <span className="participant-eyebrow participant-eyebrow--red">Solo lectura</span>
+                    <h3 id="participant-character-sheet-title">Ficha de {character?.name ?? 'personaje'}</h3>
+                  </div>
+                  <button className="participant-secondary-button" type="button" onClick={() => setOpenedCharacterId(null)}>Cerrar ficha</button>
+                </div>
+                <p className="participant-helper">Consulta narrativa. El jugador conserva el control de edición de su ficha.</p>
+                <PersistedCharacterSheet
+                  characterId={openedCharacterId}
+                  gateway={characterReadGateways.character}
+                  profilePhaseGateway={characterReadGateways.profilePhase}
+                  readOnly
+                />
+              </section>
+            ) : null}
 
             <section className="participant-card participant-card--participation">
               <h3>Participaci&oacute;n en la cr&oacute;nica</h3>

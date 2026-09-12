@@ -115,7 +115,7 @@ type ChronicleDetailSection =
 interface ChronicleDetailProps {
   readonly chronicleId: string
   readonly onBack: () => void
-  readonly onOpenCharacter?: (characterId: string) => void
+  readonly onOpenCharacter?: (characterId: string, chronicleId?: string) => void
   readonly initialSection?: ChronicleDetailSection
   readonly onChronicleUpdated?: (
     chronicle: ChronicleApiSnapshot,
@@ -1127,6 +1127,7 @@ export function ChronicleDetail({
         hidden={activeSection !== 'participants'}
       >
         <ChronicleParticipantsWorkspace
+          chronicleId={chronicleId}
           participants={participants}
           characters={associatedCharacters}
           canManage={canManageParticipants}
@@ -1352,7 +1353,8 @@ canManageParticipants ? (
 
 
 
-      <div id="chronicle-section-play-panel" hidden={activeSection !== 'play'}><ChroniclePlayWorkspace chronicleId={chronicleId} characterId={associatedCharacters.find((item) => item.ownerId === authenticatedUser.id)?.characterId} characterName={associatedCharacters.find((item) => item.ownerId === authenticatedUser.id)?.name} onOpenCharacter={onOpenCharacter} /></div>
+      <div id="chronicle-section-play-panel" hidden={activeSection !== 'play'}><ChroniclePlayWorkspace chronicleId={chronicleId} characterId={associatedCharacters.find((item) => item.ownerId === authenticatedUser.id)?.characterId} characterName={associatedCharacters.find((item) => item.ownerId === authenticatedUser.id)?.name} onOpenCharacter={(characterId) =>
+          onOpenCharacter?.(characterId, chronicleId)} /></div>
 
 <div id="chronicle-section-resources-panel"
         hidden={activeSection !== 'resources'}

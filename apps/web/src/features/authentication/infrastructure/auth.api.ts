@@ -57,7 +57,14 @@ function parseUser(
     )
   }
 
-  const rawRoles = value.roles
+  // CHRONICLE_CREATE_ACTION_ROLE_NORMALIZATION_V2
+  const rawRoles = Array.isArray(value.roles)
+    ? value.roles.map((role) =>
+        typeof role === 'string'
+          ? role.trim().toLowerCase()
+          : role,
+      )
+    : value.roles
 
   if (
     typeof value.id !== 'string' ||

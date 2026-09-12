@@ -2581,3 +2581,183 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* CHARACTER_SHEET_DAMAGE_MARKS_V2
+   Las marcas se dibujan con CSS para que nunca desborden la casilla. */
+.damage-tracker__boxes {
+  align-items: center;
+}
+
+.damage-box-item {
+  display: block;
+  min-width: 0;
+}
+
+.damage-box-item > .damage-box {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.damage-box__symbol {
+  position: relative;
+  display: block;
+  width: 68%;
+  height: 68%;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+}
+
+.damage-box--superficial {
+  border-color: #d97887;
+  background: rgb(117 28 43 / 0.16);
+}
+
+.damage-box--superficial .damage-box__symbol::before,
+.damage-box--aggravated .damage-box__symbol::before,
+.damage-box--aggravated .damage-box__symbol::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 142%;
+  height: 2px;
+  border-radius: 999px;
+  background: #eea1ab;
+  transform-origin: center;
+}
+
+.damage-box--superficial .damage-box__symbol::before {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.damage-box--aggravated {
+  border-color: #ef4057;
+  background: rgb(154 35 54 / 0.28);
+}
+
+.damage-box--aggravated .damage-box__symbol::before,
+.damage-box--aggravated .damage-box__symbol::after {
+  height: 2.5px;
+  background: #ff5267;
+}
+
+.damage-box--aggravated .damage-box__symbol::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.damage-box--aggravated .damage-box__symbol::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* CHARACTER_SHEET_STATUS_RIBBON_V3
+   Valores junto a sus etiquetas y cinta de estado más compacta. */
+.damage-tracker {
+  padding: 12px 14px;
+}
+
+.damage-tracker__header {
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.damage-tracker__header > div,
+.state-card__heading > div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.damage-tracker__label,
+.state-card__heading span {
+  margin-bottom: 0;
+}
+
+.damage-tracker__capacity,
+.state-card__heading strong {
+  display: inline;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.state-card {
+  padding: 14px;
+}
+
+.state-card__heading {
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* Hambre se lee directamente en las cinco gotas. */
+.state-card--hunger .state-card__heading strong {
+  display: none;
+}
+
+/* La potencia conserva un único número, junto a la etiqueta. */
+.state-card--blood .blood-potency-display {
+  min-height: 32px;
+}
+
+.state-card--blood .blood-potency-display span {
+  width: 28px;
+  height: 28px;
+}
+
+.state-card--blood .blood-potency-display strong {
+  display: none;
+}
+
+/* Humanidad: marcas centradas y contenidas, sin glifos desbordados. */
+.humanity-box {
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.humanity-box__symbol {
+  position: relative;
+  display: block;
+  width: 58%;
+  height: 58%;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+}
+
+.humanity-box--humanity .humanity-box__symbol::before,
+.humanity-box--filled .humanity-box__symbol::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 68%;
+  height: 68%;
+  background: #efb0b7;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.humanity-box--stain .humanity-box__symbol::before,
+.humanity-box--stain .humanity-box__symbol::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 125%;
+  height: 2px;
+  border-radius: 999px;
+  background: #ff5267;
+}
+
+.humanity-box--stain .humanity-box__symbol::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.humanity-box--stain .humanity-box__symbol::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}

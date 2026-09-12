@@ -126,17 +126,59 @@ function buildTransitionReadModel(
 }
 
 export async function loadPersistedCharacterSheetState(
-  gateway: CharacterDraftGateway,
+  gateway: Pick<CharacterDraftGateway, 'load'>,
   profilePhaseGateway: CharacterProfilePhaseGateway,
   characterId: string,
 ): Promise<PersistedCharacterSheetLoadResult> {
-  const [
-    snapshot,
-    profilePhase,
-  ] = await Promise.all([
-    gateway.load(characterId),
-    profilePhaseGateway.load(characterId),
-  ])
+  /* CHARACTER_SHEET_PROFILE_PHASE_STANDARD_V33 */
+  const snapshot =
+    await gateway.load(characterId)
+
+  let profilePhase:
+    Awaited<
+      ReturnType<
+        CharacterProfilePhaseGateway['load']
+      >
+    >
+
+  if (
+    snapshot.nature === 'vampire' &&
+    snapshot.creation.creationMode === 'standard'
+  ) {
+    profilePhase = {
+      phase: 'ESTABLISHED_VAMPIRE',
+      pendingDecisions: [],
+    }
+  } else {
+    try {
+      profilePhase =
+        await profilePhaseGateway.load(
+          characterId,
+        )
+    } catch (error: unknown) {
+      if (
+        error instanceof CharacterProfilePhaseApiError &&
+        (
+          [401, 403, 404].includes(error.status) ||
+          (
+            error.status === 422 &&
+            error.code ===
+              'CHARACTER_PROFILE_PHASE_UNAVAILABLE'
+          )
+        )
+      ) {
+        profilePhase = {
+          phase:
+            snapshot.nature === 'human'
+              ? 'HUMAN'
+              : 'ESTABLISHED_VAMPIRE',
+          pendingDecisions: [],
+        }
+      } else {
+        throw error
+      }
+    }
+  }
 
   return {
     model:

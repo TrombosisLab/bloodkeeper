@@ -3,6 +3,7 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  NotFoundException,
   Param,
   Query,
   Req,
@@ -17,6 +18,24 @@ import {
   ChronicleCharacterListPermissionError,
   ListChronicleCharactersUseCase,
 } from '../application/list-chronicle-characters.use-case'
+
+import {
+  ChronicleCharacterNotFoundError,
+  ChronicleCharacterReadPermissionError,
+  LoadChronicleCharacterUseCase,
+} from '../application/load-chronicle-character.use-case'
+
+import {
+  LoadCharacterProfilePhaseUseCase,
+} from '../application/load-character-profile-phase.use-case'
+
+import {
+  toCharacterDraftResponse,
+} from './character-draft.dto'
+
+import {
+  toCharacterProfilePhaseResponse,
+} from './character-profile-phase.dto'
 
 interface AuthenticatedChronicleCharacterRequest {
   readonly user?: {
@@ -61,6 +80,21 @@ function chronicleId(
   return value
 }
 
+function characterId(
+  value: unknown,
+): string {
+  if (
+    typeof value !== 'string' ||
+    !uuidPattern.test(value)
+  ) {
+    throw new BadRequestException({
+      code: 'INVALID_CHRONICLE_CHARACTER_REQUEST',
+    })
+  }
+
+  return value
+}
+
 function serializeCharacter(
   character: {
     readonly characterId: string
@@ -87,6 +121,10 @@ export class ChronicleCharacterController {
   constructor(
     private readonly listCharacters:
       ListChronicleCharactersUseCase,
+    private readonly loadCharacter:
+      LoadChronicleCharacterUseCase,
+    private readonly loadProfilePhase:
+      LoadCharacterProfilePhaseUseCase,
   ) {}
 
   @Get(':chronicleId/characters')
@@ -165,4 +203,79 @@ export class ChronicleCharacterController {
       throw error
     }
   }
+
+
+  @Get(':chronicleId/characters/:characterId')
+  async load(
+    @Req() request: AuthenticatedChronicleCharacterRequest,
+    @Param('chronicleId') chronicleIdInput: unknown,
+    @Param('characterId') characterIdInput: unknown,
+  ) {
+    const requesterId = authenticatedUserId(request)
+    const targetChronicleId = chronicleId(chronicleIdInput)
+    const targetCharacterId = characterId(characterIdInput)
+
+    try {
+      const character = await this.loadCharacter.execute(
+        requesterId,
+        targetChronicleId,
+        targetCharacterId,
+      )
+      return toCharacterDraftResponse(character)
+    } catch (error: unknown) {
+      if (error instanceof ChronicleCharacterReadPermissionError) {
+        throw new ForbiddenException({
+          code: 'CHRONICLE_CHARACTER_READ_PERMISSION_DENIED',
+        })
+      }
+      if (error instanceof ChronicleCharacterNotFoundError) {
+        throw new NotFoundException({
+          code: 'CHRONICLE_CHARACTER_NOT_FOUND',
+        })
+      }
+      throw error
+    }
+  }
+
+  @Get(':chronicleId/characters/:characterId/profile-phase')
+  async profilePhase(
+    @Req() request: AuthenticatedChronicleCharacterRequest,
+    @Param('chronicleId') chronicleIdInput: unknown,
+    @Param('characterId') characterIdInput: unknown,
+  ) {
+    const requesterId = authenticatedUserId(request)
+    const targetChronicleId = chronicleId(chronicleIdInput)
+    const targetCharacterId = characterId(characterIdInput)
+
+    try {
+      const character = await this.loadCharacter.execute(
+        requesterId,
+        targetChronicleId,
+        targetCharacterId,
+      )
+      const snapshot = await this.loadProfilePhase.read(
+        character.ownerId,
+        character.characterId,
+      )
+      if (snapshot === null) {
+        throw new NotFoundException({
+          code: 'CHRONICLE_CHARACTER_NOT_FOUND',
+        })
+      }
+      return toCharacterProfilePhaseResponse(snapshot)
+    } catch (error: unknown) {
+      if (error instanceof ChronicleCharacterReadPermissionError) {
+        throw new ForbiddenException({
+          code: 'CHRONICLE_CHARACTER_READ_PERMISSION_DENIED',
+        })
+      }
+      if (error instanceof ChronicleCharacterNotFoundError) {
+        throw new NotFoundException({
+          code: 'CHRONICLE_CHARACTER_NOT_FOUND',
+        })
+      }
+      throw error
+    }
+  }
+
 }

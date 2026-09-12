@@ -2150,3 +2150,29 @@ select:focus {
 }
 
 /* BK_CHRONICLE_VISUAL_POLISH_END */
+
+/* CHARACTER_SHEET_FULL_WIDTH_V1
+   La ficha utiliza todo el lienzo disponible a la derecha del lateral.
+   El resto de vistas y el creador conservan su contenedor original. */
+.application-content:has(.character-sheet) {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 8px 12px 48px;
+}
+
+.application-content:has(.character-sheet) .character-sheet {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}
+
+.application-content:has(.character-sheet) .sheet-toolbar {
+  margin-bottom: 8px;
+}
+
+@media (max-width: 900px) {
+  .application-content:has(.character-sheet) {
+    padding: 8px 8px 40px;
+  }
+}
