@@ -14,6 +14,7 @@ import type {
   ChronicleStoryApiType,
   ChronicleStoryApiVisibility,
   ChronicleStoryMilestoneApiKey,
+  ChronicleStoryMilestoneApiSnapshot,
 } from '../types/chronicle-story-api.types'
 import { createChronicleGateway } from '../infrastructure/chronicle.api'
 import {
@@ -150,6 +151,8 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
   const [completionConfirmed, setCompletionConfirmed] = useState(false)
   const [completionOperationId, setCompletionOperationId] = useState(storyCompletionOperationId)
   const [sessionNotes, setSessionNotes] = useState<Readonly<Record<string, string>>>({})
+  const [selectedMilestoneKey, setSelectedMilestoneKey] = useState<ChronicleStoryMilestoneApiKey | null>(null)
+  const [milestoneNoteDrafts, setMilestoneNoteDrafts] = useState<Readonly<Partial<Record<ChronicleStoryMilestoneApiKey, string>>>>({})
 
   const selected = stories.find((story) => story.id === selectedId) ?? null
   const filteredStories = useMemo(() => stories.filter((story) => {
@@ -198,6 +201,10 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
   }, [createRequestKey])
 
   useEffect(() => {
+    setSelectedMilestoneKey(null)
+  }, [selectedId])
+
+  useEffect(() => {
     if (selected === null) return
     setTitleDraft(selected.title)
     setTypeDraft(selected.type)
@@ -210,6 +217,7 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
     setCompletionConfirmed(false)
     setCompletionOperationId(storyCompletionOperationId())
     setSessionNotes(Object.fromEntries(selected.sessions.map((session) => [session.id, session.progressNotes ?? ''])))
+    setMilestoneNoteDrafts(Object.fromEntries(selected.milestones.map((milestone) => [milestone.key, milestone.note ?? ''])) as Partial<Record<ChronicleStoryMilestoneApiKey, string>>)
     setContext({
       sessionIds: selected.sessions.map((item) => item.id),
       eventIds: selected.events.map((item) => item.id),
@@ -230,6 +238,16 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
     } finally {
       setOperation(null)
     }
+  }
+
+  function saveMilestoneNote(milestone: ChronicleStoryMilestoneApiSnapshot) {
+    if (selected === null) return
+    const note = milestoneNoteDrafts[milestone.key]?.trim() || null
+    void perform('milestone-note:' + milestone.key, () => storyGateway.milestone(chronicleId, selected.id, milestone.key, {
+      expectedRevision: selected.revision,
+      completed: milestone.completed,
+      note,
+    }))
   }
 
   async function createStory(event: FormEvent<HTMLFormElement>) {
@@ -271,6 +289,7 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
     !selected.closure.hasPreparationSession &&
     resolutionDraft.trim().length > 0 &&
     completionConfirmed
+  const selectedMilestone = selected?.milestones.find((milestone) => milestone.key === selectedMilestoneKey) ?? null
 
   return (
     <section className="story-workspace" aria-label="Historias de la crónica">
@@ -307,9 +326,56 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
             <label><span>En juego</span><textarea value={stakesDraft} disabled={readOnly} onChange={(event) => setStakesDraft(event.target.value)} placeholder="¿Qué se puede ganar o perder?" /></label>
           </section>
 
-          <section className="story-section story-milestones"><div className="story-section__heading"><div><span>Progreso narrativo</span><h3>Hitos de la historia</h3></div><strong>{selected.progress.percentage}%</strong></div><div className="story-milestones__track">{selected.milestones.map((milestone, index) => <button key={milestone.key} type="button" disabled={readOnly || operation !== null} className={milestone.completed ? 'is-complete' : ''} onClick={() => void perform(`milestone:${milestone.key}`, () => storyGateway.milestone(chronicleId, selected.id, milestone.key, { expectedRevision: selected.revision, completed: !milestone.completed, note: milestone.note }))}><span>{milestone.completed ? '✓' : index + 1}</span><strong>{milestoneLabels[milestone.key]}</strong><small>{milestone.completed ? 'Completado' : 'Pendiente'}</small></button>)}</div></section>
-
-          <section className="story-section"><div className="story-section__heading"><div><span>Desarrollo</span><h3>Sesiones vinculadas</h3></div><button type="button" onClick={() => openContext('sessions')} disabled={readOnly}>＋ Vincular sesión</button></div><div className="story-session-list">{selected.sessions.map((session) => <article key={session.id}><div className="story-resource-icon">◫</div><div><strong>{session.sessionNumber === null ? 'Sesión' : `Sesión ${session.sessionNumber}`}: {session.title ?? 'Sin título'}</strong><small>{storyDate(session.realDate)} · {session.status}</small><textarea value={sessionNotes[session.id] ?? ''} disabled={readOnly} onChange={(event) => setSessionNotes((current) => ({ ...current, [session.id]: event.target.value }))} placeholder="Qué avanzó en esta historia…" /><button type="button" disabled={readOnly || operation !== null} onClick={() => void perform(`session:${session.id}`, () => storyGateway.updateSessionProgress(chronicleId, selected.id, session.id, { expectedRevision: selected.revision, progressNotes: sessionNotes[session.id]?.trim() || null }))}>Guardar avance</button></div></article>)}{selected.sessions.length === 0 ? <button type="button" className="story-add-card" onClick={() => openContext('sessions')}>＋ Añadir sesión relacionada</button> : null}</div></section>
+                    <section className="story-section story-milestones">
+            <div className="story-section__heading"><div><span>Progreso narrativo</span><h3>Hitos de la historia</h3></div><strong>{selected.progress.percentage}%</strong></div>
+            <div className="story-milestones__track">
+              {selected.milestones.map((milestone, index) => {
+                const isSelected = selectedMilestoneKey === milestone.key
+                return (
+                  <article key={milestone.key} className={'story-milestone' + (isSelected ? ' is-selected' : '')}>
+                    <button
+                      type="button"
+                      className={'story-milestone__status' + (milestone.completed ? ' is-complete' : '')}
+                      disabled={readOnly || operation !== null}
+                      aria-label={milestone.completed ? 'Reabrir ' + milestoneLabels[milestone.key] : 'Completar ' + milestoneLabels[milestone.key]}
+                      aria-pressed={milestone.completed}
+                      onClick={() => void perform('milestone:' + milestone.key, () => storyGateway.milestone(chronicleId, selected.id, milestone.key, {
+                        expectedRevision: selected.revision,
+                        completed: !milestone.completed,
+                        note: milestoneNoteDrafts[milestone.key]?.trim() || null,
+                      }))}
+                    >
+                      <span>{milestone.completed ? '✓' : index + 1}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="story-milestone__select"
+                      aria-expanded={isSelected}
+                      aria-label={'Editar ' + milestoneLabels[milestone.key]}
+                      onClick={() => setSelectedMilestoneKey(isSelected ? null : milestone.key)}
+                    >
+                      <strong>{milestoneLabels[milestone.key]}</strong>
+                    </button>
+                    <small>{milestone.completed ? 'Completado' : 'Pendiente'}</small>
+                  </article>
+                )
+              })}
+            </div>
+            {selectedMilestone !== null ? (
+              <div className="story-milestone-editor" aria-label={'Editar ' + milestoneLabels[selectedMilestone.key]}>
+                <div className="story-milestone-editor__heading"><div><span>Descripción del hito</span><strong>{milestoneLabels[selectedMilestone.key]}</strong></div><button type="button" aria-label="Cerrar edición del hito" onClick={() => setSelectedMilestoneKey(null)}>×</button></div>
+                <textarea
+                  value={milestoneNoteDrafts[selectedMilestone.key] ?? ''}
+                  disabled={readOnly}
+                  maxLength={2000}
+                  aria-label={'Descripción de ' + milestoneLabels[selectedMilestone.key]}
+                  placeholder="Describe qué ocurre en este punto de la historia…"
+                  onChange={(event) => setMilestoneNoteDrafts((current) => ({ ...current, [selectedMilestone.key]: event.target.value }))}
+                />
+                <div className="story-milestone-editor__actions"><small>La descripción es opcional y puede completarse más adelante.</small><button type="button" disabled={readOnly || operation !== null} onClick={() => saveMilestoneNote(selectedMilestone)}>{operation === 'milestone-note:' + selectedMilestone.key ? 'Guardando…' : 'Guardar hito'}</button></div>
+              </div>
+            ) : null}
+          </section><section className="story-section"><div className="story-section__heading"><div><span>Desarrollo</span><h3>Sesiones vinculadas</h3></div><button type="button" onClick={() => openContext('sessions')} disabled={readOnly}>＋ Vincular sesión</button></div><div className="story-session-list">{selected.sessions.map((session) => <article key={session.id}><div className="story-resource-icon">◫</div><div><strong>{session.sessionNumber === null ? 'Sesión' : `Sesión ${session.sessionNumber}`}: {session.title ?? 'Sin título'}</strong><small>{storyDate(session.realDate)} · {session.status}</small><textarea value={sessionNotes[session.id] ?? ''} disabled={readOnly} onChange={(event) => setSessionNotes((current) => ({ ...current, [session.id]: event.target.value }))} placeholder="Qué avanzó en esta historia…" /><button type="button" disabled={readOnly || operation !== null} onClick={() => void perform(`session:${session.id}`, () => storyGateway.updateSessionProgress(chronicleId, selected.id, session.id, { expectedRevision: selected.revision, progressNotes: sessionNotes[session.id]?.trim() || null }))}>Guardar avance</button></div></article>)}{selected.sessions.length === 0 ? <button type="button" className="story-add-card" onClick={() => openContext('sessions')}>＋ Añadir sesión relacionada</button> : null}</div></section>
 
           <section className="story-section"><div className="story-section__heading"><div><span>Cronología</span><h3>Sucesos registrados</h3></div><button type="button" onClick={() => openContext('events')} disabled={readOnly}>＋ Añadir suceso</button></div><div className="story-compact-grid">{selected.events.map((event) => <article key={event.id}><span className="story-resource-icon">◇</span><div><strong>{event.title}</strong><small>{event.narrativeTimeLabel ?? storyDate(event.realDate)}</small></div></article>)}{selected.events.length === 0 ? <button type="button" className="story-add-card" onClick={() => openContext('events')}>＋ Relacionar suceso</button> : null}</div></section>
 
@@ -342,3 +408,5 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
 function ContextGroup({ title, items, selected, onToggle }: { readonly title: string; readonly items: readonly { readonly id: string; readonly label: string }[]; readonly selected: readonly string[]; readonly onToggle: (id: string) => void }) {
   return <fieldset><legend>{title}</legend>{items.map((item) => <label key={item.id}><input type="checkbox" checked={selected.includes(item.id)} onChange={() => onToggle(item.id)} /><span>{item.label}</span></label>)}{items.length === 0 ? <p>No hay elementos disponibles.</p> : null}</fieldset>
 }
+
+// CHRONICLE_STORY_MILESTONE_EDITOR_V1
