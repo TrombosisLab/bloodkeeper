@@ -23,6 +23,7 @@ import './chronicle-list-create.css'
 import { ViewStateStatus } from '../../../components/ui/ViewStateStatus'
 
 import { ChronicleDetail } from './ChronicleDetail'
+import { ChronicleCreationWizard } from './ChronicleCreationWizard'
 
 const gateway =
   createChronicleGateway()
@@ -494,66 +495,14 @@ export function ChronicleListCreate({
       ) : null}
 
       {canCurrentUserCreateChronicles && createOpen ? (
-        <section
-          id="chronicle-create-panel"
-          className="chronicle-create"
-          aria-labelledby="chronicle-create-title"
-        >
-          <div className="chronicle-create__heading">
-            <div>
-              <h2 id="chronicle-create-title">Nueva crónica</h2>
-              <p>Añade una crónica y empieza a organizar tu partida.</p>
-            </div>
-            <button
-              type="button"
-              className="chronicle-create__close"
-              onClick={() => setCreateOpen(false)}
-            >
-              Cerrar
-            </button>
-          </div>
-
-          <form onSubmit={submit}>
-            <label>
-              <span>Nombre</span>
-              <input
-                name="chronicleName"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                required
-                autoComplete="off"
-              />
-            </label>
-
-            <label>
-              <span>Descripción o premisa</span>
-              <textarea
-                name="chronicleDescription"
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-                rows={4}
-              />
-            </label>
-
-            <button
-              type="submit"
-              disabled={submitting || name.trim().length === 0}
-            >
-              {submitting ? "Creando…" : "Crear crónica"}
-            </button>
-          </form>
-
-          {error !== null ? (
-            <p
-              className="chronicle-message chronicle-message--error"
-              data-view-state={failureState ?? "error"}
-              role="alert"
-              aria-live="assertive"
-            >
-              {error}
-            </p>
-          ) : null}
-        </section>
+        <ChronicleCreationWizard
+          onCancel={() => setCreateOpen(false)}
+          onCreated={(created) => {
+            setCreateOpen(false)
+            setSelectedChronicleId(created.id)
+            void loadChronicles()
+          }}
+        />
       ) : null}
 
       <section

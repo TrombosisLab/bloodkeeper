@@ -1740,3 +1740,30 @@
     width: 100% !important;
   }
 }
+
+/* RESOURCE_NPC_DOSSIER_TRAITS_RELATIONS_LAYOUT_V1 */
+/* Estos bloques son los últimos del contenido, aunque Atributos y Habilidades sean opcionales. */
+.global-npc-dossier__content > article.global-npc-dossier__traits,
+.global-npc-dossier__content > article.global-npc-dossier__relations {
+  grid-column: span 6 !important;
+  min-width: 0 !important;
+}
+
+.global-npc-dossier__traits p,
+.global-npc-dossier__relations p {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+  .global-npc-dossier__content > article.global-npc-dossier__traits,
+  .global-npc-dossier__content > article.global-npc-dossier__relations {
+    grid-column: span 1 !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .global-npc-dossier__content > article.global-npc-dossier__traits,
+  .global-npc-dossier__content > article.global-npc-dossier__relations {
+    grid-column: 1 !important;
+  }
+}

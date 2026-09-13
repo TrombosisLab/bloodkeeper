@@ -1477,7 +1477,6 @@ model ChronicleResource {
   updatedAt DateTime @updatedAt
   chronicle Chronicle @relation(fields: [chronicleId], references: [id], onDelete: Cascade)
   location ChronicleLocation? @relation("ChronicleResourceLocation", fields: [locationId], references: [id], onDelete: SetNull)
-  sessionLinks ChronicleSessionResource[] @relation("ChronicleSessionResourceResource")
   @@index([chronicleId, kind, status])
   @@index([chronicleId, visibility, status])
   @@map("chronicle_resources")
@@ -1503,7 +1502,7 @@ model ChronicleSessionResource {
   createdAt DateTime @default(now()) @db.Timestamptz(3)
 
   session ChronicleSession @relation("ChronicleSessionResourceSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  resource ChronicleResource @relation("ChronicleSessionResourceResource", fields: [resourceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  resource LibraryResource @relation("ChronicleSessionResourceResource", fields: [resourceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([sessionId, resourceId])
   @@index([resourceId])
@@ -1538,6 +1537,7 @@ model LibraryResource {
   updatedAt     DateTime @updatedAt
   owner         User     @relation("LibraryResourceOwner", fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   bindings      ChronicleResourceBinding[]
+  sessionLinks  ChronicleSessionResource[] @relation("ChronicleSessionResourceResource")
 
   @@unique([legacyType, legacyId])
   @@index([ownerId, kind, status])

@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ChronicleLocationPanel } from './ChronicleLocationPanel'
-import { ChronicleNpcPanel } from './ChronicleNpcPanel'
 import { ChronicleResourceCatalog } from './ChronicleResourceCatalog'
 import type { ChronicleResourceCatalogKind, ChronicleResourceOrder } from './ChronicleResourceCatalog'
 import './chronicle-resources-workspace.css'
 
-type Section = 'npcs' | 'locations' | ChronicleResourceCatalogKind
+type Section = ChronicleResourceCatalogKind
 
 interface Props {
   readonly chronicleId: string
@@ -14,31 +12,27 @@ interface Props {
 }
 
 const sections: readonly { readonly id: Section; readonly label: string }[] = [
-  { id: 'npcs', label: 'PNJ' },
-  { id: 'locations', label: 'Localizaciones' },
+  { id: 'npc', label: 'PNJ' },
+  { id: 'location', label: 'Localizaciones' },
   { id: 'document', label: 'Documentos' },
   { id: 'artifact', label: 'Artefactos' },
   { id: 'organization', label: 'Organizaciones' },
 ]
 
 export function ChronicleResourcesWorkspace({ chronicleId, canManageNpcs, canManageLocations }: Props) {
-  const [activeSection, setActiveSection] = useState<Section>(canManageNpcs ? 'npcs' : canManageLocations ? 'locations' : 'document')
+  const available = sections.filter((section) => section.id !== 'npc' || canManageNpcs).filter((section) => section.id !== 'location' || canManageLocations)
+  const [activeSection, setActiveSection] = useState<Section>(canManageNpcs ? 'npc' : canManageLocations ? 'location' : 'document')
   const [query, setQuery] = useState('')
   const [order, setOrder] = useState<ChronicleResourceOrder>('name')
-  const [npcCount, setNpcCount] = useState(0)
-  const [locationCount, setLocationCount] = useState(0)
-  const [catalogCounts, setCatalogCounts] = useState<Record<ChronicleResourceCatalogKind, number>>({ document: 0, artifact: 0, organization: 0 })
+  const [catalogCounts, setCatalogCounts] = useState<Record<Section, number>>({ npc: 0, location: 0, document: 0, artifact: 0, organization: 0 })
 
   useEffect(() => {
-    if (activeSection === 'npcs' && !canManageNpcs) setActiveSection(canManageLocations ? 'locations' : 'document')
-    if (activeSection === 'locations' && !canManageLocations) setActiveSection(canManageNpcs ? 'npcs' : 'document')
+    if (!available.some((section) => section.id === activeSection)) setActiveSection(available[0]?.id ?? 'document')
     setQuery('')
-  }, [activeSection, canManageLocations, canManageNpcs])
+  }, [activeSection, available.length, canManageLocations, canManageNpcs])
 
-  const available = sections.filter((section) => section.id !== 'npcs' || canManageNpcs).filter((section) => section.id !== 'locations' || canManageLocations)
-  const total = npcCount + locationCount + catalogCounts.document + catalogCounts.artifact + catalogCounts.organization
-  const placeholder = activeSection === 'npcs' ? 'Buscar PNJ...' : activeSection === 'locations' ? 'Buscar localizaciones...' : 'Buscar recursos...'
-  const catalogKind: ChronicleResourceCatalogKind = activeSection === 'document' || activeSection === 'artifact' || activeSection === 'organization' ? activeSection : 'document'
+  const total = Object.values(catalogCounts).reduce((sum, count) => sum + count, 0)
+  const placeholder = activeSection === 'npc' ? 'Buscar PNJ...' : activeSection === 'location' ? 'Buscar localizaciones...' : 'Buscar recursos...'
 
   return <section className="chronicle-resources-workspace" aria-labelledby="chronicle-resources-workspace-title" data-section={activeSection}>
     <div className="chronicle-resources-workspace__canvas">
@@ -52,11 +46,8 @@ export function ChronicleResourcesWorkspace({ chronicleId, canManageNpcs, canMan
       </aside>
 
       <main className="chronicle-resources-workspace__content">
-        {canManageNpcs ? (<div id="chronicle-resource-npcs-panel" role="tabpanel" aria-labelledby="chronicle-resource-npcs-tab" hidden={activeSection !== 'npcs'} className="chronicle-resources-workspace__panel chronicle-resources-workspace__panel--npcs"><ChronicleNpcPanel chronicleId={chronicleId} onCountChange={setNpcCount} query={query} order={order} /></div>) : null}
-        {canManageLocations ? (<div id="chronicle-resource-locations-panel" role="tabpanel" aria-labelledby="chronicle-resource-locations-tab" hidden={activeSection !== 'locations'} className="chronicle-resources-workspace__panel chronicle-resources-workspace__panel--locations"><ChronicleLocationPanel chronicleId={chronicleId} onCountChange={setLocationCount} /></div>) : null}
-        <div role="tabpanel" hidden={activeSection === 'npcs' || activeSection === 'locations'} className="chronicle-resources-workspace__panel chronicle-resources-workspace__panel--catalog"><ChronicleResourceCatalog chronicleId={chronicleId} kind={catalogKind} query={query} order={order} onCountChange={(kind, count) => setCatalogCounts((current) => ({ ...current, [kind]: count }))} /></div>
+        {available.map((section) => <div key={section.id} role="tabpanel" hidden={activeSection !== section.id} aria-labelledby={'chronicle-resource-' + section.id + '-tab'} className="chronicle-resources-workspace__panel chronicle-resources-workspace__panel--catalog"><ChronicleResourceCatalog chronicleId={chronicleId} kind={section.id} query={query} order={order} onCountChange={(kind, count) => setCatalogCounts((current) => ({ ...current, [kind]: count }))} /></div>)}
       </main>
     </div>
-    {/* SPEC-062 legacy accessibility contracts: >PNJ< >Localizaciones< chronicle-resource-locations-tab chronicle-resource-npcs-tab hidden={activeSection !== 'locations'} canManageLocations ? ( canManageNpcs ? ( */}
   </section>
 }

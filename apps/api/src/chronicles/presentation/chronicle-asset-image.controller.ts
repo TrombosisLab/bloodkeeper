@@ -27,7 +27,7 @@ export class ChronicleAssetImageController {
         ? await this.db.chronicleLocation.findFirst({ where: { ...where, status: 'ACTIVE' }, select: { id: true } })
         : type === 'SESSION'
           ? await this.db.chronicleSession.findFirst({ where, select: { id: true } })
-          : await this.db.chronicleResource.findFirst({ where: { ...where, status: 'active', ...(narrator ? {} : { visibility: 'chronicle_participants' }) }, select: { id: true } })
+          : await this.db.libraryResource.findFirst({ where: { id: entityId, status: 'active', bindings: { some: { chronicleId, status: 'attached', ...(narrator ? {} : { visibility: 'chronicle_participants' }) } } }, select: { id: true } })
     if (!row) throw new NotFoundException({ code: 'CHRONICLE_ASSET_NOT_FOUND' })
   }
   @Get(':assetType/:assetId/image') async load(@Req() request: ImageRequest, @Param('chronicleId') chronicle: unknown, @Param('assetType') rawType: unknown, @Param('assetId') rawId: unknown) { const { chronicleId, narrator } = await this.access(request, chronicle); const type = assetType(rawType), entityId = uuid(rawId); await this.target(chronicleId, narrator, type, entityId); const image = await this.db.chronicleAssetImage.findUnique({ where: { assetType_entityId: { assetType: type, entityId } } }); if (!image) throw new NotFoundException({ code: 'CHRONICLE_ASSET_IMAGE_NOT_FOUND' }); return new StreamableFile(Buffer.from(image.data), { type: image.mimeType, length: image.byteSize, disposition: 'inline' }) }

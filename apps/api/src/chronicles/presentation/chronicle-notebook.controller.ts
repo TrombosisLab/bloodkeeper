@@ -106,17 +106,25 @@ export class ChronicleNotebookController {
         orderBy: { name: 'asc' },
         select: { id: true, name: true, category: true, description: true, parentLocationId: true },
       }),
-      db.chronicleResource.findMany({
-        where: { chronicleId, status: 'active', ...(narrator ? {} : { visibility: 'chronicle_participants' }) },
+      db.libraryResource.findMany({
+        where: { status: 'active', kind: { in: ['document', 'artifact', 'organization'] }, bindings: { some: { chronicleId, status: 'attached', ...(narrator ? {} : { visibility: 'chronicle_participants' }) } } },
         orderBy: { name: 'asc' },
-        select: { id: true, kind: true, name: true, summary: true, visibility: true, locationId: true },
+        select: { id: true, kind: true, name: true, summary: true, metadata: true, bindings: { where: { chronicleId }, select: { visibility: true }, take: 1 } },
       }),
       db.chronicleParticipant.findMany({
         where: { chronicleId, status: 'ACTIVE', role: 'PLAYER' },
         select: { user: { select: { id: true, displayName: true, username: true } } },
       }),
     ])
-    return { npcs, locations: locations.map((location: any) => ({ ...location, imageUrl: '/api/chronicles/' + chronicleId + '/assets/LOCATION/' + location.id + '/image' })), resources, players: participants.map((item: any) => item.user), viewerUserId: userId }
+    const sharedResources = resources.map((resource: any) => ({
+      id: resource.id,
+      kind: String(resource.kind).toUpperCase(),
+      name: resource.name,
+      summary: resource.summary,
+      visibility: resource.bindings[0]?.visibility === 'chronicle_participants' ? 'chronicle_participants' : 'narrator_only',
+      locationId: resource.metadata && typeof resource.metadata === 'object' && typeof resource.metadata.locationId === 'string' ? resource.metadata.locationId : null,
+    }))
+    return { npcs, locations: locations.map((location: any) => ({ ...location, imageUrl: '/api/chronicles/' + chronicleId + '/assets/LOCATION/' + location.id + '/image' })), resources: sharedResources, players: participants.map((item: any) => item.user), viewerUserId: userId }
   }
 
 
@@ -128,10 +136,13 @@ export class ChronicleNotebookController {
     const targetType = rawTargetType.toUpperCase()
     if (!targetTypes.has(targetType) || !targetId) throw new BadRequestException({ code: 'INVALID_NOTE_REFERENCE' })
     const directModels: Record<string, string> = { CHARACTER: 'character', NPC: 'chronicleNpc', LOCATION: 'chronicleLocation', EVENT: 'chronicleEvent', STORY: 'chronicleStory', SESSION: 'chronicleSession' }
-    const modelName = directModels[targetType] ?? 'chronicleResource'
-    const model = (db as any)[modelName]
+    const modelName = directModels[targetType]
+    const model = modelName ? (db as any)[modelName] : db.libraryResource
     if (!model || typeof model.findFirst !== 'function') throw new NotFoundException({ code: 'NOTE_REFERENCE_NOT_FOUND' })
-    const row = await model.findFirst({ where: { id: targetId, chronicleId, ...(modelName === 'chronicleResource' ? { status: 'active', ...(targetType === 'RESOURCE' ? {} : { kind: targetType }), ...(narrator ? {} : { visibility: 'chronicle_participants' }) } : {}) } })
+    const resourceKind = targetType === 'ORGANIZATION' ? 'organization' : targetType === 'ARTIFACT' ? 'artifact' : targetType === 'DOCUMENT' ? 'document' : null
+    const row = modelName
+      ? await model.findFirst({ where: { id: targetId, chronicleId } })
+      : await model.findFirst({ where: { id: targetId, status: 'active', ...(resourceKind ? { kind: resourceKind } : {}), bindings: { some: { chronicleId, status: 'attached', ...(narrator ? {} : { visibility: 'chronicle_participants' }) } } } })
     if (!row) throw new NotFoundException({ code: 'NOTE_REFERENCE_NOT_FOUND' })
     const imageType = targetType === 'NPC' || targetType === 'LOCATION' ? targetType : 'RESOURCE'
     const image = await db.chronicleAssetImage.findUnique({ where: { assetType_entityId: { assetType: imageType, entityId: targetId } }, select: { updatedAt: true } })
@@ -240,7 +251,8 @@ export class ChronicleNotebookController {
     const directModels: Record<string, string> = { CHARACTER: 'character', NPC: 'chronicleNpc', LOCATION: 'chronicleLocation', EVENT: 'chronicleEvent', STORY: 'chronicleStory', SESSION: 'chronicleSession' }
     for (const reference of refs) {
       if (reference.targetType === 'RESOURCE' || reference.targetType === 'ORGANIZATION' || reference.targetType === 'ARTIFACT' || reference.targetType === 'DOCUMENT') {
-        const resource = await db.chronicleResource.findFirst({ where: { id: reference.targetId, chronicleId, status: 'active', ...(reference.targetType === 'RESOURCE' ? {} : { kind: reference.targetType }), ...(narrator ? {} : { visibility: 'chronicle_participants' }) }, select: { id: true } })
+        const resourceKind = reference.targetType === 'ORGANIZATION' ? 'organization' : reference.targetType === 'ARTIFACT' ? 'artifact' : reference.targetType === 'DOCUMENT' ? 'document' : null
+        const resource = await db.libraryResource.findFirst({ where: { id: reference.targetId, status: 'active', ...(resourceKind ? { kind: resourceKind } : {}), bindings: { some: { chronicleId, status: 'attached', ...(narrator ? {} : { visibility: 'chronicle_participants' }) } } }, select: { id: true } })
         if (!resource) throw new BadRequestException({ code: 'NOTE_REFERENCE_OUTSIDE_CHRONICLE', targetId: reference.targetId })
         continue
       }

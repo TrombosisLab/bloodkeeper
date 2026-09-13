@@ -13,3 +13,14 @@
 @media (max-width: 1400px) { .chronicle-resources-workspace__canvas { grid-template-columns: minmax(15rem, 17rem) minmax(0, 1fr); } }
 @media (max-width: 900px) { .chronicle-resources-workspace__canvas { grid-template-columns: 1fr; } .chronicle-resources-workspace__navigator { grid-column: 1; } }
 /* RESOURCES_PARTICIPANT_LANGUAGE_END */
+
+/* BLOODKEEPER_RESOURCE_LAYOUT_V1 */
+/* Los nombres largos del selector lateral permanecen dentro de su botón. */
+.chronicle-resources-workspace__tab {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  white-space: normal;
+  line-height: 1.15;
+}

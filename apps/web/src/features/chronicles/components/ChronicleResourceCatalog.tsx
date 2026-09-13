@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
 import './chronicle-resource-catalog.css'
 import { ChronicleEntityImage } from './ChronicleEntityImage'
 
-export type ChronicleResourceCatalogKind = 'document' | 'artifact' | 'organization'
+export type ChronicleResourceCatalogKind = 'npc' | 'location' | 'document' | 'artifact' | 'organization'
 export type ChronicleResourceOrder = 'name' | 'recent'
 
 interface Item {
@@ -19,6 +18,18 @@ interface Item {
   readonly updatedAt: string
 }
 
+interface LibraryItem {
+  readonly id: string
+  readonly kind: ChronicleResourceCatalogKind
+  readonly name: string
+  readonly summary: string | null
+  readonly narratorNotes: string | null
+  readonly metadata: unknown
+  readonly status: 'active' | 'archived'
+  readonly createdAt: string
+  readonly updatedAt: string
+}
+
 interface Props {
   readonly chronicleId: string
   readonly kind: ChronicleResourceCatalogKind
@@ -28,9 +39,11 @@ interface Props {
 }
 
 const labels = {
-  document: { plural: 'Documentos', singular: 'Documento', description: 'Añade material escrito, pistas, cartas o archivos de consulta.' },
-  artifact: { plural: 'Artefactos', singular: 'Artefacto', description: 'Registra objetos narrativos, reliquias y elementos con historia propia.' },
-  organization: { plural: 'Organizaciones', singular: 'Organización', description: 'Documenta facciones, instituciones, cultos y grupos de poder.' },
+  npc: { plural: 'PNJ', singular: 'PNJ', description: 'Vincula un PNJ del catálogo global a esta crónica.' },
+  location: { plural: 'Localizaciones', singular: 'Localización', description: 'Vincula una localización del catálogo global a esta crónica.' },
+  document: { plural: 'Documentos', singular: 'Documento', description: 'Vincula una ficha del catálogo global a esta crónica.' },
+  artifact: { plural: 'Artefactos', singular: 'Artefacto', description: 'Vincula una ficha del catálogo global a esta crónica.' },
+  organization: { plural: 'Organizaciones', singular: 'Organización', description: 'Vincula una ficha del catálogo global a esta crónica.' },
 } as const
 
 async function responseJson(response: Response) {
@@ -45,12 +58,10 @@ function displayDate(value: string) {
 
 export function ChronicleResourceCatalog({ chronicleId, kind, query, order, onCountChange }: Props) {
   const [items, setItems] = useState<readonly Item[]>([])
+  const [libraryItems, setLibraryItems] = useState<readonly LibraryItem[]>([])
   const [selected, setSelected] = useState<Item | null>(null)
-  const [showCreateForm, setShowCreateForm] = useState(false)
-  const [editing, setEditing] = useState(false)
-  const [name, setName] = useState('')
-  const [summary, setSummary] = useState('')
-  const [notes, setNotes] = useState('')
+  const [showAttachForm, setShowAttachForm] = useState(false)
+  const [selectedLibraryId, setSelectedLibraryId] = useState('')
   const [visibility, setVisibility] = useState<'narrator_only' | 'chronicle_participants'>('narrator_only')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -59,84 +70,58 @@ export function ChronicleResourceCatalog({ chronicleId, kind, query, order, onCo
   async function load(preferredId?: string) {
     setError(null)
     try {
-      const value = await responseJson(await fetch('/api/chronicles/' + chronicleId + '/resources?kind=' + kind + '&limit=100&offset=0', { credentials: 'include' })) as { items: readonly Item[] }
-      setItems(value.items)
-      onCountChange?.(kind, value.items.length)
-      setSelected(value.items.find((item) => item.id === preferredId) ?? value.items[0] ?? null)
+      const [linkedValue, libraryValue] = await Promise.all([
+        await responseJson(await fetch('/api/chronicles/' + chronicleId + '/resources?kind=' + kind + '&limit=100&offset=0', { credentials: 'include' })) as { items: readonly Item[] },
+        await responseJson(await fetch('/api/library/resources?kind=' + kind + '&status=active', { credentials: 'include' })) as { items: readonly LibraryItem[] },
+      ])
+      setItems(linkedValue.items)
+      const linkedIds = new Set(linkedValue.items.map((item) => item.id))
+      setLibraryItems(libraryValue.items.filter((item) => !linkedIds.has(item.id)))
+      onCountChange?.(kind, linkedValue.items.length)
+      const nextSelected = linkedValue.items.find((item) => item.id === preferredId) ?? linkedValue.items[0] ?? null
+      setSelected(nextSelected)
+      setVisibility(nextSelected?.visibility ?? 'narrator_only')
+      setSelectedLibraryId((current) => current && libraryValue.items.some((item) => item.id === current && !linkedIds.has(item.id)) ? current : libraryValue.items.find((item) => !linkedIds.has(item.id))?.id ?? '')
     } catch {
-      setError('No se pudo cargar el catálogo.')
+      setError('No se pudo cargar el catálogo global de recursos.')
     }
   }
 
   useEffect(() => {
-    setShowCreateForm(false)
-    setEditing(false)
+    setShowAttachForm(false)
     void load()
   }, [chronicleId, kind])
 
   const visibleItems = useMemo(() => {
     const term = query.trim().toLocaleLowerCase('es')
-    return [...items]
-      .filter((item) => !term || (item.name + ' ' + (item.summary ?? '')).toLocaleLowerCase('es').includes(term))
-      .sort((left, right) => order === 'recent' ? Date.parse(right.updatedAt) - Date.parse(left.updatedAt) : left.name.localeCompare(right.name, 'es'))
+    return [...items].filter((item) => !term || (item.name + ' ' + (item.summary ?? '')).toLocaleLowerCase('es').includes(term)).sort((left, right) => order === 'recent' ? Date.parse(right.updatedAt) - Date.parse(left.updatedAt) : left.name.localeCompare(right.name, 'es'))
   }, [items, order, query])
 
-  function resetForm() {
-    setName('')
-    setSummary('')
-    setNotes('')
-    setVisibility('narrator_only')
-  }
-
-  function closeForms() {
-    resetForm()
-    setShowCreateForm(false)
-    setEditing(false)
-  }
-
-  async function create(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const normalizedName = name.trim()
-    if (!normalizedName) {
-      setError('El nombre del recurso es obligatorio.')
+  async function attach() {
+    if (!selectedLibraryId) {
+      setError('Selecciona un recurso global.')
       return
     }
     setBusy(true)
     setError(null)
     try {
-      const created = await responseJson(await fetch('/api/chronicles/' + chronicleId + '/resources', {
+      await responseJson(await fetch('/api/library/resources/' + selectedLibraryId + '/attach', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kind, name: normalizedName, summary: summary.trim() || null, narratorNotes: notes.trim() || null, visibility }),
-      })) as Item
-      closeForms()
-      await load(created.id)
+        body: JSON.stringify({ chronicleId, visibility }),
+      }))
+      setShowAttachForm(false)
+      await load(selectedLibraryId)
     } catch {
-      setError('No se pudo crear el recurso.')
+      setError('No se pudo añadir el recurso a esta crónica.')
     } finally {
       setBusy(false)
     }
   }
 
-  function beginEdit() {
+  async function saveVisibility() {
     if (!selected) return
-    setName(selected.name)
-    setSummary(selected.summary ?? '')
-    setNotes(selected.narratorNotes ?? '')
-    setVisibility(selected.visibility)
-    setEditing(true)
-    setShowCreateForm(false)
-  }
-
-  async function update(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    if (!selected) return
-    const normalizedName = name.trim()
-    if (!normalizedName) {
-      setError('El nombre del recurso es obligatorio.')
-      return
-    }
     setBusy(true)
     setError(null)
     try {
@@ -144,59 +129,42 @@ export function ChronicleResourceCatalog({ chronicleId, kind, query, order, onCo
         method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: normalizedName, summary: summary.trim() || null, narratorNotes: notes.trim() || null, visibility }),
+        body: JSON.stringify({ visibility }),
       }))
-      closeForms()
       await load(selected.id)
     } catch {
-      setError('No se pudo actualizar el recurso.')
+      setError('No se pudo actualizar la visibilidad del recurso.')
     } finally {
       setBusy(false)
     }
   }
 
-  async function archive() {
+  async function detach() {
     if (!selected) return
     setBusy(true)
     setError(null)
     try {
-      await responseJson(await fetch('/api/chronicles/' + chronicleId + '/resources/' + selected.id + '/archive', { method: 'PATCH', credentials: 'include' }))
-      await load(selected.id)
+      await responseJson(await fetch('/api/chronicles/' + chronicleId + '/resources/' + selected.id, { method: 'DELETE', credentials: 'include' }))
+      await load()
     } catch {
-      setError('No se pudo archivar el recurso.')
+      setError('No se pudo quitar el recurso de esta crónica.')
     } finally {
       setBusy(false)
     }
   }
 
-  const fields = <>
-    <label><span>Nombre</span><input required value={name} onChange={(event) => setName(event.target.value)} /></label>
-    <label><span>Resumen narrativo</span><textarea rows={4} value={summary} onChange={(event) => setSummary(event.target.value)} /></label>
-    <label><span>Notas privadas</span><textarea rows={5} value={notes} onChange={(event) => setNotes(event.target.value)} /></label>
-    <label><span>Visibilidad en la mesa</span><select value={visibility} onChange={(event) => setVisibility(event.target.value as 'narrator_only' | 'chronicle_participants')}><option value="narrator_only">Solo Narrador</option><option value="chronicle_participants">Compartido con participantes</option></select></label>
-  </>
+  const assetType = kind === 'npc' ? 'NPC' : kind === 'location' ? 'LOCATION' : 'RESOURCE'
 
   return <section className="chronicle-resource-catalog" aria-label={'Gestión de ' + copy.plural}>
-    <button type="button" className="chronicle-resource-catalog__create-launcher" aria-expanded={showCreateForm} aria-controls="chronicle-resource-catalog-create" onClick={() => { resetForm(); setEditing(false); setShowCreateForm((current) => !current) }}>
-      <span><strong>Crear {copy.singular}</strong><small>{copy.description}</small></span><i aria-hidden="true">{showCreateForm ? '−' : '+'}</i>
+    <button type="button" className="chronicle-resource-catalog__create-launcher" aria-expanded={showAttachForm} aria-controls="chronicle-resource-catalog-attach" onClick={() => setShowAttachForm((current) => !current)}>
+      <span><strong>Añadir recurso existente</strong><small>{copy.description}</small></span><i aria-hidden="true">{showAttachForm ? '−' : '+'}</i>
     </button>
-
-    {showCreateForm ? <form id="chronicle-resource-catalog-create" className="chronicle-resource-catalog__create-panel" onSubmit={create}><header><h3>Crear {copy.singular.toLocaleLowerCase('es')}</h3><button type="button" onClick={closeForms}>Cancelar</button></header><div className="chronicle-resource-catalog__fields">{fields}</div><button type="submit" disabled={busy || !name.trim()}>{busy ? 'Guardando…' : 'Crear ' + copy.singular}</button></form> : null}
+    {showAttachForm ? <section id="chronicle-resource-catalog-attach" className="chronicle-resource-catalog__create-panel" aria-label="Añadir recurso global"><header><div><h3>Catálogo global</h3><small>Los recursos se crean y editan desde Recursos.</small></div><a href="#/resources">Gestionar Recursos</a></header>{libraryItems.length > 0 ? <><label><span>Recurso de {copy.plural.toLocaleLowerCase('es')}</span><select value={selectedLibraryId} onChange={(event) => setSelectedLibraryId(event.target.value)}><option value="">Selecciona una ficha…</option>{libraryItems.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label><label><span>Visibilidad en esta crónica</span><select value={visibility} onChange={(event) => setVisibility(event.target.value as 'narrator_only' | 'chronicle_participants')}><option value="narrator_only">Solo Narrador</option><option value="chronicle_participants">Compartido con participantes</option></select></label><button type="button" onClick={() => void attach()} disabled={busy || !selectedLibraryId}>{busy ? 'Añadiendo…' : 'Añadir a esta crónica'}</button></> : <p>No hay recursos disponibles de esta categoría. <a href="#/resources">Crea o revisa la ficha en Recursos.</a></p>}</section> : null}
     {error ? <p className="chronicle-resource-catalog__error" role="alert">{error}</p> : null}
-
     <div className="chronicle-resource-catalog__workspace">
-      <aside className="chronicle-resource-catalog__browser" aria-label={'Listado de ' + copy.plural}>
-        <header><h3>{copy.plural}</h3><span>{visibleItems.length}</span></header>
-        {visibleItems.length === 0 ? <p className="chronicle-resource-catalog__empty-list">No hay {copy.plural.toLocaleLowerCase('es')} que coincidan con los filtros.</p> : <ul>{visibleItems.map((item) => <li key={item.id}><button type="button" className={selected?.id === item.id ? 'is-active' : ''} aria-pressed={selected?.id === item.id} onClick={() => { setSelected(item); setEditing(false) }}><strong>{item.name}</strong><small>{item.summary ?? 'Sin resumen'}</small><em>{item.status === 'active' ? 'Activo' : 'Archivado'}</em></button></li>)}</ul>}
-      </aside>
-
+      <aside className="chronicle-resource-catalog__browser" aria-label={'Listado de ' + copy.plural}><header><h3>{copy.plural}</h3><span>{visibleItems.length}</span></header>{visibleItems.length === 0 ? <p className="chronicle-resource-catalog__empty-list">No hay {copy.plural.toLocaleLowerCase('es')} vinculados a esta crónica.</p> : <ul>{visibleItems.map((item) => <li key={item.id}><button type="button" className={selected?.id === item.id ? 'is-active' : ''} aria-pressed={selected?.id === item.id} onClick={() => setSelected(item)}><strong>{item.name}</strong><small>{item.summary ?? 'Sin resumen'}</small><em>{item.status === 'active' ? 'Activo' : 'Archivado'}</em></button></li>)}</ul>}</aside>
       <main className="chronicle-resource-catalog__detail">
-        {selected === null ? <div className="chronicle-resource-catalog__detail-empty"><span>{copy.singular.toLocaleUpperCase('es')}</span><h3>Selecciona una entrada</h3><p>Abre un elemento del listado o crea el primer recurso de esta categoría.</p></div> : editing ? <form className="chronicle-resource-catalog__edit" onSubmit={update}><header><div><small>DETALLE DEL {copy.singular.toLocaleUpperCase('es')}</small><h3>Editar {selected.name}</h3></div></header><div className="chronicle-resource-catalog__fields">{fields}</div><div className="chronicle-resource-catalog__actions"><button type="submit" disabled={busy}>{busy ? 'Guardando…' : 'Guardar cambios'}</button><button type="button" onClick={closeForms}>Cancelar</button></div></form> : <>
-          <header className="chronicle-resource-catalog__detail-heading"><div><small>DETALLE DEL {copy.singular.toLocaleUpperCase('es')}</small><h3>{selected.name}</h3></div><div><span>{selected.status === 'active' ? 'Activo' : 'Archivado'}</span><button type="button" onClick={beginEdit}>Editar</button></div></header>
-          <ChronicleEntityImage key={selected.id} chronicleId={chronicleId} assetType="RESOURCE" assetId={selected.id} label={selected.name} />
-          <div className="chronicle-resource-catalog__detail-grid"><article className="is-wide"><h4>Descripción narrativa</h4><p>{selected.summary ?? 'Sin resumen.'}</p></article><article className="is-private"><small>SOLO NARRADOR</small><h4>Notas privadas</h4><p>{selected.narratorNotes ?? 'Sin notas.'}</p></article><article><h4>Estado del recurso</h4><dl><dt>Tipo</dt><dd>{copy.singular}</dd><dt>Estado</dt><dd>{selected.status === 'active' ? 'Activo' : 'Archivado'}</dd><dt>Visibilidad</dt><dd>{selected.visibility === 'chronicle_participants' ? 'Compartido' : 'Solo Narrador'}</dd></dl></article><article><h4>Registro</h4><dl><dt>Creado</dt><dd>{displayDate(selected.createdAt)}</dd><dt>Actualizado</dt><dd>{displayDate(selected.updatedAt)}</dd></dl></article></div>
-          {selected.status === 'active' ? <footer className="chronicle-resource-catalog__actions"><button type="button" disabled={busy} onClick={() => void archive()}>Archivar</button></footer> : null}
-        </>}
+        {selected === null ? <div className="chronicle-resource-catalog__detail-empty"><span>{copy.singular.toLocaleUpperCase('es')}</span><h3>Selecciona una entrada</h3><p>Vincula una ficha existente desde el catálogo global de Recursos.</p></div> : <><header className="chronicle-resource-catalog__detail-heading"><div><small>DETALLE DEL {copy.singular.toLocaleUpperCase('es')}</small><h3>{selected.name}</h3></div><div><span>{selected.status === 'active' ? 'Activo' : 'Archivado'}</span><button type="button" disabled={busy} onClick={() => void detach()}>Quitar de esta crónica</button></div></header><ChronicleEntityImage key={selected.id} chronicleId={chronicleId} assetType={assetType} assetId={selected.id} label={selected.name} /><div className="chronicle-resource-catalog__detail-grid"><article className="is-wide"><h4>Descripción narrativa</h4><p>{selected.summary ?? 'Sin resumen.'}</p></article><article className="is-private"><small>SOLO NARRADOR</small><h4>Notas privadas</h4><p>{selected.narratorNotes ?? 'Sin notas.'}</p></article><article><h4>Estado del recurso</h4><dl><dt>Tipo</dt><dd>{copy.singular}</dd><dt>Estado</dt><dd>{selected.status === 'active' ? 'Activo' : 'Archivado'}</dd><dt>Visibilidad actual</dt><dd>{selected.visibility === 'chronicle_participants' ? 'Compartido con participantes' : 'Solo Narrador'}</dd></dl></article><article className="chronicle-resource-catalog__visibility-editor"><h4>Visibilidad en esta crónica</h4><label><span>Quién puede verlo</span><select value={visibility} onChange={(event) => setVisibility(event.target.value as 'narrator_only' | 'chronicle_participants')}><option value="narrator_only">Solo Narrador</option><option value="chronicle_participants">Compartido con participantes</option></select></label><button type="button" disabled={busy || selected.status !== 'active'} onClick={() => void saveVisibility()}>{busy ? 'Guardando…' : 'Guardar visibilidad'}</button></article><article><h4>Registro</h4><dl><dt>Creado</dt><dd>{displayDate(selected.createdAt)}</dd><dt>Actualizado</dt><dd>{displayDate(selected.updatedAt)}</dd></dl></article></div></>}
       </main>
     </div>
   </section>

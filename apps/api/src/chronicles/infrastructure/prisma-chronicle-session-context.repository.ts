@@ -123,8 +123,9 @@ function sortLocations(
 }
 
 function resourceKind(value: string): 'document' | 'artifact' | 'organization' {
-  if (value === 'DOCUMENT') return 'document'
-  if (value === 'ARTIFACT') return 'artifact'
+  const normalized = value.toLowerCase()
+  if (normalized === 'document') return 'document'
+  if (normalized === 'artifact') return 'artifact'
   return 'organization'
 }
 
@@ -237,7 +238,11 @@ export class PrismaChronicleSessionContextRepository
               name: true,
               summary: true,
               status: true,
-              visibility: true,
+              bindings: {
+                where: { chronicleId },
+                select: { visibility: true },
+                take: 1,
+              },
             },
           },
         },
@@ -308,7 +313,7 @@ export class PrismaChronicleSessionContextRepository
             name: resource.name,
             summary: resource.summary,
             status: resource.status === 'archived' ? 'archived' : 'active',
-            visibility: resourceVisibility(resource.visibility),
+            visibility: resourceVisibility(resource.bindings[0]?.visibility ?? 'narrator_only'),
           })),
         ),
     }
@@ -402,10 +407,10 @@ export class PrismaChronicleSessionContextRepository
               parentLocationId: true,
             },
           }),
-          transaction.chronicleResource.findMany({
+          transaction.libraryResource.findMany({
             where: {
-              chronicleId: data.chronicleId,
               id: { in: [...resourceIds] },
+              bindings: { some: { chronicleId: data.chronicleId, status: 'attached' } },
             },
             select: {
               id: true,
@@ -413,7 +418,11 @@ export class PrismaChronicleSessionContextRepository
               name: true,
               summary: true,
               status: true,
-              visibility: true,
+              bindings: {
+                where: { chronicleId: data.chronicleId },
+                select: { visibility: true },
+                take: 1,
+              },
             },
           }),
         ])
@@ -591,7 +600,7 @@ export class PrismaChronicleSessionContextRepository
                 name: resource.name,
                 summary: resource.summary,
                 status: resource.status === 'archived' ? 'archived' : 'active',
-                visibility: resourceVisibility(resource.visibility),
+                visibility: resourceVisibility(resource.bindings[0]?.visibility ?? 'narrator_only'),
               })),
             ),
         }
