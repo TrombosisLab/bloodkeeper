@@ -995,6 +995,22 @@ export function ChronicleDetail({
           aria-label="Contenido de la crónica"
         >
           <button
+            id="chronicle-section-play-tab"
+            type="button"
+            role="tab"
+            aria-selected={activeSection === 'play'}
+            aria-controls="chronicle-section-play-panel"
+            className={
+              activeSection === 'play'
+                ? 'chronicle-detail__section-tab chronicle-detail__section-tab--active'
+                : 'chronicle-detail__section-tab'
+            }
+            onClick={() => setActiveSection('play')}
+          >
+            Jugar
+          </button>
+
+          <button
             id="chronicle-section-summary-tab"
             type="button"
             role="tab"

@@ -45,6 +45,37 @@ import './styles/bloodkeeper-visual-system.css';
 
 import './styles/v5-visual-assets.css'
 import './styles/primary-workspaces.css'
+function CharacterCreationModal({
+  children,
+}: {
+  readonly children: React.ReactNode
+}) {
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [])
+
+  return (
+    <div
+      className="character-creation-modal-backdrop"
+      role="presentation"
+    >
+      <section
+        className="character-creation-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Creación de personaje"
+      >
+        {children}
+      </section>
+    </div>
+  )
+}
+
 function App() {
   const authenticatedUser =
     useAuthenticatedUser()
@@ -361,13 +392,15 @@ function App() {
           </>
         )
       ) : view === 'character-creation' ? (
-        <CharacterCreationWizard
-          characterId={creationCharacterId}
-          onCharacterPersisted={setCreationCharacterId}
-          onBackToSheet={() =>
-            navigateTo('characters')
-          }
-        />
+        <CharacterCreationModal>
+          <CharacterCreationWizard
+            characterId={creationCharacterId}
+            onCharacterPersisted={setCreationCharacterId}
+            onBackToSheet={() =>
+              navigateTo('characters')
+            }
+          />
+        </CharacterCreationModal>
       ) : null}
     </AppLayout>
   )

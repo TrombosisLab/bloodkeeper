@@ -25,6 +25,7 @@ import type {
   ChronicleSessionContextEventApiSnapshot,
   ChronicleSessionContextLocationApiSnapshot,
   ChronicleSessionContextNpcApiSnapshot,
+  ChronicleSessionContextResourceApiSnapshot,
 } from '../types/chronicle-api.types.ts'
 
 import './chronicle-session-context-panel.css'
@@ -45,31 +46,48 @@ interface ContextOption {
   readonly status:
     | 'active'
     | 'archived'
+  readonly source?: 'legacy' | 'library'
 }
 
 interface ChronicleResourceOption {
   readonly id: string
-  readonly kind: 'document' | 'artifact' | 'organization'
+  readonly kind: 'npc' | 'location' | 'document' | 'artifact' | 'organization'
   readonly name: string
   readonly summary: string | null
   readonly status: 'active' | 'archived'
-  readonly visibility: 'narrator_only' | 'chronicle_participants'
+  readonly visibility?: 'narrator_only' | 'chronicle_participants'
 }
 
 const resourceKindLabel = {
+  npc: 'PNJ',
+  location: 'Localización',
   document: 'Documento',
   artifact: 'Artefacto',
   organization: 'Organización',
 } as const
 
 async function loadAllResources(chronicleId: string): Promise<readonly ChronicleResourceOption[]> {
-  const response = await fetch(`/api/chronicles/${chronicleId}/resources?limit=100&offset=0`, {
-    credentials: 'include',
-    headers: { Accept: 'application/json' },
-  })
-  if (!response.ok) throw new Error('RESOURCE_REQUEST_FAILED')
-  const value = await response.json() as { readonly items?: readonly ChronicleResourceOption[] }
-  return value.items ?? []
+  const kinds = ['npc', 'location', 'document', 'artifact', 'organization'] as const
+  const pages = await Promise.all(
+    kinds.map(async (kind) => {
+      const response = await fetch(
+        '/api/library/resources/for-chronicle/' +
+          encodeURIComponent(chronicleId) +
+          '?kind=' +
+          kind,
+        {
+          credentials: 'include',
+          headers: { Accept: 'application/json' },
+        },
+      )
+      if (!response.ok) throw new Error('RESOURCE_REQUEST_FAILED')
+      const value = await response.json() as {
+        readonly items?: readonly ChronicleResourceOption[]
+      }
+      return value.items ?? []
+    }),
+  )
+  return pages.flat()
 }
 
 function contextErrorMessage(
@@ -208,6 +226,21 @@ function npcOption(
       npc.category ??
       npc.narrativeRole,
     status: npc.status,
+    source: 'legacy',
+  }
+}
+
+function libraryResourceOption(
+  resource:
+    ChronicleResourceOption |
+    ChronicleSessionContextResourceApiSnapshot,
+): ContextOption {
+  return {
+    id: resource.id,
+    label: resource.name,
+    detail: resourceKindLabel[resource.kind] + (resource.visibility === undefined ? '' : ' · ' + (resource.visibility === 'chronicle_participants' ? 'Compartido' : 'Solo Narrador')),
+    status: resource.status,
+    source: 'library',
   }
 }
 
@@ -222,6 +255,7 @@ function locationOption(
     detail:
       location.category,
     status: location.status,
+    source: 'legacy',
   }
 }
 
@@ -307,6 +341,10 @@ export function ChronicleSessionContextPanel({
 
   const [resourceIds, setResourceIds] = useState<readonly string[]>([])
 
+  const [contextRefreshToken, setContextRefreshToken] = useState(0)
+  const [npcResourceIds, setNpcResourceIds] = useState<readonly string[]>([])
+  const [locationResourceIds, setLocationResourceIds] = useState<readonly string[]>([])
+
   const [
     loading,
     setLoading,
@@ -327,6 +365,22 @@ export function ChronicleSessionContextPanel({
   const readOnly =
     session.status ===
     'archived'
+
+  useEffect(() => {
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === 'visible') {
+        setContextRefreshToken((current) => current + 1)
+      }
+    }
+
+    window.addEventListener('focus', refreshWhenVisible)
+    document.addEventListener('visibilitychange', refreshWhenVisible)
+
+    return () => {
+      window.removeEventListener('focus', refreshWhenVisible)
+      document.removeEventListener('visibilitychange', refreshWhenVisible)
+    }
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -386,7 +440,21 @@ export function ChronicleSessionContextPanel({
               location.id,
           ),
         )
-        setResourceIds(loadedContext.resources.map((resource) => resource.id))
+        setNpcResourceIds(
+          loadedContext.resources
+            .filter((resource) => resource.kind === 'npc')
+            .map((resource) => resource.id),
+        )
+        setLocationResourceIds(
+          loadedContext.resources
+            .filter((resource) => resource.kind === 'location')
+            .map((resource) => resource.id),
+        )
+        setResourceIds(
+          loadedContext.resources
+            .filter((resource) => resource.kind !== 'npc' && resource.kind !== 'location')
+            .map((resource) => resource.id),
+        )
 
         setEventOptions(
           mergeOptions(
@@ -409,64 +477,96 @@ export function ChronicleSessionContextPanel({
 
         setNpcOptions(
           mergeOptions(
-            npcs
-              .filter(
-                (npc) =>
-                  npc.status ===
-                  'active',
-              )
-              .map(npcOption),
-            loadedContext.npcs
-              .filter(
-                (npc) =>
-                  npc.status ===
-                  'archived',
-              )
-              .map(npcOption),
+            [
+              ...npcs
+                .filter(
+                  (npc) =>
+                    npc.status ===
+                    'active',
+                )
+                .map(npcOption),
+              ...resources
+                .filter(
+                  (resource) =>
+                    resource.status === 'active' &&
+                    resource.kind === 'npc',
+                )
+                .map(libraryResourceOption),
+            ],
+            [
+              ...loadedContext.npcs
+                .filter(
+                  (npc) =>
+                    npc.status ===
+                    'archived',
+                )
+                .map(npcOption),
+              ...loadedContext.resources
+                .filter(
+                  (resource) =>
+                    resource.status === 'archived' &&
+                    resource.kind === 'npc',
+                )
+                .map(libraryResourceOption),
+            ],
           ),
         )
 
         setLocationOptions(
           mergeOptions(
-            locations
-              .filter(
-                (location) =>
-                  location.status ===
-                  'active',
-              )
-              .map(
-                locationOption,
-              ),
-            loadedContext.locations
-              .filter(
-                (location) =>
-                  location.status ===
-                  'archived',
-              )
-              .map(
-                locationOption,
-              ),
+            [
+              ...locations
+                .filter(
+                  (location) =>
+                    location.status ===
+                    'active',
+                )
+                .map(locationOption),
+              ...resources
+                .filter(
+                  (resource) =>
+                    resource.status === 'active' &&
+                    resource.kind === 'location',
+                )
+                .map(libraryResourceOption),
+            ],
+            [
+              ...loadedContext.locations
+                .filter(
+                  (location) =>
+                    location.status ===
+                    'archived',
+                )
+                .map(locationOption),
+              ...loadedContext.resources
+                .filter(
+                  (resource) =>
+                    resource.status === 'archived' &&
+                    resource.kind === 'location',
+                )
+                .map(libraryResourceOption),
+            ],
           ),
         )
 
         setResourceOptions(
           mergeOptions(
             resources
-              .filter((resource) => resource.status === 'active')
-              .map((resource) => ({
-                id: resource.id,
-                label: resource.name,
-                detail: `${resourceKindLabel[resource.kind]} · ${resource.visibility === 'chronicle_participants' ? 'Compartido' : 'Solo Narrador'}`,
-                status: resource.status,
-              })),
+              .filter(
+                (resource) =>
+                  resource.status === 'active' &&
+                  resource.kind !== 'npc' &&
+                  resource.kind !== 'location',
+              )
+              .map(libraryResourceOption),
             loadedContext.resources
-              .filter((resource) => resource.status === 'archived')
-              .map((resource) => ({
-                id: resource.id,
-                label: resource.name,
-                detail: `${resourceKindLabel[resource.kind]} · ${resource.visibility === 'chronicle_participants' ? 'Compartido' : 'Solo Narrador'}`,
-                status: resource.status,
-              })),
+              .filter(
+                (resource) =>
+                  resource.status === 'archived' &&
+                  resource.kind !== 'npc' &&
+                  resource.kind !== 'location',
+              )
+              .map(libraryResourceOption),
           ),
         )
       } catch (
@@ -496,6 +596,7 @@ export function ChronicleSessionContextPanel({
     chronicleId,
     session.id,
     session.status,
+    contextRefreshToken,
   ])
 
   async function saveContext(
@@ -520,7 +621,13 @@ export function ChronicleSessionContextPanel({
             eventIds,
             npcIds,
             locationIds,
-            resourceIds,
+            resourceIds: [
+              ...new Set([
+                ...resourceIds,
+                ...npcResourceIds,
+                ...locationResourceIds,
+              ]),
+            ],
           },
         )
 
@@ -543,7 +650,21 @@ export function ChronicleSessionContextPanel({
             item.id,
         ),
       )
-      setResourceIds(updated.resources.map((item) => item.id))
+      setNpcResourceIds(
+        updated.resources
+          .filter((item) => item.kind === 'npc')
+          .map((item) => item.id),
+      )
+      setLocationResourceIds(
+        updated.resources
+          .filter((item) => item.kind === 'location')
+          .map((item) => item.id),
+      )
+      setResourceIds(
+        updated.resources
+          .filter((item) => item.kind !== 'npc' && item.kind !== 'location')
+          .map((item) => item.id),
+      )
     } catch (
       operationError: unknown
     ) {
@@ -566,6 +687,7 @@ export function ChronicleSessionContextPanel({
         readonly string[],
     ) => void,
     emptyLabel: string,
+    onToggle?: (option: ContextOption) => void,
   ) {
     if (options.length === 0) {
       return (
@@ -599,14 +721,18 @@ export function ChronicleSessionContextPanel({
                     option.id,
                   )
                 }
-                onChange={() =>
+                onChange={() => {
+                  if (onToggle !== undefined) {
+                    onToggle(option)
+                    return
+                  }
                   setIds(
                     toggledIds(
                       ids,
                       option.id,
                     ),
                   )
-                }
+                }}
               />
 
               <span>
@@ -635,6 +761,19 @@ export function ChronicleSessionContextPanel({
     )
   }
 
+  const selectedNpcIds = [
+    ...new Set([
+      ...npcIds,
+      ...npcResourceIds,
+    ]),
+  ]
+  const selectedLocationIds = [
+    ...new Set([
+      ...locationIds,
+      ...locationResourceIds,
+    ]),
+  ]
+
   return (
     <section
       className="chronicle-session-context-panel"
@@ -656,10 +795,10 @@ export function ChronicleSessionContextPanel({
           {context === null
             ? '—'
             : (
-                context.events.length +
-                context.npcs.length +
-                context.locations.length
-                + context.resources.length
+                eventIds.length +
+                selectedNpcIds.length +
+                selectedLocationIds.length +
+                resourceIds.length
               )}
         </span>
       </div>
@@ -691,7 +830,7 @@ export function ChronicleSessionContextPanel({
         >
           <span>PNJ</span>
           <strong>
-            {npcIds.length} seleccionados
+            {selectedNpcIds.length} seleccionados
           </strong>
           <small>
             {npcOptions.length} en el selector
@@ -703,7 +842,7 @@ export function ChronicleSessionContextPanel({
         >
           <span>Localizaciones</span>
           <strong>
-            {locationIds.length} seleccionadas
+            {selectedLocationIds.length} seleccionadas
           </strong>
           <small>
             {locationOptions.length} en el selector
@@ -741,13 +880,19 @@ export function ChronicleSessionContextPanel({
         >
           <details className="chronicle-session-context-panel__resource-fold chronicle-session-context-panel__resource-fold--events">
             <summary><span>Eventos</span><strong>{eventIds.length} vinculados</strong><small>Abrir selector</small></summary>
-<fieldset
+          <fieldset
             className="chronicle-session-context-panel__group chronicle-session-context-panel__group--events"
             disabled={
               readOnly ||
               saving
             }
           >
+            <button
+              type="button"
+              onClick={() => setContextRefreshToken((current) => current + 1)}
+            >
+              Actualizar eventos
+            </button>
             <legend>
               <span>Eventos</span>
               <small>
@@ -765,7 +910,7 @@ export function ChronicleSessionContextPanel({
           </details>
 
           <details className="chronicle-session-context-panel__resource-fold chronicle-session-context-panel__resource-fold--npcs">
-            <summary><span>PNJ</span><strong>{npcIds.length} vinculados</strong><small>Abrir selector</small></summary>
+            <summary><span>PNJ</span><strong>{selectedNpcIds.length} vinculados</strong><small>Abrir selector</small></summary>
 <fieldset
             className="chronicle-session-context-panel__group chronicle-session-context-panel__group--npcs"
             disabled={
@@ -776,21 +921,32 @@ export function ChronicleSessionContextPanel({
             <legend>
               <span>PNJ</span>
               <small>
-                {npcIds.length} / {npcOptions.length}
+                {selectedNpcIds.length} / {npcOptions.length}
               </small>
             </legend>
 
             {optionList(
               npcOptions,
-              npcIds,
+              selectedNpcIds,
               setNpcIds,
               'No hay PNJ activos disponibles.',
+              (option) => {
+                if (option.source === 'library') {
+                  setNpcResourceIds(
+                    toggledIds(npcResourceIds, option.id),
+                  )
+                  return
+                }
+                setNpcIds(
+                  toggledIds(npcIds, option.id),
+                )
+              },
             )}
           </fieldset>
           </details>
 
           <details className="chronicle-session-context-panel__resource-fold chronicle-session-context-panel__resource-fold--locations">
-            <summary><span>Localizaciones</span><strong>{locationIds.length} vinculados</strong><small>Abrir selector</small></summary>
+            <summary><span>Localizaciones</span><strong>{selectedLocationIds.length} vinculados</strong><small>Abrir selector</small></summary>
 <fieldset
             className="chronicle-session-context-panel__group chronicle-session-context-panel__group--locations"
             disabled={
@@ -801,15 +957,26 @@ export function ChronicleSessionContextPanel({
             <legend>
               <span>Localizaciones</span>
               <small>
-                {locationIds.length} / {locationOptions.length}
+                {selectedLocationIds.length} / {locationOptions.length}
               </small>
             </legend>
 
             {optionList(
               locationOptions,
-              locationIds,
+              selectedLocationIds,
               setLocationIds,
               'No hay Localizaciones activas disponibles.',
+              (option) => {
+                if (option.source === 'library') {
+                  setLocationResourceIds(
+                    toggledIds(locationResourceIds, option.id),
+                  )
+                  return
+                }
+                setLocationIds(
+                  toggledIds(locationIds, option.id),
+                )
+              },
             )}
           </fieldset>
           </details>

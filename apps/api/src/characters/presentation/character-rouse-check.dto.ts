@@ -128,6 +128,7 @@ export function parseExecuteCharacterRouseCheckRequest(
     [
       'expectedRevision',
       'operationId',
+      'sessionId',
       'reason',
     ],
   )
@@ -147,6 +148,14 @@ export function parseExecuteCharacterRouseCheckRequest(
         body.operationId,
         'body.operationId',
       ),
+    ...(body.sessionId === undefined
+      ? {}
+      : {
+          sessionId: uuid(
+            body.sessionId,
+            'body.sessionId',
+          ),
+        }),
     reason:
       publicReason(body.reason),
   }

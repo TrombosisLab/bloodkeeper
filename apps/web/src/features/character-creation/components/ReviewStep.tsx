@@ -222,8 +222,18 @@ function CompactValue({
   label: string
   value: string
 }) {
+  const isPlaceholder =
+    value === 'Sin definir' ||
+    value === 'Sin determinar'
+
   return (
-    <div className="blood-generation-summary">
+    <div
+      className={
+        isPlaceholder
+          ? 'blood-generation-summary blood-generation-summary--empty'
+          : 'blood-generation-summary'
+      }
+    >
       <span>{label}</span>
       <strong>{value}</strong>
     </div>
@@ -321,7 +331,7 @@ export function ReviewStep({
     )
 
   return (
-    <div className="creation-step-content">
+    <div className="creation-step-content creation-step-content--review">
       <div className="creation-step-heading">
         <span>Revisión final</span>
         <h2>

@@ -9,6 +9,7 @@ import { loadPersistedCharacterSheetState } from '../../character-sheet/domain/p
 import { createCharacterProfilePhaseGateway } from '../../character-sheet/infrastructure/character-profile-phase.api'
 import { DiceHistoryPanel } from '../../dice/components/DiceHistoryPanel'
 import { DiceRollPanel } from '../../dice/components/DiceRollPanel'
+import { DisciplinePowerRousePanel } from '../../dice/components/DisciplinePowerRousePanel'
 import { V5VisualMark } from '../../v5-visuals/V5VisualMark'
 import { createChronicleGateway } from '../infrastructure/chronicle.api.ts'
 import { chronicleSessionParticipantNotesApi } from '../infrastructure/chronicle-session-participant-notes.api.ts'
@@ -20,6 +21,8 @@ import type { ChronicleSharedStoryApiSnapshot } from '../types/chronicle-story-a
 import type { ChronicleSessionContextApiSnapshot } from '../types/chronicle-api.types'
 
 import './chronicle-play-workspace.css'
+
+type DiceLauncherMode = 'character' | 'rouse' | 'd10' | 'discipline'
 
 interface Props {
   readonly chronicleId: string
@@ -145,6 +148,9 @@ export function ChroniclePlayWorkspace({ chronicleId, characterId, characterName
   const [savingNote, setSavingNote] = useState<'private' | 'public' | null>(null)
   const [notesError, setNotesError] = useState<string | null>(null)
   const [savedNote, setSavedNote] = useState<'private' | 'public' | null>(null)
+  const [diceLauncherOpen, setDiceLauncherOpen] = useState(false)
+  const [diceLauncherMode, setDiceLauncherMode] = useState<DiceLauncherMode>(characterId ? 'character' : 'd10')
+  const [diceHistoryReload, setDiceHistoryReload] = useState(0)
 
   useEffect(() => {
     let active = true
@@ -232,6 +238,20 @@ export function ChroniclePlayWorkspace({ chronicleId, characterId, characterName
     return () => { active = false }
   }, [chronicleId, session?.id])
 
+  useEffect(() => {
+    if (!diceLauncherOpen) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setDiceLauncherOpen(false)
+    }
+    const previousOverflow = globalThis.document.body.style.overflow
+    globalThis.document.body.style.overflow = 'hidden'
+    globalThis.document.addEventListener('keydown', onKeyDown)
+    return () => {
+      globalThis.document.body.style.overflow = previousOverflow
+      globalThis.document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [diceLauncherOpen])
+
   async function saveNote(kind: 'private' | 'public') {
     if (!session?.id) return
     setSavingNote(kind)
@@ -317,33 +337,172 @@ export function ChroniclePlayWorkspace({ chronicleId, characterId, characterName
       {contextLoading ? <p className="chronicle-play-workspace__context-state" role="status">Actualizando contexto de juego…</p> : null}
       {contextError ? <p className="chronicle-play-workspace__context-state is-warning" role="alert">{contextError}</p> : null}
 
-      <div className="chronicle-play-workspace__operation-grid">
-        <section className="chronicle-play-workspace__dice">
-          <DiceRollPanel mode={characterId ? 'character' : 'manual'} characterId={characterId} chronicleId={chronicleId} sessionId={session?.id} attributes={attributeDefinitions} skills={skillDefinitions} />
-          <div className="chronicle-play-workspace__recent-rolls"><DiceHistoryPanel chronicleId={chronicleId} contextLabel="Tiradas de la crónica" /></div>
-        </section>
+      <section className="chronicle-play-workspace__dice-launcher" aria-label="Lanzador e historial de dados">
 
-        <section className="chronicle-play-workspace__immediate">
-          <header><small>CONTEXTO INMEDIATO</small><h2>Situación narrativa</h2></header>
-          <article><span>Progreso de la historia</span><div className="chronicle-play-workspace__progress"><i><b style={{ width: `${linkedStory?.progress.percentage ?? 0}%` }} /></i><strong>{linkedStory?.progress.completed ?? 0} / {linkedStory?.progress.total ?? 5} hitos</strong></div></article>
-          <article><span>Último evento en cronología</span><strong>{latestEvent?.title ?? 'Sin sucesos vinculados'}</strong><small>{latestEvent?.narrativeTimeLabel ?? '—'}</small></article>
-          <article><span>Recursos vinculados</span><div className="chronicle-play-workspace__resource-counts"><b>PNJ {context.npcs.length}</b><b>Lugares {context.locations.length}</b><b>Sucesos {context.events.length}</b><b>Documentos {context.resources.length}</b></div></article>
-          <article><span>Próximo hito</span><strong>{linkedStory?.milestones.find((item) => !item.completed)?.key.replace(/_/g, ' ') ?? 'Resolución narrativa'}</strong><small>{linkedStory?.sharedSummary ?? 'Continúa la escena actual.'}</small></article>
-        </section>
-      </div>
+        <div className="chronicle-play-workspace__dice-launcher-card">
+          <div>
+            <small>DADOS V5</small>
+            <h2>Lanzador de dados</h2>
+            <p>Abre una acción de dados cuando la escena lo necesite.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setDiceLauncherMode(characterId ? 'character' : 'd10')
+              setDiceLauncherOpen(true)
+            }}
+          >
+            Abrir lanzador
+          </button>
+        </div>
+        <div className="chronicle-play-workspace__recent-rolls" key={diceHistoryReload}>
+          <DiceHistoryPanel chronicleId={chronicleId} refreshIntervalMs={5000} contextLabel="Historial de tiradas" />
+        </div>
+      </section>
+
+      {diceLauncherOpen ? (
+        <div
+          className="chronicle-play-workspace__dice-modal-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setDiceLauncherOpen(false)
+          }}
+        >
+          <section
+            className="chronicle-play-workspace__dice-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="chronicle-play-dice-modal-title"
+          >
+            <header className="chronicle-play-workspace__dice-modal-header">
+              <div>
+                <small>CENTRO DE TIRADAS</small>
+                <h2 id="chronicle-play-dice-modal-title">Lanzador de dados</h2>
+              </div>
+              <button
+                type="button"
+                className="chronicle-play-workspace__dice-modal-close"
+                aria-label="Cerrar lanzador de dados"
+                onClick={() => setDiceLauncherOpen(false)}
+              >
+                ×
+              </button>
+            </header>
+
+            <div className="chronicle-play-workspace__dice-modal-modes" role="toolbar" aria-label="Tipo de tirada">
+              <button
+                type="button"
+                className={diceLauncherMode === 'character' ? 'is-active' : ''}
+                disabled={!characterId}
+                aria-pressed={diceLauncherMode === 'character'}
+                onClick={() => setDiceLauncherMode('character')}
+              >
+                Tirada de personaje
+              </button>
+              <button
+                type="button"
+                className={diceLauncherMode === 'rouse' ? 'is-active' : ''}
+                disabled={!characterId}
+                aria-pressed={diceLauncherMode === 'rouse'}
+                onClick={() => setDiceLauncherMode('rouse')}
+              >
+                Control de enardecimiento
+              </button>
+              <button
+                type="button"
+                className={diceLauncherMode === 'discipline' ? 'is-active' : ''}
+                disabled={!characterId}
+                aria-pressed={diceLauncherMode === 'discipline'}
+                onClick={() => setDiceLauncherMode('discipline')}
+              >
+                Poder de Disciplina
+              </button>
+              <button
+                type="button"
+                className={diceLauncherMode === 'd10' ? 'is-active' : ''}
+                aria-pressed={diceLauncherMode === 'd10'}
+                onClick={() => setDiceLauncherMode('d10')}
+              >
+                Dados d10
+              </button>
+            </div>
+
+            <div className="chronicle-play-workspace__dice-modal-body">
+              {diceLauncherMode === 'character' && characterId ? (
+                <DiceRollPanel
+                  key="character-roll"
+                  mode="character"
+                  characterId={characterId}
+                  chronicleId={chronicleId}
+                  sessionId={session?.id}
+                  attributes={attributeDefinitions}
+                  skills={skillDefinitions}
+                  onRollCompleted={() => setDiceHistoryReload((item) => item + 1)}
+                />
+              ) : null}
+
+              {diceLauncherMode === 'rouse' && model && characterId ? (
+                <PersistedCharacterRouseCheck
+                  characterId={characterId}
+                  revision={characterRevision}
+                  hunger={hunger} sessionId={session?.id}
+                  onApplied={() => setReload((item) => item + 1)}
+                  onConflictReload={() => setReload((item) => item + 1)}
+                />
+              ) : null}
+
+              {diceLauncherMode === 'discipline' && model && characterId ? (
+                <DisciplinePowerRousePanel
+                  characterId={characterId}
+                  hunger={hunger}
+                  reloadKey={reload}
+                  onApplied={() => {
+                    setReload((item) => item + 1)
+                    setDiceHistoryReload((item) => item + 1)
+                  }}
+                  onConflictReload={() => setReload((item) => item + 1)}
+                />
+              ) : null}
+
+              {diceLauncherMode === 'd10' ? (
+                <DiceRollPanel
+                  key="d10-roll"
+                  mode="manual"
+                  manualVariant="d10"
+                  chronicleId={chronicleId}
+                  sessionId={session?.id}
+                  onRollCompleted={() => setDiceHistoryReload((item) => item + 1)}
+                />
+              ) : null}
+
+              {diceLauncherMode === 'discipline' && (!characterId || !model) ? (
+                <p className="chronicle-play-workspace__dice-modal-empty">
+                  Asocia un personaje activo para utilizar los poderes de Disciplina.
+                </p>
+              ) : null}
+
+              {diceLauncherMode === 'rouse' && (!characterId || !model) ? (
+                <p className="chronicle-play-workspace__dice-modal-empty">
+                  Asocia un personaje activo para realizar el Control de Enardecimiento.
+                </p>
+              ) : null}
+            </div>
+          </section>
+        </div>
+      ) : null}
 
       <section className="chronicle-play-workspace__vampire" aria-labelledby="chronicle-play-vampire-title">
         <header><small>ESTADO VAMPÍRICO</small><h2 id="chronicle-play-vampire-title">Recursos de Sangre</h2></header>
         {model && characterId ? <div className="chronicle-play-workspace__vampire-grid">
-          <article><h3>Control de enardecimiento</h3><p>Comprueba si aumenta tu Hambre.</p><PersistedCharacterRouseCheck characterId={characterId} revision={characterRevision} hunger={hunger} onApplied={() => setReload((item) => item + 1)} onConflictReload={() => setReload((item) => item + 1)} /></article>
+
           <article><h3>Alimentación</h3><p>Registra presa, resonancia y Hambre saciada.</p><PersistedCharacterFeeding characterId={characterId} revision={characterRevision} hunger={hunger} onApplied={() => setReload((item) => item + 1)} /></article>
           <article className="chronicle-play-workspace__hunger"><h3>Hambre actual</h3><strong>{hunger} / 5</strong><i aria-label={`Hambre ${hunger} de 5`}>{Array.from({ length: 5 }, (_, index) => <b key={index} className={index < hunger ? 'is-filled' : ''} />)}</i><span>{hunger >= 4 ? 'Crítica' : hunger >= 2 ? 'Moderada' : 'Controlada'}</span></article>
         </div> : <p className="chronicle-play-workspace__empty">Asocia un personaje activo para utilizar Enardecimiento y Alimentación.</p>}
       </section>
 
       <section className="chronicle-play-workspace__notes" aria-label="Notas e información de la sesión">
-        <article><header><h2>Notas privadas</h2><small>Solo tú</small></header><textarea value={privateNotes} disabled={notesLoading || !session} onChange={(event) => { setPrivateNotes(event.target.value); setSavedNote(null) }} placeholder="Escribe tus notas privadas..." /><button type="button" disabled={notesLoading || savingNote !== null || !session} onClick={() => void saveNote('private')}>{savingNote === 'private' ? 'Guardando…' : 'Guardar nota privada'}</button>{savedNote === 'private' ? <small role="status">Nota privada guardada</small> : null}</article>
-        <article><header><h2>Notas compartidas</h2><small>Participantes de la crónica</small></header><textarea value={publicNotes} disabled={notesLoading || !session} onChange={(event) => { setPublicNotes(event.target.value); setSavedNote(null) }} placeholder="Escribe una nota para compartir..." /><button type="button" disabled={notesLoading || savingNote !== null || !session} onClick={() => void saveNote('public')}>{savingNote === 'public' ? 'Guardando…' : 'Guardar nota compartida'}</button>{savedNote === 'public' ? <small role="status">Nota compartida guardada</small> : null}{notes.sharedNotes.length ? <ul className="chronicle-play-workspace__shared-notes">{notes.sharedNotes.slice(0, 3).map((note) => <li key={note.authorUserId}><strong>{note.authorName}</strong><span>{note.content}</span></li>)}</ul> : null}</article>
+        <article><header><h2>Notas privadas</h2><small>Solo tú</small></header><textarea value={privateNotes} disabled={notesLoading || !session} onChange={(event) => { setPrivateNotes(event.target.value); setSavedNote(null) }} placeholder="Escribe tus notas privadas..." /><button type="button" disabled={notesLoading || savingNote !== null || !session} onClick={() => void saveNote('private')}>{savingNote === 'private' ? 'Guardando…' : 'Guardar nota privada'}</button>{savedNote === 'private' ? <small role="status">Nota privada guardada en Cuaderno</small> : null}</article>
+        <article><header><h2>Notas compartidas</h2><small>Participantes de la crónica</small></header><textarea value={publicNotes} disabled={notesLoading || !session} onChange={(event) => { setPublicNotes(event.target.value); setSavedNote(null) }} placeholder="Escribe una nota para compartir..." /><button type="button" disabled={notesLoading || savingNote !== null || !session} onClick={() => void saveNote('public')}>{savingNote === 'public' ? 'Guardando…' : 'Guardar nota compartida'}</button>{savedNote === 'public' ? <small role="status">Nota compartida guardada en Cuaderno</small> : null}{notes.sharedNotes.length ? <ul className="chronicle-play-workspace__shared-notes">{notes.sharedNotes.slice(0, 3).map((note) => <li key={note.authorUserId}><strong>{note.authorName}</strong><span>{note.content}</span></li>)}</ul> : null}</article>
         <article className="chronicle-play-workspace__discoveries"><header><h2>Información descubierta</h2><small>Contexto público</small></header>{discovered.length ? <ul>{discovered.map((item) => <li key={item.id}><strong>{item.label}</strong><span>{item.kind}</span></li>)}</ul> : <p>No hay información pública vinculada.</p>}</article>
         {notesError ? <p className="chronicle-play-workspace__notes-error" role="alert">{notesError}</p> : null}
       </section>

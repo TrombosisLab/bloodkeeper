@@ -38,6 +38,19 @@ interface NotesPatch {
   readonly publicNotes?: string | null
 }
 
+const participantNotebookNotes = {
+  private: {
+    tag: 'SESSION_PARTICIPANT_PRIVATE',
+    title: 'Notas privadas de la sesión',
+    visibility: 'PRIVATE' as const,
+  },
+  shared: {
+    tag: 'SESSION_PARTICIPANT_SHARED',
+    title: 'Notas compartidas de la sesión',
+    visibility: 'CHRONICLE' as const,
+  },
+} as const
+
 @Controller('chronicles/:chronicleId/sessions/:sessionId/participant-notes')
 export class ChronicleSessionParticipantNotesController {
   constructor(
@@ -169,6 +182,108 @@ export class ChronicleSessionParticipantNotesController {
     }
   }
 
+  private async syncNotebookNote(
+    database: any,
+    input: {
+      readonly chronicleId: string
+      readonly sessionId: string
+      readonly authorUserId: string
+      readonly kind: 'private' | 'shared'
+      readonly content: string | null
+    },
+  ) {
+    const definition = participantNotebookNotes[input.kind]
+    const matches = await database.chronicleNote.findMany({
+      where: {
+        chronicleId: input.chronicleId,
+        sessionId: input.sessionId,
+        authorUserId: input.authorUserId,
+        tags: { has: definition.tag },
+      },
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      select: { id: true, status: true },
+    })
+    const companion = matches[0]
+
+    if (input.content !== null) {
+      if (companion) {
+        await database.chronicleNote.update({
+          where: { id: companion.id },
+          data: {
+            title: definition.title,
+            content: input.content,
+            visibility: definition.visibility,
+            status: 'ACTIVE',
+            tags: [definition.tag],
+            revision: { increment: 1 },
+          },
+        })
+      } else {
+        await database.chronicleNote.create({
+          data: {
+            chronicleId: input.chronicleId,
+            sessionId: input.sessionId,
+            authorUserId: input.authorUserId,
+            title: definition.title,
+            content: input.content,
+            visibility: definition.visibility,
+            tags: [definition.tag],
+          },
+        })
+      }
+    } else {
+      for (const match of matches) {
+        if (match.status === 'ACTIVE') {
+          await database.chronicleNote.update({
+            where: { id: match.id },
+            data: { status: 'ARCHIVED', revision: { increment: 1 } },
+          })
+        }
+      }
+    }
+
+    if (input.content !== null) {
+      for (const duplicate of matches.slice(1)) {
+        if (duplicate.status === 'ACTIVE') {
+          await database.chronicleNote.update({
+            where: { id: duplicate.id },
+            data: { status: 'ARCHIVED', revision: { increment: 1 } },
+          })
+        }
+      }
+    }
+  }
+
+  private async syncNotebookNotes(
+    database: any,
+    input: {
+      readonly chronicleId: string
+      readonly sessionId: string
+      readonly authorUserId: string
+      readonly privateNotes: string | null
+      readonly publicNotes: string | null
+      readonly privateChanged: boolean
+      readonly publicChanged: boolean
+    },
+  ) {
+    const operations: Array<Promise<void>> = []
+    if (input.privateChanged) {
+      operations.push(this.syncNotebookNote(database, {
+        ...input,
+        kind: 'private',
+        content: input.privateNotes,
+      }))
+    }
+    if (input.publicChanged) {
+      operations.push(this.syncNotebookNote(database, {
+        ...input,
+        kind: 'shared',
+        content: input.publicNotes,
+      }))
+    }
+    await Promise.all(operations)
+  }
+
   @Get()
   async load(
     @Req() request: RequestWithUser,
@@ -188,51 +303,77 @@ export class ChronicleSessionParticipantNotesController {
   ) {
     const access = await this.access(request, chronicleIdInput, sessionIdInput)
     const data = this.payload(body)
-    const existing = await this.database.chronicleSessionParticipantNote.findUnique({
-      where: {
-        sessionId_authorUserId: {
-          sessionId: access.sessionId,
-          authorUserId: access.actorUserId,
-        },
-      },
-    })
-
-    if (existing === null) {
-      if (data.expectedRevision !== 0) {
-        throw new ConflictException({ code: 'CHRONICLE_SESSION_NOTE_REVISION_CONFLICT' })
-      }
-
-      try {
-        await this.database.chronicleSessionParticipantNote.create({
-          data: {
-            chronicleId: access.chronicleId,
+    await this.database.$transaction(async (database: any) => {
+      const existing = await database.chronicleSessionParticipantNote.findUnique({
+        where: {
+          sessionId_authorUserId: {
             sessionId: access.sessionId,
             authorUserId: access.actorUserId,
-            privateNotes: data.privateNotes ?? null,
-            publicNotes: data.publicNotes ?? null,
           },
-        })
-      } catch {
-        throw new ConflictException({ code: 'CHRONICLE_SESSION_NOTE_REVISION_CONFLICT' })
-      }
-    } else {
-      if (existing.revision !== data.expectedRevision) {
-        throw new ConflictException({ code: 'CHRONICLE_SESSION_NOTE_REVISION_CONFLICT' })
-      }
-
-      const updated = await this.database.chronicleSessionParticipantNote.updateMany({
-        where: { id: existing.id, revision: data.expectedRevision },
-        data: {
-          ...(data.privateNotes === undefined ? {} : { privateNotes: data.privateNotes }),
-          ...(data.publicNotes === undefined ? {} : { publicNotes: data.publicNotes }),
-          revision: { increment: 1 },
         },
       })
 
-      if (updated.count !== 1) {
+      if (existing === null) {
+        if (data.expectedRevision !== 0) {
+          throw new ConflictException({ code: 'CHRONICLE_SESSION_NOTE_REVISION_CONFLICT' })
+        }
+
+        try {
+          await database.chronicleSessionParticipantNote.create({
+            data: {
+              chronicleId: access.chronicleId,
+              sessionId: access.sessionId,
+              authorUserId: access.actorUserId,
+              privateNotes: data.privateNotes ?? null,
+              publicNotes: data.publicNotes ?? null,
+            },
+          })
+        } catch {
+          throw new ConflictException({ code: 'CHRONICLE_SESSION_NOTE_REVISION_CONFLICT' })
+        }
+      } else {
+        if (existing.revision !== data.expectedRevision) {
+          throw new ConflictException({ code: 'CHRONICLE_SESSION_NOTE_REVISION_CONFLICT' })
+        }
+
+        const updated = await database.chronicleSessionParticipantNote.updateMany({
+          where: { id: existing.id, revision: data.expectedRevision },
+          data: {
+            ...(data.privateNotes === undefined ? {} : { privateNotes: data.privateNotes }),
+            ...(data.publicNotes === undefined ? {} : { publicNotes: data.publicNotes }),
+            revision: { increment: 1 },
+          },
+        })
+
+        if (updated.count !== 1) {
+          throw new ConflictException({ code: 'CHRONICLE_SESSION_NOTE_REVISION_CONFLICT' })
+        }
+      }
+
+      const current = await database.chronicleSessionParticipantNote.findUnique({
+        where: {
+          sessionId_authorUserId: {
+            sessionId: access.sessionId,
+            authorUserId: access.actorUserId,
+          },
+        },
+        select: { privateNotes: true, publicNotes: true },
+      })
+
+      if (!current) {
         throw new ConflictException({ code: 'CHRONICLE_SESSION_NOTE_REVISION_CONFLICT' })
       }
-    }
+
+      await this.syncNotebookNotes(database, {
+        chronicleId: access.chronicleId,
+        sessionId: access.sessionId,
+        authorUserId: access.actorUserId,
+        privateNotes: current.privateNotes,
+        publicNotes: current.publicNotes,
+        privateChanged: data.privateNotes !== undefined,
+        publicChanged: data.publicNotes !== undefined,
+      })
+    })
 
     return this.snapshot(access.chronicleId, access.sessionId, access.actorUserId)
   }

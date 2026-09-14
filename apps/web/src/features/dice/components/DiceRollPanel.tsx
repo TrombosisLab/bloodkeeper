@@ -12,6 +12,10 @@ import {
   DiceApiError,
 } from '../infrastructure/dice.api.ts'
 
+import {
+  DiceDieVisual,
+} from './DiceDieVisual.tsx'
+
 import type {
   CharacterDiceRollCommand,
   DiceGateway,
@@ -26,6 +30,11 @@ import './dice-roll-panel.css'
 
 interface DiceRollPanelProps {
   readonly mode: 'manual' | 'character'
+  readonly manualPreset?: { readonly pool: number; readonly hunger: number; readonly description?: string }
+  readonly manualTitle?: string
+  readonly manualSubtitle?: string
+  readonly onRollCompleted?: () => void
+  readonly manualVariant?: 'pool' | 'd10'
   readonly characterId?: string
   readonly chronicleId?: string
   readonly sessionId?: string
@@ -152,6 +161,11 @@ function errorMessage(error: unknown): string {
 
 export function DiceRollPanel({
   mode,
+  manualPreset,
+  manualTitle = 'Tirada manual',
+  manualSubtitle = 'Prepara la reserva en el servidor antes de lanzar.',
+  onRollCompleted,
+  manualVariant = 'pool',
   characterId,
   chronicleId,
   sessionId,
@@ -167,12 +181,12 @@ export function DiceRollPanel({
     () => normalizeDiceTraitOptions(skills),
     [skills],
   )
-  const [pool, setPool] = useState('3')
-  const [hunger, setHunger] = useState('1')
+  const [pool, setPool] = useState(String(manualPreset?.pool ?? (manualVariant === 'd10' ? 1 : 3)))
+  const [hunger, setHunger] = useState(String(manualPreset?.hunger ?? 1))
   const [modifier, setModifier] = useState('0')
   const [modifierLabel, setModifierLabel] = useState('Modificador general')
   const [difficulty, setDifficulty] = useState('')
-  const [description, setDescription] = useState('')
+  const [description, setDescription] = useState(manualPreset?.description ?? '')
   const [visibility, setVisibility] =
     useState<'contextual' | 'private'>('contextual')
   const [attribute, setAttribute] = useState(
@@ -217,7 +231,7 @@ export function DiceRollPanel({
   function commandOptions() {
     const parsedModifier = optionalInteger(modifier)
     const parsedDifficulty = optionalInteger(difficulty)
-    const normalizedDescription = description.trim()
+    const normalizedDescription = description.trim() || (manualVariant === 'd10' ? 'Lanzamiento de ' + pool + 'd10' : '')
     const normalizedLabel = modifierLabel.trim()
     return {
       ...(parsedModifier === undefined || parsedModifier === 0
@@ -255,7 +269,7 @@ export function DiceRollPanel({
       if (mode === 'manual') {
         const command: ManualDiceRollCommand = {
           pool: Number(pool),
-          hunger: Number(hunger),
+          hunger: manualVariant === 'd10' ? 0 : Number(hunger),
           ...commandOptions(),
         }
         const snapshot = await gateway.previewManual(command)
@@ -298,6 +312,7 @@ export function DiceRollPanel({
             prepared.command,
           )
       setResult(executed)
+      onRollCompleted?.()
     } catch (rollError: unknown) {
       setResult(null)
       setError(errorMessage(rollError))
@@ -311,51 +326,75 @@ export function DiceRollPanel({
       className="dice-roll-panel"
       aria-labelledby={titleId}
       data-mode={mode}
+      data-manual-variant={manualVariant}
     >
       <header className="dice-roll-panel__header">
         <div>
           <span>Dados V5</span>
           <h2 id={titleId}>
             {mode === 'manual'
-              ? 'Tirada manual'
+              ? manualVariant === 'd10'
+                ? 'Lanzamiento d10'
+                : manualTitle
               : 'Tirada del personaje'}
           </h2>
         </div>
-        <p>Prepara la reserva en el servidor antes de lanzar.</p>
+        <p>{mode === 'manual' && manualVariant === 'd10'
+          ? 'Lanza uno o dos dados de diez caras.'
+          : 'Prepara la reserva en el servidor antes de lanzar.'}</p>
       </header>
 
       <form className="dice-roll-panel__form" onSubmit={prepare}>
         {mode === 'manual' ? (
           <>
-            <label>
-              Reserva base
-              <input
-                type="number"
-                min="1"
-                step="1"
-                required
-                value={pool}
-                onChange={(event) => {
-                  invalidatePrepared()
-                  setPool(event.target.value)
-                }}
-              />
-            </label>
-            <label>
-              Hambre
-              <input
-                type="number"
-                min="0"
-                max="5"
-                step="1"
-                required
-                value={hunger}
-                onChange={(event) => {
-                  invalidatePrepared()
-                  setHunger(event.target.value)
-                }}
-              />
-            </label>
+            {manualVariant === 'd10' ? (
+              <label>
+                Dados d10
+                <select
+                  required
+                  value={pool}
+                  onChange={(event) => {
+                    invalidatePrepared()
+                    setPool(event.target.value)
+                  }}
+                >
+                  <option value="1">1 dado</option>
+                  <option value="2">2 dados</option>
+                </select>
+              </label>
+            ) : (
+              <>
+                <label>
+                  Reserva base
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    required
+                    value={pool}
+                    onChange={(event) => {
+                      invalidatePrepared()
+                      setPool(event.target.value)
+                    }}
+                  />
+                </label>
+                <label>
+                  Hambre
+                  <input
+                    type="number"
+                    min="0"
+                    max="5"
+                    step="1"
+                    required
+                    value={hunger}
+                    onChange={(event) => {
+                      invalidatePrepared()
+                      setHunger(event.target.value)
+                    }}
+                  />
+                </label>
+              </>
+            )}
           </>
         ) : (
           <>
@@ -396,58 +435,62 @@ export function DiceRollPanel({
           </>
         )}
 
-        <label>
-          Modificador
-          <input
-            type="number"
-            step="1"
-            value={modifier}
-            onChange={(event) => {
-              invalidatePrepared()
-              setModifier(event.target.value)
-            }}
-          />
-        </label>
+        {manualVariant !== 'd10' ? (
+          <>
+            <label>
+              Modificador
+              <input
+                type="number"
+                step="1"
+                value={modifier}
+                onChange={(event) => {
+                  invalidatePrepared()
+                  setModifier(event.target.value)
+                }}
+              />
+            </label>
 
-        <label>
-          Origen del modificador
-          <input
-            type="text"
-            maxLength={80}
-            value={modifierLabel}
-            onChange={(event) => {
-              invalidatePrepared()
-              setModifierLabel(event.target.value)
-            }}
-          />
-        </label>
+            <label>
+              Origen del modificador
+              <input
+                type="text"
+                maxLength={80}
+                value={modifierLabel}
+                onChange={(event) => {
+                  invalidatePrepared()
+                  setModifierLabel(event.target.value)
+                }}
+              />
+            </label>
 
-        <label>
-          Dificultad opcional
-          <input
-            type="number"
-            min="1"
-            step="1"
-            value={difficulty}
-            onChange={(event) => {
-              invalidatePrepared()
-              setDifficulty(event.target.value)
-            }}
-          />
-        </label>
+            <label>
+              Dificultad opcional
+              <input
+                type="number"
+                min="1"
+                step="1"
+                value={difficulty}
+                onChange={(event) => {
+                  invalidatePrepared()
+                  setDifficulty(event.target.value)
+                }}
+              />
+            </label>
 
-        <label className="dice-roll-panel__description">
-          Descripción opcional
-          <input
-            type="text"
-            maxLength={160}
-            value={description}
-            onChange={(event) => {
-              invalidatePrepared()
-              setDescription(event.target.value)
-            }}
-          />
-        </label>
+            <label className="dice-roll-panel__description">
+              Descripción opcional
+              <input
+                type="text"
+                maxLength={160}
+                value={description}
+                onChange={(event) => {
+                  invalidatePrepared()
+                  setDescription(event.target.value)
+                }}
+              />
+            </label>
+          </>
+        ) : null}
 
         {chronicleId !== undefined || mode === 'character' ? (
           <label>
@@ -575,10 +618,7 @@ export function DiceRollPanel({
                 className={`dice-roll-result__die dice-roll-result__die--${die.type}${die.isCriticalTen ? ' dice-roll-result__die--critical-ten' : ''}${die.isBestialFailureDie ? ' dice-roll-result__die--bestial-one' : ''}`}
                 aria-label={`${die.type === 'hunger' ? 'Dado de Hambre' : 'Dado normal'}: ${die.value}`}
               >
-                <span>{die.value}</span>
-                <small>{die.type === 'hunger' ? 'Hambre' : 'Normal'}</small>
-                {die.isCriticalTen ? <em>Diez crítico</em> : null}
-                {die.isBestialFailureDie ? <em>Uno de Hambre</em> : null}
+                <DiceDieVisual die={die} />
               </li>
             ))}
           </ol>

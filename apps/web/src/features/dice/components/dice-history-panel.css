@@ -26,6 +26,23 @@
   justify-content: space-between;
 }
 
+.dice-history-panel__actions,
+.dice-history-panel__filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.dice-history-panel__filter-toggle {
+  border-color: rgba(215, 154, 164, 0.55);
+}
+
+.dice-history-panel__clear-filters {
+  border-color: rgba(215, 154, 164, 0.35);
+  color: #d7c4c8;
+}
+
 .dice-history-panel__heading span {
   color: #d79aa4;
   font-size: 0.72rem;
@@ -158,17 +175,17 @@
 
 .dice-history-panel__die {
   display: grid;
-  min-width: 3.1rem;
+  min-width: 3.8rem;
+  min-height: 3.8rem;
   place-items: center;
-  padding: 0.45rem;
-  border: 1px solid #65565a;
-  border-radius: 0.48rem;
-  background: #201a1b;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .dice-history-panel__die--hunger {
-  border-color: #a33a49;
-  background: #43151c;
+  background: transparent;
 }
 
 .dice-history-panel__error {
@@ -186,6 +203,27 @@
 }
 
 @media (max-width: 700px) {
+  .dice-history-panel__heading {
+    gap: 0.8rem;
+    flex-direction: column;
+  }
+
+  .dice-history-panel__actions {
+    width: 100%;
+  }
+
+  .dice-history-panel__actions > button {
+    flex: 1 1 9rem;
+  }
+
+  .dice-history-panel__filter-actions {
+    width: 100%;
+  }
+
+  .dice-history-panel__filter-actions > button {
+    flex: 1 1 9rem;
+  }
+
   .dice-history-panel__summary {
     align-items: flex-start;
     flex-direction: column;
@@ -196,4 +234,27 @@
     margin-left: 0;
     text-align: left;
   }
+}
+
+
+/* BLOODKEEPER_DICE_HISTORY_LIVE_FILTERS_V1_START */
+.dice-history-panel__live {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  margin-top: .35rem;
+  color: var(--color-success, #8bcf9a);
+  font-size: .68rem;
+  letter-spacing: .04em;
+}
+/* BLOODKEEPER_DICE_HISTORY_LIVE_FILTERS_V1_END */
+
+
+/* BLOODKEEPER_ROUSE_HISTORY_LIVE_V1 */
+.dice-history-panel__live {
+  display: inline-flex;
+  margin-top: .35rem;
+  color: var(--color-success, #8bcf9a);
+  font-size: .68rem;
+  letter-spacing: .04em;
 }

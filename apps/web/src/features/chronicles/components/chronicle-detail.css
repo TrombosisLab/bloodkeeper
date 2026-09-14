@@ -422,6 +422,36 @@
   }
 }
 
+/* CHRONICLE_DETAIL_LAYOUT_ALIGNMENT_V1
+ * Usa las mismas distancias de composición que Inicio y Personajes.
+ * La crónica conserva el ancho operativo completo, pero recupera el mismo
+ * colchón visual que Inicio, Personajes, Administración y Crónicas.
+ */
+@media (min-width: 900px) {
+  main.application-content:has(> .chronicle-detail) {
+    padding: 0 !important;
+  }
+
+  main.application-content:has(> .chronicle-detail) > .chronicle-detail {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: clamp(16px, 2vw, 28px)
+      clamp(16px, 2.4vw, 38px) 40px !important;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 899px) {
+  main.application-content:has(> .chronicle-detail) > .chronicle-detail {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 16px 16px 32px !important;
+    box-sizing: border-box;
+  }
+}
+
 /* Sesiones referencia: permitir ancho operativo */
 .chronicle-detail:has(.chronicle-session-panel),.chronicle-detail__sections:has(.chronicle-session-panel){width:100%;max-width:none;min-width:0}
 

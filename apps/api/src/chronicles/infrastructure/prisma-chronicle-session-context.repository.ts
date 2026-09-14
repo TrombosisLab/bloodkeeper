@@ -122,8 +122,10 @@ function sortLocations(
   )
 }
 
-function resourceKind(value: string): 'document' | 'artifact' | 'organization' {
+function resourceKind(value: string): 'npc' | 'location' | 'document' | 'artifact' | 'organization' {
   const normalized = value.toLowerCase()
+  if (normalized === 'npc') return 'npc'
+  if (normalized === 'location') return 'location'
   if (normalized === 'document') return 'document'
   if (normalized === 'artifact') return 'artifact'
   return 'organization'

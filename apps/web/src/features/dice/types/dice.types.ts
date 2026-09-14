@@ -68,6 +68,18 @@ export interface ResolvedDice {
   readonly isBestialFailureDie: boolean
 }
 
+export interface DiceRouseHistorySnapshot {
+  readonly kind: 'rouseCheck'
+  readonly reason: string
+  readonly rolls: readonly number[]
+  readonly selectedResult: number
+  readonly success: boolean
+  readonly hungerBefore: number
+  readonly hungerAfter: number
+  readonly consequence: string
+  readonly consequenceDifficulty: number | null
+}
+
 export interface DiceRollSnapshot {
   readonly dice: readonly ResolvedDice[]
   readonly difficulty: number | null
@@ -80,6 +92,7 @@ export interface DiceRollSnapshot {
   readonly specialEvidence: DiceRollSpecialEvidence
   readonly outcome: DiceRollOutcome
   readonly meetsDifficulty: boolean | null
+  readonly rouse?: DiceRouseHistorySnapshot
 }
 
 export interface ExecutedDiceRoll {

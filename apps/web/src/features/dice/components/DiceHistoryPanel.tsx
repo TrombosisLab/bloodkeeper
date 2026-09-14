@@ -1,6 +1,7 @@
 import {
   useEffect,
   useId,
+  useRef,
   useState,
 } from 'react'
 
@@ -12,6 +13,10 @@ import {
   createDiceGateway,
   DiceApiError,
 } from '../infrastructure/dice.api.ts'
+
+import {
+  DiceDieVisual,
+} from './DiceDieVisual.tsx'
 
 import type {
   DiceGateway,
@@ -28,6 +33,7 @@ interface DiceHistoryPanelProps {
   readonly chronicleId?: string
   readonly sessionId?: string
   readonly contextLabel?: string
+  readonly refreshIntervalMs?: number
   readonly gateway?: DiceGateway
 }
 
@@ -37,6 +43,12 @@ const sourceLabels: Readonly<
   manual: 'Manual',
   character: 'Personaje',
   action: 'Acción',
+}
+
+function rouseConsequenceLabel(value: string): string {
+  if (value === 'hungerFrenzyTestRequired') return 'Prueba de Frenesí por Hambre · Dificultad 4'
+  if (value === 'torporTriggered') return 'Torpor'
+  return 'Sin consecuencia adicional'
 }
 
 const outcomeLabels = {
@@ -54,9 +66,22 @@ function historyError(error: unknown): string {
     }
     if (
       error.code === 'DICE_ROLL_CONTEXT_PERMISSION_DENIED' ||
+      error.code === 'DICE_CONTEXT_PERMISSION_DENIED' ||
       error.code === 'CHRONICLE_PERMISSION_DENIED'
     ) {
       return 'No tienes permiso para consultar este historial.'
+    }
+    if (
+      error.code === 'DICE_CONTEXT_NOT_FOUND' ||
+      error.code === 'DICE_ROLL_CONTEXT_NOT_FOUND'
+    ) {
+      return 'La crónica o la sesión seleccionada ya no está disponible.'
+    }
+    if (error.code === 'INVALID_DICE_RESPONSE') {
+      return 'Hay una entrada antigua incompatible; el historial seguirá mostrando las nuevas tiradas.'
+    }
+    if (error.code === 'DICE_REQUEST_FAILED') {
+      return 'El servidor no ha podido consultar el historial de tiradas.'
     }
     if (error.code === 'DICE_ROLL_NOT_FOUND') {
       return 'La tirada ya no está disponible.'
@@ -97,6 +122,7 @@ export function DiceHistoryPanel({
   chronicleId,
   sessionId,
   contextLabel = 'Tus tiradas recientes',
+  refreshIntervalMs = 0,
   gateway = defaultGateway,
 }: DiceHistoryPanelProps) {
   const titleId = useId()
@@ -114,20 +140,29 @@ export function DiceHistoryPanel({
   const [detailLoadingId, setDetailLoadingId] =
     useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const loadingRef = useRef(false)
 
-  async function load(reset: boolean): Promise<void> {
-    if (reset) setLoading(true)
-    else setLoadingMore(true)
-    setError(null)
+  async function load(
+    reset: boolean,
+    silent = false,
+    requestedSource: DicePoolContextSource | '' = source,
+    requestedDescription = description,
+  ): Promise<void> {
+    if (loadingRef.current) return
+    loadingRef.current = true
+    if (reset && !silent) setLoading(true)
+    else if (!reset) setLoadingMore(true)
+    if (!silent) setError(null)
     try {
       const page = await gateway.history({
         ...(characterId === undefined ? {} : { characterId }),
         ...(chronicleId === undefined ? {} : { chronicleId }),
         ...(sessionId === undefined ? {} : { sessionId }),
-        ...(source === '' ? {} : { source }),
-        ...(description.trim().length === 0
+        ...(requestedSource === '' ? {} : { source: requestedSource }),
+        ...(requestedDescription.trim().length === 0
           ? {}
-          : { description: description.trim() }),
+          : { description: requestedDescription.trim() }),
         limit: 10,
         ...(!reset && nextCursor !== null
           ? { cursor: nextCursor }
@@ -137,16 +172,21 @@ export function DiceHistoryPanel({
         reset ? page.items : mergedItems(current, page.items),
       )
       setNextCursor(page.nextCursor)
-      if (reset) setSelected(null)
+      if (reset && !silent) setSelected(null)
     } catch (loadError: unknown) {
-      setError(historyError(loadError))
-      if (reset) {
-        setItems([])
-        setNextCursor(null)
+      if (!silent) {
+        setError(historyError(loadError))
+        if (reset) {
+          setItems([])
+          setNextCursor(null)
+        }
       }
     } finally {
-      setLoading(false)
-      setLoadingMore(false)
+      loadingRef.current = false
+      if (!silent) {
+        setLoading(false)
+        setLoadingMore(false)
+      }
     }
   }
 
@@ -154,9 +194,42 @@ export function DiceHistoryPanel({
     void load(true)
   }, [characterId, chronicleId, sessionId, gateway])
 
+  useEffect(() => {
+    if (refreshIntervalMs < 1000) return
+    const refresh = () => {
+      if (globalThis.document.visibilityState !== 'visible') return
+      void load(true, true)
+    }
+    const onVisibilityChange = () => {
+      if (globalThis.document.visibilityState === 'visible') refresh()
+    }
+    const timer = globalThis.setInterval(refresh, refreshIntervalMs)
+    globalThis.document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      globalThis.clearInterval(timer)
+      globalThis.document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  }, [
+    characterId,
+    chronicleId,
+    sessionId,
+    source,
+    description,
+    refreshIntervalMs,
+    gateway,
+  ])
+
   async function filter(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     await load(true)
+    setFiltersOpen(false)
+  }
+
+  async function clearFilters(): Promise<void> {
+    setSource('')
+    setDescription('')
+    await load(true, false, '', '')
+    setFiltersOpen(false)
   }
 
   async function toggleDetail(item: DiceRollHistoryItem) {
@@ -185,48 +258,80 @@ export function DiceHistoryPanel({
           <span>Memoria inmutable</span>
           <h2 id={titleId}>Historial de tiradas</h2>
           <p>{contextLabel}</p>
+          {refreshIntervalMs >= 1000 ? (
+            <small className="dice-history-panel__live">
+              ● Actualización automática
+            </small>
+          ) : null}
         </div>
-        <button
-          type="button"
-          onClick={() => void load(true)}
-          disabled={loading}
-        >
-          Actualizar
-        </button>
+        <div className="dice-history-panel__actions">
+          <button
+            type="button"
+            className="dice-history-panel__filter-toggle"
+            aria-expanded={filtersOpen}
+            aria-controls={`${titleId}-filters`}
+            onClick={() => setFiltersOpen((current) => !current)}
+          >
+            {filtersOpen ? 'Ocultar filtros' : 'Buscar tiradas'}
+            {source !== '' || description.trim().length > 0
+              ? ' · Activos'
+              : ''}
+          </button>
+          <button
+            type="button"
+            onClick={() => void load(true)}
+            disabled={loading}
+          >
+            Actualizar
+          </button>
+        </div>
       </header>
 
-      <form
-        className="dice-history-panel__filters"
-        onSubmit={filter}
-      >
-        <label>
-          Origen
-          <select
-            value={source}
-            onChange={(event) =>
-              setSource(event.target.value as DicePoolContextSource | '')
-            }
-          >
-            <option value="">Todos</option>
-            <option value="manual">Manual</option>
-            <option value="character">Personaje</option>
-            <option value="action">Acción</option>
-          </select>
-        </label>
-        <label>
-          Descripción
-          <input
-            type="search"
-            maxLength={160}
-            value={description}
-            placeholder="Buscar etiqueta"
-            onChange={(event) => setDescription(event.target.value)}
-          />
-        </label>
-        <button type="submit" disabled={loading}>
-          Aplicar filtros
-        </button>
-      </form>
+      {filtersOpen ? (
+        <form
+          id={`${titleId}-filters`}
+          className="dice-history-panel__filters"
+          onSubmit={filter}
+        >
+          <label>
+            Origen
+            <select
+              value={source}
+              onChange={(event) =>
+                setSource(event.target.value as DicePoolContextSource | '')
+              }
+            >
+              <option value="">Todos</option>
+              <option value="manual">Manual</option>
+              <option value="character">Personaje</option>
+              <option value="action">Acción</option>
+            </select>
+          </label>
+          <label>
+            Buscar texto de la tirada
+            <input
+              type="search"
+              maxLength={160}
+              value={description}
+              placeholder="Ej.: persecución, ritual, 1d10…"
+              onChange={(event) => setDescription(event.target.value)}
+            />
+          </label>
+          <div className="dice-history-panel__filter-actions">
+            <button type="submit" disabled={loading}>
+              Aplicar filtros
+            </button>
+            <button
+              type="button"
+              className="dice-history-panel__clear-filters"
+              disabled={loading || (source === '' && description.trim().length === 0)}
+              onClick={() => void clearFilters()}
+            >
+              Limpiar
+            </button>
+          </div>
+        </form>
+      ) : null}
 
       {error !== null ? (
         <p className="dice-history-panel__error" role="alert">
@@ -255,15 +360,20 @@ export function DiceHistoryPanel({
                 <span className="dice-history-panel__identity">
                   <strong>{item.actorDisplayName}</strong>
                   <small>
-                    {sourceLabels[item.source]} · {contextText(item)}
+                    {item.description !== null ? `{item.description} · ` : ''}{sourceLabels[item.source]} · {contextText(item)}
                     {item.visibility === 'private' ? ' · Privada' : ''}
                   </small>
                 </span>
                 <span className="dice-history-panel__result">
-                  <strong>{outcomeLabels[item.roll.outcome]}</strong>
+                  <strong>
+                    {item.roll.rouse === undefined
+                      ? outcomeLabels[item.roll.outcome]
+                      : `Control de Enardecimiento · ${outcomeLabels[item.roll.outcome]}`}
+                  </strong>
                   <small>
-                    Reserva {item.pool.finalPool} · {item.roll.totalSuccesses}
-                    {item.roll.totalSuccesses === 1 ? ' éxito' : ' éxitos'}
+                    {item.roll.rouse === undefined
+                      ? `Reserva ${item.pool.finalPool} · ${item.roll.totalSuccesses}${item.roll.totalSuccesses === 1 ? ' éxito' : ' éxitos'}`
+                      : `Hambre ${item.roll.rouse.hungerBefore} → ${item.roll.rouse.hungerAfter} · Dado usado ${item.roll.rouse.selectedResult}`}
                   </small>
                 </span>
                 <time dateTime={item.createdAt}>
@@ -292,6 +402,18 @@ export function DiceHistoryPanel({
                       <dt>Resultado especial</dt>
                       <dd>{outcomeLabels[selected.roll.outcome]}</dd>
                     </div>
+                    {selected.roll.rouse !== undefined ? (
+                      <>
+                        <div>
+                          <dt>Hambre antes y después</dt>
+                          <dd>{selected.roll.rouse.hungerBefore} → {selected.roll.rouse.hungerAfter}</dd>
+                        </div>
+                        <div>
+                          <dt>Consecuencia</dt>
+                          <dd>{rouseConsequenceLabel(selected.roll.rouse.consequence)}</dd>
+                        </div>
+                      </>
+                    ) : null}
                     <div>
                       <dt>Reglas</dt>
                       <dd>{selected.rulesVersion}</dd>
@@ -309,11 +431,9 @@ export function DiceHistoryPanel({
                             ? 'dice-history-panel__die dice-history-panel__die--hunger'
                             : 'dice-history-panel__die'
                         }
+                        aria-label={`${die.type === 'hunger' ? 'Dado de Hambre' : 'Dado normal'}: ${die.value}`}
                       >
-                        <span>{die.value}</span>
-                        <small>
-                          {die.type === 'hunger' ? 'Hambre' : 'Normal'}
-                        </small>
+                        <DiceDieVisual die={die} />
                       </li>
                     ))}
                   </ol>

@@ -20,6 +20,7 @@ interface PersistedCharacterRouseCheckProps {
   characterId: string
   revision: number
   hunger: number
+  sessionId?: string
   result?: CharacterRouseCheckResult | null
   gateway?: CharacterRouseCheckGateway
   onApplied: (
@@ -117,6 +118,7 @@ export function PersistedCharacterRouseCheck({
   characterId,
   revision,
   hunger,
+  sessionId,
   result = null,
   gateway,
   onApplied,
@@ -173,6 +175,7 @@ export function PersistedCharacterRouseCheck({
           {
             expectedRevision: revision,
             operationId,
+            ...(sessionId === undefined ? {} : { sessionId }),
             reason: 'other',
           },
         )

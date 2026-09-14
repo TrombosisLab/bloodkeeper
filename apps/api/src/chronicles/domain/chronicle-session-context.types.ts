@@ -31,7 +31,7 @@ export interface ChronicleSessionContextLocation {
 
 export interface ChronicleSessionContextResource {
   readonly id: string
-  readonly kind: 'document' | 'artifact' | 'organization'
+  readonly kind: 'npc' | 'location' | 'document' | 'artifact' | 'organization'
   readonly name: string
   readonly summary: string | null
   readonly status: 'active' | 'archived'

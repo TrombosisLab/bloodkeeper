@@ -41,6 +41,15 @@ import {
 } from './application/execute-character-rouse-check.use-case'
 
 import {
+  LoadCharacterDisciplinePowerRouseProfilesUseCase,
+} from './application/load-character-discipline-power-rouse-profiles.use-case'
+
+import {
+  ExecuteCharacterDisciplinePowerRouseCheckUseCase,
+} from './application/execute-character-discipline-power-rouse-check.use-case'
+
+
+import {
   UseCharacterBlushOfLifeUseCase,
 } from './application/use-character-blush-of-life.use-case'
 
@@ -180,6 +189,15 @@ import {
 import {
   CharacterRouseCheckController,
 } from './presentation/character-rouse-check.controller'
+
+import {
+  CharacterDisciplinePowerRouseProfilesController,
+} from './presentation/character-discipline-power-rouse-profiles.controller'
+
+import {
+  CharacterDisciplinePowerRouseCheckController,
+} from './presentation/character-discipline-power-rouse-check.controller'
+
 
 import {
   CharacterBlushOfLifeController,
@@ -437,6 +455,45 @@ const useCaseProviders = [
   },
   {
     provide:
+      LoadCharacterDisciplinePowerRouseProfilesUseCase,
+    inject: [
+      CHARACTER_DRAFT_REPOSITORY,
+      CHRONICLE_PARTICIPANT_REPOSITORY,
+      CHARACTER_RULES_CATALOG,
+    ],
+    useFactory: (
+      characters:
+        PrismaCharacterDraftRepository,
+      participants:
+        ChronicleParticipantRepository,
+      catalog: CharacterRulesCatalog,
+    ) =>
+      new LoadCharacterDisciplinePowerRouseProfilesUseCase(
+        characters,
+        participants,
+        catalog,
+      ),
+  },
+  {
+    provide:
+      ExecuteCharacterDisciplinePowerRouseCheckUseCase,
+    inject: [
+      LoadCharacterDisciplinePowerRouseProfilesUseCase,
+      ExecuteCharacterRouseCheckUseCase,
+    ],
+    useFactory: (
+      profiles:
+        LoadCharacterDisciplinePowerRouseProfilesUseCase,
+      executeRouse:
+        ExecuteCharacterRouseCheckUseCase,
+    ) =>
+      new ExecuteCharacterDisciplinePowerRouseCheckUseCase(
+        profiles,
+        executeRouse,
+      ),
+  },
+  {
+    provide:
       ApplyCharacterBloodResonanceUseCase,
     inject: [
       CHARACTER_DRAFT_REPOSITORY,
@@ -669,6 +726,8 @@ const useCaseProviders = [
     CharacterEmbraceController,
     CharacterBloodResonanceController,
     CharacterRouseCheckController,
+    CharacterDisciplinePowerRouseProfilesController,
+    CharacterDisciplinePowerRouseCheckController,
     CharacterBlushOfLifeController,
     CharacterInitialVampireController,
     CharacterProfilePhaseController,

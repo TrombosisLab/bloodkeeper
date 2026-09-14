@@ -23,6 +23,7 @@ export type CharacterRouseCheckConsequence =
 export interface CharacterRouseCheckRequest {
   readonly expectedRevision: number
   readonly operationId: string
+  readonly sessionId?: string
 
   /*
    * SPEC-059-C publica sólo la acción manual genérica.

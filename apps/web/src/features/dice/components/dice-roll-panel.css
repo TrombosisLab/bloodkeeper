@@ -152,27 +152,17 @@
 .dice-roll-result__die {
   display: grid;
   place-items: center;
-  width: 3.35rem;
-  min-height: 3.65rem;
-  border: 1px solid #66575a;
-  border-radius: 10px;
-  background: #eee8e2;
-  color: #211b1c;
-}
-
-.dice-roll-result__die span {
-  font-size: 1.35rem;
-  font-weight: 800;
+  width: 3.8rem;
+  min-height: 3.8rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #f4d9dc;
 }
 
 .dice-roll-result__die--hunger {
-  border-color: #a64b58;
-  background: linear-gradient(145deg, #8d3442, #43171f);
-  color: #fff2f2;
-}
-
-.dice-roll-result__die--hunger small {
-  color: #f1c4c9;
+  background: transparent;
 }
 
 .dice-roll-result__difficulty {
@@ -204,6 +194,13 @@
 
   .dice-roll-panel__description {
     grid-column: auto;
+  }
+
+  .dice-roll-result__die,
+  .dice-die-visual {
+    width: 3.25rem;
+    min-height: 3.25rem;
+    height: 3.25rem;
   }
 }
 
@@ -239,19 +236,147 @@
   font-size: 0.84rem;
 }
 
-.dice-roll-result__die em {
-  color: inherit;
-  font-size: 0.58rem;
-  font-style: normal;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
 .dice-roll-result__die--critical-ten {
   box-shadow: inset 0 0 0 2px rgba(232, 183, 104, 0.52);
 }
 
 .dice-roll-result__die--bestial-one {
   box-shadow: inset 0 0 0 2px rgba(255, 118, 139, 0.62);
+}
+
+.discipline-rouse-panel {
+  margin-top: 1rem;
+}
+
+.discipline-rouse-panel__form {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+  gap: 0.8rem;
+  align-items: end;
+}
+
+.discipline-rouse-panel__form label {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--ui-button-text-muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.discipline-rouse-panel__summary {
+  display: grid;
+  gap: 0.2rem;
+  min-height: var(--ui-button-height);
+  align-content: center;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--ui-surface-panel-border);
+  border-radius: 9px;
+  background: rgb(0 0 0 / 18%);
+}
+
+.discipline-rouse-panel__summary span,
+.discipline-rouse-panel__result span,
+.discipline-rouse-panel__result small,
+.discipline-rouse-panel__state,
+.discipline-rouse-panel__notice {
+  color: var(--ui-button-text-muted);
+}
+
+.discipline-rouse-panel__summary strong {
+  color: #f4d9dc;
+}
+
+.discipline-rouse-panel__form button {
+  min-height: var(--ui-button-height);
+  border-color: var(--ui-button-primary-border);
+  background: linear-gradient(180deg, var(--ui-button-primary-bg-hover), var(--ui-button-primary-bg));
+}
+
+.discipline-rouse-panel__state,
+.discipline-rouse-panel__notice,
+.discipline-rouse-panel__error {
+  margin: 0;
+  padding: 0.8rem 0;
+}
+
+.discipline-rouse-panel__notice,
+.discipline-rouse-panel__error {
+  color: #efb6bd;
+}
+
+.discipline-rouse-panel__error {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.discipline-rouse-panel__error button {
+  min-height: 2.25rem;
+}
+
+.discipline-rouse-panel__result {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ui-surface-panel-border);
+}
+
+.discipline-rouse-panel__result > div:first-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1rem;
+  align-items: baseline;
+}
+
+.discipline-rouse-panel__result > div:first-child span {
+  flex-basis: 100%;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.discipline-rouse-panel__result > div:first-child strong {
+  color: #f4d9dc;
+  font-size: 1.15rem;
+}
+
+@media (max-width: 760px) {
+  .discipline-rouse-panel__form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .discipline-rouse-panel__form button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 460px) {
+  .discipline-rouse-panel__form {
+    grid-template-columns: 1fr;
+  }
+
+  .discipline-rouse-panel__form button {
+    grid-column: auto;
+  }
+}
+
+/* BLOODKEEPER-DICE-VISUAL-LIVE-CLEANUP */
+.dice-roll-result__die,
+.dice-roll-result__die--hunger,
+.dice-roll-result__die--critical-ten,
+.dice-roll-result__die--bestial-one {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.dice-roll-result__die em,
+.dice-roll-result__die span,
+.dice-roll-result__die small {
+  display: none !important;
 }

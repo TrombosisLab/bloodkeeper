@@ -37,6 +37,7 @@ export interface PersistCharacterRouseCheckData
   readonly characterId: string
   readonly operationId: string
   readonly expectedRevision: number
+  readonly sessionId?: string
   readonly bloodPotency: number | null
   readonly disciplinePowerLevel: number | null
   readonly rolls: readonly number[]

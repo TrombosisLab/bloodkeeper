@@ -16,6 +16,7 @@ import type {
   ExecutedDiceRoll,
   ManualDiceRollCommand,
   ResolvedDice,
+  DiceRouseHistorySnapshot,
 } from '../types/dice.types.ts'
 
 type FetchImplementation = typeof globalThis.fetch
@@ -248,12 +249,75 @@ function parsedSpecialResult(
   return result as DiceRollSpecialResult
 }
 
+function rouseHistory(value: unknown): DiceRouseHistorySnapshot {
+  const item = record(value)
+    const rolls = Array.isArray(item.rolls) ? item.rolls : null
+    const selectedResult = integer(item.selectedResult)
+    if (
+      item.kind !== 'rouseCheck' ||
+    rolls === null ||
+    rolls.length < 1 ||
+    rolls.length > 2 ||
+    !rolls.every((roll: unknown) => {
+      if (typeof roll !== 'number' || !Number.isSafeInteger(roll)) return false
+      return roll >= 1 && roll <= 10
+    }) ||
+    selectedResult < 1 ||
+    selectedResult > 10 ||
+    !rolls.includes(selectedResult) ||
+    typeof item.reason !== 'string' ||
+    typeof item.success !== 'boolean' ||
+    typeof item.consequence !== 'string'
+  ) {
+    throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
+  }
+  const hungerBefore = integer(item.hungerBefore)
+  const hungerAfter = integer(item.hungerAfter)
+  const consequenceDifficulty = item.consequenceDifficulty === null
+    ? null
+    : integer(item.consequenceDifficulty)
+  if (
+    hungerBefore < 0 || hungerBefore > 5 ||
+    hungerAfter < 0 || hungerAfter > 5 ||
+    (consequenceDifficulty !== null && consequenceDifficulty !== 4)
+  ) {
+    throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
+  }
+  return {
+    kind: 'rouseCheck',
+    reason: item.reason,
+    rolls: rolls.map((roll) => integer(roll)),
+    selectedResult,
+    success: item.success,
+    hungerBefore,
+    hungerAfter,
+    consequence: item.consequence,
+    consequenceDifficulty,
+  }
+}
+
+function optionalRouseHistory(
+  value: unknown,
+): DiceRouseHistorySnapshot | null {
+  try {
+    return rouseHistory(value)
+  } catch {
+    // Los metadatos añadidos por versiones anteriores no deben
+    // impedir que se muestre el resto del historial.
+    return null
+  }
+}
+
 function roll(value: unknown): DiceRollSnapshot {
   const item = record(value)
   if (!Array.isArray(item.dice)) {
     throw new DiceApiError(502, 'INVALID_DICE_RESPONSE')
   }
   const parsedDice = item.dice.map(die)
+  const parsedRouse =
+    item.rouse === undefined
+      ? null
+      : optionalRouseHistory(item.rouse)
   const outcome = string(item.outcome)
   const outcomes: readonly DiceRollOutcome[] = [
     'success',
@@ -280,6 +344,7 @@ function roll(value: unknown): DiceRollSnapshot {
     ),
     outcome: outcome as DiceRollOutcome,
     meetsDifficulty: nullableBoolean(item.meetsDifficulty),
+    ...(parsedRouse === null ? {} : { rouse: parsedRouse }),
   }
 }
 

@@ -1,0 +1,7 @@
+.dice-die-visual {
+  display: block;
+  width: 3.8rem;
+  height: 3.8rem;
+  object-fit: contain;
+  filter: drop-shadow(0 0.25rem 0.35rem rgb(0 0 0 / 22%));
+}

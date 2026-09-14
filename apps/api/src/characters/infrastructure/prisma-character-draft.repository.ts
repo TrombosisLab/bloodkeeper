@@ -1,3 +1,6 @@
+import { randomUUID } from 'node:crypto'
+
+// CHARACTER_DRAFT_UUID_HARDENING_V1
 import {
   buildCharacterBloodDyscrasiaConsumptionHistoryEntry,
   buildCharacterBloodFeedingHistoryEntry,
@@ -995,6 +998,7 @@ function toIdentityCreate(
   identity: Partial<PersistedCharacterIdentity>,
 ): Prisma.CharacterIdentityUncheckedCreateWithoutCharacterInput {
   return {
+    id: randomUUID(),
     name: identity.name ?? '',
     concept: identity.concept ?? null,
     predatorTypeKey:
@@ -1425,6 +1429,7 @@ export class PrismaCharacterDraftRepository
         const character =
           await transaction.character.create({
             data: {
+              id: randomUUID(),
               ownerId: data.ownerId,
               chronicleId: data.chronicleId,
               status: PrismaCharacterStatus.DRAFT,

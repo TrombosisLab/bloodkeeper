@@ -103,6 +103,8 @@ function richSnapshot() {
     blood: {
       bloodPotency: 1,
       hunger: 2,
+      resonance: null,
+      dyscrasia: null,
     },
     damage: {
       health: {
@@ -466,6 +468,14 @@ test(
     assert.equal(
       request.chronicleId,
       snapshot.chronicleId,
+    )
+    // CHARACTER_DRAFT_BLOOD_TRANSPORT_HARDENING_V1
+    assert.deepEqual(
+      request.blood,
+      {
+        bloodPotency: 1,
+        hunger: 2,
+      },
     )
     assert.deepEqual(
       request.damage,

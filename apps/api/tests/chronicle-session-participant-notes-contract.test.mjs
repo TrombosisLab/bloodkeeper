@@ -13,6 +13,11 @@ test('las notas de juego se persisten por sesión y autor', () => {
   assert.match(controller, /privateNotes/)
   assert.match(controller, /publicNotes/)
   assert.match(controller, /revision: \{ increment: 1 \}/)
+  assert.match(controller, /SESSION_PARTICIPANT_PRIVATE/)
+  assert.match(controller, /SESSION_PARTICIPANT_SHARED/)
+  assert.match(controller, /syncNotebookNotes/)
+  assert.match(controller, /chronicleNote\.create/)
+  assert.match(controller, /status: 'ARCHIVED'/)
 })
 
 test('solo participantes activos acceden y las notas públicas se comparten', () => {

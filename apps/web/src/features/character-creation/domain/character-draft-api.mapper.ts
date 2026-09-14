@@ -237,7 +237,10 @@ export function mapCharacterDraftToCreateRequest(
       sessionZero
         ? null
         : {
-            ...draft.blood,
+            // CHARACTER_DRAFT_BLOOD_TRANSPORT_HARDENING_V1
+            // Resonance and dyscrasia belong to the read model only.
+            bloodPotency: draft.blood.bloodPotency,
+            hunger: draft.blood.hunger,
           },
     skills: {
       ...draft.skills,
@@ -463,7 +466,10 @@ export function mapCharacterDraftApiSnapshotToEditorState(
       snapshot.blood === null
         ? structuredClone(initialCharacterDraft.blood)
         : {
-            ...snapshot.blood,
+            // CHARACTER_DRAFT_BLOOD_TRANSPORT_HARDENING_V1
+            // No propagar campos avanzados al estado editable del creador.
+            bloodPotency: snapshot.blood.bloodPotency,
+            hunger: snapshot.blood.hunger,
           },
 
     skills: {

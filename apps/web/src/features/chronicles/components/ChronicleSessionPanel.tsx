@@ -24,12 +24,8 @@ import {
 } from '../../../components/ui/ViewStateStatus'
 
 import {
-  DiceHistoryPanel,
-} from '../../dice/components/DiceHistoryPanel'
-
-import {
-  DiceRollPanel,
-} from '../../dice/components/DiceRollPanel'
+  ChronicleSessionDiceLauncher,
+} from './ChronicleSessionDiceLauncher'
 
 import {
   ChronicleSessionAttendancePanel,
@@ -1333,20 +1329,9 @@ export function ChronicleSessionPanel({
                 className="chronicle-session-panel__workspace-panel"
               >
                 <div className="chronicle-session-panel__dice-context">
-                  <DiceRollPanel
-                    mode="manual"
+                  <ChronicleSessionDiceLauncher
                     chronicleId={chronicleId}
-                    sessionId={
-                      selectedSession.id
-                    }
-                  />
-
-                  <DiceHistoryPanel
-                    chronicleId={chronicleId}
-                    sessionId={
-                      selectedSession.id
-                    }
-                    contextLabel="Historial de la sesión seleccionada"
+                    sessionId={selectedSession.id}
                   />
                 </div>
               </div>

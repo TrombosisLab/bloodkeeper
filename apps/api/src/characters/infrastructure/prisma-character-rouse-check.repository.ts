@@ -291,6 +291,32 @@ export class PrismaCharacterRouseCheckRepository
             )
           }
 
+          // BLOODKEEPER_ROUSE_SESSION_CONTEXT_V1
+          // Un control conserva el ledger independiente, pero se vincula
+          // a la sesión activa para que aparezca en su historial.
+          if (data.sessionId !== undefined) {
+            if (current.chronicleId === null) {
+              throw new CharacterRouseCheckWriteConflictError(
+                data.characterId,
+              )
+            }
+
+            const session =
+              await transaction.chronicleSession.findFirst({
+                where: {
+                  id: data.sessionId,
+                  chronicleId: current.chronicleId,
+                },
+                select: { id: true },
+              })
+
+            if (session === null) {
+              throw new CharacterRouseCheckWriteConflictError(
+                data.characterId,
+              )
+            }
+          }
+
           const claimed =
             await transaction.character
               .updateMany({
@@ -360,7 +386,7 @@ export class PrismaCharacterRouseCheckRepository
                     data.characterId,
                   chronicleId:
                     current.chronicleId,
-                  sessionId: null,
+                  sessionId: data.sessionId ?? null,
                   rerollParentId: null,
                   source:
                     PrismaDiceRollSource.ACTION,

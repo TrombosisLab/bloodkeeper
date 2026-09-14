@@ -49,6 +49,7 @@ export interface ExecuteCharacterRouseCheckCommand {
   readonly characterId: string
   readonly expectedRevision: number
   readonly operationId: string
+  readonly sessionId?: string
   readonly reason: CharacterRouseCheckReason
 
   /*
@@ -295,6 +296,7 @@ export class ExecuteCharacterRouseCheckUseCase {
       expectedRevision:
         command.expectedRevision,
       operationId: command.operationId,
+      sessionId: command.sessionId,
       actorId: actorUserId,
       reason: command.reason,
       forced: command.forced ?? false,

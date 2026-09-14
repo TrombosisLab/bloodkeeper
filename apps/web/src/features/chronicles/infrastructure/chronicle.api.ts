@@ -702,7 +702,7 @@ function parseChronicleSessionContextResourceResponse(value: unknown) {
   if (
     !isRecord(value) ||
     typeof value.id !== 'string' ||
-    !['document', 'artifact', 'organization'].includes(String(value.kind)) ||
+    !['npc', 'location', 'document', 'artifact', 'organization'].includes(String(value.kind)) ||
     typeof value.name !== 'string' ||
     !isStringOrNull(value.summary) ||
     !validContextResourceStatus(value.status) ||
@@ -712,7 +712,7 @@ function parseChronicleSessionContextResourceResponse(value: unknown) {
   }
   return {
     id: value.id,
-    kind: value.kind as 'document' | 'artifact' | 'organization',
+    kind: value.kind as 'npc' | 'location' | 'document' | 'artifact' | 'organization',
     name: value.name,
     summary: value.summary,
     status: value.status,

@@ -397,9 +397,11 @@ export function AdministrationHub() {
   ) => {
     event.preventDefault()
 
+    const formElement = event.currentTarget
+
     const form =
       new FormData(
-        event.currentTarget,
+        formElement,
       )
 
     const selected =
@@ -432,7 +434,7 @@ export function AdministrationHub() {
         roles: selected,
       })
 
-      event.currentTarget
+      formElement
         .reset()
 
       setShowCreateAccount(
