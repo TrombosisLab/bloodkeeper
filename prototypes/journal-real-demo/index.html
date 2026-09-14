@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0d090b">
+<title>BloodKeeper · Cuaderno de investigación</title>
+<style>
+:root{
+  --ink:#2b211b;--ink-soft:#5d4a3c;--paper:#d7c49b;--paper-light:#e7d7ae;
+  --wine:#8d2940;--wine-bright:#b53d52;--gold:#b38b5f;--black:#0d090b;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  margin:0;color:#e9dfda;background:
+  radial-gradient(circle at 72% 12%,rgba(105,35,51,.14),transparent 27rem),
+  linear-gradient(135deg,#080608,#121014 48%,#090708);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+button,select{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh;display:grid;grid-template-columns:210px 1fr;grid-template-rows:76px 1fr}
+.sidebar{
+  grid-row:1/3;padding:22px 16px;border-right:1px solid rgba(180,139,108,.18);
+  background:linear-gradient(180deg,#120d10,#090709 55%,#100a0d);
+  box-shadow:18px 0 45px rgba(0,0,0,.18);z-index:5
+}
+.brand{display:flex;align-items:center;gap:11px;padding:0 9px 25px;border-bottom:1px solid rgba(180,139,108,.16)}
+.brand-mark{width:28px;height:34px;display:grid;place-items:center;color:#d4a5aa;font-family:Georgia,serif;font-size:31px;transform:rotate(-4deg)}
+.brand strong{font-family:Georgia,serif;letter-spacing:.11em;font-size:15px}
+.brand small{display:block;margin-top:3px;color:#88787b;font-size:10px;letter-spacing:.18em}
+.nav{display:grid;gap:4px;margin-top:24px}
+.nav button{
+  padding:11px 12px;border:1px solid transparent;border-radius:7px;text-align:left;
+  color:#a89b9d;background:transparent
+}
+.nav button:hover{color:#eee3df;background:rgba(255,255,255,.035)}
+.nav button.active{color:#f5e8e4;border-color:rgba(163,63,82,.32);background:linear-gradient(90deg,rgba(119,31,48,.38),rgba(119,31,48,.08))}
+.sidebar-foot{position:absolute;bottom:18px;left:18px;color:#6f6264;font-size:12px}
+.topbar{
+  grid-column:2;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 28px;
+  border-bottom:1px solid rgba(180,139,108,.2);
+  background:linear-gradient(90deg,rgba(18,12,15,.98),rgba(30,14,19,.9),rgba(13,9,11,.98))
+}
+.heading small{color:#9c8385;text-transform:uppercase;letter-spacing:.18em;font-size:10px}
+.heading h1{font:600 22px Georgia,serif;margin:3px 0 0;color:#f0e5df}
+.actions{display:flex;align-items:center;gap:9px}
+.actions select,.actions button,.controls button{
+  min-height:38px;border:1px solid rgba(180,139,108,.38);border-radius:7px;background:#171114;color:#eee2dd;padding:0 13px
+}
+.actions .primary{border-color:#b34257;background:linear-gradient(135deg,#762238,#a33249);font-weight:700}
+main{grid-column:2;min-width:0;padding:18px 28px 30px;overflow:hidden}
+.section-tabs{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.section-tabs button{
+  border:1px solid rgba(180,139,108,.26);border-radius:5px 5px 0 0;background:#151013;color:#a99898;
+  padding:8px 15px;font-size:13px
+}
+.section-tabs button[aria-selected="true"]{color:#f1e6de;border-color:rgba(176,62,82,.62);background:#4b1825}
+.stage{position:relative;max-width:1140px;margin:auto;padding:22px 38px 44px;perspective:1800px}
+.desk{
+  position:absolute;inset:0;border-radius:20px;background:
+  linear-gradient(105deg,rgba(255,255,255,.018),transparent 22%),
+  repeating-linear-gradient(93deg,rgba(103,70,52,.055) 0 1px,transparent 1px 9px),
+  #121011;
+  border:1px solid rgba(180,139,108,.12);box-shadow:0 28px 65px rgba(0,0,0,.4)
+}
+.book{
+  position:relative;display:grid;grid-template-columns:1fr 1fr;aspect-ratio:1.55/1;min-height:610px;
+  filter:drop-shadow(0 28px 24px rgba(0,0,0,.48));transform:rotateX(1.2deg)
+}
+.book:before{
+  content:"";position:absolute;inset:-10px -12px -13px;border-radius:9px 13px 13px 9px;
+  background:linear-gradient(100deg,#241715,#3b2520 46%,#211412 51%,#3c2721);
+  box-shadow:inset 0 0 0 2px rgba(208,159,101,.09),inset 0 0 28px #080505;z-index:0
+}
+.book:after{
+  content:"";position:absolute;left:50%;top:-5px;bottom:-6px;width:22px;transform:translateX(-50%);
+  background:linear-gradient(90deg,rgba(0,0,0,.42),rgba(255,255,255,.08) 44%,rgba(0,0,0,.38));filter:blur(4px);z-index:8;pointer-events:none
+}
+.page{
+  position:relative;z-index:2;overflow:hidden;color:var(--ink);padding:clamp(28px,3vw,48px);
+  background:
+  radial-gradient(ellipse at 16% 14%,rgba(93,57,23,.12),transparent 23%),
+  radial-gradient(ellipse at 82% 76%,rgba(91,49,18,.1),transparent 29%),
+  repeating-linear-gradient(0deg,rgba(62,43,24,.025) 0 1px,transparent 1px 4px),
+  linear-gradient(96deg,var(--paper),var(--paper-light) 44%,#d2bc8c);
+  box-shadow:inset 0 0 30px rgba(76,45,19,.17)
+}
+.page-left{border-radius:5px 0 0 5px;box-shadow:inset -18px 0 30px rgba(64,36,17,.14),inset 0 0 27px rgba(76,45,19,.15)}
+.page-right{border-radius:0 6px 6px 0;box-shadow:inset 19px 0 28px rgba(64,36,17,.16),inset 0 0 27px rgba(76,45,19,.15)}
+.page:before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.34;
+  background:
+  linear-gradient(91deg,transparent 12%,rgba(82,55,31,.09) 12.2%,transparent 12.6%),
+  linear-gradient(177deg,transparent 71%,rgba(82,55,31,.07) 71.2%,transparent 71.7%);
+  mix-blend-mode:multiply
+}
+.page:after{
+  content:"";position:absolute;inset:8px;border:1px solid rgba(82,54,29,.08);pointer-events:none;
+  clip-path:polygon(0 1%,2% 0,9% 1%,18% 0,31% 1%,47% 0,61% 1%,73% 0,88% 1%,100% 0,99% 15%,100% 29%,99% 42%,100% 58%,99% 74%,100% 90%,99% 100%,82% 99%,70% 100%,55% 99%,40% 100%,25% 99%,10% 100%,0 99%,1% 80%,0 65%,1% 46%,0 25%)
+}
+.page-inner{position:relative;z-index:2;height:100%;display:flex;flex-direction:column}
+.kicker{font:700 11px "Courier New",monospace;letter-spacing:.16em;color:#755d49;text-transform:uppercase}
+.page h2{margin:8px 0 5px;font:700 clamp(25px,2.4vw,37px) Georgia,serif;letter-spacing:-.02em;color:#271d17}
+.page h3{margin:4px 0 12px;font:700 19px Georgia,serif}
+.rule{height:2px;margin:7px 0 18px;background:linear-gradient(90deg,#3d2c22 0 58%,transparent 58%);opacity:.58}
+.lead{font:italic 17px/1.55 Georgia,serif;color:#49392e}
+.body-copy{font:15px/1.65 Georgia,serif}
+.hand{font:italic 20px/1.35 "Segoe Print","Bradley Hand",cursive;color:#392a21;transform:rotate(-1deg)}
+.meta{display:flex;justify-content:space-between;color:#725d4b;font:12px "Courier New",monospace;text-transform:uppercase}
+.page-number{margin-top:auto;padding-top:12px;text-align:center;color:#79634f;font:12px Georgia,serif}
+.entry-list{display:grid;gap:10px;margin-top:8px}
+.entry{
+  display:grid;grid-template-columns:42px 1fr;gap:11px;padding:10px 4px;border-bottom:1px solid rgba(66,44,27,.22);
+  background:transparent;text-align:left;color:inherit
+}
+.entry .num{font:700 23px Georgia,serif;color:#7c2635}
+.entry strong{display:block;font:700 15px Georgia,serif}.entry span{font:12px/1.4 "Courier New",monospace;color:#6d5847}
+.stamp{
+  display:inline-block;align-self:flex-start;margin:8px 0;padding:5px 10px;border:2px solid rgba(117,31,42,.55);
+  color:#792b38;font:700 11px "Courier New",monospace;letter-spacing:.13em;text-transform:uppercase;transform:rotate(-2deg)
+}
+.note{
+  position:relative;width:74%;margin:17px 0 12px auto;padding:16px 18px 18px;background:#c9b47a;
+  color:#3d3023;box-shadow:3px 6px 10px rgba(60,39,23,.26),inset 0 0 18px rgba(109,71,27,.08);
+  transform:rotate(1.7deg);font:italic 17px/1.45 "Segoe Print","Bradley Hand",cursive
+}
+.note:before{content:"";position:absolute;top:-7px;left:39%;width:64px;height:17px;background:rgba(91,72,49,.2);transform:rotate(-4deg)}
+.note.draggable{touch-action:none}
+.editing .note.draggable{outline:2px dashed rgba(123,35,50,.52);cursor:grab}
+.redline{display:inline;border-bottom:2px solid rgba(139,34,50,.72)}
+.tag{display:inline-block;margin:3px;padding:4px 7px;border:1px solid rgba(75,51,33,.25);border-radius:2px;font:11px "Courier New",monospace}
+.entity-card{
+  margin:14px 0;padding:14px 15px;border:1px solid rgba(73,46,27,.28);background:rgba(255,251,226,.2);
+  box-shadow:2px 4px 7px rgba(74,48,31,.11)
+}
+.entity-card button{border:0;border-bottom:1px dashed #732837;background:transparent;color:#662331;padding:0;font:700 17px Georgia,serif}
+.clipping{
+  margin:14px 0;padding:14px 17px;columns:2;column-gap:22px;border:1px solid rgba(57,40,27,.19);
+  background:rgba(232,220,185,.54);font:12px/1.5 Georgia,serif;transform:rotate(-.6deg)
+}
+.clipping h3{column-span:all;text-transform:uppercase;font-size:17px;border-bottom:3px double #453327;padding-bottom:7px}
+.thread{display:grid;grid-template-columns:12px 1fr;gap:10px;margin:12px 0}
+.thread:before{content:"";width:2px;height:100%;margin-left:5px;background:#802a38;transform:rotate(2deg)}
+.thread p{margin:0 0 8px;font:14px/1.5 Georgia,serif}
+.tabs{
+  position:absolute;right:-74px;top:72px;z-index:1;display:grid;gap:7px
+}
+.tabs button{
+  width:78px;padding:10px 8px;border:1px solid rgba(68,45,27,.38);border-left:0;border-radius:0 5px 5px 0;
+  background:#bca66f;color:#33261d;text-align:right;font:700 11px "Courier New",monospace;box-shadow:3px 4px 8px rgba(0,0,0,.22);
+  transition:transform .18s ease
+}
+.tabs button:nth-child(2){background:#a97868}.tabs button:nth-child(3){background:#baa37c}.tabs button:nth-child(4){background:#9d8a6a}
+.tabs button:hover,.tabs button.active{transform:translateX(8px)}
+.turn-page{
+  position:absolute;top:0;right:0;width:50%;height:100%;z-index:15;transform-origin:left center;
+  transform-style:preserve-3d;transition:transform 720ms cubic-bezier(.45,.03,.18,1);display:none
+}
+.turn-page.forward.turning{transform:rotateY(-180deg)}
+.turn-page.backward{right:auto;left:0;transform-origin:right center}
+.turn-page.backward.turning{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.face.back{transform:rotateY(180deg)}
+.turn-page.forward .face.front{box-shadow:inset 18px 0 28px rgba(64,36,17,.16),-12px 8px 18px rgba(0,0,0,.24)}
+.turn-page.backward .face.front{box-shadow:inset -18px 0 28px rgba(64,36,17,.16),12px 8px 18px rgba(0,0,0,.24)}
+.controls{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;gap:12px;margin-top:18px}
+.controls button{background:rgba(24,16,20,.92)}
+.controls button:disabled{opacity:.35;cursor:not-allowed}
+.counter{min-width:88px;text-align:center;color:#a49292;font:12px "Courier New",monospace}
+.tip{text-align:center;color:#76686b;font-size:12px;margin:7px 0 0}
+.dialog{
+  position:fixed;inset:0;z-index:40;display:none;place-items:center;padding:20px;background:rgba(5,4,5,.75);backdrop-filter:blur(5px)
+}
+.dialog.open{display:grid}
+.dialog-card{width:min(480px,100%);padding:26px;border:1px solid rgba(182,128,91,.38);border-radius:9px;background:#171114;box-shadow:0 30px 90px #000}
+.dialog-card header{display:flex;justify-content:space-between;align-items:start;border-bottom:1px solid rgba(180,139,108,.22);padding-bottom:13px}
+.dialog-card h2{margin:0;font:25px Georgia,serif}.dialog-card p{color:#b9aaaa;line-height:1.6}
+.dialog-card button{border:1px solid rgba(180,139,108,.38);border-radius:6px;background:#28171c;color:#eee;padding:8px 12px}
+.toast{position:fixed;right:22px;bottom:22px;z-index:50;padding:12px 16px;border:1px solid #8b4150;border-radius:7px;background:#1d1115;box-shadow:0 12px 35px #000;opacity:0;transform:translateY(12px);transition:.22s;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+@media(max-width:980px){
+  .app{grid-template-columns:74px 1fr}.brand-copy,.nav span,.sidebar-foot{display:none}.nav button{text-align:center;font-size:0}.nav button:first-letter{font-size:18px}
+  .stage{padding-right:26px}.tabs{right:-12px}.tabs button{width:48px;font-size:0}.tabs button:first-letter{font-size:12px}
+}
+@media(max-width:760px){
+  .app{display:block}.sidebar{display:none}.topbar{padding:11px 14px}.heading h1{font-size:18px}.actions select{display:none}.actions button:not(.primary){display:none}
+  main{padding:12px 8px 24px}.section-tabs{justify-content:flex-start;overflow:auto;flex-wrap:nowrap;padding:0 6px}.section-tabs button{white-space:nowrap}
+  .stage{padding:10px 12px 28px}.book{display:block;aspect-ratio:auto;min-height:620px}.page{min-height:620px;padding:30px 28px}.page-left{display:none}.page-right{border-radius:6px}
+  .book:after{display:none}.book:before{inset:-8px}.tabs{display:none}.turn-page{width:100%}.clipping{columns:1}.note{width:86%}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.turn-page,.toast,.tabs button{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">♜</span><div class="brand-copy"><strong>BLOODKEEPER</strong><small>VAMPIRO V5</small></div></div>
+    <nav class="nav" aria-label="Navegación principal">
+      <button><span>Inicio</span>⌂</button><button><span>Personajes</span>♙</button><button><span>Crónicas</span>◫</button>
+      <button class="active"><span>Cuaderno</span>▤</button><button><span>Dados</span>◆</button>
+    </nav>
+    <div class="sidebar-foot">Trombosis · jugador</div>
+  </aside>
+
+  <header class="topbar">
+    <div class="heading"><small>Crónica activa</small><h1>Sombras de Santiago</h1></div>
+    <div class="actions">
+      <select aria-label="Crónica"><option>Sombras de Santiago</option><option>A Coruña</option></select>
+      <button id="editButton" aria-pressed="false">✎ Editar</button>
+      <button class="primary" id="newNoteButton">＋ Nueva nota</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="section-tabs" role="tablist" aria-label="Secciones">
+      <button role="tab" data-jump="0" aria-selected="true">Resumen</button>
+      <button role="tab" data-jump="1" aria-selected="false">Investigación</button>
+      <button role="tab" data-jump="2" aria-selected="false">Sesiones</button>
+      <button role="tab" data-jump="3" aria-selected="false">Archivo</button>
+    </div>
+
+    <section class="stage" aria-label="Cuaderno de investigación interactivo">
+      <div class="desk"></div>
+      <div class="book" id="book">
+        <article class="page page-left"><div class="page-inner" id="leftPage"></div></article>
+        <article class="page page-right"><div class="page-inner" id="rightPage"></div></article>
+        <div class="turn-page" id="turnPage" aria-hidden="true">
+          <div class="face front page"><div class="page-inner"></div></div>
+          <div class="face back page"><div class="page-inner"></div></div>
+        </div>
+        <div class="tabs" aria-label="Marcadores">
+          <button data-jump="0" class="active">RESUMEN</button><button data-jump="1">PISTAS</button>
+          <button data-jump="2">SESIONES</button><button data-jump="3">ARCHIVO</button>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="prevButton" aria-label="Página anterior">‹ Anterior</button>
+        <span class="counter" id="counter">1–2 / 8</span>
+        <button id="nextButton" aria-label="Página siguiente">Siguiente ›</button>
+      </div>
+      <p class="tip">Prueba las pestañas, abre el PNJ y activa «Editar» para mover la nota.</p>
+    </section>
+  </main>
+</div>
+
+<template class="spread">
+  <div data-left>
+    <div class="meta"><span>BK · 01</span><span>14 OCT 2026</span></div>
+    <span class="kicker">Diario de la crónica</span>
+    <h2>Sombras de Santiago</h2><div class="rule"></div>
+    <p class="lead">La ciudad no duerme. Sólo aprende a ocultar mejor aquello que sucede después de medianoche.</p>
+    <div class="stamp">Confidencial · Coterie</div>
+    <p class="body-copy">Cuaderno compartido de pistas, personas y lugares. Las anotaciones privadas permanecen marcadas y sólo son visibles para su autor.</p>
+    <p class="hand">«Empieza por el puerto. Todos evitan hablar del almacén 7.»</p>
+    <div class="page-number">1</div>
+  </div>
+  <div data-right>
+    <span class="kicker">Memoria reciente</span><h2>Últimas entradas</h2><div class="rule"></div>
+    <div class="entry-list">
+      <button class="entry" data-jump="1"><span class="num">01</span><span><strong>La llamada desde el Derby</strong><span>Mercedes pidió vernos antes del amanecer.</span></span></button>
+      <button class="entry" data-jump="2"><span class="num">02</span><span><strong>Sesión 12 · Puertas cerradas</strong><span>El acceso al archivo parroquial no estaba vacío.</span></span></button>
+      <button class="entry" data-jump="3"><span class="num">03</span><span><strong>Documentos recuperados</strong><span>Dos recortes y una llave sin identificar.</span></span></button>
+    </div>
+    <div class="note draggable">Volver al Derby. Preguntar por la mujer del abrigo rojo.</div>
+    <div class="page-number">2</div>
+  </div>
+</template>
+
+<template class="spread">
+  <div data-left>
+    <div class="meta"><span>CASO 04</span><span>22:45</span></div>
+    <span class="kicker">Investigación activa</span><h2>La llamada desde el Derby</h2><div class="rule"></div>
+    <p class="body-copy">Una llamada cortada sitúa a <span class="redline">Mercedes Andrade</span> cerca del Café Derby. En el mensaje se escucha una campana y, después, un golpe metálico.</p>
+    <div class="entity-card"><span class="kicker">PNJ relacionado</span><h3><button data-entity="mercedes">Mercedes Andrade</button></h3><p class="body-copy">Tremere · aliada incómoda · última vez vista: Ensanche</p></div>
+    <div class="thread"><div><p><strong>21:55</strong> — sale de la reunión.</p><p><strong>22:31</strong> — paga en efectivo.</p><p><strong>22:45</strong> — llamada interrumpida.</p></div></div>
+    <div class="page-number">3</div>
+  </div>
+  <div data-right>
+    <span class="kicker">Hipótesis</span><h2>Lo que no encaja</h2><div class="rule"></div>
+    <p class="hand">La campana no es de la Catedral. Es más pequeña, quizá del convento.</p>
+    <div class="note draggable"><strong>COMPROBAR</strong><br>¿Quién controla las cámaras de la Rúa do Vilar?</div>
+    <p class="body-copy"><strong>Pistas abiertas</strong></p>
+    <span class="tag">#derby</span><span class="tag">#mercedes</span><span class="tag">#campana</span><span class="tag">#almacén-7</span>
+    <p class="body-copy">La llave recuperada tiene restos de sal y una muesca triangular. No coincide con las cerraduras del café.</p>
+    <div class="stamp">Pendiente de verificar</div>
+    <div class="page-number">4</div>
+  </div>
+</template>
+
+<template class="spread">
+  <div data-left>
+    <div class="meta"><span>SESIÓN 12</span><span>12 OCT 2026</span></div>
+    <span class="kicker">Registro de la noche</span><h2>Puertas cerradas</h2><div class="rule"></div>
+    <p class="lead">La coterie entró en el archivo parroquial siguiendo una pista que nunca debió estar allí.</p>
+    <div class="thread"><div><p><strong>Inicio.</strong> Reunión discreta en la Alameda.</p><p><strong>Incidente.</strong> La puerta del archivo ya estaba forzada.</p><p><strong>Cierre.</strong> Huellas húmedas conducen a una salida lateral.</p></div></div>
+    <div class="page-number">5</div>
+  </div>
+  <div data-right>
+    <span class="kicker">Consecuencias</span><h2>Después del archivo</h2><div class="rule"></div>
+    <p class="body-copy">El custodio reconoce a uno de los visitantes, pero se niega a dar un nombre. Asegura que llevaba «un anillo oscuro con una torre».</p>
+    <div class="note draggable">Cruzar el símbolo con Organizaciones. No mencionarlo ante la Camarilla todavía.</div>
+    <p class="body-copy"><strong>Recursos vinculados</strong></p>
+    <div class="entity-card"><span class="kicker">Localización</span><h3>Archivo de San Martiño</h3><p class="body-copy">Acceso restringido · sótano sin inventariar</p></div>
+    <div class="page-number">6</div>
+  </div>
+</template>
+
+<template class="spread">
+  <div data-left>
+    <span class="kicker">Archivo de prensa</span><h2>Recorte sin fechar</h2><div class="rule"></div>
+    <div class="clipping"><h3>Movimiento nocturno en el puerto</h3>Varios trabajadores aseguran haber visto vehículos sin matrícula entrando por el acceso de servicio. La autoridad portuaria niega que existan operaciones fuera de horario. Dos testigos describen un emblema triangular en una de las puertas.<br><br>Las grabaciones solicitadas no estaban disponibles al cierre de esta edición.</div>
+    <div class="stamp">Origen sin confirmar</div>
+    <div class="page-number">7</div>
+  </div>
+  <div data-right>
+    <span class="kicker">Índice cruzado</span><h2>Personas y lugares</h2><div class="rule"></div>
+    <div class="entry-list">
+      <button class="entry" data-entity="mercedes"><span class="num">M</span><span><strong>Mercedes Andrade</strong><span>PNJ · 4 referencias</span></span></button>
+      <button class="entry"><span class="num">D</span><span><strong>Café Derby</strong><span>Localización · 3 referencias</span></span></button>
+      <button class="entry"><span class="num">P</span><span><strong>Puerto · almacén 7</strong><span>Localización · 2 referencias</span></span></button>
+    </div>
+    <p class="hand">Nada está aislado. Sólo faltan las líneas correctas.</p>
+    <div class="page-number">8</div>
+  </div>
+</template>
+
+<div class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+  <div class="dialog-card">
+    <header><div><small class="kicker">PNJ · Tremere</small><h2 id="dialogTitle">Mercedes Andrade</h2></div><button id="closeDialog" aria-label="Cerrar">×</button></header>
+    <p><strong>Relación:</strong> aliada incómoda. Mantiene buena posición con la Camarilla, pero ha ocultado información sobre el puerto.</p>
+    <p><strong>Referencias:</strong> 4 notas, 2 sesiones y 1 localización.</p>
+    <button>Ver ficha completa</button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  var templates=Array.from(document.querySelectorAll("template.spread"));
+  var left=document.getElementById("leftPage");
+  var right=document.getElementById("rightPage");
+  var turn=document.getElementById("turnPage");
+  var index=0,busy=false,editing=false;
+  var prev=document.getElementById("prevButton"),next=document.getElementById("nextButton");
+  var counter=document.getElementById("counter"),book=document.getElementById("book");
+  var dialog=document.getElementById("dialog"),toast=document.getElementById("toast");
+
+  function part(i,side){return templates[i].content.querySelector("[data-"+side+"]").innerHTML}
+  function render(){
+    left.innerHTML=part(index,"left");right.innerHTML=part(index,"right");
+    counter.textContent=(index*2+1)+"–"+(index*2+2)+" / "+(templates.length*2);
+    prev.disabled=index===0;next.disabled=index===templates.length-1;
+    document.querySelectorAll("[data-jump]").forEach(function(el){
+      var active=Number(el.dataset.jump)===index;
+      el.classList.toggle("active",active);
+      if(el.getAttribute("role")==="tab")el.setAttribute("aria-selected",String(active));
+    });
+  }
+  function move(to){
+    if(busy||to===index||to<0||to>=templates.length)return;
+    busy=true;
+    var forward=to>index;
+    turn.className="turn-page "+(forward?"forward":"backward");
+    turn.querySelector(".front .page-inner").innerHTML=forward?part(index,"right"):part(index,"left");
+    turn.querySelector(".back .page-inner").innerHTML=forward?part(to,"left"):part(to,"right");
+    turn.style.display="block";
+    requestAnimationFrame(function(){requestAnimationFrame(function(){turn.classList.add("turning")})});
+    window.setTimeout(function(){index=to;render();turn.style.display="none";turn.className="turn-page";busy=false},740);
+  }
+  prev.addEventListener("click",function(){move(index-1)});
+  next.addEventListener("click",function(){move(index+1)});
+  document.addEventListener("click",function(event){
+    var target=event.target.closest("[data-jump]");
+    if(target)move(Number(target.dataset.jump));
+    if(event.target.closest("[data-entity='mercedes']"))dialog.classList.add("open");
+  });
+  document.getElementById("closeDialog").addEventListener("click",function(){dialog.classList.remove("open")});
+  dialog.addEventListener("click",function(e){if(e.target===dialog)dialog.classList.remove("open")});
+  document.addEventListener("keydown",function(e){
+    if(e.key==="Escape")dialog.classList.remove("open");
+    if(e.key==="ArrowRight")move(index+1);
+    if(e.key==="ArrowLeft")move(index-1);
+  });
+
+  document.getElementById("editButton").addEventListener("click",function(e){
+    editing=!editing;book.classList.toggle("editing",editing);e.currentTarget.setAttribute("aria-pressed",String(editing));
+    e.currentTarget.textContent=editing?"✓ Terminar":"✎ Editar";
+    show(editing?"Modo edición activo: arrastra la nota":"Posición guardada");
+  });
+  document.getElementById("newNoteButton").addEventListener("click",function(){
+    var note=document.createElement("div");note.className="note draggable";note.contentEditable="true";
+    note.innerHTML="<strong>NUEVA NOTA</strong><br>Escribe aquí…";right.insertBefore(note,right.querySelector(".page-number"));
+    note.focus();show("Nota añadida a esta página");
+  });
+  function show(message){toast.textContent=message;toast.classList.add("show");setTimeout(function(){toast.classList.remove("show")},1900)}
+
+  var drag=null;
+  book.addEventListener("pointerdown",function(e){
+    var note=e.target.closest(".draggable");if(!editing||!note)return;
+    drag={node:note,x:e.clientX,y:e.clientY,dx:0,dy:0};note.setPointerCapture(e.pointerId);e.preventDefault();
+  });
+  book.addEventListener("pointermove",function(e){
+    if(!drag)return;drag.dx=e.clientX-drag.x;drag.dy=e.clientY-drag.y;
+    drag.node.style.transform="translate("+drag.dx+"px,"+drag.dy+"px) rotate(1.7deg)";
+  });
+  book.addEventListener("pointerup",function(){if(drag){show("Nueva posición lista para guardarse");drag=null}});
+  render();
+})();
+</script>
+</body>
+</html>
