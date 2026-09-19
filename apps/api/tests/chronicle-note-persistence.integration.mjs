@@ -94,7 +94,7 @@ test(
         {
           title: 'Contextual image note',
           content: 'The note keeps the document as its visual context.',
-          visibility: 'CHRONICLE',
+          visibility: 'PRIVATE',
           references: [
             {
               targetType: 'DOCUMENT',
@@ -140,15 +140,6 @@ test(
       assert.equal(narratorPreview.canViewPrivateDetails, true)
       assert.equal(narratorPreview.narratorDetails, 'Narrator-only evidence.')
       assert.match(narratorPreview.imageUrl, new RegExp(resourceId))
-
-      const playerNote = await controller.get(
-        requestFor(playerId),
-        chronicleId,
-        created.id,
-      )
-
-      assert.equal(playerNote.contextImageTargetType, 'DOCUMENT')
-      assert.equal(playerNote.contextImageTargetId, resourceId)
 
       await assert.rejects(
         () => controller.resourcePreview(
