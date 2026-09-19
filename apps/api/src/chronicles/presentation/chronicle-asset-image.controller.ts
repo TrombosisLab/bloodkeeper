@@ -1,3 +1,4 @@
+// CHRONICLE_SPACE_DETAIL_IMAGE_PERMISSIONS_V1
 import { BadRequestException, Controller, Delete, ForbiddenException, Get, Inject, NotFoundException, Param, PayloadTooLargeException, Put, Req, StreamableFile, UnauthorizedException } from '@nestjs/common'
 import { createHash } from 'node:crypto'
 import { DatabaseService } from '../../database/database.service'
@@ -7,7 +8,7 @@ import { parseChronicleIdParam, parseChronicleNarratorId } from './chronicle.dto
 
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024
 type AssetType = 'NPC' | 'LOCATION' | 'RESOURCE' | 'SESSION'
-type ImageRequest = AsyncIterable<Buffer> & { user?: { id?: unknown }; headers: { readonly ['content-type']?: string } }
+type ImageRequest = AsyncIterable<Buffer> & { user?: { id?: unknown; roles?: readonly unknown[] }; headers: { readonly ['content-type']?: string } }
 
 function assetType(value: unknown): AssetType { if (value === 'NPC' || value === 'LOCATION' || value === 'RESOURCE' || value === 'SESSION') return value; throw new BadRequestException({ code: 'INVALID_CHRONICLE_ASSET_TYPE' }) }
 function uuid(value: unknown): string { if (typeof value !== 'string' || !/^[0-9a-f-]{36}$/i.test(value)) throw new BadRequestException({ code: 'INVALID_CHRONICLE_ASSET_ID' }); return value }
@@ -18,7 +19,11 @@ async function body(request: ImageRequest): Promise<Buffer> { const chunks: Buff
 export class ChronicleAssetImageController {
   constructor(private readonly db: DatabaseService, @Inject(CHRONICLE_PARTICIPANT_REPOSITORY) private readonly participants: ChronicleParticipantRepository) {}
   private user(request: ImageRequest): string { try { return parseChronicleNarratorId(request.user?.id) } catch { throw new UnauthorizedException({ code: 'AUTHENTICATION_REQUIRED' }) } }
-  private async access(request: ImageRequest, input: unknown) { const chronicleId = parseChronicleIdParam(input); const membership = await this.participants.findActiveMembership(chronicleId, this.user(request)); if (!membership) throw new ForbiddenException({ code: 'CHRONICLE_ASSET_IMAGE_PERMISSION_DENIED' }); return { chronicleId, narrator: membership.role === 'narrator' } }
+  private async access(request: ImageRequest, input: unknown) { const chronicleId = parseChronicleIdParam(input); const roles = Array.isArray(request.user?.roles) ? request.user.roles : []
+    const administrator = roles.includes('admin')
+    const membership = await this.participants.findActiveMembership(chronicleId, this.user(request))
+    if (!membership && !administrator) throw new ForbiddenException({ code: 'CHRONICLE_ASSET_IMAGE_PERMISSION_DENIED' })
+    return { chronicleId, narrator: administrator || membership?.role === 'narrator' } }
   private async target(chronicleId: string, narrator: boolean, type: AssetType, entityId: string) {
     const where = { id: entityId, chronicleId }
     const row = type === 'NPC'

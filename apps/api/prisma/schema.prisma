@@ -232,6 +232,7 @@ model User {
   @@index([status])
   @@map("users")
   libraryResources LibraryResource[] @relation("LibraryResourceOwner")
+  chronicleSpaceBoardPersonalStates ChronicleSpaceBoardPersonalState[] @relation("ChronicleSpaceBoardPersonalStateUser")
 }
 
 model AuthSession {
@@ -281,12 +282,14 @@ model Chronicle {
   sessionParticipantNotes ChronicleSessionParticipantNote[] @relation("ChronicleSessionParticipantNoteChronicle")
   coverImage ChronicleCoverImage?
   notebookNotes ChronicleNote[] @relation("ChronicleNoteChronicle")
+  spaceBoard ChronicleSpaceBoard? @relation("ChronicleSpaceBoardChronicle")
 
   @@index([narratorId])
   @@index([status])
   @@map("chronicles")
   resources ChronicleResource[]
   libraryResourceBindings ChronicleResourceBinding[]
+  spaceBoardPersonalStates ChronicleSpaceBoardPersonalState[] @relation("ChronicleSpaceBoardPersonalStateChronicle")
 }
 
 model ChronicleCoverImage {
@@ -387,6 +390,7 @@ model ChronicleLocation {
   chronicle Chronicle @relation("ChronicleLocationChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   resourceLinks ChronicleResource[] @relation("ChronicleResourceLocation")
   contextLinks ChronicleSessionLocation[] @relation("ChronicleSessionLocationLocation")
+  contextNotes ChronicleNote[] @relation("ChronicleNoteContextLocation")
   storyLinks   ChronicleStoryLocation[] @relation("ChronicleStoryLocationLocation")
   eventLinks ChronicleEventLocation[] @relation("ChronicleEventLocationLocation")
 
@@ -505,6 +509,9 @@ model ChronicleNote {
   id           String                @id @default(uuid()) @db.Uuid
   chronicleId  String                @db.Uuid
   sessionId    String?               @db.Uuid
+  contextLocationId String?
+  contextImageTargetType String?
+  contextImageTargetId String? @db.Uuid
   authorUserId String                @db.Uuid
   title        String
   content      String
@@ -518,6 +525,7 @@ model ChronicleNote {
 
   chronicle Chronicle @relation("ChronicleNoteChronicle", fields: [chronicleId], references: [id], onDelete: Cascade)
   session   ChronicleSession? @relation("ChronicleNoteSession", fields: [sessionId], references: [id], onDelete: SetNull)
+  contextLocation ChronicleLocation? @relation("ChronicleNoteContextLocation", fields: [contextLocationId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   author    User @relation("ChronicleNoteAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
   references ChronicleNoteReference[] @relation("ChronicleNoteReferenceNote")
   audiences ChronicleNoteAudience[] @relation("ChronicleNoteAudienceNote")
@@ -1562,4 +1570,34 @@ model ChronicleResourceBinding {
   @@index([chronicleId, status])
   @@index([resourceId, status])
   @@map("chronicle_resource_bindings")
+}
+
+
+model ChronicleSpaceBoard {
+  chronicleId String   @id @db.Uuid
+  state      Json
+  revision   Int       @default(1)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime  @updatedAt @db.Timestamptz(3)
+
+  chronicle Chronicle @relation("ChronicleSpaceBoardChronicle", fields: [chronicleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("chronicle_space_boards")
+}
+
+
+model ChronicleSpaceBoardPersonalState {
+  chronicleId String   @db.Uuid
+  userId      String   @db.Uuid
+  state       Json
+  revision    Int      @default(1)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  chronicle Chronicle @relation("ChronicleSpaceBoardPersonalStateChronicle", fields: [chronicleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user      User      @relation("ChronicleSpaceBoardPersonalStateUser", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([chronicleId, userId])
+  @@index([userId])
+  @@map("chronicle_space_board_personal_states")
 }

@@ -15,7 +15,7 @@ import {
 import { DatabaseService } from '../../database/database.service'
 
 type RequestWithUser = { user?: { id?: unknown; roles?: unknown } }
-type NoteInput = { title?: unknown; content?: unknown; visibility?: unknown; sessionId?: unknown; pinned?: unknown; references?: unknown; audienceUserIds?: unknown; tags?: unknown }
+type NoteInput = { title?: unknown; content?: unknown; visibility?: unknown; sessionId?: unknown; pinned?: unknown; references?: unknown; audienceUserIds?: unknown; tags?: unknown; contextLocationId?: unknown; contextImageTargetType?: unknown; contextImageTargetId?: unknown }
 const targetTypes = new Set(['CHARACTER', 'NPC', 'LOCATION', 'EVENT', 'STORY', 'SESSION', 'RESOURCE', 'ORGANIZATION', 'ARTIFACT', 'DOCUMENT'])
 
 function actor(request: RequestWithUser): string {
@@ -49,6 +49,18 @@ function references(value: unknown): Array<{ targetType: string; targetId: strin
     return { targetType, targetId, label: text(row.label, 'references.label') ?? undefined }
   })
 }
+function contentReferences(value: string): Array<{ targetType: string; targetId: string }> {
+  const result: Array<{ targetType: string; targetId: string }> = []
+  const pattern = /@\[[^\]]+\]\(([A-Z_]+):([^\)]+)\)/g
+  let match: RegExpExecArray | null
+  while ((match = pattern.exec(value)) !== null) {
+    const targetType = match[1]!.toUpperCase()
+    const targetId = match[2]!
+    if (targetTypes.has(targetType) && targetId) result.push({ targetType, targetId })
+  }
+  return result
+}
+
 function noteTags(value: unknown): string[] {
   if (value === undefined || value === null) return []
   if (!Array.isArray(value) || value.length > 12) throw new BadRequestException({ code: 'INVALID_NOTE_TAGS' })
@@ -60,6 +72,32 @@ function noteTags(value: unknown): string[] {
   })
   return [...new Set(normalized)]
 }
+function contextLocationId(value: unknown): string | null {
+  if (value === undefined || value === null || value === '') return null
+  if (typeof value !== 'string' || !/^[0-9a-f-]{36}$/i.test(value)) throw new BadRequestException({ code: 'INVALID_NOTE_CONTEXT_LOCATION' })
+  return value
+}
+
+function contextImageTargetType(value: unknown): string | null {
+  if (value === undefined || value === null || value === '') return null
+  if (typeof value !== 'string' || !/^(NPC|LOCATION|RESOURCE|ORGANIZATION|ARTIFACT|DOCUMENT|SESSION)$/i.test(value)) throw new BadRequestException({ code: 'INVALID_NOTE_CONTEXT_IMAGE_TARGET_TYPE' })
+  return value.toUpperCase()
+}
+
+function contextImageTargetId(value: unknown): string | null {
+  if (value === undefined || value === null || value === '') return null
+  if (typeof value !== 'string' || !/^[0-9a-f-]{36}$/i.test(value)) throw new BadRequestException({ code: 'INVALID_NOTE_CONTEXT_IMAGE_TARGET_ID' })
+  return value
+}
+
+function contextLocationReferences(value: string): Array<{ targetType: string; targetId: string }> {
+  const result: Array<{ targetType: string; targetId: string }> = []
+  const pattern = /@\[[^\]]+\]\(LOCATION:([^\)]+)\)/g
+  let match: RegExpExecArray | null
+  while ((match = pattern.exec(value)) !== null) result.push({ targetType: 'LOCATION', targetId: match[1]! })
+  return result
+}
+
 function audience(value: unknown): string[] {
   if (value === undefined || value === null) return []
   if (!Array.isArray(value) || value.some((item) => typeof item !== 'string') || value.length > 50) throw new BadRequestException({ code: 'INVALID_NOTE_AUDIENCE' })
@@ -95,7 +133,7 @@ export class ChronicleNotebookController {
   async context(@Req() request: RequestWithUser, @Param('chronicleId') chronicleId: string) {
     const userId = actor(request)
     const { db, narrator } = await this.access(chronicleId, userId)
-    const [npcs, locations, resources, participants] = await Promise.all([
+    const [npcs, locations, resources, participants, characters] = await Promise.all([
       db.chronicleNpc.findMany({
         where: { chronicleId, status: 'ACTIVE' },
         orderBy: { name: 'asc' },
@@ -115,6 +153,11 @@ export class ChronicleNotebookController {
         where: { chronicleId, status: 'ACTIVE', role: 'PLAYER' },
         select: { user: { select: { id: true, displayName: true, username: true } } },
       }),
+      db.character.findMany({
+        where: { chronicleId, status: 'ACTIVE' },
+        orderBy: { updatedAt: 'desc' },
+        select: { id: true, ownerId: true, status: true, identity: { select: { name: true, concept: true } } },
+      }),
     ])
     const sharedResources = resources.map((resource: any) => ({
       id: resource.id,
@@ -124,11 +167,20 @@ export class ChronicleNotebookController {
       visibility: resource.bindings[0]?.visibility === 'chronicle_participants' ? 'chronicle_participants' : 'narrator_only',
       locationId: resource.metadata && typeof resource.metadata === 'object' && typeof resource.metadata.locationId === 'string' ? resource.metadata.locationId : null,
     }))
-    return { npcs, locations: locations.map((location: any) => ({ ...location, imageUrl: '/api/chronicles/' + chronicleId + '/assets/LOCATION/' + location.id + '/image' })), resources: sharedResources, players: participants.map((item: any) => item.user), viewerUserId: userId }
+    const locationImageIds = new Set((await db.chronicleAssetImage.findMany({ where: { assetType: 'LOCATION', entityId: { in: locations.map((location: any) => location.id) } }, select: { entityId: true } })).map((row: any) => String(row.entityId)))
+    const contextImageRows = await db.chronicleAssetImage.findMany({ where: { assetType: { in: ['NPC', 'LOCATION', 'RESOURCE'] }, entityId: { in: [...npcs, ...locations, ...resources].map((item: any) => item.id) } }, select: { assetType: true, entityId: true } })
+    const contextImageSet = new Set(contextImageRows.map((row: any) => row.assetType + ':' + String(row.entityId)))
+    const contextImageCandidates = [
+      ...npcs.filter((item: any) => contextImageSet.has('NPC:' + String(item.id))).map((item: any) => ({ targetType: 'NPC', targetId: item.id, name: item.name, imageUrl: '/api/chronicles/' + chronicleId + '/assets/NPC/' + item.id + '/image' })),
+      ...locations.filter((item: any) => contextImageSet.has('LOCATION:' + String(item.id))).map((item: any) => ({ targetType: 'LOCATION', targetId: item.id, name: item.name, imageUrl: '/api/chronicles/' + chronicleId + '/assets/LOCATION/' + item.id + '/image' })),
+      ...resources.filter((item: any) => contextImageSet.has('RESOURCE:' + String(item.id))).map((item: any) => ({ targetType: String(item.kind ?? 'RESOURCE').toUpperCase(), targetId: item.id, name: item.name ?? item.title ?? item.label ?? 'Recurso', imageUrl: '/api/chronicles/' + chronicleId + '/assets/RESOURCE/' + item.id + '/image' }))
+    ]
+    return { npcs, locations: locations.map((location: any) => ({ ...location, imageUrl: '/api/chronicles/' + chronicleId + '/assets/LOCATION/' + location.id + '/image', hasImage: locationImageIds.has(String(location.id)) })), characters: characters.map((item: any) => ({ id: String(item.id), ownerId: String(item.ownerId), status: String(item.status).toLowerCase(), name: String(item.identity?.name || 'Personaje sin nombre'), concept: item.identity?.concept ?? null })).sort((left: any, right: any) => left.name.localeCompare(right.name, 'es')), resources: sharedResources, players: participants.map((item: any) => item.user), imageCandidates: contextImageCandidates, viewerUserId: userId }
   }
 
 
   // RESOURCE_PREVIEW_DEEP_REFERENCE_V1
+  // CHRONICLE_NOTE_MENTIONS_PLAYER_CHARACTERS_V1
   @Get('resource/:targetType/:targetId')
   async resourcePreview(@Req() request: RequestWithUser, @Param('chronicleId') chronicleId: string, @Param('targetType') rawTargetType: string, @Param('targetId') targetId: string) {
     const userId = actor(request)
@@ -143,11 +195,12 @@ export class ChronicleNotebookController {
     const row = modelName
       ? await model.findFirst({ where: { id: targetId, chronicleId } })
       : await model.findFirst({ where: { id: targetId, status: 'active', ...(resourceKind ? { kind: resourceKind } : {}), bindings: { some: { chronicleId, status: 'attached', ...(narrator ? {} : { visibility: 'chronicle_participants' }) } } } })
+    const characterIdentity = targetType === 'CHARACTER' ? await db.characterIdentity.findUnique({ where: { characterId: targetId }, select: { name: true, concept: true } }) : null
     if (!row) throw new NotFoundException({ code: 'NOTE_REFERENCE_NOT_FOUND' })
     const imageType = targetType === 'NPC' || targetType === 'LOCATION' ? targetType : 'RESOURCE'
     const image = await db.chronicleAssetImage.findUnique({ where: { assetType_entityId: { assetType: imageType, entityId: targetId } }, select: { updatedAt: true } })
-    const label = row.name ?? row.title ?? row.alias ?? row.label ?? 'Recurso'
-    const description = row.description ?? row.summary ?? row.premise ?? row.objective ?? null
+    const label = characterIdentity?.name ?? row.name ?? row.title ?? row.alias ?? row.label ?? 'Recurso'
+    const description = characterIdentity?.concept ?? row.description ?? row.summary ?? row.premise ?? row.objective ?? null
     const category = row.category ?? row.type ?? row.kind ?? targetType
     return {
       id: String(row.id),
@@ -203,10 +256,15 @@ export class ChronicleNotebookController {
     const sessionId = text(body?.sessionId, 'sessionId')
     if (sessionId && !(await db.chronicleSession.findFirst({ where: { id: sessionId, chronicleId }, select: { id: true } }))) throw new BadRequestException({ code: 'NOTE_SESSION_OUTSIDE_CHRONICLE' })
     const refs = references(body?.references)
+    const selectedContextLocationId = contextLocationId(body?.contextLocationId)
+    const selectedContextImageTargetType = contextImageTargetType(body?.contextImageTargetType) || (selectedContextLocationId ? 'LOCATION' : null)
+    const selectedContextImageTargetId = contextImageTargetId(body?.contextImageTargetId) || selectedContextLocationId
+    await this.validateContextImageTarget(db, selectedContextImageTargetType, selectedContextImageTargetId, [...refs, ...contentReferences(content)])
     const audienceIds = audience(body?.audienceUserIds)
     if (noteVisibility === 'SELECTED_PLAYERS' && !audienceIds.length) throw new BadRequestException({ code: 'NOTE_AUDIENCE_REQUIRED', message: 'Selecciona al menos un jugador.' })
-    await this.validateRelations(db, chronicleId, refs, audienceIds, narrator)
-    const row = await db.chronicleNote.create({ data: { chronicleId, sessionId, authorUserId: userId, title, content, visibility: noteVisibility, pinned: body?.pinned === true, favorites: { create: body?.pinned === true ? [{ userId }] : [] }, tags: noteTags(body?.tags), references: { create: refs }, audiences: { create: noteVisibility === 'SELECTED_PLAYERS' ? audienceIds.map((id) => ({ userId: id })) : [] } }, include: { favorites: { where: { userId }, select: { userId: true } }, references: true, audiences: { select: { userId: true } }, author: { select: { id: true, displayName: true, username: true } }, session: { select: { id: true, title: true, sessionNumber: true } } } })
+    await this.validateRelations(db, chronicleId, [...refs, ...contentReferences(content)], audienceIds, narrator && noteVisibility === 'PRIVATE')
+    await this.validateContextLocation(db, chronicleId, selectedContextLocationId, [...refs, ...contextLocationReferences(content)])
+    const row = await db.chronicleNote.create({ data: { chronicleId, sessionId, authorUserId: userId, contextLocationId: selectedContextLocationId, contextImageTargetType: selectedContextImageTargetType, contextImageTargetId: selectedContextImageTargetId, title, content, visibility: noteVisibility, pinned: body?.pinned === true, favorites: { create: body?.pinned === true ? [{ userId }] : [] }, tags: noteTags(body?.tags), references: { create: refs }, audiences: { create: noteVisibility === 'SELECTED_PLAYERS' ? audienceIds.map((id) => ({ userId: id })) : [] } }, include: { favorites: { where: { userId }, select: { userId: true } }, references: true, audiences: { select: { userId: true } }, author: { select: { id: true, displayName: true, username: true } }, session: { select: { id: true, title: true, sessionNumber: true } } } })
     return this.present(row, narrator, userId)
   }
 
@@ -214,24 +272,34 @@ export class ChronicleNotebookController {
   async update(@Req() request: RequestWithUser, @Param('chronicleId') chronicleId: string, @Param('noteId') noteId: string, @Body() body: NoteInput) {
     const userId = actor(request)
     const { db, narrator } = await this.access(chronicleId, userId)
-    const existing = await db.chronicleNote.findFirst({ where: { id: noteId, ...this.whereVisible(userId, narrator, chronicleId) } })
+    const existing = await db.chronicleNote.findFirst({ where: { id: noteId, ...this.whereVisible(userId, narrator, chronicleId) }, include: { references: true } })
     if (!existing) throw new NotFoundException({ code: 'CHRONICLE_NOTE_NOT_FOUND' })
     if (!narrator && existing.authorUserId !== userId) throw new ForbiddenException({ code: 'CHRONICLE_NOTE_EDIT_DENIED' })
     const noteVisibility = body?.visibility === undefined ? existing.visibility : visibility(body.visibility)
+    const contextContent = body?.content === undefined ? existing.content : text(body.content, 'content', true)!
+    const selectedContextLocationId = body?.contextLocationId === undefined ? ((existing as any).contextLocationId ?? null) : contextLocationId(body.contextLocationId)
     const sessionId = body?.sessionId === undefined ? existing.sessionId : text(body.sessionId, 'sessionId')
     if (sessionId && !(await db.chronicleSession.findFirst({ where: { id: sessionId, chronicleId }, select: { id: true } }))) throw new BadRequestException({ code: 'NOTE_SESSION_OUTSIDE_CHRONICLE' })
+    const content = body?.content === undefined ? existing.content : text(body.content, 'content', true)!
+    const embeddedRefs = contentReferences(content)
+    const existingRefs = Array.isArray((existing as any).references) ? (existing as any).references : []
     const refs = body?.references === undefined ? null : references(body.references)
+    const selectedContextImageTargetType = contextImageTargetType(body?.contextImageTargetType) || (selectedContextLocationId ? 'LOCATION' : null)
+    const selectedContextImageTargetId = contextImageTargetId(body?.contextImageTargetId) || selectedContextLocationId
+    const contextImageReferences = [...(refs ?? existingRefs), ...embeddedRefs]
+    await this.validateContextImageTarget(db, selectedContextImageTargetType, selectedContextImageTargetId, contextImageReferences)
     const audienceIds = noteVisibility !== 'SELECTED_PLAYERS' ? [] : body?.audienceUserIds === undefined ? null : audience(body.audienceUserIds)
     if (noteVisibility === 'SELECTED_PLAYERS' && (body?.visibility !== undefined || audienceIds !== null)) {
       const effectiveAudience = audienceIds ?? (await db.chronicleNoteAudience.findMany({ where: { noteId }, select: { userId: true } })).map((item: any) => item.userId)
       if (!effectiveAudience.length) throw new BadRequestException({ code: 'NOTE_AUDIENCE_REQUIRED', message: 'Selecciona al menos un jugador.' })
       await this.validateRelations(db, chronicleId, [], effectiveAudience, narrator)
     }
-    if (refs || audienceIds) await this.validateRelations(db, chronicleId, refs ?? [], audienceIds ?? [], narrator)
+    if (refs || audienceIds || body?.content !== undefined || body?.visibility !== undefined) await this.validateRelations(db, chronicleId, [...(refs ?? existingRefs), ...embeddedRefs], audienceIds ?? [], narrator && noteVisibility === 'PRIVATE')
+    if (selectedContextLocationId && (body?.contextLocationId !== undefined || body?.content !== undefined || body?.references !== undefined)) await this.validateContextLocation(db, chronicleId, selectedContextLocationId, [...(refs ?? []), ...contextLocationReferences(contextContent), ...(((existing as any).references ?? []))])
     const row = await db.$transaction(async (tx: any) => {
       if (refs) await tx.chronicleNoteReference.deleteMany({ where: { noteId } })
       if (audienceIds) await tx.chronicleNoteAudience.deleteMany({ where: { noteId } })
-      return tx.chronicleNote.update({ where: { id: noteId }, data: { ...(body?.title !== undefined ? { title: text(body.title, 'title', true) } : {}), ...(body?.content !== undefined ? { content: text(body.content, 'content', true) } : {}), visibility: noteVisibility, sessionId, ...(body?.pinned !== undefined ? { pinned: body.pinned === true } : {}), ...(body?.tags !== undefined ? { tags: noteTags(body.tags) } : {}), revision: { increment: 1 }, ...(refs ? { references: { create: refs } } : {}), ...(audienceIds && noteVisibility === 'SELECTED_PLAYERS' ? { audiences: { create: audienceIds.map((id) => ({ userId: id })) } } : {}) }, include: { favorites: { where: { userId }, select: { userId: true } }, references: true, audiences: { select: { userId: true } }, author: { select: { id: true, displayName: true, username: true } }, session: { select: { id: true, title: true, sessionNumber: true } } } })
+      return tx.chronicleNote.update({ where: { id: noteId }, data: { ...(body?.title !== undefined ? { title: text(body.title, 'title', true) } : {}), ...(body?.content !== undefined ? { content: text(body.content, 'content', true) } : {}), visibility: noteVisibility, sessionId, contextLocationId: selectedContextLocationId, contextImageTargetType: selectedContextImageTargetType, contextImageTargetId: selectedContextImageTargetId, ...(body?.pinned !== undefined ? { pinned: body.pinned === true } : {}), ...(body?.tags !== undefined ? { tags: noteTags(body.tags) } : {}), revision: { increment: 1 }, ...(refs ? { references: { create: refs } } : {}), ...(audienceIds && noteVisibility === 'SELECTED_PLAYERS' ? { audiences: { create: audienceIds.map((id) => ({ userId: id })) } } : {}) }, include: { favorites: { where: { userId }, select: { userId: true } }, references: true, audiences: { select: { userId: true } }, author: { select: { id: true, displayName: true, username: true } }, session: { select: { id: true, title: true, sessionNumber: true } } } })
     })
     return this.present(row, narrator, userId)
   }
@@ -247,12 +315,27 @@ export class ChronicleNotebookController {
     return { archived: true, id: noteId }
   }
 
-  private async validateRelations(db: any, chronicleId: string, refs: Array<{ targetType: string; targetId: string }>, audienceIds: string[], narrator: boolean) {
+  private async validateContextImageTarget(db: any, targetType: string | null, targetId: string | null, refs: Array<{ targetType: string; targetId: string }>) {
+    if (!targetType || !targetId) return
+    if (!refs.some((reference) => reference.targetType === targetType && reference.targetId === targetId)) throw new BadRequestException({ code: 'NOTE_CONTEXT_IMAGE_NOT_MENTIONED' })
+    const assetType = targetType === 'NPC' || targetType === 'LOCATION' || targetType === 'SESSION' ? targetType : 'RESOURCE'
+    const image = await db.chronicleAssetImage.findUnique({ where: { assetType_entityId: { assetType, entityId: targetId } }, select: { entityId: true } })
+    if (!image) throw new BadRequestException({ code: 'NOTE_CONTEXT_IMAGE_NOT_AVAILABLE' })
+  }
+
+  private async validateContextLocation(db: any, chronicleId: string, contextLocationId: string | null, refs: Array<{ targetType: string; targetId: string }>) {
+    if (!contextLocationId) return
+    if (!refs.some((reference) => reference.targetType === 'LOCATION' && reference.targetId === contextLocationId)) throw new BadRequestException({ code: 'NOTE_CONTEXT_LOCATION_NOT_MENTIONED' })
+    const location = await db.chronicleLocation.findFirst({ where: { id: contextLocationId, chronicleId, status: 'ACTIVE' }, select: { id: true } })
+    if (!location) throw new BadRequestException({ code: 'NOTE_CONTEXT_LOCATION_OUTSIDE_CHRONICLE' })
+  }
+
+  private async validateRelations(db: any, chronicleId: string, refs: Array<{ targetType: string; targetId: string }>, audienceIds: string[], allowNarratorOnlyResources: boolean) {
     const directModels: Record<string, string> = { CHARACTER: 'character', NPC: 'chronicleNpc', LOCATION: 'chronicleLocation', EVENT: 'chronicleEvent', STORY: 'chronicleStory', SESSION: 'chronicleSession' }
     for (const reference of refs) {
       if (reference.targetType === 'RESOURCE' || reference.targetType === 'ORGANIZATION' || reference.targetType === 'ARTIFACT' || reference.targetType === 'DOCUMENT') {
         const resourceKind = reference.targetType === 'ORGANIZATION' ? 'organization' : reference.targetType === 'ARTIFACT' ? 'artifact' : reference.targetType === 'DOCUMENT' ? 'document' : null
-        const resource = await db.libraryResource.findFirst({ where: { id: reference.targetId, status: 'active', ...(resourceKind ? { kind: resourceKind } : {}), bindings: { some: { chronicleId, status: 'attached', ...(narrator ? {} : { visibility: 'chronicle_participants' }) } } }, select: { id: true } })
+        const resource = await db.libraryResource.findFirst({ where: { id: reference.targetId, status: 'active', ...(resourceKind ? { kind: resourceKind } : {}), bindings: { some: { chronicleId, status: 'attached', ...(allowNarratorOnlyResources ? {} : { visibility: 'chronicle_participants' }) } } }, select: { id: true } })
         if (!resource) throw new BadRequestException({ code: 'NOTE_REFERENCE_OUTSIDE_CHRONICLE', targetId: reference.targetId })
         continue
       }
@@ -268,6 +351,6 @@ export class ChronicleNotebookController {
   }
 
   private present(note: any, narrator: boolean, userId: string) {
-    return { id: note.id, chronicleId: note.chronicleId, sessionId: note.sessionId, title: note.title, content: note.content, visibility: note.visibility, status: note.status, pinned: (note.favorites ?? []).some((favorite: any) => favorite.userId === userId), tags: note.tags ?? [], canEdit: narrator || note.authorUserId === userId, revision: note.revision, createdAt: note.createdAt, updatedAt: note.updatedAt, author: note.author, session: note.session, references: note.references.map((ref: any) => ({ id: ref.id, targetType: ref.targetType, targetId: ref.targetId, label: ref.label })), audienceUserIds: narrator || note.authorUserId === userId ? note.audiences.map((row: any) => row.userId) : [] }
+    return { id: note.id, chronicleId: note.chronicleId, sessionId: note.sessionId, contextLocationId: note.contextLocationId ?? null, title: note.title, content: note.content, visibility: note.visibility, status: note.status, pinned: (note.favorites ?? []).some((favorite: any) => favorite.userId === userId), tags: note.tags ?? [], canEdit: narrator || note.authorUserId === userId, revision: note.revision, createdAt: note.createdAt, updatedAt: note.updatedAt, author: note.author, session: note.session, references: note.references.map((ref: any) => ({ id: ref.id, targetType: ref.targetType, targetId: ref.targetId, label: ref.label })), audienceUserIds: narrator || note.authorUserId === userId ? note.audiences.map((row: any) => row.userId) : [] }
   }
 }

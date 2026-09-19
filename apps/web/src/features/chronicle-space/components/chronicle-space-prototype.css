@@ -1,0 +1,516 @@
+.chronicle-space { --ink:#271f22; --muted:#9b898f; --red:#c94d67; --gold:#d2a367; min-height:100vh; padding:32px clamp(18px,4vw,62px) 68px; color:#f8ede9; background:radial-gradient(circle at 78% 0%,rgba(111,31,52,.36),transparent 35%),linear-gradient(135deg,#0d0b0e,#1b1116 52%,#100d10); font-family:Inter,ui-sans-serif,system-ui,sans-serif }.chronicle-space *,.chronicle-space *:before,.chronicle-space *:after{box-sizing:border-box}.chronicle-space button,.chronicle-space select{font:inherit}.chronicle-space h1,.chronicle-space h2,.chronicle-space h3,.chronicle-space p{margin-top:0}.chronicle-space__header{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;max-width:1450px;margin:0 auto;padding-bottom:26px;border-bottom:1px solid rgba(220,181,172,.18)}.space-kicker,.space-intro>div>span,.panel-heading span{display:block;color:#e16a7d;font-size:11px;font-weight:800;letter-spacing:.19em;text-transform:uppercase}.chronicle-space h1{margin-bottom:8px;color:#fff3ed;font-family:Georgia,'Times New Roman',serif;font-size:clamp(36px,5vw,68px);line-height:.98;letter-spacing:-.045em}.chronicle-space__header p{margin:0;color:#bca9aa;font-size:15px}.space-controls{display:flex;align-items:end;gap:12px}.space-controls label{display:grid;gap:7px;color:#bca9aa;font-size:10px}.space-controls select,.space-controls a{min-height:44px;border:1px solid rgba(217,143,148,.48);border-radius:8px;background:rgba(19,13,17,.9);color:#fff0eb;padding:0 14px}.space-controls select{min-width:245px}.space-controls a{display:inline-flex;align-items:center;color:#f9e8df;text-decoration:none;font-size:13px;font-weight:750}.space-nav{display:flex;gap:8px;max-width:1450px;margin:22px auto 18px}.space-nav button{display:grid;gap:4px;min-width:138px;padding:12px 17px;border:1px solid rgba(206,158,137,.33);border-radius:8px;background:#171116;color:#ddc9c6;text-align:left;cursor:pointer}.space-nav small{color:#a38b8d;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.space-nav button.is-active{border-color:#d75c70;background:linear-gradient(135deg,#6d2638,#311721);color:#fff5f0;box-shadow:0 8px 20px rgba(86,18,40,.3)}.space-alert,.space-status{max-width:1450px;margin:18px auto;padding:14px 17px;border:1px solid rgba(215,92,112,.6);border-radius:8px;background:rgba(101,24,45,.35);color:#f4d4d5}.space-status{border-color:rgba(220,181,172,.18);background:rgba(255,255,255,.035);color:#dbcaca}.space-intro{display:grid;grid-template-columns:minmax(250px,1.2fr) minmax(250px,1fr) auto;align-items:end;gap:30px;max-width:1450px;margin:0 auto 24px;padding:24px 28px;border:1px solid rgba(220,181,172,.18);border-radius:13px;background:linear-gradient(110deg,rgba(52,22,31,.85),rgba(23,15,20,.86))}.space-intro h2{margin:8px 0 0;color:#fff0e9;font-family:Georgia,serif;font-size:clamp(26px,3vw,43px);line-height:1}.space-intro p{max-width:560px;margin:0;color:#c4b2b0;line-height:1.55}.space-counts{display:flex;gap:25px}.space-counts b{display:grid;gap:5px;color:#f2b1a7;font-family:Georgia,serif;font-size:28px}.space-counts small{color:#a58e91;font-family:Inter,system-ui,sans-serif;font-size:9px;font-weight:750;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}.space-panel{max-width:1450px;margin:0 auto;padding:28px;border:1px solid rgba(220,181,172,.18);border-radius:15px;background:rgba(17,13,17,.82);box-shadow:0 25px 80px rgba(0,0,0,.27)}.panel-heading{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:22px}.panel-heading h2{margin:8px 0 0;color:#fff2ec;font-family:Georgia,serif;font-size:clamp(28px,3vw,44px);line-height:1}.panel-heading p{max-width:420px;margin:0;color:#a99597;font-size:13px;line-height:1.5;text-align:right}.space-board{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;min-height:610px;overflow:hidden;padding:28px;border:1px solid rgba(201,150,115,.25);border-radius:12px;background-color:#23171b;background-image:linear-gradient(rgba(196,131,105,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(196,131,105,.08) 1px,transparent 1px),radial-gradient(circle at 20% 10%,rgba(125,39,52,.27),transparent 32%);background-size:34px 34px,34px 34px,auto}.space-board:after{content:'CENTRO DE INVESTIGACIÓN · SUPERFICIE ACOTADA';position:absolute;right:25px;bottom:17px;color:rgba(226,176,144,.38);font-size:9px;font-weight:800;letter-spacing:.16em}.board-card{position:relative;z-index:1;display:flex;min-height:158px;flex-direction:column;align-items:flex-start;padding:19px 18px 16px;border:1px solid rgba(221,179,141,.34);border-radius:5px;background:linear-gradient(145deg,#f1dfb3,#d8bd87);color:var(--ink);text-align:left;cursor:pointer;box-shadow:8px 10px 0 rgba(10,6,8,.22),0 13px 24px rgba(0,0,0,.2);transition:transform .18s ease,box-shadow .18s ease}.board-card:hover{transform:translateY(-5px) rotate(0);box-shadow:10px 17px 0 rgba(10,6,8,.26),0 18px 27px rgba(0,0,0,.25)}.board-card--1,.board-card--5{transform:rotate(-1.5deg)}.board-card--2,.board-card--6{transform:rotate(1.2deg)}.board-card small{padding-right:17px;color:#806650;font-size:9px;font-weight:850;letter-spacing:.13em;text-transform:uppercase}.board-card strong{margin:14px 0 7px;font-family:Georgia,serif;font-size:22px;line-height:1.04}.board-card p{display:-webkit-box;overflow:hidden;margin:0;color:#5d4a3d;font-size:12px;line-height:1.35;-webkit-box-orient:vertical;-webkit-line-clamp:3}.board-card em{margin-top:auto;padding-top:13px;color:#8b3045;font-size:10px;font-style:normal;font-weight:800}.card-pin{position:absolute;top:8px;right:13px;width:11px;height:11px;border-radius:50%;background:#bb4057;box-shadow:0 2px 3px rgba(0,0,0,.35)}.card-pin--lugar{background:#5b7e91}.card-pin--nota{background:#bd9150}.board-line{position:absolute;z-index:0;height:2px;background:rgba(225,151,119,.38);transform-origin:left center}.board-line--one{top:42%;left:25%;width:39%;transform:rotate(10deg)}.board-line--two{top:65%;left:42%;width:34%;transform:rotate(-12deg)}.space-empty{grid-column:1/-1;align-self:center;justify-self:center;max-width:390px;margin:0;color:#a99597;text-align:center;line-height:1.6}.timeline{position:relative;display:grid;gap:14px}.timeline:before{content:'';position:absolute;top:20px;bottom:20px;left:24px;width:1px;background:rgba(201,75,99,.45)}.timeline-card{position:relative;display:grid;grid-template-columns:50px minmax(0,1fr) auto;align-items:center;gap:18px;min-height:112px;padding:18px 21px 18px 10px;border:1px solid rgba(220,181,172,.18);border-radius:10px;background:linear-gradient(100deg,rgba(48,23,31,.8),rgba(24,18,23,.88))}.timeline-marker{position:relative;z-index:1;display:grid;width:30px;height:30px;place-items:center;border:1px solid #d55b6e;border-radius:50%;background:#26151b;color:#f1afb1;font-size:10px;font-weight:800}.timeline-card small{color:#d99d89;font-size:10px;font-weight:750;letter-spacing:.1em;text-transform:uppercase}.timeline-card h3{margin:8px 0 6px;color:#fff1eb;font-family:Georgia,serif;font-size:24px}.timeline-card p{margin:0;color:#ae9c9e;font-size:13px;line-height:1.5}.timeline-card>span{color:#8e777c;font-size:11px;white-space:nowrap}.archive-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.archive-box{min-width:0;padding:18px;border:1px solid rgba(220,181,172,.18);border-radius:10px;background:rgba(31,19,24,.7)}.archive-box header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:12px;border-bottom:1px solid rgba(220,181,172,.18)}.archive-box header span{color:#dfa179;font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}.archive-box header b{color:#f1af9e;font-family:Georgia,serif;font-size:25px}.archive-row{display:grid;gap:5px;width:100%;padding:13px 0;border:0;border-bottom:1px solid rgba(222,180,174,.12);background:transparent;color:#f3e7e1;text-align:left;cursor:pointer}.archive-row:last-child{border-bottom:0}.archive-row:hover strong{color:#ee8e9b}.archive-row strong{overflow:hidden;color:#f1ded7;font-family:Georgia,serif;font-size:16px;text-overflow:ellipsis;white-space:nowrap}.archive-row small{color:#a48d91;font-size:11px}.space-overlay{position:fixed;z-index:20;inset:0;display:grid;place-items:center;padding:25px;background:rgba(5,4,6,.78);backdrop-filter:blur(7px)}.space-detail{position:relative;width:min(620px,100%);padding:38px;border:1px solid rgba(221,129,135,.54);border-radius:15px;background:linear-gradient(145deg,#26131c,#120e13);box-shadow:0 25px 80px rgba(0,0,0,.6)}.detail-close{position:absolute;top:16px;right:17px;border:1px solid rgba(224,155,155,.35);border-radius:6px;background:transparent;color:#d7b7b6;padding:7px 10px;cursor:pointer}.space-detail h2{margin:12px 0 18px;color:#fff0ea;font-family:Georgia,serif;font-size:42px;line-height:1}.detail-copy{color:#cdb8b8;font-size:16px;line-height:1.65;white-space:pre-wrap}.space-detail dl{display:grid;gap:9px;margin:25px 0}.space-detail dl div{display:flex;justify-content:space-between;gap:20px;padding-top:10px;border-top:1px solid rgba(220,181,172,.18)}.space-detail dt{color:#9f888d;font-size:11px;text-transform:uppercase}.space-detail dd{margin:0;color:#f0d8d1;font-size:12px;text-align:right}.detail-action{width:100%;margin-top:18px;padding:12px;border:1px solid #c84b63;border-radius:7px;background:#72273e;color:#fff1ed;font-weight:800;cursor:pointer}
+@media (max-width:1050px){.space-intro{grid-template-columns:1fr 1fr}.space-counts{grid-column:1/-1}.space-board{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:760px){.chronicle-space{padding:20px 13px 40px}.chronicle-space__header{align-items:stretch;flex-direction:column;padding-bottom:20px}.space-controls{align-items:stretch;flex-direction:column}.space-controls select{width:100%}.space-controls a{justify-content:center}.space-nav{overflow:auto;margin-top:15px;padding-bottom:2px}.space-nav button{min-width:120px}.space-intro{grid-template-columns:1fr;gap:18px;padding:20px}.space-counts{grid-column:auto;justify-content:space-between}.space-panel{padding:17px 13px}.panel-heading{align-items:start;flex-direction:column;gap:13px}.panel-heading p{text-align:left}.space-board{grid-template-columns:1fr 1fr;gap:13px;min-height:0;padding:15px}.board-card{min-height:175px;padding:16px 14px 13px}.board-card strong{font-size:18px}.board-card p{font-size:11px}.board-line{display:none}.timeline-card{grid-template-columns:39px minmax(0,1fr);gap:12px;padding-right:14px}.timeline-card>span{grid-column:2}.archive-grid{grid-template-columns:1fr}.space-detail{padding:30px 22px 23px}.space-detail h2{font-size:34px}}
+@media (max-width:470px){.space-board{grid-template-columns:1fr}.space-counts b{font-size:24px}.space-counts small{font-size:8px}.board-card{min-height:150px}}
+@media (prefers-reduced-motion:reduce){.chronicle-space *{transition:none!important}}
+
+/* CHRONICLE_SPACE_VISUAL_FIX_V1 — reserva para la barra fija de sesión en móvil. */
+@media (max-width:760px){.chronicle-space{padding-bottom:126px}}
+
+/* CHRONICLE_SPACE_LONG_NOTES_V1 — lectura completa de notas extensas. */
+.space-overlay{place-items:start center;overflow-y:auto;padding:24px 25px}.space-detail{max-height:calc(100vh - 48px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+@media (max-width:760px){.space-overlay{place-items:start center;padding:16px 12px 96px}.space-detail{max-height:calc(100vh - 32px);padding:28px 20px 24px}}
+
+/* CHRONICLE_SPACE_MENTIONS_V1 — referencias visuales dentro de notas. */
+.mention-link{display:inline;margin:0 2px;padding:0 4px;border:0;border-bottom:1px solid rgba(214,119,128,.72);border-radius:3px;background:rgba(201,75,99,.12);color:#f08b99;font:inherit;cursor:pointer}.mention-link:hover{background:rgba(201,75,99,.28);color:#ffd1ca}
+
+/* CHRONICLE_SPACE_NOTES_V1 — editor de notas dentro del Centro. */
+.space-new-note{min-height:44px;padding:0 15px;border:1px solid #d75c70;border-radius:8px;background:#72273e;color:#fff1ed;font-size:13px;font-weight:800;cursor:pointer}.space-new-note:hover{background:#8b304b}.space-composer{position:relative;width:min(700px,100%);max-height:calc(100vh - 48px);overflow-y:auto;padding:38px;border:1px solid rgba(221,129,135,.54);border-radius:15px;background:linear-gradient(145deg,#26131c,#120e13);box-shadow:0 25px 80px rgba(0,0,0,.6);scrollbar-gutter:stable}.space-composer h2{margin:12px 0 25px;color:#fff0ea;font-family:Georgia,serif;font-size:42px;line-height:1}.space-composer>label{display:grid;gap:7px;margin-top:16px;color:#c9afb0;font-size:11px;font-weight:750;letter-spacing:.05em;text-transform:uppercase}.space-composer input,.space-composer textarea,.space-composer select{width:100%;border:1px solid rgba(224,155,155,.35);border-radius:7px;background:#120e13;color:#fff0eb;padding:12px;font:15px/1.45 Inter,system-ui,sans-serif;letter-spacing:normal;text-transform:none}.space-composer textarea{min-height:220px;resize:vertical}.composer-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}.composer-grid label{display:grid;gap:7px;color:#c9afb0;font-size:11px;font-weight:750;letter-spacing:.05em;text-transform:uppercase}.space-composer .detail-action{margin-top:22px}.space-composer .detail-action:disabled{cursor:wait;opacity:.62}
+@media (max-width:760px){.space-new-note{width:100%}.space-composer{max-height:calc(100vh - 32px);padding:28px 20px 24px}.space-composer h2{font-size:34px}.composer-grid{grid-template-columns:1fr}}
+
+/* CHRONICLE_SPACE_NOTE_EDIT_V1 — acción de edición de anotaciones. */
+.detail-secondary{width:100%;margin-top:18px;padding:11px;border:1px solid rgba(224,155,155,.45);border-radius:7px;background:transparent;color:#f0c8c5;font-weight:800;cursor:pointer}.detail-secondary:hover{background:rgba(201,75,99,.14)}
+
+/* CHRONICLE_SPACE_BOARD_V1 — pizarra acotada, tarjetas movibles y relaciones simples. */
+.space-board{display:block;position:relative;min-height:690px;overflow:visible;padding:0;border-color:rgba(201,150,115,.32)}
+.board-connections-layer{position:absolute;z-index:0;inset:0;width:100%;height:100%;pointer-events:none}
+.board-link{stroke:rgba(224,157,119,.7);stroke-width:.42;stroke-dasharray:1.3 1.1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+.board-connect-hint{position:absolute;z-index:2;top:16px;left:22px;right:22px;color:rgba(245,211,181,.68);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;pointer-events:none}
+.board-card{position:absolute;z-index:1;width:21%;min-height:188px;display:flex;align-items:stretch;padding:0;border:1px solid rgba(221,179,141,.34);border-radius:5px;background:linear-gradient(145deg,#f1dfb3,#d8bd87);color:var(--ink);box-shadow:8px 10px 0 rgba(10,6,8,.22),0 13px 24px rgba(0,0,0,.2);touch-action:none;transition:box-shadow .18s ease,filter .18s ease}
+.board-card:hover{filter:brightness(1.04);box-shadow:10px 15px 0 rgba(10,6,8,.25),0 18px 27px rgba(0,0,0,.25)}
+.board-card.is-dragging{z-index:4;cursor:grabbing;box-shadow:12px 18px 0 rgba(10,6,8,.3),0 22px 35px rgba(0,0,0,.3);filter:brightness(1.08)}
+.board-card.is-connect-source{outline:3px solid rgba(224,84,112,.72);outline-offset:4px}
+.board-card__open{display:flex;min-width:0;flex:1;flex-direction:column;align-items:flex-start;padding:19px 18px 10px;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer}
+.board-card__open small{padding-right:17px;color:#806650;font-size:9px;font-weight:850;letter-spacing:.13em;text-transform:uppercase}
+.board-card__open strong{margin:14px 0 7px;font-family:Georgia,serif;font-size:22px;line-height:1.04}
+.board-card__open p{display:-webkit-box;overflow:hidden;margin:0;color:#5d4a3d;font-size:12px;line-height:1.35;-webkit-box-orient:vertical;-webkit-line-clamp:3}
+.board-card__open em{margin-top:auto;padding-top:13px;color:#8b3045;font-size:10px;font-style:normal;font-weight:800}
+.board-card__connect{align-self:flex-end;margin:0 10px 10px;padding:7px 8px;border:1px solid rgba(139,48,69,.4);border-radius:4px;background:rgba(255,244,211,.34);color:#743047;font-size:9px;font-weight:850;cursor:pointer}
+.board-card__connect:hover{background:rgba(255,244,211,.7)}
+.connection-composer{position:relative;z-index:5;display:grid;grid-template-columns:minmax(180px,1fr) minmax(180px,1fr) auto auto;align-items:end;gap:12px;margin:18px 18px 0;padding:15px 17px;border:1px solid rgba(224,157,119,.45);border-radius:8px;background:rgba(29,16,22,.95);box-shadow:0 12px 24px rgba(0,0,0,.3)}
+.connection-composer>div{display:grid;gap:5px}.connection-composer span,.board-connections header span{color:#e16a7d;font-size:9px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}.connection-composer strong{color:#fff0e9;font-family:Georgia,serif;font-size:16px}.connection-composer strong b{color:#e1a071;font-family:Inter,system-ui,sans-serif;font-size:12px}.connection-composer label{display:grid;gap:5px;color:#c9afb0;font-size:10px;font-weight:750}.connection-composer input{width:100%;border:1px solid rgba(224,155,155,.35);border-radius:5px;background:#120e13;color:#fff0eb;padding:9px;font:13px/1.35 Inter,system-ui,sans-serif}.connection-composer button{min-height:36px;padding:0 11px;border:1px solid rgba(224,155,155,.35);border-radius:5px;background:transparent;color:#f7dfd7;font-size:11px;font-weight:800;cursor:pointer}.connection-composer .connection-save{border-color:#d75c70;background:#72273e}.board-connections{position:relative;z-index:2;margin-top:20px;padding:17px;border:1px solid rgba(220,181,172,.2);border-radius:9px;background:rgba(20,13,18,.72)}.board-connections header{display:flex;align-items:end;justify-content:space-between;border-bottom:1px solid rgba(220,181,172,.16);padding-bottom:10px}.board-connections h3{margin:5px 0 0;color:#fff0e9;font-family:Georgia,serif;font-size:21px}.board-connections header>b{color:#e4a067;font-size:20px}.board-connections article{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:11px 0;border-bottom:1px solid rgba(220,181,172,.12)}.board-connections article:last-child{border-bottom:0;padding-bottom:0}.board-connections article strong{color:#f0d8cf;font-family:Georgia,serif;font-size:15px}.board-connections article strong b{color:#e3a16c;font-family:Inter,system-ui,sans-serif;font-size:11px;font-weight:700}.board-connections article button{border:0;background:transparent;color:#d97883;font-size:10px;font-weight:800;cursor:pointer}
+@media (max-width:900px){.board-card{width:29%}.connection-composer{grid-template-columns:1fr 1fr}.connection-composer>div{grid-column:1/-1}}
+@media (max-width:760px){.space-board{display:grid;grid-template-columns:1fr;gap:16px;min-height:0!important;padding:48px 16px 20px}.board-connections-layer{display:none}.board-card{position:relative!important;left:auto!important;top:auto!important;width:100%;min-height:170px}.board-connect-hint{top:17px;left:16px;right:16px;font-size:9px}.connection-composer{grid-template-columns:1fr;margin:16px 0 0}.connection-composer>div{grid-column:auto}.connection-composer button{width:100%}.board-connections article{align-items:flex-start;flex-direction:column}.board-connections article button{padding:0}}
+
+/* CHRONICLE_SPACE_BOARD_DRAG_HANDLE_V1 — asa explícita para mover tarjetas sin abrir la ficha. */
+.board-card__drag-handle{position:absolute;z-index:4;top:7px;right:9px;padding:3px 5px;border:1px solid rgba(139,48,69,.38);border-radius:4px;background:rgba(255,244,211,.68);color:#743047;font-size:8px;font-weight:900;letter-spacing:.04em;cursor:grab;user-select:none;touch-action:none}.board-card__drag-handle:active{cursor:grabbing;background:#f7e6b8}.board-card__drag-handle + .board-card__open .card-pin{display:none}
+
+/* CHRONICLE_SPACE_BOARD_UPDATE_NOTICE_V1 — aviso no destructivo de cambios remotos. */
+.board-update-notice{display:inline-flex;align-items:center;gap:10px;color:#f4d2b9}
+.board-update-notice button{padding:5px 9px;border:1px solid rgba(224,157,119,.52);border-radius:4px;background:rgba(112,39,62,.72);color:#fff0e9;font:800 9px/1 Inter,system-ui,sans-serif;letter-spacing:.05em;text-transform:uppercase;cursor:pointer}
+.board-update-notice button:hover{background:#8f334d}
+
+/* CHRONICLE_SPACE_BOARD_FILTERS_V1 — filtros compactos para pizarras con muchas tarjetas. */
+.board-filter-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 12px;color:#bda7a1;font-size:10px;font-weight:800;letter-spacing:.11em;text-transform:uppercase}
+.board-filter-bar button{display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid rgba(220,181,172,.25);border-radius:999px;background:rgba(29,16,22,.82);color:#d7c0ba;font-size:10px;font-weight:800;cursor:pointer}
+.board-filter-bar button b{display:grid;min-width:17px;height:17px;place-items:center;border-radius:50%;background:rgba(224,157,119,.16);color:#e4a067;font-size:9px}
+.board-filter-bar button:hover,.board-filter-bar button.is-active{border-color:#d75c70;background:rgba(111,38,58,.72);color:#fff0e9}
+@media (max-width:760px){.board-filter-bar{align-items:stretch;gap:6px}.board-filter-bar span{width:100%}.board-filter-bar button{flex:1;justify-content:center;padding:8px 6px;font-size:9px}}
+
+/* CHRONICLE_SPACE_BOARD_RESPONSIVE_V1 — superficie con altura y lectura adaptables. */
+.space-board{scroll-margin-top:24px}
+@media (max-width:1050px){.space-board{min-height:calc(100px + 52vw)}}
+@media (max-width:760px){.space-board{overflow:visible;min-height:0!important}.board-connect-hint{position:relative;top:auto;left:auto;right:auto;margin-bottom:4px}.board-card__open{padding:16px 14px 10px}.board-card__open strong{font-size:19px}.board-card__connect{font-size:9px}}
+
+/* CHRONICLE_SPACE_BOARD_BOUNDS_V2 — el contenedor acompaña a la tarjeta más baja. */
+@media (min-width:761px){.space-board{overflow:visible;min-height:760px}.board-card{box-sizing:border-box}}
+
+/* CHRONICLE_SPACE_BOARD_COMPACT_CARDS_V1 — tarjetas de resumen sin texto redundante. */
+.board-card{width:18%;min-height:116px;height:116px}
+.board-card__open{padding:14px 14px 9px}
+.board-card__open small{padding-right:8px;font-size:8px;letter-spacing:.11em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.board-card__open strong{margin:8px 0 0;font-size:17px;line-height:1.08;display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.board-card__open em{padding-top:7px;font-size:8px;letter-spacing:.03em;opacity:.72}
+.board-card__connect{margin:0 8px 8px;padding:6px 7px;font-size:8px;white-space:nowrap}
+.board-preview-backdrop{position:fixed;z-index:50;inset:0;display:grid;place-items:center;padding:24px;background:rgba(8,5,8,.68);backdrop-filter:blur(4px)}
+.board-preview-dialog{position:relative;width:min(560px,calc(100vw - 32px));max-height:min(620px,calc(100vh - 48px));overflow:auto;padding:28px 30px 24px;border:1px solid rgba(224,157,119,.48);border-radius:12px;background:linear-gradient(145deg,#28131d,#120d13);color:#fff0e9;box-shadow:0 24px 70px rgba(0,0,0,.48)}
+.board-preview-dialog>span{color:#e16a7d;font-size:10px;font-weight:850;letter-spacing:.14em;text-transform:uppercase}
+.board-preview-dialog h3{margin:10px 0 14px;color:#fff0e9;font-family:Georgia,serif;font-size:32px;line-height:1.05}
+.board-preview-dialog p{margin:0;color:#dcc5bd;font-size:14px;line-height:1.6;white-space:pre-wrap}
+.board-preview-close{position:absolute;top:10px;right:12px;border:0;background:transparent;color:#e3a16c;font-size:26px;line-height:1;cursor:pointer}
+.board-preview-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.board-preview-actions button{min-height:38px;padding:0 14px;border:1px solid rgba(224,155,155,.35);border-radius:6px;background:transparent;color:#f7dfd7;font-size:11px;font-weight:800;cursor:pointer}
+.board-preview-actions button:first-child{border-color:#d75c70;background:#72273e}
+@media (max-width:900px){.board-card{width:29%}}
+@media (max-width:760px){.board-card{width:100%;height:108px;min-height:108px}.board-card__open{padding:13px 13px 8px}.board-card__open strong{font-size:18px}.board-preview-backdrop{place-items:end center;padding:10px}.board-preview-dialog{width:100%;max-height:78vh;padding:25px 22px 20px;border-radius:12px 12px 6px 6px}.board-preview-dialog h3{font-size:27px}.board-preview-dialog p{font-size:13px}.board-preview-actions{display:grid;grid-template-columns:1fr}.board-preview-actions button{width:100%}}
+
+/* CHRONICLE_SPACE_BOARD_COMPACT_ACTIONS_V1 — acciones contenidas y tarjetas sin desbordamiento. */
+.board-card{box-sizing:border-box;overflow:hidden}
+.board-card__open{padding-right:82px}
+.board-card__open em{display:none}
+.board-card__connect{position:absolute;right:8px;bottom:8px;margin:0;padding:5px 7px;font-size:8px;line-height:1.1}
+@media (max-width:900px) and (min-width:761px){.board-card{width:22%}}
+
+/* CHRONICLE_SPACE_BOARD_PREVIEW_MENTIONS_V1 — menciones activas dentro de la ventana flotante. */
+.board-preview-dialog .mention-link{display:inline;margin:0 2px;padding:0 4px;border:0;border-bottom:1px solid rgba(240,139,153,.8);border-radius:3px;background:rgba(201,75,99,.14);color:#ffabb5;font:inherit;cursor:pointer}
+.board-preview-dialog .mention-link:hover{background:rgba(201,75,99,.3);color:#ffe1dc}
+
+/* CHRONICLE_SPACE_BOARD_PERSONAL_VISIBILITY_V1 — selección local por crónica y usuario. */
+.board-visibility-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px;color:#cdb8b4;font-size:11px}
+.board-visibility-bar span b{color:#e3a16c}
+.board-visibility-bar>div{display:flex;gap:7px;flex-wrap:wrap}
+.board-visibility-bar button{padding:6px 10px;border:1px solid rgba(224,157,119,.35);border-radius:6px;background:rgba(35,19,27,.82);color:#e8d4ce;font:inherit;cursor:pointer}
+.board-visibility-bar button:hover:not(:disabled){border-color:#e16a7d;color:#fff0e9;background:rgba(201,75,99,.18)}
+.board-visibility-bar button:disabled{cursor:not-allowed;opacity:.45}
+.board-visibility-panel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0 0 12px;padding:10px;border:1px solid rgba(224,157,119,.22);border-radius:8px;background:rgba(27,16,22,.78)}
+.board-visibility-panel label{display:flex;align-items:center;gap:7px;min-width:0;padding:8px;border:1px solid rgba(224,157,119,.18);border-radius:6px;color:#e8d4ce;cursor:pointer}
+.board-visibility-panel label:hover{border-color:rgba(225,106,125,.55);background:rgba(201,75,99,.1)}
+.board-visibility-panel input{flex:0 0 auto;accent-color:#d75c70}
+.board-visibility-panel span{display:grid;min-width:0;gap:2px}
+.board-visibility-panel small{color:#d98a76;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.board-visibility-panel strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f4dfd8;font-family:Georgia,serif;font-size:13px}
+@media(max-width:760px){.board-visibility-bar{align-items:flex-start;flex-direction:column}.board-visibility-bar>div{width:100%}.board-visibility-bar button{flex:1}.board-visibility-panel{grid-template-columns:1fr}.board-visibility-panel strong{white-space:normal}}
+
+/* CHRONICLE_SPACE_BOARD_SELECTION_FILTERS_V1 — el selector escala con crónicas grandes. */
+.board-visibility-panel{display:grid;grid-template-columns:1fr;gap:9px}
+.board-selection-tools{display:grid;grid-template-columns:minmax(180px,1fr) 145px 145px 145px auto;align-items:end;gap:8px}
+.board-selection-field{display:grid!important;gap:4px!important;min-width:0;padding:0!important;border:0!important;background:transparent!important;color:#d8c0ba!important;font-size:10px;font-weight:750}
+.board-selection-field span{color:#d98a76;font-size:9px;font-weight:850;letter-spacing:.11em;text-transform:uppercase}
+.board-selection-field input,.board-selection-field select{box-sizing:border-box;width:100%;min-height:34px;padding:7px 9px;border:1px solid rgba(224,157,119,.3);border-radius:5px;background:#160e14;color:#f4dfd8;font:12px/1.2 Inter,system-ui,sans-serif}
+.board-selection-field input::placeholder{color:#927b7c}
+.board-selection-field select{cursor:pointer}
+.board-selection-reset{min-height:34px;padding:7px 9px;border:1px solid rgba(224,157,119,.3);border-radius:5px;background:transparent;color:#e8d4ce;font:11px/1.2 Inter,system-ui,sans-serif;cursor:pointer}
+.board-selection-reset:hover{border-color:#e16a7d;color:#fff0e9;background:rgba(201,75,99,.14)}
+.board-selection-summary{color:#bda5a1;font-size:10px}
+.board-selection-summary b{color:#e3a16c}
+.board-selection-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;max-height:276px;overflow:auto;padding-right:3px}
+.board-selection-list label{min-width:0}
+.board-selection-list strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board-selection-empty{grid-column:1/-1;margin:5px 0;color:#bda5a1;font-size:12px}
+@media(max-width:980px){.board-selection-tools{grid-template-columns:minmax(180px,1fr) 135px 135px 135px}.board-selection-reset{grid-column:1/-1;justify-self:start}}
+@media(max-width:760px){.board-selection-tools{grid-template-columns:1fr}.board-selection-reset{grid-column:auto;width:100%}.board-selection-list{grid-template-columns:1fr;max-height:340px}.board-selection-list strong{white-space:normal}}
+
+/* CHRONICLE_SPACE_BOARD_NOTE_AUTHORS_V1 — autor visible sin romper el formato compacto. */
+.board-preview-dialog>span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* CHRONICLE_SPACE_BOARD_PERSONAL_PRESETS_V1 — modos rápidos sin perder la selección del jugador. */
+.board-visibility-bar button.is-active{border-color:#f09a88;background:rgba(201,75,99,.34);color:#fff0e9;box-shadow:0 0 0 1px rgba(240,154,136,.18)}
+.board-card__open small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* CHRONICLE_SPACE_BOARD_PERSONAL_LAYOUT_V1 — la distribución personal no pisa la pizarra común. */
+.board-visibility-bar button.is-active{box-shadow:0 0 0 1px rgba(240,154,136,.22),0 0 16px rgba(201,75,99,.14)}
+
+/* CHRONICLE_SPACE_BOARD_COLLISION_SAFE_V1 — las tarjetas buscan un hueco libre al arrastrarse. */
+.board-card.is-dragging{z-index:8}
+
+/* CHRONICLE_SPACE_BOARD_CLEAR_PERSONAL_V1 — limpia solo la selección local del jugador. */
+.board-visibility-clear{border-color:rgba(226,112,126,.58)!important;color:#f0b1aa!important;background:rgba(117,30,49,.22)!important}
+.board-visibility-clear:hover:not(:disabled){border-color:#f09a88!important;color:#fff0e9!important;background:rgba(201,75,99,.38)!important}
+.board-visibility-clear:disabled{opacity:.42}
+
+/* CHRONICLE_SPACE_BOARD_COLLISION_REPAIR_V1 — las posiciones antiguas se saneam al entrar en la vista. */
+.board-card.is-collision-repaired{transition:top .18s ease,left .18s ease}
+
+/* CHRONICLE_SPACE_BOARD_RESET_PERSONAL_POSITIONS_V1 — devuelve Mi vista a una cuadrícula limpia. */
+.board-visibility-reset{border-color:rgba(224,157,119,.5)!important;color:#e9c59f!important}
+.board-visibility-reset:hover:not(:disabled){border-color:#f09a88!important;color:#fff0e9!important;background:rgba(201,75,99,.24)!important}
+.board-visibility-reset:disabled{opacity:.42}
+
+/* CHRONICLE_SPACE_BOARD_SELECTION_BATCH_V1 — acciones rápidas sobre el resultado filtrado. */
+.board-selection-batch{display:flex;grid-column:1/-1;gap:7px;flex-wrap:wrap}
+.board-selection-batch button{min-height:32px;padding:6px 10px;border:1px solid rgba(224,157,119,.32);border-radius:5px;background:rgba(35,19,27,.72);color:#e8d4ce;font:11px/1.2 Inter,system-ui,sans-serif;cursor:pointer}
+.board-selection-batch button:first-child{border-color:rgba(125,193,147,.48);color:#c9efd3}
+.board-selection-batch button:hover:not(:disabled){border-color:#f09a88;color:#fff0e9;background:rgba(201,75,99,.2)}
+.board-selection-batch button:disabled{cursor:not-allowed;opacity:.42}
+@media(max-width:760px){.board-selection-batch{display:grid;grid-template-columns:1fr 1fr}.board-selection-batch button{width:100%}}
+
+/* CHRONICLE_SPACE_BOARD_QUICK_SEARCH_V1 — búsqueda inmediata sin abrir el selector. */
+.board-quick-search{display:grid;gap:5px;margin:0 0 10px;max-width:420px}
+.board-quick-search label{color:#d98a76;font-size:9px;font-weight:850;letter-spacing:.11em;text-transform:uppercase}
+.board-quick-search>div{display:flex;gap:6px}
+.board-quick-search input{box-sizing:border-box;flex:1;min-width:0;min-height:34px;padding:8px 10px;border:1px solid rgba(224,157,119,.3);border-radius:5px;background:#160e14;color:#f4dfd8;font:12px/1.2 Inter,system-ui,sans-serif}
+.board-quick-search input::placeholder{color:#927b7c}
+.board-quick-search input:focus{outline:1px solid rgba(240,154,136,.72);border-color:#d75c70}
+.board-quick-search button{width:34px;border:1px solid rgba(224,157,119,.3);border-radius:5px;background:rgba(35,19,27,.82);color:#e8d4ce;font-size:18px;line-height:1;cursor:pointer}
+.board-quick-search button:hover:not(:disabled){border-color:#d75c70;color:#fff0e9}
+.board-quick-search button:disabled{cursor:not-allowed;opacity:.38}
+@media(max-width:760px){.board-quick-search{max-width:none}.board-quick-search input{min-height:38px}.board-quick-search button{width:40px}}
+
+/* CHRONICLE_SPACE_BOARD_PERSONAL_PRESETS_V2 — configuraciones personales reutilizables. */
+.board-visibility-preset{border-color:rgba(186,146,225,.48)!important;color:#e1c7ee!important}
+.board-visibility-preset:hover:not(:disabled){border-color:#f09a88!important;color:#fff0e9!important;background:rgba(201,75,99,.24)!important}
+.board-preset-panel{display:grid;gap:10px;margin:0 0 12px;padding:11px;border:1px solid rgba(186,146,225,.28);border-radius:8px;background:rgba(27,16,30,.84)}
+.board-preset-create{display:flex;align-items:end;gap:8px}.board-preset-create label{display:grid;flex:1;gap:4px;color:#d8c0da;font-size:9px;font-weight:850;letter-spacing:.11em;text-transform:uppercase}.board-preset-create input{box-sizing:border-box;min-height:34px;padding:8px 9px;border:1px solid rgba(186,146,225,.34);border-radius:5px;background:#160e14;color:#f4dfd8;font:12px/1.2 Inter,system-ui,sans-serif}.board-preset-create button{min-height:34px;padding:7px 10px;border:1px solid rgba(186,146,225,.5);border-radius:5px;background:rgba(101,54,123,.25);color:#f0dff4;font:11px/1.2 Inter,system-ui,sans-serif;cursor:pointer}.board-preset-create button:hover{border-color:#f09a88;background:rgba(201,75,99,.24);color:#fff0e9}
+.board-preset-list{display:flex;flex-wrap:wrap;gap:7px}.board-preset-list>div{display:flex}.board-preset-list>div>button{min-height:30px;padding:6px 9px;border:1px solid rgba(224,157,119,.28);background:rgba(35,19,27,.72);color:#e8d4ce;font:11px/1.2 Inter,system-ui,sans-serif;cursor:pointer}.board-preset-list>div>button:first-child{border-radius:5px 0 0 5px}.board-preset-list>div>button:last-child{border-left:0;border-radius:0 5px 5px 0;color:#e9a2a8}.board-preset-list>div>button:hover{border-color:#f09a88;color:#fff0e9}.board-preset-empty{margin:0;color:#bda5a1;font-size:11px}
+@media(max-width:760px){.board-preset-create{align-items:stretch;flex-direction:column}.board-preset-create button{width:100%;min-height:38px}.board-preset-list{display:grid;grid-template-columns:1fr}.board-preset-list>div>button:first-child{flex:1;text-align:left}}
+
+/* CHRONICLE_SPACE_BOARD_PERSONAL_PRESETS_IMPORT_EXPORT_V1 — respaldo portátil de vistas personales. */
+.board-preset-tools{display:flex;flex-wrap:wrap;gap:8px}.board-preset-tools>button,.board-preset-import{min-height:30px;box-sizing:border-box;padding:7px 10px;border:1px solid rgba(186,146,225,.42);border-radius:5px;background:rgba(35,19,27,.72);color:#e8d4ce;font:11px/1.2 Inter,system-ui,sans-serif;cursor:pointer}.board-preset-tools>button:hover:not(:disabled),.board-preset-import:hover{border-color:#f09a88;background:rgba(201,75,99,.24);color:#fff0e9}.board-preset-tools>button:disabled{cursor:not-allowed;opacity:.4}.board-preset-import{display:inline-flex;align-items:center;gap:7px}.board-preset-import input{width:0;height:0;overflow:hidden;opacity:0;position:absolute}.board-preset-error{margin:0;color:#f0a0a0;font-size:11px}
+@media(max-width:760px){.board-preset-tools>*{flex:1;text-align:center;min-height:38px}}
+
+/* CHRONICLE_SPACE_BOARD_FOCUS_V1 — consulta móvil y acciones contextuales sin otra pizarra. */
+.board-card.is-highlighted{z-index:5;outline:3px solid rgba(240,154,136,.9);outline-offset:5px;filter:brightness(1.1);box-shadow:0 0 0 7px rgba(201,75,99,.18),12px 18px 30px rgba(0,0,0,.32)}
+.board-focus-backdrop{position:fixed;z-index:60;inset:0;display:grid;place-items:center;padding:24px;background:rgba(8,5,8,.72);backdrop-filter:blur(5px)}
+.board-focus-dialog{position:relative;width:min(620px,calc(100vw - 32px));max-height:min(720px,calc(100vh - 48px));overflow:auto;padding:30px 32px 26px;border:1px solid rgba(224,157,119,.5);border-radius:13px;background:linear-gradient(145deg,#2c1520,#120d13);color:#fff0e9;box-shadow:0 25px 75px rgba(0,0,0,.52)}
+.board-focus-dialog>span{display:block;color:#e16a7d;font-size:10px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}.board-focus-dialog>small{display:block;margin-top:8px;color:#cfae9d;font-size:11px;text-transform:uppercase;letter-spacing:.08em}.board-focus-dialog h3{margin:10px 0 12px;color:#fff0e9;font-family:Georgia,serif;font-size:34px;line-height:1.04}.board-focus-dialog>p{margin:0;color:#dcc5bd;font-size:14px;line-height:1.6;white-space:pre-wrap}.board-focus-close{position:absolute;top:10px;right:13px;border:0;background:transparent;color:#e3a16c;font-size:26px;line-height:1;cursor:pointer}.board-focus-related{display:grid;gap:8px;margin-top:24px;padding-top:18px;border-top:1px solid rgba(224,157,119,.22)}.board-focus-related>strong{color:#e3a16c;font-size:10px;letter-spacing:.13em;text-transform:uppercase}.board-focus-related button{padding:11px 12px;border:1px solid rgba(224,157,119,.3);border-radius:6px;background:rgba(54,27,37,.72);color:#f7dfd7;text-align:left;font-size:12px;cursor:pointer}.board-focus-related button:hover{border-color:#f09a88;background:rgba(201,75,99,.24)}.board-focus-related p{margin:0;color:#bca9a2;font-size:12px}.board-focus-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:24px}.board-focus-actions button{min-height:40px;padding:0 12px;border:1px solid rgba(224,155,155,.38);border-radius:6px;background:transparent;color:#f7dfd7;font-size:11px;font-weight:800;cursor:pointer}.board-focus-actions button:first-child{border-color:#d75c70;background:#72273e}.board-focus-actions button:hover{border-color:#f09a88;background:rgba(201,75,99,.24)}
+@media(max-width:760px){.board-focus-backdrop{place-items:end center;padding:10px}.board-focus-dialog{width:100%;max-height:82vh;padding:25px 21px 19px;border-radius:13px 13px 6px 6px}.board-focus-dialog h3{font-size:28px}.board-focus-dialog>p{font-size:13px}.board-focus-actions{grid-template-columns:1fr 1fr}.board-focus-actions button{min-height:44px}.board-focus-related button{min-height:42px}}
+
+/* CHRONICLE_SPACE_BOARD_RESOURCE_NOTES_V1 — anotaciones ligadas a la ficha del recurso. */
+.board-focus-notes{display:grid;gap:8px;margin-top:20px;padding-top:17px;border-top:1px solid rgba(224,157,119,.22)}.board-focus-notes>strong{color:#e3a16c;font-size:10px;letter-spacing:.13em;text-transform:uppercase}.board-focus-notes button{min-width:0;padding:10px 12px;border:1px solid rgba(224,157,119,.3);border-radius:6px;background:rgba(54,27,37,.72);color:#f7dfd7;text-align:left;font-size:12px;cursor:pointer}.board-focus-notes button:hover{border-color:#f09a88;background:rgba(201,75,99,.24)}.board-focus-notes p{margin:0;color:#d6c0b8;font-size:12px}.note-reference-context{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:4px 12px;margin-top:18px;padding:12px 13px;border:1px solid rgba(224,157,119,.34);border-radius:7px;background:rgba(81,40,47,.28)}.note-reference-context span{grid-column:1/-1;color:#e16a7d;font-size:9px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}.note-reference-context strong{min-width:0;overflow:hidden;color:#fff0e9;font-family:Georgia,serif;font-size:16px;text-overflow:ellipsis;white-space:nowrap}.note-reference-context button{padding:6px 0;border:0;background:transparent;color:#e3a16c;font-size:10px;font-weight:800;cursor:pointer}.note-reference-context button:hover{color:#fff0e9}
+@media(max-width:760px){.note-reference-context{grid-template-columns:1fr}.note-reference-context button{justify-self:start}}
+
+/* CHRONICLE_SPACE_TIMELINE_NOTES_V1 — la memoria une sesiones y anotaciones sin duplicar datos. */
+.timeline-card__body{min-width:0}.timeline-card__notes{display:grid;gap:8px;margin-top:17px;padding-top:14px;border-top:1px solid rgba(224,157,119,.18)}.timeline-card__notes>span,.timeline-independent header span{color:#d97883;font-size:9px;font-weight:850;letter-spacing:.14em;text-transform:uppercase}.timeline-note{display:grid;min-width:0;gap:4px;padding:10px 12px;border:1px solid rgba(224,157,119,.26);border-radius:6px;background:rgba(73,35,44,.42);color:#f4ded5;text-align:left;cursor:pointer}.timeline-note:hover{border-color:#e39a7e;background:rgba(142,47,68,.34)}.timeline-note strong{overflow:hidden;font-family:Georgia,serif;font-size:14px;line-height:1.15;text-overflow:ellipsis;white-space:nowrap}.timeline-note small{overflow:hidden;color:#cbaea1;font-size:10px;text-overflow:ellipsis;white-space:nowrap}.timeline-independent{margin-top:22px;padding:18px;border:1px solid rgba(224,157,119,.25);border-radius:9px;background:rgba(23,14,19,.74)}.timeline-independent header{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:13px;padding-bottom:11px;border-bottom:1px solid rgba(224,157,119,.16)}.timeline-independent h3{margin:5px 0 0;color:#fff0e9;font-family:Georgia,serif;font-size:23px}.timeline-independent header b{color:#e3a16c;font-size:20px}.timeline-independent>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media(max-width:760px){.timeline-independent>div{grid-template-columns:1fr}.timeline-card__notes{margin-top:14px}.timeline-note{min-height:47px}.timeline-independent{padding:15px}}
+
+/* CHRONICLE_SPACE_TIMELINE_INDEPENDENT_LINE_V1 — el bloque sin sesión queda fuera de la línea temporal. */
+.timeline-independent{position:relative;z-index:1}
+
+/* CHRONICLE_SPACE_TIMELINE_SESSION_DETAIL_V1 — sesión consultable sin abandonar el Centro. */
+.timeline-card__body{min-width:0}.timeline-card__note-count{display:block;margin-top:10px;color:#d99d89;font-size:10px;letter-spacing:.04em}.timeline-card__aside{display:grid;justify-items:end;align-content:center;gap:11px;min-width:94px}.timeline-card__aside>span{color:#8e777c;font-size:11px;white-space:nowrap}.timeline-session-action{min-height:32px;padding:0 10px;border:1px solid rgba(215,92,112,.62);border-radius:6px;background:rgba(114,39,62,.46);color:#ffe6df;font-size:10px;font-weight:800;cursor:pointer}.timeline-session-action:hover{background:#72273e;border-color:#ef8f9d}.timeline-session-detail{max-height:min(760px,calc(100vh - 42px));overflow:auto}.timeline-session-detail__meta{display:block;color:#d99d89;font-size:10px;font-weight:750;letter-spacing:.1em;text-transform:uppercase}.timeline-session-detail__notes{display:grid;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid rgba(224,157,119,.18)}.timeline-session-detail__notes>span{color:#d97883;font-size:9px;font-weight:850;letter-spacing:.14em;text-transform:uppercase}.timeline-session-detail__empty{margin:18px 0 0;color:#a99597;font-size:13px}.timeline-session-detail .timeline-note{width:100%;box-sizing:border-box}.timeline-session-detail .detail-action{margin-top:22px}
+@media(max-width:760px){.timeline-card__aside{grid-column:2;justify-items:start;align-content:start;min-width:0}.timeline-card__aside>span{font-size:10px}.timeline-session-detail{max-height:calc(100vh - 24px);padding:30px 22px 23px}.timeline-session-detail h2{font-size:34px}.timeline-session-detail__notes{margin-top:16px}}
+
+/* CHRONICLE_SPACE_TIMELINE_GLOBAL_OVERLAYS_V1 — previsualización disponible fuera de Pizarra. */
+.board-preview-backdrop,.space-overlay{isolation:isolate}
+
+/* CHRONICLE_SPACE_GLOBAL_PREVIEW_MENTIONS_V1 — referencias pulsables antes de abrir la ficha completa. */
+.board-preview-dialog .mention-link{display:inline;margin:0 2px;padding:0 4px;border:0;border-bottom:1px solid rgba(240,139,153,.8);border-radius:3px;background:rgba(201,75,99,.14);color:#ffabb5;font:inherit;cursor:pointer}.board-preview-dialog .mention-link:hover{background:rgba(201,75,99,.3);color:#ffe1dc}
+
+/* CHRONICLE_SPACE_TIMELINE_FILTERS_V1 — navegación compacta para cronologías extensas. */
+.timeline-tools{display:grid;grid-template-columns:minmax(210px,.85fr) minmax(0,1.7fr) auto;align-items:end;gap:12px;margin:0 0 20px;padding:13px;border:1px solid rgba(220,181,172,.16);border-radius:8px;background:rgba(31,19,24,.62)}.timeline-search{display:grid;gap:6px;color:#d99d89;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.timeline-search input{width:100%;box-sizing:border-box;min-height:36px;padding:0 10px;border:1px solid rgba(224,155,155,.32);border-radius:6px;background:#120e13;color:#f7e7e0;font:12px/1.2 Inter,system-ui,sans-serif;letter-spacing:normal;text-transform:none}.timeline-search input:focus{outline:1px solid rgba(240,139,153,.75);border-color:#d75c70}.timeline-filters{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.timeline-filters>span{margin-right:3px;color:#d99d89;font-size:9px;font-weight:800;letter-spacing:.12em}.timeline-filters button{min-height:30px;padding:0 9px;border:1px solid rgba(224,155,155,.28);border-radius:999px;background:rgba(19,13,17,.76);color:#cdb9b4;font-size:10px;font-weight:750;cursor:pointer}.timeline-filters button:hover,.timeline-filters button.is-active{border-color:#d75c70;background:rgba(114,39,62,.72);color:#fff0eb}.timeline-result-count{color:#a99597;font-size:10px;white-space:nowrap}
+@media(max-width:900px){.timeline-tools{grid-template-columns:1fr}.timeline-result-count{justify-self:start}}.timeline-tools+ .timeline{margin-top:0}
+
+/* CHRONICLE_SPACE_ARCHIVE_FILTERS_V1 — el Archivo escala sin perder contexto. */
+.archive-tools{display:grid;grid-template-columns:minmax(210px,.85fr) minmax(0,1.4fr) auto;align-items:end;gap:12px;margin:0 0 18px;padding:13px;border:1px solid rgba(220,181,172,.16);border-radius:8px;background:rgba(31,19,24,.62)}.archive-search{display:grid;gap:6px;color:#d99d89;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.archive-search input{width:100%;box-sizing:border-box;min-height:36px;padding:0 10px;border:1px solid rgba(224,155,155,.32);border-radius:6px;background:#120e13;color:#f7e7e0;font:12px/1.2 Inter,system-ui,sans-serif;letter-spacing:normal;text-transform:none}.archive-search input:focus{outline:1px solid rgba(240,139,153,.75);border-color:#d75c70}.archive-filters{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.archive-filters>span{margin-right:3px;color:#d99d89;font-size:9px;font-weight:800;letter-spacing:.12em}.archive-filters button{min-height:30px;padding:0 10px;border:1px solid rgba(224,155,155,.28);border-radius:999px;background:rgba(19,13,17,.76);color:#cdb9b4;font-size:10px;font-weight:750;cursor:pointer}.archive-filters button:hover,.archive-filters button.is-active{border-color:#d75c70;background:rgba(114,39,62,.72);color:#fff0eb}.archive-result-count{color:#a99597;font-size:10px;white-space:nowrap}.archive-empty{margin-top:16px;padding:20px;border:1px dashed rgba(220,181,172,.25);border-radius:8px}
+@media(max-width:900px){.archive-tools{grid-template-columns:1fr}.archive-result-count{justify-self:start}}@media(max-width:760px){.archive-filters{align-items:stretch}.archive-filters>span{width:100%}.archive-filters button{flex:1;justify-content:center;padding:0 7px;font-size:9px}.archive-search input{min-height:40px}}
+
+/* CHRONICLE_SPACE_ARCHIVE_EXPAND_V1 — el Archivo no oculta fichas cuando una categoría crece. */
+.archive-box__header{align-items:center!important}.archive-box__summary{display:flex;align-items:center;gap:8px}.archive-box__expand{padding:5px 8px;border:1px solid rgba(224,155,155,.28);border-radius:999px;background:rgba(19,13,17,.76);color:#d9b8b3;font-size:9px;font-weight:750;cursor:pointer}.archive-box__expand:hover{border-color:#d75c70;background:rgba(114,39,62,.72);color:#fff0eb}
+@media(max-width:520px){.archive-box__header{align-items:flex-start!important}.archive-box__summary{align-items:flex-end;flex-direction:column;gap:5px}.archive-box__expand{white-space:nowrap}}
+
+/* CHRONICLE_SPACE_ARCHIVE_RESOURCE_KINDS_V1 — el Archivo refleja todos los recursos consultables de la crónica. */
+.archive-box:nth-child(n+4) .archive-box__header span{color:#cba47d}
+@media(max-width:760px){.archive-filters{gap:5px}.archive-filters button{flex:1 1 30%}}
+
+/* CHRONICLE_SPACE_ARCHIVE_SORT_V1 — orden explícito sin perder los filtros del Archivo. */
+.archive-sort{display:grid;gap:6px;color:#d99d89;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.archive-sort select{min-height:30px;padding:0 9px;border:1px solid rgba(224,155,155,.28);border-radius:6px;background:#120e13;color:#f3ded8;font:11px/1.2 Inter,system-ui,sans-serif;letter-spacing:normal;text-transform:none}.archive-sort select:focus{outline:1px solid rgba(240,139,153,.75);border-color:#d75c70}
+.archive-tools{grid-template-columns:minmax(210px,.85fr) minmax(0,1.4fr) auto auto}
+@media(max-width:900px){.archive-tools{grid-template-columns:1fr}.archive-sort{max-width:260px}}
+@media(max-width:760px){.archive-sort{max-width:none}.archive-sort select{min-height:40px}}
+
+/* CHRONICLE_SPACE_RESOURCE_RELATED_NOTES_V1 — una ficha permite volver a las anotaciones que la citan. */
+.space-detail__related{display:grid;gap:8px;margin-top:22px;padding-top:16px;border-top:1px solid rgba(224,157,119,.18)}.space-detail__related>span{color:#d97883;font-size:9px;font-weight:850;letter-spacing:.14em;text-transform:uppercase}.space-detail__related-note{display:grid;gap:4px;width:100%;padding:10px 12px;border:1px solid rgba(224,157,119,.26);border-radius:6px;background:rgba(73,35,44,.42);color:#f4ded5;text-align:left;cursor:pointer}.space-detail__related-note:hover{border-color:#e39a7e;background:rgba(142,47,68,.34)}.space-detail__related-note strong{overflow:hidden;font-family:Georgia,serif;font-size:14px;line-height:1.2;text-overflow:ellipsis;white-space:nowrap}.space-detail__related-note small{overflow:hidden;color:#cbaea1;font-size:10px;text-overflow:ellipsis;white-space:nowrap}
+
+/* CHRONICLE_SPACE_RESOURCE_MENTION_LINKS_V1 — menciones textuales y referencias explícitas comparten la misma relación. */
+
+/* CHRONICLE_SPACE_DETAIL_VISUALS_V1 — las fichas enseñan la imagen real sin perder legibilidad. */
+.space-detail__visual{display:grid;gap:8px;margin:18px 0 20px}.space-detail__visual-frame{position:relative;display:grid;place-items:center;min-height:154px;overflow:hidden;border:1px solid rgba(224,157,119,.32);border-radius:10px;background:radial-gradient(circle at 50% 25%,rgba(133,49,68,.5),transparent 55%),linear-gradient(145deg,#2a171e,#120f12);box-shadow:0 16px 34px rgba(0,0,0,.28)}.space-detail__visual--resource .space-detail__visual-frame{min-height:184px;max-height:280px}.space-detail__visual--session .space-detail__visual-frame{min-height:190px;max-height:310px}.space-detail__visual img{display:block;width:100%;height:100%;min-height:inherit;max-height:inherit;object-fit:cover}.space-detail__visual--resource img{object-position:center 30%}.space-detail__visual--session img{object-position:center 42%}.space-detail__visual-frame.is-missing img{display:none}.space-detail__visual-fallback{position:absolute;inset:0;display:grid;place-items:center;color:rgba(228,177,143,.72);font-family:Georgia,serif;font-size:clamp(18px,4vw,29px);font-weight:700;letter-spacing:.18em;text-transform:uppercase}.space-detail__visual-frame:not(.is-missing) .space-detail__visual-fallback{display:none}.space-detail__visual figcaption{color:#a99597;font-size:10px;letter-spacing:.1em;text-transform:uppercase}.space-detail__visual + .space-kicker{margin-top:2px}.timeline-session-detail .space-detail__visual{margin-top:18px}.timeline-session-detail .space-detail__visual + h2{margin-top:4px}@media(max-width:760px){.space-detail__visual--resource .space-detail__visual-frame{min-height:156px;max-height:220px}.space-detail__visual--session .space-detail__visual-frame{min-height:156px;max-height:240px}}
+
+/* CHRONICLE_SPACE_SESSION_DETAIL_VISUAL_V1 — la sesión reutiliza su imagen persistida. */
+
+/* CHRONICLE_SPACE_RESOURCE_RELATED_NOTES_V2 — navegación contextual desde la ficha completa. */
+.space-detail__related{display:grid;gap:8px;margin-top:22px;padding-top:16px;border-top:1px solid rgba(224,157,119,.18)}.space-detail__related>span{color:#d97883;font-size:9px;font-weight:850;letter-spacing:.14em;text-transform:uppercase}.space-detail__related-note{display:grid;gap:4px;width:100%;padding:10px 12px;border:1px solid rgba(224,157,119,.26);border-radius:6px;background:rgba(73,35,44,.42);color:#f4ded5;text-align:left;cursor:pointer}.space-detail__related-note:hover{border-color:#e39a7e;background:rgba(142,47,68,.34)}.space-detail__related-note strong{overflow:hidden;font-family:Georgia,serif;font-size:14px;line-height:1.2;text-overflow:ellipsis;white-space:nowrap}.space-detail__related-note small{overflow:hidden;color:#cbaea1;font-size:10px;text-overflow:ellipsis;white-space:nowrap}.space-detail__related-empty{margin:22px 0 0;padding-top:16px;border-top:1px solid rgba(224,157,119,.18);color:#a99597;font-size:12px}
+
+/* CHRONICLE_SPACE_RESOURCE_RELATED_NOTES_V3 — anotaciones citadas o conectadas desde la pizarra. */
+.space-detail__related-v3{display:grid;gap:8px;margin-top:22px;padding-top:16px;border-top:1px solid rgba(224,157,119,.18)}.space-detail__related-v3>span{color:#d97883;font-size:9px;font-weight:850;letter-spacing:.14em;text-transform:uppercase}.space-detail__related-note-v3{display:grid;gap:4px;width:100%;padding:10px 12px;border:1px solid rgba(224,157,119,.26);border-radius:6px;background:rgba(73,35,44,.42);color:#f4ded5;text-align:left;cursor:pointer}.space-detail__related-note-v3:hover{border-color:#e39a7e;background:rgba(142,47,68,.34)}.space-detail__related-note-v3 strong{overflow:hidden;font-family:Georgia,serif;font-size:14px;line-height:1.2;text-overflow:ellipsis;white-space:nowrap}.space-detail__related-note-v3 small{overflow:hidden;color:#cbaea1;font-size:10px;text-overflow:ellipsis;white-space:nowrap}.space-detail__related-empty-v3{margin:22px 0 0;padding-top:16px;border-top:1px solid rgba(224,157,119,.18);color:#a99597;font-size:12px}
+
+
+.space-detail__image-tools{display:grid;gap:8px;margin:-8px 0 18px;padding:10px 0;border-bottom:1px solid rgba(224,157,119,.14)}.space-detail__image-tools label{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#c9afb0;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.space-detail__image-tools input{max-width:190px;color:#d8b9b0;font-size:10px;letter-spacing:normal;text-transform:none}.space-detail__image-tools button{justify-self:start;padding:6px 10px;border:1px solid rgba(224,155,155,.38);border-radius:5px;background:transparent;color:#efb0a8;font-size:10px;font-weight:800;cursor:pointer}.space-detail__image-tools button:hover{background:rgba(201,75,99,.16)}.space-detail__image-tools small{color:#d99d89;font-size:10px}
+@media(max-width:760px){.space-detail__image-tools label{align-items:flex-start;flex-direction:column}.space-detail__image-tools input{max-width:100%}}
+
+/* CHRONICLE_SPACE_DETAIL_IMAGE_EDIT_MODE_V1 — la ficha de lectura conserva una superficie limpia. */
+.detail-edit-trigger-v1{margin:8px 0 4px}.space-detail__image-edit-panel-v1{margin:4px 0 18px;padding:12px 0}.space-detail__image-edit-panel-v1 label{font-size:10px}.space-detail__image-edit-panel-v1 button{margin-top:2px}
+
+/* CHRONICLE_SPACE_TIMELINE_SESSION_CARD_VISUALS_V1 — contexto visual sin convertir la tarjeta en un editor. */
+.timeline-card__body{position:relative}.timeline-card__visual-v1{position:absolute;top:0;right:0;width:104px;height:64px;overflow:hidden;border:1px solid rgba(224,157,119,.3);border-radius:6px;background:linear-gradient(145deg,#2a171e,#120f12)}.timeline-card__visual-v1 img{display:block;width:100%;height:100%;object-fit:cover}.timeline-card__visual-v1.is-missing img{display:none}.timeline-card__visual-v1 span{position:absolute;inset:0;display:grid;place-items:center;color:rgba(228,177,143,.7);font-size:9px;font-weight:800;letter-spacing:.12em}.timeline-card__visual-v1:not(.is-missing) span{display:none}.timeline-card__body>h3,.timeline-card__body>p,.timeline-card__body>.timeline-card__note-count{padding-right:122px}
+@media(max-width:760px){.timeline-card__visual-v1{position:relative;top:auto;right:auto;width:100%;height:92px;margin-bottom:10px}.timeline-card__body>h3,.timeline-card__body>p,.timeline-card__body>.timeline-card__note-count{padding-right:0}}
+
+
+.detail-edit-trigger-permission-v1{margin:8px 0 4px}.space-detail__session-edit-panel-permission-v1{margin:4px 0 18px;padding:12px 0}
+
+/* CHRONICLE_SPACE_BOARD_CONNECTION_TYPES_V1 — lectura visual de las relaciones sin depender sólo del color. */
+.board-link{stroke-dasharray:none;stroke-width:.38}
+.board-link--visual{stroke:rgba(224,157,119,.72);stroke-width:.38}
+.board-link--known{stroke:#e3a16c;stroke-width:.62}
+.board-link--suspicion{stroke:#bd798a;stroke-width:.48;stroke-dasharray:1.7 1.25}
+.connection-composer{grid-template-columns:minmax(170px,1fr) minmax(180px,1fr) minmax(160px,1fr) auto auto}
+.connection-composer select{width:100%;border:1px solid rgba(224,155,155,.35);border-radius:5px;background:#120e13;color:#fff0eb;padding:9px;font:13px/1.35 Inter,system-ui,sans-serif}
+.connection-visual-help{align-self:center;margin:0;color:#c9afb0;font-size:11px;line-height:1.35}
+.connection-type-badge{display:inline-block;margin:0 7px;color:#e3a16c;font-family:Inter,system-ui,sans-serif;font-size:9px;font-style:normal;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+.connection-type-badge--suspicion{color:#bd798a}
+@media(max-width:900px){.connection-composer{grid-template-columns:1fr 1fr}.connection-visual-help{grid-column:1/-1}}
+@media(max-width:760px){.connection-composer{grid-template-columns:1fr}.connection-visual-help{grid-column:auto}}
+
+/* CHRONICLE_SPACE_BOARD_STABLE_AUTO_LAYOUT_V1 — la reparación no salta entre posiciones ni pisa tarjetas. */
+.board-card.is-dragging{z-index:8;transition:none}
+.board-card{transition:left .16s ease,top .16s ease,box-shadow .18s ease,filter .18s ease}
+
+/* CHRONICLE_SPACE_BOARD_FREE_OVERLAP_V2 — movimiento directo, sin recolocación automática. */
+.board-card{transition:box-shadow .18s ease,filter .18s ease}
+.board-card.is-dragging{z-index:8;transition:none}
+
+/* CHRONICLE_SPACE_BOARD_FREE_OVERLAP_V3 — movimiento directo, sin recolocación automática. */
+.board-card{transition:box-shadow .18s ease,filter .18s ease}
+.board-card.is-dragging{z-index:8;transition:none}
+
+/* CHRONICLE_SPACE_BOARD_CONNECTION_LAYER_V1 — las relaciones se ven por encima de las tarjetas. */
+.space-board .board-connections-layer{z-index:4;pointer-events:none}
+.space-board .board-card{z-index:2}
+.space-board .board-card.is-dragging{z-index:6}
+.space-board .board-connect-hint{z-index:7}
+.space-board .board-link{vector-effect:non-scaling-stroke;opacity:.88;pointer-events:none}
+
+/* CHRONICLE_SPACE_BOARD_CONNECTION_GEOMETRY_V1 — líneas ancladas en los bordes y legibles. */
+.space-board .board-connections-layer{z-index:1}
+.space-board .board-card{z-index:2}
+.space-board .board-link{vector-effect:non-scaling-stroke;stroke-linecap:round;opacity:1}
+.space-board .board-link--visual{stroke-width:2.4px}
+.space-board .board-link--known{stroke-width:3.1px}
+.space-board .board-link--suspicion{stroke-width:2.8px}
+
+/* CHRONICLE_SPACE_BOARD_CONNECTION_DIRECTION_LENGTH_V1 — trazos completos, legibles y por encima de las tarjetas. */
+.space-board .board-connections-layer{z-index:4;pointer-events:none}
+.space-board .board-card{z-index:2}
+.space-board .board-card.is-dragging{z-index:7}
+.space-board .board-connect-hint{z-index:8}
+.space-board .board-link{vector-effect:non-scaling-stroke;stroke-linecap:round;opacity:1;pointer-events:none}
+.space-board .board-link--visual{stroke-width:2.4px}
+.space-board .board-link--known{stroke-width:3.1px}
+.space-board .board-link--suspicion{stroke-width:2.8px}
+
+/* CHRONICLE_SPACE_BOARD_SMOOTH_DRAG_CONNECTIONS_V1 — las líneas llegan al borde y no interfieren con el arrastre. */
+.space-board .board-connections-layer{z-index:4;pointer-events:none}
+.space-board .board-card{z-index:2}
+.space-board .board-card.is-dragging{z-index:7;transition:none}
+.space-board .board-link{vector-effect:non-scaling-stroke;stroke-linecap:round;opacity:1;pointer-events:none}
+.space-board .board-link--visual{stroke-width:2.4px}
+.space-board .board-link--known{stroke-width:3.1px}
+.space-board .board-link--suspicion{stroke-width:2.8px}
+
+/* CHRONICLE_SPACE_BOARD_CONNECTION_EDITOR_V1 — edición y lectura de relaciones desde la pizarra. */
+.space-board .board-connections-layer line.board-link{pointer-events:stroke;cursor:pointer}
+.connection-composer--editor{grid-template-columns:minmax(220px,1.2fr) minmax(170px,1fr) minmax(190px,1fr) auto auto}
+.connection-composer--editor>div{display:grid;gap:7px}
+.connection-direction{justify-self:start!important;min-height:30px!important;padding:0 9px!important;color:#e3a16c!important;font-size:10px!important}
+.connection-editor-message{grid-column:1/-1;margin:0;color:#e9a0a4;font-size:11px}
+.connection-row-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.connection-row-actions button{padding:5px 8px;border:1px solid rgba(224,155,155,.28);border-radius:4px;background:transparent;color:#d97883;font-size:10px;font-weight:800;cursor:pointer}
+.connection-row-actions .connection-edit{border-color:rgba(224,157,119,.45);color:#e3a16c}
+.connection-row-actions button:hover{border-color:#f09a88;background:rgba(201,75,99,.18)}
+.connection-legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin:12px 0 3px;padding:9px 0;border-bottom:1px solid rgba(220,181,172,.12);color:#cdb7ae;font-size:10px;font-weight:750;text-transform:uppercase;letter-spacing:.05em}
+.connection-legend span{display:inline-flex;align-items:center;gap:6px}
+.connection-legend span::before{display:inline-block;width:25px;height:0;border-top:3px solid currentColor;content:''}
+.connection-legend__visual{color:#e09d77}.connection-legend__known{color:#e3a16c}.connection-legend__suspicion{color:#bd798a}.connection-legend__suspicion::before{border-top-style:dashed}
+@media(max-width:900px){.connection-composer--editor{grid-template-columns:1fr 1fr}.connection-composer--editor>div{grid-column:1/-1}}
+@media(max-width:760px){.connection-composer--editor{grid-template-columns:1fr}.connection-composer--editor>div{grid-column:auto}.connection-row-actions{width:100%;justify-content:flex-start}.connection-row-actions button{min-height:36px}.connection-legend{gap:8px 12px}}
+
+/* CHRONICLE_SPACE_BOARD_CONNECTION_VISUAL_CONTRAST_V1 — cada relación tiene una silueta y color propios, no sólo una variación mínima de grosor. */
+.space-board .board-link--visual{stroke:#aab4c2;stroke-width:1.45px;stroke-dasharray:.75 1.7;opacity:.82;filter:none}
+.space-board .board-link--known{stroke:#f2a35f;stroke-width:3.65px;stroke-dasharray:none;opacity:1;filter:drop-shadow(0 0 1px rgba(242,163,95,.55))}
+.space-board .board-link--suspicion{stroke:#d77b9a;stroke-width:2.7px;stroke-dasharray:7 5;opacity:.96;filter:drop-shadow(0 0 1px rgba(215,123,154,.35))}
+.connection-legend__visual{color:#aab4c2}.connection-legend__visual::before{border-top-width:2px!important;border-top-style:dotted!important}
+.connection-legend__known{color:#f2a35f}.connection-legend__known::before{border-top-width:4px!important;border-top-style:solid!important}
+.connection-legend__suspicion{color:#d77b9a}.connection-legend__suspicion::before{border-top-width:3px!important;border-top-style:dashed!important}
+
+/* CHRONICLE_SPACE_BOARD_CONNECTION_FILTERS_V1 — localizar relaciones sin alterar las líneas visibles de la pizarra. */
+.connection-list-tools{display:grid;grid-template-columns:minmax(220px,1fr) auto;align-items:end;gap:12px;margin:13px 0 5px}
+.connection-list-tools>label{display:grid;gap:5px;color:#c9afb0;font-size:10px;font-weight:750}
+.connection-list-tools input{width:100%;border:1px solid rgba(224,155,155,.3);border-radius:5px;background:#120e13;color:#fff0eb;padding:9px;font:13px/1.35 Inter,system-ui,sans-serif}
+.connection-filter-buttons{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px}
+.connection-filter-button{padding:8px 10px;border:1px solid rgba(224,155,155,.28);border-radius:5px;background:transparent;color:#cdb7ae;font-size:10px;font-weight:800;cursor:pointer}
+.connection-filter-button.is-active{border-color:#e3a16c;background:rgba(201,75,99,.23);color:#fff0e9}
+.connection-filter-button--visual.is-active{border-color:#aab4c2;color:#aab4c2}.connection-filter-button--known.is-active{border-color:#f2a35f;color:#f2a35f}.connection-filter-button--suspicion.is-active{border-color:#d77b9a;color:#d77b9a}
+.connection-list-empty{margin:14px 0 2px;color:#bca9a2;font-size:12px}
+@media(max-width:900px){.connection-list-tools{grid-template-columns:1fr}.connection-filter-buttons{justify-content:flex-start}}
+
+/* CHRONICLE_SPACE_BOARD_CONNECTION_FOCUS_V1 — centra la atención en una relación sin mover ni alterar posiciones. */
+.space-board.has-focused-connection .board-card:not(.is-focused-endpoint){opacity:.24;filter:saturate(.35) brightness(.62)}
+.space-board.has-focused-connection .board-card.is-focused-endpoint{z-index:8;opacity:1;outline:4px solid rgba(246,190,117,.95);outline-offset:6px;filter:brightness(1.08);box-shadow:0 0 0 10px rgba(224,157,119,.18),12px 18px 32px rgba(0,0,0,.34)}
+.space-board.has-focused-connection .board-link:not(.is-focused){opacity:.12}
+.space-board .board-link.is-focused{opacity:1;filter:drop-shadow(0 0 3px rgba(255,226,174,.8))}
+.connection-focus-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 4px;padding:9px 11px;border:1px solid rgba(224,157,119,.45);border-radius:5px;background:rgba(94,45,48,.26);color:#f1d2bf;font-size:11px}
+.connection-focus-banner button{border:1px solid rgba(224,155,155,.34);border-radius:4px;background:transparent;color:#f09a88;padding:6px 8px;font-size:10px;font-weight:800;cursor:pointer}
+.connection-row-actions .connection-focus{border-color:rgba(246,190,117,.45);color:#f6be75}
+.board-connections article.is-focused-row{border-radius:5px;background:rgba(201,75,99,.14);box-shadow:inset 3px 0 #f6be75;padding-left:10px;padding-right:8px}
+@media(max-width:760px){.connection-focus-banner{align-items:flex-start;flex-direction:column}.connection-focus-banner button{width:100%;min-height:34px}}
+
+/* CHRONICLE_SPACE_BOARD_CARD_FOCUS_V1 — una tarjeta enfoca su red y ofrece abrir la ficha sin hacerlo automáticamente. */
+.space-board.has-focused-card .board-card:not(.is-focused-card){opacity:.24;filter:saturate(.35) brightness(.62)}
+.space-board.has-focused-card .board-card.is-focused-card{z-index:8;opacity:1;outline:4px solid rgba(246,190,117,.95);outline-offset:6px;filter:brightness(1.08);box-shadow:0 0 0 10px rgba(224,157,119,.18),12px 18px 32px rgba(0,0,0,.34)}
+.space-board.has-focused-card .board-link:not(.is-focused){opacity:.12}
+.board-card__focus-actions{position:absolute;z-index:10;right:8px;bottom:8px;left:8px;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 8px;border:1px solid rgba(139,48,69,.45);border-radius:5px;background:rgba(48,24,31,.94);box-shadow:0 5px 12px rgba(0,0,0,.24)}
+.board-card__focus-actions span{margin-right:auto;color:#f6be75;font-size:8px;font-weight:900;letter-spacing:.1em}
+.board-card__focus-actions button{padding:6px 7px;border:1px solid rgba(224,155,155,.4);border-radius:4px;background:rgba(255,244,211,.12);color:#f7dfd7;font-size:9px;font-weight:850;cursor:pointer}
+.board-card__focus-actions button:first-of-type{border-color:#d75c70;background:#72273e}
+.board-card__focus-actions button:hover{border-color:#f09a88;background:rgba(201,75,99,.3)}
+.card-focus-banner{border-color:rgba(246,190,117,.5);background:rgba(107,69,42,.2)}
+@media(max-width:760px){.board-card__focus-actions{position:relative;right:auto;bottom:auto;left:auto;margin:0 9px 9px}.board-card__focus-actions span{font-size:8px}.board-card__focus-actions button{min-height:34px}}
+
+/* CHRONICLE_SPACE_BOARD_NAVIGATION_V1 — navegación visual sin alterar el estado de la pizarra. */
+.space-board-navigation{display:flex;align-items:center;justify-content:flex-end;gap:7px;margin:0 0 9px;color:#cbaeb0;font-size:9px;font-weight:850;letter-spacing:.12em;text-transform:uppercase}
+.space-board-navigation span{margin-right:3px;color:#e16a7d}
+.space-board-navigation strong{min-width:42px;color:#f6be75;text-align:center;font-size:11px;letter-spacing:0}
+.space-board-navigation button{min-height:29px;padding:0 9px;border:1px solid rgba(224,155,155,.35);border-radius:5px;background:rgba(29,16,22,.76);color:#f7dfd7;font-size:11px;font-weight:800;cursor:pointer}
+.space-board-navigation button:hover{border-color:#e16a7d;background:#72273e}
+.space-board-navigation button[aria-label]{width:29px;padding:0;font-size:16px;line-height:1}
+.space-board{transform-origin:top left;transition:transform .18s ease,width .18s ease}
+@media(max-width:760px){.space-board-navigation{justify-content:center;margin-bottom:8px}.space-board-navigation button{min-height:34px}.space-board-navigation button[aria-label]{width:34px}}
+
+/* CHRONICLE_SPACE_BOARD_NAVIGATION_FOCUS_V1 — navegación hacia el foco y encuadre general. */
+.space-board-navigation button:last-child{border-color:rgba(246,190,117,.48);color:#f6be75}
+
+/* CHRONICLE_SPACE_BOARD_MOBILE_ACTIONS_V1 — barra de acciones táctiles para la tarjeta enfocada. */
+.board-mobile-actions{display:none}
+@media(max-width:760px){
+  .board-card__focus-actions{display:none}
+  .board-mobile-actions{position:fixed;z-index:60;right:10px;bottom:10px;left:10px;display:flex;align-items:center;gap:6px;padding:8px;border:1px solid rgba(224,157,119,.58);border-radius:8px;background:rgba(30,15,23,.96);box-shadow:0 12px 30px rgba(0,0,0,.42);backdrop-filter:blur(8px)}
+  .board-mobile-actions__title{display:grid;min-width:0;margin-right:auto;gap:2px}
+  .board-mobile-actions__title span{color:#e16a7d;font-size:8px;font-weight:900;letter-spacing:.12em}
+  .board-mobile-actions__title strong{max-width:145px;overflow:hidden;color:#fff0e9;font-family:Georgia,serif;font-size:12px;text-overflow:ellipsis;white-space:nowrap}
+  .board-mobile-actions button{min-height:34px;padding:0 9px;border:1px solid rgba(224,155,155,.38);border-radius:5px;background:rgba(255,244,211,.1);color:#f7dfd7;font-size:10px;font-weight:850;white-space:nowrap}
+  .board-mobile-actions button:first-of-type{border-color:#d75c70;background:#72273e}
+  .board-mobile-actions button:hover{border-color:#f09a88}
+  .space-board{padding-bottom:70px}
+}
+@media(max-width:430px){
+  .board-mobile-actions{gap:4px;padding:7px}
+  .board-mobile-actions__title{max-width:105px}
+  .board-mobile-actions__title strong{max-width:105px;font-size:11px}
+  .board-mobile-actions button{padding:0 6px;font-size:9px}
+}
+
+
+/* CHRONICLE_SPACE_BOARD_MOBILE_LAYOUT_V1 — evita solapamientos con la sesión y respeta la zona segura del teléfono. */
+@media(max-width:760px){
+  .space-board{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+  .board-connect-hint{padding-right:8px;line-height:1.35}
+  .board-connect-hint::after{content:'En móvil, pulsa una tarjeta para enfocarla y mostrar sus acciones.';display:block;margin-top:5px;color:rgba(246,190,117,.82);font-size:9px;font-weight:700;letter-spacing:.02em;line-height:1.35;text-transform:none}
+  .board-mobile-actions{bottom:calc(10px + env(safe-area-inset-bottom))}
+  #root:has(.board-mobile-actions) .authentication-session{bottom:calc(86px + env(safe-area-inset-bottom))}
+  #root:has(.board-mobile-actions) .space-board{padding-bottom:calc(164px + env(safe-area-inset-bottom))}
+}
+
+
+/* CHRONICLE_SPACE_NOTE_MENTIONS_PICKER_V1 — selección de recursos mientras se escribe una nota. */
+.space-composer__mention-menu{display:grid;gap:4px;max-height:220px;overflow:auto;margin-top:8px;padding:8px;border:1px solid rgba(214,75,96,.55);border-radius:8px;background:#171316;box-shadow:0 14px 34px rgba(0,0,0,.38)}
+.space-composer__mention-menu button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:8px 9px;border:0;border-radius:6px;background:transparent;color:#eadbd5;text-align:left;cursor:pointer;font:inherit}
+.space-composer__mention-menu button:hover,.space-composer__mention-menu button:focus-visible{background:#3a1b22;color:#fff}
+.space-composer__mention-menu button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.space-composer__mention-menu button small{flex:0 0 auto;color:#d99d89;font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+.space-composer__mention-menu p{margin:2px 4px;color:#a99690;font-size:11px}
+@media(max-width:760px){.space-composer__mention-menu{max-height:180px}.space-composer__mention-menu button{min-height:38px}}
+
+
+/* CHRONICLE_SPACE_NOTE_CONTEXT_IMAGE_SELECTOR_V1 — selección persistente y portada contextual de la nota. */
+.context-image-field{display:grid;gap:7px;margin-top:16px;color:#c9afb0;font-size:11px;font-weight:750;letter-spacing:.05em;text-transform:uppercase}
+.context-image-field select{width:100%;border:1px solid rgba(224,155,155,.35);border-radius:7px;background:#120e13;color:#fff0eb;padding:12px;font:15px/1.45 Inter,system-ui,sans-serif;letter-spacing:normal;text-transform:none}
+.context-image-field small{color:#a99597;font-size:10px;font-weight:500;letter-spacing:normal;text-transform:none}
+.detail-context-image{margin:0 0 22px;border:1px solid rgba(224,155,155,.28);border-radius:9px;overflow:hidden;background:#160f14}
+.detail-context-image img{display:block;width:100%;max-height:330px;object-fit:cover}
+.detail-context-image figcaption{padding:9px 12px;color:#d99d89;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+@media(max-width:760px){.detail-context-image img{max-height:250px}}
+
+
+/* CHRONICLE_SPACE_NOTE_CONTEXT_IMAGE_ANY_REFERENCE_V1 — destinos de imagen contextual para cualquier mención con imagen canónica. */
+
+
+/* CHRONICLE_SPACE_BOARD_MOBILE_DETAIL_SAFE_AREA_V1 — el detalle puede desplazarse por encima de la barra fija de foco. */
+@media(max-width:760px){
+  #root:has(.board-mobile-actions) .space-detail{
+    padding-bottom:calc(112px + env(safe-area-inset-bottom));
+    scroll-padding-bottom:calc(112px + env(safe-area-inset-bottom));
+  }
+}
+
+
+/* CHRONICLE_SPACE_BOARD_MOBILE_FOCUS_DIALOG_SAFE_AREA_V2 — el diálogo de foco puede desplazarse por encima de la barra fija. */
+@media(max-width:760px){
+  #root:has(.board-mobile-actions) .board-focus-dialog{
+    padding-bottom:calc(112px + env(safe-area-inset-bottom));
+    scroll-padding-bottom:calc(112px + env(safe-area-inset-bottom));
+  }
+}
+
+
+/* CHRONICLE_SPACE_BOARD_MOBILE_FOCUS_DIALOG_ACTIONS_V3 — el diálogo ya contiene sus acciones; la barra fija no debe taparlas. */
+@media(max-width:760px){
+  #root:has(.board-focus-backdrop) .board-mobile-actions{
+    display:none;
+  }
+}
+
+
+/* CHRONICLE_SPACE_BOARD_MOBILE_FOCUS_DIALOG_RENDER_V4 — al abrir el foco intermedio, sus acciones y Cerrar quedan libres. */
+
+
+/* CHRONICLE_SPACE_BOARD_MOBILE_PREVIEW_RENDER_V5 — al abrir la previsualización, sus acciones y Cerrar quedan libres. */
+
+
+/* CHRONICLE_SPACE_APP_SHELL_V1: el módulo usa el mismo marco de contenido que el resto de secciones. */
+body main.application-content--chronicle-space { padding: 0; }
+
+
+/* CHRONICLE_SPACE_LAYOUT_POLISH_V1: misma huella lateral y ritmo compacto que Recursos y Personajes. */
+.application-content:has(.chronicle-space){width:100%!important;max-width:none!important;margin:0!important;padding:18px 0 32px!important}
+.chronicle-space{width:100%;max-width:none;padding:0 30px 48px}
+.chronicle-space>.space-alert,.chronicle-space>.space-status,.chronicle-space>.space-panel{width:100%;max-width:none;margin-left:0;margin-right:0}
+.space-panel{padding:24px;border-radius:14px}
+.panel-heading{margin-bottom:14px}
+.panel-heading p{max-width:480px}
+.board-filter-bar{margin-bottom:8px}
+.board-quick-search{max-width:520px;margin-bottom:8px}
+.board-visibility-bar{margin-bottom:8px}
+.space-board-navigation{margin-bottom:7px}
+@media(max-width:900px){.chronicle-space{padding-inline:16px}.space-panel{padding:20px}}
+@media(max-width:760px){.application-content:has(.chronicle-space){padding:10px 0 24px!important}.chronicle-space{padding:0 14px 126px}.space-panel{padding:17px 13px}.panel-heading{margin-bottom:12px}}
+
+
+/* CHRONICLE_SPACE_BOARD_CONTROLS_UP_V1: la franja de vista no reserva una altura vacía antes de la pizarra. */
+.space-panel:has(.board-filter-bar){position:relative}
+.space-panel:has(.board-filter-bar)>.board-visibility-bar{position:absolute;top:112px;right:24px;z-index:2;width:max-content;max-width:calc(100% - 560px);margin:0;align-items:center}
+.space-panel:has(.board-filter-bar)>.board-visibility-bar>div{justify-content:flex-end}
+.space-panel:has(.board-filter-bar)>.space-board-navigation{position:absolute;top:166px;right:24px;z-index:2;width:max-content;margin:0}
+.space-panel:has(.board-filter-bar)>.space-board{margin-top:0}
+.space-panel:has(.board-filter-bar):has(.board-visibility-panel)>.board-visibility-bar,.space-panel:has(.board-filter-bar):has(.board-preset-panel)>.board-visibility-bar,.space-panel:has(.board-filter-bar):has(.board-visibility-panel)>.space-board-navigation,.space-panel:has(.board-filter-bar):has(.board-preset-panel)>.space-board-navigation{position:static;width:auto;max-width:none;margin:0 0 8px}
+@media(max-width:1100px){.space-panel:has(.board-filter-bar)>.board-visibility-bar,.space-panel:has(.board-filter-bar)>.space-board-navigation{position:static;width:auto;max-width:none;margin:0 0 8px}.space-panel:has(.board-filter-bar)>.board-visibility-bar{align-items:flex-start}}
+@media(max-width:760px){.space-panel:has(.board-filter-bar)>.board-visibility-bar,.space-panel:has(.board-filter-bar)>.space-board-navigation{margin-bottom:8px}}

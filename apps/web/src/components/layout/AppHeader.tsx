@@ -3,6 +3,8 @@ export function AppHeader({ displayName = 'jugador' }: { displayName?: string })
   const currentHash = typeof window !== 'undefined' ? window.location.hash : ''
   const pageContext = currentHash.startsWith('#/notebook')
     ? { eyebrow: 'CUADERNO', title: 'Cuaderno de la crónica', subtitle: 'Notas. Ideas. Conexiones. Todo deja huella.' }
+    : currentHash.startsWith('#/chronicle-space')
+      ? { eyebrow: 'SALA DE INVESTIGACIÓN', title: 'La mesa de investigación', subtitle: 'Personas, lugares y pistas de una misma historia.' }
     : currentHash.startsWith('#/dashboard')
       ? { eyebrow: 'INICIO', title: `Bienvenido, ${displayName}`, subtitle: 'Selecciona una crónica activa y consulta el estado de tu personaje.' }
       : currentHash.startsWith('#/characters')
@@ -66,3 +68,5 @@ export function AppHeader({ displayName = 'jugador' }: { displayName?: string })
 // NOTEBOOK_GLOBAL_HEADER_V6
 
 // NOTEBOOK_GLOBAL_HEADER_V7
+
+// CHRONICLE_SPACE_APP_SHELL_V1

@@ -1767,3 +1767,35 @@
     grid-column: 1 !important;
   }
 }
+
+
+/* CHRONICLE_SPACE_SESSION_SAFE_AREA_V1 — el panel de sesión no tapa el final del Centro de crónica. */
+@media (max-width:899px){
+  body{padding-bottom:max(8rem,calc(6rem + env(safe-area-inset-bottom)))}
+  .chronicle-space{padding-bottom:max(7rem,calc(6rem + env(safe-area-inset-bottom)));scroll-padding-bottom:8rem}
+}
+
+
+/* CHRONICLE_SPACE_GLOBAL_HEADER_V1: controles propios de la Sala dentro de la cabecera global. */
+.app-header .app-header__page-actions:has(.chronicle-space-global-actions){max-width:min(780px,calc(100vw - 470px));align-items:stretch}.chronicle-space-global-actions{display:grid;grid-template-columns:auto minmax(170px,230px) auto;grid-template-areas:'new chronicle counts' 'nav nav nav';align-items:end;gap:7px 10px;width:100%}.chronicle-space-global-actions__new-note{grid-area:new!important;white-space:nowrap}.chronicle-space-global-actions__chronicle{grid-area:chronicle;display:grid;gap:3px;min-width:0;color:#b9aaa4;font-size:10px;text-align:left}.chronicle-space-global-actions__chronicle select{width:100%;min-width:0;min-height:38px;border:1px solid rgba(119,73,77,.8);border-radius:8px;background:rgba(12,10,11,.88);color:#f1e8e3;padding:0 10px}.chronicle-space-global-actions__counts{grid-area:counts;display:flex;align-items:end;justify-content:flex-end;gap:15px;min-height:38px}.chronicle-space-global-actions__counts b{display:grid;gap:2px;color:#f2b1a7;font-family:Georgia,'Times New Roman',serif;font-size:22px;line-height:1;text-align:center}.chronicle-space-global-actions__counts small{color:#a58e91;font-family:Inter,system-ui,sans-serif;font-size:8px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}.chronicle-space-global-actions__nav{grid-area:nav;display:flex;justify-content:flex-end;gap:6px;min-width:0;overflow:auto}.app-header .app-header__page-actions .chronicle-space-global-actions__nav button{min-height:30px!important;padding:5px 9px!important;border-radius:7px!important;font-size:11px!important;line-height:1.1!important;white-space:nowrap}.chronicle-space-global-actions__nav small{display:block;color:#a58e91;font-size:8px;letter-spacing:.08em;text-transform:uppercase}.chronicle-space-global-actions__nav button.is-active{border-color:#c0475a!important;background:linear-gradient(135deg,#6d2638,#311721)!important;color:#fff5f0!important}
+@media(max-width:900px){.app-header .app-header__page-actions:has(.chronicle-space-global-actions){position:static!important;grid-column:2!important;grid-row:2!important;justify-self:stretch!important;max-width:none!important;margin:4px 16px 0!important}.chronicle-space-global-actions{grid-template-columns:auto minmax(150px,1fr) auto;grid-template-areas:'new chronicle counts' 'nav nav nav'}}
+@media(max-width:600px){.chronicle-space-global-actions{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:'new chronicle' 'counts counts' 'nav nav';gap:7px}.chronicle-space-global-actions__new-note{width:100%}.chronicle-space-global-actions__counts{justify-content:space-around;padding:4px 0}.chronicle-space-global-actions__nav{justify-content:flex-start}.chronicle-space-global-actions__nav button{flex:0 0 auto}}
+
+
+/* CHRONICLE_SPACE_LAYOUT_POLISH_V1: la navegación de la Sala tiene peso propio dentro de la cabecera global. */
+.app-header .app-header__page-actions:has(.chronicle-space-global-actions){width:min(860px,calc(100vw - 360px))!important;max-width:none!important}
+.chronicle-space-global-actions{grid-template-columns:minmax(150px,auto) minmax(205px,250px) minmax(220px,1fr);gap:8px 12px}
+.chronicle-space-global-actions__counts{gap:20px}
+.chronicle-space-global-actions__nav{justify-content:stretch;gap:8px}
+.app-header .app-header__page-actions .chronicle-space-global-actions__nav button{flex:1 1 0;min-width:0!important;min-height:40px!important;padding:7px 12px!important;border:1px solid rgba(206,158,137,.5)!important;border-radius:8px!important;background:rgba(25,15,22,.9)!important;color:#e8d8d3!important;text-align:center!important;font-size:12px!important;font-weight:800!important;line-height:1.1!important;box-shadow:0 4px 12px rgba(0,0,0,.18)}
+.chronicle-space-global-actions__nav small{font-size:8px;font-weight:800;letter-spacing:.11em}
+.app-header .app-header__page-actions .chronicle-space-global-actions__nav button.is-active{border-color:#e06b7e!important;background:linear-gradient(135deg,#7a2940,#3a1825)!important;color:#fff5f0!important;box-shadow:0 0 0 1px rgba(224,107,126,.2),0 6px 16px rgba(86,18,40,.28)}
+@media(min-width:901px) and (max-width:1360px){
+  .app-header:has(.chronicle-space-global-actions){grid-template-columns:minmax(180px,24%) minmax(0,1fr) minmax(180px,24%)!important;grid-template-rows:minmax(104px,1fr) auto!important;min-height:174px!important}
+  .app-header:has(.chronicle-space-global-actions) .app-brand{grid-column:1!important;grid-row:1!important}
+  .app-header:has(.chronicle-space-global-actions) .app-header__page-context{grid-column:2!important;grid-row:1!important;padding-right:18px!important}
+  .app-header:has(.chronicle-space-global-actions) .app-header__status{grid-column:3!important;grid-row:1!important}
+  .app-header .app-header__page-actions:has(.chronicle-space-global-actions){position:static!important;grid-column:1/-1!important;grid-row:2!important;justify-self:stretch!important;width:auto!important;max-width:none!important;margin:0 24px 12px!important}
+}
+@media(max-width:900px){.app-header .app-header__page-actions:has(.chronicle-space-global-actions){width:auto!important;max-width:none!important}.chronicle-space-global-actions{gap:7px}}
+@media(max-width:600px){.app-header .app-header__page-actions:has(.chronicle-space-global-actions){margin-inline:12px!important}.app-header .app-header__page-actions .chronicle-space-global-actions__nav button{min-height:38px!important;padding:6px 8px!important;font-size:11px!important}}

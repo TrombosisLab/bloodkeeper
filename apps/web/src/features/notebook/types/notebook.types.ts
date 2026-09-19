@@ -1,9 +1,9 @@
 export type NotebookVisibility = 'PRIVATE' | 'CHRONICLE' | 'SELECTED_PLAYERS'
-export type ResourceType = 'NPC' | 'LOCATION' | 'ORGANIZATION' | 'ARTIFACT' | 'DOCUMENT' | 'SESSION'
+export type ResourceType = 'CHARACTER' | 'NPC' | 'LOCATION' | 'ORGANIZATION' | 'ARTIFACT' | 'DOCUMENT' | 'SESSION'
 export type NotebookReference = { readonly id: string; readonly targetType: string; readonly targetId: string; readonly label: string | null }
 export type NotebookPlayer = { readonly id: string; readonly displayName: string; readonly username: string }
 export type NotebookNote = {
-  readonly id: string; readonly sessionId: string | null; readonly title: string; readonly content: string
+  readonly id: string; readonly sessionId: string | null; readonly contextLocationId: string | null; readonly contextImageTargetType: string | null; readonly contextImageTargetId: string | null; readonly title: string; readonly content: string
   readonly visibility: NotebookVisibility; readonly pinned: boolean; readonly tags: readonly string[]
   readonly canEdit: boolean; readonly updatedAt: string; readonly author: NotebookPlayer
   readonly audienceUserIds: readonly string[]
@@ -12,11 +12,14 @@ export type NotebookNote = {
 }
 export type NotebookPage = { readonly items: readonly NotebookNote[]; readonly canManage: boolean; readonly viewerUserId: string }
 export type NotebookContextNpc = { readonly id: string; readonly name: string; readonly category: string | null; readonly description: string | null; readonly narrativeRole: string | null; readonly detailLevel: string }
-export type NotebookContextLocation = { readonly id: string; readonly name: string; readonly category: string | null; readonly description: string | null; readonly parentLocationId: string | null; readonly imageUrl?: string }
+export type NotebookContextLocation = { readonly id: string; readonly name: string; readonly category: string | null; readonly description: string | null; readonly parentLocationId: string | null; readonly imageUrl?: string; readonly hasImage?: boolean }
+// CHRONICLE_NOTE_MENTIONS_PLAYER_CHARACTERS_V1
+export type NotebookContextImageCandidate = { readonly targetType: string; readonly targetId: string; readonly name: string; readonly imageUrl: string }
 export type NotebookContext = {
+  readonly characters: readonly { readonly id: string; readonly ownerId: string; readonly status: string; readonly name: string; readonly concept: string | null }[]
   readonly npcs: readonly NotebookContextNpc[]; readonly locations: readonly NotebookContextLocation[]
   readonly resources: readonly { id: string; kind: 'ORGANIZATION' | 'ARTIFACT' | 'DOCUMENT'; name: string; summary: string | null; visibility: string; locationId: string | null }[]
-  readonly players: readonly NotebookPlayer[]; readonly viewerUserId: string
+  readonly players: readonly NotebookPlayer[]; readonly imageCandidates: readonly NotebookContextImageCandidate[]; readonly viewerUserId: string
 }
 export type NotebookResourcePreview = {
   readonly id: string; readonly targetType: string; readonly targetId: string; readonly label: string

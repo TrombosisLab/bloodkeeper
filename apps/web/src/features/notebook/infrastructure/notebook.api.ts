@@ -1,7 +1,7 @@
 import type { NotebookContext, NotebookNote, NotebookPage, NotebookVisibility, NotebookResourcePreview } from '../types/notebook.types'
 export type NotebookWrite = {
   readonly title: string; readonly content: string; readonly visibility: NotebookVisibility
-  readonly sessionId?: string | null; readonly tags?: readonly string[]; readonly audienceUserIds?: readonly string[]
+  readonly sessionId?: string | null; readonly contextLocationId?: string | null; readonly contextImageTargetType?: string | null; readonly contextImageTargetId?: string | null; readonly tags?: readonly string[]; readonly audienceUserIds?: readonly string[]
   readonly references?: readonly { readonly targetType: string; readonly targetId: string; readonly label?: string }[]
 }
 async function request<T>(url: string, init?: RequestInit): Promise<T> {

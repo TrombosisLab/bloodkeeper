@@ -15,6 +15,7 @@ export type AppSection =
   | 'chronicles'
   | 'administration'
   | 'notebook'
+  | 'chronicle-space'
   | 'play'
 
 export interface AppNavigationPermissions {

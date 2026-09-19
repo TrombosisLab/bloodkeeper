@@ -21,6 +21,8 @@ import { PlayHub } from './features/chronicles/components/PlayHub'
 import { ResourceLibrary } from './features/resources/components/ResourceLibrary'
 import { Dashboard } from './features/dashboard/components/Dashboard'
 import { NotebookWorkspace } from './features/notebook/components/NotebookWorkspace'
+import { ChronicleSpacePrototype } from './features/chronicle-space/components/ChronicleSpacePrototype'
+import { NotebookFreshPrototype } from './features/notebook/components/NotebookFreshPrototype'
 import { AppBreadcrumbs } from './features/navigation/components/AppBreadcrumbs'
 import { AppNavigation } from './features/navigation/components/AppNavigation'
 import {
@@ -82,6 +84,8 @@ function App() {
 
   const canAccessAdministration = authenticatedUser?.roles.includes('admin') ?? false
   const canAccessChronicles = true
+  const chronicleSpaceRoute = () => window.location.search.includes('chronicle-space=fresh') && window.location.hash.startsWith('#/chronicle-space')
+  const [isChronicleSpace, setIsChronicleSpace] = useState(() => chronicleSpaceRoute())
 
   // CHRONICLE_CREATE_ACTION_ROLE_NORMALIZATION_V1
   const normalizedRoles = authenticatedUser.roles.map((role) => role.toLowerCase())
@@ -120,6 +124,12 @@ function App() {
 
   useEffect(() => {
     const synchronizeLocation = () => {
+      const routeIsChronicleSpace = chronicleSpaceRoute()
+      setIsChronicleSpace(routeIsChronicleSpace)
+      if (routeIsChronicleSpace) {
+        return
+      }
+
       const synchronizedView =
         appViewFromHash(
           window.location.hash,
@@ -209,6 +219,14 @@ function App() {
         navigateTo('characters')
         return
 
+      case 'chronicle-space': {
+        const target = new URL('/?chronicle-space=fresh#/chronicle-space', window.location.origin)
+        const currentChronicleId = new URLSearchParams(window.location.search).get('chronicleId')
+        if (currentChronicleId) target.searchParams.set('chronicleId', currentChronicleId)
+        window.location.href = target.toString()
+        return
+      }
+
       case 'notebook':
         navigateTo('notebook')
         return
@@ -232,6 +250,29 @@ function App() {
     [characterReadChronicleId],
   )
 
+  if (isChronicleSpace) {
+    return (
+      <AppLayout
+        contentClassName="application-content application-content--chronicle-space"
+        header={<AppHeader displayName={authenticatedUser.displayName} />}
+        navigation={
+          <AppNavigation
+            aria-label="Secciones principales"
+            activeSection="chronicle-space"
+            canAccessChronicles={canAccessChronicles}
+            canAccessAdministration={canAccessAdministration}
+            canCreateChronicles={canCreateChronicles}
+            onNavigate={navigateToSection}
+          />
+        }
+      >
+        <ChronicleSpacePrototype />
+      </AppLayout>
+    )
+  }
+
+  // NOTEBOOK_FRESH_PROTOTYPE_V1 — ruta temporal aislada para trabajar desde cero.
+  if (window.location.search.includes('notebook=fresh') && window.location.hash.startsWith('#/notebook')) return <NotebookFreshPrototype />
   return (
     <AppLayout
       breadcrumbs={
@@ -421,3 +462,11 @@ ReactDOM.createRoot(
 // APPLICATION_CONTENT_ALL_PAGES_V2
 
 import './dossier-dots';
+
+// CHRONICLE_SPACE_APP_SHELL_V1
+
+// CHRONICLE_SPACE_ROUTE_PRESERVE_V1
+
+// CHRONICLE_SPACE_NAVIGATION_PRESERVE_CHRONICLE_V1
+
+// CHRONICLE_SPACE_SPA_NAVIGATION_V1

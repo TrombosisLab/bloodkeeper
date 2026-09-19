@@ -3210,3 +3210,872 @@ dialog.nb2-modal.nb2-wide{width:min(940px,calc(100vw - 48px));padding:28px 30px;
     padding-right: 30px !important;
   }
 }
+
+
+/* SPEC071_PAGE_TRANSITION_V1: dos caras React, 440 ms y fallback seguro. */
+.nb2-page-transition {
+  position: relative;
+  min-width: 0;
+  isolation: isolate;
+  perspective: 1800px;
+}
+.nb2-page-transition__base {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+.nb2-page-turn {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-origin: left center;
+  transition: transform 440ms cubic-bezier(.45,.03,.18,1);
+  pointer-events: none;
+}
+.nb2-page-turn--backward { transform-origin: right center; }
+.nb2-page-turn--turning-forward { transform: rotateY(-180deg); }
+.nb2-page-turn--turning-backward { transform: rotateY(180deg); }
+.nb2-page-face {
+  position: absolute;
+  inset: 0;
+  min-width: 0;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.nb2-page-face--back { transform: rotateY(180deg); }
+@media (max-width: 760px) {
+  .nb2-page-transition { perspective: none; }
+  .nb2-page-turn {
+    transform: none !important;
+    transition: opacity 220ms ease;
+  }
+  .nb2-page-turn--preparing { opacity: 1; }
+  .nb2-page-turn--turning-forward,
+  .nb2-page-turn--turning-backward { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nb2-page-turn { transition: none !important; transform: none !important; }
+}
+
+/* SPEC071_C_PHYSICAL_NOTEBOOK_V1
+   Capa visual aislada: cubierta, lomo, hojas y pestañas decorativas.
+   La navegación, los datos y los permisos siguen perteneciendo a React. */
+.nb2-page-transition {
+  --nb-book-cover: #281217;
+  --nb-book-cover-deep: #160b0e;
+  --nb-book-edge: #6f3942;
+  position: relative;
+  min-width: 0;
+  margin: clamp(8px, 1.4vw, 20px) 0;
+  padding: clamp(12px, 1.6vw, 22px) clamp(12px, 1.8vw, 26px) clamp(14px, 1.9vw, 28px) clamp(16px, 2.2vw, 32px);
+  overflow: hidden;
+  border: 1px solid var(--nb-book-edge);
+  border-radius: 17px 10px 10px 17px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.06), transparent 9%, transparent 90%, rgba(0,0,0,.22)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 4px),
+    linear-gradient(135deg, var(--nb-book-cover) 0%, #1f1014 54%, var(--nb-book-cover-deep) 100%);
+  box-shadow:
+    0 20px 42px rgba(0,0,0,.38),
+    inset 0 0 0 2px rgba(255,214,190,.045),
+    inset 14px 0 22px rgba(0,0,0,.32),
+    inset -12px 0 18px rgba(0,0,0,.2);
+}
+
+/* Lomo y nervio de la encuadernación. */
+.nb2-page-transition::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0 auto 0 0;
+  width: clamp(18px, 2.1vw, 30px);
+  pointer-events: none;
+  border-right: 1px solid rgba(222,128,118,.22);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.46), rgba(119,43,55,.3) 45%, rgba(255,189,166,.08) 76%, rgba(0,0,0,.32)),
+    repeating-linear-gradient(90deg, transparent 0 5px, rgba(0,0,0,.17) 5px 6px);
+  box-shadow: 5px 0 10px rgba(0,0,0,.26);
+}
+
+/* Pestañas de índice: son decorativas; las pestañas funcionales siguen en la navegación existente. */
+.nb2-page-transition::after {
+  content: '';
+  position: absolute;
+  z-index: 3;
+  top: 8px;
+  right: clamp(14px, 2.8vw, 42px);
+  width: clamp(34px, 4vw, 54px);
+  height: 28px;
+  pointer-events: none;
+  border-radius: 0 0 5px 5px;
+  background: #a67b45;
+  box-shadow:
+    14px 25px 0 -2px #77313d,
+    -4px 50px 0 -5px #455161;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+  opacity: .92;
+}
+
+/* La superficie de hoja recibe el giro de SPEC-071-B sin tapar su contenido. */
+.nb2-page-transition__base {
+  position: relative;
+  z-index: 1;
+  min-height: 430px;
+  overflow: hidden;
+  border: 1px solid rgba(135,104,76,.8);
+  border-radius: 5px 12px 12px 5px;
+  background:
+    radial-gradient(ellipse at 12% 9%, rgba(255,255,255,.72), transparent 29%),
+    radial-gradient(ellipse at 93% 91%, rgba(113,75,41,.2), transparent 34%),
+    repeating-linear-gradient(0deg, rgba(93,61,35,.035) 0 1px, transparent 1px 5px),
+    linear-gradient(135deg, #f1e3c9 0%, #e5d1ac 52%, #eedfc2 100%);
+  box-shadow:
+    0 12px 25px rgba(0,0,0,.28),
+    inset 0 0 0 2px rgba(102,67,35,.15),
+    inset 14px 0 24px rgba(88,53,26,.1),
+    inset -10px 0 18px rgba(88,53,26,.08);
+}
+
+.nb2-page-transition__base::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(100,61,29,.16), transparent 8%, transparent 93%, rgba(100,61,29,.12));
+}
+
+.nb2-page-transition__base > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Los bloques existentes conservan su jerarquía y contraste dentro de la hoja. */
+.nb2-page-transition__base > .nb2-panel,
+.nb2-page-transition__base > .nb2-notes {
+  border-radius: 4px;
+}
+
+@media (max-width: 760px) {
+  .nb2-page-transition {
+    margin: 6px 0;
+    padding: 8px 8px 10px 16px;
+    border-radius: 12px 7px 7px 12px;
+  }
+  .nb2-page-transition::before { width: 17px; }
+  .nb2-page-transition::after { right: 12px; top: 5px; width: 38px; height: 22px; }
+  .nb2-page-transition__base { min-height: 360px; border-radius: 4px 8px 8px 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nb2-page-transition,
+  .nb2-page-transition__base { scroll-behavior: auto; }
+}
+
+/* NOTEBOOK_JOURNAL_SURFACE_V1
+   Primera capa visual del diario físico. Se apoya en las estructuras ya
+   existentes de resumen, notas, sesiones y archivo; no cambia navegación,
+   datos, menciones ni permisos. */
+:root {
+  --nb-paper-light: #f1e3c8;
+  --nb-paper: #e5d0a9;
+  --nb-paper-deep: #c5a87b;
+  --nb-paper-ink: #2b1c18;
+  --nb-paper-muted: #715744;
+  --nb-cover: #291318;
+  --nb-cover-deep: #160a0e;
+  --nb-cover-edge: #713943;
+}
+
+/* El contenido asentado conserva la cubierta, pero ya no depende de la
+   superficie efímera de la transición de página. */
+.nb2-page-transition > .nb2-summary-book,
+.nb2-page-transition > .nb2-notes,
+.nb2-page-transition > .nb2-session-workspace,
+.nb2-page-transition > .nb2-panel {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+/* Resumen: doble página real, con lomo y papel continuo. */
+.nb2-page-transition > .nb2-summary-book {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid rgba(120, 82, 49, .82);
+  border-radius: 5px 12px 12px 5px;
+  color: var(--nb-paper-ink);
+  background:
+    radial-gradient(ellipse at 9% 7%, rgba(255,255,255,.72), transparent 28%),
+    radial-gradient(ellipse at 92% 96%, rgba(104,68,35,.22), transparent 32%),
+    repeating-linear-gradient(0deg, rgba(89,58,32,.035) 0 1px, transparent 1px 5px),
+    linear-gradient(90deg, var(--nb-paper-light), var(--nb-paper) 50%, var(--nb-paper-light));
+  box-shadow:
+    0 16px 28px rgba(0,0,0,.3),
+    inset 0 0 0 2px rgba(92,58,29,.12),
+    inset 18px 0 25px rgba(84,51,26,.1),
+    inset -16px 0 22px rgba(84,51,26,.08);
+}
+
+.nb2-page-transition > .nb2-summary-book::before,
+.nb2-page-transition > .nb2-notes::before,
+.nb2-page-transition > .nb2-session-workspace::before,
+.nb2-page-transition > .nb2-panel::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: clamp(18px, 2vw, 34px);
+  pointer-events: none;
+  transform: translateX(-50%);
+  background:
+    linear-gradient(90deg, rgba(99,59,28,.18), rgba(255,255,255,.24) 42%, rgba(91,52,26,.28) 58%, rgba(255,255,255,.12)),
+    linear-gradient(90deg, transparent, rgba(58,35,22,.16), transparent);
+  box-shadow: 0 0 18px rgba(66,39,21,.2);
+}
+
+.nb2-summary-book__page {
+  min-width: 0;
+  min-height: clamp(560px, 50vw, 720px);
+  padding: clamp(34px, 4vw, 68px) clamp(26px, 4vw, 64px) clamp(42px, 5vw, 76px);
+  color: var(--nb-paper-ink);
+  background: transparent;
+}
+
+.nb2-summary-book__page--left {
+  border-right: 1px solid rgba(112, 76, 45, .22);
+}
+
+.nb2-summary-book__page--right {
+  border-left: 1px solid rgba(255,255,255,.24);
+}
+
+.nb2-summary-book__page h1,
+.nb2-summary-book__page h2,
+.nb2-summary-book__page h3,
+.nb2-summary-book__page strong {
+  color: var(--nb-paper-ink);
+}
+
+.nb2-summary-book__page p,
+.nb2-summary-book__page span,
+.nb2-summary-book__page small {
+  color: var(--nb-paper-muted);
+}
+
+.nb2-summary-book__page button {
+  color: var(--nb-paper-ink);
+  border-color: rgba(112, 76, 45, .42);
+  background: rgba(255, 248, 226, .2);
+}
+
+/* Notas: listado y lector quedan en el mismo objeto, como un cuaderno de
+   dos páginas. El contexto conserva su espacio sin ocultar menciones. */
+.nb2-page-transition > .nb2-notes {
+  padding: clamp(18px, 2.4vw, 34px);
+  border: 1px solid rgba(120, 82, 49, .82);
+  border-radius: 5px 12px 12px 5px;
+  background:
+    radial-gradient(ellipse at 11% 4%, rgba(255,255,255,.55), transparent 27%),
+    radial-gradient(ellipse at 92% 94%, rgba(104,68,35,.18), transparent 35%),
+    repeating-linear-gradient(0deg, rgba(89,58,32,.03) 0 1px, transparent 1px 5px),
+    linear-gradient(135deg, var(--nb-paper-light), var(--nb-paper));
+  box-shadow: 0 16px 28px rgba(0,0,0,.3), inset 0 0 0 2px rgba(92,58,29,.1);
+}
+
+.nb2-notes .nb2-filters {
+  position: relative;
+  z-index: 2;
+  border-color: rgba(112, 76, 45, .36);
+  background: rgba(255, 247, 225, .18);
+}
+
+.nb2-notes .nb2-columns {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  gap: clamp(12px, 1.5vw, 24px);
+}
+
+.nb2-notes .nb2-note-list,
+.nb2-notes .nb2-context {
+  border-color: rgba(112, 76, 45, .38);
+  background: rgba(44, 25, 23, .88);
+}
+
+.nb2-notes .nb2-reader {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  border-color: rgba(120, 82, 49, .7);
+  color: var(--nb-paper-ink);
+  background:
+    radial-gradient(ellipse at 10% 4%, rgba(255,255,255,.72), transparent 27%),
+    radial-gradient(ellipse at 94% 92%, rgba(104,68,35,.18), transparent 33%),
+    repeating-linear-gradient(0deg, rgba(89,58,32,.035) 0 1px, transparent 1px 5px),
+    linear-gradient(135deg, #f4e7cb, #e5d0a9);
+  box-shadow: inset 0 0 0 2px rgba(92,58,29,.1), 0 12px 22px rgba(0,0,0,.18);
+}
+
+.nb2-notes .nb2-reader h1,
+.nb2-notes .nb2-reader h2,
+.nb2-notes .nb2-reader h3,
+.nb2-notes .nb2-reader strong,
+.nb2-notes .nb2-reader p,
+.nb2-notes .nb2-reader span,
+.nb2-notes .nb2-reader small {
+  color: var(--nb-paper-ink);
+}
+
+.nb2-notes .nb2-reader .nb2-mention,
+.nb2-notes .nb2-reader .nb2-linked {
+  color: #7c263c;
+  border-color: rgba(124,38,60,.4);
+  background: rgba(124,38,60,.08);
+}
+
+/* Sesiones y archivo adoptan la misma encuadernación sin alterar su
+   composición de lista/detalle ni sus acciones. */
+.nb2-page-transition > .nb2-session-workspace,
+.nb2-page-transition > .nb2-panel {
+  padding: clamp(20px, 2.8vw, 42px);
+  border: 1px solid rgba(120, 82, 49, .82);
+  border-radius: 5px 12px 12px 5px;
+  background:
+    radial-gradient(ellipse at 10% 6%, rgba(255,255,255,.58), transparent 28%),
+    radial-gradient(ellipse at 94% 96%, rgba(104,68,35,.2), transparent 33%),
+    repeating-linear-gradient(0deg, rgba(89,58,32,.03) 0 1px, transparent 1px 5px),
+    linear-gradient(135deg, var(--nb-paper-light), var(--nb-paper));
+  box-shadow: 0 16px 28px rgba(0,0,0,.3), inset 0 0 0 2px rgba(92,58,29,.1);
+}
+
+.nb2-session-workspace .nb2-session-layout,
+.nb2-panel .nb2-catalog {
+  position: relative;
+  z-index: 1;
+}
+
+.nb2-panel .nb2-panel-heading h2,
+.nb2-panel .nb2-panel-heading h3,
+.nb2-panel .nb2-panel-heading p,
+.nb2-panel .nb2-panel-heading label {
+  color: var(--nb-paper-ink);
+}
+
+.nb2-panel .nb2-resource-card {
+  border-color: rgba(112, 76, 45, .42);
+  background: rgba(255, 248, 226, .24);
+  color: var(--nb-paper-ink);
+}
+
+/* En móvil se conserva la metáfora, pero las páginas pasan a una columna y
+   el lomo deja de cortar el texto. */
+@media (max-width: 760px) {
+  .nb2-page-transition > .nb2-summary-book {
+    display: block;
+  }
+
+  .nb2-page-transition > .nb2-summary-book::before,
+  .nb2-page-transition > .nb2-notes::before,
+  .nb2-page-transition > .nb2-session-workspace::before,
+  .nb2-page-transition > .nb2-panel::before {
+    left: 17px;
+    width: 12px;
+    transform: none;
+  }
+
+  .nb2-summary-book__page {
+    min-height: auto;
+    padding: 30px 24px 38px 34px;
+  }
+
+  .nb2-summary-book__page--left,
+  .nb2-summary-book__page--right {
+    border-right: 0;
+    border-left: 0;
+  }
+
+  .nb2-summary-book__page--right {
+    border-top: 1px solid rgba(112, 76, 45, .25);
+  }
+
+  .nb2-page-transition > .nb2-notes,
+  .nb2-page-transition > .nb2-session-workspace,
+  .nb2-page-transition > .nb2-panel {
+    padding: 14px 14px 18px 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nb2-summary-book,
+  .nb2-notes,
+  .nb2-session-workspace,
+  .nb2-panel { scroll-behavior: auto; }
+}
+
+/* NOTEBOOK_JOURNAL_SURFACE_V2
+   Corrección posterior a la revisión visual. Las reglas antiguas del
+   Cuaderno usan !important; esta capa las anula de forma localizada para
+   recuperar contraste y superficie de papel sin tocar comportamiento. */
+
+/* RESUMEN: quitar el fondo transparente y el velo oscuro que tapaban el
+   papel, conservando un lomo central visible. */
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book {
+  background:
+    radial-gradient(ellipse at 9% 7%, rgba(255,255,255,.72), transparent 28%),
+    radial-gradient(ellipse at 92% 96%, rgba(104,68,35,.22), transparent 32%),
+    repeating-linear-gradient(0deg, rgba(89,58,32,.035) 0 1px, transparent 1px 5px),
+    linear-gradient(90deg, #f1e3c8, #e5d0a9 50%, #f1e3c8) !important;
+  border: 1px solid rgba(120,82,49,.82) !important;
+  border-radius: 5px 12px 12px 5px !important;
+  box-shadow: 0 16px 28px rgba(0,0,0,.3), inset 0 0 0 2px rgba(92,58,29,.12), inset 18px 0 25px rgba(84,51,26,.1), inset -16px 0 22px rgba(84,51,26,.08) !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book::before {
+  content: '' !important;
+  position: absolute !important;
+  z-index: 2 !important;
+  top: 0 !important;
+  right: auto !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  width: clamp(18px, 2vw, 34px) !important;
+  height: auto !important;
+  transform: translateX(-50%) !important;
+  pointer-events: none !important;
+  background: linear-gradient(90deg, rgba(99,59,28,.18), rgba(255,255,255,.24) 42%, rgba(91,52,26,.28) 58%, rgba(255,255,255,.12)) !important;
+  mask-image: none !important;
+  filter: none !important;
+  box-shadow: 0 0 18px rgba(66,39,21,.2) !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page,
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page h2,
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page p,
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page small,
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page strong,
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page span {
+  color: #2b1c18 !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__entry,
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__entry strong,
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__entry span {
+  color: #34261e !important;
+}
+
+/* NOTAS: el listado y el contexto pasan a ser páginas legibles, mientras el
+   lector central mantiene su papel más claro. */
+.nb2-page-transition > .nb2-notes {
+  background:
+    radial-gradient(ellipse at 11% 4%, rgba(255,255,255,.58), transparent 27%),
+    radial-gradient(ellipse at 92% 94%, rgba(104,68,35,.18), transparent 35%),
+    repeating-linear-gradient(0deg, rgba(89,58,32,.03) 0 1px, transparent 1px 5px),
+    linear-gradient(135deg, #f1e3c8, #e5d0a9) !important;
+  border-color: rgba(120,82,49,.82) !important;
+  box-shadow: 0 16px 28px rgba(0,0,0,.3), inset 0 0 0 2px rgba(92,58,29,.1) !important;
+}
+
+.nb2-notes .nb2-filters {
+  color: #2b1c18 !important;
+  border-color: rgba(112,76,45,.38) !important;
+  background: rgba(255,248,226,.42) !important;
+}
+
+.nb2-notes .nb2-filters input,
+.nb2-notes .nb2-filters select {
+  color: #2b1c18 !important;
+  border-color: rgba(112,76,45,.42) !important;
+  background: rgba(255,248,226,.7) !important;
+}
+
+.nb2-notes .nb2-note-list,
+.nb2-notes .nb2-context {
+  color: #2b1c18 !important;
+  border-color: rgba(112,76,45,.38) !important;
+  background: rgba(250,237,207,.82) !important;
+}
+
+.nb2-notes .nb2-note-list h2,
+.nb2-notes .nb2-note-list h3,
+.nb2-notes .nb2-note-list strong,
+.nb2-notes .nb2-note-list p,
+.nb2-notes .nb2-note-list span,
+.nb2-notes .nb2-context h2,
+.nb2-notes .nb2-context h3,
+.nb2-notes .nb2-context strong,
+.nb2-notes .nb2-context p,
+.nb2-notes .nb2-context span {
+  color: #2b1c18 !important;
+}
+
+.nb2-notes .nb2-note-item {
+  color: #34261e !important;
+  border-color: rgba(112,76,45,.26) !important;
+  background: rgba(255,248,226,.28) !important;
+}
+
+.nb2-notes .nb2-note-item:hover,
+.nb2-notes .nb2-note-item:focus-visible {
+  color: #2b1c18 !important;
+  border-color: rgba(124,38,60,.65) !important;
+  background: rgba(124,38,60,.12) !important;
+}
+
+/* SESIONES: inspector y tarjetas dejan de parecer un panel ajeno al libro. */
+.nb2-page-transition > .nb2-session-workspace {
+  background:
+    radial-gradient(ellipse at 10% 6%, rgba(255,255,255,.58), transparent 28%),
+    radial-gradient(ellipse at 94% 96%, rgba(104,68,35,.2), transparent 33%),
+    repeating-linear-gradient(0deg, rgba(89,58,32,.03) 0 1px, transparent 1px 5px),
+    linear-gradient(135deg, #f1e3c8, #e5d0a9) !important;
+  border-color: rgba(120,82,49,.82) !important;
+}
+
+.nb2-session-inspector,
+.nb2-session-timeline > * {
+  color: #2b1c18 !important;
+  border-color: rgba(112,76,45,.38) !important;
+  background: rgba(250,237,207,.84) !important;
+}
+
+.nb2-session-inspector h1,
+.nb2-session-inspector h2,
+.nb2-session-inspector h3,
+.nb2-session-inspector p,
+.nb2-session-inspector span,
+.nb2-session-inspector strong,
+.nb2-session-timeline > * h2,
+.nb2-session-timeline > * h3,
+.nb2-session-timeline > * p,
+.nb2-session-timeline > * span,
+.nb2-session-timeline > * strong {
+  color: #2b1c18 !important;
+}
+
+.nb2-session-inspector input,
+.nb2-session-inspector textarea,
+.nb2-session-inspector select {
+  color: #2b1c18 !important;
+  border-color: rgba(112,76,45,.42) !important;
+  background: rgba(255,248,226,.7) !important;
+}
+
+/* ARCHIVO: el catálogo utiliza el mismo papel y deja de quedar casi negro. */
+.nb2-page-transition > .nb2-panel {
+  color: #2b1c18 !important;
+  background:
+    radial-gradient(ellipse at 10% 6%, rgba(255,255,255,.58), transparent 28%),
+    radial-gradient(ellipse at 94% 96%, rgba(104,68,35,.2), transparent 33%),
+    repeating-linear-gradient(0deg, rgba(89,58,32,.03) 0 1px, transparent 1px 5px),
+    linear-gradient(135deg, #f1e3c8, #e5d0a9) !important;
+  border-color: rgba(120,82,49,.82) !important;
+  box-shadow: 0 16px 28px rgba(0,0,0,.3), inset 0 0 0 2px rgba(92,58,29,.1) !important;
+}
+
+.nb2-panel .nb2-panel-heading,
+.nb2-panel .nb2-panel-heading h2,
+.nb2-panel .nb2-panel-heading h3,
+.nb2-panel .nb2-panel-heading p,
+.nb2-panel .nb2-panel-heading label,
+.nb2-panel .nb2-catalog,
+.nb2-panel .nb2-catalog h2,
+.nb2-panel .nb2-catalog h3,
+.nb2-panel .nb2-catalog p,
+.nb2-panel .nb2-catalog span,
+.nb2-panel .nb2-catalog strong {
+  color: #2b1c18 !important;
+}
+
+.nb2-panel .nb2-panel-heading input,
+.nb2-panel .nb2-panel-heading select,
+.nb2-panel .nb2-catalog input,
+.nb2-panel .nb2-catalog select {
+  color: #2b1c18 !important;
+  border-color: rgba(112,76,45,.42) !important;
+  background: rgba(255,248,226,.7) !important;
+}
+
+.nb2-panel .nb2-resource-card {
+  color: #2b1c18 !important;
+  border-color: rgba(112,76,45,.42) !important;
+  background: rgba(255,248,226,.45) !important;
+}
+
+.nb2-panel .nb2-resource-card h2,
+.nb2-panel .nb2-resource-card h3,
+.nb2-panel .nb2-resource-card p,
+.nb2-panel .nb2-resource-card span,
+.nb2-panel .nb2-resource-card strong {
+  color: #2b1c18 !important;
+}
+
+/* MÓVIL: reservar espacio al final para que la tarjeta global de sesión no
+   oculte las últimas líneas de una página larga. */
+@media (max-width: 760px) {
+  .application-content--notebook,
+  .application-content--notebook .nb2-workspace,
+  .application-content--notebook .nb2-page-transition {
+    padding-bottom: 92px !important;
+  }
+
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book::before {
+    left: 17px !important;
+    right: auto !important;
+    width: 12px !important;
+    transform: none !important;
+  }
+}
+
+/* NOTEBOOK_JOURNAL_COMPOSITION_V3
+   El diario deja de ser solo una superficie de papel: la navegación propia
+   del Cuaderno se convierte en pestañas funcionales y el resumen usa la
+   composición de doble página del prototipo. */
+
+/* Pestañas superiores del Cuaderno. Son los botones React existentes, por lo
+   que mantienen la navegación y los estados accesibles. */
+.nb2-workspace > .nb2-sections {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 7px !important;
+  width: 100% !important;
+  margin: 0 auto 14px !important;
+  padding: 0 !important;
+}
+
+.nb2-workspace > .nb2-sections > div {
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  flex-wrap: wrap !important;
+}
+
+.nb2-workspace > .nb2-sections > div + div {
+  padding-left: 10px !important;
+  border-left: 1px solid rgba(190,143,87,.42) !important;
+}
+
+.nb2-workspace > .nb2-sections button {
+  min-height: 36px !important;
+  padding: 9px 16px !important;
+  border: 1px solid rgba(137,91,56,.7) !important;
+  border-radius: 4px 4px 0 0 !important;
+  color: #d9c3ad !important;
+  background: rgba(30,15,18,.78) !important;
+  font-size: 12px !important;
+  letter-spacing: .02em !important;
+}
+
+.nb2-workspace > .nb2-sections button:hover,
+.nb2-workspace > .nb2-sections button:focus-visible,
+.nb2-workspace > .nb2-sections button[aria-pressed="true"] {
+  border-color: #c64257 !important;
+  color: #fff1e4 !important;
+  background: #6f2637 !important;
+  box-shadow: 0 -2px 0 #d85a6d inset !important;
+}
+
+/* En el resumen se muestra el índice principal arriba. El catálogo de
+   recursos sigue disponible desde la navegación general y sus propias
+   secciones del Cuaderno. */
+.nb2-workspace:has(.nb2-summary-book) > .nb2-sections > div:nth-child(2) {
+  display: none !important;
+}
+
+/* El resumen se alinea como una página de diario, no como una tarjeta
+   centrada dentro del papel. */
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page {
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  min-height: 620px !important;
+  padding: 48px clamp(34px, 5vw, 74px) 58px !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page--left {
+  padding-right: clamp(42px, 6vw, 86px) !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page--right {
+  padding-left: clamp(42px, 6vw, 86px) !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page h2 {
+  max-width: 430px !important;
+  margin: 9px 0 12px !important;
+  font-size: clamp(38px, 4.5vw, 60px) !important;
+  line-height: .98 !important;
+  letter-spacing: -.025em !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__description {
+  max-width: 430px !important;
+  margin: 0 !important;
+  font-size: clamp(15px, 1.25vw, 19px) !important;
+  line-height: 1.55 !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__stats {
+  width: min(100%, 430px) !important;
+  margin-top: 34px !important;
+  padding: 19px 0 !important;
+  border-top: 1px solid rgba(112,76,45,.5) !important;
+  border-bottom: 1px solid rgba(112,76,45,.5) !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__stats > button {
+  text-align: left !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__stats > button strong {
+  color: #7f263a !important;
+  font-size: clamp(24px, 2.4vw, 34px) !important;
+}
+
+/* Las entradas de memoria son tarjetas de índice numeradas, como en el
+   prototipo, usando solo títulos y fechas reales del sistema. */
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__entries {
+  display: grid !important;
+  gap: 12px !important;
+  width: 100% !important;
+  margin-top: 23px !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__entry {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: 40px minmax(0, 1fr) auto !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  min-height: 56px !important;
+  padding: 9px 12px !important;
+  border: 1px solid rgba(137,91,56,.48) !important;
+  border-radius: 2px !important;
+  background: rgba(255,248,226,.36) !important;
+  color: #34261e !important;
+  text-align: left !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__entry::before {
+  content: counter(nb-summary-entry, decimal-leading-zero) !important;
+  counter-increment: nb-summary-entry !important;
+  color: #8d2940 !important;
+  font: 700 20px Georgia, serif !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page--right {
+  counter-reset: nb-summary-entry !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__entry strong {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  overflow: hidden !important;
+  color: #34261e !important;
+  font: 700 clamp(14px, 1.2vw, 18px) Georgia, serif !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__entry span {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  color: #715744 !important;
+  font-size: 11px !important;
+}
+
+.nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__entry em {
+  grid-column: 3 !important;
+  grid-row: 1 / span 2 !important;
+  color: #8d2940 !important;
+}
+
+/* Notas: corregir las tarjetas que seguían heredando texto oscuro sobre
+   fondos oscuros después de la primera conversión. */
+.nb2-workspace .nb2-notes .nb2-note-list > section,
+.nb2-workspace .nb2-notes .nb2-group-heading {
+  color: #34261e !important;
+  border-color: rgba(112,76,45,.28) !important;
+  background: rgba(255,248,226,.18) !important;
+}
+
+.nb2-workspace .nb2-notes .nb2-group-heading h3,
+.nb2-workspace .nb2-notes .nb2-group-heading button,
+.nb2-workspace .nb2-notes .nb2-note-item strong,
+.nb2-workspace .nb2-notes .nb2-note-item span,
+.nb2-workspace .nb2-notes .nb2-note-item small,
+.nb2-workspace .nb2-notes .nb2-note-item p {
+  color: #34261e !important;
+}
+
+.nb2-workspace .nb2-notes .nb2-note-item[aria-pressed="true"] {
+  border-color: #8d2940 !important;
+  background: #7b2940 !important;
+}
+
+.nb2-workspace .nb2-notes .nb2-note-item[aria-pressed="true"] strong,
+.nb2-workspace .nb2-notes .nb2-note-item[aria-pressed="true"] span,
+.nb2-workspace .nb2-notes .nb2-note-item[aria-pressed="true"] small,
+.nb2-workspace .nb2-notes .nb2-note-item[aria-pressed="true"] p {
+  color: #fff1e4 !important;
+}
+
+.nb2-workspace .nb2-notes .nb2-context,
+.nb2-workspace .nb2-notes .nb2-context h2,
+.nb2-workspace .nb2-notes .nb2-context h3,
+.nb2-workspace .nb2-notes .nb2-context strong,
+.nb2-workspace .nb2-notes .nb2-context p,
+.nb2-workspace .nb2-notes .nb2-context span {
+  color: #34261e !important;
+  border-color: rgba(112,76,45,.38) !important;
+  background: rgba(250,237,207,.82) !important;
+}
+
+@media (max-width: 760px) {
+  .nb2-workspace > .nb2-sections {
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    padding: 0 6px !important;
+    scrollbar-width: thin !important;
+  }
+
+  .nb2-workspace > .nb2-sections > div {
+    flex-wrap: nowrap !important;
+  }
+
+  .nb2-workspace > .nb2-sections > div + div {
+    display: none !important;
+  }
+
+  .nb2-workspace > .nb2-sections button {
+    flex: 0 0 auto !important;
+    padding: 8px 13px !important;
+  }
+
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page {
+    min-height: auto !important;
+    padding: 34px 27px 42px 42px !important;
+  }
+
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__page h2 {
+    font-size: clamp(34px, 10vw, 48px) !important;
+  }
+
+  .nb2-workspace:has(.nb2-summary-book) .nb2-summary-book__entry {
+    grid-template-columns: 34px minmax(0, 1fr) auto !important;
+  }
+}

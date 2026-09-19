@@ -1,3 +1,4 @@
+// CHRONICLE_SESSION_IMAGE_MANAGEMENT_V1
 import {
   useEffect,
   useState,
@@ -337,6 +338,12 @@ export function ChronicleSessionPanel({
     ChronicleSessionApiSnapshot | null
   >(null)
 
+  // CHRONICLE_SESSION_IMAGE_MANAGEMENT_V1
+  const [sessionImageRevision, setSessionImageRevision] = useState(() => Date.now())
+  const [sessionImageAvailable, setSessionImageAvailable] = useState<boolean | null>(null)
+  const [sessionImageBusy, setSessionImageBusy] = useState(false)
+  const [sessionImageMessage, setSessionImageMessage] = useState<string | null>(null)
+
   const [
     activeWorkspaceSection,
     setActiveWorkspaceSection,
@@ -532,6 +539,9 @@ export function ChronicleSessionPanel({
     )
     setOperationError(null)
 
+    setSessionImageMessage(null)
+    setSessionImageAvailable(null)
+
     try {
       setSelectedSession(
         await gateway.session(
@@ -582,6 +592,40 @@ export function ChronicleSessionPanel({
   function cancelEdit() {
     setEditingSessionId(null)
     setEditForm(emptyForm)
+  }
+
+  function sessionImageUrl(sessionId: string): string {
+    return '/api/chronicles/' + chronicleId + '/assets/SESSION/' + sessionId + '/image?v=' + sessionImageRevision
+  }
+
+  async function uploadSessionImage(file: File) {
+    if (!selectedSession) return
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { setSessionImageMessage('Usa PNG, JPG o WEBP.'); return }
+    if (file.size > 2 * 1024 * 1024) { setSessionImageMessage('La imagen no puede superar 2 MB.'); return }
+    setSessionImageBusy(true)
+    setSessionImageMessage('Guardando portada…')
+    try {
+      const response = await fetch('/api/chronicles/' + chronicleId + '/assets/SESSION/' + selectedSession.id + '/image', { method: 'PUT', credentials: 'include', headers: { 'content-type': file.type }, body: file })
+      if (!response.ok) throw new Error('session-image-upload-failed')
+      setSessionImageRevision(Date.now())
+      setSessionImageAvailable(true)
+      setSessionImageMessage('Portada actualizada.')
+    } catch { setSessionImageMessage('No se pudo guardar la portada. Sólo el Narrador puede modificarla.') }
+    finally { setSessionImageBusy(false) }
+  }
+
+  async function removeSessionImage() {
+    if (!selectedSession) return
+    setSessionImageBusy(true)
+    setSessionImageMessage('Retirando portada…')
+    try {
+      const response = await fetch('/api/chronicles/' + chronicleId + '/assets/SESSION/' + selectedSession.id + '/image', { method: 'DELETE', credentials: 'include' })
+      if (!response.ok) throw new Error('session-image-remove-failed')
+      setSessionImageRevision(Date.now())
+      setSessionImageAvailable(false)
+      setSessionImageMessage('Portada retirada.')
+    } catch { setSessionImageMessage('No se pudo retirar la portada. Sólo el Narrador puede modificarla.') }
+    finally { setSessionImageBusy(false) }
   }
 
   async function updateSession(
@@ -1118,6 +1162,12 @@ export function ChronicleSessionPanel({
                       `edit-${selectedSession.id}`,
                     )}
 
+                    <div className="chronicle-session-panel__image-tools">
+                      <label><span>Cambiar portada de la Sesión</span><input type="file" accept="image/png,image/jpeg,image/webp" disabled={sessionImageBusy} onChange={(event) => { const file = event.currentTarget.files?.[0]; if (file) void uploadSessionImage(file) }} /></label>
+                      <button type="button" className="chronicle-session-panel__compact-action" disabled={sessionImageBusy || sessionImageAvailable === false} onClick={() => void removeSessionImage()}>Quitar portada</button>
+                      {sessionImageMessage ? <small role="status">{sessionImageMessage}</small> : null}
+                    </div>
+
                     <div className="chronicle-session-panel__actions">
                       <button
                         type="submit"
@@ -1143,6 +1193,11 @@ export function ChronicleSessionPanel({
                   </form>
                 ) : (
                   <>
+                    <figure className="chronicle-session-panel__visual">
+                      <div className="chronicle-session-panel__visual-frame"><img src={sessionImageUrl(selectedSession.id)} alt={'Portada de ' + sessionTitle(selectedSession)} onLoad={() => setSessionImageAvailable(true)} onError={(event) => { setSessionImageAvailable(false); event.currentTarget.hidden = true; event.currentTarget.parentElement?.classList.add('is-missing') }} /><span aria-hidden="true">SESIÓN</span></div>
+                      <figcaption>Portada visual de la Sesión</figcaption>
+                    </figure>
+
                     <dl className="chronicle-session-panel__detail-grid">
                       <div className="chronicle-session-panel__detail-section chronicle-session-panel__detail-wide">
                         <div className="chronicle-session-panel__detail-section-heading">

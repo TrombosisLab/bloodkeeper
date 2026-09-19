@@ -1,3 +1,4 @@
+// LEGACY_NOTEBOOK_NAV_HIDDEN_V1: la ruta y los datos del Cuaderno se conservan; solo se oculta su acceso visual.
 import {
   useEffect,
   useState,
@@ -97,7 +98,7 @@ export function AppNavigation({
     >
       <div className="app-navigation__heading">
         <div>
-          
+
           <strong>Secciones</strong>
         </div>
 
@@ -179,22 +180,19 @@ export function AppNavigation({
           <button type="button" aria-current={activeSection === 'resources' ? 'page' : undefined} onClick={() => selectSection('resources')}><span>Recursos</span><small>Biblioteca reutilizable</small></button>
         ) : null}
 
+
+
+
         {canAccessChronicles ? (
           <button
             type="button"
-            aria-current={activeSection === 'notebook' ? 'page' : undefined}
-            onClick={() => selectSection('notebook')}
+            aria-current={activeSection === 'chronicle-space' ? 'page' : undefined}
+            onClick={() => selectSection('chronicle-space')}
           >
-            <span>Cuaderno</span>
-            <small>Notas y referencias</small>
+            <span>Sala de Investigación</span>
+            <small>Pizarra, cronología y archivo</small>
           </button>
         ) : null}
-        {/* NOTEBOOK_NAVIGATION_GROUPED_V3 */}
-        {activeSection === 'notebook' ? <div className="app-navigation__notebook-subnav" aria-label="Secciones del Cuaderno">
-          <section><strong>DIARIO</strong><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'ALL', label: 'Resumen' } }))}>Resumen</button><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'ALL', label: 'Notas' } }))}>Notas</button><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'SESSION', label: 'Sesiones' } }))}>Sesiones</button></section>
-          <section><strong>ARCHIVO DE LA CRÓNICA</strong><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'NPC', label: 'PNJ' } }))}>PNJ</button><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'LOCATION', label: 'Localizaciones' } }))}>Localizaciones</button><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'ORGANIZATION', label: 'Organizaciones' } }))}>Organizaciones</button><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'ARTIFACT', label: 'Artefactos' } }))}>Artefactos</button><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'DOCUMENT', label: 'Documentos' } }))}>Documentos</button></section>
-          <section><strong>EXPLORAR</strong><button type="button" onClick={() => window.dispatchEvent(new CustomEvent('bloodkeeper:notebook-section', { detail: { section: 'TAGS', label: 'Etiquetas' } }))}>Etiquetas</button></section>
-        </div> : null}
 
         {canAccessChronicles ? (
           <button
@@ -218,3 +216,5 @@ export function AppNavigation({
 }
 
 // UNIFIED_DASHBOARD_HEADER_V2
+
+// RESEARCH_ROOM_NAVIGATION_V1
