@@ -3,6 +3,8 @@ export type ChronicleNoteForPresentation = {
   chronicleId: string
   sessionId: string | null
   contextLocationId: string | null
+  contextImageTargetType: string | null
+  contextImageTargetId: string | null
   title: string
   content: string
   visibility: string
@@ -44,6 +46,8 @@ export function presentChronicleNote(
     chronicleId: note.chronicleId,
     sessionId: note.sessionId,
     contextLocationId: note.contextLocationId,
+    contextImageTargetType: note.contextImageTargetType,
+    contextImageTargetId: note.contextImageTargetId,
     title: note.title,
     content: note.content,
     visibility: note.visibility,

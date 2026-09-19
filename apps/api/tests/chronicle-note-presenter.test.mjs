@@ -10,6 +10,8 @@ const note = {
   chronicleId: 'chronicle-id',
   sessionId: null,
   contextLocationId: null,
+  contextImageTargetType: 'DOCUMENT',
+  contextImageTargetId: 'document-id',
   title: 'Pista',
   content: 'Contenido',
   visibility: 'SELECTED_PLAYERS',
@@ -41,6 +43,8 @@ test(
     const presented = presentChronicleNote(note, true, 'author-id')
 
     assert.equal(presented.pinned, false)
+    assert.equal(presented.contextImageTargetType, 'DOCUMENT')
+    assert.equal(presented.contextImageTargetId, 'document-id')
     assert.deepEqual(presented.audienceUserIds, ['player-id'])
     assert.deepEqual(presented.references, [{
       id: 'reference-id',
