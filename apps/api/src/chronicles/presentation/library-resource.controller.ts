@@ -20,7 +20,18 @@ export class LibraryResourceController {
 
  @Post(':resourceId/archive')async archive(@Req()r:any,@Param('resourceId')raw:unknown){const resourceId=id(raw),ownerId=owner(r);const result=await this.db.libraryResource.updateMany({where:{id:resourceId,ownerId,status:'active'},data:{status:'archived'}});if(!result.count&&!await this.db.libraryResource.findFirst({where:{id:resourceId,ownerId}}))throw new NotFoundException({code:'LIBRARY_RESOURCE_NOT_FOUND'});return{archived:true}}
  @Post(':resourceId/restore')async restore(@Req()r:any,@Param('resourceId')raw:unknown){const resourceId=id(raw),ownerId=owner(r);const result=await this.db.libraryResource.updateMany({where:{id:resourceId,ownerId,status:'archived'},data:{status:'active'}});if(!result.count&&!await this.db.libraryResource.findFirst({where:{id:resourceId,ownerId}}))throw new NotFoundException({code:'LIBRARY_RESOURCE_NOT_FOUND'});return{restored:true}}
- @Delete(':resourceId')async remove(@Req()r:any,@Param('resourceId')raw:unknown){const resourceId=id(raw),ownerId=owner(r);await this.db.chronicleResourceBinding.deleteMany({where:{resourceId}});const result=await this.db.libraryResource.deleteMany({where:{id:resourceId,ownerId,status:'archived'}});if(!result.count)throw new NotFoundException({code:'LIBRARY_RESOURCE_ARCHIVED_NOT_FOUND'});return{deleted:true}}
+ @Delete(':resourceId')
+ async remove(@Req()r:any,@Param('resourceId')raw:unknown){
+  const resourceId=id(raw),ownerId=owner(r)
+  await this.db.$transaction(async(transaction:any)=>{
+   const resource=await transaction.libraryResource.findFirst({where:{id:resourceId,ownerId,status:'archived'},select:{id:true}})
+   if(!resource)throw new NotFoundException({code:'LIBRARY_RESOURCE_ARCHIVED_NOT_FOUND'})
+   await transaction.chronicleResourceBinding.deleteMany({where:{resourceId}})
+   const result=await transaction.libraryResource.deleteMany({where:{id:resourceId,ownerId,status:'archived'}})
+   if(!result.count)throw new NotFoundException({code:'LIBRARY_RESOURCE_ARCHIVED_NOT_FOUND'})
+  })
+  return{deleted:true}
+ }
 
  private async resourceImage(req:any,raw:unknown){const resource=await this.db.libraryResource.findFirst({where:{id:id(raw),ownerId:owner(req)}});if(!resource)throw new NotFoundException({code:'LIBRARY_RESOURCE_NOT_FOUND'});const assetType=resource.kind==='npc'?'NPC':resource.kind==='location'?'LOCATION':'RESOURCE';return{resource,assetType}}
  @Get(':resourceId/image')async image(@Req()req:any,@Param('resourceId')raw:unknown){const x=await this.resourceImage(req,raw),image=await this.db.chronicleAssetImage.findUnique({where:{assetType_entityId:{assetType:x.assetType,entityId:x.resource.id}}});if(!image)throw new NotFoundException({code:'LIBRARY_RESOURCE_IMAGE_NOT_FOUND'});return new StreamableFile(Buffer.from(image.data),{type:image.mimeType,length:image.byteSize,disposition:'inline'})}
