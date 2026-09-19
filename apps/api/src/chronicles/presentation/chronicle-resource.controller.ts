@@ -125,8 +125,11 @@ export class ChronicleResourceController {
     if (!current) throw new NotFoundException({ code: 'CHRONICLE_RESOURCE_NOT_FOUND' })
     const globalData: any = { ...data }
     delete globalData.visibility
-    const resource = Object.keys(globalData).length > 0 ? await this.db.libraryResource.update({ where: { id: resourceId }, data: globalData }) : current
-    if (data.visibility !== undefined) await this.db.chronicleResourceBinding.update({ where: { chronicleId_resourceId: { chronicleId, resourceId } }, data: { visibility: data.visibility, status: 'attached' } })
+    const resource = await this.db.$transaction(async (transaction) => {
+      const updated = Object.keys(globalData).length > 0 ? await transaction.libraryResource.update({ where: { id: resourceId }, data: globalData }) : current
+      if (data.visibility !== undefined) await transaction.chronicleResourceBinding.update({ where: { chronicleId_resourceId: { chronicleId, resourceId } }, data: { visibility: data.visibility, status: 'attached' } })
+      return updated
+    })
     const updated = await this.linked(ownerId, chronicleId, resourceId)
     return response(resource, updated?.bindings[0])
   }
