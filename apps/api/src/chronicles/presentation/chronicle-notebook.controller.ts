@@ -27,8 +27,13 @@ import {
   text,
   visibility,
 } from './chronicle-note-input'
+import {
+  ChronicleNoteForPresentation,
+  presentChronicleNote,
+} from './chronicle-note-presenter'
 
 type RequestWithUser = { user?: { id?: unknown; roles?: unknown } }
+type PresentedChronicleNote = ReturnType<typeof presentChronicleNote>
 
 function actor(request: RequestWithUser): string {
   if (typeof request.user?.id !== 'string' || request.user.id.length === 0) throw new UnauthorizedException({ code: 'AUTHENTICATION_REQUIRED' })
@@ -57,7 +62,7 @@ export class ChronicleNotebookController {
     const userId = actor(request)
     const { db, narrator } = await this.access(chronicleId, userId)
     const notes = await db.chronicleNote.findMany({ where: this.whereVisible(userId, narrator, chronicleId), orderBy: [{ pinned: 'desc' }, { updatedAt: 'desc' }], include: { favorites: { where: { userId }, select: { userId: true } }, references: true, audiences: { select: { userId: true } }, author: { select: { id: true, displayName: true, username: true } }, session: { select: { id: true, title: true, sessionNumber: true } } } })
-    return { items: notes.map((note: any) => this.present(note, narrator, userId)).sort((a: any, b: any) => Number(b.pinned) - Number(a.pinned) || new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()), canManage: narrator, viewerUserId: userId }
+    return { items: notes.map((note: ChronicleNoteForPresentation) => presentChronicleNote(note, narrator, userId)).sort((a: PresentedChronicleNote, b: PresentedChronicleNote) => Number(b.pinned) - Number(a.pinned) || new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()), canManage: narrator, viewerUserId: userId }
   }
 
   @Get('context')
@@ -162,7 +167,7 @@ export class ChronicleNotebookController {
     const { db, narrator } = await this.access(chronicleId, userId)
     const note = await db.chronicleNote.findFirst({ where: { id: noteId, ...this.whereVisible(userId, narrator, chronicleId) }, include: { favorites: { where: { userId }, select: { userId: true } }, references: true, audiences: { select: { userId: true } }, author: { select: { id: true, displayName: true, username: true } }, session: { select: { id: true, title: true, sessionNumber: true } } } })
     if (!note) throw new NotFoundException({ code: 'CHRONICLE_NOTE_NOT_FOUND' })
-    return this.present(note, narrator, userId)
+    return presentChronicleNote(note, narrator, userId)
   }
 
   @Post(':noteId/pin')
@@ -196,7 +201,7 @@ export class ChronicleNotebookController {
     await this.validateRelations(db, chronicleId, [...refs, ...contentReferences(content)], audienceIds, narrator && noteVisibility === 'PRIVATE')
     await this.validateContextLocation(db, chronicleId, selectedContextLocationId, [...refs, ...contextLocationReferences(content)])
     const row = await db.chronicleNote.create({ data: { chronicleId, sessionId, authorUserId: userId, contextLocationId: selectedContextLocationId, contextImageTargetType: selectedContextImageTargetType, contextImageTargetId: selectedContextImageTargetId, title, content, visibility: noteVisibility, pinned: body?.pinned === true, favorites: { create: body?.pinned === true ? [{ userId }] : [] }, tags: noteTags(body?.tags), references: { create: refs }, audiences: { create: noteVisibility === 'SELECTED_PLAYERS' ? audienceIds.map((id) => ({ userId: id })) : [] } }, include: { favorites: { where: { userId }, select: { userId: true } }, references: true, audiences: { select: { userId: true } }, author: { select: { id: true, displayName: true, username: true } }, session: { select: { id: true, title: true, sessionNumber: true } } } })
-    return this.present(row, narrator, userId)
+    return presentChronicleNote(row, narrator, userId)
   }
 
   @Patch(':noteId')
@@ -232,7 +237,7 @@ export class ChronicleNotebookController {
       if (audienceIds) await tx.chronicleNoteAudience.deleteMany({ where: { noteId } })
       return tx.chronicleNote.update({ where: { id: noteId }, data: { ...(body?.title !== undefined ? { title: text(body.title, 'title', true) } : {}), ...(body?.content !== undefined ? { content: text(body.content, 'content', true) } : {}), visibility: noteVisibility, sessionId, contextLocationId: selectedContextLocationId, contextImageTargetType: selectedContextImageTargetType, contextImageTargetId: selectedContextImageTargetId, ...(body?.pinned !== undefined ? { pinned: body.pinned === true } : {}), ...(body?.tags !== undefined ? { tags: noteTags(body.tags) } : {}), revision: { increment: 1 }, ...(refs ? { references: { create: refs } } : {}), ...(audienceIds && noteVisibility === 'SELECTED_PLAYERS' ? { audiences: { create: audienceIds.map((id) => ({ userId: id })) } } : {}) }, include: { favorites: { where: { userId }, select: { userId: true } }, references: true, audiences: { select: { userId: true } }, author: { select: { id: true, displayName: true, username: true } }, session: { select: { id: true, title: true, sessionNumber: true } } } })
     })
-    return this.present(row, narrator, userId)
+    return presentChronicleNote(row, narrator, userId)
   }
 
   @Delete(':noteId')
@@ -281,7 +286,4 @@ export class ChronicleNotebookController {
     }
   }
 
-  private present(note: any, narrator: boolean, userId: string) {
-    return { id: note.id, chronicleId: note.chronicleId, sessionId: note.sessionId, contextLocationId: note.contextLocationId ?? null, title: note.title, content: note.content, visibility: note.visibility, status: note.status, pinned: (note.favorites ?? []).some((favorite: any) => favorite.userId === userId), tags: note.tags ?? [], canEdit: narrator || note.authorUserId === userId, revision: note.revision, createdAt: note.createdAt, updatedAt: note.updatedAt, author: note.author, session: note.session, references: note.references.map((ref: any) => ({ id: ref.id, targetType: ref.targetType, targetId: ref.targetId, label: ref.label })), audienceUserIds: narrator || note.authorUserId === userId ? note.audiences.map((row: any) => row.userId) : [] }
-  }
 }
