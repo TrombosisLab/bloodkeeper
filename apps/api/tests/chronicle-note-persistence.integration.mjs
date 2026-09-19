@@ -163,6 +163,9 @@ test(
       await database.chronicleAssetImage.deleteMany({
         where: { entityId: resourceId },
       })
+      await database.chronicleParticipant.deleteMany({
+        where: { chronicleId },
+      })
       await database.chronicle.deleteMany({
         where: { id: chronicleId },
       })
