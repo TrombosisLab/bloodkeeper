@@ -1,0 +1,33 @@
+# BloodKeeper — Cloudflare Tunnel opcional
+# Este archivo no contiene credenciales. Se usa junto a compose.deploy.yaml.
+services:
+  cloudflared:
+    image: ${BLOODKEEPER_CLOUDFLARED_IMAGE:-cloudflare/cloudflared:latest}
+    command:
+      - tunnel
+      - --no-autoupdate
+      - run
+      - --token
+      - ${CLOUDFLARE_TUNNEL_TOKEN:?CLOUDFLARE_TUNNEL_TOKEN es obligatorio}
+    networks:
+      - application
+    depends_on:
+      web:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+networks:
+  application:
+    driver: bridge
