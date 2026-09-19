@@ -31,6 +31,10 @@ import {
   ChronicleNoteForPresentation,
   presentChronicleNote,
 } from './chronicle-note-presenter'
+import {
+  findNoteReferenceTarget,
+  previewImageType,
+} from './chronicle-note-reference-access'
 
 type RequestWithUser = { user?: { id?: unknown; roles?: unknown } }
 type PresentedChronicleNote = ReturnType<typeof presentChronicleNote>
@@ -123,39 +127,28 @@ export class ChronicleNotebookController {
     const { db, narrator } = await this.access(chronicleId, userId)
     const targetType = rawTargetType.toUpperCase()
     if (!targetTypes.has(targetType) || !targetId) throw new BadRequestException({ code: 'INVALID_NOTE_REFERENCE' })
-    const directModels: Record<string, string> = { CHARACTER: 'character', NPC: 'chronicleNpc', LOCATION: 'chronicleLocation', EVENT: 'chronicleEvent', STORY: 'chronicleStory', SESSION: 'chronicleSession' }
-    const modelName = directModels[targetType]
-    const model = modelName ? (db as any)[modelName] : db.libraryResource
-    if (!model || typeof model.findFirst !== 'function') throw new NotFoundException({ code: 'NOTE_REFERENCE_NOT_FOUND' })
-    const resourceKind = targetType === 'ORGANIZATION' ? 'organization' : targetType === 'ARTIFACT' ? 'artifact' : targetType === 'DOCUMENT' ? 'document' : null
-    const row = modelName
-      ? await model.findFirst({ where: { id: targetId, chronicleId } })
-      : await model.findFirst({ where: { id: targetId, status: 'active', ...(resourceKind ? { kind: resourceKind } : {}), bindings: { some: { chronicleId, status: 'attached', ...(narrator ? {} : { visibility: 'chronicle_participants' }) } } } })
-    const characterIdentity = targetType === 'CHARACTER' ? await db.characterIdentity.findUnique({ where: { characterId: targetId }, select: { name: true, concept: true } }) : null
+    const row = await findNoteReferenceTarget(db, { chronicleId, targetType, targetId, narrator })
     if (!row) throw new NotFoundException({ code: 'NOTE_REFERENCE_NOT_FOUND' })
-    const imageType = targetType === 'NPC' || targetType === 'LOCATION' ? targetType : 'RESOURCE'
+    const imageType = previewImageType(targetType)
     const image = await db.chronicleAssetImage.findUnique({ where: { assetType_entityId: { assetType: imageType, entityId: targetId } }, select: { updatedAt: true } })
-    const label = characterIdentity?.name ?? row.name ?? row.title ?? row.alias ?? row.label ?? 'Recurso'
-    const description = characterIdentity?.concept ?? row.description ?? row.summary ?? row.premise ?? row.objective ?? null
-    const category = row.category ?? row.type ?? row.kind ?? targetType
     return {
       id: String(row.id),
       targetType,
       targetId,
-      label: String(label),
-      category: String(category),
+      label: String(row.label ?? 'Recurso'),
+      category: String(row.category ?? targetType),
       status: String(row.status ?? 'ACTIVE'),
-      description: typeof description === 'string' ? description : null,
-      narrativeRole: row.narrativeRole ?? row.role ?? null,
-      detailLevel: row.detailLevel ?? null,
+      description: row.description,
+      narrativeRole: row.narrativeRole,
+      detailLevel: row.detailLevel,
       metrics: { appearances: null, histories: null },
-      narratorDetails: narrator ? (row.narratorNotes ?? row.notes ?? null) : null,
-      deepProfile: narrator && targetType === 'NPC' ? row.deepProfile ?? null : null,
-      metadata: narrator ? row.metadata ?? null : null,
+      narratorDetails: narrator ? row.narratorDetails : null,
+      deepProfile: narrator && targetType === 'NPC' ? row.deepProfile : null,
+      metadata: narrator ? row.metadata : null,
       canViewPrivateDetails: narrator,
-      sessionDate: targetType === 'SESSION' ? row.realDate ?? null : null,
-      sessionNumber: targetType === 'SESSION' ? row.sessionNumber ?? null : null,
-      parentLocationId: targetType === 'LOCATION' ? row.parentLocationId ?? null : null,
+      sessionDate: targetType === 'SESSION' ? row.sessionDate : null,
+      sessionNumber: targetType === 'SESSION' ? row.sessionNumber : null,
+      parentLocationId: targetType === 'LOCATION' ? row.parentLocationId : null,
       imageUrl: image ? '/api/chronicles/' + chronicleId + '/assets/' + imageType + '/' + targetId + '/image?v=' + image.updatedAt.getTime() : null,
       privateNotice: 'La información privada del Narrador no se muestra a los jugadores.'
     }
@@ -267,17 +260,8 @@ export class ChronicleNotebookController {
   }
 
   private async validateRelations(db: any, chronicleId: string, refs: Array<{ targetType: string; targetId: string }>, audienceIds: string[], allowNarratorOnlyResources: boolean) {
-    const directModels: Record<string, string> = { CHARACTER: 'character', NPC: 'chronicleNpc', LOCATION: 'chronicleLocation', EVENT: 'chronicleEvent', STORY: 'chronicleStory', SESSION: 'chronicleSession' }
     for (const reference of refs) {
-      if (reference.targetType === 'RESOURCE' || reference.targetType === 'ORGANIZATION' || reference.targetType === 'ARTIFACT' || reference.targetType === 'DOCUMENT') {
-        const resourceKind = reference.targetType === 'ORGANIZATION' ? 'organization' : reference.targetType === 'ARTIFACT' ? 'artifact' : reference.targetType === 'DOCUMENT' ? 'document' : null
-        const resource = await db.libraryResource.findFirst({ where: { id: reference.targetId, status: 'active', ...(resourceKind ? { kind: resourceKind } : {}), bindings: { some: { chronicleId, status: 'attached', ...(allowNarratorOnlyResources ? {} : { visibility: 'chronicle_participants' }) } } }, select: { id: true } })
-        if (!resource) throw new BadRequestException({ code: 'NOTE_REFERENCE_OUTSIDE_CHRONICLE', targetId: reference.targetId })
-        continue
-      }
-      const modelName = directModels[reference.targetType]
-      if (!modelName || !db[modelName]) throw new BadRequestException({ code: 'INVALID_NOTE_REFERENCE_TYPE' })
-      const row = await db[modelName].findFirst({ where: { id: reference.targetId, chronicleId }, select: { id: true } })
+      const row = await findNoteReferenceTarget(db, { chronicleId, targetType: reference.targetType, targetId: reference.targetId, narrator: allowNarratorOnlyResources })
       if (!row) throw new BadRequestException({ code: 'NOTE_REFERENCE_OUTSIDE_CHRONICLE', targetId: reference.targetId })
     }
     if (audienceIds.length > 0) {
