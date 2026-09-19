@@ -22,11 +22,25 @@ jobs:
   verify:
     name: Verify source builds
     runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: bloodkeeper
+          POSTGRES_USER: bloodkeeper
+          POSTGRES_PASSWORD: validation-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U bloodkeeper -d bloodkeeper"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       POSTGRES_DB: bloodkeeper
       POSTGRES_USER: bloodkeeper
       POSTGRES_PASSWORD: validation-only
-      DATABASE_URL: postgresql://bloodkeeper:validation-only@postgres:5432/bloodkeeper?schema=public
+      DATABASE_URL: postgresql://bloodkeeper:validation-only@127.0.0.1:5432/bloodkeeper?schema=public
     steps:
       - name: Check out repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
@@ -45,6 +59,40 @@ jobs:
           docker run --rm
           --env DATABASE_URL=$DATABASE_URL
           bloodkeeper-api-verify npm test
+
+      - name: Apply API integration migrations
+        run: >-
+          docker run --rm
+          --network host
+          --env DATABASE_URL=$DATABASE_URL
+          bloodkeeper-api-verify
+          npx prisma migrate deploy
+
+      - name: Start API for integration tests
+        run: |
+          docker run --detach --name bloodkeeper-api-integration --network host --env DATABASE_URL="$DATABASE_URL" bloodkeeper-api-verify npm start
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:3000/health >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+
+          docker logs bloodkeeper-api-integration
+          exit 1
+
+      - name: Test API integration
+        run: >-
+          docker run --rm
+          --network host
+          --env DATABASE_URL=$DATABASE_URL
+          bloodkeeper-api-verify
+          npm run test:integration
+
+      - name: Stop API integration container
+        if: ${{ always() }}
+        run: docker rm --force bloodkeeper-api-integration || true
 
       - name: Audit API dependencies
         run: docker run --rm bloodkeeper-api-verify npm audit --audit-level=high
