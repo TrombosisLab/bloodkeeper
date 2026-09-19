@@ -7,6 +7,10 @@
 /* CHRONICLE_SPACE_VISUAL_FIX_V1 — reserva para la barra fija de sesión en móvil. */
 @media (max-width:760px){.chronicle-space{padding-bottom:126px}}
 
+/* CHRONICLE_SPACE_DIALOG_BACKDROP_V1 — el cierre del fondo usa un control semántico separado del diálogo. */
+.space-overlay__dismiss{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;cursor:default}
+.space-overlay>section,.space-overlay>aside,.space-overlay>form,.board-preview-backdrop>section,.board-focus-backdrop>section{position:relative;z-index:1}
+
 /* CHRONICLE_SPACE_LONG_NOTES_V1 — lectura completa de notas extensas. */
 .space-overlay{place-items:start center;overflow-y:auto;padding:24px 25px}.space-detail{max-height:calc(100vh - 48px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
 @media (max-width:760px){.space-overlay{place-items:start center;padding:16px 12px 96px}.space-detail{max-height:calc(100vh - 32px);padding:28px 20px 24px}}

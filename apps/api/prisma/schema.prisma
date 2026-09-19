@@ -509,7 +509,7 @@ model ChronicleNote {
   id           String                @id @default(uuid()) @db.Uuid
   chronicleId  String                @db.Uuid
   sessionId    String?               @db.Uuid
-  contextLocationId String?
+  contextLocationId String? @db.Uuid
   contextImageTargetType String?
   contextImageTargetId String? @db.Uuid
   authorUserId String                @db.Uuid
