@@ -187,7 +187,17 @@ La política completa se documenta en `RECOVERY.md`.
 
 ## Restauración
 
-La restauración no se ejecuta desde la Web. Continúa siendo una operación SSH.
+La restauración no se ejecuta desde la Web. Continúa siendo una operación SSH
+desde el panel común de administración:
+
+```bash
+sudo bash scripts/admin-menu.sh
+```
+
+En el menú principal elige **Restaurar un dump o paquete completo**. La misma
+opción está disponible dentro de **Copias de seguridad**. El panel pide la
+ruta, conserva la separación entre verificación y aplicación, y nunca aplica
+una restauración destructiva sin la confirmación correspondiente.
 
 Verificación no destructiva de un dump:
 
@@ -209,6 +219,12 @@ Verificación de un paquete completo:
 ./scripts/restore-full.sh \
   --verify /ruta/bloodkeeper_full_FECHA.tar.gz
 ```
+
+Para una recuperación completa guiada, el panel verifica primero el paquete y
+después lo extrae a una ruta nueva. El propio script muestra entonces los
+pasos para reconstruir API/Web con `./scripts/bootstrap-server.sh --deploy`,
+verificar el dump y aplicarlo con confirmación. No se debe iniciar esa ruta
+con una imagen Web antigua mediante `docker compose up -d`.
 
 No aplicar una restauración sin comprobar antes qué datos serán sustituidos.
 

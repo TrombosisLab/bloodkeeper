@@ -12,8 +12,9 @@ fi
 cd "$ROOT"
 
 pause_menu() {
-  printf '\nPulsa Intro para volver al menú... '
-  read -r _ || true
+  printf '\nPulsa Intro o cualquier tecla para volver al menú... '
+  read -r -n 1 _ || true
+  printf '\n'
 }
 
 ask_path() {
@@ -36,6 +37,7 @@ backup_menu() {
     printf '[4] Consultar programación\n'
     printf '[5] Copiar archivos del volumen Docker al host\n'
     printf '[6] Consultar servicio de petición web\n'
+    printf '[7] Restaurar un dump o paquete completo\n'
     printf '[q] Volver\n'
     read -r -p 'Elige una opción: ' option
 
@@ -86,6 +88,9 @@ backup_menu() {
         "$ROOT/scripts/install-manual-backup-request-service.sh" --status
         pause_menu
         ;;
+      7)
+        restore_menu
+        ;;
       q|Q) return ;;
       *) printf 'Opción no válida.\n' ;;
     esac
@@ -115,15 +120,18 @@ restore_menu() {
       esac
       ;;
     *.tar.gz)
-      printf '[1] Verificar el paquete sin desplegarlo\n'
-      printf '[2] Extraerlo a una ruta nueva\n'
+      printf '[1] Verificar el paquete completo sin desplegarlo\n'
+      printf '[2] Preparar restauración completa guiada\n'
       read -r -p 'Elige una opción: ' mode
       case "$mode" in
         1) "$ROOT/scripts/restore-full.sh" --verify "$archive" ;;
         2)
           target=""
-          read -r -p 'Ruta nueva de recuperación: ' target
-          [ -n "$target" ] && "$ROOT/scripts/restore-full.sh" --extract "$archive" --target-dir "$target" --confirm
+          read -r -p "Ruta nueva de recuperación [$ROOT-restored]: " target
+          target="${target:-$ROOT-restored}"
+          "$ROOT/scripts/restore-full.sh" --verify "$archive"
+          "$ROOT/scripts/restore-full.sh" --extract "$archive" --target-dir "$target" --confirm
+          printf '\nSiguiente paso: entra en la ruta recuperada y ejecuta el bootstrap indicado.\n'
           ;;
         *) printf 'Opción no válida.\n' ;;
       esac
@@ -187,7 +195,7 @@ while true; do
   printf '[2] Comprobación operativa\n'
   printf '[3] Logs\n'
   printf '[4] Copias de seguridad\n'
-  printf '[5] Restaurar una copia\n'
+  printf '[5] Restaurar un dump o paquete completo\n'
   printf '[6] Cloudflare Tunnel\n'
   printf '[7] Operación, actualización y rollback\n'
   printf '[8] Limpiar completamente la base de datos\n'
