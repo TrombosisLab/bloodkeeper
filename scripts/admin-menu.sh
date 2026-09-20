@@ -121,11 +121,18 @@ restore_menu() {
       ;;
     *.tar.gz)
       printf '[1] Verificar el paquete completo sin desplegarlo\n'
-      printf '[2] Preparar restauración completa guiada\n'
+      printf '[2] Ejecutar restauración completa automatizada\n'
+      printf '[3] Preparar recuperación sin aplicar datos\n'
       read -r -p 'Elige una opción: ' mode
       case "$mode" in
         1) "$ROOT/scripts/restore-full.sh" --verify "$archive" ;;
         2)
+          target=""
+          read -r -p "Ruta nueva de recuperación [$ROOT-restored]: " target
+          target="${target:-$ROOT-restored}"
+          "$ROOT/scripts/restore-full-guided.sh" --archive "$archive" --target-dir "$target"
+          ;;
+        3)
           target=""
           read -r -p "Ruta nueva de recuperación [$ROOT-restored]: " target
           target="${target:-$ROOT-restored}"

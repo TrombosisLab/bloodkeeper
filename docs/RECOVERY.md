@@ -177,6 +177,26 @@ no está iniciado, el script levanta únicamente `v5r-postgres` y espera a que
 esté saludable. No necesita que Web ni API estén arrancados y no debe
 sustituirse por un `docker compose up -d` manual durante esta fase.
 
+## Restauración completa automatizada
+
+En una máquina limpia, una vez copiado el paquete completo al servidor, el
+panel de administración puede ejecutar el flujo completo mediante:
+
+```bash
+./scripts/restore-full-guided.sh \
+  --archive /ruta/bloodkeeper_full_FECHA.tar.gz \
+  --target-dir /ruta/bloodkeeper-restored
+```
+
+El flujo verifica primero el paquete, lo extrae en una ruta nueva, detiene la
+instalación actual sin borrar sus volúmenes, ejecuta el bootstrap, verifica el
+dump y solicita una confirmación explícita antes de aplicarlo. Si falla después
+de detener la instalación anterior, intenta volver a levantarla. La ruta
+anterior no se elimina automáticamente.
+
+La copia del paquete a la máquina destino sigue siendo responsabilidad del
+operador y debe hacerse antes de iniciar el flujo.
+
 ## Aplicar una restauración de base
 
 Después de verificar el dump incluido:

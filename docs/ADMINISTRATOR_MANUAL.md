@@ -220,11 +220,29 @@ Verificación de un paquete completo:
   --verify /ruta/bloodkeeper_full_FECHA.tar.gz
 ```
 
-Para una recuperación completa guiada, el panel verifica primero el paquete y
-después lo extrae a una ruta nueva. El propio script muestra entonces los
-pasos para reconstruir API/Web con `./scripts/bootstrap-server.sh --deploy`,
-verificar el dump y aplicarlo con confirmación. No se debe iniciar esa ruta
-con una imagen Web antigua mediante `docker compose up -d`.
+Para una recuperación completa automatizada, el panel verifica primero el
+paquete, lo extrae a una ruta nueva, detiene la instalación actual sin borrar
+sus volúmenes, reconstruye API/Web, verifica el dump incluido, pide una
+confirmación explícita y aplica los datos. Si el proceso falla, intenta volver
+a levantar la instalación anterior. La instalación anterior no se elimina
+automáticamente.
+
+Desde el menú, elige **Restaurar un dump o paquete completo**, indica el
+archivo `.tar.gz` y selecciona **Ejecutar restauración completa automatizada**.
+El flujo requiere escribir `CONTINUAR` antes de detener la instalación y
+`RESTAURAR` antes de sustituir la base de datos.
+
+También se puede ejecutar directamente:
+
+```bash
+./scripts/restore-full-guided.sh \
+  --archive /ruta/bloodkeeper_full_FECHA.tar.gz \
+  --target-dir /ruta/bloodkeeper-restored
+```
+
+La copia del paquete a la máquina destino sigue siendo un paso previo manual
+o externo. No se debe iniciar la ruta recuperada con una imagen Web antigua
+mediante `docker compose up -d`; el flujo ejecuta el bootstrap correspondiente.
 
 No aplicar una restauración sin comprobar antes qué datos serán sustituidos.
 
