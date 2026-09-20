@@ -29,6 +29,7 @@ despliegue y mantenimiento mediante SSH.
 | `check-maintenance-operations.sh` | Valida el mantenimiento de SPEC-009 |
 | `check-ui-design-system.sh` | Valida los fundamentos de SPEC-010.A |
 | `create-initial-admin.sh` | Crea la primera cuenta administrativa |
+| `admin-menu.sh` | Menú posterior para estado, restauración, Cloudflare, exportaciones y reinicialización |
 
 ## Desarrollo
 

@@ -365,3 +365,18 @@ printf 'Acceso local: http://localhost:%s\n' "$web_port"
 printf 'Desde la red: usa el nombre o la dirección actual de esta máquina y el puerto %s.\n' "$web_port"
 printf 'Datos: volúmenes Docker nuevos o previamente existentes del proyecto %s.\n' "$PROJECT_NAME"
 printf 'Configuración privada: %s\n' "$ENV_FILE"
+# BLOODKEEPER_ADMIN_MENU_V1
+offer_admin_menu() {
+  if [ "${BLOODKEEPER_SKIP_ADMIN_MENU:-0}" = '1' ] ||
+     [ "${BLOODKEEPER_NONINTERACTIVE:-0}" = '1' ] ||
+     [ ! -t 0 ]; then
+    return
+  fi
+  answer='s'
+  read -r -p '¿Abrir ahora el menú de administración? [S/n] ' answer
+  case "$answer" in
+    n|N|no|NO) return ;;
+  esac
+  "$ROOT/scripts/admin-menu.sh"
+}
+offer_admin_menu
