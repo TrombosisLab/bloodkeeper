@@ -7,10 +7,10 @@ import type { ChronicleParticipantRepository } from '../application/chronicle-pa
 import { parseChronicleIdParam, parseChronicleNarratorId } from './chronicle.dto'
 
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024
-type AssetType = 'NPC' | 'LOCATION' | 'RESOURCE' | 'SESSION'
+type AssetType = 'NPC' | 'LOCATION' | 'RESOURCE' | 'SESSION' | 'MAP'
 type ImageRequest = AsyncIterable<Buffer> & { user?: { id?: unknown; roles?: readonly unknown[] }; headers: { readonly ['content-type']?: string } }
 
-function assetType(value: unknown): AssetType { if (value === 'NPC' || value === 'LOCATION' || value === 'RESOURCE' || value === 'SESSION') return value; throw new BadRequestException({ code: 'INVALID_CHRONICLE_ASSET_TYPE' }) }
+function assetType(value: unknown): AssetType { if (value === 'NPC' || value === 'LOCATION' || value === 'RESOURCE' || value === 'SESSION' || value === 'MAP') return value; throw new BadRequestException({ code: 'INVALID_CHRONICLE_ASSET_TYPE' }) }
 function uuid(value: unknown): string { if (typeof value !== 'string' || !/^[0-9a-f-]{36}$/i.test(value)) throw new BadRequestException({ code: 'INVALID_CHRONICLE_ASSET_ID' }); return value }
 function mime(bytes: Buffer): string | null { if (bytes.length >= 8 && bytes.subarray(0, 8).equals(Buffer.from([137,80,78,71,13,10,26,10]))) return 'image/png'; if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'image/jpeg'; if (bytes.length >= 12 && bytes.subarray(0,4).toString('ascii') === 'RIFF' && bytes.subarray(8,12).toString('ascii') === 'WEBP') return 'image/webp'; return null }
 async function body(request: ImageRequest): Promise<Buffer> { const chunks: Buffer[] = []; let size = 0; for await (const value of request) { const chunk = Buffer.isBuffer(value) ? value : Buffer.from(value); size += chunk.byteLength; if (size > MAX_IMAGE_BYTES) throw new PayloadTooLargeException({ code: 'CHRONICLE_ASSET_IMAGE_TOO_LARGE', maximumBytes: MAX_IMAGE_BYTES }); chunks.push(chunk) } if (!size) throw new BadRequestException({ code: 'CHRONICLE_ASSET_IMAGE_EMPTY' }); return Buffer.concat(chunks, size) }
@@ -29,10 +29,12 @@ export class ChronicleAssetImageController {
     const row = type === 'NPC'
       ? await this.db.chronicleNpc.findFirst({ where: { ...where, status: 'ACTIVE' }, select: { id: true } })
       : type === 'LOCATION'
-        ? await this.db.chronicleLocation.findFirst({ where: { ...where, status: 'ACTIVE' }, select: { id: true } })
-        : type === 'SESSION'
+        ? (await this.db.chronicleLocation.findFirst({ where: { ...where, status: 'ACTIVE' }, select: { id: true } })) ?? await this.db.libraryResource.findFirst({ where: { id: entityId, status: 'active', kind: 'location', bindings: { some: { chronicleId, status: 'attached', ...(narrator ? {} : { visibility: 'chronicle_participants' }) } } }, select: { id: true } })
+      : type === 'SESSION'
           ? await this.db.chronicleSession.findFirst({ where, select: { id: true } })
-          : await this.db.libraryResource.findFirst({ where: { id: entityId, status: 'active', bindings: { some: { chronicleId, status: 'attached', ...(narrator ? {} : { visibility: 'chronicle_participants' }) } } }, select: { id: true } })
+          : type === 'MAP'
+            ? await this.db.chronicleMap.findFirst({ where: { ...where, ...(narrator ? {} : { status: 'ACTIVE' }) }, select: { id: true } })
+            : await this.db.libraryResource.findFirst({ where: { id: entityId, status: 'active', bindings: { some: { chronicleId, status: 'attached', ...(narrator ? {} : { visibility: 'chronicle_participants' }) } } }, select: { id: true } })
     if (!row) throw new NotFoundException({ code: 'CHRONICLE_ASSET_NOT_FOUND' })
   }
   @Get(':assetType/:assetId/image') async load(@Req() request: ImageRequest, @Param('chronicleId') chronicle: unknown, @Param('assetType') rawType: unknown, @Param('assetId') rawId: unknown) { const { chronicleId, narrator } = await this.access(request, chronicle); const type = assetType(rawType), entityId = uuid(rawId); await this.target(chronicleId, narrator, type, entityId); const image = await this.db.chronicleAssetImage.findUnique({ where: { assetType_entityId: { assetType: type, entityId } } }); if (!image) throw new NotFoundException({ code: 'CHRONICLE_ASSET_IMAGE_NOT_FOUND' }); return new StreamableFile(Buffer.from(image.data), { type: image.mimeType, length: image.byteSize, disposition: 'inline' }) }

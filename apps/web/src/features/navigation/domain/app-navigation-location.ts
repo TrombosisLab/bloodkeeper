@@ -15,6 +15,7 @@ const hashByView:
     notebook: '#/notebook',
     play: '#/play',
     resources: '#/resources',
+    map: '#/map',
   }
 
 export function hashForAppView(
@@ -48,6 +49,9 @@ export function appViewFromHash(
     case '#/notebook':
       return permissions.canAccessChronicles ? 'notebook' : 'dashboard'
 
+    case '#/map':
+      return permissions.canAccessChronicles ? 'map' : 'dashboard'
+
     case '#/chronicles':
       return permissions.canAccessChronicles
         ? 'chronicles'
@@ -78,6 +82,10 @@ export function sectionForAppView(
 
   if (view === 'resources') {
     return 'resources'
+  }
+
+  if (view === 'map') {
+    return 'map'
   }
 
   if (view === 'play') {

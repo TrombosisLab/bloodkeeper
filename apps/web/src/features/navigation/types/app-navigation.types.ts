@@ -1,5 +1,6 @@
 export type AppView =
   | 'resources'
+  | 'map'
   | 'dashboard'
   | 'characters'
   | 'character-creation'
@@ -17,6 +18,7 @@ export type AppSection =
   | 'notebook'
   | 'chronicle-space'
   | 'play'
+  | 'map'
 
 export interface AppNavigationPermissions {
   readonly canAccessChronicles: boolean

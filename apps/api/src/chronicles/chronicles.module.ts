@@ -271,6 +271,7 @@ import {
 import { ChronicleNotebookController } from './presentation/chronicle-notebook.controller'
 import { ChronicleSpaceBoardController } from './presentation/chronicle-space-board.controller'
 import { ChronicleSpaceBoardPersonalController } from './presentation/chronicle-space-board-personal.controller'
+import { ChronicleMapController } from './presentation/chronicle-map.controller'
 
 import {
   CHRONICLE_STORY_REPOSITORY,
@@ -330,6 +331,7 @@ import { ChronicleCoverController } from './presentation/chronicle-cover.control
     ChronicleNotebookController,
     ChronicleSpaceBoardController,
     ChronicleSpaceBoardPersonalController,
+    ChronicleMapController,
 
   ],
   providers: [

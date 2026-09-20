@@ -17,7 +17,9 @@ export function AppHeader({ displayName = 'jugador' }: { displayName?: string })
               ? { eyebrow: 'RECURSOS', title: 'Recursos', subtitle: 'Biblioteca reutilizable.' }
               : currentHash.startsWith('#/chronicles')
                 ? { eyebrow: 'CRÓNICAS', title: 'Crónicas', subtitle: 'Participación y gestión.' }
-                : { eyebrow: '', title: '', subtitle: '' }
+                : currentHash.startsWith('#/map')
+                  ? { eyebrow: 'MAPA', title: 'Cartografía de la crónica', subtitle: 'Mapas, lugares y zonas de la historia.' }
+                  : { eyebrow: '', title: '', subtitle: '' }
   const isDashboard = typeof window !== 'undefined' && window.location.hash === '#/dashboard'
   useActiveChronicleHeader()
   return (

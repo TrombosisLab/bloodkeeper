@@ -180,6 +180,10 @@ export function AppNavigation({
           <button type="button" aria-current={activeSection === 'resources' ? 'page' : undefined} onClick={() => selectSection('resources')}><span>Recursos</span><small>Biblioteca reutilizable</small></button>
         ) : null}
 
+        {canAccessChronicles ? (
+          <button type="button" aria-current={activeSection === 'map' ? 'page' : undefined} onClick={() => selectSection('map')}><span>Mapa</span><small>Cartografía de la crónica</small></button>
+        ) : null}
+
 
 
 

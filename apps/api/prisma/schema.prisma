@@ -228,11 +228,12 @@ model User {
   blushOfLifeExemptions   CharacterBlushOfLifeExemptionOperation[] @relation("BlushOfLifeExemptionActor")
   chronicleSessionNotes   ChronicleSessionParticipantNote[] @relation("ChronicleSessionParticipantNoteAuthor")
   dashboardContext UserDashboardContext?
+  libraryResources                  LibraryResource[]                        @relation("LibraryResourceOwner")
+  chronicleSpaceBoardPersonalStates ChronicleSpaceBoardPersonalState[]       @relation("ChronicleSpaceBoardPersonalStateUser")
+  chronicleMapRequests              ChronicleMapRequest[]                    @relation("ChronicleMapRequestRequester")
 
   @@index([status])
   @@map("users")
-  libraryResources LibraryResource[] @relation("LibraryResourceOwner")
-  chronicleSpaceBoardPersonalStates ChronicleSpaceBoardPersonalState[] @relation("ChronicleSpaceBoardPersonalStateUser")
 }
 
 model AuthSession {
@@ -283,13 +284,14 @@ model Chronicle {
   coverImage ChronicleCoverImage?
   notebookNotes ChronicleNote[] @relation("ChronicleNoteChronicle")
   spaceBoard ChronicleSpaceBoard? @relation("ChronicleSpaceBoardChronicle")
+  resources                ChronicleResource[]
+  libraryResourceBindings  ChronicleResourceBinding[]
+  spaceBoardPersonalStates ChronicleSpaceBoardPersonalState[] @relation("ChronicleSpaceBoardPersonalStateChronicle")
+  chronicleMaps            ChronicleMap[]                     @relation("ChronicleMapChronicle")
 
   @@index([narratorId])
   @@index([status])
   @@map("chronicles")
-  resources ChronicleResource[]
-  libraryResourceBindings ChronicleResourceBinding[]
-  spaceBoardPersonalStates ChronicleSpaceBoardPersonalState[] @relation("ChronicleSpaceBoardPersonalStateChronicle")
 }
 
 model ChronicleCoverImage {
@@ -364,9 +366,9 @@ model ChronicleNpc {
   storyLinks   ChronicleStoryNpc[] @relation("ChronicleStoryNpcNpc")
   eventLinks ChronicleEventNpc[] @relation("ChronicleEventNpcNpc")
 
+  @@unique([id, chronicleId])
   @@index([chronicleId, status])
   @@index([chronicleId, detailLevel])
-  @@unique([id, chronicleId])
   @@map("chronicle_npcs")
 }
 
@@ -396,11 +398,13 @@ model ChronicleLocation {
 
   parentLocation ChronicleLocation?  @relation("ChronicleLocationHierarchy", fields: [parentLocationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   childLocations ChronicleLocation[] @relation("ChronicleLocationHierarchy")
+  mapLinks       ChronicleMap[]       @relation("ChronicleMapLocation")
+  mapMarkers     ChronicleMapMarker[] @relation("ChronicleMapMarkerLocation")
 
+  @@unique([id, chronicleId])
   @@index([chronicleId, status])
   @@index([chronicleId, parentLocationId])
   @@index([parentLocationId])
-  @@unique([id, chronicleId])
   @@map("chronicle_locations")
 }
 
@@ -429,10 +433,10 @@ model ChronicleEvent {
   npcLinks ChronicleEventNpc[] @relation("ChronicleEventNpcEvent")
   locationLinks ChronicleEventLocation[] @relation("ChronicleEventLocationEvent")
 
+  @@unique([id, chronicleId])
   @@index([chronicleId, status])
   @@index([chronicleId, timelineOrder])
   @@index([chronicleId, realDate])
-  @@unique([id, chronicleId])
   @@map("chronicle_events")
 }
 
@@ -466,10 +470,10 @@ model ChronicleSession {
     participantNotes ChronicleSessionParticipantNote[] @relation("ChronicleSessionParticipantNoteSession")
   notebookNotes ChronicleNote[] @relation("ChronicleNoteSession")
 
+  @@unique([id, chronicleId])
     @@index([chronicleId, status])
     @@index([chronicleId, sessionNumber])
     @@index([chronicleId, realDate])
-    @@unique([id, chronicleId])
     @@map("chronicle_sessions")
 }
 
@@ -543,6 +547,7 @@ model ChronicleNoteFavorite {
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   note ChronicleNote @relation(fields: [noteId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@id([noteId, userId])
   @@index([userId])
   @@map("chronicle_note_favorites")
@@ -709,11 +714,11 @@ model CharacterExperienceMovement {
   corrections CharacterExperienceMovement[] @relation("CharacterExperienceCorrection")
 
   @@unique([characterId, deduplicationKey])
+  @@unique([characterId, storyId])
   @@index([characterId, createdAt])
   @@index([actorId, createdAt])
   @@index([sessionId])
   @@index([storyId])
-  @@unique([characterId, storyId])
   @@index([correctsMovementId])
   @@map("character_experience_movements")
 }
@@ -760,10 +765,10 @@ model Character {
   sessionAttendances  ChronicleSessionAttendance[] @relation("ChronicleSessionAttendanceCharacter")
   portrait            CharacterPortrait?
 
+  @@unique([id, chronicleId])
   @@index([ownerId])
   @@index([chronicleId])
   @@index([status])
-  @@unique([id, chronicleId])
   @@map("characters")
 }
 
@@ -1201,6 +1206,7 @@ model ChronicleSessionScene {
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
   chronicle Chronicle @relation("ChronicleSessionSceneChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   session ChronicleSession @relation("ChronicleSessionSceneSession", fields: [sessionId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+
   @@unique([sessionId, sortOrder])
   @@index([chronicleId, sessionId])
   @@map("chronicle_session_scenes")
@@ -1218,6 +1224,7 @@ model ChronicleSessionPreparationItem {
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
   chronicle Chronicle @relation("ChronicleSessionPreparationChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   session ChronicleSession @relation("ChronicleSessionPreparationSession", fields: [sessionId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+
   @@unique([sessionId, sortOrder])
   @@index([chronicleId, sessionId])
   @@map("chronicle_session_preparation_items")
@@ -1230,6 +1237,7 @@ model ChronicleEventCharacter {
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   event ChronicleEvent @relation("ChronicleEventCharacterEvent", fields: [eventId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
   character Character @relation("ChronicleEventCharacterCharacter", fields: [characterId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+
   @@id([eventId, characterId])
   @@index([characterId])
   @@map("chronicle_event_character_links")
@@ -1242,6 +1250,7 @@ model ChronicleEventNpc {
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   event ChronicleEvent @relation("ChronicleEventNpcEvent", fields: [eventId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
   npc ChronicleNpc @relation("ChronicleEventNpcNpc", fields: [npcId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+
   @@id([eventId, npcId])
   @@index([npcId])
   @@map("chronicle_event_npc_links")
@@ -1254,6 +1263,7 @@ model ChronicleEventLocation {
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   event ChronicleEvent @relation("ChronicleEventLocationEvent", fields: [eventId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
   location ChronicleLocation @relation("ChronicleEventLocationLocation", fields: [locationId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+
   @@id([eventId, locationId])
   @@index([locationId])
   @@map("chronicle_event_location_links")
@@ -1485,6 +1495,7 @@ model ChronicleResource {
   updatedAt DateTime @updatedAt
   chronicle Chronicle @relation(fields: [chronicleId], references: [id], onDelete: Cascade)
   location ChronicleLocation? @relation("ChronicleResourceLocation", fields: [locationId], references: [id], onDelete: SetNull)
+
   @@index([chronicleId, kind, status])
   @@index([chronicleId, visibility, status])
   @@map("chronicle_resources")
@@ -1523,11 +1534,11 @@ model UserDashboardContext {
   characterId String? @db.Uuid
   sessionId String? @db.Uuid
   lastOpenedAt DateTime @updatedAt @db.Timestamptz(3)
-  user User @relation(fields:[userId],references:[id],onDelete:Cascade,onUpdate:Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
   @@index([chronicleId])
   @@map("user_dashboard_contexts")
 }
-
 
 // Recurso canónico reutilizable del narrador.
 model LibraryResource {
@@ -1546,6 +1557,9 @@ model LibraryResource {
   owner         User     @relation("LibraryResourceOwner", fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   bindings      ChronicleResourceBinding[]
   sessionLinks  ChronicleSessionResource[] @relation("ChronicleSessionResourceResource")
+  mapMarkers    ChronicleMapMarker[]       @relation("ChronicleMapMarkerResource")
+  mapLinks      ChronicleMap[]             @relation("ChronicleMapResource")
+  mapRequests   ChronicleMapRequest[]      @relation("ChronicleMapRequestResource")
 
   @@unique([legacyType, legacyId])
   @@index([ownerId, kind, status])
@@ -1572,7 +1586,6 @@ model ChronicleResourceBinding {
   @@map("chronicle_resource_bindings")
 }
 
-
 model ChronicleSpaceBoard {
   chronicleId String   @id @db.Uuid
   state      Json
@@ -1584,7 +1597,6 @@ model ChronicleSpaceBoard {
 
   @@map("chronicle_space_boards")
 }
-
 
 model ChronicleSpaceBoardPersonalState {
   chronicleId String   @db.Uuid
@@ -1600,4 +1612,115 @@ model ChronicleSpaceBoardPersonalState {
   @@id([chronicleId, userId])
   @@index([userId])
   @@map("chronicle_space_board_personal_states")
+}
+
+enum ChronicleMapStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum ChronicleMapRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Documento cartográfico de una crónica. La jerarquía es independiente de la
+// jerarquía de localizaciones para permitir varios mapas de un mismo lugar.
+model ChronicleMap {
+  id               String             @id @default(uuid()) @db.Uuid
+  chronicleId      String             @db.Uuid
+  parentMapId      String?            @db.Uuid
+  linkedLocationId String?            @db.Uuid
+  linkedResourceId String?            @db.Uuid
+  name             String
+  description      String?
+  status           ChronicleMapStatus @default(ACTIVE)
+  sortOrder        Int                @default(0)
+  createdAt        DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime           @updatedAt @db.Timestamptz(3)
+
+  chronicle      Chronicle             @relation("ChronicleMapChronicle", fields: [chronicleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  parentMap      ChronicleMap?         @relation("ChronicleMapHierarchy", fields: [parentMapId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  childMaps      ChronicleMap[]        @relation("ChronicleMapHierarchy")
+  linkedLocation ChronicleLocation?    @relation("ChronicleMapLocation", fields: [linkedLocationId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  linkedResource LibraryResource?      @relation("ChronicleMapResource", fields: [linkedResourceId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  markers        ChronicleMapMarker[]  @relation("ChronicleMapMarkerMap")
+  areas          ChronicleMapArea[]    @relation("ChronicleMapAreaMap")
+  requests       ChronicleMapRequest[] @relation("ChronicleMapRequestMap")
+
+  @@index([chronicleId, status, parentMapId])
+  @@index([parentMapId])
+  @@index([linkedLocationId])
+  @@index([linkedResourceId])
+  @@map("chronicle_maps")
+}
+
+model ChronicleMapMarker {
+  id         String   @id @default(uuid()) @db.Uuid
+  mapId      String   @db.Uuid
+  resourceId String?  @db.Uuid
+  locationId String?  @db.Uuid
+  kind       String   @default("LOCATION")
+  label      String?
+  x          Float
+  y          Float
+  size       String   @default("large")
+  visibility String   @default("chronicle_participants")
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  map      ChronicleMap       @relation("ChronicleMapMarkerMap", fields: [mapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  resource LibraryResource?   @relation("ChronicleMapMarkerResource", fields: [resourceId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  location ChronicleLocation? @relation("ChronicleMapMarkerLocation", fields: [locationId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([mapId])
+  @@index([resourceId])
+  @@index([locationId])
+  @@map("chronicle_map_markers")
+}
+
+model ChronicleMapArea {
+  id         String   @id @default(uuid()) @db.Uuid
+  mapId      String   @db.Uuid
+  name       String
+  geometry   Json
+  color      String?
+  fillColor  String?
+  labelColor String?
+  labelSize  String   @default("medium")
+  labelVertical   String   @default("top")
+  labelHorizontal String   @default("left")
+  visibility String   @default("chronicle_participants")
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  map ChronicleMap @relation("ChronicleMapAreaMap", fields: [mapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([mapId])
+  @@map("chronicle_map_areas")
+}
+
+model ChronicleMapRequest {
+  id          String                    @id @default(uuid()) @db.Uuid
+  mapId       String                    @db.Uuid
+  requesterId String                    @db.Uuid
+  resourceId  String?                   @db.Uuid
+  title       String
+  description String?
+  kind        String                    @default("LOCATION")
+  x           Float
+  y           Float
+  status      ChronicleMapRequestStatus @default(PENDING)
+  reviewNote  String?
+  createdAt   DateTime                  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime                  @updatedAt @db.Timestamptz(3)
+
+  map       ChronicleMap     @relation("ChronicleMapRequestMap", fields: [mapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  requester User             @relation("ChronicleMapRequestRequester", fields: [requesterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  resource  LibraryResource? @relation("ChronicleMapRequestResource", fields: [resourceId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([mapId, status])
+  @@index([requesterId, status])
+  @@map("chronicle_map_requests")
 }

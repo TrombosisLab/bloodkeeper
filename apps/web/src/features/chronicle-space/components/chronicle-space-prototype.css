@@ -450,9 +450,9 @@
 .context-image-field select{width:100%;border:1px solid rgba(224,155,155,.35);border-radius:7px;background:#120e13;color:#fff0eb;padding:12px;font:15px/1.45 Inter,system-ui,sans-serif;letter-spacing:normal;text-transform:none}
 .context-image-field small{color:#a99597;font-size:10px;font-weight:500;letter-spacing:normal;text-transform:none}
 .detail-context-image{margin:0 0 22px;border:1px solid rgba(224,155,155,.28);border-radius:9px;overflow:hidden;background:#160f14}
-.detail-context-image img{display:block;width:100%;max-height:330px;object-fit:cover}
+.detail-context-image img{display:block;width:100%;height:330px;object-fit:contain;background:#160f14}
 .detail-context-image figcaption{padding:9px 12px;color:#d99d89;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
-@media(max-width:760px){.detail-context-image img{max-height:250px}}
+@media(max-width:760px){.detail-context-image img{height:250px}}
 
 
 /* CHRONICLE_SPACE_NOTE_CONTEXT_IMAGE_ANY_REFERENCE_V1 — destinos de imagen contextual para cualquier mención con imagen canónica. */

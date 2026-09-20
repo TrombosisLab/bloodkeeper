@@ -585,6 +585,8 @@ export function ChronicleSpacePrototype() {
   }, [context, noteContent])
 
   const chronicle = useMemo(() => chronicles.find((item) => item.id === chronicleId), [chronicles, chronicleId])
+  const activeChronicles = useMemo(() => chronicles.filter((item) => item.status !== 'archived'), [chronicles])
+  const archivedChronicles = useMemo(() => chronicles.filter((item) => item.status === 'archived'), [chronicles])
   const cards = useMemo<readonly Card[]>(() => { const people = (context?.npcs || []).map((item) => ({ id: 'npc-' + item.id, kind: 'PNJ' as const, title: item.name, meta: item.category || item.narrativeRole || 'Persona', description: item.description || 'Sin descripción disponible.', targetType: 'NPC', targetId: item.id })); const places = (context?.locations || []).map((item) => ({ id: 'loc-' + item.id, kind: 'LUGAR' as const, title: item.name, meta: item.category || 'Lugar', description: item.description || 'Sin descripción disponible.', targetType: 'LOCATION', targetId: item.id })); const annotations = notes.map((item) => ({ id: 'note-' + item.id, kind: 'NOTA' as const, title: item.title, meta: item.visibility === 'PRIVATE' ? 'Privada' : 'Compartida', author: item.author.displayName || item.author.username, description: item.content || 'Anotación vacía.' })); return [...people, ...places, ...annotations] }, [context, notes])
   const chronicleMentionOptions = useMemo(() => {
     const boardOptions = cards
@@ -1149,7 +1151,7 @@ export function ChronicleSpacePrototype() {
     {typeof document !== 'undefined' && document.getElementById('app-header-page-actions') !== null ? createPortal(
       <div className="chronicle-space-global-actions" aria-label="Controles de la Sala de Investigación">
         <button className="chronicle-space-global-actions__new-note" type="button" onClick={openNewNote}>+ Nueva nota</button>
-        <label className="chronicle-space-global-actions__chronicle"><span>Crónica</span><select value={chronicleId} onChange={(event) => { rememberChronicleSpaceSelection(event.target.value); setChronicleId(event.target.value) }}>{chronicles.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+        <label className="chronicle-space-global-actions__chronicle"><span>Crónica</span><select value={chronicleId} onChange={(event) => { rememberChronicleSpaceSelection(event.target.value); setChronicleId(event.target.value) }}>{activeChronicles.length ? <optgroup label="Activas">{activeChronicles.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</optgroup> : null}{archivedChronicles.length ? <optgroup label="Archivadas">{archivedChronicles.map((item) => <option key={item.id} value={item.id}>{item.name} · Archivada</option>)}</optgroup> : null}</select></label>
         <div className="chronicle-space-global-actions__counts" aria-label="Resumen de la crónica"><b>{cards.length}<small>elementos visibles</small></b><b>{sessions.length}<small>sesiones</small></b><b>{notes.length}<small>anotaciones</small></b></div>
         <nav className="chronicle-space-global-actions__nav" aria-label="Secciones de la Sala de Investigación">{nav.map((item) => <button key={item.id} className={section === item.id ? 'is-active' : ''} type="button" onClick={() => changeChronicleSpaceSection(item.id)}><small>{item.note}</small>{item.label}</button>)}</nav>
       </div>,
