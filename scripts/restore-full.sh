@@ -26,10 +26,13 @@ Uso:
 
 Modos:
   --verify   Verifica el paquete completo y restaura el dump en una
-             base temporal. No modifica la base activa.
+             base temporal. Inicia y espera sólo PostgreSQL si hace
+             falta; no necesita que Web/API estén saludables y no
+             modifica la base activa.
   --extract  Reconstruye repositorio, configuración y artefactos de
              recuperación en una ruta nueva. No despliega ni sustituye
-             automáticamente la base activa.
+             automáticamente la base activa. Después debe ejecutarse
+             bootstrap-server.sh --deploy para reconstruir la aplicación.
 EOF
 }
 
@@ -61,6 +64,52 @@ cleanup() {
   fi
 
   return "$code"
+}
+
+postgres_state() {
+  docker inspect \
+    --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
+    v5r-postgres \
+    2>/dev/null || true
+}
+
+wait_for_postgres() {
+  local attempts=60
+  local state
+
+  while [ "$attempts" -gt 0 ]; do
+    state="$(postgres_state)"
+
+    case "$state" in
+      healthy)
+        echo "✓ v5r-postgres: healthy"
+        return 0
+        ;;
+      unhealthy|exited|dead)
+        docker compose logs --tail=100 postgres || true
+        die "PostgreSQL terminó en estado $state."
+        ;;
+    esac
+
+    sleep 2
+    attempts=$((attempts - 1))
+  done
+
+  docker compose ps
+  docker compose logs --tail=100 postgres || true
+  die "PostgreSQL no alcanzó un estado saludable."
+}
+
+ensure_postgres_for_restore() {
+  local state
+  state="$(postgres_state)"
+
+  if [ "$state" != "healthy" ]; then
+    echo "PostgreSQL no está listo; iniciando únicamente PostgreSQL para validar la copia..."
+    docker compose up -d postgres
+  fi
+
+  wait_for_postgres
 }
 
 trap cleanup EXIT
@@ -190,6 +239,8 @@ test -s "$database_archive.meta"
 case "$MODE" in
   verify)
     cd "$ROOT"
+    echo "La verificación no inicia Web ni API; sólo necesita PostgreSQL."
+    ensure_postgres_for_restore
     "$ROOT/scripts/restore.sh" \
       --verify "$database_archive"
 
@@ -252,7 +303,8 @@ case "$MODE" in
     echo
     echo "Siguiente procedimiento documentado:"
     echo "  cd $TARGET_DIR"
-    echo "  ./scripts/bootstrap-server.sh"
+    echo "  ./scripts/bootstrap-server.sh --deploy"
+    echo "  # El bootstrap reconstruye API y Web antes de iniciar los servicios."
     echo "  ./scripts/restore.sh --verify backups/full-recovery/$(basename "$database_archive")"
     echo "  ./scripts/restore.sh --apply backups/full-recovery/$(basename "$database_archive") --confirm"
 

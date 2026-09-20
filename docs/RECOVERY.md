@@ -172,7 +172,10 @@ Validación reutilizable:
 ```
 
 La verificación comprueba el paquete, el repositorio, el árbol de trabajo,
-el volumen y restaura la base en un destino temporal.
+el volumen y restaura la base en un destino temporal. Si PostgreSQL todavía
+no está iniciado, el script levanta únicamente `v5r-postgres` y espera a que
+esté saludable. No necesita que Web ni API estén arrancados y no debe
+sustituirse por un `docker compose up -d` manual durante esta fase.
 
 ## Aplicar una restauración de base
 
@@ -191,15 +194,46 @@ fallan.
 ## Recuperación desde una máquina limpia
 
 1. Instalar Docker y Git en cualquier sistema compatible.
-2. Clonar el repositorio autorizado y ejecutar `./install.sh`.
-3. Durante el alta inicial, omitir la creación de administrador si se va
-   a restaurar una base que ya contiene usuarios.
-4. Copiar y verificar el paquete de recuperación desde almacenamiento
-   externo.
-5. Detener temporalmente web, API y worker mediante
-   `scripts/portable-compose.sh` antes de sustituir datos.
-6. Restaurar el dump lógico validado en PostgreSQL.
-7. Volver a iniciar los servicios y comprobar `/api/health` desde la web.
+2. Clonar el repositorio autorizado y ejecutar `./install.sh` sólo si se
+   necesita preparar el host; durante el alta inicial, omitir la creación
+   de administrador si se va a restaurar una base que ya contiene usuarios.
+3. Copiar el paquete completo y su checksum desde almacenamiento externo.
+4. Verificarlo sin depender de Web ni API:
+
+   ```bash
+   ./scripts/restore-full.sh --verify /ruta/bloodkeeper_full_FECHA.tar.gz
+   ```
+
+5. Para reconstruir una instalación desde el paquete, extraerlo a una ruta
+   nueva:
+
+   ```bash
+   ./scripts/restore-full.sh \
+     --extract /ruta/bloodkeeper_full_FECHA.tar.gz \
+     --target-dir /ruta/bloodkeeper \
+     --confirm
+   cd /ruta/bloodkeeper
+   ```
+
+6. Reconstruir las imágenes y arrancar los servicios con el bootstrap del
+   proyecto. Este paso evita reutilizar una imagen Web antigua:
+
+   ```bash
+   ./scripts/bootstrap-server.sh --deploy
+   ```
+
+7. Verificar y aplicar el dump incluido, sólo después de que el bootstrap
+   haya dejado saludable PostgreSQL, API y Web:
+
+   ```bash
+   ./scripts/restore.sh --verify backups/full-recovery/bloodkeeper_vampiro_v5_FECHA.dump
+   ./scripts/restore.sh --apply backups/full-recovery/bloodkeeper_vampiro_v5_FECHA.dump --confirm
+   ./scripts/check.sh
+   ```
+
+No se recomienda iniciar la aplicación con `docker compose up -d` antes de
+reconstruir API y Web: una imagen anterior puede no contener el usuario
+interno `node` o no coincidir con los archivos recuperados.
 
 El checkout Git se recupera desde GitHub y las imágenes de BloodKeeper se
 reconstruyen localmente; ninguno debe transportar datos de aplicación.
@@ -233,7 +267,7 @@ restaurar PostgreSQL se vuelven a comprobar los servicios y `/api/health`.
 Las instalaciones históricas que necesiten preparar el entorno mediante el
 flujo source-build pueden usar el adaptador:
 
-./scripts/bootstrap-server.sh
+./scripts/bootstrap-server.sh --deploy
 
 Este adaptador no es un requisito de la distribución portable, que utiliza
 Docker Compose y los servicios contenidos en el proyecto.
