@@ -1,0 +1,249 @@
+.manual-page {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 0 3rem;
+  color: var(--color-text-primary, #f3e8e2);
+}
+
+.manual-page__hero {
+  border-bottom: 1px solid rgba(125, 58, 73, .58);
+  padding-bottom: 1.3rem;
+}
+
+.manual-page__eyebrow {
+  display: block;
+  color: #df6077;
+  font-size: .69rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.manual-page h1,
+.manual-page h2,
+.manual-page h3 {
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.manual-page__hero h1 {
+  margin: .25rem 0 .45rem;
+  color: #f8ece7;
+  font-size: clamp(2.2rem, 5vw, 4.35rem);
+  line-height: 1.04;
+}
+
+.manual-page__hero p,
+.manual-page__panel-heading p,
+.manual-role-summary p,
+.manual-page__notice p,
+.manual-guide-card__body,
+.manual-quick-start p {
+  color: #bcaeb0;
+}
+
+.manual-page__hero p {
+  max-width: 58rem;
+  margin: 0;
+  font-size: .98rem;
+}
+
+.manual-page__notice {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  margin: 1.25rem 0 1.35rem;
+  padding: .85rem 1rem;
+  border: 1px solid rgba(207, 164, 102, .52);
+  border-radius: .65rem;
+  background: rgba(76, 43, 31, .2);
+}
+
+.manual-page__notice > span { color: #d9ac6e; }
+.manual-page__notice p { margin: 0; font-size: .86rem; }
+.manual-page__notice strong { color: #f5e6d7; }
+
+.manual-page__panel {
+  overflow: hidden;
+  border: 1px solid rgba(105, 53, 68, .72);
+  border-radius: .75rem;
+  background: rgba(24, 14, 20, .78);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .23);
+}
+
+.manual-page__panel-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.4rem 1.1rem;
+  border-bottom: 1px solid rgba(105, 53, 68, .66);
+  background: linear-gradient(90deg, rgba(84, 24, 43, .22), transparent 75%);
+}
+
+.manual-page__panel-heading h2 {
+  margin: .18rem 0 .25rem;
+  color: #f5e9e4;
+  font-size: clamp(1.55rem, 3vw, 2.1rem);
+}
+
+.manual-page__panel-heading p { margin: 0; font-size: .86rem; }
+
+.manual-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.8rem;
+  padding: .25rem .65rem;
+  border: 1px solid #c99b5c;
+  border-radius: 999px;
+  color: #deb671;
+  background: rgba(201, 155, 92, .08);
+  font-size: .7rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.manual-badge--soft {
+  border-color: rgba(142, 183, 216, .72);
+  color: #a7cae4;
+  background: rgba(142, 183, 216, .08);
+}
+
+.manual-role-tabs {
+  display: flex;
+  gap: .5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 1rem 1.4rem 0;
+  border-bottom: 1px solid rgba(105, 53, 68, .66);
+}
+
+.manual-role-tabs button {
+  flex: 0 0 auto;
+  min-height: 2.65rem;
+  margin-bottom: -1px;
+  padding: .6rem 1rem;
+  border: 1px solid rgba(105, 53, 68, .8);
+  border-bottom-color: transparent;
+  border-radius: .55rem .55rem 0 0;
+  background: rgba(38, 19, 29, .7);
+  color: #c7b5b5;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.manual-role-tabs button:hover,
+.manual-role-tabs button:focus-visible {
+  border-color: #d15a72;
+  color: #f6eae4;
+}
+
+.manual-role-tabs button.is-active {
+  border-color: #d75b73;
+  border-bottom-color: rgba(24, 14, 20, .78);
+  color: #f7eae5;
+  background: rgba(24, 14, 20, .96);
+}
+
+.manual-role-panel { padding: 1.35rem; }
+
+.manual-role-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid rgba(115, 55, 72, .74);
+  border-radius: .65rem;
+  background: rgba(63, 20, 36, .3);
+}
+
+.manual-role-summary h2 {
+  margin: 0 0 .25rem;
+  color: #f8ebe5;
+  font-size: clamp(1.6rem, 3vw, 2.15rem);
+}
+
+.manual-role-summary p { margin: 0; font-size: .88rem; }
+
+.manual-guide-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .75rem;
+}
+
+.manual-guide-card {
+  align-self: start;
+  border: 1px solid rgba(105, 53, 68, .76);
+  border-radius: .55rem;
+  background: rgba(12, 9, 12, .38);
+}
+
+.manual-guide-card[open] { border-color: rgba(215, 91, 115, .62); }
+
+.manual-guide-card summary {
+  position: relative;
+  padding: .9rem 2.6rem .9rem 1rem;
+  color: #f4e6e1;
+  cursor: pointer;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  list-style: none;
+}
+
+.manual-guide-card summary::-webkit-details-marker { display: none; }
+.manual-guide-card summary::after { content: '+'; position: absolute; top: .7rem; right: 1rem; color: #df6077; font: 1.35rem Arial, sans-serif; }
+.manual-guide-card[open] summary::after { content: '−'; }
+
+.manual-guide-card__body {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid rgba(105, 53, 68, .56);
+  font-size: .82rem;
+}
+
+.manual-guide-card__body p { margin: .85rem 0 .45rem; }
+.manual-guide-card__body p:first-child { margin-top: .8rem; }
+.manual-guide-card__body ul { margin: .45rem 0 0; padding-left: 1.15rem; }
+.manual-guide-card__body li { margin: .4rem 0; }
+
+.manual-guide-card__commands { display: grid; gap: .35rem; margin: .75rem 0; }
+
+.manual-guide-card code {
+  display: block;
+  overflow-wrap: anywhere;
+  padding: .32rem .45rem;
+  border: 1px solid rgba(143, 184, 217, .22);
+  border-radius: .3rem;
+  color: #c1d9eb;
+  background: rgba(12, 25, 36, .52);
+  font: .72rem/1.4 Consolas, monospace;
+}
+
+.manual-quick-start {
+  margin-top: 1rem;
+  padding: .9rem 1rem;
+  border: 1px solid rgba(100, 192, 134, .34);
+  border-radius: .55rem;
+  background: rgba(28, 67, 47, .12);
+}
+
+.manual-quick-start strong { color: #6cc98c; font-family: Georgia, 'Times New Roman', serif; font-size: 1.05rem; }
+.manual-quick-start p { margin: .25rem 0 0; font-size: .82rem; }
+.manual-page__footer { margin: 1rem 0 0; color: #8e7d81; font-size: .72rem; text-align: center; }
+
+@media (max-width: 780px) {
+  .manual-page__panel-heading,
+  .manual-role-summary { align-items: flex-start; flex-direction: column; }
+  .manual-guide-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .manual-page { padding-inline: 0; }
+  .manual-page__panel-heading,
+  .manual-role-panel { padding-inline: 1rem; }
+  .manual-role-tabs { padding-inline: 1rem; }
+  .manual-page__hero h1 { font-size: 2.45rem; }
+}

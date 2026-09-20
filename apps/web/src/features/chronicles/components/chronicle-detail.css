@@ -229,6 +229,52 @@
   padding-top: var(--space-4);
 }
 
+.chronicle-detail__current-association {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-translucent);
+  padding: var(--space-3);
+}
+
+.chronicle-detail__current-association > strong,
+.chronicle-detail__current-association > small,
+.chronicle-detail__association-eyebrow {
+  display: block;
+}
+
+.chronicle-detail__association-eyebrow {
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.chronicle-detail__current-association > small {
+  color: var(--color-text-muted);
+}
+
+.chronicle-detail__association-confirmation {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: var(--space-3);
+}
+
+.chronicle-detail__association-confirmation p {
+  margin: 0;
+  line-height: var(--line-height-normal);
+}
+
+.chronicle-detail__association-confirmation > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
 .chronicle-detail__association > p {
   max-width: 72ch;
   margin: 0.65rem 0 0;

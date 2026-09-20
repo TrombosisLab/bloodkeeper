@@ -23,6 +23,7 @@ import { Dashboard } from './features/dashboard/components/Dashboard'
 import { NotebookWorkspace } from './features/notebook/components/NotebookWorkspace'
 import { ChronicleSpacePrototype } from './features/chronicle-space/components/ChronicleSpacePrototype'
 import { ChronicleMapPage } from './features/map/components/ChronicleMapPage'
+import { ManualPage } from './features/manual/components/ManualPage'
 import { NotebookFreshPrototype } from './features/notebook/components/NotebookFreshPrototype'
 import { AppBreadcrumbs } from './features/navigation/components/AppBreadcrumbs'
 import { AppNavigation } from './features/navigation/components/AppNavigation'
@@ -243,6 +244,10 @@ function App() {
       case 'map':
         navigateTo('map')
         return
+
+      case 'manual':
+        navigateTo('manual')
+        return
     }
   }
 
@@ -316,6 +321,8 @@ function App() {
         <ResourceLibrary />
       ) : view === 'map' && canAccessChronicles ? (
         <ChronicleMapPage />
+      ) : view === 'manual' ? (
+        <ManualPage />
       ) : view === 'play' && canAccessChronicles ? (
         <PlayHub onOpenCharacter={(characterId: string, chronicleId?: string) => {
             setCreationCharacterId(characterId)

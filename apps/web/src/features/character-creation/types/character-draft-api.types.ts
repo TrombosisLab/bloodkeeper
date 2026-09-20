@@ -172,6 +172,7 @@ export interface CharacterDraftApiSnapshot {
   characterId: string
   ownerId: string
   chronicleId: string | null
+  chronicleName?: string | null
   status: CharacterDraftApiLifecycleStatus
   nature: CharacterDraftApiNature
   revision: number

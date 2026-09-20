@@ -19,7 +19,7 @@ type ArchiveFilter = 'ALL' | 'NOTES' | 'PEOPLE' | 'PLACES' | 'ORGANIZATIONS' | '
 type ArchiveSort = 'DEFAULT' | 'NAME' | 'RECENT'
 type Kind = 'PERSONAJE' | 'PNJ' | 'LUGAR' | 'NOTA' | 'ORGANIZACION' | 'ARTEFACTO' | 'DOCUMENTO'
 type BoardFilter = 'ALL' | Kind
-type Card = { readonly id: string; readonly kind: Kind; readonly title: string; readonly meta: string; readonly description: string; readonly author?: string; readonly targetType?: string; readonly targetId?: string }
+type Card = { readonly id: string; readonly kind: Kind; readonly title: string; readonly meta: string; readonly description: string; readonly author?: string; readonly targetType?: string; readonly targetId?: string; readonly sessionId?: string | null }
 type BoardPosition = { readonly x: number; readonly y: number }
 type BoardDragSnapshot = {
   readonly cardId: string
@@ -43,6 +43,7 @@ type BoardPreset = {
   readonly selectionKind: 'ALL' | Kind
   readonly selectionStatus: 'ALL' | 'VISIBLE' | 'HIDDEN'
   readonly selectionAuthor: string
+  readonly selectionSession: string
 }
 
 type BoardConnectionType = 'VISUAL' | 'KNOWN' | 'SUSPICION'
@@ -62,6 +63,7 @@ function rememberChronicleSpaceSection(section: Section) {
 }
 
 const chronicleSpaceSelectionKey = 'chronicleId'
+const GENERAL_BOARD_SESSION_FILTER = '__general__'
 function rememberChronicleSpaceSelection(id: string) {
   if (typeof window === 'undefined' || !id) return
   const url = new URL(window.location.href)
@@ -338,6 +340,7 @@ export function ChronicleSpacePrototype() {
   const [boardSelectionKind, setBoardSelectionKind] = useState<'ALL' | Kind>('ALL')
   const [boardSelectionStatus, setBoardSelectionStatus] = useState<'ALL' | 'VISIBLE' | 'HIDDEN'>('ALL')
   const [boardSelectionAuthor, setBoardSelectionAuthor] = useState('ALL')
+  const [boardSelectionSession, setBoardSelectionSession] = useState('ALL')
   // CHRONICLE_SPACE_BOARD_PERSONAL_PRESETS_V1
   const [boardViewMode, setBoardViewMode] = useState<'PERSONAL' | 'ALL'>('PERSONAL')
   // CHRONICLE_SPACE_BOARD_PERSONAL_LAYOUT_V1
@@ -503,6 +506,7 @@ export function ChronicleSpacePrototype() {
       setBoardSelectionKind(state.selectionKind === 'PNJ' || state.selectionKind === 'LUGAR' || state.selectionKind === 'NOTA' ? state.selectionKind : 'ALL')
       setBoardSelectionStatus(state.selectionStatus === 'VISIBLE' || state.selectionStatus === 'HIDDEN' ? state.selectionStatus : 'ALL')
       setBoardSelectionAuthor(typeof state.selectionAuthor === 'string' ? state.selectionAuthor : 'ALL')
+      setBoardSelectionSession(typeof state.selectionSession === 'string' ? state.selectionSession : 'ALL')
       setBoardViewMode(state.viewMode === 'ALL' ? 'ALL' : 'PERSONAL')
       setBoardFilter(state.boardFilter === 'PNJ' || state.boardFilter === 'LUGAR' || state.boardFilter === 'NOTA' ? state.boardFilter : 'ALL')
       setBoardQuickQuery(typeof state.quickQuery === 'string' ? state.quickQuery : '')
@@ -536,10 +540,10 @@ export function ChronicleSpacePrototype() {
   useEffect(() => {
     if (!chronicleId || boardVisibilityHydratedFor !== chronicleId || boardPresetHydratedFor !== chronicleId) return
     const timer = window.setTimeout(() => {
-      void chronicleSpaceBoardPersonalApi.replace(chronicleId, { hiddenCardIds: [...hiddenBoardCardIds], personalPositions: personalBoardPositions, selectionQuery: boardSelectionQuery, selectionKind: boardSelectionKind, selectionStatus: boardSelectionStatus, selectionAuthor: boardSelectionAuthor, viewMode: boardViewMode, boardFilter, quickQuery: boardQuickQuery, presets: boardPresets }).catch((cause) => setError(cause instanceof Error ? cause.message : 'No se pudo guardar tu vista personal.'))
+      void chronicleSpaceBoardPersonalApi.replace(chronicleId, { hiddenCardIds: [...hiddenBoardCardIds], personalPositions: personalBoardPositions, selectionQuery: boardSelectionQuery, selectionKind: boardSelectionKind, selectionStatus: boardSelectionStatus, selectionAuthor: boardSelectionAuthor, selectionSession: boardSelectionSession, viewMode: boardViewMode, boardFilter, quickQuery: boardQuickQuery, presets: boardPresets }).catch((cause) => setError(cause instanceof Error ? cause.message : 'No se pudo guardar tu vista personal.'))
     }, 250)
     return () => window.clearTimeout(timer)
-  }, [boardFilter, boardPresetHydratedFor, boardPresets, boardQuickQuery, boardSelectionAuthor, boardSelectionKind, boardSelectionQuery, boardSelectionStatus, boardViewMode, boardVisibilityHydratedFor, chronicleId, hiddenBoardCardIds, personalBoardPositions])
+  }, [boardFilter, boardPresetHydratedFor, boardPresets, boardQuickQuery, boardSelectionAuthor, boardSelectionKind, boardSelectionQuery, boardSelectionSession, boardSelectionStatus, boardViewMode, boardVisibilityHydratedFor, chronicleId, hiddenBoardCardIds, personalBoardPositions])
 
 
 
@@ -587,7 +591,7 @@ export function ChronicleSpacePrototype() {
   const chronicle = useMemo(() => chronicles.find((item) => item.id === chronicleId), [chronicles, chronicleId])
   const activeChronicles = useMemo(() => chronicles.filter((item) => item.status !== 'archived'), [chronicles])
   const archivedChronicles = useMemo(() => chronicles.filter((item) => item.status === 'archived'), [chronicles])
-  const cards = useMemo<readonly Card[]>(() => { const people = (context?.npcs || []).map((item) => ({ id: 'npc-' + item.id, kind: 'PNJ' as const, title: item.name, meta: item.category || item.narrativeRole || 'Persona', description: item.description || 'Sin descripción disponible.', targetType: 'NPC', targetId: item.id })); const places = (context?.locations || []).map((item) => ({ id: 'loc-' + item.id, kind: 'LUGAR' as const, title: item.name, meta: item.category || 'Lugar', description: item.description || 'Sin descripción disponible.', targetType: 'LOCATION', targetId: item.id })); const annotations = notes.map((item) => ({ id: 'note-' + item.id, kind: 'NOTA' as const, title: item.title, meta: item.visibility === 'PRIVATE' ? 'Privada' : 'Compartida', author: item.author.displayName || item.author.username, description: item.content || 'Anotación vacía.' })); return [...people, ...places, ...annotations] }, [context, notes])
+  const cards = useMemo<readonly Card[]>(() => { const people = (context?.npcs || []).map((item) => ({ id: 'npc-' + item.id, kind: 'PNJ' as const, title: item.name, meta: item.category || item.narrativeRole || 'Persona', description: item.description || 'Sin descripción disponible.', targetType: 'NPC', targetId: item.id })); const places = (context?.locations || []).map((item) => ({ id: 'loc-' + item.id, kind: 'LUGAR' as const, title: item.name, meta: item.category || 'Lugar', description: item.description || 'Sin descripción disponible.', targetType: 'LOCATION', targetId: item.id })); const annotations = notes.map((item) => ({ id: 'note-' + item.id, kind: 'NOTA' as const, title: item.title, meta: item.visibility === 'PRIVATE' ? 'Privada' : 'Compartida', author: item.author.displayName || item.author.username, description: item.content || 'Anotación vacía.', sessionId: item.sessionId })); return [...people, ...places, ...annotations] }, [context, notes])
   const chronicleMentionOptions = useMemo(() => {
     const boardOptions = cards
       .filter((card) => Boolean(card.targetType && card.targetId))
@@ -628,6 +632,12 @@ export function ChronicleSpacePrototype() {
     const searched = query ? filtered.filter((card) => (card.title + ' ' + card.meta + ' ' + card.description).toLocaleLowerCase().includes(query)) : filtered
     return boardViewMode === 'ALL' ? searched : searched.filter((card) => !hiddenBoardCardIds.has(card.id))
   }, [boardFilter, boardQuickQuery, boardViewMode, cards, hiddenBoardCardIds])
+  // CHRONICLE_SPACE_BOARD_LAYOUT_STABILITY_V1 — una crónica/vista nueva parte de una geometría limpia.
+  const boardLayoutResetKey = visibleCards.map((card) => card.id).join('|')
+  useEffect(() => {
+    stableLayoutSignature.current = ''
+    setBoardHeightFloor(0)
+  }, [boardLayoutResetKey, boardViewMode, chronicleId])
   // CHRONICLE_SPACE_BOARD_BOUNDS_V2 — una tarjeta absoluta no aumenta el alto por sí sola.
   // CHRONICLE_SPACE_BOARD_PERSONAL_LAYOUT_V1 — la altura también acompaña la distribución personal.
   const boardHeight = useMemo(() => {
@@ -637,7 +647,9 @@ export function ChronicleSpacePrototype() {
       const stored = (boardViewMode === 'PERSONAL' ? personalBoardPositions[card.id] || boardPositions[card.id] : boardPositions[card.id])?.y
       return typeof stored === 'number' && Number.isFinite(stored) ? Math.max(highest, Math.min(93, Math.max(0, stored))) : highest
     }, 0)
-    const heightForStoredPosition = maxY > 0 ? (210 / Math.max(0.07, 1 - maxY / 100)) : 0
+    // Las posiciones son porcentajes del tablero. No se debe invertir el porcentaje
+    // con 1 - y, porque una tarjeta al 90% dispararía la altura a miles de píxeles.
+    const heightForStoredPosition = maxY > 0 ? ((maxY / 100) * layoutHeight + 160) : 0
     return Math.ceil(Math.max(layoutHeight, heightForStoredPosition, boardHeightFloor))
   }, [boardHeightFloor, boardPositions, boardViewMode, personalBoardPositions, visibleCards])
   // CHRONICLE_SPACE_BOARD_PERSONAL_CONNECTIONS_V1 — una relación solo existe en la vista si se ven sus dos extremos.
@@ -926,10 +938,11 @@ export function ChronicleSpacePrototype() {
       .filter((card) => boardSelectionKind === 'ALL' || card.kind === boardSelectionKind)
       .filter((card) => boardSelectionStatus === 'ALL' || (boardSelectionStatus === 'HIDDEN' ? hiddenBoardCardIds.has(card.id) : !hiddenBoardCardIds.has(card.id)))
       .filter((card) => boardSelectionAuthor === 'ALL' || card.author === boardSelectionAuthor)
+      .filter((card) => boardSelectionSession === 'ALL' || (card.kind === 'NOTA' && (boardSelectionSession === GENERAL_BOARD_SESSION_FILTER ? !card.sessionId : card.sessionId === boardSelectionSession)))
       .filter((card) => !query || (card.title + ' ' + card.meta).toLocaleLowerCase().includes(query))
       .slice()
       .sort((left, right) => kindOrder[left.kind] - kindOrder[right.kind] || left.title.localeCompare(right.title, 'es', { sensitivity: 'base' }))
-  }, [boardSelectionAuthor, boardSelectionKind, boardSelectionQuery, boardSelectionStatus, cards, hiddenBoardCardIds])
+  }, [boardSelectionAuthor, boardSelectionKind, boardSelectionQuery, boardSelectionSession, boardSelectionStatus, cards, hiddenBoardCardIds])
 
   function toggleBoardCard(cardId: string) {
     setHiddenBoardCardIds((current) => {
@@ -976,7 +989,7 @@ export function ChronicleSpacePrototype() {
     if (boardViewMode !== 'PERSONAL') return
     const fallbackName = 'Vista ' + String(boardPresets.length + 1)
     const name = boardPresetName.trim() || fallbackName
-    const preset: BoardPreset = { name, hiddenCardIds: [...hiddenBoardCardIds], personalPositions: personalBoardPositions, boardFilter, quickQuery: boardQuickQuery, selectionQuery: boardSelectionQuery, selectionKind: boardSelectionKind, selectionStatus: boardSelectionStatus, selectionAuthor: boardSelectionAuthor }
+    const preset: BoardPreset = { name, hiddenCardIds: [...hiddenBoardCardIds], personalPositions: personalBoardPositions, boardFilter, quickQuery: boardQuickQuery, selectionQuery: boardSelectionQuery, selectionKind: boardSelectionKind, selectionStatus: boardSelectionStatus, selectionAuthor: boardSelectionAuthor, selectionSession: boardSelectionSession }
     setBoardPresets((current) => [...current.filter((item) => item.name !== name), preset].slice(-12))
     setBoardPresetName('')
     setBoardPresetOpen(false)
@@ -992,6 +1005,7 @@ export function ChronicleSpacePrototype() {
     setBoardSelectionKind(preset.selectionKind || 'ALL')
     setBoardSelectionStatus(preset.selectionStatus || 'ALL')
     setBoardSelectionAuthor(preset.selectionAuthor || 'ALL')
+    setBoardSelectionSession(preset.selectionSession || 'ALL')
     setBoardManageOpen(false)
   }
 
@@ -1004,6 +1018,7 @@ export function ChronicleSpacePrototype() {
     setBoardSelectionKind('ALL')
     setBoardSelectionStatus('ALL')
     setBoardSelectionAuthor('ALL')
+    setBoardSelectionSession('ALL')
   }
 
   // CHRONICLE_SPACE_BOARD_SELECTION_BATCH_V1
@@ -1178,6 +1193,7 @@ export function ChronicleSpacePrototype() {
           <label className="board-selection-field"><span>Buscar</span><input value={boardSelectionQuery} onChange={(event) => setBoardSelectionQuery(event.target.value)} placeholder="Nombre de tarjeta…" /></label>
           <label className="board-selection-field"><span>Tipo</span><select value={boardSelectionKind} onChange={(event) => setBoardSelectionKind(event.target.value as 'ALL' | Kind)}><option value="ALL">Todos los tipos</option><option value="PNJ">PNJ</option><option value="LUGAR">Lugares</option><option value="NOTA">Anotaciones</option></select></label>
           <label className="board-selection-field"><span>Estado</span><select value={boardSelectionStatus} onChange={(event) => setBoardSelectionStatus(event.target.value as 'ALL' | 'VISIBLE' | 'HIDDEN')}><option value="ALL">Todos</option><option value="VISIBLE">Visibles</option><option value="HIDDEN">Ocultas</option></select></label>
+          <label className="board-selection-field"><span>Sesión</span><select aria-label="Filtrar anotaciones por sesión" value={boardSelectionSession} onChange={(event) => { const value = event.target.value; setBoardSelectionSession(value); if (value !== 'ALL') setBoardSelectionKind('NOTA') }}><option value="ALL">Todas las sesiones</option><option value={GENERAL_BOARD_SESSION_FILTER}>Notas sin sesión</option>{sessions.map((session) => <option key={session.id} value={session.id}>{session.title || (session.sessionNumber === null ? 'Sesión sin título' : 'Sesión ' + session.sessionNumber)}</option>)}</select></label>
           <label className="board-selection-field"><span>Autor</span><select value={boardSelectionAuthor} onChange={(event) => setBoardSelectionAuthor(event.target.value)}><option value="ALL">Todos los autores</option>{boardSelectionAuthors.map((author) => <option key={author} value={author}>{author}</option>)}</select></label>
           <button className="board-selection-reset" type="button" onClick={resetBoardFilters}>Limpiar filtros</button>
           <div className="board-selection-batch" aria-label="Acciones para los resultados filtrados">

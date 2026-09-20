@@ -117,7 +117,7 @@
 
 /* CHRONICLE_SPACE_BOARD_SELECTION_FILTERS_V1 — el selector escala con crónicas grandes. */
 .board-visibility-panel{display:grid;grid-template-columns:1fr;gap:9px}
-.board-selection-tools{display:grid;grid-template-columns:minmax(180px,1fr) 145px 145px 145px auto;align-items:end;gap:8px}
+.board-selection-tools{display:grid;grid-template-columns:minmax(180px,1fr) repeat(4,125px) auto;align-items:end;gap:8px}
 .board-selection-field{display:grid!important;gap:4px!important;min-width:0;padding:0!important;border:0!important;background:transparent!important;color:#d8c0ba!important;font-size:10px;font-weight:750}
 .board-selection-field span{color:#d98a76;font-size:9px;font-weight:850;letter-spacing:.11em;text-transform:uppercase}
 .board-selection-field input,.board-selection-field select{box-sizing:border-box;width:100%;min-height:34px;padding:7px 9px;border:1px solid rgba(224,157,119,.3);border-radius:5px;background:#160e14;color:#f4dfd8;font:12px/1.2 Inter,system-ui,sans-serif}
@@ -131,7 +131,7 @@
 .board-selection-list label{min-width:0}
 .board-selection-list strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .board-selection-empty{grid-column:1/-1;margin:5px 0;color:#bda5a1;font-size:12px}
-@media(max-width:980px){.board-selection-tools{grid-template-columns:minmax(180px,1fr) 135px 135px 135px}.board-selection-reset{grid-column:1/-1;justify-self:start}}
+@media(max-width:980px){.board-selection-tools{grid-template-columns:minmax(180px,1fr) repeat(4,115px)}.board-selection-reset{grid-column:1/-1;justify-self:start}}
 @media(max-width:760px){.board-selection-tools{grid-template-columns:1fr}.board-selection-reset{grid-column:auto;width:100%}.board-selection-list{grid-template-columns:1fr;max-height:340px}.board-selection-list strong{white-space:normal}}
 
 /* CHRONICLE_SPACE_BOARD_NOTE_AUTHORS_V1 — autor visible sin romper el formato compacto. */

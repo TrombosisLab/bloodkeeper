@@ -42,6 +42,7 @@ function snapshot() {
       '3bbc46f8-a45f-4589-9872-129e6652082c',
     chronicleId:
       '2fc3fe58-c087-4473-b315-f072aa65efb1',
+    chronicleName: 'Prueba de crónica integral',
     status: 'draft',
     revision: 7,
     createdAt:
@@ -199,7 +200,7 @@ function snapshot() {
 }
 
 test(
-  '004-F.1 crea identidad visible desde catálogos sin exponer el UUID de Crónica',
+  '004-F.1 crea identidad visible desde la crónica asociada sin exponer su UUID',
   () => {
     const model =
       adaptPersistedCharacterToSheetModel(
@@ -225,7 +226,7 @@ test(
     )
     assert.equal(
       model.identity.chronicle,
-      '',
+      'Prueba de crónica integral',
     )
     assert.equal(
       model.chronicleId,
@@ -233,7 +234,7 @@ test(
     )
     assert.equal(
       model.availability.chronicleName,
-      false,
+      true,
     )
   },
 )

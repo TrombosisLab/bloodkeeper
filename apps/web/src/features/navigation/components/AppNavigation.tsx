@@ -214,7 +214,15 @@ export function AppNavigation({
             <small>Participación y gestión</small>
           </button>
         ) : null}
-      </nav>
+            <button
+        type="button"
+        aria-current={activeSection === 'manual' ? 'page' : undefined}
+        onClick={() => selectSection('manual')}
+      >
+        <span>Manual</span>
+        <small>Guía de uso</small>
+      </button>
+</nav>
     </aside>
   )
 }

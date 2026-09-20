@@ -103,6 +103,37 @@ const characterStatusLabels = {
   archived: 'Archivado',
 } as const
 
+async function includeOwnAssociatedCharacter(
+  associatedCharacters: readonly ChronicleCharacterApiSummary[],
+  ownCharacters: readonly CharacterDraftApiSnapshot[],
+  userId: string,
+): Promise<readonly CharacterDraftApiSnapshot[]> {
+  const associatedCharacter = associatedCharacters.find(
+    (character) => character.ownerId === userId,
+  )
+
+  if (
+    associatedCharacter === undefined ||
+    ownCharacters.some(
+      (character) =>
+        character.characterId === associatedCharacter.characterId,
+    )
+  ) {
+    return ownCharacters
+  }
+
+  try {
+    const loadedCharacter = await characterGateway.load(
+      associatedCharacter.characterId,
+    )
+
+    return [...ownCharacters, loadedCharacter]
+  } catch {
+    // La crónica sigue funcionando aunque la ficha completa no esté disponible.
+    return ownCharacters
+  }
+}
+
 type ChronicleDetailSection =
   | 'summary'
   | 'participants'
@@ -396,6 +427,13 @@ export function ChronicleDetail({
         characterGateway.list(),
       ])
 
+      const ownCharactersForView =
+        await includeOwnAssociatedCharacter(
+          loadedAssociatedCharacters,
+          loadedOwnCharacters,
+          authenticatedUser.id,
+        )
+
       const membership =
         loadedParticipants.find(
           (participant) =>
@@ -422,8 +460,8 @@ export function ChronicleDetail({
       setAssociatedCharacters(
         loadedAssociatedCharacters,
       )
-      setOwnCharacters(
-        loadedOwnCharacters,
+       setOwnCharacters(
+        ownCharactersForView,
       )
       setCandidates(
         loadedCandidates,
@@ -523,6 +561,13 @@ export function ChronicleDetail({
         null,
     )
 
+  const ownAssociatedCharacter =
+    ownCharacters.find(
+      (character) =>
+        character.chronicleId ===
+        chronicleId,
+    ) ?? null
+
   function ownCharacter(
     characterId: string,
   ) {
@@ -592,8 +637,15 @@ export function ChronicleDetail({
     setAssociatedCharacters(
       updatedAssociated,
     )
+    const updatedOwnForView =
+      await includeOwnAssociatedCharacter(
+        updatedAssociated,
+        updatedOwn,
+        authenticatedUser.id,
+      )
+
     setOwnCharacters(
-      updatedOwn,
+      updatedOwnForView,
     )
   }
 
@@ -1268,6 +1320,28 @@ canManageParticipants ? (
 }
           characterAssociation={
 <div className="chronicle-detail__association">
+          {ownAssociatedCharacter ? (
+            <section className="chronicle-detail__current-association" aria-label="Personaje asociado">
+              <span className="chronicle-detail__association-eyebrow">PERSONAJE ASOCIADO</span>
+              <strong>{characterName(ownAssociatedCharacter)}</strong>
+              <small>{ownAssociatedCharacter.identity.concept ?? 'Sin concepto definido'}</small>
+              {pendingConfirmationCharacterId === ownAssociatedCharacter.characterId ? (
+                <div className="chronicle-detail__association-confirmation" role="alert">
+                  <p>Este personaje tiene historial en la crónica. Se conservará su historial, pero dejará de estar asociado.</p>
+                  <div>
+                    <button type="button" className="chronicle-detail__compact-action" disabled={operationId === 'disassociate:' + ownAssociatedCharacter.characterId} onClick={() => void disassociateCharacter(ownAssociatedCharacter, true)}>
+                      {operationId === 'disassociate:' + ownAssociatedCharacter.characterId ? 'Desasociando…' : 'Confirmar desasociación'}
+                    </button>
+                    <button type="button" className="chronicle-detail__compact-action" onClick={() => { setPendingConfirmationCharacterId(null); setOperationError(null) }}>Cancelar</button>
+                  </div>
+                </div>
+              ) : (
+                <button type="button" className="chronicle-detail__compact-action" disabled={operationId === 'disassociate:' + ownAssociatedCharacter.characterId} onClick={() => void disassociateCharacter(ownAssociatedCharacter, false)}>
+                  {operationId === 'disassociate:' + ownAssociatedCharacter.characterId ? 'Desasociando…' : 'Desasociar personaje'}
+                </button>
+              )}
+            </section>
+          ) : null}
           <button
             type="button"
             className="chronicle-detail__fold-launcher"

@@ -1236,7 +1236,7 @@ model ChronicleEventCharacter {
   chronicleId String @db.Uuid
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   event ChronicleEvent @relation("ChronicleEventCharacterEvent", fields: [eventId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
-  character Character @relation("ChronicleEventCharacterCharacter", fields: [characterId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  character Character @relation("ChronicleEventCharacterCharacter", fields: [characterId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([eventId, characterId])
   @@index([characterId])
@@ -1419,7 +1419,7 @@ model ChronicleStoryCharacter {
   createdAt   DateTime @default(now()) @db.Timestamptz(3)
 
   story ChronicleStory @relation("ChronicleStoryCharacterStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
-  character Character @relation("ChronicleStoryCharacterCharacter", fields: [characterId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  character Character @relation("ChronicleStoryCharacterCharacter", fields: [characterId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([storyId, characterId])
   @@index([characterId])

@@ -363,7 +363,10 @@ export function adaptPersistedCharacterToSheetModel(
        * No se presenta el UUID como nombre de Crónica.
        * Queda vacío hasta disponer de su catálogo persistido.
        */
-      chronicle: '',
+      chronicle:
+        optionalText(
+          snapshot.chronicleName ?? null,
+        ),
       ambition:
         optionalText(
           snapshot.identity.ambition,
@@ -446,7 +449,10 @@ export function adaptPersistedCharacterToSheetModel(
     },
 
     availability: {
-      chronicleName: false,
+      chronicleName:
+        snapshot.chronicleName !== null &&
+        snapshot.chronicleName !== undefined &&
+        snapshot.chronicleName.trim() !== '',
       bloodExperience: true,
     },
   }

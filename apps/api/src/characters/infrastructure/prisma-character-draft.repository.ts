@@ -630,6 +630,11 @@ function fromPredatorTypeChoicesJson(
 }
 
 const characterRelations = {
+  chronicle: {
+    select: {
+      name: true,
+    },
+  },
   identity: true,
   creationState: true,
   attributes: true,
@@ -1110,6 +1115,7 @@ function toPersistedDraft(
     characterId: row.id,
     ownerId: row.ownerId,
     chronicleId: row.chronicleId,
+    chronicleName: row.chronicle?.name ?? null,
     status: statusFromPrisma[row.status],
     nature: natureFromPrisma[row.nature],
     revision: row.revision,
@@ -1854,23 +1860,35 @@ export class PrismaCharacterDraftRepository
     data:
       UpdateCharacterChronicleAssociationData,
   ): Promise<PersistedCharacterDraft> {
-    const updated =
-      await this.database.character.updateMany({
-        where: {
-          id: data.characterId,
-          ownerId,
-          revision:
-            data.expectedRevision,
-        },
-        data: {
-          chronicleId: data.chronicleId,
-          revision: {
-            increment: 1,
-          },
-        },
-      })
+    const updatedCount =
+      data.chronicleId === null
+        ? await this.database.$executeRaw`
+            UPDATE "characters"
+            SET "chronicleId" = NULL,
+                "revision" = "revision" + 1,
+                "updatedAt" = CURRENT_TIMESTAMP
+            WHERE "id" = CAST(${data.characterId} AS uuid)
+              AND "ownerId" = CAST(${ownerId} AS uuid)
+              AND "revision" = ${data.expectedRevision}
+          `
+        : (
+            await this.database.character.updateMany({
+              where: {
+                id: data.characterId,
+                ownerId,
+                revision:
+                  data.expectedRevision,
+              },
+              data: {
+                chronicleId: data.chronicleId,
+                revision: {
+                  increment: 1,
+                },
+              },
+            })
+          ).count
 
-    if (updated.count !== 1) {
+    if (updatedCount !== 1) {
       throw new CharacterDraftWriteConflictError(
         data.characterId,
       )

@@ -56,10 +56,7 @@ export interface CharacterSheetDamageModel {
 }
 
 export interface CharacterSheetAvailability {
-  /*
-   * La API sólo expone chronicleId. El nombre visible se
-   * resolverá cuando exista el catálogo persistido de Crónicas.
-   */
+  /* Indica si la asociación resuelta incluye un nombre visible. */
   chronicleName: boolean
 
   /*

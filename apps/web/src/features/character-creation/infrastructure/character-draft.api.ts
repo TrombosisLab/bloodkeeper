@@ -776,6 +776,8 @@ export function parseCharacterDraftApiSnapshotResponse(
     typeof value.characterId !== 'string' ||
     typeof value.ownerId !== 'string' ||
     !isStringOrNull(value.chronicleId) ||
+    (value.chronicleName !== undefined &&
+      !isStringOrNull(value.chronicleName)) ||
     !oneOf(value.status, lifecycleStatuses) ||
     !(
       value.nature === undefined ||

@@ -325,6 +325,7 @@ export interface PersistedCharacterDraft {
   characterId: string
   ownerId: string
   chronicleId: string | null
+  chronicleName?: string | null
   status: CharacterLifecycleStatus
   nature: CharacterNature
   revision: number

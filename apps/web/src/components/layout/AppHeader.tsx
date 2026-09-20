@@ -19,6 +19,8 @@ export function AppHeader({ displayName = 'jugador' }: { displayName?: string })
                 ? { eyebrow: 'CRÓNICAS', title: 'Crónicas', subtitle: 'Participación y gestión.' }
                 : currentHash.startsWith('#/map')
                   ? { eyebrow: 'MAPA', title: 'Cartografía de la crónica', subtitle: 'Mapas, lugares y zonas de la historia.' }
+                     : currentHash.startsWith('#/manual')
+                       ? { eyebrow: 'MANUAL DE USO', title: 'Cómo usar BloodKeeper', subtitle: 'Guía práctica por perfiles y permisos.' }
                   : { eyebrow: '', title: '', subtitle: '' }
   const isDashboard = typeof window !== 'undefined' && window.location.hash === '#/dashboard'
   useActiveChronicleHeader()

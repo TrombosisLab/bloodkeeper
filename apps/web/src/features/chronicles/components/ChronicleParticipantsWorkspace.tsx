@@ -220,11 +220,6 @@ export function ChronicleParticipantsWorkspace({
     document.getElementById('chronicle-characters-title')?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  function triggerDisassociation() {
-    const button = Array.from(document.querySelectorAll('button')).find((item) => item.textContent?.trim() === 'Desasociar') as HTMLButtonElement | undefined
-    button?.click()
-  }
-
   async function saveNotes() {
     if (selected === null || notesRevision === null || savingNotes) return
     setSavingNotes(true)
@@ -420,7 +415,6 @@ export function ChronicleParticipantsWorkspace({
 
             {canManage ? <section className="participant-card participant-card--actions">
               <span className="participant-eyebrow">Acciones</span>
-              {character ? <button className="participant-secondary-button participant-full-button" type="button" onClick={triggerDisassociation}>⌘ <span>Desasociar personaje</span></button> : null}
               {selected.status === 'active' ? <button className="participant-action-danger" type="button" disabled={retiringId === selected.id} onClick={() => onRetire(selected)}>▣ <span>{retiringId === selected.id ? 'Retirando...' : 'Retirar participante'}</span></button> : null}
             </section> : null}
           </>
