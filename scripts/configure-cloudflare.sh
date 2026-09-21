@@ -21,6 +21,7 @@ QUICK_LOG=''
 QUICK_NETWORK=''
 QUICK_URL=''
 QUICK_ACTIVE='false'
+QUICK_OVERRIDE_FILE=''
 
 die() {
   printf 'ERROR: %s\n' "$*" >&2
@@ -42,11 +43,38 @@ prepare_cloudflared_image() {
     || die 'No se pudo descargar la imagen de cloudflared. Revisa la conexión de la VM.'
 }
 
+restore_web_without_tunnel_host() {
+  if [ -z "$QUICK_OVERRIDE_FILE" ]; then
+    return
+  fi
+
+  printf 'Restaurando Web sin el hostname temporal de Cloudflare...\n'
+  "${COMPOSE[@]}" up -d --force-recreate --no-deps web >/dev/null 2>&1 || \
+    printf 'ADVERTENCIA: no se pudo recrear Web sin el hostname temporal.\n' >&2
+  rm -f "$QUICK_OVERRIDE_FILE"
+  QUICK_OVERRIDE_FILE=''
+}
+
+write_quick_compose_override() {
+  local host="${QUICK_URL#https://}"
+  [[ "$host" =~ ^[A-Za-z0-9.-]+$ ]] || die 'El hostname recibido de Cloudflare no es válido.'
+
+  QUICK_OVERRIDE_FILE="${TMPDIR:-/tmp}/bloodkeeper-cloudflare-quick-${PROJECT_NAME}.compose.yaml"
+  umask 077
+  printf '%s\n' \
+    'services:' \
+    '  web:' \
+    '    environment:' \
+    "      BLOODKEEPER_VITE_ALLOWED_HOSTS: $host" \
+    > "$QUICK_OVERRIDE_FILE"
+}
+
 cleanup_quick_tunnel() {
-  if [ "$QUICK_ACTIVE" = 'true' ]; then
+  if [ "$QUICK_ACTIVE" = 'true' ] || [ -n "$QUICK_OVERRIDE_FILE" ]; then
     printf '\nApagando el túnel temporal...\n'
     "${DOCKER[@]}" rm -f "$QUICK_CONTAINER" >/dev/null 2>&1 || true
     QUICK_ACTIVE='false'
+    restore_web_without_tunnel_host
   fi
 }
 
@@ -162,6 +190,10 @@ start_quick_tunnel() {
     fi
     die "No se obtuvo la URL temporal después de 60 segundos. Revisa $QUICK_LOG"
   fi
+
+  write_quick_compose_override
+  printf 'Aplicando temporalmente el hostname a Vite...\n'
+  "${COMPOSE[@]}" --file "$QUICK_OVERRIDE_FILE" up -d --force-recreate --no-deps web
 
   printf '\n============================================================\n'
   printf 'TÚNEL TEMPORAL ACTIVO\n'
