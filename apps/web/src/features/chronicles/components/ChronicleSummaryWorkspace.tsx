@@ -22,6 +22,7 @@ interface Props {
   readonly participants: readonly ChronicleParticipantApiSnapshot[]
   readonly characters: readonly ChronicleCharacterApiSummary[]
   readonly canManage: boolean
+  readonly active?: boolean
   readonly onNavigate: (section: 'stories' | 'sessions' | 'timeline', intent?: 'create-story' | 'create-session' | 'create-event') => void
   readonly lifecycleLabel: string
   readonly lifecycleBusy: boolean
@@ -86,6 +87,7 @@ export function ChronicleSummaryWorkspace({
   participants,
   characters,
   canManage,
+  active = true,
   onNavigate,
   lifecycleLabel,
   lifecycleBusy,
@@ -117,8 +119,9 @@ export function ChronicleSummaryWorkspace({
   }
 
   useEffect(() => {
+    if (!active) return
     void loadSummary()
-  }, [chronicle.id, canManage])
+  }, [active, chronicle.id, canManage])
 
   const sessions = data?.sessions ?? []
   const stories = data?.stories ?? []

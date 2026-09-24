@@ -1178,6 +1178,7 @@ export function ChronicleDetail({
           participants={participants}
           characters={associatedCharacters}
           canManage={canManageParticipants}
+          active={activeSection === 'summary'}
           onNavigate={(section, intent) => {
             if (intent === 'create-story') setStoryCreateRequestKey((value) => value + 1)
             if (intent === 'create-session') setSessionCreateRequestKey((value) => value + 1)
