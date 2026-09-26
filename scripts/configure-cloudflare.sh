@@ -1,124 +1,58 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# Configura una publicación Cloudflare opcional para una instalación existente.
-# No modifica la instalación local ni guarda secretos en el repositorio.
-
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-if [ -n "${BLOODKEEPER_COMPOSE_FILE:-}" ]; then
-  COMPOSE_FILE="$BLOODKEEPER_COMPOSE_FILE"
-elif [ -s "$ROOT/compose.yaml" ]; then
-  COMPOSE_FILE="$ROOT/compose.yaml"
-else
-  COMPOSE_FILE="$ROOT/compose.deploy.yaml"
-fi
+ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+COMPOSE_FILE="${BLOODKEEPER_COMPOSE_FILE:-$ROOT/compose.yaml}"
 ENV_FILE="${BLOODKEEPER_ENV_FILE:-$ROOT/.env}"
 CLOUDFLARE_ENV_FILE="${BLOODKEEPER_CLOUDFLARE_ENV_FILE:-$ROOT/.env.cloudflare}"
 PROJECT_NAME="${BLOODKEEPER_PROJECT_NAME:-}"
-QUICK_IMAGE="${BLOODKEEPER_CLOUDFLARED_IMAGE:-cloudflare/cloudflared:latest}"
-QUICK_CONTAINER=''
-QUICK_LOG=''
-QUICK_NETWORK=''
-QUICK_URL=''
-QUICK_ACTIVE='false'
-QUICK_OVERRIDE_FILE=''
+CLOUDFLARED_IMAGE="${BLOODKEEPER_CLOUDFLARED_IMAGE:-cloudflare/cloudflared:latest}"
+
+QUICK_CONTAINER=""
+QUICK_LOG=""
+QUICK_NETWORK=""
+QUICK_URL=""
+QUICK_ACTIVE="false"
+QUICK_OVERRIDE_FILE=""
+NAMED_OVERRIDE_FILE=""
 
 die() {
   printf 'ERROR: %s\n' "$*" >&2
   exit 1
 }
 
-require_command() {
-  command -v "$1" >/dev/null 2>&1 || die "falta la dependencia del sistema: $1"
-}
+[ -f "$COMPOSE_FILE" ] || die "No existe $COMPOSE_FILE"
+[ -f "$ENV_FILE" ] || die "No existe $ENV_FILE"
 
-prepare_cloudflared_image() {
-  image="$1"
-  if "${DOCKER[@]}" image inspect "$image" >/dev/null 2>&1; then
-    return
-  fi
-
-  printf 'Descargando la imagen de Cloudflare: %s\n' "$image"
-  "${DOCKER[@]}" pull "$image" \
-    || die 'No se pudo descargar la imagen de cloudflared. Revisa la conexión de la VM.'
-}
-
-restore_web_without_tunnel_host() {
-  if [ -z "$QUICK_OVERRIDE_FILE" ]; then
-    return
-  fi
-
-  printf 'Restaurando Web sin el hostname temporal de Cloudflare...\n'
-  "${COMPOSE[@]}" up -d --force-recreate --no-deps web >/dev/null 2>&1 || \
-    printf 'ADVERTENCIA: no se pudo recrear Web sin el hostname temporal.\n' >&2
-  rm -f "$QUICK_OVERRIDE_FILE"
-  QUICK_OVERRIDE_FILE=''
-}
-
-write_quick_compose_override() {
-  local host="${QUICK_URL#https://}"
-  [[ "$host" =~ ^[A-Za-z0-9.-]+$ ]] || die 'El hostname recibido de Cloudflare no es válido.'
-
-  QUICK_OVERRIDE_FILE="${TMPDIR:-/tmp}/bloodkeeper-cloudflare-quick-${PROJECT_NAME}.compose.yaml"
-  umask 077
-  printf '%s\n' \
-    'services:' \
-    '  web:' \
-    '    environment:' \
-    "      BLOODKEEPER_VITE_ALLOWED_HOSTS: $host" \
-    > "$QUICK_OVERRIDE_FILE"
-}
-
-cleanup_quick_tunnel() {
-  if [ "$QUICK_ACTIVE" = 'true' ] || [ -n "$QUICK_OVERRIDE_FILE" ]; then
-    printf '\nApagando el túnel temporal...\n'
-    "${DOCKER[@]}" rm -f "$QUICK_CONTAINER" >/dev/null 2>&1 || true
-    QUICK_ACTIVE='false'
-    restore_web_without_tunnel_host
-  fi
-}
-
-trap cleanup_quick_tunnel EXIT INT TERM
-
-if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+if docker info >/dev/null 2>&1; then
   DOCKER=(docker)
-elif command -v sudo >/dev/null 2>&1 && sudo docker info >/dev/null 2>&1; then
+elif sudo docker info >/dev/null 2>&1; then
   DOCKER=(sudo docker)
 else
-  die 'Docker no está disponible para el usuario actual.'
+  die "Docker no está disponible."
 fi
 
-require_command grep
-require_command sed
-require_command tail
-require_command seq
 "${DOCKER[@]}" compose version >/dev/null 2>&1 \
-  || die 'Docker Compose no está disponible. Ejecuta primero install.sh.'
+  || die "Docker Compose no está disponible."
 
-find_running_web_container() {
-  if [ -n "$PROJECT_NAME" ]; then
-    "${DOCKER[@]}" ps -q \
-      --filter 'label=com.docker.compose.service=web' \
-      --filter "label=com.docker.compose.project=$PROJECT_NAME" \
-      | sed -n '1p'
-  else
-    "${DOCKER[@]}" ps -q \
-      --filter 'label=com.docker.compose.service=web' \
-      | sed -n '1p'
-  fi
-}
+running_web_container="$(
+  "${DOCKER[@]}" ps -q \
+    --filter 'label=com.docker.compose.service=web' \
+    | sed -n '1p'
+)"
 
-running_web_container="$(find_running_web_container)"
 if [ -z "$PROJECT_NAME" ] && [ -n "$running_web_container" ]; then
-  PROJECT_NAME="$("${DOCKER[@]}" inspect "$running_web_container" \
-    --format '{{index .Config.Labels "com.docker.compose.project"}}')"
+  PROJECT_NAME="$(
+    "${DOCKER[@]}" inspect "$running_web_container" \
+      --format '{{index .Config.Labels "com.docker.compose.project"}}'
+  )"
 fi
+
 PROJECT_NAME="${PROJECT_NAME:-$(basename "$ROOT")}"
+
 QUICK_CONTAINER="${PROJECT_NAME}-cloudflare-quick"
 QUICK_LOG="${TMPDIR:-/tmp}/bloodkeeper-cloudflare-quick-${PROJECT_NAME}.log"
-
-[ -s "$COMPOSE_FILE" ] || die "falta el archivo Compose: $COMPOSE_FILE"
-[ -s "$ENV_FILE" ] || die "falta la configuración local: $ENV_FILE. Ejecuta primero install.sh."
+NAMED_OVERRIDE_FILE="${TMPDIR:-/tmp}/bloodkeeper-cloudflare-named-${PROJECT_NAME}.compose.yaml"
 
 COMPOSE=(
   "${DOCKER[@]}" compose
@@ -127,102 +61,183 @@ COMPOSE=(
   --file "$COMPOSE_FILE"
 )
 
-compose_cloudflare=(
+COMPOSE_CLOUDFLARE=(
   "${COMPOSE[@]}"
   --env-file "$CLOUDFLARE_ENV_FILE"
   --file "$ROOT/compose.cloudflare.yaml"
 )
 
-get_web_container() {
-  running_web_container="$(find_running_web_container)"
-  if [ -n "$running_web_container" ]; then
-    printf '%s' "$running_web_container"
+prepare_cloudflared_image() {
+  if "${DOCKER[@]}" image inspect "$CLOUDFLARED_IMAGE" >/dev/null 2>&1; then
     return
   fi
-  "${COMPOSE[@]}" ps -q web 2>/dev/null || true
+
+  printf 'Descargando la imagen de Cloudflare...\n'
+  "${DOCKER[@]}" pull "$CLOUDFLARED_IMAGE"
+}
+
+get_web_container() {
+  local container
+
+  container="$(
+    "${DOCKER[@]}" ps -q \
+      --filter 'label=com.docker.compose.service=web' \
+      --filter "label=com.docker.compose.project=$PROJECT_NAME" \
+      | sed -n '1p'
+  )"
+
+  if [ -n "$container" ]; then
+    printf '%s' "$container"
+  else
+    "${COMPOSE[@]}" ps -q web 2>/dev/null || true
+  fi
 }
 
 get_application_network() {
-  web_container="$(get_web_container)"
-  [ -n "$web_container" ] || die 'El contenedor web no está levantado. Ejecuta primero install.sh.'
+  local web_container network
 
-  network="$("${DOCKER[@]}" inspect "$web_container" \
-    --format '{{range $name, $value := .NetworkSettings.Networks}}{{println $name}}{{end}}' \
-    | sed -n '1p')"
-  [ -n "$network" ] || die 'No se pudo localizar la red Docker de BloodKeeper.'
+  web_container="$(get_web_container)"
+  [ -n "$web_container" ] || die "El contenedor web no está levantado."
+
+  network="$(
+    "${DOCKER[@]}" inspect "$web_container" \
+      --format '{{range $name, $value := .NetworkSettings.Networks}}{{println $name}}{{end}}' \
+      | sed -n '1p'
+  )"
+
+  [ -n "$network" ] || die "No se pudo localizar la red Docker."
   printf '%s' "$network"
 }
 
-quick_container_is_running() {
-  state="$("${DOCKER[@]}" inspect \
-    --format '{{.State.Running}}' \
-    "$QUICK_CONTAINER" 2>/dev/null || true)"
-  [ "$state" = 'true' ]
+write_host_override() {
+  local file="$1"
+  local host="$2"
+
+  [[ "$host" =~ ^[A-Za-z0-9.-]+$ ]] \
+    || die "El hostname no es válido."
+
+  umask 077
+
+  printf '%s\n' \
+    'services:' \
+    '  web:' \
+    '    environment:' \
+    "      BLOODKEEPER_VITE_ALLOWED_HOSTS: $host" \
+    > "$file"
 }
+
+restore_web_without_public_host() {
+  local override_file="$1"
+
+  "${COMPOSE[@]}" up -d --force-recreate --no-deps web
+  rm -f "$override_file"
+}
+
+quick_container_is_running() {
+  local state
+
+  state="$(
+    "${DOCKER[@]}" inspect \
+      --format '{{.State.Running}}' \
+      "$QUICK_CONTAINER" 2>/dev/null || true
+  )"
+
+  [ "$state" = "true" ]
+}
+
+cleanup_quick_tunnel() {
+  if [ "$QUICK_ACTIVE" = "true" ] || [ -n "$QUICK_OVERRIDE_FILE" ]; then
+    echo
+    echo "Apagando el túnel temporal..."
+
+    "${DOCKER[@]}" rm -f "$QUICK_CONTAINER" >/dev/null 2>&1 || true
+    QUICK_ACTIVE="false"
+
+    if [ -n "$QUICK_OVERRIDE_FILE" ]; then
+      restore_web_without_public_host "$QUICK_OVERRIDE_FILE" \
+        || echo "ADVERTENCIA: no se pudo restaurar Web."
+      QUICK_OVERRIDE_FILE=""
+    fi
+  fi
+}
+
+trap cleanup_quick_tunnel EXIT INT TERM
 
 start_quick_tunnel() {
   QUICK_NETWORK="$(get_application_network)"
-  prepare_cloudflared_image "$QUICK_IMAGE"
+  prepare_cloudflared_image
   : > "$QUICK_LOG"
 
   "${DOCKER[@]}" rm -f "$QUICK_CONTAINER" >/dev/null 2>&1 || true
-  printf 'Iniciando túnel temporal...\n'
+
+  echo "Iniciando túnel temporal..."
+
   "${DOCKER[@]}" run --rm \
     --name "$QUICK_CONTAINER" \
     --network "$QUICK_NETWORK" \
-    "$QUICK_IMAGE" \
+    "$CLOUDFLARED_IMAGE" \
     tunnel --no-autoupdate --url http://web:5173 \
-    >"$QUICK_LOG" 2>&1 &
-  QUICK_ACTIVE='true'
+    > "$QUICK_LOG" 2>&1 &
+
+  QUICK_ACTIVE="true"
 
   for _ in $(seq 1 60); do
-    QUICK_URL="$(sed -nE 's/.*(https:\/\/[^[:space:]]+\.trycloudflare\.com).*/\1/p' "$QUICK_LOG" | tail -n 1 || true)"
-    if [ -n "$QUICK_URL" ]; then
-      break
-    fi
+    QUICK_URL="$(
+      sed -nE \
+        's/.*(https:\/\/[^[:space:]]+\.trycloudflare\.com).*/\1/p' \
+        "$QUICK_LOG" \
+        | tail -n 1 || true
+    )"
+
+    [ -n "$QUICK_URL" ] && break
     sleep 1
   done
 
-  if [ -z "$QUICK_URL" ]; then
-    if ! quick_container_is_running; then
-      cat "$QUICK_LOG" >&2
-      die 'El túnel temporal terminó antes de obtener una URL.'
-    fi
-    die "No se obtuvo la URL temporal después de 60 segundos. Revisa $QUICK_LOG"
-  fi
+  [ -n "$QUICK_URL" ] \
+    || die "No se obtuvo la URL temporal. Revisa $QUICK_LOG"
 
-  write_quick_compose_override
-  printf 'Aplicando temporalmente el hostname a Vite...\n'
-  "${COMPOSE[@]}" --file "$QUICK_OVERRIDE_FILE" up -d --force-recreate --no-deps web
+  QUICK_OVERRIDE_FILE="${TMPDIR:-/tmp}/bloodkeeper-cloudflare-quick-${PROJECT_NAME}.compose.yaml"
 
-  printf '\n============================================================\n'
-  printf 'TÚNEL TEMPORAL ACTIVO\n'
-  printf '============================================================\n'
+  write_host_override "$QUICK_OVERRIDE_FILE" "${QUICK_URL#https://}"
+
+  quick_compose=(
+    "${COMPOSE[@]}"
+    --file "$QUICK_OVERRIDE_FILE"
+  )
+
+  "${quick_compose[@]}" up -d --force-recreate --no-deps web
+
+  echo
+  echo "============================================================"
+  echo "TÚNEL TEMPORAL ACTIVO"
+  echo "============================================================"
   printf 'URL: %s\n' "$QUICK_URL"
-  printf 'Esta URL deja de funcionar al apagar este script.\n'
-  printf 'Es una prueba temporal y no configura Cloudflare Access.\n'
+  echo "La URL dejará de funcionar al apagar este script."
   printf 'Log: %s\n' "$QUICK_LOG"
 }
 
 quick_menu() {
-  while [ "$QUICK_ACTIVE" = 'true' ]; do
-    printf '\n¿Qué quieres hacer?\n'
-    printf '  [m] Mantener el túnel abierto\n'
-    printf '  [e] Ver estado\n'
-    printf '  [l] Ver últimas líneas del log\n'
-    printf '  [a] Apagar el túnel\n'
-    printf '  [q] Salir y apagar el túnel\n'
-    read -r -p 'Opción: ' action
+  while [ "$QUICK_ACTIVE" = "true" ]; do
+    echo
+    echo "¿Qué quieres hacer?"
+    echo "  [m] Mantener el túnel abierto"
+    echo "  [e] Ver estado"
+    echo "  [l] Ver últimas líneas del log"
+    echo "  [a] Apagar el túnel"
+    echo "  [q] Salir y apagar el túnel"
+
+    read -r -p "Opción: " action
+
     case "$action" in
       m|M)
         printf 'El túnel sigue activo en %s\n' "$QUICK_URL"
         ;;
       e|E)
         if quick_container_is_running; then
-          printf 'Estado: activo\n'
+          echo "Estado: activo"
         else
-          printf 'Estado: detenido\n'
-          QUICK_ACTIVE='false'
+          echo "Estado: detenido"
+          QUICK_ACTIVE="false"
         fi
         ;;
       l|L)
@@ -232,52 +247,92 @@ quick_menu() {
         cleanup_quick_tunnel
         ;;
       *)
-        printf 'Opción no reconocida.\n'
+        echo "Opción no reconocida."
         ;;
     esac
   done
 }
 
 configure_named_tunnel() {
-  [ -s "$ROOT/compose.cloudflare.yaml" ] || die 'falta compose.cloudflare.yaml para activar el túnel permanente.'
+  [ -f "$ROOT/compose.cloudflare.yaml" ] \
+    || die "No existe compose.cloudflare.yaml."
 
-  printf '\nEl túnel permanente requiere:\n'
-  printf '  1. Un dominio activo en Cloudflare.\n'
-  printf '  2. Un Named Tunnel creado desde Zero Trust.\n'
-  printf '  3. La ruta pública apuntando a http://web:5173.\n'
-  printf '  4. Una aplicación Access con los correos autorizados.\n\n'
-  printf 'Consulta: https://developers.cloudflare.com/tunnel/get-started/\n'
-  printf 'Consulta: https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/self-hosted-public-app/\n\n'
+  echo
+  echo "El túnel permanente requiere:"
+  echo "  1. Un dominio activo en Cloudflare."
+  echo "  2. Un Named Tunnel creado desde Zero Trust."
+  echo "  3. La ruta pública apuntando a http://web:5173."
+  echo "  4. Una aplicación Access con los correos autorizados."
+  echo
 
-  hostname=''
-  read -r -p 'Hostname público (ej. app.trombosis.eu): ' hostname
-  [[ "$hostname" =~ ^[A-Za-z0-9.-]+$ ]] || die 'El hostname no es válido.'
+  local hostname token
 
-  printf 'Pega el token del túnel. No se mostrará ni se guardará en Git.\n'
-  read -r -s -p 'Token Cloudflare: ' token
+  read -r -p "Hostname público: " hostname
+  [[ "$hostname" =~ ^[A-Za-z0-9.-]+$ ]] \
+    || die "El hostname no es válido."
+
+  echo "Pega el token del túnel. No se mostrará."
+  read -r -s -p "Token Cloudflare: " token
   printf '\n'
-  [ -n "$token" ] || die 'El token no puede estar vacío.'
+
+  [ -n "$token" ] || die "El token no puede estar vacío."
 
   umask 077
-  printf 'BLOODKEEPER_PUBLIC_HOSTNAME=%s\n' "$hostname" > "$CLOUDFLARE_ENV_FILE"
-  printf 'CLOUDFLARE_TUNNEL_TOKEN=%s\n' "$token" >> "$CLOUDFLARE_ENV_FILE"
+
+  printf 'BLOODKEEPER_PUBLIC_HOSTNAME=%s\n' "$hostname" \
+    > "$CLOUDFLARE_ENV_FILE"
+
+  printf 'CLOUDFLARE_TUNNEL_TOKEN=%s\n' "$token" \
+    >> "$CLOUDFLARE_ENV_FILE"
+
   chmod 600 "$CLOUDFLARE_ENV_FILE"
   unset token
 
-  "${compose_cloudflare[@]}" config --quiet
-  prepare_cloudflared_image "$QUICK_IMAGE"
-  "${compose_cloudflare[@]}" up -d cloudflared
+  write_host_override "$NAMED_OVERRIDE_FILE" "$hostname"
 
-  printf '\nCloudflare Tunnel activado para %s\n' "$hostname"
+  named_compose=(
+    "${COMPOSE_CLOUDFLARE[@]}"
+    --file "$NAMED_OVERRIDE_FILE"
+  )
+
+  "${named_compose[@]}" config --quiet
+  prepare_cloudflared_image
+  "${named_compose[@]}" up -d --force-recreate web cloudflared
+
+  echo
+  printf 'Cloudflare Tunnel activado para %s\n' "$hostname"
   printf 'Configuración privada: %s\n' "$CLOUDFLARE_ENV_FILE"
 }
 
-printf 'BLOODKEEPER — PUBLICACIÓN OPCIONAL\n'
+stop_named_tunnel() {
+  echo
+  echo "Deteniendo el túnel permanente..."
+
+  if [ -f "$CLOUDFLARE_ENV_FILE" ]; then
+    "${COMPOSE_CLOUDFLARE[@]}" stop cloudflared \
+      >/dev/null 2>&1 || true
+
+    "${COMPOSE_CLOUDFLARE[@]}" rm -f cloudflared \
+      >/dev/null 2>&1 || true
+  fi
+
+  rm -f "$NAMED_OVERRIDE_FILE"
+
+  "${COMPOSE[@]}" up -d --force-recreate --no-deps web
+
+  echo "Túnel permanente detenido."
+  printf 'Se conserva: %s\n' "$CLOUDFLARE_ENV_FILE"
+}
+
+echo "BLOODKEEPER — PUBLICACIÓN OPCIONAL"
 printf 'Instalación local detectada en: %s\n\n' "$ROOT"
-printf '  [1] Tunnel temporal de prueba\n'
-printf '  [2] Tunnel permanente + Access\n'
-printf '  [q] Cancelar\n'
-read -r -p 'Elige una opción: ' mode
+
+echo "  [1] Tunnel temporal de prueba"
+echo "  [2] Tunnel permanente + Access"
+echo "  [3] Detener el túnel permanente"
+echo "  [q] Cancelar"
+
+read -r -p "Elige una opción: " mode
 
 case "$mode" in
   1)
@@ -287,10 +342,13 @@ case "$mode" in
   2)
     configure_named_tunnel
     ;;
+  3)
+    stop_named_tunnel
+    ;;
   q|Q)
-    printf 'No se ha cambiado la configuración de BloodKeeper.\n'
+    echo "No se ha cambiado la configuración de BloodKeeper."
     ;;
   *)
-    die 'Opción no válida.'
+    die "Opción no válida."
     ;;
 esac
