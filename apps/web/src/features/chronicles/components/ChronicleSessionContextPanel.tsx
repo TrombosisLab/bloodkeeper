@@ -55,7 +55,8 @@ interface ChronicleResourceOption {
   readonly name: string
   readonly summary: string | null
   readonly status: 'active' | 'archived'
-  readonly visibility?: 'narrator_only' | 'chronicle_participants'
+  readonly visibility?: 'narrator_only' | 'chronicle_participants' | 'selected_players'
+  readonly audienceUserIds?: readonly string[]
 }
 
 const resourceKindLabel = {
@@ -238,7 +239,7 @@ function libraryResourceOption(
   return {
     id: resource.id,
     label: resource.name,
-    detail: resourceKindLabel[resource.kind] + (resource.visibility === undefined ? '' : ' · ' + (resource.visibility === 'chronicle_participants' ? 'Compartido' : 'Solo Narrador')),
+    detail: resourceKindLabel[resource.kind] + (resource.visibility === undefined ? '' : ' · ' + (resource.visibility === 'chronicle_participants' ? 'Compartido' : resource.visibility === 'selected_players' ? 'Jugadores seleccionados' : 'Solo Narrador')),
     status: resource.status,
     source: 'library',
   }

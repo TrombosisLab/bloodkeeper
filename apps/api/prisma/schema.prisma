@@ -229,6 +229,7 @@ model User {
   chronicleSessionNotes   ChronicleSessionParticipantNote[] @relation("ChronicleSessionParticipantNoteAuthor")
   dashboardContext UserDashboardContext?
   libraryResources                  LibraryResource[]                        @relation("LibraryResourceOwner")
+  chronicleResourceAudiences        ChronicleResourceAudience[]               @relation("ChronicleResourceAudienceUser")
   chronicleSpaceBoardPersonalStates ChronicleSpaceBoardPersonalState[]       @relation("ChronicleSpaceBoardPersonalStateUser")
   chronicleMapRequests              ChronicleMapRequest[]                    @relation("ChronicleMapRequestRequester")
 
@@ -1579,11 +1580,25 @@ model ChronicleResourceBinding {
   updatedAt      DateTime @updatedAt
   chronicle      Chronicle @relation(fields: [chronicleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   resource       LibraryResource @relation(fields: [resourceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  audiences      ChronicleResourceAudience[] @relation("ChronicleResourceAudienceBinding")
 
   @@unique([chronicleId, resourceId])
   @@index([chronicleId, status])
   @@index([resourceId, status])
   @@map("chronicle_resource_bindings")
+}
+
+model ChronicleResourceAudience {
+  bindingId String   @db.Uuid
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  binding ChronicleResourceBinding @relation("ChronicleResourceAudienceBinding", fields: [bindingId], references: [id], onDelete: Cascade)
+  user    User                     @relation("ChronicleResourceAudienceUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([bindingId, userId])
+  @@index([userId])
+  @@map("chronicle_resource_audiences")
 }
 
 model ChronicleSpaceBoard {

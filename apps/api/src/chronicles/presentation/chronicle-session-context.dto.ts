@@ -52,7 +52,8 @@ export interface ChronicleSessionContextResponseDto {
     readonly name: string
     readonly summary: string | null
     readonly status: 'active' | 'archived'
-    readonly visibility: 'narrator_only' | 'chronicle_participants'
+    readonly visibility: 'narrator_only' | 'chronicle_participants' | 'selected_players'
+    readonly audienceUserIds: readonly string[]
   }[]
 }
 
@@ -230,6 +231,7 @@ export function toChronicleSessionContextResponse(
           summary: resource.summary,
           status: resource.status,
           visibility: resource.visibility,
+          audienceUserIds: resource.audienceUserIds ?? [],
         }),
       ),
   }

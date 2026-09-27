@@ -33,8 +33,8 @@ function areaColor(value: unknown, fallback: AreaColor): AreaColor { return valu
 function areaLabelSize(value: unknown): AreaLabelSize { return value === undefined || value === null ? 'medium' : areaLabelSizes.includes(value as AreaLabelSize) ? value as AreaLabelSize : (() => { throw new BadRequestException({ code: 'INVALID_CHRONICLE_MAP_AREA_LABEL_SIZE' }) })() }
 function areaLabelVertical(value: unknown): AreaLabelVertical { return value === undefined || value === null ? 'top' : areaLabelVerticals.includes(value as AreaLabelVertical) ? value as AreaLabelVertical : (() => { throw new BadRequestException({ code: 'INVALID_CHRONICLE_MAP_AREA_LABEL_VERTICAL' }) })() }
 function areaLabelHorizontal(value: unknown): AreaLabelHorizontal { return value === undefined || value === null ? 'left' : areaLabelHorizontals.includes(value as AreaLabelHorizontal) ? value as AreaLabelHorizontal : (() => { throw new BadRequestException({ code: 'INVALID_CHRONICLE_MAP_AREA_LABEL_HORIZONTAL' }) })() }
-function requestStatus(value: unknown): RequestStatus { return requestStatuses.includes(value as RequestStatus) ? value as RequestStatus : (() => { throw new BadRequestException({ code: 'INVALID_CHRONICLE_MAP_REQUEST_STATUS' }) })() }
 function resourceAssetType(value: unknown): 'NPC' | 'LOCATION' | 'RESOURCE' { return value === 'npc' ? 'NPC' : value === 'location' ? 'LOCATION' : 'RESOURCE' }
+function requestStatus(value: unknown): RequestStatus { return requestStatuses.includes(value as RequestStatus) ? value as RequestStatus : (() => { throw new BadRequestException({ code: 'INVALID_CHRONICLE_MAP_REQUEST_STATUS' }) })() }
 
 @Controller('chronicles/:chronicleId/maps')
 export class ChronicleMapController {
@@ -74,23 +74,24 @@ export class ChronicleMapController {
     if (!resource) throw new BadRequestException({ code: 'CHRONICLE_MAP_RESOURCE_NOT_AVAILABLE' })
   }
 
-  private presentMap(row: any, chronicleId: string, narrator: boolean) {
-    const markers = (row.markers ?? []).filter((marker: any) => narrator || (marker.visibility !== 'narrator_only' && (!marker.resource || marker.resource.bindings?.some((binding: any) => binding.visibility === 'chronicle_participants')))).map((marker: any) => ({ id: marker.id, mapId: marker.mapId, resourceId: marker.resourceId, locationId: marker.locationId, kind: marker.kind, label: marker.label, x: marker.x, y: marker.y, size: marker.size ?? 'large', visibility: marker.visibility, resource: marker.resource ? { id: marker.resource.id, kind: marker.resource.kind, name: marker.resource.name, summary: marker.resource.summary, imageUrl: `/api/chronicles/${chronicleId}/assets/${resourceAssetType(marker.resource.kind)}/${marker.resource.id}/image` } : null, location: marker.location ? { id: marker.location.id, name: marker.location.name, category: marker.location.category } : null }))
-    return { id: row.id, chronicleId, parentMapId: row.parentMapId, linkedLocationId: row.linkedLocationId, linkedResourceId: row.linkedResourceId, name: row.name, description: row.description, status: String(row.status).toLowerCase(), sortOrder: row.sortOrder, imageUrl: `/api/chronicles/${chronicleId}/assets/MAP/${row.id}/image`, hasImage: Boolean(row.hasImage), markers, areas: (narrator ? row.areas ?? [] : (row.areas ?? []).filter((area: any) => area.visibility !== 'narrator_only')).map((area: any) => ({ ...area, color: area.color ?? '#bd3e57', fillColor: area.fillColor ?? area.color ?? '#bd3e57', labelColor: area.labelColor ?? '#fff3ed', labelSize: area.labelSize ?? 'medium', labelVertical: area.labelVertical ?? 'top', labelHorizontal: area.labelHorizontal ?? 'left' })) }
+  private presentMap(row: any, chronicleId: string, narrator: boolean, userId?: string) {
+    const markers = (row.markers ?? []).filter((marker: any) => narrator || (marker.visibility !== 'narrator_only' && (!marker.resource || marker.resource.bindings?.some((binding: any) => binding.visibility === 'chronicle_participants' || (binding.visibility === 'selected_players' && binding.audiences?.some((audience: any) => audience.userId === userId)))))).map((marker: any) => ({ id: marker.id, mapId: marker.mapId, resourceId: marker.resourceId, locationId: marker.locationId, kind: marker.kind, label: marker.label, x: marker.x, y: marker.y, size: marker.size ?? 'large', visibility: marker.visibility, resource: marker.resource ? { id: marker.resource.id, kind: marker.resource.kind, name: marker.resource.name, summary: marker.resource.summary, imageUrl: `/api/chronicles/${chronicleId}/assets/${resourceAssetType(marker.resource.kind)}/${marker.resource.id}/image` } : null, location: marker.location ? { id: marker.location.id, name: marker.location.name, category: marker.location.category } : null }))
+    return { id: row.id, chronicleId, parentMapId: row.parentMapId, linkedLocationId: row.linkedLocationId, linkedResourceId: narrator || row.linkedResource?.bindings?.length ? row.linkedResourceId : null, name: row.name, description: row.description, status: String(row.status).toLowerCase(), sortOrder: row.sortOrder, imageUrl: `/api/chronicles/${chronicleId}/assets/MAP/${row.id}/image`, hasImage: Boolean(row.hasImage), markers, areas: (narrator ? row.areas ?? [] : (row.areas ?? []).filter((area: any) => area.visibility !== 'narrator_only')).map((area: any) => ({ ...area, color: area.color ?? '#bd3e57', fillColor: area.fillColor ?? area.color ?? '#bd3e57', labelColor: area.labelColor ?? '#fff3ed', labelSize: area.labelSize ?? 'medium', labelVertical: area.labelVertical ?? 'top', labelHorizontal: area.labelHorizontal ?? 'left' })) }
   }
 
-  private includes(chronicleId: string) {
-    return { markers: { include: { resource: { select: { id: true, kind: true, name: true, summary: true, bindings: { where: { chronicleId, status: 'attached' }, select: { visibility: true } } } }, location: { select: { id: true, name: true, category: true } } } }, areas: { orderBy: { createdAt: 'asc' } } }
+  private includes(chronicleId: string, userId?: string, narrator = false) {
+    const resourceVisibility = narrator || !userId ? {} : { OR: [{ visibility: 'chronicle_participants' }, { visibility: 'selected_players', audiences: { some: { userId } } }] }
+    return { linkedResource: { select: { id: true, bindings: { where: { chronicleId, status: 'attached', ...resourceVisibility }, select: { visibility: true } } } }, markers: { include: { resource: { select: { id: true, kind: true, name: true, summary: true, bindings: { where: { chronicleId, status: 'attached', ...resourceVisibility }, select: { visibility: true, audiences: { select: { userId: true } } } } } }, location: { select: { id: true, name: true, category: true } } } }, areas: { orderBy: { createdAt: 'asc' } } }
   }
 
   @Get()
   async list(@Req() request: RequestWithUser, @Param('chronicleId') rawChronicleId: unknown) {
     const chronicleId = id(rawChronicleId, 'INVALID_CHRONICLE_ID')
-    const { db, narrator } = await this.access(chronicleId, request)
-    const rows = await db.chronicleMap.findMany({ where: { chronicleId, ...(narrator ? {} : { status: 'ACTIVE' }) }, orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }], include: this.includes(chronicleId) })
+    const { db, userId, narrator } = await this.access(chronicleId, request)
+    const rows = await db.chronicleMap.findMany({ where: { chronicleId, ...(narrator ? {} : { status: 'ACTIVE' }) }, orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }], include: this.includes(chronicleId, userId, narrator) })
     const images = await db.chronicleAssetImage.findMany({ where: { assetType: 'MAP', entityId: { in: rows.map((row: any) => row.id) } }, select: { entityId: true } })
     const imageIds = new Set(images.map((image: any) => String(image.entityId)))
-    return { chronicleId, canManage: narrator, maps: rows.map((row: any) => this.presentMap({ ...row, hasImage: imageIds.has(String(row.id)) }, chronicleId, narrator)) }
+    return { chronicleId, canManage: narrator, maps: rows.map((row: any) => this.presentMap({ ...row, hasImage: imageIds.has(String(row.id)) }, chronicleId, narrator, userId)) }
   }
 
   @Post()
@@ -106,7 +107,7 @@ export class ChronicleMapController {
     await this.assertParent(db, chronicleId, parentMapId)
     if (linkedLocationId && !await db.chronicleLocation.findFirst({ where: { id: linkedLocationId, chronicleId }, select: { id: true } })) throw new BadRequestException({ code: 'CHRONICLE_MAP_LOCATION_NOT_AVAILABLE' })
     await this.assertResource(db, chronicleId, userId, linkedResourceId)
-    const created = await db.chronicleMap.create({ data: { chronicleId, parentMapId, linkedLocationId, linkedResourceId, name, description: text(body.description, 'description', 2000), sortOrder: typeof body.sortOrder === 'number' && Number.isInteger(body.sortOrder) ? body.sortOrder : 0 }, include: this.includes(chronicleId) })
+    const created = await db.chronicleMap.create({ data: { chronicleId, parentMapId, linkedLocationId, linkedResourceId, name, description: text(body.description, 'description', 2000), sortOrder: typeof body.sortOrder === 'number' && Number.isInteger(body.sortOrder) ? body.sortOrder : 0 }, include: this.includes(chronicleId, userId, narrator) })
     return this.presentMap({ ...created, hasImage: false }, chronicleId, narrator)
   }
 
@@ -124,7 +125,7 @@ export class ChronicleMapController {
     if (body.linkedLocationId !== undefined) { const linkedLocationId = body.linkedLocationId ? id(body.linkedLocationId) : null; if (linkedLocationId && !await db.chronicleLocation.findFirst({ where: { id: linkedLocationId, chronicleId }, select: { id: true } })) throw new BadRequestException({ code: 'CHRONICLE_MAP_LOCATION_NOT_AVAILABLE' }); data.linkedLocationId = linkedLocationId }
     if (body.linkedResourceId !== undefined) { const linkedResourceId = body.linkedResourceId ? id(body.linkedResourceId) : null; await this.assertResource(db, chronicleId, userId, linkedResourceId); data.linkedResourceId = linkedResourceId }
     if (body.sortOrder !== undefined) { if (typeof body.sortOrder !== 'number' || !Number.isInteger(body.sortOrder)) throw new BadRequestException({ code: 'INVALID_CHRONICLE_MAP_ORDER' }); data.sortOrder = body.sortOrder }
-    const row = await db.chronicleMap.update({ where: { id: mapId }, data, include: this.includes(chronicleId) })
+    const row = await db.chronicleMap.update({ where: { id: mapId }, data, include: this.includes(chronicleId, userId, narrator) })
     const image = await db.chronicleAssetImage.findUnique({ where: { assetType_entityId: { assetType: 'MAP', entityId: mapId } }, select: { entityId: true } })
     return this.presentMap({ ...row, hasImage: Boolean(image) }, chronicleId, narrator)
   }
@@ -132,7 +133,7 @@ export class ChronicleMapController {
   @Delete(':mapId')
   async deleteMap(@Req() request: RequestWithUser, @Param('chronicleId') rawChronicleId: unknown, @Param('mapId') rawMapId: unknown) {
     const chronicleId = id(rawChronicleId, 'INVALID_CHRONICLE_ID'), mapId = id(rawMapId)
-    const { db, narrator } = await this.access(chronicleId, request)
+    const { db, userId, narrator } = await this.access(chronicleId, request)
     if (!narrator) throw new ForbiddenException({ code: 'CHRONICLE_MAP_NARRATOR_ONLY' })
     await this.mapOrThrow(db, chronicleId, mapId, true)
     const child = await db.chronicleMap.findFirst({ where: { chronicleId, parentMapId: mapId }, select: { id: true } })
@@ -147,7 +148,7 @@ export class ChronicleMapController {
   @Post(':mapId/archive')
   async archive(@Req() request: RequestWithUser, @Param('chronicleId') rawChronicleId: unknown, @Param('mapId') rawMapId: unknown) {
     const chronicleId = id(rawChronicleId, 'INVALID_CHRONICLE_ID'), mapId = id(rawMapId)
-    const { db, narrator } = await this.access(chronicleId, request)
+    const { db, userId, narrator } = await this.access(chronicleId, request)
     if (!narrator) throw new ForbiddenException({ code: 'CHRONICLE_MAP_NARRATOR_ONLY' })
     await this.mapOrThrow(db, chronicleId, mapId, true)
     await db.chronicleMap.update({ where: { id: mapId }, data: { status: 'ARCHIVED' } })
@@ -193,7 +194,7 @@ export class ChronicleMapController {
   @Delete(':mapId/markers/:markerId')
   async deleteMarker(@Req() request: RequestWithUser, @Param('chronicleId') rawChronicleId: unknown, @Param('mapId') rawMapId: unknown, @Param('markerId') rawMarkerId: unknown) {
     const chronicleId = id(rawChronicleId, 'INVALID_CHRONICLE_ID'), mapId = id(rawMapId), markerId = id(rawMarkerId)
-    const { db, narrator } = await this.access(chronicleId, request)
+    const { db, userId, narrator } = await this.access(chronicleId, request)
     if (!narrator) throw new ForbiddenException({ code: 'CHRONICLE_MAP_NARRATOR_ONLY' })
     await this.mapOrThrow(db, chronicleId, mapId)
     const result = await db.chronicleMapMarker.deleteMany({ where: { id: markerId, mapId } })
@@ -204,7 +205,7 @@ export class ChronicleMapController {
   @Post(':mapId/areas')
   async createArea(@Req() request: RequestWithUser, @Param('chronicleId') rawChronicleId: unknown, @Param('mapId') rawMapId: unknown, @Body() body: unknown) {
     const chronicleId = id(rawChronicleId, 'INVALID_CHRONICLE_ID'), mapId = id(rawMapId)
-    const { db, narrator } = await this.access(chronicleId, request)
+    const { db, userId, narrator } = await this.access(chronicleId, request)
     if (!narrator) throw new ForbiddenException({ code: 'CHRONICLE_MAP_NARRATOR_ONLY' })
     await this.mapOrThrow(db, chronicleId, mapId)
     if (!record(body)) throw new BadRequestException({ code: 'INVALID_CHRONICLE_MAP_AREA' })
@@ -214,7 +215,7 @@ export class ChronicleMapController {
   @Patch(':mapId/areas/:areaId')
   async updateArea(@Req() request: RequestWithUser, @Param('chronicleId') rawChronicleId: unknown, @Param('mapId') rawMapId: unknown, @Param('areaId') rawAreaId: unknown, @Body() body: unknown) {
     const chronicleId = id(rawChronicleId, 'INVALID_CHRONICLE_ID'), mapId = id(rawMapId), areaId = id(rawAreaId)
-    const { db, narrator } = await this.access(chronicleId, request)
+    const { db, userId, narrator } = await this.access(chronicleId, request)
     if (!narrator) throw new ForbiddenException({ code: 'CHRONICLE_MAP_NARRATOR_ONLY' })
     await this.mapOrThrow(db, chronicleId, mapId)
     if (!record(body)) throw new BadRequestException({ code: 'INVALID_CHRONICLE_MAP_AREA' })
@@ -236,7 +237,7 @@ export class ChronicleMapController {
   @Delete(':mapId/areas/:areaId')
   async deleteArea(@Req() request: RequestWithUser, @Param('chronicleId') rawChronicleId: unknown, @Param('mapId') rawMapId: unknown, @Param('areaId') rawAreaId: unknown) {
     const chronicleId = id(rawChronicleId, 'INVALID_CHRONICLE_ID'), mapId = id(rawMapId), areaId = id(rawAreaId)
-    const { db, narrator } = await this.access(chronicleId, request)
+    const { db, userId, narrator } = await this.access(chronicleId, request)
     if (!narrator) throw new ForbiddenException({ code: 'CHRONICLE_MAP_NARRATOR_ONLY' })
     await this.mapOrThrow(db, chronicleId, mapId)
     const result = await db.chronicleMapArea.deleteMany({ where: { id: areaId, mapId } })
@@ -251,7 +252,7 @@ export class ChronicleMapController {
     await this.mapOrThrow(db, chronicleId, mapId)
     if (!record(body)) throw new BadRequestException({ code: 'INVALID_CHRONICLE_MAP_REQUEST' })
     const resourceId = body.resourceId ? id(body.resourceId) : null
-    if (resourceId && !await db.libraryResource.findFirst({ where: { id: resourceId, status: 'active', bindings: { some: { chronicleId, status: 'attached', visibility: 'chronicle_participants' } } }, select: { id: true } })) throw new BadRequestException({ code: 'CHRONICLE_MAP_RESOURCE_NOT_AVAILABLE' })
+    if (resourceId && !await db.libraryResource.findFirst({ where: { id: resourceId, status: 'active', bindings: { some: { chronicleId, status: 'attached', OR: [{ visibility: 'chronicle_participants' }, { visibility: 'selected_players', audiences: { some: { userId } } }] } } }, select: { id: true } })) throw new BadRequestException({ code: 'CHRONICLE_MAP_RESOURCE_NOT_AVAILABLE' })
     const requestRow = await db.chronicleMapRequest.create({ data: { mapId, requesterId: userId, resourceId, title: text(body.title, 'title', 160, true) as string, description: text(body.description, 'description', 2000), kind: markerKind(body.kind), x: coordinate(body.x, 'x'), y: coordinate(body.y, 'y') } })
     return { id: requestRow.id, mapId, title: requestRow.title, status: 'pending', createdAt: requestRow.createdAt.toISOString() }
   }
@@ -269,7 +270,7 @@ export class ChronicleMapController {
   @Patch(':mapId/requests/:requestId')
   async reviewRequest(@Req() request: RequestWithUser, @Param('chronicleId') rawChronicleId: unknown, @Param('mapId') rawMapId: unknown, @Param('requestId') rawRequestId: unknown, @Body() body: unknown) {
     const chronicleId = id(rawChronicleId, 'INVALID_CHRONICLE_ID'), mapId = id(rawMapId), requestId = id(rawRequestId)
-    const { db, narrator } = await this.access(chronicleId, request)
+    const { db, userId, narrator } = await this.access(chronicleId, request)
     if (!narrator) throw new ForbiddenException({ code: 'CHRONICLE_MAP_NARRATOR_ONLY' })
     await this.mapOrThrow(db, chronicleId, mapId, true)
     if (!record(body)) throw new BadRequestException({ code: 'INVALID_CHRONICLE_MAP_REQUEST' })

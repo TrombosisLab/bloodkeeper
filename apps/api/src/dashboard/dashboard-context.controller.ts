@@ -26,9 +26,9 @@ export class DashboardContextController {
   let context:any=null, publicNotes=0
   if(session){
    const [events,npcs,locations,resources,notes]=await Promise.all([
-    db.chronicleSessionEvent.findMany({where:{sessionId:session.id},include:{event:true}}),db.chronicleSessionNpc.findMany({where:{sessionId:session.id},include:{npc:true}}),db.chronicleSessionLocation.findMany({where:{sessionId:session.id},include:{location:true}}),db.chronicleSessionResource.findMany({where:{sessionId:session.id},include:{resource:true}}),db.chronicleSessionParticipantNote.count({where:{sessionId:session.id,publicNotes:{not:null}}})])
+    db.chronicleSessionEvent.findMany({where:{sessionId:session.id},include:{event:true}}),db.chronicleSessionNpc.findMany({where:{sessionId:session.id},include:{npc:true}}),db.chronicleSessionLocation.findMany({where:{sessionId:session.id},include:{location:true}}),db.chronicleSessionResource.findMany({where:{sessionId:session.id},include:{resource:{include:{bindings:{where:{chronicleId:membership.chronicleId,status:'attached'},select:{visibility:true,audiences:{where:{userId},select:{userId:true}}}}}}}}),db.chronicleSessionParticipantNote.count({where:{sessionId:session.id,publicNotes:{not:null}}})])
    publicNotes=notes
-   const visible=resources.map((x:any)=>x.resource).filter((r:any)=>String(membership.role)==='NARRATOR'||r.visibility==='chronicle_participants')
+   const visible=resources.map((x:any)=>x.resource).filter((r:any)=>String(membership.role)==='NARRATOR'||r.bindings?.some((binding:any)=>binding.visibility==='chronicle_participants'||binding.visibility==='selected_players'&&binding.audiences?.some((audience:any)=>audience.userId===userId)))
    context={location:locations[0]?.location?{name:locations[0].location.name,detail:locations[0].location.category}:null,npc:npcs[0]?.npc?{name:npcs[0].npc.name,detail:npcs[0].npc.narrativeRole||npcs[0].npc.category}:null,organization:visible.find((r:any)=>String(r.kind)==='ORGANIZATION')?{name:visible.find((r:any)=>String(r.kind)==='ORGANIZATION').name,detail:visible.find((r:any)=>String(r.kind)==='ORGANIZATION').summary}:null,threat:events[0]?.event?{name:events[0].event.title,detail:events[0].event.description}:null}
   }
   let experience=0

@@ -137,7 +137,7 @@ export function NotebookWorkspace() {
   const cards: Card[] = useMemo(() => [
     ...(context?.npcs ?? []).map((item) => ({ targetType: 'NPC', targetId: item.id, label: item.name, description: item.description, category: item.category })),
     ...(context?.locations ?? []).map((item) => ({ targetType: 'LOCATION', targetId: item.id, label: item.name, description: item.description, category: item.category })),
-    ...(context?.resources ?? []).map((item) => ({ targetType: item.kind, targetId: item.id, label: item.name, description: item.summary, category: labels[item.kind] ?? item.kind, restricted: item.visibility !== 'chronicle_participants' })),
+    ...(context?.resources ?? []).map((item) => ({ targetType: item.kind, targetId: item.id, label: item.name, description: item.summary, category: labels[item.kind] ?? item.kind, restricted: item.visibility === 'narrator_only' })),
     ...sessions.map((item) => ({ targetType: 'SESSION', targetId: item.id, label: item.title || 'Sesión ' + (item.sessionNumber ?? ''), description: item.summary, category: item.status })),
   ], [context, sessions])
   const selected = notes.find((item) => item.id === selectedId) ?? null

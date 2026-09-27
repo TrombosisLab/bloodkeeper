@@ -5,15 +5,22 @@ import type { ChronicleParticipantRepository } from '../application/chronicle-pa
 import { parseChronicleIdParam, parseChronicleNarratorId } from './chronicle.dto'
 
 type Kind = 'npc' | 'location' | 'document' | 'artifact' | 'organization'
-type Visibility = 'narrator_only' | 'chronicle_participants'
+type Visibility = 'narrator_only' | 'chronicle_participants' | 'selected_players'
 
 function kind(value: unknown): Kind {
   if (value === 'npc' || value === 'location' || value === 'document' || value === 'artifact' || value === 'organization') return value
   throw new BadRequestException({ code: 'INVALID_CHRONICLE_RESOURCE_KIND' })
 }
 function visibility(value: unknown): Visibility {
-  if (value === 'narrator_only' || value === 'chronicle_participants') return value
+  if (value === 'narrator_only' || value === 'chronicle_participants' || value === 'selected_players') return value
   throw new BadRequestException({ code: 'INVALID_CHRONICLE_RESOURCE_VISIBILITY' })
+}
+function audienceIds(value: unknown): string[] | undefined {
+  if (value === undefined) return undefined
+  if (!Array.isArray(value) || value.length > 100) throw new BadRequestException({ code: 'INVALID_CHRONICLE_RESOURCE_AUDIENCE' })
+  const result = [...new Set(value)]
+  if (result.some((item) => typeof item !== 'string' || !/^[0-9a-f-]{36}$/i.test(item))) throw new BadRequestException({ code: 'INVALID_CHRONICLE_RESOURCE_AUDIENCE' })
+  return result as string[]
 }
 function id(value: unknown): string {
   if (typeof value !== 'string' || !/^[0-9a-f-]{36}$/i.test(value)) throw new BadRequestException({ code: 'INVALID_CHRONICLE_RESOURCE_ID' })
@@ -22,7 +29,7 @@ function id(value: unknown): string {
 function payload(value: unknown, partial = false) {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new BadRequestException({ code: 'INVALID_CHRONICLE_RESOURCE_REQUEST' })
   const input = value as Record<string, unknown>
-  const allowed = ['kind', 'name', 'summary', 'narratorNotes', 'visibility', 'metadata']
+  const allowed = ['kind', 'name', 'summary', 'narratorNotes', 'visibility', 'audienceUserIds', 'metadata']
   if (Object.keys(input).some((key) => !allowed.includes(key))) throw new BadRequestException({ code: 'INVALID_CHRONICLE_RESOURCE_REQUEST' })
   const output: Record<string, unknown> = {}
   if (!partial || input.kind !== undefined) output.kind = kind(input.kind)
@@ -37,8 +44,9 @@ function payload(value: unknown, partial = false) {
     }
   }
   if (!partial || input.visibility !== undefined) output.visibility = visibility(input.visibility ?? 'narrator_only')
+  if (input.audienceUserIds !== undefined) output.audienceUserIds = audienceIds(input.audienceUserIds)
   if (input.metadata !== undefined) output.metadata = input.metadata
-  return output as { kind?: Kind; name?: string; summary?: string | null; narratorNotes?: string | null; visibility?: Visibility; metadata?: unknown }
+  return output as { kind?: Kind; name?: string; summary?: string | null; narratorNotes?: string | null; visibility?: Visibility; audienceUserIds?: string[]; metadata?: unknown }
 }
 function response(resource: any, binding: any) {
   return {
@@ -48,7 +56,8 @@ function response(resource: any, binding: any) {
     name: resource.name,
     summary: resource.summary,
     narratorNotes: resource.narratorNotes,
-    visibility: binding?.visibility === 'chronicle_participants' ? 'chronicle_participants' : 'narrator_only',
+    visibility: binding?.visibility === 'chronicle_participants' ? 'chronicle_participants' : binding?.visibility === 'selected_players' ? 'selected_players' : 'narrator_only',
+    audienceUserIds: Array.isArray(binding?.audiences) ? binding.audiences.map((audience: any) => String(audience.userId)) : [],
     metadata: resource.metadata,
     locationId: resource.metadata && typeof resource.metadata === 'object' && typeof resource.metadata.locationId === 'string' ? resource.metadata.locationId : null,
     status: binding?.status === 'archived' || resource.status === 'archived' ? 'archived' : 'active',
@@ -82,8 +91,19 @@ export class ChronicleResourceController {
         status: 'active',
         bindings: { some: { chronicleId, status: { in: ['attached', 'archived'] } } },
       },
-      include: { bindings: { where: { chronicleId }, take: 1 } },
+      include: { bindings: { where: { chronicleId }, take: 1, include: { audiences: { select: { userId: true } } } } },
     })
+  }
+
+  private async validateAudience(chronicleId: string, ids: readonly string[]) {
+    if (!ids.length) throw new BadRequestException({ code: 'CHRONICLE_RESOURCE_AUDIENCE_REQUIRED', message: 'Selecciona al menos un jugador.' })
+    const rows = await this.db.chronicleParticipant.findMany({ where: { chronicleId, status: 'ACTIVE', role: 'PLAYER', userId: { in: [...ids] } }, select: { userId: true } })
+    if (rows.length !== ids.length) throw new BadRequestException({ code: 'CHRONICLE_RESOURCE_AUDIENCE_OUTSIDE_CHRONICLE' })
+  }
+
+  private async syncAudience(transaction: any, bindingId: string, visibilityValue: Visibility, ids: readonly string[]) {
+    await transaction.chronicleResourceAudience.deleteMany({ where: { bindingId } })
+    if (visibilityValue === 'selected_players') await transaction.chronicleResourceAudience.createMany({ data: ids.map((userId) => ({ bindingId, userId })) })
   }
 
   @Get()
@@ -99,7 +119,7 @@ export class ChronicleResourceController {
       orderBy: [{ name: 'asc' }, { id: 'asc' }],
       skip: offset,
       take: limit + 1,
-      include: { bindings: { where: { chronicleId }, take: 1 } },
+      include: { bindings: { where: { chronicleId }, take: 1, include: { audiences: { select: { userId: true } } } } },
     })
     return { items: rows.slice(0, limit).map((row: any) => response(row, row.bindings[0])), nextOffset: rows.length > limit ? offset + limit : null }
   }
@@ -108,12 +128,16 @@ export class ChronicleResourceController {
   async create(@Req() req: any, @Param('chronicleId') rawChronicleId: unknown, @Body() body: unknown) {
     const { chronicleId, ownerId } = await this.access(req, rawChronicleId)
     const data = payload(body)
+    const selectedAudience = data.audienceUserIds ?? []
+    if (data.visibility === 'selected_players') await this.validateAudience(chronicleId, selectedAudience)
     const result = await this.db.$transaction(async (transaction) => {
       const resource = await transaction.libraryResource.create({ data: { ownerId, kind: data.kind!, name: data.name!, summary: data.summary ?? null, narratorNotes: data.narratorNotes ?? null, metadata: data.metadata as any } })
       const binding = await transaction.chronicleResourceBinding.create({ data: { chronicleId, resourceId: resource.id, visibility: data.visibility ?? 'narrator_only' } })
+      await this.syncAudience(transaction, binding.id, data.visibility ?? 'narrator_only', selectedAudience)
       return { resource, binding }
     })
-    return response(result.resource, result.binding)
+    const linked = await this.linked(ownerId, chronicleId, result.resource.id)
+    return response(result.resource, linked?.bindings[0] ?? result.binding)
   }
 
   @Patch(':resourceId')
@@ -123,11 +147,20 @@ export class ChronicleResourceController {
     const data = payload(body, true)
     const current = await this.linked(ownerId, chronicleId, resourceId)
     if (!current) throw new NotFoundException({ code: 'CHRONICLE_RESOURCE_NOT_FOUND' })
+    const currentBinding = current.bindings[0]
+    const nextVisibility = data.visibility ?? (currentBinding?.visibility as Visibility ?? 'narrator_only')
+    const currentAudience = Array.isArray(currentBinding?.audiences) ? currentBinding.audiences.map((item: any) => String(item.userId)) : []
+    const nextAudience = data.audienceUserIds ?? currentAudience
+    if (nextVisibility === 'selected_players') await this.validateAudience(chronicleId, nextAudience)
     const globalData: any = { ...data }
     delete globalData.visibility
+    delete globalData.audienceUserIds
     const resource = await this.db.$transaction(async (transaction) => {
       const updated = Object.keys(globalData).length > 0 ? await transaction.libraryResource.update({ where: { id: resourceId }, data: globalData }) : current
-      if (data.visibility !== undefined) await transaction.chronicleResourceBinding.update({ where: { chronicleId_resourceId: { chronicleId, resourceId } }, data: { visibility: data.visibility, status: 'attached' } })
+      if (data.visibility !== undefined || data.audienceUserIds !== undefined) {
+        const binding = await transaction.chronicleResourceBinding.update({ where: { chronicleId_resourceId: { chronicleId, resourceId } }, data: { visibility: nextVisibility, status: 'attached' } })
+        await this.syncAudience(transaction, binding.id, nextVisibility, nextAudience)
+      }
       return updated
     })
     const updated = await this.linked(ownerId, chronicleId, resourceId)

@@ -131,10 +131,10 @@ function resourceKind(value: string): 'npc' | 'location' | 'document' | 'artifac
   return 'organization'
 }
 
-function resourceVisibility(value: string): 'narrator_only' | 'chronicle_participants' {
-  return value === 'chronicle_participants'
-    ? 'chronicle_participants'
-    : 'narrator_only'
+function resourceVisibility(value: string): 'narrator_only' | 'chronicle_participants' | 'selected_players' {
+  if (value === 'chronicle_participants') return 'chronicle_participants'
+  if (value === 'selected_players') return 'selected_players'
+  return 'narrator_only'
 }
 
 function sortResources(
@@ -242,7 +242,7 @@ export class PrismaChronicleSessionContextRepository
               status: true,
               bindings: {
                 where: { chronicleId },
-                select: { visibility: true },
+                select: { visibility: true, audiences: { select: { userId: true } } },
                 take: 1,
               },
             },
@@ -316,6 +316,7 @@ export class PrismaChronicleSessionContextRepository
             summary: resource.summary,
             status: resource.status === 'archived' ? 'archived' : 'active',
             visibility: resourceVisibility(resource.bindings[0]?.visibility ?? 'narrator_only'),
+            audienceUserIds: resource.bindings[0]?.audiences?.map((audience) => String(audience.userId)) ?? [],
           })),
         ),
     }
@@ -422,7 +423,7 @@ export class PrismaChronicleSessionContextRepository
               status: true,
               bindings: {
                 where: { chronicleId: data.chronicleId },
-                select: { visibility: true },
+                select: { visibility: true, audiences: { select: { userId: true } } },
                 take: 1,
               },
             },
@@ -603,6 +604,7 @@ export class PrismaChronicleSessionContextRepository
                 summary: resource.summary,
                 status: resource.status === 'archived' ? 'archived' : 'active',
                 visibility: resourceVisibility(resource.bindings[0]?.visibility ?? 'narrator_only'),
+            audienceUserIds: resource.bindings[0]?.audiences?.map((audience) => String(audience.userId)) ?? [],
               })),
             ),
         }

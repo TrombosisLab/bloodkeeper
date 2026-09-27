@@ -21,6 +21,7 @@ type ReferenceLookupOptions = {
   targetType: string
   targetId: string
   narrator: boolean
+  userId?: string
 }
 
 const resourceTargetTypes = new Set([
@@ -104,7 +105,7 @@ export async function findNoteReferenceTarget(
           some: {
             chronicleId,
             status: 'attached',
-            ...(narrator ? {} : { visibility: 'chronicle_participants' }),
+            ...(narrator ? {} : { OR: [{ visibility: 'chronicle_participants' }, ...(options.userId ? [{ visibility: 'selected_players', audiences: { some: { userId: options.userId } } }] : [])] }),
           },
         },
       },

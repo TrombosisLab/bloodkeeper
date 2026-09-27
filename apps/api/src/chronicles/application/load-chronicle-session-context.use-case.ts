@@ -66,7 +66,7 @@ export class LoadChronicleSessionContextUseCase {
     return {
       ...context,
       resources: (context.resources ?? []).filter(
-        (resource) => resource.visibility === 'chronicle_participants',
+        (resource) => resource.visibility === 'chronicle_participants' || (resource.visibility === 'selected_players' && resource.audienceUserIds.includes(actorUserId)),
       ),
     }
   }

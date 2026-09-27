@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+# Configura una publicación Cloudflare opcional sobre una instalación
+# BloodKeeper ya existente. El archivo .env de la aplicación es obligatorio
+# y nunca se crea ni se modifica aquí. La configuración del túnel se guarda
+# únicamente en .env.cloudflare.
+
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 COMPOSE_FILE="${BLOODKEEPER_COMPOSE_FILE:-$ROOT/compose.yaml}"
 ENV_FILE="${BLOODKEEPER_ENV_FILE:-$ROOT/.env}"
 CLOUDFLARE_ENV_FILE="${BLOODKEEPER_CLOUDFLARE_ENV_FILE:-$ROOT/.env.cloudflare}"
+CLOUDFLARE_COMPOSE_FILE="${BLOODKEEPER_CLOUDFLARE_COMPOSE_FILE:-$ROOT/compose.cloudflare.yaml}"
 PROJECT_NAME="${BLOODKEEPER_PROJECT_NAME:-}"
 CLOUDFLARED_IMAGE="${BLOODKEEPER_CLOUDFLARED_IMAGE:-cloudflare/cloudflared:latest}"
 
@@ -21,8 +27,28 @@ die() {
   exit 1
 }
 
+show_service_logs() {
+  local service="$1"
+  shift
+  local -a stack=("$@")
+
+  echo
+  echo "Últimos logs de $service:"
+  "${stack[@]}" logs --tail=100 "$service" 2>&1 || true
+}
+
+report_stack_failure() {
+  local -a stack=("$@")
+
+  echo
+  echo "Estado de los servicios:"
+  "${stack[@]}" ps -a 2>&1 || true
+  show_service_logs api "${stack[@]}"
+  show_service_logs web "${stack[@]}"
+}
+
 [ -f "$COMPOSE_FILE" ] || die "No existe $COMPOSE_FILE"
-[ -f "$ENV_FILE" ] || die "No existe $ENV_FILE"
+[ -f "$ENV_FILE" ] || die "No existe $ENV_FILE. Configura primero la instalación BloodKeeper."
 
 if docker info >/dev/null 2>&1; then
   DOCKER=(docker)
@@ -35,20 +61,36 @@ fi
 "${DOCKER[@]}" compose version >/dev/null 2>&1 \
   || die "Docker Compose no está disponible."
 
-running_web_container="$(
-  "${DOCKER[@]}" ps -q \
-    --filter 'label=com.docker.compose.service=web' \
-    | sed -n '1p'
-)"
+detect_project_name() {
+  local container working_dir detected
 
-if [ -z "$PROJECT_NAME" ] && [ -n "$running_web_container" ]; then
-  PROJECT_NAME="$(
-    "${DOCKER[@]}" inspect "$running_web_container" \
-      --format '{{index .Config.Labels "com.docker.compose.project"}}'
-  )"
-fi
+  [ -n "$PROJECT_NAME" ] && return
 
-PROJECT_NAME="${PROJECT_NAME:-$(basename "$ROOT")}"
+  while read -r container; do
+    [ -n "$container" ] || continue
+
+    working_dir="$("${DOCKER[@]}" inspect "$container" \
+      --format '{{index .Config.Labels "com.docker.compose.project.working_dir"}}' \
+      2>/dev/null || true)"
+
+    if [ "$working_dir" = "$ROOT" ]; then
+      detected="$("${DOCKER[@]}" inspect "$container" \
+        --format '{{index .Config.Labels "com.docker.compose.project"}}' \
+        2>/dev/null || true)"
+      if [ -n "$detected" ] && [ "$detected" != "<no value>" ]; then
+        PROJECT_NAME="$detected"
+        break
+      fi
+    fi
+  done < <(
+    "${DOCKER[@]}" ps -aq \
+      --filter 'label=com.docker.compose.service=web' 2>/dev/null || true
+  )
+
+  PROJECT_NAME="${PROJECT_NAME:-$(basename -- "$ROOT")}"
+}
+
+detect_project_name
 
 QUICK_CONTAINER="${PROJECT_NAME}-cloudflare-quick"
 QUICK_LOG="${TMPDIR:-/tmp}/bloodkeeper-cloudflare-quick-${PROJECT_NAME}.log"
@@ -56,15 +98,10 @@ NAMED_OVERRIDE_FILE="${TMPDIR:-/tmp}/bloodkeeper-cloudflare-named-${PROJECT_NAME
 
 COMPOSE=(
   "${DOCKER[@]}" compose
+  --project-directory "$ROOT"
   --env-file "$ENV_FILE"
   --project-name "$PROJECT_NAME"
   --file "$COMPOSE_FILE"
-)
-
-COMPOSE_CLOUDFLARE=(
-  "${COMPOSE[@]}"
-  --env-file "$CLOUDFLARE_ENV_FILE"
-  --file "$ROOT/compose.cloudflare.yaml"
 )
 
 prepare_cloudflared_image() {
@@ -72,8 +109,147 @@ prepare_cloudflared_image() {
     return
   fi
 
-  printf 'Descargando la imagen de Cloudflare...\n'
+  printf 'Descargando la imagen de Cloudflare: %s\n' "$CLOUDFLARED_IMAGE"
   "${DOCKER[@]}" pull "$CLOUDFLARED_IMAGE"
+}
+
+write_host_override() {
+  local file="$1"
+  local host="$2"
+
+  [[ "$host" =~ ^[A-Za-z0-9.-]+$ ]] \
+    || die "El hostname no es válido."
+
+  umask 077
+  printf '%s\n' \
+    'services:' \
+    '  web:' \
+    '    environment:' \
+    "      BLOODKEEPER_VITE_ALLOWED_HOSTS: \"$host\"" \
+    > "$file"
+}
+
+build_web_image() {
+  local -a stack=("$@")
+  local image
+
+  image="$("${stack[@]}" images -q web 2>/dev/null | sed -n '1p' || true)"
+
+  # Si existe una imagen antigua que no contiene el usuario configurado por
+  # apps/web/Dockerfile, la reconstruimos sin caché. Esto evita el fallo:
+  # "unable to find user node".
+  if [ -n "$image" ] && ! "${DOCKER[@]}" run --rm \
+      --entrypoint sh "$image" -c 'id node >/dev/null 2>&1'; then
+    echo "La imagen web existente no contiene el usuario node."
+    echo "Reconstruyendo Web sin caché..."
+    "${stack[@]}" build --pull --no-cache web
+  else
+    "${stack[@]}" build --pull web
+  fi
+}
+
+wait_for_healthy() {
+  local service="$1"
+  shift
+  local -a stack=("$@")
+  local container status
+
+  for _ in $(seq 1 90); do
+    container="$("${stack[@]}" ps -q "$service" 2>/dev/null | sed -n '1p' || true)"
+
+    if [ -n "$container" ]; then
+      status="$("${DOCKER[@]}" inspect "$container" \
+        --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
+        2>/dev/null || true)"
+
+      case "$status" in
+        healthy)
+          return 0
+          ;;
+        unhealthy|exited|dead)
+          show_service_logs "$service" "${stack[@]}"
+          return 1
+          ;;
+      esac
+    fi
+
+    sleep 1
+  done
+
+  show_service_logs "$service" "${stack[@]}"
+  return 1
+}
+
+start_web() {
+  local -a stack=("$@")
+
+  "${stack[@]}" config --quiet || return 1
+  build_web_image "${stack[@]}" || return 1
+
+  if ! "${stack[@]}" up -d --force-recreate web; then
+    report_stack_failure "${stack[@]}"
+    return 1
+  fi
+
+  if ! wait_for_healthy web "${stack[@]}"; then
+    report_stack_failure "${stack[@]}"
+    return 1
+  fi
+}
+
+wait_for_running() {
+  local service="$1"
+  shift
+  local -a stack=("$@")
+  local container status
+
+  for _ in $(seq 1 45); do
+    container="$("${stack[@]}" ps -q "$service" 2>/dev/null | sed -n '1p' || true)"
+
+    if [ -n "$container" ]; then
+      status="$("${DOCKER[@]}" inspect "$container" \
+        --format '{{.State.Status}}' 2>/dev/null || true)"
+
+      [ "$status" = "running" ] && {
+        printf '%s' "$container"
+        return 0
+      }
+
+      case "$status" in
+        exited|dead)
+          show_service_logs "$service" "${stack[@]}"
+          return 1
+          ;;
+      esac
+    fi
+
+    sleep 1
+  done
+
+  show_service_logs "$service" "${stack[@]}"
+  return 1
+}
+
+wait_for_tunnel_connection() {
+  local service="$1"
+  shift
+  local -a stack=("$@")
+  local container output
+
+  container="$(wait_for_running "$service" "${stack[@]}")" || return 1
+
+  for _ in $(seq 1 45); do
+    output="$("${DOCKER[@]}" logs "$container" 2>&1 || true)"
+    if grep -Eqi 'registered tunnel connection|connection.*registered' <<< "$output"; then
+      printf '%s' "$container"
+      return 0
+    fi
+    sleep 1
+  done
+
+  echo "Cloudflared está ejecutándose, pero no confirmó una conexión al túnel." >&2
+  "${DOCKER[@]}" logs --tail=100 "$container" >&2 || true
+  return 1
 }
 
 get_web_container() {
@@ -109,28 +285,17 @@ get_application_network() {
   printf '%s' "$network"
 }
 
-write_host_override() {
-  local file="$1"
-  local host="$2"
-
-  [[ "$host" =~ ^[A-Za-z0-9.-]+$ ]] \
-    || die "El hostname no es válido."
+write_cloudflare_env() {
+  local hostname="$1"
+  local token="$2"
+  local temp
 
   umask 077
-
-  printf '%s\n' \
-    'services:' \
-    '  web:' \
-    '    environment:' \
-    "      BLOODKEEPER_VITE_ALLOWED_HOSTS: $host" \
-    > "$file"
-}
-
-restore_web_without_public_host() {
-  local override_file="$1"
-
-  "${COMPOSE[@]}" up -d --force-recreate --no-deps web
-  rm -f "$override_file"
+  temp="$(mktemp "${CLOUDFLARE_ENV_FILE}.tmp.XXXXXX")"
+  printf 'BLOODKEEPER_PUBLIC_HOSTNAME=%s\n' "$hostname" > "$temp"
+  printf 'CLOUDFLARE_TUNNEL_TOKEN=%s\n' "$token" >> "$temp"
+  chmod 600 "$temp"
+  mv -f -- "$temp" "$CLOUDFLARE_ENV_FILE"
 }
 
 quick_container_is_running() {
@@ -154,8 +319,10 @@ cleanup_quick_tunnel() {
     QUICK_ACTIVE="false"
 
     if [ -n "$QUICK_OVERRIDE_FILE" ]; then
-      restore_web_without_public_host "$QUICK_OVERRIDE_FILE" \
-        || echo "ADVERTENCIA: no se pudo restaurar Web."
+      rm -f -- "$QUICK_OVERRIDE_FILE"
+      if ! start_web "${COMPOSE[@]}"; then
+        echo "ADVERTENCIA: no se pudo restaurar Web sin el hostname público." >&2
+      fi
       QUICK_OVERRIDE_FILE=""
     fi
   fi
@@ -164,6 +331,12 @@ cleanup_quick_tunnel() {
 trap cleanup_quick_tunnel EXIT INT TERM
 
 start_quick_tunnel() {
+  local -a quick_compose
+
+  if ! start_web "${COMPOSE[@]}"; then
+    die "La aplicación no alcanzó un estado saludable; no se inicia el túnel temporal."
+  fi
+
   QUICK_NETWORK="$(get_application_network)"
   prepare_cloudflared_image
   : > "$QUICK_LOG"
@@ -197,7 +370,6 @@ start_quick_tunnel() {
     || die "No se obtuvo la URL temporal. Revisa $QUICK_LOG"
 
   QUICK_OVERRIDE_FILE="${TMPDIR:-/tmp}/bloodkeeper-cloudflare-quick-${PROJECT_NAME}.compose.yaml"
-
   write_host_override "$QUICK_OVERRIDE_FILE" "${QUICK_URL#https://}"
 
   quick_compose=(
@@ -205,7 +377,9 @@ start_quick_tunnel() {
     --file "$QUICK_OVERRIDE_FILE"
   )
 
-  "${quick_compose[@]}" up -d --force-recreate --no-deps web
+  if ! start_web "${quick_compose[@]}"; then
+    die "No se pudo permitir el hostname temporal en Web."
+  fi
 
   echo
   echo "============================================================"
@@ -254,8 +428,11 @@ quick_menu() {
 }
 
 configure_named_tunnel() {
-  [ -f "$ROOT/compose.cloudflare.yaml" ] \
-    || die "No existe compose.cloudflare.yaml."
+  local hostname token
+  local -a named_compose
+
+  [ -f "$CLOUDFLARE_COMPOSE_FILE" ] \
+    || die "No existe $CLOUDFLARE_COMPOSE_FILE"
 
   echo
   echo "El túnel permanente requiere:"
@@ -264,8 +441,6 @@ configure_named_tunnel() {
   echo "  3. La ruta pública apuntando a http://web:5173."
   echo "  4. Una aplicación Access con los correos autorizados."
   echo
-
-  local hostname token
 
   read -r -p "Hostname público: " hostname
   [[ "$hostname" =~ ^[A-Za-z0-9.-]+$ ]] \
@@ -277,27 +452,36 @@ configure_named_tunnel() {
 
   [ -n "$token" ] || die "El token no puede estar vacío."
 
-  umask 077
-
-  printf 'BLOODKEEPER_PUBLIC_HOSTNAME=%s\n' "$hostname" \
-    > "$CLOUDFLARE_ENV_FILE"
-
-  printf 'CLOUDFLARE_TUNNEL_TOKEN=%s\n' "$token" \
-    >> "$CLOUDFLARE_ENV_FILE"
-
-  chmod 600 "$CLOUDFLARE_ENV_FILE"
+  write_cloudflare_env "$hostname" "$token"
   unset token
 
   write_host_override "$NAMED_OVERRIDE_FILE" "$hostname"
 
   named_compose=(
-    "${COMPOSE_CLOUDFLARE[@]}"
+    "${COMPOSE[@]}"
+    --env-file "$CLOUDFLARE_ENV_FILE"
+    --file "$CLOUDFLARE_COMPOSE_FILE"
     --file "$NAMED_OVERRIDE_FILE"
   )
 
   "${named_compose[@]}" config --quiet
   prepare_cloudflared_image
-  "${named_compose[@]}" up -d --force-recreate web cloudflared
+
+  # Primero se deja Web saludable con el hostname permitido. Solo después
+  # se inicia Cloudflared; así nunca se anuncia un túnel que apunta a una
+  # aplicación que todavía no está lista.
+  if ! start_web "${named_compose[@]}"; then
+    die "La aplicación no alcanzó un estado saludable; no se inicia Cloudflared."
+  fi
+
+  if ! "${named_compose[@]}" up -d --force-recreate cloudflared; then
+    report_stack_failure "${named_compose[@]}"
+    die "No se pudo iniciar Cloudflared."
+  fi
+
+  if ! wait_for_tunnel_connection cloudflared "${named_compose[@]}" >/dev/null; then
+    die "Cloudflared no confirmó la conexión con Cloudflare."
+  fi
 
   echo
   printf 'Cloudflare Tunnel activado para %s\n' "$hostname"
@@ -305,20 +489,27 @@ configure_named_tunnel() {
 }
 
 stop_named_tunnel() {
+  local -a named_compose
+
   echo
   echo "Deteniendo el túnel permanente..."
 
-  if [ -f "$CLOUDFLARE_ENV_FILE" ]; then
-    "${COMPOSE_CLOUDFLARE[@]}" stop cloudflared \
-      >/dev/null 2>&1 || true
+  if [ -f "$CLOUDFLARE_ENV_FILE" ] && [ -f "$CLOUDFLARE_COMPOSE_FILE" ]; then
+    named_compose=(
+      "${COMPOSE[@]}"
+      --env-file "$CLOUDFLARE_ENV_FILE"
+      --file "$CLOUDFLARE_COMPOSE_FILE"
+    )
 
-    "${COMPOSE_CLOUDFLARE[@]}" rm -f cloudflared \
-      >/dev/null 2>&1 || true
+    "${named_compose[@]}" stop cloudflared >/dev/null 2>&1 || true
+    "${named_compose[@]}" rm -f cloudflared >/dev/null 2>&1 || true
   fi
 
-  rm -f "$NAMED_OVERRIDE_FILE"
+  rm -f -- "$NAMED_OVERRIDE_FILE"
 
-  "${COMPOSE[@]}" up -d --force-recreate --no-deps web
+  if ! start_web "${COMPOSE[@]}"; then
+    die "No se pudo restaurar Web sin el hostname público."
+  fi
 
   echo "Túnel permanente detenido."
   printf 'Se conserva: %s\n' "$CLOUDFLARE_ENV_FILE"

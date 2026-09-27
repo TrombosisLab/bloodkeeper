@@ -706,7 +706,8 @@ function parseChronicleSessionContextResourceResponse(value: unknown) {
     typeof value.name !== 'string' ||
     !isStringOrNull(value.summary) ||
     !validContextResourceStatus(value.status) ||
-    !['narrator_only', 'chronicle_participants'].includes(String(value.visibility))
+    !['narrator_only', 'chronicle_participants', 'selected_players'].includes(String(value.visibility)) ||
+    !(value.audienceUserIds === undefined || Array.isArray(value.audienceUserIds))
   ) {
     return invalidResponse()
   }
@@ -716,7 +717,8 @@ function parseChronicleSessionContextResourceResponse(value: unknown) {
     name: value.name,
     summary: value.summary,
     status: value.status,
-    visibility: value.visibility as 'narrator_only' | 'chronicle_participants',
+    visibility: value.visibility as 'narrator_only' | 'chronicle_participants' | 'selected_players',
+    ...(Array.isArray(value.audienceUserIds) ? { audienceUserIds: value.audienceUserIds.filter((item): item is string => typeof item === 'string') } : {}),
   }
 }
 

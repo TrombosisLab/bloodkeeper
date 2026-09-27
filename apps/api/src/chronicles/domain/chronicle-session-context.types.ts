@@ -35,7 +35,8 @@ export interface ChronicleSessionContextResource {
   readonly name: string
   readonly summary: string | null
   readonly status: 'active' | 'archived'
-  readonly visibility: 'narrator_only' | 'chronicle_participants'
+  readonly visibility: 'narrator_only' | 'chronicle_participants' | 'selected_players'
+  readonly audienceUserIds: readonly string[]
 }
 
 export interface ChronicleSessionContext {

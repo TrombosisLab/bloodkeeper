@@ -85,7 +85,7 @@ export class ChronicleNotebookController {
         select: { id: true, name: true, category: true, description: true, parentLocationId: true },
       }),
       db.libraryResource.findMany({
-        where: { status: 'active', kind: { in: ['document', 'artifact', 'organization'] }, bindings: { some: { chronicleId, status: 'attached', ...(narrator ? {} : { visibility: 'chronicle_participants' }) } } },
+        where: { status: 'active', kind: { in: ['document', 'artifact', 'organization'] }, bindings: { some: { chronicleId, status: 'attached', ...(narrator ? {} : { OR: [{ visibility: 'chronicle_participants' }, { visibility: 'selected_players', audiences: { some: { userId } } }] }) } } },
         orderBy: { name: 'asc' },
         select: { id: true, kind: true, name: true, summary: true, metadata: true, bindings: { where: { chronicleId }, select: { visibility: true }, take: 1 } },
       }),
@@ -104,7 +104,7 @@ export class ChronicleNotebookController {
       kind: String(resource.kind).toUpperCase(),
       name: resource.name,
       summary: resource.summary,
-      visibility: resource.bindings[0]?.visibility === 'chronicle_participants' ? 'chronicle_participants' : 'narrator_only',
+      visibility: resource.bindings[0]?.visibility === 'chronicle_participants' ? 'chronicle_participants' : resource.bindings[0]?.visibility === 'selected_players' ? 'selected_players' : 'narrator_only',
       locationId: resource.metadata && typeof resource.metadata === 'object' && typeof resource.metadata.locationId === 'string' ? resource.metadata.locationId : null,
     }))
     const locationImageIds = new Set((await db.chronicleAssetImage.findMany({ where: { assetType: 'LOCATION', entityId: { in: locations.map((location: any) => location.id) } }, select: { entityId: true } })).map((row: any) => String(row.entityId)))
@@ -127,7 +127,7 @@ export class ChronicleNotebookController {
     const { db, narrator } = await this.access(chronicleId, userId)
     const targetType = rawTargetType.toUpperCase()
     if (!targetTypes.has(targetType) || !targetId) throw new BadRequestException({ code: 'INVALID_NOTE_REFERENCE' })
-    const row = await findNoteReferenceTarget(db, { chronicleId, targetType, targetId, narrator })
+    const row = await findNoteReferenceTarget(db, { chronicleId, targetType, targetId, narrator, userId })
     if (!row) throw new NotFoundException({ code: 'NOTE_REFERENCE_NOT_FOUND' })
     const imageType = previewImageType(targetType)
     const image = await db.chronicleAssetImage.findUnique({ where: { assetType_entityId: { assetType: imageType, entityId: targetId } }, select: { updatedAt: true } })
@@ -191,7 +191,7 @@ export class ChronicleNotebookController {
     await this.validateContextImageTarget(db, selectedContextImageTargetType, selectedContextImageTargetId, [...refs, ...contentReferences(content)])
     const audienceIds = audience(body?.audienceUserIds)
     if (noteVisibility === 'SELECTED_PLAYERS' && !audienceIds.length) throw new BadRequestException({ code: 'NOTE_AUDIENCE_REQUIRED', message: 'Selecciona al menos un jugador.' })
-    await this.validateRelations(db, chronicleId, [...refs, ...contentReferences(content)], audienceIds, narrator && noteVisibility === 'PRIVATE')
+    await this.validateRelations(db, chronicleId, [...refs, ...contentReferences(content)], audienceIds, narrator && noteVisibility === 'PRIVATE', userId)
     await this.validateContextLocation(db, chronicleId, selectedContextLocationId, [...refs, ...contextLocationReferences(content)])
     const row = await db.chronicleNote.create({ data: { chronicleId, sessionId, authorUserId: userId, contextLocationId: selectedContextLocationId, contextImageTargetType: selectedContextImageTargetType, contextImageTargetId: selectedContextImageTargetId, title, content, visibility: noteVisibility, pinned: body?.pinned === true, favorites: { create: body?.pinned === true ? [{ userId }] : [] }, tags: noteTags(body?.tags), references: { create: refs }, audiences: { create: noteVisibility === 'SELECTED_PLAYERS' ? audienceIds.map((id) => ({ userId: id })) : [] } }, include: { favorites: { where: { userId }, select: { userId: true } }, references: true, audiences: { select: { userId: true } }, author: { select: { id: true, displayName: true, username: true } }, session: { select: { id: true, title: true, sessionNumber: true } } } })
     return presentChronicleNote(row, narrator, userId)
@@ -221,9 +221,9 @@ export class ChronicleNotebookController {
     if (noteVisibility === 'SELECTED_PLAYERS' && (body?.visibility !== undefined || audienceIds !== null)) {
       const effectiveAudience = audienceIds ?? (await db.chronicleNoteAudience.findMany({ where: { noteId }, select: { userId: true } })).map((item: any) => item.userId)
       if (!effectiveAudience.length) throw new BadRequestException({ code: 'NOTE_AUDIENCE_REQUIRED', message: 'Selecciona al menos un jugador.' })
-      await this.validateRelations(db, chronicleId, [], effectiveAudience, narrator)
+      await this.validateRelations(db, chronicleId, [], effectiveAudience, narrator, userId)
     }
-    if (refs || audienceIds || body?.content !== undefined || body?.visibility !== undefined) await this.validateRelations(db, chronicleId, [...(refs ?? existingRefs), ...embeddedRefs], audienceIds ?? [], narrator && noteVisibility === 'PRIVATE')
+    if (refs || audienceIds || body?.content !== undefined || body?.visibility !== undefined) await this.validateRelations(db, chronicleId, [...(refs ?? existingRefs), ...embeddedRefs], audienceIds ?? [], narrator && noteVisibility === 'PRIVATE', userId)
     if (selectedContextLocationId && (body?.contextLocationId !== undefined || body?.content !== undefined || body?.references !== undefined)) await this.validateContextLocation(db, chronicleId, selectedContextLocationId, [...(refs ?? []), ...contextLocationReferences(contextContent), ...(((existing as any).references ?? []))])
     const row = await db.$transaction(async (tx: any) => {
       if (refs) await tx.chronicleNoteReference.deleteMany({ where: { noteId } })
@@ -259,9 +259,9 @@ export class ChronicleNotebookController {
     if (!location) throw new BadRequestException({ code: 'NOTE_CONTEXT_LOCATION_OUTSIDE_CHRONICLE' })
   }
 
-  private async validateRelations(db: any, chronicleId: string, refs: Array<{ targetType: string; targetId: string }>, audienceIds: string[], allowNarratorOnlyResources: boolean) {
+  private async validateRelations(db: any, chronicleId: string, refs: Array<{ targetType: string; targetId: string }>, audienceIds: string[], allowNarratorOnlyResources: boolean, userId: string) {
     for (const reference of refs) {
-      const row = await findNoteReferenceTarget(db, { chronicleId, targetType: reference.targetType, targetId: reference.targetId, narrator: allowNarratorOnlyResources })
+      const row = await findNoteReferenceTarget(db, { chronicleId, targetType: reference.targetType, targetId: reference.targetId, narrator: allowNarratorOnlyResources, userId })
       if (!row) throw new BadRequestException({ code: 'NOTE_REFERENCE_OUTSIDE_CHRONICLE', targetId: reference.targetId })
     }
     if (audienceIds.length > 0) {
