@@ -8,6 +8,10 @@ import type {
 } from 'react'
 
 import {
+  createPortal,
+} from 'react-dom'
+
+import {
   ViewStateStatus,
 } from '../../../components/ui/ViewStateStatus'
 
@@ -840,7 +844,41 @@ export function ChronicleEventPanel({
       'event-reorder:',
     ) ?? false
 
+  useEffect(() => {
+    if (!editingSelected) {
+      return
+    }
+
+    const previousBodyOverflow =
+      document.body.style.overflow
+
+    function closeWithEscape(
+      event: KeyboardEvent,
+    ) {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        cancelEdit()
+      }
+    }
+
+    document.body.style.overflow = 'hidden'
+    window.addEventListener(
+      'keydown',
+      closeWithEscape,
+    )
+
+    return () => {
+      document.body.style.overflow =
+        previousBodyOverflow
+      window.removeEventListener(
+        'keydown',
+        closeWithEscape,
+      )
+    }
+  }, [editingSelected])
+
   return (
+    <>
     <section
       className="chronicle-event-panel"
       aria-labelledby="chronicle-events-title"
@@ -1124,48 +1162,7 @@ export function ChronicleEventPanel({
                 </div>
               </div>
 
-              {editingSelected ? (
-                <form
-                  className="chronicle-event-panel__edit"
-                  onSubmit={(submitEvent) =>
-                    void updateEvent(
-                      submitEvent,
-                      selectedEvent.id,
-                    )
-                  }
-                >
-                  {formFields(
-                    editForm,
-                    updateEditField,
-                    `edit-${selectedEvent.id}`,
-                  )}
-
-                  <div className="chronicle-event-panel__actions">
-                    <button
-                      type="submit"
-                      disabled={
-                        operationId ===
-                        `event-update:${selectedEvent.id}`
-                      }
-                    >
-                      {operationId ===
-                      `event-update:${selectedEvent.id}`
-                        ? 'Guardando…'
-                        : 'Guardar cambios'}
-                    </button>
-
-                    <button
-                      type="button"
-                      className="chronicle-event-panel__compact-action"
-                      onClick={cancelEdit}
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <>
-                  <dl className="chronicle-event-panel__detail-grid">
+              <dl className="chronicle-event-panel__detail-grid">
                     <div>
                       <dt>Posición temporal</dt>
                       <dd>
@@ -1323,12 +1320,119 @@ export function ChronicleEventPanel({
                       </button>
                     </div>
                   ) : null}
-                </>
-              )}
             </>
           )}
         </div>
       </div>
     </section>
+    {editingSelected && selectedEvent !== null
+      ? createPortal(
+          <div
+            className="chronicle-event-panel__modal-backdrop"
+            role="presentation"
+            onMouseDown={(event) => {
+              if (
+                event.target === event.currentTarget &&
+                operationId !==
+                  `event-update:${selectedEvent.id}`
+              ) {
+                cancelEdit()
+              }
+            }}
+          >
+            <section
+              className="chronicle-event-panel__modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="chronicle-event-edit-title"
+              onMouseDown={(event) =>
+                event.stopPropagation()
+              }
+            >
+              <header className="chronicle-event-panel__modal-heading">
+                <div>
+                  <span>Editar Evento</span>
+                  <h2 id="chronicle-event-edit-title">
+                    {selectedEvent.title}
+                  </h2>
+                </div>
+
+                <div className="chronicle-event-panel__modal-heading-actions">
+                  <span className="chronicle-event-panel__state">
+                    {eventStatusLabels[selectedEvent.status]}
+                  </span>
+                  <button
+                    type="button"
+                    className="chronicle-event-panel__modal-close"
+                    aria-label="Cerrar editor"
+                    disabled={
+                      operationId ===
+                      `event-update:${selectedEvent.id}`
+                    }
+                    onClick={cancelEdit}
+                  >
+                    ×
+                  </button>
+                </div>
+              </header>
+
+              {operationError !== null ? (
+                <p
+                  className="chronicle-event-panel__error"
+                  role="alert"
+                  aria-live="assertive"
+                >
+                  {operationError}
+                </p>
+              ) : null}
+
+              <form
+                className="chronicle-event-panel__edit"
+                onSubmit={(submitEvent) =>
+                  void updateEvent(
+                    submitEvent,
+                    selectedEvent.id,
+                  )
+                }
+              >
+                {formFields(
+                  editForm,
+                  updateEditField,
+                  `edit-${selectedEvent.id}`,
+                )}
+
+                <div className="chronicle-event-panel__actions">
+                  <button
+                    type="submit"
+                    disabled={
+                      operationId ===
+                      `event-update:${selectedEvent.id}`
+                    }
+                  >
+                    {operationId ===
+                    `event-update:${selectedEvent.id}`
+                      ? 'Guardando…'
+                      : 'Guardar cambios'}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="chronicle-event-panel__compact-action"
+                    onClick={cancelEdit}
+                    disabled={
+                      operationId ===
+                      `event-update:${selectedEvent.id}`
+                    }
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </section>
+          </div>,
+          document.body,
+        )
+      : null}
+    </>
   )
 }
