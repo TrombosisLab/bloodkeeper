@@ -601,7 +601,7 @@ export function ChronicleSessionPanel({
   async function uploadSessionImage(file: File) {
     if (!selectedSession) return
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { setSessionImageMessage('Usa PNG, JPG o WEBP.'); return }
-    if (file.size > 2 * 1024 * 1024) { setSessionImageMessage('La imagen no puede superar 2 MB.'); return }
+    if (file.size > 5 * 1024 * 1024) { setSessionImageMessage('La imagen no puede superar 5 MB.'); return }
     setSessionImageBusy(true)
     setSessionImageMessage('Guardando portada…')
     try {

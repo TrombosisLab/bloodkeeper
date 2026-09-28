@@ -9,7 +9,7 @@ const storage = fs.readFileSync(new URL('../src/administration/storage-usage.con
 test('SPEC-067 persiste un único retrato limitado por personaje', () => {
   assert.match(schema, /model CharacterPortrait/)
   assert.match(schema, /data\s+Bytes/)
-  assert.match(portrait, /MAX_PORTRAIT_BYTES = 2 \* 1024 \* 1024/)
+  assert.match(portrait, /MAX_PORTRAIT_BYTES = 5 \* 1024 \* 1024/)
   assert.match(portrait, /image\/jpeg/)
   assert.match(portrait, /image\/png/)
   assert.match(portrait, /image\/webp/)

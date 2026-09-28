@@ -6,7 +6,7 @@ import { CHRONICLE_PARTICIPANT_REPOSITORY } from '../application/chronicle-parti
 import type { ChronicleParticipantRepository } from '../application/chronicle-participant.repository'
 import { parseChronicleIdParam, parseChronicleNarratorId } from './chronicle.dto'
 
-const MAX_IMAGE_BYTES = 2 * 1024 * 1024
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024
 type AssetType = 'NPC' | 'LOCATION' | 'RESOURCE' | 'SESSION' | 'MAP'
 type ImageRequest = AsyncIterable<Buffer> & { user?: { id?: unknown; roles?: readonly unknown[] }; headers: { readonly ['content-type']?: string } }
 

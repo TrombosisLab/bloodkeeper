@@ -31,7 +31,7 @@ export function CharacterPortrait({
     if (file === undefined || characterId === undefined) return
 
     if (!ACCEPTED_TYPES.includes(file.type) || file.size > MAX_PORTRAIT_BYTES) {
-      setMessage('Usa JPEG, PNG o WebP de hasta 2 MB.')
+      setMessage('Usa JPEG, PNG o WebP de hasta 5 MB.')
       return
     }
 
@@ -111,7 +111,7 @@ export function CharacterPortrait({
         </div>
       ) : null}
 
-      <small>JPEG, PNG o WebP · máximo 2 MB</small>
+      <small>JPEG, PNG o WebP · máximo 5 MB</small>
       {message ? <p role="status">{message}</p> : null}
     </aside>
   )

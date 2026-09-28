@@ -20,7 +20,7 @@ import {
   parseChronicleNarratorId,
 } from './chronicle.dto'
 
-const MAX_COVER_BYTES = 3 * 1024 * 1024
+const MAX_COVER_BYTES = 5 * 1024 * 1024
 
 interface CoverRequest extends AsyncIterable<Buffer> {
   readonly user?: { readonly id?: unknown }

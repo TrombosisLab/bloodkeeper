@@ -19,7 +19,7 @@ import {
   parseCharacterDraftOwnerId,
 } from './character-draft.dto'
 
-const MAX_PORTRAIT_BYTES = 2 * 1024 * 1024
+const MAX_PORTRAIT_BYTES = 5 * 1024 * 1024
 
 interface PortraitRequest extends AsyncIterable<Buffer> {
   readonly user?: { readonly id?: unknown }

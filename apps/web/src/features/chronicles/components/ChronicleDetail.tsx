@@ -956,8 +956,8 @@ export function ChronicleDetail({
 
   const uploadCover = async (file: File | null) => {
     if (file === null) return
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 3 * 1024 * 1024) {
-      setCoverMessage('Usa JPEG, PNG o WebP de hasta 3 MB.')
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      setCoverMessage('Usa JPEG, PNG o WebP de hasta 5 MB.')
       return
     }
     setCoverBusy(true)

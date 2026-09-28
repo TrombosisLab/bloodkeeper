@@ -252,7 +252,7 @@ export function ChronicleSpacePrototype() {
   async function uploadDetailImage(assetType: string, assetId: string, file: File) {
     if (!chronicleId) return
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { setDetailImageMessage('Usa PNG, JPG o WEBP.'); return }
-    if (file.size > 2 * 1024 * 1024) { setDetailImageMessage('La imagen no puede superar 2 MB.'); return }
+    if (file.size > 5 * 1024 * 1024) { setDetailImageMessage('La imagen no puede superar 5 MB.'); return }
     setDetailImageBusy(true)
     setDetailImageMessage('Guardando imagen…')
     try {
