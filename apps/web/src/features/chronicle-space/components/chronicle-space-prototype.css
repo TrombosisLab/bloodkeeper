@@ -518,3 +518,28 @@ body main.application-content--chronicle-space { padding: 0; }
 .space-panel:has(.board-filter-bar):has(.board-visibility-panel)>.board-visibility-bar,.space-panel:has(.board-filter-bar):has(.board-preset-panel)>.board-visibility-bar,.space-panel:has(.board-filter-bar):has(.board-visibility-panel)>.space-board-navigation,.space-panel:has(.board-filter-bar):has(.board-preset-panel)>.space-board-navigation{position:static;width:auto;max-width:none;margin:0 0 8px}
 @media(max-width:1100px){.space-panel:has(.board-filter-bar)>.board-visibility-bar,.space-panel:has(.board-filter-bar)>.space-board-navigation{position:static;width:auto;max-width:none;margin:0 0 8px}.space-panel:has(.board-filter-bar)>.board-visibility-bar{align-items:flex-start}}
 @media(max-width:760px){.space-panel:has(.board-filter-bar)>.board-visibility-bar,.space-panel:has(.board-filter-bar)>.space-board-navigation{margin-bottom:8px}}
+
+
+/* CHRONICLE_SPACE_BOARD_CONNECTION_CENTER_ARROW_COLOR_V1 — trazo de centro a centro bajo las tarjetas y flecha configurable sobre el borde de destino. */
+.space-board .board-connections-layer{z-index:1;pointer-events:none}
+.space-board .board-arrows-layer{position:absolute;z-index:3;inset:0;width:100%;height:100%;pointer-events:none}
+.space-board .board-card{z-index:2}
+.space-board .board-card.is-dragging{z-index:7}
+.space-board .board-link--arrow{vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-width:3px;opacity:1;pointer-events:none}
+.connection-arrow-option,.connection-color-option{display:grid;align-content:center;gap:5px;color:#c9afb0;font-size:10px;font-weight:800}
+.connection-arrow-option>span:last-child{display:flex;align-items:center;gap:6px;white-space:nowrap;font-weight:650;letter-spacing:normal;text-transform:none}
+.connection-arrow-option input{accent-color:#d75c70}
+.connection-color-option input{width:48px;height:30px;padding:2px;border:1px solid rgba(224,155,155,.35);border-radius:5px;background:#120e13;cursor:pointer}
+.connection-composer--editor{grid-template-columns:minmax(220px,1.2fr) minmax(120px,.65fr) minmax(170px,1fr) minmax(190px,1fr) minmax(145px,.8fr) 64px auto auto}
+@media(max-width:900px){.connection-composer--editor{grid-template-columns:1fr 1fr}.connection-arrow-option,.connection-color-option{min-height:44px}}
+@media(max-width:760px){.connection-composer--editor{grid-template-columns:1fr}.connection-color-option input{width:100%;height:38px}.space-board .board-arrows-layer{display:none}}
+
+
+/* CHRONICLE_SPACE_BOARD_CONNECTION_SCOPES_V1 — teorías privadas por jugador y relaciones oficiales compartidas. */
+.board-scope-note{margin:0 0 9px;padding:8px 11px;border:1px solid rgba(220,181,172,.22);border-radius:6px;background:rgba(20,13,18,.66);color:#cdb7ae;font-size:10px;line-height:1.45}
+.board-scope-note--personal{border-color:rgba(116,178,207,.36);box-shadow:inset 3px 0 #74b2cf}.board-scope-note--shared{border-color:rgba(242,163,95,.4);box-shadow:inset 3px 0 #f2a35f}
+.space-board .board-link--scope-personal{opacity:.82;filter:drop-shadow(0 0 2px rgba(116,178,207,.42))}.space-board .board-link--scope-shared{opacity:1}
+.connection-scope-label{display:grid;align-content:center;gap:3px;min-height:44px;margin:0;padding:7px 9px;border:1px solid rgba(220,181,172,.24);border-radius:5px;background:rgba(18,14,19,.7);color:#cdb7ae;font-size:9px;line-height:1.3}.connection-scope-label b{font-size:10px;letter-spacing:.08em;text-transform:uppercase}.connection-scope-label--personal{border-color:rgba(116,178,207,.44)}.connection-scope-label--personal b{color:#8ac7df}.connection-scope-label--shared{border-color:rgba(242,163,95,.5)}.connection-scope-label--shared b{color:#f2a35f}
+.connection-scope-badge{display:inline-block;margin-right:7px;padding:2px 5px;border:1px solid currentColor;border-radius:999px;font-family:Inter,system-ui,sans-serif;font-size:8px;font-style:normal;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.connection-scope-badge--personal{color:#8ac7df}.connection-scope-badge--shared{color:#f2a35f}
+.connection-readonly{padding:5px 8px;color:#9e8f8a;font-size:9px;font-weight:800;text-transform:uppercase}.board-card__connect:disabled,.board-focus-actions button:disabled,.board-mobile-actions button:disabled{cursor:not-allowed;opacity:.4}
+@media(max-width:900px){.connection-scope-label{min-height:52px}}

@@ -3,11 +3,11 @@ import { DatabaseService } from '../../database/database.service'
 import { Observable } from 'rxjs'
 import { publishChronicleSpaceBoard, subscribeChronicleSpaceBoard } from './chronicle-space-board.events'
 
-type RequestWithUser = { user?: { id?: unknown } }
+type RequestWithUser = { user?: { id?: unknown; roles?: readonly unknown[] } }
 type Position = { readonly x: number; readonly y: number }
 // CHRONICLE_SPACE_BOARD_CONNECTION_TYPES_V1
 type ConnectionType = 'VISUAL' | 'KNOWN' | 'SUSPICION'
-type Connection = { readonly id: string; readonly fromId: string; readonly toId: string; readonly label: string; readonly type: ConnectionType }
+type Connection = { readonly id: string; readonly fromId: string; readonly toId: string; readonly label: string; readonly type: ConnectionType; readonly arrow: boolean; readonly color: string }
 
 function actor(request: RequestWithUser): string {
   if (typeof request.user?.id !== 'string' || request.user.id.length === 0) throw new UnauthorizedException({ code: 'AUTHENTICATION_REQUIRED' })
@@ -45,13 +45,26 @@ function connectionType(value: unknown): ConnectionType {
   return value
 }
 
+function connectionArrow(value: unknown, type: ConnectionType): boolean {
+  if (value === undefined || value === null) return type !== 'VISUAL'
+  if (typeof value !== 'boolean') throw new BadRequestException({ code: 'INVALID_CHRONICLE_SPACE_BOARD_CONNECTION_ARROW' })
+  return value
+}
+
+function connectionColor(value: unknown): string {
+  if (value === undefined || value === null || value === '') return ''
+  if (typeof value !== 'string' || !/^#[0-9a-f]{6}$/i.test(value)) throw new BadRequestException({ code: 'INVALID_CHRONICLE_SPACE_BOARD_CONNECTION_COLOR' })
+  return value.toLowerCase()
+}
+
 function connections(value: unknown): Connection[] {
   if (value === undefined || value === null) return []
   if (!Array.isArray(value) || value.length > 200) throw new BadRequestException({ code: 'INVALID_CHRONICLE_SPACE_BOARD' })
   const result: Connection[] = []
   for (const raw of value) {
     if (!record(raw) || typeof raw.id !== 'string' || typeof raw.fromId !== 'string' || typeof raw.toId !== 'string' || typeof raw.label !== 'string' || (raw.type !== undefined && raw.type !== 'VISUAL' && raw.type !== 'KNOWN' && raw.type !== 'SUSPICION') || raw.id.length > 180 || raw.fromId.length > 180 || raw.toId.length > 180 || raw.fromId === raw.toId || raw.label.length > 160) throw new BadRequestException({ code: 'INVALID_CHRONICLE_SPACE_BOARD' })
-    result.push({ id: raw.id, fromId: raw.fromId, toId: raw.toId, label: raw.label.trim(), type: connectionType(raw.type) })
+    const type = connectionType(raw.type)
+    result.push({ id: raw.id, fromId: raw.fromId, toId: raw.toId, label: raw.label.trim(), type, arrow: connectionArrow(raw.arrow, type), color: connectionColor(raw.color) })
   }
   return result
 }
@@ -64,12 +77,15 @@ function sameBoardState(left: unknown, right: unknown): boolean {
 export class ChronicleSpaceBoardController {
   constructor(private readonly database: DatabaseService) {}
 
-  private async access(chronicleId: string, userId: string) {
+  private async access(chronicleId: string, request: RequestWithUser) {
+    const userId = actor(request)
     const db = this.database as any
-    const chronicle = await db.chronicle.findUnique({ where: { id: chronicleId }, select: { id: true, narratorId: true, participants: { where: { userId, status: 'ACTIVE' }, select: { userId: true } } } })
+    const chronicle = await db.chronicle.findUnique({ where: { id: chronicleId }, select: { id: true, narratorId: true, participants: { where: { userId, status: 'ACTIVE' }, select: { userId: true, role: true } } } })
     if (!chronicle) throw new ForbiddenException({ code: 'CHRONICLE_NOT_FOUND' })
     if (chronicle.narratorId !== userId && chronicle.participants.length === 0) throw new ForbiddenException({ code: 'CHRONICLE_SPACE_BOARD_PERMISSION_DENIED' })
-    return db
+    const roles = Array.isArray(request.user?.roles) ? request.user.roles : []
+    const canManage = roles.includes('admin') || roles.includes('narrator') || chronicle.narratorId === userId || chronicle.participants.some((participant: any) => participant.role === 'narrator')
+    return { db, canManage }
   }
 
   private present(row: any, chronicleId: string) {
@@ -83,14 +99,14 @@ export class ChronicleSpaceBoardController {
 
   @Get()
   async get(@Req() request: RequestWithUser, @Param('chronicleId') chronicleId: string) {
-    const db = await this.access(chronicleId, actor(request))
+    const { db } = await this.access(chronicleId, request)
     const row = await db.chronicleSpaceBoard.findUnique({ where: { chronicleId } })
     return this.present(row, chronicleId)
   }
 
   @Sse('events')
   async events(@Req() request: RequestWithUser, @Param('chronicleId') chronicleId: string): Promise<Observable<MessageEvent>> {
-    const db = await this.access(chronicleId, actor(request))
+    const { db } = await this.access(chronicleId, request)
     const current = await db.chronicleSpaceBoard.findUnique({ where: { chronicleId } })
     return new Observable<MessageEvent>((subscriber) => {
       subscriber.next({ data: this.present(current, chronicleId) })
@@ -100,7 +116,8 @@ export class ChronicleSpaceBoardController {
 
   @Patch()
   async replace(@Req() request: RequestWithUser, @Param('chronicleId') chronicleId: string, @Body() body: unknown) {
-    const db = await this.access(chronicleId, actor(request))
+    const { db, canManage } = await this.access(chronicleId, request)
+    if (!canManage) throw new ForbiddenException({ code: 'CHRONICLE_SPACE_BOARD_SHARED_WRITE_DENIED' })
     if (!record(body)) throw new BadRequestException({ code: 'INVALID_CHRONICLE_SPACE_BOARD' })
     const expected = expectedRevision(body.revision)
     const next = { positions: positions(body.positions), connections: connections(body.connections) }

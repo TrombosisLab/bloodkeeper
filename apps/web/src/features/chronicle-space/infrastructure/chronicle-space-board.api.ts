@@ -1,6 +1,6 @@
 export type ChronicleSpaceBoardPosition = { readonly x: number; readonly y: number }
 // CHRONICLE_SPACE_BOARD_CONNECTION_TYPES_V1
-export type ChronicleSpaceBoardConnection = { readonly id: string; readonly fromId: string; readonly toId: string; readonly label: string; readonly type: 'VISUAL' | 'KNOWN' | 'SUSPICION' }
+export type ChronicleSpaceBoardConnection = { readonly id: string; readonly fromId: string; readonly toId: string; readonly label: string; readonly type: 'VISUAL' | 'KNOWN' | 'SUSPICION'; readonly arrow: boolean; readonly color: string }
 export type ChronicleSpaceBoardSnapshot = { readonly chronicleId: string; readonly positions: Readonly<Record<string, ChronicleSpaceBoardPosition>>; readonly connections: readonly ChronicleSpaceBoardConnection[]; readonly revision: number; readonly updatedAt: string | null }
 
 export class ChronicleSpaceBoardConflictError extends Error {

@@ -48,7 +48,9 @@ type BoardPreset = {
 
 type BoardConnectionType = 'VISUAL' | 'KNOWN' | 'SUSPICION'
 // CHRONICLE_SPACE_BOARD_CONNECTION_TYPES_V1
-type BoardConnection = { readonly id: string; readonly fromId: string; readonly toId: string; readonly label: string; readonly type: BoardConnectionType }
+type BoardConnection = { readonly id: string; readonly fromId: string; readonly toId: string; readonly label: string; readonly type: BoardConnectionType; readonly arrow: boolean; readonly color: string }
+type BoardConnectionScope = 'PERSONAL' | 'SHARED'
+type ScopedBoardConnection = BoardConnection & { readonly scope: BoardConnectionScope }
 const gateway = createChronicleGateway()
 function readChronicleSpaceSection(): Section {
   if (typeof window === 'undefined') return 'BOARD'
@@ -64,6 +66,21 @@ function rememberChronicleSpaceSection(section: Section) {
 
 const chronicleSpaceSelectionKey = 'chronicleId'
 const GENERAL_BOARD_SESSION_FILTER = '__general__'
+const BOARD_POSITION_HEIGHT = 760
+const BOARD_CONNECTION_COLORS: Record<BoardConnectionType, string> = { VISUAL: '#aab4c2', KNOWN: '#f2a35f', SUSPICION: '#d77b9a' }
+const boardConnectionColor = (type: BoardConnectionType) => BOARD_CONNECTION_COLORS[type]
+const boardConnectionKey = (connection: ScopedBoardConnection) => connection.scope + ':' + connection.id
+function readPersonalBoardConnections(value: unknown): BoardConnection[] {
+  if (!Array.isArray(value)) return []
+  return value.slice(0, 200).flatMap((raw) => {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return []
+    const item = raw as Record<string, unknown>
+    if (typeof item.id !== 'string' || typeof item.fromId !== 'string' || typeof item.toId !== 'string' || item.fromId === item.toId) return []
+    const type: BoardConnectionType = item.type === 'KNOWN' || item.type === 'SUSPICION' ? item.type : 'VISUAL'
+    const color = typeof item.color === 'string' && /^#[0-9a-f]{6}$/i.test(item.color) ? item.color.toLowerCase() : boardConnectionColor(type)
+    return [{ id: item.id, fromId: item.fromId, toId: item.toId, label: typeof item.label === 'string' ? item.label.slice(0, 160).trim() : '', type, arrow: typeof item.arrow === 'boolean' ? item.arrow : type !== 'VISUAL', color }]
+  })
+}
 function rememberChronicleSpaceSelection(id: string) {
   if (typeof window === 'undefined' || !id) return
   const url = new URL(window.location.href)
@@ -189,13 +206,14 @@ export function ChronicleSpacePrototype() {
   const [draggingBoardId, setDraggingBoardId] = useState<string | null>(null)
   // CHRONICLE_SPACE_BOARD_SMOOTH_DRAG_CONNECTIONS_V1 — conserva el arrastre en píxeles aunque cambie la altura.
   const boardDragSnapshot = useRef<BoardDragSnapshot | null>(null)
-  // CHRONICLE_SPACE_BOARD_STABLE_AUTO_LAYOUT_V1 — evita que una reparación se repita en bucle.
   const [boardHeightFloor, setBoardHeightFloor] = useState(0)
-  const stableLayoutSignature = useRef('')
   const [connectionSourceId, setConnectionSourceId] = useState<string | null>(null)
   const [pendingConnection, setPendingConnection] = useState<{ readonly fromId: string; readonly toId: string } | null>(null)
   const [connectionLabel, setConnectionLabel] = useState('')
   const [pendingConnectionType, setPendingConnectionType] = useState<BoardConnectionType>('VISUAL')
+  const [pendingConnectionArrow, setPendingConnectionArrow] = useState(true)
+  const [pendingConnectionColor, setPendingConnectionColor] = useState(boardConnectionColor('VISUAL'))
+  const [pendingConnectionScope, setPendingConnectionScope] = useState<BoardConnectionScope>('PERSONAL')
   // CHRONICLE_SPACE_BOARD_CONNECTION_EDITOR_V1 — una relación existente puede editarse sin recrearla.
   const [editingConnectionId, setEditingConnectionId] = useState<string | null>(null)
   const [connectionEditorMessage, setConnectionEditorMessage] = useState('')
@@ -345,6 +363,7 @@ export function ChronicleSpacePrototype() {
   const [boardViewMode, setBoardViewMode] = useState<'PERSONAL' | 'ALL'>('PERSONAL')
   // CHRONICLE_SPACE_BOARD_PERSONAL_LAYOUT_V1
   const [personalBoardPositions, setPersonalBoardPositions] = useState<Record<string, BoardPosition>>({})
+  const [personalBoardConnections, setPersonalBoardConnections] = useState<readonly BoardConnection[]>([])
   const [hiddenBoardCardIds, setHiddenBoardCardIds] = useState<ReadonlySet<string>>(new Set())
   const [boardVisibilityHydratedFor, setBoardVisibilityHydratedFor] = useState<string | null>(null)
   const skipNextBoardSaveRef = useRef(false)
@@ -440,6 +459,8 @@ export function ChronicleSpacePrototype() {
     setFocusedBoardCardId(null)
     setConnectionLabel('')
     setPendingConnectionType('VISUAL')
+    setPendingConnectionArrow(true)
+    setPendingConnectionColor(boardConnectionColor('VISUAL'))
     setBoardHydratedFor(null)
     if (!chronicleId) { skipNextBoardSaveRef.current = true; boardRevisionRef.current = 0; boardDirtyRef.current = false; setBoardPositions({}); setBoardConnections([]); setBoardRevision(0); setBoardUpdateAvailable(false); return }
     void chronicleSpaceBoardApi.get(chronicleId).then((saved) => {
@@ -502,6 +523,7 @@ export function ChronicleSpacePrototype() {
       const positions = state.personalPositions
       setHiddenBoardCardIds(new Set(Array.isArray(hidden) ? hidden.filter((item): item is string => typeof item === 'string') : []))
       setPersonalBoardPositions(positions && typeof positions === 'object' && !Array.isArray(positions) ? positions as Record<string, BoardPosition> : {})
+      setPersonalBoardConnections(readPersonalBoardConnections(state.personalConnections))
       setBoardSelectionQuery(typeof state.selectionQuery === 'string' ? state.selectionQuery : '')
       setBoardSelectionKind(state.selectionKind === 'PNJ' || state.selectionKind === 'LUGAR' || state.selectionKind === 'NOTA' ? state.selectionKind : 'ALL')
       setBoardSelectionStatus(state.selectionStatus === 'VISIBLE' || state.selectionStatus === 'HIDDEN' ? state.selectionStatus : 'ALL')
@@ -540,10 +562,10 @@ export function ChronicleSpacePrototype() {
   useEffect(() => {
     if (!chronicleId || boardVisibilityHydratedFor !== chronicleId || boardPresetHydratedFor !== chronicleId) return
     const timer = window.setTimeout(() => {
-      void chronicleSpaceBoardPersonalApi.replace(chronicleId, { hiddenCardIds: [...hiddenBoardCardIds], personalPositions: personalBoardPositions, selectionQuery: boardSelectionQuery, selectionKind: boardSelectionKind, selectionStatus: boardSelectionStatus, selectionAuthor: boardSelectionAuthor, selectionSession: boardSelectionSession, viewMode: boardViewMode, boardFilter, quickQuery: boardQuickQuery, presets: boardPresets }).catch((cause) => setError(cause instanceof Error ? cause.message : 'No se pudo guardar tu vista personal.'))
+      void chronicleSpaceBoardPersonalApi.replace(chronicleId, { hiddenCardIds: [...hiddenBoardCardIds], personalPositions: personalBoardPositions, personalConnections: personalBoardConnections, selectionQuery: boardSelectionQuery, selectionKind: boardSelectionKind, selectionStatus: boardSelectionStatus, selectionAuthor: boardSelectionAuthor, selectionSession: boardSelectionSession, viewMode: boardViewMode, boardFilter, quickQuery: boardQuickQuery, presets: boardPresets }).catch((cause) => setError(cause instanceof Error ? cause.message : 'No se pudo guardar tu vista personal.'))
     }, 250)
     return () => window.clearTimeout(timer)
-  }, [boardFilter, boardPresetHydratedFor, boardPresets, boardQuickQuery, boardSelectionAuthor, boardSelectionKind, boardSelectionQuery, boardSelectionSession, boardSelectionStatus, boardViewMode, boardVisibilityHydratedFor, chronicleId, hiddenBoardCardIds, personalBoardPositions])
+  }, [boardFilter, boardPresetHydratedFor, boardPresets, boardQuickQuery, boardSelectionAuthor, boardSelectionKind, boardSelectionQuery, boardSelectionSession, boardSelectionStatus, boardViewMode, boardVisibilityHydratedFor, chronicleId, hiddenBoardCardIds, personalBoardConnections, personalBoardPositions])
 
 
 
@@ -589,6 +611,8 @@ export function ChronicleSpacePrototype() {
   }, [context, noteContent])
 
   const chronicle = useMemo(() => chronicles.find((item) => item.id === chronicleId), [chronicles, chronicleId])
+  const canManageSharedBoard = authenticatedUser.roles.includes('admin') || authenticatedUser.roles.includes('narrator') || chronicle?.narratorId === authenticatedUser.id
+  const canCreateBoardConnection = boardViewMode === 'PERSONAL' || canManageSharedBoard
   const activeChronicles = useMemo(() => chronicles.filter((item) => item.status !== 'archived'), [chronicles])
   const archivedChronicles = useMemo(() => chronicles.filter((item) => item.status === 'archived'), [chronicles])
   const cards = useMemo<readonly Card[]>(() => { const people = (context?.npcs || []).map((item) => ({ id: 'npc-' + item.id, kind: 'PNJ' as const, title: item.name, meta: item.category || item.narrativeRole || 'Persona', description: item.description || 'Sin descripción disponible.', targetType: 'NPC', targetId: item.id })); const places = (context?.locations || []).map((item) => ({ id: 'loc-' + item.id, kind: 'LUGAR' as const, title: item.name, meta: item.category || 'Lugar', description: item.description || 'Sin descripción disponible.', targetType: 'LOCATION', targetId: item.id })); const annotations = notes.map((item) => ({ id: 'note-' + item.id, kind: 'NOTA' as const, title: item.title, meta: item.visibility === 'PRIVATE' ? 'Privada' : 'Compartida', author: item.author.displayName || item.author.username, description: item.content || 'Anotación vacía.', sessionId: item.sessionId })); return [...people, ...places, ...annotations] }, [context, notes])
@@ -632,31 +656,30 @@ export function ChronicleSpacePrototype() {
     const searched = query ? filtered.filter((card) => (card.title + ' ' + card.meta + ' ' + card.description).toLocaleLowerCase().includes(query)) : filtered
     return boardViewMode === 'ALL' ? searched : searched.filter((card) => !hiddenBoardCardIds.has(card.id))
   }, [boardFilter, boardQuickQuery, boardViewMode, cards, hiddenBoardCardIds])
-  // CHRONICLE_SPACE_BOARD_LAYOUT_STABILITY_V1 — una crónica/vista nueva parte de una geometría limpia.
+  // CHRONICLE_SPACE_BOARD_LAYOUT_STABILITY_V1 — cambiar la crónica o la vista reinicia solo el tamaño mínimo.
   const boardLayoutResetKey = visibleCards.map((card) => card.id).join('|')
   useEffect(() => {
-    stableLayoutSignature.current = ''
     setBoardHeightFloor(0)
   }, [boardLayoutResetKey, boardViewMode, chronicleId])
-  // CHRONICLE_SPACE_BOARD_BOUNDS_V2 — una tarjeta absoluta no aumenta el alto por sí sola.
-  // CHRONICLE_SPACE_BOARD_PERSONAL_LAYOUT_V1 — la altura también acompaña la distribución personal.
+  // CHRONICLE_SPACE_BOARD_FREE_OVERLAP_V2 — la pizarra crece sin recolocar las tarjetas existentes.
   const boardHeight = useMemo(() => {
     const rows = Math.max(1, Math.ceil(visibleCards.length / 4))
-    const layoutHeight = Math.max(760, rows * 210 + 40)
-    const maxY = visibleCards.reduce((highest, card) => {
+    const layoutHeight = Math.max(BOARD_POSITION_HEIGHT, rows * 210 + 40)
+    const maxStoredY = visibleCards.reduce((highest, card) => {
       const stored = (boardViewMode === 'PERSONAL' ? personalBoardPositions[card.id] || boardPositions[card.id] : boardPositions[card.id])?.y
-      return typeof stored === 'number' && Number.isFinite(stored) ? Math.max(highest, Math.min(93, Math.max(0, stored))) : highest
+      return typeof stored === 'number' && Number.isFinite(stored) ? Math.max(highest, stored) : highest
     }, 0)
-    // Las posiciones son porcentajes del tablero. No se debe invertir el porcentaje
-    // con 1 - y, porque una tarjeta al 90% dispararía la altura a miles de píxeles.
-    const heightForStoredPosition = maxY > 0 ? ((maxY / 100) * layoutHeight + 160) : 0
+    const heightForStoredPosition = maxStoredY > 0 ? ((maxStoredY / 100) * BOARD_POSITION_HEIGHT + 160) : 0
     return Math.ceil(Math.max(layoutHeight, heightForStoredPosition, boardHeightFloor))
   }, [boardHeightFloor, boardPositions, boardViewMode, personalBoardPositions, visibleCards])
-  // CHRONICLE_SPACE_BOARD_PERSONAL_CONNECTIONS_V1 — una relación solo existe en la vista si se ven sus dos extremos.
+  // CHRONICLE_SPACE_BOARD_CONNECTION_SCOPES_V1 — cada jugador conserva sus teorías; la capa compartida contiene las relaciones oficiales.
   const visibleBoardConnections = useMemo(() => {
     const visibleIds = new Set(visibleCards.map((card) => card.id))
-    return boardConnections.filter((connection) => visibleIds.has(connection.fromId) && visibleIds.has(connection.toId))
-  }, [boardConnections, visibleCards])
+    const shared = boardConnections.map((connection): ScopedBoardConnection => ({ ...connection, scope: 'SHARED' }))
+    const personal = personalBoardConnections.map((connection): ScopedBoardConnection => ({ ...connection, scope: 'PERSONAL' }))
+    const available = boardViewMode === 'PERSONAL' ? [...shared, ...personal] : shared
+    return available.filter((connection) => visibleIds.has(connection.fromId) && visibleIds.has(connection.toId))
+  }, [boardConnections, boardViewMode, personalBoardConnections, visibleCards])
   const filteredBoardConnections = useMemo(() => {
     const query = connectionListQuery.trim().toLocaleLowerCase()
     return visibleBoardConnections.filter((connection) => {
@@ -685,112 +708,35 @@ export function ChronicleSpacePrototype() {
   // CHRONICLE_SPACE_BOARD_SMOOTH_DRAG_CONNECTIONS_V1 — las líneas usan el tamaño real aproximado de la tarjeta.
   function boardConnectionEndpoints(from: BoardPosition, to: BoardPosition): { readonly from: BoardPosition; readonly to: BoardPosition } {
     const cardWidth = typeof window !== 'undefined' && window.innerWidth <= 900 ? 29 : 18.25
-    const cardHeight = Math.max(6, Math.min(13, (122 / Math.max(760, boardHeight)) * 100))
+    const cardHeight = Math.max(12, Math.min(24, (116 / Math.max(760, boardHeight)) * 100))
+    return { from: { x: from.x + cardWidth / 2, y: from.y + cardHeight / 2 }, to: { x: to.x + cardWidth / 2, y: to.y + cardHeight / 2 } }
+  }
+  function boardConnectionArrowEndpoints(from: BoardPosition, to: BoardPosition): { readonly from: BoardPosition; readonly to: BoardPosition } {
+    const cardWidth = typeof window !== 'undefined' && window.innerWidth <= 900 ? 29 : 18.25
+    const cardHeight = Math.max(12, Math.min(24, (116 / Math.max(760, boardHeight)) * 100))
     const fromCenter = { x: from.x + cardWidth / 2, y: from.y + cardHeight / 2 }
     const toCenter = { x: to.x + cardWidth / 2, y: to.y + cardHeight / 2 }
-    const clipToCardEdge = (center: BoardPosition, target: BoardPosition): BoardPosition => {
-      const dx = target.x - center.x
-      const dy = target.y - center.y
-      const scale = 0.995 / Math.max(Math.abs(dx) / (cardWidth / 2), Math.abs(dy) / (cardHeight / 2), 0.001)
-      return { x: center.x + dx * scale, y: center.y + dy * scale }
-    }
-    return { from: clipToCardEdge(fromCenter, toCenter), to: clipToCardEdge(toCenter, fromCenter) }
+    const dx = toCenter.x - fromCenter.x
+    const dy = toCenter.y - fromCenter.y
+    const distance = Math.max(0.001, Math.hypot(dx, dy))
+    const edgeScale = 0.995 / Math.max(Math.abs(dx) / (cardWidth / 2), Math.abs(dy) / (cardHeight / 2), 0.001)
+    const edge = { x: toCenter.x - dx * edgeScale, y: toCenter.y - dy * edgeScale }
+    const arrowGap = 1.5
+    return { from: { x: edge.x - (dx / distance) * arrowGap, y: edge.y - (dy / distance) * arrowGap }, to: edge }
   }
   function boardPosition(cardId: string, index: number): BoardPosition {
     const saved = boardViewMode === 'PERSONAL' ? personalBoardPositions[cardId] || boardPositions[cardId] : boardPositions[cardId]
-    if (saved) return { x: Math.max(2, Math.min(76, saved.x)), y: Math.max(4, Math.min(92, saved.y)) }
-    const occupied = cards.slice(0, index).map((card, previousIndex) => boardPosition(card.id, previousIndex))
-    const candidates = Array.from({ length: Math.max(cards.length + 20, 32) }, (_, candidateIndex) => defaultBoardPosition(candidateIndex))
-    const position = candidates.find((candidate) => occupied.every((item) => Math.abs(item.x - candidate.x) > 20 || Math.abs(item.y - candidate.y) > 24)) || defaultBoardPosition(index)
-    return { x: Math.max(2, Math.min(76, position.x)), y: Math.max(4, Math.min(92, position.y)) }
+    if (saved) return { x: Math.max(2, Math.min(76, saved.x)), y: Math.max(4, saved.y) }
+    return defaultBoardPosition(index)
   }
-  // CHRONICLE_SPACE_BOARD_STABLE_AUTO_LAYOUT_V1 — posiciones estables, sin solapamientos ni bucles de reparación.
-  type BoardPlacement = { readonly position: BoardPosition; readonly boardHeight: number }
-  const boardPlacementBox = (boardRect: DOMRect, placement: BoardPlacement, width: number, height: number) => ({
-    left: boardRect.left + (placement.position.x / 100) * boardRect.width,
-    top: boardRect.top + (placement.position.y / 100) * placement.boardHeight,
-    right: boardRect.left + (placement.position.x / 100) * boardRect.width + width,
-    bottom: boardRect.top + (placement.position.y / 100) * placement.boardHeight + height,
-  })
-  const boardBoxesOverlap = (box: { readonly left: number; readonly top: number; readonly right: number; readonly bottom: number }, other: { readonly left: number; readonly top: number; readonly right: number; readonly bottom: number }) => box.left < other.right && box.right > other.left && box.top < other.bottom && box.bottom > other.top
-  const boardGridPlacement = (column: number, row: number, boardHeight: number): BoardPlacement => ({
-    position: { x: 4 + column * 24, y: ((10 + row * 210) / boardHeight) * 100 },
-    boardHeight,
-  })
-  const boardCurrentPosition = (cardId: string, index: number): BoardPosition => boardPosition(cardId, index)
 
-  useEffect(() => {
-    if (visibleCards.length < 2 || typeof window === 'undefined') return
-    const board = document.querySelector<HTMLElement>('.space-board')
-    if (!board) return
-    const firstCard = board.querySelector<HTMLElement>('.board-card')
-    if (!firstCard || window.getComputedStyle(firstCard).position !== 'absolute') return
-    const boardRect = board.getBoundingClientRect()
-    if (!boardRect.width || !boardRect.height) return
-    const elements = new Map(Array.from(board.querySelectorAll<HTMLElement>('.board-card')).map((element) => [element.querySelector<HTMLElement>('.board-card__open')?.getAttribute('data-card-id') || '', element]))
-    const orderedCards = [...visibleCards].sort((left, right) => {
-      const leftIndex = cards.findIndex((card) => card.id === left.id)
-      const rightIndex = cards.findIndex((card) => card.id === right.id)
-      const leftPosition = boardCurrentPosition(left.id, leftIndex)
-      const rightPosition = boardCurrentPosition(right.id, rightIndex)
-      return leftPosition.y - rightPosition.y || leftPosition.x - rightPosition.x || left.id.localeCompare(right.id)
-    })
-    const accepted: Array<{ readonly left: number; readonly top: number; readonly right: number; readonly bottom: number }> = []
-    const repaired: Record<string, BoardPosition> = {}
-    let requiredHeight = boardRect.height
-    let changed = false
-    const signature = boardViewMode + '|' + orderedCards.map((card) => card.id + ':' + boardCurrentPosition(card.id, cards.findIndex((item) => item.id === card.id)).x.toFixed(2) + ',' + boardCurrentPosition(card.id, cards.findIndex((item) => item.id === card.id)).y.toFixed(2)).join('|')
-    if (stableLayoutSignature.current === signature) return
-
-    orderedCards.forEach((card, order) => {
-      const element = elements.get(card.id)
-      if (!element) return
-      const measured = element.getBoundingClientRect()
-      const index = cards.findIndex((item) => item.id === card.id)
-      const current = boardCurrentPosition(card.id, index)
-      const currentPlacement = { position: current, boardHeight: boardRect.height }
-      const isFree = (placement: BoardPlacement) => {
-        const box = boardPlacementBox(boardRect, placement, measured.width, measured.height)
-        return accepted.every((other) => !boardBoxesOverlap(box, other))
-      }
-      let next = currentPlacement
-      if (!isFree(next)) {
-        const columns = 4
-        const maxRows = Math.max(visibleCards.length + 4, 12)
-        const candidates = Array.from({ length: maxRows * columns }, (_, slot) => {
-          const row = Math.floor(slot / columns)
-          const column = slot % columns
-          const top = 10 + row * 210
-          const candidateHeight = Math.max(boardRect.height, top + measured.height + 32)
-          requiredHeight = Math.max(requiredHeight, candidateHeight)
-          return boardGridPlacement(column, row, candidateHeight)
-        })
-        const freeCandidate = candidates.find(isFree)
-        if (!freeCandidate) throw new Error('No se encontró una posición libre para la tarjeta ' + card.id)
-        next = freeCandidate
-        if (next.position.x !== current.x || Math.abs(next.position.y - current.y) > 0.01) {
-          repaired[card.id] = next.position
-          changed = true
-        }
-      }
-      const acceptedBox = boardPlacementBox(boardRect, next, measured.width, measured.height)
-      accepted.push(acceptedBox)
-      if (order === orderedCards.length - 1) requiredHeight = Math.max(requiredHeight, acceptedBox.bottom - boardRect.top + 24)
-    })
-
-    stableLayoutSignature.current = signature
-    if (!changed) return
-    if (requiredHeight > boardRect.height + 2) setBoardHeightFloor((current) => Math.max(current, Math.ceil(requiredHeight)))
-    if (boardViewMode === 'PERSONAL') {
-      setPersonalBoardPositions((current) => ({ ...current, ...repaired }))
-      return
-    }
-    markBoardDirty()
-    setBoardPositions((current) => ({ ...current, ...repaired }))
-  }, [boardPositions, boardViewMode, cards, personalBoardPositions, visibleCards])
+  function boardConnectionPosition(position: BoardPosition): BoardPosition {
+    return { x: position.x, y: (position.y / 100 * BOARD_POSITION_HEIGHT / Math.max(1, boardHeight)) * 100 }
+  }
 
   function beginBoardDrag(event: ReactPointerEvent<HTMLElement>, cardId: string) {
     if ((event.target as HTMLElement).closest('button')) return
+    if (boardViewMode === 'ALL' && !canManageSharedBoard) return
     const board = event.currentTarget.parentElement
     if (!board) return
     const boardRect = board.getBoundingClientRect()
@@ -819,12 +765,14 @@ export function ChronicleSpacePrototype() {
     if (!boardRect.width || !boardRect.height) return
     const leftPx = snapshot.leftPx + (event.clientX - snapshot.pointerX)
     const topPx = Math.max(8, snapshot.topPx + (event.clientY - snapshot.pointerY))
-    const padding = 32
-    const nextBoardHeight = Math.max(snapshot.boardHeight, topPx + snapshot.cardHeight + padding)
+    const nextBoardHeight = Math.max(snapshot.boardHeight, topPx + snapshot.cardHeight + 32)
     const nextLeftPx = Math.max(8, Math.min(boardRect.width - snapshot.cardWidth - 8, leftPx))
     const nextPosition = {
       x: (nextLeftPx / boardRect.width) * 100,
-      y: (topPx / nextBoardHeight) * 100,
+      y: (topPx / BOARD_POSITION_HEIGHT) * 100,
+    }
+    if (nextBoardHeight > snapshot.boardHeight + 1) {
+      setBoardHeightFloor((current) => Math.max(current, Math.ceil(nextBoardHeight)))
     }
     if (nextBoardHeight > snapshot.boardHeight + 1) {
       setBoardHeightFloor((current) => Math.max(current, Math.ceil(nextBoardHeight)))
@@ -842,26 +790,43 @@ export function ChronicleSpacePrototype() {
     setDraggingBoardId(null)
   }
   function startConnection(card: Card) {
+    if (boardViewMode === 'ALL' && !canManageSharedBoard) {
+      setConnectionEditorMessage('La Vista general contiene relaciones oficiales. Solo el Narrador puede modificarlas.')
+      return
+    }
     if (!connectionSourceId) { setConnectionSourceId(card.id); setSelected(null); return }
     if (connectionSourceId === card.id) { setConnectionSourceId(null); return }
     setPendingConnection({ fromId: connectionSourceId, toId: card.id })
     setConnectionSourceId(null)
     setConnectionLabel('')
     setPendingConnectionType('VISUAL')
+    setPendingConnectionArrow(true)
+    setPendingConnectionColor(boardConnectionColor('VISUAL'))
+    setPendingConnectionScope(boardViewMode === 'ALL' ? 'SHARED' : 'PERSONAL')
   }
   function resetConnectionEditor() {
     setPendingConnection(null)
     setEditingConnectionId(null)
     setConnectionLabel('')
     setPendingConnectionType('VISUAL')
+    setPendingConnectionArrow(true)
+    setPendingConnectionColor(boardConnectionColor('VISUAL'))
+    setPendingConnectionScope(boardViewMode === 'ALL' ? 'SHARED' : 'PERSONAL')
     setConnectionEditorMessage('')
   }
-  function editConnection(connection: BoardConnection) {
+  function editConnection(connection: ScopedBoardConnection) {
+    if (connection.scope === 'SHARED' && !canManageSharedBoard) {
+      setConnectionEditorMessage('Esta relación es oficial y solo puede modificarla el Narrador.')
+      return
+    }
     setConnectionSourceId(null)
     setPendingConnection({ fromId: connection.fromId, toId: connection.toId })
     setEditingConnectionId(connection.id)
     setConnectionLabel(connection.label)
     setPendingConnectionType(connection.type)
+    setPendingConnectionArrow(connection.arrow)
+    setPendingConnectionColor(connection.color || boardConnectionColor(connection.type))
+    setPendingConnectionScope(connection.scope)
     setConnectionEditorMessage('')
   }
   function invertConnectionDirection() {
@@ -874,18 +839,37 @@ export function ChronicleSpacePrototype() {
     if (!pendingConnection) return
     const type = pendingConnectionType
     const label = type === 'VISUAL' ? '' : connectionLabel.trim() || (type === 'KNOWN' ? 'Relación conocida' : 'Teoría o sospecha')
-    setBoardConnections((current) => {
+    const color = /^#[0-9a-f]{6}$/i.test(pendingConnectionColor) ? pendingConnectionColor.toLowerCase() : boardConnectionColor(type)
+    if (pendingConnectionScope === 'SHARED' && !canManageSharedBoard) {
+      setConnectionEditorMessage('La Vista general solo puede modificarla el Narrador.')
+      return
+    }
+    const updateConnections = (current: readonly BoardConnection[]) => {
       const samePair = (item: BoardConnection) => (item.fromId === pendingConnection.fromId && item.toId === pendingConnection.toId) || (item.fromId === pendingConnection.toId && item.toId === pendingConnection.fromId)
       if (editingConnectionId) {
-        const next = { id: editingConnectionId, fromId: pendingConnection.fromId, toId: pendingConnection.toId, label, type }
+        const next = { id: editingConnectionId, fromId: pendingConnection.fromId, toId: pendingConnection.toId, label, type, arrow: pendingConnectionArrow, color }
         return current.filter((item) => item.id === editingConnectionId || !samePair(item)).map((item) => item.id === editingConnectionId ? next : item)
       }
-      if (current.some(samePair)) return current.map((item) => samePair(item) ? { ...item, fromId: pendingConnection.fromId, toId: pendingConnection.toId, label, type } : item)
-      return [...current, { id: 'connection-' + Date.now(), fromId: pendingConnection.fromId, toId: pendingConnection.toId, label, type }]
-    })
+      if (current.some(samePair)) return current.map((item) => samePair(item) ? { ...item, fromId: pendingConnection.fromId, toId: pendingConnection.toId, label, type, arrow: pendingConnectionArrow, color } : item)
+      return [...current, { id: 'connection-' + Date.now(), fromId: pendingConnection.fromId, toId: pendingConnection.toId, label, type, arrow: pendingConnectionArrow, color }]
+    }
+    if (pendingConnectionScope === 'SHARED') {
+      markBoardDirty()
+      setBoardConnections(updateConnections)
+    } else {
+      setPersonalBoardConnections(updateConnections)
+    }
     resetConnectionEditor()
   }
-  function removeConnection(id: string) { markBoardDirty(); setBoardConnections((current) => current.filter((item) => item.id !== id)) }
+  function removeConnection(connection: ScopedBoardConnection) {
+    if (connection.scope === 'SHARED') {
+      if (!canManageSharedBoard) { setConnectionEditorMessage('Esta relación oficial solo puede retirarla el Narrador.'); return }
+      markBoardDirty()
+      setBoardConnections((current) => current.filter((item) => item.id !== connection.id))
+      return
+    }
+    setPersonalBoardConnections((current) => current.filter((item) => item.id !== connection.id))
+  }
 
   function openBoardCardPreview(card: Card) { setBoardPreviewCard(card) }
   function getBoardFocusRelated(card: Card) {
@@ -1062,13 +1046,13 @@ export function ChronicleSpacePrototype() {
 
 
   function isFocusedConnectionEndpoint(cardId: string) {
-    const connection = boardConnections.find((item) => item.id === focusedConnectionId)
+    const connection = visibleBoardConnections.find((item) => boardConnectionKey(item) === focusedConnectionId)
     return Boolean(connection && (connection.fromId === cardId || connection.toId === cardId))
   }
   function isFocusedBoardCardEndpoint(cardId: string) {
     if (!focusedBoardCardId) return false
     if (focusedBoardCardId === cardId) return true
-    return boardConnections.some((connection) => (connection.fromId === focusedBoardCardId || connection.toId === focusedBoardCardId) && (connection.fromId === cardId || connection.toId === cardId))
+    return visibleBoardConnections.some((connection) => (connection.fromId === focusedBoardCardId || connection.toId === focusedBoardCardId) && (connection.fromId === cardId || connection.toId === cardId))
   }
   function centerBoardCard(cardId: string) {
     if (typeof window === 'undefined') return
@@ -1095,8 +1079,9 @@ export function ChronicleSpacePrototype() {
     setFocusedBoardCardId(nextFocusedId)
     if (nextFocusedId) centerBoardCard(nextFocusedId)
   }
-  function focusConnection(connection: BoardConnection) {
-    setFocusedConnectionId((current) => current === connection.id ? null : connection.id)
+  function focusConnection(connection: ScopedBoardConnection) {
+    const key = boardConnectionKey(connection)
+    setFocusedConnectionId((current) => current === key ? null : key)
     setFocusedBoardCardId(null)
     if (typeof window === 'undefined') return
     window.setTimeout(() => {
@@ -1180,14 +1165,15 @@ export function ChronicleSpacePrototype() {
       <div className="board-visibility-bar">
         <span>{boardViewMode === 'ALL' ? 'Vista general' : 'Mi vista'}: <b>{visibleCards.length}</b> de {cards.length} tarjetas</span>
         <div>
-          <button className={boardViewMode === 'PERSONAL' ? 'is-active' : ''} type="button" onClick={() => { setBoardViewMode('PERSONAL'); setBoardFilter('ALL') }}>Mi vista</button>
-          <button className={boardViewMode === 'ALL' ? 'is-active' : ''} type="button" onClick={() => { setBoardViewMode('ALL'); setBoardFilter('ALL') }}>Vista general</button>
+          <button className={boardViewMode === 'PERSONAL' ? 'is-active' : ''} type="button" onClick={() => { resetConnectionEditor(); setConnectionSourceId(null); setPendingConnectionScope('PERSONAL'); setBoardViewMode('PERSONAL'); setBoardFilter('ALL') }}>Mi vista</button>
+          <button className={boardViewMode === 'ALL' ? 'is-active' : ''} type="button" onClick={() => { resetConnectionEditor(); setConnectionSourceId(null); setPendingConnectionScope('SHARED'); setBoardViewMode('ALL'); setBoardFilter('ALL') }}>Vista general</button>
           <button type="button" onClick={() => setBoardManageOpen((current) => !current)}>{boardManageOpen ? 'Cerrar selección' : 'Elegir tarjetas'}</button>
           <button className="board-visibility-clear" type="button" onClick={hideAllBoardCards} disabled={boardViewMode !== 'PERSONAL' || !cards.some((card) => !hiddenBoardCardIds.has(card.id))} aria-label="Retirar todas las tarjetas de mi vista">Retirar todas</button>
           <button className="board-visibility-reset" type="button" onClick={resetPersonalBoardPositions} disabled={boardViewMode !== 'PERSONAL' || !cards.length} aria-label="Restaurar las posiciones de mi vista">Restaurar posiciones</button>
           <button className="board-visibility-preset" type="button" onClick={() => setBoardPresetOpen((current) => !current)} disabled={boardViewMode !== 'PERSONAL'}>{boardPresetOpen ? 'Cerrar presets' : 'Guardar vista'}</button>
         </div>
       </div>
+      <p className={'board-scope-note board-scope-note--' + (boardViewMode === 'PERSONAL' ? 'personal' : 'shared')}>{boardViewMode === 'PERSONAL' ? 'Tus conexiones son privadas: ningún otro jugador puede verlas ni modificarlas. Las relaciones oficiales del Narrador también aparecen como referencia.' : canManageSharedBoard ? 'Vista oficial compartida: los cambios se muestran a todos los participantes de la crónica.' : 'Vista oficial compartida: puedes consultarla, pero solo el Narrador puede modificar tarjetas y conexiones.'}</p>
       {boardManageOpen ? <div className="board-visibility-panel" aria-label="Elegir tarjetas visibles">
         <div className="board-selection-tools">
           <label className="board-selection-field"><span>Buscar</span><input value={boardSelectionQuery} onChange={(event) => setBoardSelectionQuery(event.target.value)} placeholder="Nombre de tarjeta…" /></label>
@@ -1219,25 +1205,26 @@ export function ChronicleSpacePrototype() {
         <button type="button" onClick={() => fitBoardToViewport()}>Ver toda</button>
       </div>
 <div className={'space-board' + (focusedConnectionId ? ' has-focused-connection' : '') + (focusedBoardCardId ? ' has-focused-card' : '')} style={{ minHeight: boardHeight, transform: 'scale(' + boardZoom + ')', transformOrigin: 'top left', width: (100 / boardZoom) + '%' }}>
-        <svg className="board-connections-layer" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="board-arrow-known" markerWidth="5" markerHeight="5" refX="4" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L5,3 z" fill="#e3a16c" /></marker><marker id="board-arrow-suspicion" markerWidth="5" markerHeight="5" refX="4" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L5,3 z" fill="#bd798a" /></marker></defs>{visibleBoardConnections.map((connection) => { const fromIndex = cards.findIndex((card) => card.id === connection.fromId); const toIndex = cards.findIndex((card) => card.id === connection.toId); if (fromIndex < 0 || toIndex < 0 || (boardFilter !== 'ALL' && (!visibleCards.some((card) => card.id === connection.fromId) || !visibleCards.some((card) => card.id === connection.toId)))) return null; const from = boardPosition(connection.fromId, fromIndex); const to = boardPosition(connection.toId, toIndex); const endpoints = boardConnectionEndpoints(from, to); return <line className={'board-link board-link--' + connection.type.toLowerCase() + (focusedConnectionId === connection.id || Boolean(focusedBoardCardId && (connection.fromId === focusedBoardCardId || connection.toId === focusedBoardCardId)) ? ' is-focused' : '')} key={connection.id} x1={endpoints.from.x} y1={endpoints.from.y} x2={endpoints.to.x} y2={endpoints.to.y} markerEnd={connection.type === 'KNOWN' ? 'url(#board-arrow-known)' : connection.type === 'SUSPICION' ? 'url(#board-arrow-suspicion)' : undefined} onClick={() => focusConnection(connection)} onDoubleClick={() => editConnection(connection)} aria-label="Enfocar relación; doble pulsación para editar" /> })}</svg>
-        <div className="board-connect-hint">{boardUpdateAvailable ? <span className="board-update-notice">Hay cambios nuevos de otro usuario.<button type="button" onClick={() => window.location.reload()}>Recargar pizarra</button></span> : boardSaving ? 'Guardando la pizarra…' : connectionSourceId ? 'Selecciona otra tarjeta para conectarla.' : 'Arrastra las tarjetas para ordenar la pizarra. Usa «Conectar» para crear una relación.'}</div>
-        {visibleCards.length ? visibleCards.map((card) => { const index = cards.findIndex((item) => item.id === card.id); const position = boardPosition(card.id, index); return <article className={'board-card board-card--' + ((index % 6) + 1) + (connectionSourceId === card.id ? ' is-connect-source' : '') + (draggingBoardId === card.id ? ' is-dragging' : '') + (highlightedBoardCardId === card.id ? ' is-highlighted' : '') + (isFocusedConnectionEndpoint(card.id) ? ' is-focused-endpoint' : '') + (isFocusedBoardCardEndpoint(card.id) ? ' is-focused-card' : '')} key={card.id} data-board-card-id={card.id} style={{ left: position.x + '%', top: position.y + '%' }} onPointerDown={(event) => beginBoardDrag(event, card.id)} onPointerMove={(event) => moveBoardCard(event, card.id)} onPointerUp={finishBoardDrag}><span className="board-card__drag-handle" title="Arrastrar tarjeta">⠿ Mover</span>
+        <svg className="board-connections-layer" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">{visibleBoardConnections.map((connection) => { const fromIndex = cards.findIndex((card) => card.id === connection.fromId); const toIndex = cards.findIndex((card) => card.id === connection.toId); if (fromIndex < 0 || toIndex < 0 || (boardFilter !== 'ALL' && (!visibleCards.some((card) => card.id === connection.fromId) || !visibleCards.some((card) => card.id === connection.toId)))) return null; const from = boardConnectionPosition(boardPosition(connection.fromId, fromIndex)); const to = boardConnectionPosition(boardPosition(connection.toId, toIndex)); const endpoints = boardConnectionEndpoints(from, to); return <line className={'board-link board-link--' + connection.type.toLowerCase() + ' board-link--scope-' + connection.scope.toLowerCase() + (focusedConnectionId === boardConnectionKey(connection) || Boolean(focusedBoardCardId && (connection.fromId === focusedBoardCardId || connection.toId === focusedBoardCardId)) ? ' is-focused' : '')} key={boardConnectionKey(connection)} x1={endpoints.from.x} y1={endpoints.from.y} x2={endpoints.to.x} y2={endpoints.to.y} style={{ stroke: connection.color || undefined }} onClick={() => focusConnection(connection)} onDoubleClick={() => editConnection(connection)} aria-label={connection.scope === 'PERSONAL' ? 'Enfocar relación privada; doble pulsación para editar' : canManageSharedBoard ? 'Enfocar relación oficial; doble pulsación para editar' : 'Enfocar relación oficial'} /> })}</svg>
+        <svg className="board-arrows-layer" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="board-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L6,3 z" fill="context-stroke" /></marker></defs>{visibleBoardConnections.filter((connection) => connection.arrow).map((connection) => { const fromIndex = cards.findIndex((card) => card.id === connection.fromId); const toIndex = cards.findIndex((card) => card.id === connection.toId); if (fromIndex < 0 || toIndex < 0 || (boardFilter !== 'ALL' && (!visibleCards.some((card) => card.id === connection.fromId) || !visibleCards.some((card) => card.id === connection.toId)))) return null; const from = boardConnectionPosition(boardPosition(connection.fromId, fromIndex)); const to = boardConnectionPosition(boardPosition(connection.toId, toIndex)); const endpoints = boardConnectionArrowEndpoints(from, to); return <line className={'board-link board-link--arrow board-link--' + connection.type.toLowerCase() + ' board-link--scope-' + connection.scope.toLowerCase()} key={'arrow-' + boardConnectionKey(connection)} x1={endpoints.from.x} y1={endpoints.from.y} x2={endpoints.to.x} y2={endpoints.to.y} style={{ stroke: connection.color || undefined }} markerEnd="url(#board-arrow)" /> })}</svg>
+        <div className="board-connect-hint">{boardUpdateAvailable ? <span className="board-update-notice">Hay cambios oficiales nuevos.<button type="button" onClick={() => window.location.reload()}>Recargar pizarra</button></span> : boardSaving ? 'Guardando la vista oficial…' : connectionSourceId ? 'Selecciona otra tarjeta para conectarla.' : boardViewMode === 'ALL' && !canManageSharedBoard ? 'Vista oficial en modo consulta. Cambia a «Mi vista» para organizar tus propias teorías.' : 'Arrastra las tarjetas libremente; pueden solaparse. Usa «Conectar» para crear una relación.'}</div>
+        {visibleCards.length ? visibleCards.map((card) => { const index = cards.findIndex((item) => item.id === card.id); const position = boardPosition(card.id, index); return <article className={'board-card board-card--' + ((index % 6) + 1) + (connectionSourceId === card.id ? ' is-connect-source' : '') + (draggingBoardId === card.id ? ' is-dragging' : '') + (highlightedBoardCardId === card.id ? ' is-highlighted' : '') + (isFocusedConnectionEndpoint(card.id) ? ' is-focused-endpoint' : '') + (isFocusedBoardCardEndpoint(card.id) ? ' is-focused-card' : '')} key={card.id} data-board-card-id={card.id} style={{ left: position.x + '%', top: (position.y / 100 * BOARD_POSITION_HEIGHT) + 'px' }} onPointerDown={(event) => beginBoardDrag(event, card.id)} onPointerMove={(event) => moveBoardCard(event, card.id)} onPointerUp={finishBoardDrag}><span className="board-card__drag-handle" title="Arrastrar tarjeta">⠿ Mover</span>
           <button className="board-card__open" data-card-id={card.id} type="button" onClick={() => focusBoardCard(card)}><i className={'card-pin card-pin--' + card.kind.toLowerCase()} /><small>{kindLabel(card.kind)}</small><strong>{card.title}</strong></button>
-          <button className="board-card__connect" type="button" onClick={() => startConnection(card)}>{connectionSourceId === card.id ? 'Origen seleccionado' : 'Conectar'}</button>
+          <button className="board-card__connect" type="button" onClick={() => startConnection(card)} disabled={!canCreateBoardConnection} title={!canCreateBoardConnection ? 'Las relaciones oficiales solo puede modificarlas el Narrador' : undefined}>{connectionSourceId === card.id ? 'Origen seleccionado' : 'Conectar'}</button>
           {focusedBoardCardId === card.id ? <div className="board-card__focus-actions"><span>FOCO ACTIVO</span><button type="button" onClick={() => openBoardCardPreview(card)}>Abrir tarjeta</button><button type="button" onClick={() => setFocusedBoardCardId(null)}>Quitar foco</button></div> : null}
         </article> }) : <p className="space-empty">No hay tarjetas de este tipo para la crónica seleccionada.</p>}
       </div>
       {timelineSession ? <div className="space-overlay"><button className="space-overlay__dismiss" type="button" aria-label="Cerrar ficha de sesión" tabIndex={-1} onClick={() => closeTimelineSession()} /><section className="space-detail timeline-session-detail" role="dialog" aria-modal="true" aria-label={'Sesión ' + (timelineSession.title || 'sin título')} onClick={(event) => event.stopPropagation()}><button className="detail-close" type="button" onClick={() => closeTimelineSession()}>Cerrar</button><span className="space-kicker">FICHA DE SESIÓN</span><figure className="space-detail__visual space-detail__visual--session"><div className="space-detail__visual-frame"><img src={timelineSessionPreview?.imageUrl || '/api/chronicles/' + chronicleId + '/assets/SESSION/' + timelineSession.id + '/image'} alt={'Imagen de ' + (timelineSession.title || 'sesión')} onError={(event) => { event.currentTarget.hidden = true; event.currentTarget.parentElement?.classList.add('is-missing') }} /><span className="space-detail__visual-fallback" aria-hidden="true">SESIÓN</span></div><figcaption>{timelineSessionPreview?.imageUrl ? 'Imagen de la sesión' : 'Capa visual de la sesión'}</figcaption></figure><h2>{timelineSession.title || 'Sesión sin título'}</h2><small className="timeline-session-detail__meta">{dateLabel(timelineSession.realDate)} · {timelineSession.status === 'completed' ? 'Completada' : timelineSession.status === 'preparation' ? 'En preparación' : 'Archivada'}</small><p className="detail-copy">{timelineSession.summary || 'Esta sesión todavía no tiene un resumen.'}</p><dl><div><dt>Identificador</dt><dd>{timelineSession.sessionNumber ? 'Sesión ' + timelineSession.sessionNumber : 'Registro'}</dd></div><div><dt>Anotaciones</dt><dd>{notes.filter((note) => note.sessionId === timelineSession.id).length}</dd></div></dl>{notes.filter((note) => note.sessionId === timelineSession.id).length ? <div className="timeline-session-detail__notes"><span>ANOTACIONES DE LA SESIÓN</span>{notes.filter((note) => note.sessionId === timelineSession.id).map((note) => <button className="timeline-note" type="button" key={note.id} onClick={() => { closeTimelineSession(); openBoardCardPreview({ id: 'note-' + note.id, kind: 'NOTA', title: note.title, meta: note.visibility === 'PRIVATE' ? 'Privada' : 'Compartida', description: note.content }) }}><strong>{note.title}</strong><small>{note.author?.displayName || note.author?.username || 'Anotación'} · {dateLabel(note.updatedAt)}</small></button>)}</div> : <p className="timeline-session-detail__empty">Esta sesión todavía no tiene anotaciones vinculadas.</p>}<button className="detail-action" type="button" onClick={() => closeTimelineSession()}>Volver a cronología</button></section></div> : null}
       {boardPreviewCard ? <div className="board-preview-backdrop"><button className="space-overlay__dismiss" type="button" aria-label="Cerrar previsualización" tabIndex={-1} onClick={() => setBoardPreviewCard(null)} /><section className="board-preview-dialog" role="dialog" aria-modal="true" aria-label={'Previsualización de ' + boardPreviewCard.title} onClick={(event) => event.stopPropagation()}><button className="board-preview-close" type="button" aria-label="Cerrar previsualización" onClick={() => setBoardPreviewCard(null)}>×</button><span>{kindLabel(boardPreviewCard.kind)}{boardPreviewCard.meta ? ' · ' + boardPreviewCard.meta : ''}{boardPreviewCard.author ? ' · ' + boardPreviewCard.author : ''}</span><h3>{boardPreviewCard.title}</h3><p>{boardPreviewCard.kind === 'NOTA' ? renderMentionText(boardPreviewCard.description, openMention) : (boardPreviewCard.description || 'Sin información adicional disponible.')}</p><div className="board-preview-actions"><button type="button" onClick={() => void openBoardCardRecord(boardPreviewCard)}>{boardPreviewCard.kind === 'NOTA' ? 'Abrir anotación completa' : 'Abrir ficha completa'}</button><button type="button" onClick={() => openBoardFocus(boardPreviewCard)}>Ver conexiones</button><button type="button" onClick={() => addBoardNoteFor(boardPreviewCard)}>Añadir nota</button><button type="button" onClick={() => toggleBoardHighlight(boardPreviewCard.id)}>{highlightedBoardCardId === boardPreviewCard.id ? 'Quitar destacado' : 'Destacar'}</button><button type="button" onClick={() => setBoardPreviewCard(null)}>Cerrar</button></div></section></div> : null}
-      {boardFocusCard ? <div className="board-focus-backdrop"><button className="space-overlay__dismiss" type="button" aria-label="Cerrar foco" tabIndex={-1} onClick={() => setBoardFocusCard(null)} /><section className="board-focus-dialog" role="dialog" aria-modal="true" aria-label={'Foco de ' + boardFocusCard.title} onClick={(event) => event.stopPropagation()}><button className="board-focus-close" type="button" aria-label="Cerrar foco" onClick={() => setBoardFocusCard(null)}>×</button><span>FOCO DE INVESTIGACIÓN</span><small>{kindLabel(boardFocusCard.kind)}{boardFocusCard.meta ? ' · ' + boardFocusCard.meta : ''}</small><h3>{boardFocusCard.title}</h3><p>{plainMentionText(boardFocusCard.description) || 'Sin información adicional disponible.'}</p>{getBoardAttachedNotes(boardFocusCard).length ? <div className="board-focus-notes"><strong>Notas vinculadas</strong>{getBoardAttachedNotes(boardFocusCard).map((note) => { const noteCard = cards.find((item) => item.id === 'note-' + note.id); return noteCard ? <button type="button" key={note.id} onClick={() => { setBoardFocusCard(null); openBoardCardPreview(noteCard) }}>{note.title}</button> : <p key={note.id}>{note.title}</p> })}</div> : null}<div className="board-focus-related"><strong>Conectado con</strong>{getBoardFocusRelated(boardFocusCard).length ? getBoardFocusRelated(boardFocusCard).map((related) => <button type="button" key={related.id} onClick={() => { setBoardFocusCard(null); openBoardCardPreview(related) }}>{kindLabel(related.kind)} · {related.title}</button>) : <p>No hay conexiones guardadas para este elemento.</p>}</div><div className="board-focus-actions"><button type="button" onClick={() => void openBoardCardRecord(boardFocusCard)}>{boardFocusCard.kind === 'NOTA' ? 'Abrir anotación' : 'Abrir ficha'}</button><button type="button" onClick={() => { setBoardFocusCard(null); startConnection(boardFocusCard) }}>Conectar</button><button type="button" onClick={() => addBoardNoteFor(boardFocusCard)}>Añadir nota</button><button type="button" onClick={() => toggleBoardHighlight(boardFocusCard.id)}>{highlightedBoardCardId === boardFocusCard.id ? 'Quitar destacado' : 'Destacar'}</button></div></section></div> : null}
-      {pendingConnection ? <form className="connection-composer connection-composer--editor" onSubmit={saveConnection}><div><span>{editingConnectionId ? 'EDITAR RELACIÓN' : 'CONEXIÓN DE LA PIZARRA'}</span><strong>{cards.find((card) => card.id === pendingConnection.fromId)?.title || 'Elemento'} <b>→</b> {cards.find((card) => card.id === pendingConnection.toId)?.title || 'Elemento'}</strong><button className="connection-direction" type="button" onClick={invertConnectionDirection}>Invertir dirección</button></div><label>Tipo de conexión<select value={pendingConnectionType} onChange={(event) => setPendingConnectionType(event.target.value as BoardConnectionType)}><option value="VISUAL">Conexión visual</option><option value="KNOWN">Relación conocida</option><option value="SUSPICION">Teoría o sospecha</option></select></label>{pendingConnectionType === 'VISUAL' ? <p className="connection-visual-help">Línea visual sin etiqueta.</p> : <label>{pendingConnectionType === 'KNOWN' ? 'Etiqueta de la relación' : 'Pregunta o sospecha'}<input value={connectionLabel} onChange={(event) => setConnectionLabel(event.target.value)} placeholder={pendingConnectionType === 'KNOWN' ? 'Ej.: trabaja para' : 'Ej.: ¿se reúne aquí?'} autoFocus /></label>}{connectionEditorMessage ? <p className="connection-editor-message">{connectionEditorMessage}</p> : null}<button type="button" onClick={resetConnectionEditor}>Cancelar</button><button className="connection-save" type="submit">{editingConnectionId ? 'Guardar cambios' : 'Guardar conexión'}</button></form> : null}      {focusedBoardCardId && !boardPreviewCard && !boardFocusCard ? <div className="board-mobile-actions" role="toolbar" aria-label="Acciones de la tarjeta enfocada">
+      {boardFocusCard ? <div className="board-focus-backdrop"><button className="space-overlay__dismiss" type="button" aria-label="Cerrar foco" tabIndex={-1} onClick={() => setBoardFocusCard(null)} /><section className="board-focus-dialog" role="dialog" aria-modal="true" aria-label={'Foco de ' + boardFocusCard.title} onClick={(event) => event.stopPropagation()}><button className="board-focus-close" type="button" aria-label="Cerrar foco" onClick={() => setBoardFocusCard(null)}>×</button><span>FOCO DE INVESTIGACIÓN</span><small>{kindLabel(boardFocusCard.kind)}{boardFocusCard.meta ? ' · ' + boardFocusCard.meta : ''}</small><h3>{boardFocusCard.title}</h3><p>{plainMentionText(boardFocusCard.description) || 'Sin información adicional disponible.'}</p>{getBoardAttachedNotes(boardFocusCard).length ? <div className="board-focus-notes"><strong>Notas vinculadas</strong>{getBoardAttachedNotes(boardFocusCard).map((note) => { const noteCard = cards.find((item) => item.id === 'note-' + note.id); return noteCard ? <button type="button" key={note.id} onClick={() => { setBoardFocusCard(null); openBoardCardPreview(noteCard) }}>{note.title}</button> : <p key={note.id}>{note.title}</p> })}</div> : null}<div className="board-focus-related"><strong>Conectado con</strong>{getBoardFocusRelated(boardFocusCard).length ? getBoardFocusRelated(boardFocusCard).map((related) => <button type="button" key={related.id} onClick={() => { setBoardFocusCard(null); openBoardCardPreview(related) }}>{kindLabel(related.kind)} · {related.title}</button>) : <p>No hay conexiones guardadas para este elemento.</p>}</div><div className="board-focus-actions"><button type="button" onClick={() => void openBoardCardRecord(boardFocusCard)}>{boardFocusCard.kind === 'NOTA' ? 'Abrir anotación' : 'Abrir ficha'}</button><button type="button" disabled={!canCreateBoardConnection} onClick={() => { setBoardFocusCard(null); startConnection(boardFocusCard) }}>Conectar</button><button type="button" onClick={() => addBoardNoteFor(boardFocusCard)}>Añadir nota</button><button type="button" onClick={() => toggleBoardHighlight(boardFocusCard.id)}>{highlightedBoardCardId === boardFocusCard.id ? 'Quitar destacado' : 'Destacar'}</button></div></section></div> : null}
+      {pendingConnection ? <form className="connection-composer connection-composer--editor" onSubmit={saveConnection}><div><span>{editingConnectionId ? 'EDITAR RELACIÓN' : 'CONEXIÓN DE LA PIZARRA'}</span><strong>{cards.find((card) => card.id === pendingConnection.fromId)?.title || 'Elemento'} <b>→</b> {cards.find((card) => card.id === pendingConnection.toId)?.title || 'Elemento'}</strong><button className="connection-direction" type="button" onClick={invertConnectionDirection}>Invertir dirección</button></div><p className={'connection-scope-label connection-scope-label--' + pendingConnectionScope.toLowerCase()}><b>{pendingConnectionScope === 'PERSONAL' ? 'Privada' : 'Oficial'}</b>{pendingConnectionScope === 'PERSONAL' ? 'Solo tú puedes verla' : 'Visible para toda la crónica'}</p><label>Tipo de conexión<select value={pendingConnectionType} onChange={(event) => { const type = event.target.value as BoardConnectionType; setPendingConnectionType(type); setPendingConnectionColor(boardConnectionColor(type)) }}><option value="VISUAL">Conexión visual</option><option value="KNOWN">Relación conocida</option><option value="SUSPICION">Teoría o sospecha</option></select></label>{pendingConnectionType === 'VISUAL' ? <p className="connection-visual-help">Línea visual sin etiqueta.</p> : <label>{pendingConnectionType === 'KNOWN' ? 'Etiqueta de la relación' : 'Pregunta o sospecha'}<input value={connectionLabel} onChange={(event) => setConnectionLabel(event.target.value)} placeholder={pendingConnectionType === 'KNOWN' ? 'Ej.: trabaja para' : 'Ej.: ¿se reúne aquí?'} autoFocus /></label>}<label className="connection-arrow-option"><span>Punta de flecha</span><span><input type="checkbox" checked={pendingConnectionArrow} onChange={(event) => setPendingConnectionArrow(event.target.checked)} /> Mostrar dirección</span></label><label className="connection-color-option"><span>Color</span><input type="color" value={pendingConnectionColor} onChange={(event) => setPendingConnectionColor(event.target.value)} /></label>{connectionEditorMessage ? <p className="connection-editor-message" role="alert">{connectionEditorMessage}</p> : null}<button type="button" onClick={resetConnectionEditor}>Cancelar</button><button className="connection-save" type="submit">{editingConnectionId ? 'Guardar cambios' : 'Guardar conexión'}</button></form> : null}      {focusedBoardCardId && !boardPreviewCard && !boardFocusCard ? <div className="board-mobile-actions" role="toolbar" aria-label="Acciones de la tarjeta enfocada">
         <div className="board-mobile-actions__title"><span>FOCO ACTIVO</span><strong>{cards.find((card) => card.id === focusedBoardCardId)?.title || "Tarjeta"}</strong></div>
         <button type="button" onClick={() => { const card = cards.find((item) => item.id === focusedBoardCardId); if (card) openBoardCardPreview(card) }}>Abrir</button>
-        <button type="button" onClick={() => { const card = cards.find((item) => item.id === focusedBoardCardId); if (card) startConnection(card) }}>Conectar</button>
+        <button type="button" disabled={!canCreateBoardConnection} onClick={() => { const card = cards.find((item) => item.id === focusedBoardCardId); if (card) startConnection(card) }}>Conectar</button>
         <button type="button" onClick={() => setFocusedBoardCardId(null)}>Quitar foco</button>
       </div> : null}
 
-      {visibleBoardConnections.length ? <section className="board-connections"><header><div><span>RELACIONES DE LA PIZARRA</span><h3>Conexiones guardadas</h3></div><b>{filteredBoardConnections.length}/{visibleBoardConnections.length}</b></header><div className="connection-list-tools"><label>Buscar relación<input value={connectionListQuery} onChange={(event) => setConnectionListQuery(event.target.value)} placeholder="Tarjeta o etiqueta…" /></label><div className="connection-filter-buttons" aria-label="Filtrar relaciones"><button className={'connection-filter-button ' + (connectionListFilter === 'ALL' ? 'is-active' : '')} type="button" onClick={() => setConnectionListFilter('ALL')}>Todas</button><button className={'connection-filter-button connection-filter-button--visual ' + (connectionListFilter === 'VISUAL' ? 'is-active' : '')} type="button" onClick={() => setConnectionListFilter('VISUAL')}>Visuales</button><button className={'connection-filter-button connection-filter-button--known ' + (connectionListFilter === 'KNOWN' ? 'is-active' : '')} type="button" onClick={() => setConnectionListFilter('KNOWN')}>Conocidas</button><button className={'connection-filter-button connection-filter-button--suspicion ' + (connectionListFilter === 'SUSPICION' ? 'is-active' : '')} type="button" onClick={() => setConnectionListFilter('SUSPICION')}>Sospechas</button></div></div>{focusedConnectionId ? <div className="connection-focus-banner"><span>Foco activo: se resaltan los dos extremos de la relación.</span><button type="button" onClick={() => setFocusedConnectionId(null)}>Quitar foco</button></div> : null}{focusedBoardCardId ? <div className="connection-focus-banner card-focus-banner"><span>Foco de tarjeta: se resaltan sus relaciones.</span><button type="button" onClick={() => setFocusedBoardCardId(null)}>Quitar foco</button></div> : null}{filteredBoardConnections.length ? filteredBoardConnections.map((connection) => <article className={focusedConnectionId === connection.id ? 'is-focused-row' : ''} key={connection.id}><strong>{cards.find((card) => card.id === connection.fromId)?.title || 'Elemento'} <i className={'connection-type-badge connection-type-badge--' + connection.type.toLowerCase()}>{connection.type === 'KNOWN' ? 'Relación conocida' : connection.type === 'SUSPICION' ? 'Teoría o sospecha' : 'Conexión visual'}</i>{connection.type !== 'VISUAL' ? <b>— {connection.label} —</b> : null} {cards.find((card) => card.id === connection.toId)?.title || 'Elemento'}</strong><div className="connection-row-actions"><button className="connection-focus" type="button" onClick={() => focusConnection(connection)}>{focusedConnectionId === connection.id ? 'Quitar foco' : 'Enfocar'}</button><button className="connection-edit" type="button" onClick={() => editConnection(connection)}>Editar</button><button type="button" onClick={() => removeConnection(connection.id)}>Quitar</button></div></article>) : <p className="connection-list-empty">No hay relaciones que coincidan con el filtro actual.</p>}</section> : null}
+      {visibleBoardConnections.length ? <section className="board-connections"><header><div><span>RELACIONES DE LA PIZARRA</span><h3>Conexiones guardadas</h3></div><b>{filteredBoardConnections.length}/{visibleBoardConnections.length}</b></header><div className="connection-list-tools"><label>Buscar relación<input value={connectionListQuery} onChange={(event) => setConnectionListQuery(event.target.value)} placeholder="Tarjeta o etiqueta…" /></label><div className="connection-filter-buttons" aria-label="Filtrar relaciones"><button className={'connection-filter-button ' + (connectionListFilter === 'ALL' ? 'is-active' : '')} type="button" onClick={() => setConnectionListFilter('ALL')}>Todas</button><button className={'connection-filter-button connection-filter-button--visual ' + (connectionListFilter === 'VISUAL' ? 'is-active' : '')} type="button" onClick={() => setConnectionListFilter('VISUAL')}>Visuales</button><button className={'connection-filter-button connection-filter-button--known ' + (connectionListFilter === 'KNOWN' ? 'is-active' : '')} type="button" onClick={() => setConnectionListFilter('KNOWN')}>Conocidas</button><button className={'connection-filter-button connection-filter-button--suspicion ' + (connectionListFilter === 'SUSPICION' ? 'is-active' : '')} type="button" onClick={() => setConnectionListFilter('SUSPICION')}>Sospechas</button></div></div>{focusedConnectionId ? <div className="connection-focus-banner"><span>Foco activo: se resaltan los dos extremos de la relación.</span><button type="button" onClick={() => setFocusedConnectionId(null)}>Quitar foco</button></div> : null}{focusedBoardCardId ? <div className="connection-focus-banner card-focus-banner"><span>Foco de tarjeta: se resaltan sus relaciones.</span><button type="button" onClick={() => setFocusedBoardCardId(null)}>Quitar foco</button></div> : null}{filteredBoardConnections.length ? filteredBoardConnections.map((connection) => <article className={focusedConnectionId === boardConnectionKey(connection) ? 'is-focused-row' : ''} key={boardConnectionKey(connection)}><strong>{cards.find((card) => card.id === connection.fromId)?.title || 'Elemento'} <i className={'connection-scope-badge connection-scope-badge--' + connection.scope.toLowerCase()}>{connection.scope === 'PERSONAL' ? 'Privada' : 'Oficial'}</i><i className={'connection-type-badge connection-type-badge--' + connection.type.toLowerCase()}>{connection.type === 'KNOWN' ? 'Relación conocida' : connection.type === 'SUSPICION' ? 'Teoría o sospecha' : 'Conexión visual'}</i>{connection.type !== 'VISUAL' ? <b>— {connection.label} —</b> : null} {cards.find((card) => card.id === connection.toId)?.title || 'Elemento'}</strong><div className="connection-row-actions"><button className="connection-focus" type="button" onClick={() => focusConnection(connection)}>{focusedConnectionId === boardConnectionKey(connection) ? 'Quitar foco' : 'Enfocar'}</button>{connection.scope === 'PERSONAL' || canManageSharedBoard ? <><button className="connection-edit" type="button" onClick={() => editConnection(connection)}>Editar</button><button type="button" onClick={() => removeConnection(connection)}>Quitar</button></> : <span className="connection-readonly">Solo lectura</span>}</div></article>) : <p className="connection-list-empty">No hay relaciones que coincidan con el filtro actual.</p>}</section> : null}
     </section> : null}
       {/* CHRONICLE_SPACE_TIMELINE_GLOBAL_OVERLAYS_V1 — disponibles también desde Cronología y Archivo. */}
       {section !== 'BOARD' && boardPreviewCard ? <div className="board-preview-backdrop"><button className="space-overlay__dismiss" type="button" aria-label="Cerrar previsualización" tabIndex={-1} onClick={() => setBoardPreviewCard(null)} /><section className="board-preview-dialog" role="dialog" aria-modal="true" aria-label={'Previsualización de ' + boardPreviewCard.title} onClick={(event) => event.stopPropagation()}><button className="board-preview-close" type="button" aria-label="Cerrar previsualización" onClick={() => setBoardPreviewCard(null)}>×</button><span>{kindLabel(boardPreviewCard.kind)}{boardPreviewCard.meta ? ' · ' + boardPreviewCard.meta : ''}</span><h3>{boardPreviewCard.title}</h3><p>{boardPreviewCard.kind === 'NOTA' ? renderMentionText(boardPreviewCard.description, openMention) : (boardPreviewCard.description || 'Sin información adicional disponible.')}</p><div className="board-preview-actions"><button type="button" onClick={() => void openBoardCardRecord(boardPreviewCard)}>{boardPreviewCard.kind === 'NOTA' ? 'Abrir anotación completa' : 'Abrir ficha completa'}</button><button type="button" onClick={() => setBoardPreviewCard(null)}>Cerrar</button></div></section></div> : null}
