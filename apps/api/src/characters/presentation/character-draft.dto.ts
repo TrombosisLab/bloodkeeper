@@ -647,9 +647,12 @@ function validateHumanity(
   path: string,
 ): void {
   const value = record(input, path)
-  onlyKeys(value, ['value', 'stains', 'convictions', 'touchstones'], path)
+  onlyKeys(value, ['value', 'stains', 'notes', 'convictions', 'touchstones'], path)
   integer(required(value, 'value', path), `${path}.value`)
   integer(required(value, 'stains', path), `${path}.stains`)
+  if (Object.hasOwn(value, 'notes')) {
+    stringValue(value.notes, `${path}.notes`)
+  }
 
   arrayValue(required(value, 'convictions', path), `${path}.convictions`)
     .forEach((item, index) => {
@@ -1071,11 +1074,14 @@ export function parseUpdateCharacterDraftRequest(
   if (Object.hasOwn(value, 'humanityStains')) integer(value.humanityStains, 'body.humanityStains')
   if (Object.hasOwn(value, 'humanityNarrative')) {
     const narrative = record(value.humanityNarrative, 'body.humanityNarrative')
-    onlyKeys(narrative, ['convictions', 'touchstones'], 'body.humanityNarrative')
+    onlyKeys(narrative, ['notes', 'convictions', 'touchstones'], 'body.humanityNarrative')
     validateHumanity(
       {
         value: 0,
         stains: 0,
+        ...(Object.hasOwn(narrative, 'notes')
+          ? { notes: narrative.notes }
+          : {}),
         convictions: required(narrative, 'convictions', 'body.humanityNarrative'),
         touchstones: required(narrative, 'touchstones', 'body.humanityNarrative'),
       },

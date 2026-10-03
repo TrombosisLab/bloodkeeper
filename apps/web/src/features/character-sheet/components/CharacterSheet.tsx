@@ -35,6 +35,10 @@ import type {
 } from '../types/character-sheet-model.types'
 
 import type {
+  CharacterNarrativeState,
+} from '../types/character-convictions.types'
+
+import type {
   CharacterInitialVampireTransitionReadModel,
 } from '../types/character-transition-read-model.types'
 
@@ -50,6 +54,9 @@ import type {
 import { CharacterAttributes } from './CharacterAttributes'
 import { CharacterTrackers } from './CharacterTrackers'
 import { CharacterIdentity } from './CharacterIdentity'
+import type {
+  CharacterIdentityEditableFields,
+} from './CharacterIdentity'
 import { CharacterSkills } from './CharacterSkills'
 import { CharacterState } from './CharacterState'
 import { CharacterDisciplines } from './CharacterDisciplines'
@@ -97,6 +104,12 @@ interface CharacterSheetProps {
     snapshot: CharacterOperationalStateSnapshot,
   ) => void
   onStateReload?: () => void
+  onNarrativeSave?: (
+    narrative: CharacterNarrativeState,
+  ) => Promise<void>
+  onIdentitySave?: (
+    identity: CharacterIdentityEditableFields,
+  ) => Promise<void>
   readOnly?: boolean
 }
 
@@ -162,6 +175,8 @@ export function CharacterSheet({
   onRouseCheckApplied,
   onStateSaved,
   onStateReload,
+  onNarrativeSave,
+  onIdentitySave,
   readOnly = false,
 }: CharacterSheetProps) {
   const persisted =
@@ -233,6 +248,12 @@ export function CharacterSheet({
     !readOnly &&
     model.status !== 'archived' &&
     resolvedStateGateway !== null
+
+  const persistedIdentityEditable =
+    persisted &&
+    !readOnly &&
+    model.status !== 'archived' &&
+    onIdentitySave !== undefined
 
   const hasHunger =
     hunger !== null
@@ -415,7 +436,9 @@ export function CharacterSheet({
       document.getElementById('character-sheet-page-actions') !== null
         ? createPortal(
             <div className="character-sheet__header-actions">
-              {(!persisted || persistedStateEditable) ? (
+              {(!persisted ||
+                persistedStateEditable ||
+                persistedIdentityEditable) ? (
                 <button
                   type="button"
                   className="sheet-header__state-edit"
@@ -423,7 +446,7 @@ export function CharacterSheet({
                   disabled={statePersistence === 'saving'}
                   onClick={() => setStateEditing((editing) => !editing)}
                 >
-                  {stateEditing ? 'Finalizar edición' : 'Editar estados'}
+                  {stateEditing ? 'Finalizar modificación' : 'Modificar ficha'}
                 </button>
               ) : null}
 
@@ -453,8 +476,8 @@ export function CharacterSheet({
                 ? `Ficha persistida · revisión ${model.revision} · archivada · estados en solo lectura`
                 : stateEditing
                   ? hasHunger
-                    ? 'Edición persistida de Salud, Voluntad, Humanidad, Manchas y Hambre.'
-                    : 'Edición persistida de Salud, Voluntad, Humanidad y Manchas.'
+                    ? 'Modificación de ficha activa: Ambición, Deseo, Salud, Voluntad, Humanidad, Manchas y Hambre.'
+                    : 'Modificación de ficha activa: Ambición, Deseo, Salud, Voluntad, Humanidad y Manchas.'
                   : `Ficha persistida · revisión ${model.revision}`)}
           </span>
 
@@ -479,6 +502,13 @@ export function CharacterSheet({
           characterId={characterId}
           character={model?.identity ?? demoCharacter}
           profilePhase={profilePhase}
+          editing={stateEditing && persistedIdentityEditable}
+          onSave={
+            persistedIdentityEditable
+              ? onIdentitySave
+              : undefined
+          }
+          onFinishEditing={() => setStateEditing(false)}
         />
 
         <div className="character-sheet__state-panel">
@@ -636,7 +666,16 @@ export function CharacterSheet({
 
         {activeSection === 'story' ? (
           <section className="character-sheet__single-stage" aria-labelledby="narrative-title">
-            <CharacterNarrative narrative={model?.narrative} />
+          <CharacterNarrative
+            narrative={model?.narrative}
+            onSave={
+              persisted &&
+              !readOnly &&
+              model.status !== 'archived'
+                ? onNarrativeSave
+                : undefined
+            }
+          />
           </section>
         ) : null}
 

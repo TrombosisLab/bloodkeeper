@@ -317,6 +317,7 @@ export interface PersistedCharacterTouchstone {
 export interface PersistedCharacterHumanity {
   value: number
   stains: number
+  notes?: string
   convictions: PersistedCharacterConviction[]
   touchstones: PersistedCharacterTouchstone[]
 }
@@ -422,6 +423,7 @@ export interface UpdateCharacterDraftData {
   humanityValue?: number
   humanityStains?: number
   humanityNarrative?: {
+    notes?: string
     convictions: PersistedCharacterConviction[]
     touchstones: PersistedCharacterTouchstone[]
   }

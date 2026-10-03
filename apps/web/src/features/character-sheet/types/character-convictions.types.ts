@@ -1,6 +1,7 @@
 export interface Conviction {
   key: string
   text: string
+  touchstoneKey: string | null
 }
 
 export interface Touchstone {

@@ -39,6 +39,10 @@ import type {
 } from '../types/character-sheet-model.types'
 
 import type {
+  CharacterNarrativeState,
+} from '../types/character-convictions.types'
+
+import type {
   CharacterRouseCheckResult,
 } from '../types/character-rouse-check-persistence.types'
 
@@ -49,12 +53,17 @@ import type {
 import { CharacterSheet } from './CharacterSheet'
 
 import type {
+  CharacterIdentityEditableFields,
+} from './CharacterIdentity'
+
+import type {
   CharacterBlushOfLifeResult,
 } from '../types/character-blush-of-life-persistence.types'
 
 interface PersistedCharacterSheetProps {
   characterId: string
   gateway?: Pick<CharacterDraftGateway, 'load'>
+  narrativeGateway?: Pick<CharacterDraftGateway, 'update'>
   profilePhaseGateway?: CharacterProfilePhaseGateway
   readOnly?: boolean
 }
@@ -103,6 +112,7 @@ function withOperationalState(
 export function PersistedCharacterSheet({
   characterId,
   gateway,
+  narrativeGateway,
   profilePhaseGateway,
   readOnly = false,
 }: PersistedCharacterSheetProps) {
@@ -120,6 +130,14 @@ export function PersistedCharacterSheet({
         profilePhaseGateway ??
         createCharacterProfilePhaseGateway(),
       [profilePhaseGateway],
+    )
+
+  const resolvedNarrativeGateway =
+    useMemo(
+      () =>
+        narrativeGateway ??
+        createCharacterDraftGateway(),
+      [narrativeGateway],
     )
 
   const [reloadVersion, setReloadVersion] =
@@ -205,6 +223,83 @@ export function PersistedCharacterSheet({
           : 'error'
 
   if (loadState.kind === 'ready') {
+    const saveIdentity = async (
+      identity: CharacterIdentityEditableFields,
+    ): Promise<void> => {
+      await resolvedNarrativeGateway.update(
+        loadState.model.characterId,
+        {
+          expectedRevision:
+            loadState.model.revision,
+          identity: {
+            ambition:
+              identity.ambition === ''
+                ? null
+                : identity.ambition,
+            desire:
+              identity.desire === ''
+                ? null
+                : identity.desire,
+          },
+        },
+      )
+
+      setReloadVersion(
+        (version) => version + 1,
+      )
+    }
+
+    const saveNarrative = async (
+      narrative: CharacterNarrativeState,
+    ): Promise<void> => {
+      const touchstoneKeys =
+        new Set(
+          narrative.touchstones.map(
+            (touchstone) => touchstone.key,
+          ),
+        )
+
+      await resolvedNarrativeGateway.update(
+        loadState.model.characterId,
+        {
+          expectedRevision:
+            loadState.model.revision,
+          humanityNarrative: {
+            notes: narrative.notes,
+            convictions:
+              narrative.convictions.map(
+                (conviction) => ({
+                  convictionId:
+                    conviction.key,
+                  text: conviction.text,
+                  touchstoneId:
+                    conviction.touchstoneKey !== null &&
+                    touchstoneKeys.has(
+                      conviction.touchstoneKey,
+                    )
+                      ? conviction.touchstoneKey
+                      : null,
+                }),
+              ),
+            touchstones:
+              narrative.touchstones.map(
+                (touchstone) => ({
+                  touchstoneId:
+                    touchstone.key,
+                  name: touchstone.name,
+                  relationship:
+                    touchstone.relation,
+                }),
+              ),
+          },
+        },
+      )
+
+      setReloadVersion(
+        (version) => version + 1,
+      )
+    }
+
     return (
       <CharacterSheet
         key={
@@ -216,6 +311,18 @@ export function PersistedCharacterSheet({
         }
         model={loadState.model}
         readOnly={readOnly}
+        onNarrativeSave={
+          readOnly ||
+          loadState.model.status === 'archived'
+            ? undefined
+            : saveNarrative
+        }
+        onIdentitySave={
+          readOnly ||
+          loadState.model.status === 'archived'
+            ? undefined
+            : saveIdentity
+        }
         lastRouseCheckResult={
           lastRouseCheckResult
         }

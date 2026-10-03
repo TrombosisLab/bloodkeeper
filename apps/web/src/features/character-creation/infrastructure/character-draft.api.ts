@@ -737,6 +737,10 @@ function validHumanity(
     isRecord(value) &&
     isInteger(value.value) &&
     isInteger(value.stains) &&
+    (
+      value.notes === undefined ||
+      typeof value.notes === 'string'
+    ) &&
     Array.isArray(value.convictions) &&
     value.convictions.every(
       (conviction) =>

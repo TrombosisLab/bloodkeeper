@@ -359,10 +359,6 @@ export function adaptPersistedCharacterToSheetModel(
           snapshot.identity
             .predatorTypeKey,
         ),
-      /*
-       * No se presenta el UUID como nombre de Crónica.
-       * Queda vacío hasta disponer de su catálogo persistido.
-       */
       chronicle:
         optionalText(
           snapshot.chronicleName ?? null,
@@ -432,6 +428,8 @@ export function adaptPersistedCharacterToSheetModel(
               conviction.convictionId,
             text:
               conviction.text,
+            touchstoneKey:
+              conviction.touchstoneId,
           }),
         ),
       touchstones:
@@ -445,7 +443,8 @@ export function adaptPersistedCharacterToSheetModel(
               touchstone.relationship,
           }),
         ),
-      notes: '',
+      notes:
+        snapshot.humanity.notes ?? '',
     },
 
     availability: {

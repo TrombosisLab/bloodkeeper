@@ -1385,6 +1385,7 @@ function toPersistedDraft(
     humanity: {
       value: row.humanity.value,
       stains: row.humanity.stains,
+      notes: row.humanity.notes,
       convictions: row.convictions.map(
         (conviction) => ({
           convictionId: conviction.convictionId,
@@ -1590,6 +1591,7 @@ export class PrismaCharacterDraftRepository
                 create: {
                   value: data.humanity.value,
                   stains: data.humanity.stains,
+                  notes: data.humanity.notes ?? '',
                 },
               },
               touchstones: {
@@ -1860,35 +1862,23 @@ export class PrismaCharacterDraftRepository
     data:
       UpdateCharacterChronicleAssociationData,
   ): Promise<PersistedCharacterDraft> {
-    const updatedCount =
-      data.chronicleId === null
-        ? await this.database.$executeRaw`
-            UPDATE "characters"
-            SET "chronicleId" = NULL,
-                "revision" = "revision" + 1,
-                "updatedAt" = CURRENT_TIMESTAMP
-            WHERE "id" = CAST(${data.characterId} AS uuid)
-              AND "ownerId" = CAST(${ownerId} AS uuid)
-              AND "revision" = ${data.expectedRevision}
-          `
-        : (
-            await this.database.character.updateMany({
-              where: {
-                id: data.characterId,
-                ownerId,
-                revision:
-                  data.expectedRevision,
-              },
-              data: {
-                chronicleId: data.chronicleId,
-                revision: {
-                  increment: 1,
-                },
-              },
-            })
-          ).count
+    const updated =
+      await this.database.character.updateMany({
+        where: {
+          id: data.characterId,
+          ownerId,
+          revision:
+            data.expectedRevision,
+        },
+        data: {
+          chronicleId: data.chronicleId,
+          revision: {
+            increment: 1,
+          },
+        },
+      })
 
-    if (updatedCount !== 1) {
+    if (updated.count !== 1) {
       throw new CharacterDraftWriteConflictError(
         data.characterId,
       )
@@ -2591,6 +2581,37 @@ export class PrismaCharacterDraftRepository
     ownerId: string,
     data: UpdateCharacterDraftData,
   ): Promise<PersistedCharacterDraft> {
+    const changedSections =
+      Object.keys(data).filter(
+        (key) =>
+          key !== 'characterId' &&
+          key !== 'expectedRevision',
+      )
+
+    const identityKeys =
+      data.identity === undefined
+        ? []
+        : Object.keys(data.identity)
+
+    const updatesOnlyEditableSheetFields =
+      changedSections.length > 0 &&
+      changedSections.every(
+        (key) =>
+          key === 'humanityNarrative' ||
+          key === 'identity',
+      ) &&
+      (
+        data.identity === undefined ||
+        (
+          identityKeys.length > 0 &&
+          identityKeys.every(
+            (key) =>
+              key === 'ambition' ||
+              key === 'desire',
+          )
+        )
+      )
+
     return this.database.$transaction(
       async (transaction) => {
         const characterData:
@@ -2609,7 +2630,13 @@ export class PrismaCharacterDraftRepository
               id: data.characterId,
               ownerId,
               revision: data.expectedRevision,
-              status: PrismaCharacterStatus.DRAFT,
+              status:
+                updatesOnlyEditableSheetFields
+                  ? {
+                      not:
+                        PrismaCharacterStatus.ARCHIVED,
+                    }
+                  : PrismaCharacterStatus.DRAFT,
             },
             data: characterData,
           })
@@ -2989,6 +3016,18 @@ export class PrismaCharacterDraftRepository
         }
 
         if (data.humanityNarrative !== undefined) {
+          if (data.humanityNarrative.notes !== undefined) {
+            await transaction.characterHumanityState
+              .update({
+                where: {
+                  characterId: data.characterId,
+                },
+                data: {
+                  notes: data.humanityNarrative.notes,
+                },
+              })
+          }
+
           await transaction.characterConviction
             .deleteMany({
               where: {

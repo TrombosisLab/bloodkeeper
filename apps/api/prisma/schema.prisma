@@ -204,30 +204,30 @@ enum InventoryItemStatus {
 }
 
 model User {
-  createdChronicleStories ChronicleStory[] @relation("ChronicleStoryCreatedBy")
-  completedStoryMilestones ChronicleStoryMilestone[] @relation("ChronicleStoryMilestoneCompletedBy")
+  createdChronicleStories   ChronicleStory[]                    @relation("ChronicleStoryCreatedBy")
+  completedStoryMilestones  ChronicleStoryMilestone[]           @relation("ChronicleStoryMilestoneCompletedBy")
   storyCompletionOperations ChronicleStoryCompletionOperation[] @relation("ChronicleStoryCompletionActor")
-  id           String            @id @default(uuid()) @db.Uuid
-  username     String            @unique
-  displayName  String
-  passwordHash String
-  status       UserAccountStatus @default(ACTIVE)
-  roles        UserRole[]        @default([PLAYER])
-  createdAt    DateTime          @default(now()) @db.Timestamptz(3)
-  updatedAt    DateTime          @updatedAt @db.Timestamptz(3)
+  id                        String                              @id @default(uuid()) @db.Uuid
+  username                  String                              @unique
+  displayName               String
+  passwordHash              String
+  status                    UserAccountStatus                   @default(ACTIVE)
+  roles                     UserRole[]                          @default([PLAYER])
+  createdAt                 DateTime                            @default(now()) @db.Timestamptz(3)
+  updatedAt                 DateTime                            @updatedAt @db.Timestamptz(3)
 
-  sessions                AuthSession[]
-  ownedCharacters         Character[]            @relation("CharacterOwner")
-  chronicleParticipations ChronicleParticipant[] @relation("ChronicleParticipantUser")
-  authoredChronicleNotes ChronicleNote[] @relation("ChronicleNoteAuthor")
-  chronicleNoteAudiences ChronicleNoteAudience[] @relation("ChronicleNoteAudienceUser")
-  notebookFavorites ChronicleNoteFavorite[]
-  experienceMovements     CharacterExperienceMovement[] @relation("CharacterExperienceActor")
-  executedDiceRolls       DiceRollRecord[] @relation("DiceRollActor")
-  rouseCheckOperations    CharacterRouseCheckOperation[] @relation("RouseCheckActor")
-  blushOfLifeExemptions   CharacterBlushOfLifeExemptionOperation[] @relation("BlushOfLifeExemptionActor")
-  chronicleSessionNotes   ChronicleSessionParticipantNote[] @relation("ChronicleSessionParticipantNoteAuthor")
-  dashboardContext UserDashboardContext?
+  sessions                          AuthSession[]
+  ownedCharacters                   Character[]                              @relation("CharacterOwner")
+  chronicleParticipations           ChronicleParticipant[]                   @relation("ChronicleParticipantUser")
+  authoredChronicleNotes            ChronicleNote[]                          @relation("ChronicleNoteAuthor")
+  chronicleNoteAudiences            ChronicleNoteAudience[]                  @relation("ChronicleNoteAudienceUser")
+  notebookFavorites                 ChronicleNoteFavorite[]
+  experienceMovements               CharacterExperienceMovement[]            @relation("CharacterExperienceActor")
+  executedDiceRolls                 DiceRollRecord[]                         @relation("DiceRollActor")
+  rouseCheckOperations              CharacterRouseCheckOperation[]           @relation("RouseCheckActor")
+  blushOfLifeExemptions             CharacterBlushOfLifeExemptionOperation[] @relation("BlushOfLifeExemptionActor")
+  chronicleSessionNotes             ChronicleSessionParticipantNote[]        @relation("ChronicleSessionParticipantNoteAuthor")
+  dashboardContext                  UserDashboardContext?
   libraryResources                  LibraryResource[]                        @relation("LibraryResourceOwner")
   chronicleResourceAudiences        ChronicleResourceAudience[]               @relation("ChronicleResourceAudienceUser")
   chronicleSpaceBoardPersonalStates ChronicleSpaceBoardPersonalState[]       @relation("ChronicleSpaceBoardPersonalStateUser")
@@ -238,13 +238,13 @@ model User {
 }
 
 model AuthSession {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @db.Uuid
-  tokenHash String   @unique
-  expiresAt DateTime @db.Timestamptz(3)
-  createdAt DateTime @default(now()) @db.Timestamptz(3)
-  lastSeenAt DateTime @default(now()) @db.Timestamptz(3)
-  revokedAt DateTime? @db.Timestamptz(3)
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @db.Uuid
+  tokenHash  String    @unique
+  expiresAt  DateTime  @db.Timestamptz(3)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+  lastSeenAt DateTime  @default(now()) @db.Timestamptz(3)
+  revokedAt  DateTime? @db.Timestamptz(3)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -261,30 +261,30 @@ enum ChronicleSessionStatus {
 }
 
 model Chronicle {
-  id          String          @id @default(uuid()) @db.Uuid
-  narratorId  String          @db.Uuid
-  name        String
-  description String?
-  status      ChronicleStatus @default(PREPARATION)
-  experiencePace ChronicleExperiencePace @default(STANDARD)
+  id               String                  @id @default(uuid()) @db.Uuid
+  narratorId       String                  @db.Uuid
+  name             String
+  description      String?
+  status           ChronicleStatus         @default(PREPARATION)
+  experiencePace   ChronicleExperiencePace @default(STANDARD)
   currentSituation String?
-  createdAt   DateTime        @default(now()) @db.Timestamptz(3)
-  updatedAt   DateTime        @updatedAt @db.Timestamptz(3)
+  createdAt        DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime                @updatedAt @db.Timestamptz(3)
 
-  characters   Character[]            @relation("CharacterChronicle")
-  participants ChronicleParticipant[] @relation("ChronicleParticipantChronicle")
-  npcs         ChronicleNpc[]          @relation("ChronicleNpcChronicle")
-  locations    ChronicleLocation[]     @relation("ChronicleLocationChronicle")
-  events       ChronicleEvent[]        @relation("ChronicleEventChronicle")
-  sessions     ChronicleSession[]      @relation("ChronicleSessionChronicle")
-  stories      ChronicleStory[]        @relation("ChronicleStoryChronicle")
-  diceRolls    DiceRollRecord[]         @relation("DiceRollChronicle")
-  sessionScenes ChronicleSessionScene[] @relation("ChronicleSessionSceneChronicle")
-  sessionPreparationItems ChronicleSessionPreparationItem[] @relation("ChronicleSessionPreparationChronicle")
-  sessionParticipantNotes ChronicleSessionParticipantNote[] @relation("ChronicleSessionParticipantNoteChronicle")
-  coverImage ChronicleCoverImage?
-  notebookNotes ChronicleNote[] @relation("ChronicleNoteChronicle")
-  spaceBoard ChronicleSpaceBoard? @relation("ChronicleSpaceBoardChronicle")
+  characters               Character[]                        @relation("CharacterChronicle")
+  participants             ChronicleParticipant[]             @relation("ChronicleParticipantChronicle")
+  npcs                     ChronicleNpc[]                     @relation("ChronicleNpcChronicle")
+  locations                ChronicleLocation[]                @relation("ChronicleLocationChronicle")
+  events                   ChronicleEvent[]                   @relation("ChronicleEventChronicle")
+  sessions                 ChronicleSession[]                 @relation("ChronicleSessionChronicle")
+  stories                  ChronicleStory[]                   @relation("ChronicleStoryChronicle")
+  diceRolls                DiceRollRecord[]                   @relation("DiceRollChronicle")
+  sessionScenes            ChronicleSessionScene[]            @relation("ChronicleSessionSceneChronicle")
+  sessionPreparationItems  ChronicleSessionPreparationItem[]  @relation("ChronicleSessionPreparationChronicle")
+  sessionParticipantNotes  ChronicleSessionParticipantNote[]  @relation("ChronicleSessionParticipantNoteChronicle")
+  coverImage               ChronicleCoverImage?
+  notebookNotes            ChronicleNote[]                    @relation("ChronicleNoteChronicle")
+  spaceBoard               ChronicleSpaceBoard?               @relation("ChronicleSpaceBoardChronicle")
   resources                ChronicleResource[]
   libraryResourceBindings  ChronicleResourceBinding[]
   spaceBoardPersonalStates ChronicleSpaceBoardPersonalState[] @relation("ChronicleSpaceBoardPersonalStateChronicle")
@@ -297,11 +297,11 @@ model Chronicle {
 
 model ChronicleCoverImage {
   chronicleId String   @id @db.Uuid
-  mimeType   String
-  byteSize   Int
-  sha256     String
-  data       Bytes
-  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+  mimeType    String
+  byteSize    Int
+  sha256      String
+  data        Bytes
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
 
   chronicle Chronicle @relation(fields: [chronicleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
@@ -319,15 +319,15 @@ enum ChronicleParticipantStatus {
 }
 
 model ChronicleParticipant {
-  id          String                     @id @default(uuid()) @db.Uuid
-  chronicleId String                     @db.Uuid
-  userId      String                     @db.Uuid
-  role        ChronicleParticipantRole
-  status      ChronicleParticipantStatus @default(ACTIVE)
+  id            String                     @id @default(uuid()) @db.Uuid
+  chronicleId   String                     @db.Uuid
+  userId        String                     @db.Uuid
+  role          ChronicleParticipantRole
+  status        ChronicleParticipantStatus @default(ACTIVE)
   narratorNotes String?
-  revision    Int @default(1)
-  createdAt   DateTime                   @default(now()) @db.Timestamptz(3)
-  updatedAt   DateTime                   @updatedAt @db.Timestamptz(3)
+  revision      Int                        @default(1)
+  createdAt     DateTime                   @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime                   @updatedAt @db.Timestamptz(3)
 
   chronicle Chronicle @relation("ChronicleParticipantChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   user      User      @relation("ChronicleParticipantUser", fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -356,16 +356,16 @@ model ChronicleNpc {
   description   String?
   narrativeRole String?
   notes         String?
-  status        ChronicleNpcStatus       @default(ACTIVE)
-  detailLevel   ChronicleNpcDetailLevel  @default(SIMPLE)
-  deepProfile Json?
-  createdAt     DateTime                 @default(now()) @db.Timestamptz(3)
-  updatedAt     DateTime                 @updatedAt @db.Timestamptz(3)
+  status        ChronicleNpcStatus      @default(ACTIVE)
+  detailLevel   ChronicleNpcDetailLevel @default(SIMPLE)
+  deepProfile   Json?
+  createdAt     DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime                @updatedAt @db.Timestamptz(3)
 
-  chronicle Chronicle @relation("ChronicleNpcChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  chronicle    Chronicle             @relation("ChronicleNpcChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   contextLinks ChronicleSessionNpc[] @relation("ChronicleSessionNpcNpc")
-  storyLinks   ChronicleStoryNpc[] @relation("ChronicleStoryNpcNpc")
-  eventLinks ChronicleEventNpc[] @relation("ChronicleEventNpcNpc")
+  storyLinks   ChronicleStoryNpc[]   @relation("ChronicleStoryNpcNpc")
+  eventLinks   ChronicleEventNpc[]   @relation("ChronicleEventNpcNpc")
 
   @@unique([id, chronicleId])
   @@index([chronicleId, status])
@@ -390,15 +390,15 @@ model ChronicleLocation {
   createdAt        DateTime                @default(now()) @db.Timestamptz(3)
   updatedAt        DateTime                @updatedAt @db.Timestamptz(3)
 
-  chronicle Chronicle @relation("ChronicleLocationChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  resourceLinks ChronicleResource[] @relation("ChronicleResourceLocation")
-  contextLinks ChronicleSessionLocation[] @relation("ChronicleSessionLocationLocation")
-  contextNotes ChronicleNote[] @relation("ChronicleNoteContextLocation")
-  storyLinks   ChronicleStoryLocation[] @relation("ChronicleStoryLocationLocation")
-  eventLinks ChronicleEventLocation[] @relation("ChronicleEventLocationLocation")
+  chronicle     Chronicle                  @relation("ChronicleLocationChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  resourceLinks ChronicleResource[]        @relation("ChronicleResourceLocation")
+  contextLinks  ChronicleSessionLocation[] @relation("ChronicleSessionLocationLocation")
+  contextNotes  ChronicleNote[]            @relation("ChronicleNoteContextLocation")
+  storyLinks    ChronicleStoryLocation[]   @relation("ChronicleStoryLocationLocation")
+  eventLinks    ChronicleEventLocation[]   @relation("ChronicleEventLocationLocation")
 
-  parentLocation ChronicleLocation?  @relation("ChronicleLocationHierarchy", fields: [parentLocationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  childLocations ChronicleLocation[] @relation("ChronicleLocationHierarchy")
+  parentLocation ChronicleLocation?   @relation("ChronicleLocationHierarchy", fields: [parentLocationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  childLocations ChronicleLocation[]  @relation("ChronicleLocationHierarchy")
   mapLinks       ChronicleMap[]       @relation("ChronicleMapLocation")
   mapMarkers     ChronicleMapMarker[] @relation("ChronicleMapMarkerLocation")
 
@@ -427,12 +427,12 @@ model ChronicleEvent {
   createdAt          DateTime             @default(now()) @db.Timestamptz(3)
   updatedAt          DateTime             @updatedAt @db.Timestamptz(3)
 
-  chronicle Chronicle @relation("ChronicleEventChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  contextLinks ChronicleSessionEvent[] @relation("ChronicleSessionEventEvent")
-  storyLinks   ChronicleStoryEvent[] @relation("ChronicleStoryEventEvent")
+  chronicle      Chronicle                 @relation("ChronicleEventChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  contextLinks   ChronicleSessionEvent[]   @relation("ChronicleSessionEventEvent")
+  storyLinks     ChronicleStoryEvent[]     @relation("ChronicleStoryEventEvent")
   characterLinks ChronicleEventCharacter[] @relation("ChronicleEventCharacterEvent")
-  npcLinks ChronicleEventNpc[] @relation("ChronicleEventNpcEvent")
-  locationLinks ChronicleEventLocation[] @relation("ChronicleEventLocationEvent")
+  npcLinks       ChronicleEventNpc[]       @relation("ChronicleEventNpcEvent")
+  locationLinks  ChronicleEventLocation[]  @relation("ChronicleEventLocationEvent")
 
   @@unique([id, chronicleId])
   @@index([chronicleId, status])
@@ -442,40 +442,40 @@ model ChronicleEvent {
 }
 
 model ChronicleSession {
-    id            String                 @id @default(uuid()) @db.Uuid
-    chronicleId   String                 @db.Uuid
-    sessionNumber Int?
-    title         String?
-    realDate      DateTime?              @db.Timestamptz(3)
-    status        ChronicleSessionStatus @default(PREPARATION)
-    experiencePaceSnapshot ChronicleExperiencePace?
-    summary       String?
-    narratorNotes String?
-    objective String?
-    plannedSummary String?
-    revision Int @default(1)
-    createdAt     DateTime               @default(now()) @db.Timestamptz(3)
-    updatedAt     DateTime               @updatedAt @db.Timestamptz(3)
+  id                     String                   @id @default(uuid()) @db.Uuid
+  chronicleId            String                   @db.Uuid
+  sessionNumber          Int?
+  title                  String?
+  realDate               DateTime?                @db.Timestamptz(3)
+  status                 ChronicleSessionStatus   @default(PREPARATION)
+  experiencePaceSnapshot ChronicleExperiencePace?
+  summary                String?
+  narratorNotes          String?
+  objective              String?
+  plannedSummary         String?
+  revision               Int                      @default(1)
+  createdAt              DateTime                 @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime                 @updatedAt @db.Timestamptz(3)
 
-    chronicle Chronicle @relation("ChronicleSessionChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-    experienceMovements CharacterExperienceMovement[] @relation("CharacterExperienceSession")
-    diceRolls           DiceRollRecord[] @relation("DiceRollSession")
-    attendances         ChronicleSessionAttendance[] @relation("ChronicleSessionAttendanceSession")
-    eventLinks          ChronicleSessionEvent[] @relation("ChronicleSessionEventSession")
-    npcLinks            ChronicleSessionNpc[] @relation("ChronicleSessionNpcSession")
-    locationLinks       ChronicleSessionLocation[] @relation("ChronicleSessionLocationSession")
-    resourceLinks       ChronicleSessionResource[] @relation("ChronicleSessionResourceSession")
-    storyLinks          ChronicleStorySession[] @relation("ChronicleStorySessionSession")
-    scenes ChronicleSessionScene[] @relation("ChronicleSessionSceneSession")
-    preparationItems ChronicleSessionPreparationItem[] @relation("ChronicleSessionPreparationSession")
-    participantNotes ChronicleSessionParticipantNote[] @relation("ChronicleSessionParticipantNoteSession")
-  notebookNotes ChronicleNote[] @relation("ChronicleNoteSession")
+  chronicle           Chronicle                         @relation("ChronicleSessionChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  experienceMovements CharacterExperienceMovement[]     @relation("CharacterExperienceSession")
+  diceRolls           DiceRollRecord[]                  @relation("DiceRollSession")
+  attendances         ChronicleSessionAttendance[]      @relation("ChronicleSessionAttendanceSession")
+  eventLinks          ChronicleSessionEvent[]           @relation("ChronicleSessionEventSession")
+  npcLinks            ChronicleSessionNpc[]             @relation("ChronicleSessionNpcSession")
+  locationLinks       ChronicleSessionLocation[]        @relation("ChronicleSessionLocationSession")
+  resourceLinks       ChronicleSessionResource[]        @relation("ChronicleSessionResourceSession")
+  storyLinks          ChronicleStorySession[]           @relation("ChronicleStorySessionSession")
+  scenes              ChronicleSessionScene[]           @relation("ChronicleSessionSceneSession")
+  preparationItems    ChronicleSessionPreparationItem[] @relation("ChronicleSessionPreparationSession")
+  participantNotes    ChronicleSessionParticipantNote[] @relation("ChronicleSessionParticipantNoteSession")
+  notebookNotes       ChronicleNote[]                   @relation("ChronicleNoteSession")
 
   @@unique([id, chronicleId])
-    @@index([chronicleId, status])
-    @@index([chronicleId, sessionNumber])
-    @@index([chronicleId, realDate])
-    @@map("chronicle_sessions")
+  @@index([chronicleId, status])
+  @@index([chronicleId, sessionNumber])
+  @@index([chronicleId, realDate])
+  @@map("chronicle_sessions")
 }
 
 model ChronicleSessionParticipantNote {
@@ -511,30 +511,30 @@ enum ChronicleNoteStatus {
 }
 
 model ChronicleNote {
-  id           String                @id @default(uuid()) @db.Uuid
-  chronicleId  String                @db.Uuid
-  sessionId    String?               @db.Uuid
-  contextLocationId String? @db.Uuid
+  id                     String                  @id @default(uuid()) @db.Uuid
+  chronicleId            String                  @db.Uuid
+  sessionId              String?                 @db.Uuid
+  contextLocationId      String?                 @db.Uuid
   contextImageTargetType String?
-  contextImageTargetId String? @db.Uuid
-  authorUserId String                @db.Uuid
-  title        String
-  content      String
-  visibility   ChronicleNoteVisibility @default(CHRONICLE)
-  status       ChronicleNoteStatus   @default(ACTIVE)
-  pinned       Boolean               @default(false)
-  tags         String[]              @default([])
-  revision     Int                   @default(1)
-  createdAt    DateTime              @default(now()) @db.Timestamptz(3)
-  updatedAt    DateTime              @updatedAt @db.Timestamptz(3)
+  contextImageTargetId   String?                 @db.Uuid
+  authorUserId           String                  @db.Uuid
+  title                  String
+  content                String
+  visibility             ChronicleNoteVisibility @default(CHRONICLE)
+  status                 ChronicleNoteStatus     @default(ACTIVE)
+  pinned                 Boolean                 @default(false)
+  tags                   String[]                @default([])
+  revision               Int                     @default(1)
+  createdAt              DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime                @updatedAt @db.Timestamptz(3)
 
-  chronicle Chronicle @relation("ChronicleNoteChronicle", fields: [chronicleId], references: [id], onDelete: Cascade)
-  session   ChronicleSession? @relation("ChronicleNoteSession", fields: [sessionId], references: [id], onDelete: SetNull)
-  contextLocation ChronicleLocation? @relation("ChronicleNoteContextLocation", fields: [contextLocationId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  author    User @relation("ChronicleNoteAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
-  references ChronicleNoteReference[] @relation("ChronicleNoteReferenceNote")
-  audiences ChronicleNoteAudience[] @relation("ChronicleNoteAudienceNote")
-  favorites ChronicleNoteFavorite[]
+  chronicle       Chronicle                @relation("ChronicleNoteChronicle", fields: [chronicleId], references: [id], onDelete: Cascade)
+  session         ChronicleSession?        @relation("ChronicleNoteSession", fields: [sessionId], references: [id], onDelete: SetNull)
+  contextLocation ChronicleLocation?       @relation("ChronicleNoteContextLocation", fields: [contextLocationId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  author          User                     @relation("ChronicleNoteAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
+  references      ChronicleNoteReference[] @relation("ChronicleNoteReferenceNote")
+  audiences       ChronicleNoteAudience[]  @relation("ChronicleNoteAudienceNote")
+  favorites       ChronicleNoteFavorite[]
 
   @@index([chronicleId, status, updatedAt])
   @@index([chronicleId, sessionId, status])
@@ -543,11 +543,11 @@ model ChronicleNote {
 }
 
 model ChronicleNoteFavorite {
-  noteId String @db.Uuid
-  userId String @db.Uuid
-  createdAt DateTime @default(now()) @db.Timestamptz(3)
-  note ChronicleNote @relation(fields: [noteId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  noteId    String        @db.Uuid
+  userId    String        @db.Uuid
+  createdAt DateTime      @default(now()) @db.Timestamptz(3)
+  note      ChronicleNote @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([noteId, userId])
   @@index([userId])
@@ -575,7 +575,7 @@ model ChronicleNoteAudience {
   createdAt DateTime @default(now()) @db.Timestamptz(3)
 
   note ChronicleNote @relation("ChronicleNoteAudienceNote", fields: [noteId], references: [id], onDelete: Cascade)
-  user User @relation("ChronicleNoteAudienceUser", fields: [userId], references: [id], onDelete: Cascade)
+  user User          @relation("ChronicleNoteAudienceUser", fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([noteId, userId])
   @@index([userId])
@@ -664,12 +664,12 @@ model DiceRollRecord {
   rollSnapshot   Json
   createdAt      DateTime           @default(now()) @db.Timestamptz(3)
 
-  actor        User              @relation("DiceRollActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  character    Character?        @relation("DiceRollCharacter", fields: [characterId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  chronicle    Chronicle?        @relation("DiceRollChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  session      ChronicleSession? @relation("DiceRollSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  rerollParent DiceRollRecord?   @relation("DiceRollRerolls", fields: [rerollParentId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  rerolls      DiceRollRecord[]  @relation("DiceRollRerolls")
+  actor               User                          @relation("DiceRollActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  character           Character?                    @relation("DiceRollCharacter", fields: [characterId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  chronicle           Chronicle?                    @relation("DiceRollChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  session             ChronicleSession?             @relation("DiceRollSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  rerollParent        DiceRollRecord?               @relation("DiceRollRerolls", fields: [rerollParentId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  rerolls             DiceRollRecord[]              @relation("DiceRollRerolls")
   rouseCheckOperation CharacterRouseCheckOperation? @relation("RouseCheckHistory")
 
   @@index([actorId, createdAt, id])
@@ -692,11 +692,11 @@ enum CharacterExperienceComponent {
 }
 
 model CharacterExperienceMovement {
-  id                 String                       @id @default(uuid()) @db.Uuid
-  characterId        String                       @db.Uuid
-  actorId            String                       @db.Uuid
-  sessionId          String?                      @db.Uuid
-  storyId            String?                      @db.Uuid
+  id                 String                          @id @default(uuid()) @db.Uuid
+  characterId        String                          @db.Uuid
+  actorId            String                          @db.Uuid
+  sessionId          String?                         @db.Uuid
+  storyId            String?                         @db.Uuid
   type               CharacterExperienceMovementType
   component          CharacterExperienceComponent
   amount             Int
@@ -704,14 +704,14 @@ model CharacterExperienceMovement {
   deduplicationKey   String?
   acquisitionType    String?
   acquisitionKey     String?
-  correctsMovementId String?                      @db.Uuid
-  createdAt          DateTime                     @default(now()) @db.Timestamptz(3)
+  correctsMovementId String?                         @db.Uuid
+  createdAt          DateTime                        @default(now()) @db.Timestamptz(3)
 
-  character Character @relation("CharacterExperienceCharacter", fields: [characterId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  actor     User      @relation("CharacterExperienceActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  session   ChronicleSession? @relation("CharacterExperienceSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  story     ChronicleStory? @relation("CharacterExperienceStory", fields: [storyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  corrects  CharacterExperienceMovement? @relation("CharacterExperienceCorrection", fields: [correctsMovementId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  character   Character                     @relation("CharacterExperienceCharacter", fields: [characterId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  actor       User                          @relation("CharacterExperienceActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  session     ChronicleSession?             @relation("CharacterExperienceSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  story       ChronicleStory?               @relation("CharacterExperienceStory", fields: [storyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  corrects    CharacterExperienceMovement?  @relation("CharacterExperienceCorrection", fields: [correctsMovementId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   corrections CharacterExperienceMovement[] @relation("CharacterExperienceCorrection")
 
   @@unique([characterId, deduplicationKey])
@@ -734,37 +734,37 @@ model Character {
   createdAt   DateTime        @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime        @updatedAt @db.Timestamptz(3)
 
-  owner     User       @relation("CharacterOwner", fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  chronicle Chronicle? @relation("CharacterChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  owner      User                      @relation("CharacterOwner", fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  chronicle  Chronicle?                @relation("CharacterChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   storyLinks ChronicleStoryCharacter[] @relation("ChronicleStoryCharacterCharacter")
   eventLinks ChronicleEventCharacter[] @relation("ChronicleEventCharacterCharacter")
 
-  identity      CharacterIdentity?
-  creationState CharacterCreationState?
-  attributes    CharacterAttributes?
-  blood         CharacterBloodState?
+  identity                 CharacterIdentity?
+  creationState            CharacterCreationState?
+  attributes               CharacterAttributes?
+  blood                    CharacterBloodState?
   bloodResonanceOperations CharacterBloodResonanceOperation[]
-  rouseCheckOperations     CharacterRouseCheckOperation[] @relation("RouseCheckCharacter")
+  rouseCheckOperations     CharacterRouseCheckOperation[]           @relation("RouseCheckCharacter")
   blushOfLifeExemptions    CharacterBlushOfLifeExemptionOperation[] @relation("BlushOfLifeExemptionCharacter")
-  damage        CharacterDamageState?
-  skills        CharacterSkill[]
-  disciplines   CharacterDiscipline[]
-  bloodSorceryRituals CharacterBloodSorceryRitual[]
-  oblivionCeremonies  CharacterOblivionCeremony[]
-  thinBloodAlchemy    CharacterThinBloodAlchemyState?
-  thinBloodFormulas   CharacterThinBloodAlchemyFormula[]
-  thinBloodTraits     CharacterThinBloodTrait[]
-  advantages          CharacterAdvantageSelection[]
-  humanity      CharacterHumanityState?
-  convictions   CharacterConviction[]
-  touchstones   CharacterTouchstone[]
-  inventoryItems CharacterInventoryItem[]
-  notes          CharacterNote[]
-  historyEntries CharacterHistoryEntry[]
-  experienceMovements CharacterExperienceMovement[] @relation("CharacterExperienceCharacter")
-  diceRolls           DiceRollRecord[] @relation("DiceRollCharacter")
-  sessionAttendances  ChronicleSessionAttendance[] @relation("ChronicleSessionAttendanceCharacter")
-  portrait            CharacterPortrait?
+  damage                   CharacterDamageState?
+  skills                   CharacterSkill[]
+  disciplines              CharacterDiscipline[]
+  bloodSorceryRituals      CharacterBloodSorceryRitual[]
+  oblivionCeremonies       CharacterOblivionCeremony[]
+  thinBloodAlchemy         CharacterThinBloodAlchemyState?
+  thinBloodFormulas        CharacterThinBloodAlchemyFormula[]
+  thinBloodTraits          CharacterThinBloodTrait[]
+  advantages               CharacterAdvantageSelection[]
+  humanity                 CharacterHumanityState?
+  convictions              CharacterConviction[]
+  touchstones              CharacterTouchstone[]
+  inventoryItems           CharacterInventoryItem[]
+  notes                    CharacterNote[]
+  historyEntries           CharacterHistoryEntry[]
+  experienceMovements      CharacterExperienceMovement[]            @relation("CharacterExperienceCharacter")
+  diceRolls                DiceRollRecord[]                         @relation("DiceRollCharacter")
+  sessionAttendances       ChronicleSessionAttendance[]             @relation("ChronicleSessionAttendanceCharacter")
+  portrait                 CharacterPortrait?
 
   @@unique([id, chronicleId])
   @@index([ownerId])
@@ -787,9 +787,9 @@ model CharacterPortrait {
 }
 
 model CharacterIdentity {
-  id              String  @id @default(uuid()) @db.Uuid
-  characterId     String  @unique @db.Uuid
-  name            String  @default("")
+  id              String                @id @default(uuid()) @db.Uuid
+  characterId     String                @unique @db.Uuid
+  name            String                @default("")
   concept         String?
   predatorTypeKey String?
   ambition        String?
@@ -805,13 +805,13 @@ model CharacterIdentity {
 }
 
 model CharacterCreationState {
-  characterId            String                  @id @db.Uuid
-  schemaVersion          Int                     @default(1)
-  currentStep            CharacterCreationStep   @default(IDENTITY)
-  creationMode           CharacterCreationMode   @default(STANDARD)
+  characterId             String                  @id @db.Uuid
+  schemaVersion           Int                     @default(1)
+  currentStep             CharacterCreationStep   @default(IDENTITY)
+  creationMode            CharacterCreationMode   @default(STANDARD)
   skillDistributionMethod SkillDistributionMethod @default(BALANCED)
-  predatorTypeChoices    Json                    @default("{}")
-  updatedAt              DateTime                @updatedAt @db.Timestamptz(3)
+  predatorTypeChoices     Json                    @default("{}")
+  updatedAt               DateTime                @updatedAt @db.Timestamptz(3)
 
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
@@ -819,7 +819,7 @@ model CharacterCreationState {
 }
 
 model CharacterAttributes {
-  characterId String @id @db.Uuid
+  characterId  String @id @db.Uuid
   strength     Int    @default(1)
   dexterity    Int    @default(1)
   stamina      Int    @default(1)
@@ -845,7 +845,7 @@ model CharacterBloodState {
   resonanceSpecialAffinityKey CharacterBloodSpecialAffinityKey?
   dyscrasiaKey                CharacterBloodDyscrasiaKey?
   dyscrasiaAcquisitionMode    CharacterBloodDyscrasiaAcquisitionMode?
-  dyscrasiaSourceOperationId  String?                                  @db.Uuid
+  dyscrasiaSourceOperationId  String?                                 @db.Uuid
 
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
@@ -866,9 +866,9 @@ model CharacterBloodResonanceOperation {
   hungerAfter              Int
   createdAt                DateTime                                @default(now()) @db.Timestamptz(3)
 
-  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  dyscrasiaConsumption CharacterBloodDyscrasiaConsumptionOperation? @relation("CharacterBloodDyscrasiaSource")
-  blushOfLifeExemptions CharacterBlushOfLifeExemptionOperation[] @relation("BlushOfLifeExemptionSource")
+  character             Character                                    @relation(fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  dyscrasiaConsumption  CharacterBloodDyscrasiaConsumptionOperation? @relation("CharacterBloodDyscrasiaSource")
+  blushOfLifeExemptions CharacterBlushOfLifeExemptionOperation[]     @relation("BlushOfLifeExemptionSource")
 
   @@id([characterId, operationId])
   @@index([characterId, createdAt])
@@ -901,8 +901,8 @@ model CharacterBlushOfLifeExemptionOperation {
   characterRevision      Int
   createdAt              DateTime                   @default(now()) @db.Timestamptz(3)
 
-  character Character @relation("BlushOfLifeExemptionCharacter", fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  actor     User      @relation("BlushOfLifeExemptionActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  character            Character                        @relation("BlushOfLifeExemptionCharacter", fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  actor                User                             @relation("BlushOfLifeExemptionActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   sourceBloodOperation CharacterBloodResonanceOperation @relation("BlushOfLifeExemptionSource", fields: [characterId, sourceBloodOperationId], references: [characterId, operationId], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([characterId, operationId])
@@ -913,23 +913,23 @@ model CharacterBlushOfLifeExemptionOperation {
 }
 
 model CharacterRouseCheckOperation {
-  characterId            String   @db.Uuid
-  operationId            String   @db.Uuid
-  actorId                String   @db.Uuid
-  reason                 String
-  forced                 Boolean  @default(false)
-  bloodPotency           Int?
-  disciplinePowerLevel   Int?
-  rolls                  Json
-  selectedResult         Int
-  success                Boolean
-  hungerBefore           Int
-  hungerAfter            Int
-  consequence            String
+  characterId           String   @db.Uuid
+  operationId           String   @db.Uuid
+  actorId               String   @db.Uuid
+  reason                String
+  forced                Boolean  @default(false)
+  bloodPotency          Int?
+  disciplinePowerLevel  Int?
+  rolls                 Json
+  selectedResult        Int
+  success               Boolean
+  hungerBefore          Int
+  hungerAfter           Int
+  consequence           String
   consequenceDifficulty Int?
-  rollHistoryId          String   @unique @db.Uuid
-  characterRevision      Int
-  createdAt              DateTime @default(now()) @db.Timestamptz(3)
+  rollHistoryId         String   @unique @db.Uuid
+  characterRevision     Int
+  createdAt             DateTime @default(now()) @db.Timestamptz(3)
 
   character   Character      @relation("RouseCheckCharacter", fields: [characterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   actor       User           @relation("RouseCheckActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -942,11 +942,11 @@ model CharacterRouseCheckOperation {
 }
 
 model CharacterDamageState {
-  characterId               String @id @db.Uuid
-  healthSuperficial         Int    @default(0)
-  healthAggravated          Int    @default(0)
-  willpowerSuperficial      Int    @default(0)
-  willpowerAggravated       Int    @default(0)
+  characterId          String @id @db.Uuid
+  healthSuperficial    Int    @default(0)
+  healthAggravated     Int    @default(0)
+  willpowerSuperficial Int    @default(0)
+  willpowerAggravated  Int    @default(0)
 
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
@@ -958,7 +958,7 @@ model CharacterSkill {
   skillKey    String
   rating      Int    @default(0)
 
-  character  Character               @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  character   Character                 @relation(fields: [characterId], references: [id], onDelete: Cascade)
   specialties CharacterSkillSpecialty[]
 
   @@id([characterId, skillKey])
@@ -966,8 +966,8 @@ model CharacterSkill {
 }
 
 model CharacterSkillSpecialty {
-  id          String               @id
-  characterId String               @db.Uuid
+  id          String                @id
+  characterId String                @db.Uuid
   skillKey    String
   name        String
   origin      SkillSpecialtyOrigin?
@@ -979,8 +979,8 @@ model CharacterSkillSpecialty {
 }
 
 model CharacterDiscipline {
-  characterId    String            @db.Uuid
-  disciplineKey  String
+  characterId     String            @db.Uuid
+  disciplineKey   String
   contributionKey String
   rating          Int               @default(0)
   origin          DisciplineOrigin?
@@ -996,7 +996,7 @@ model CharacterDisciplinePower {
   characterId     String @db.Uuid
   disciplineKey   String
   contributionKey String
-  powerKey         String
+  powerKey        String
 
   discipline CharacterDiscipline @relation(fields: [characterId, disciplineKey, contributionKey], references: [characterId, disciplineKey, contributionKey], onDelete: Cascade)
 
@@ -1045,11 +1045,11 @@ model CharacterThinBloodAlchemyFormula {
 }
 
 model CharacterThinBloodTrait {
-  characterId                        String  @db.Uuid
-  definitionKey                      String
-  clanCurseClanKey                   String?
-  disciplineAffinityDisciplineKey    String?
-  disciplineAffinityPowerKey         String?
+  characterId                     String  @db.Uuid
+  definitionKey                   String
+  clanCurseClanKey                String?
+  disciplineAffinityDisciplineKey String?
+  disciplineAffinityPowerKey      String?
 
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
@@ -1058,15 +1058,15 @@ model CharacterThinBloodTrait {
 }
 
 model CharacterAdvantageSelection {
-  characterId      String                   @db.Uuid
-  selectionId      String
-  definitionKey    String
-  category         AdvantageCategory
-  rating           Int
-  origin           AdvantageSelectionOrigin
+  characterId       String                   @db.Uuid
+  selectionId       String
+  definitionKey     String
+  category          AdvantageCategory
+  rating            Int
+  origin            AdvantageSelectionOrigin
   parentSelectionId String?
 
-  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  character Character                     @relation(fields: [characterId], references: [id], onDelete: Cascade)
   parent    CharacterAdvantageSelection?  @relation("CharacterAdvantageParent", fields: [characterId, parentSelectionId], references: [characterId, selectionId], onDelete: NoAction, onUpdate: NoAction)
   children  CharacterAdvantageSelection[] @relation("CharacterAdvantageParent")
   details   CharacterAdvantageDetails?
@@ -1077,27 +1077,27 @@ model CharacterAdvantageSelection {
 }
 
 model CharacterAdvantageDetails {
-  characterId      String @db.Uuid
-  selectionId      String
-  kind             AdvantageDetailsKind
-  effectiveness    Int?
-  reliability      Int?
-  identity         String?
-  sphere           String?
-  maskBenefits     AdvantageMaskBenefit[] @default([])
-  secret           String?
-  resourceSource   String?
-  substance        String?
-  poolCategory     String?
-  folkloricSource  String?
-  taboo            String?
-  excludedPrey     String?
-  loresheetKey     String?
-  benefitKey       String?
-  languages        String[] @default([])
-  resembles        String?
-  subculture       String?
-  description      String?
+  characterId     String                 @db.Uuid
+  selectionId     String
+  kind            AdvantageDetailsKind
+  effectiveness   Int?
+  reliability     Int?
+  identity        String?
+  sphere          String?
+  maskBenefits    AdvantageMaskBenefit[] @default([])
+  secret          String?
+  resourceSource  String?
+  substance       String?
+  poolCategory    String?
+  folkloricSource String?
+  taboo           String?
+  excludedPrey    String?
+  loresheetKey    String?
+  benefitKey      String?
+  languages       String[]               @default([])
+  resembles       String?
+  subculture      String?
+  description     String?
 
   selection CharacterAdvantageSelection @relation(fields: [characterId, selectionId], references: [characterId, selectionId], onDelete: Cascade)
 
@@ -1109,6 +1109,7 @@ model CharacterHumanityState {
   characterId String @id @db.Uuid
   value       Int    @default(7)
   stains      Int    @default(0)
+  notes       String @default("")
 
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
@@ -1134,7 +1135,7 @@ model CharacterConviction {
   text         String
   touchstoneId String?
 
-  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  character  Character            @relation(fields: [characterId], references: [id], onDelete: Cascade)
   touchstone CharacterTouchstone? @relation(fields: [characterId, touchstoneId], references: [characterId, touchstoneId], onDelete: Restrict)
 
   @@id([characterId, convictionId])
@@ -1193,20 +1194,20 @@ enum ChronicleSessionWorkStatus {
 }
 
 model ChronicleSessionScene {
-  id String @id @default(uuid()) @db.Uuid
-  chronicleId String @db.Uuid
-  sessionId String @db.Uuid
-  title String
-  purpose String?
+  id             String                     @id @default(uuid()) @db.Uuid
+  chronicleId    String                     @db.Uuid
+  sessionId      String                     @db.Uuid
+  title          String
+  purpose        String?
   narrativePhase String?
-  intensity Int?
-  sortOrder Int
-  status ChronicleSessionWorkStatus @default(PENDING)
-  revision Int @default(1)
-  createdAt DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt DateTime @updatedAt @db.Timestamptz(3)
-  chronicle Chronicle @relation("ChronicleSessionSceneChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  session ChronicleSession @relation("ChronicleSessionSceneSession", fields: [sessionId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  intensity      Int?
+  sortOrder      Int
+  status         ChronicleSessionWorkStatus @default(PENDING)
+  revision       Int                        @default(1)
+  createdAt      DateTime                   @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime                   @updatedAt @db.Timestamptz(3)
+  chronicle      Chronicle                  @relation("ChronicleSessionSceneChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  session        ChronicleSession           @relation("ChronicleSessionSceneSession", fields: [sessionId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
 
   @@unique([sessionId, sortOrder])
   @@index([chronicleId, sessionId])
@@ -1214,17 +1215,17 @@ model ChronicleSessionScene {
 }
 
 model ChronicleSessionPreparationItem {
-  id String @id @default(uuid()) @db.Uuid
-  chronicleId String @db.Uuid
-  sessionId String @db.Uuid
-  text String
-  sortOrder Int
-  status ChronicleSessionWorkStatus @default(PENDING)
-  revision Int @default(1)
-  createdAt DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt DateTime @updatedAt @db.Timestamptz(3)
-  chronicle Chronicle @relation("ChronicleSessionPreparationChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  session ChronicleSession @relation("ChronicleSessionPreparationSession", fields: [sessionId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  id          String                     @id @default(uuid()) @db.Uuid
+  chronicleId String                     @db.Uuid
+  sessionId   String                     @db.Uuid
+  text        String
+  sortOrder   Int
+  status      ChronicleSessionWorkStatus @default(PENDING)
+  revision    Int                        @default(1)
+  createdAt   DateTime                   @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime                   @updatedAt @db.Timestamptz(3)
+  chronicle   Chronicle                  @relation("ChronicleSessionPreparationChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  session     ChronicleSession           @relation("ChronicleSessionPreparationSession", fields: [sessionId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
 
   @@unique([sessionId, sortOrder])
   @@index([chronicleId, sessionId])
@@ -1232,12 +1233,12 @@ model ChronicleSessionPreparationItem {
 }
 
 model ChronicleEventCharacter {
-  eventId String @db.Uuid
-  characterId String @db.Uuid
-  chronicleId String @db.Uuid
-  createdAt DateTime @default(now()) @db.Timestamptz(3)
-  event ChronicleEvent @relation("ChronicleEventCharacterEvent", fields: [eventId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
-  character Character @relation("ChronicleEventCharacterCharacter", fields: [characterId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  eventId     String         @db.Uuid
+  characterId String         @db.Uuid
+  chronicleId String         @db.Uuid
+  createdAt   DateTime       @default(now()) @db.Timestamptz(3)
+  event       ChronicleEvent @relation("ChronicleEventCharacterEvent", fields: [eventId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  character   Character      @relation("ChronicleEventCharacterCharacter", fields: [characterId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([eventId, characterId])
   @@index([characterId])
@@ -1245,12 +1246,12 @@ model ChronicleEventCharacter {
 }
 
 model ChronicleEventNpc {
-  eventId String @db.Uuid
-  npcId String @db.Uuid
-  chronicleId String @db.Uuid
-  createdAt DateTime @default(now()) @db.Timestamptz(3)
-  event ChronicleEvent @relation("ChronicleEventNpcEvent", fields: [eventId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
-  npc ChronicleNpc @relation("ChronicleEventNpcNpc", fields: [npcId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  eventId     String         @db.Uuid
+  npcId       String         @db.Uuid
+  chronicleId String         @db.Uuid
+  createdAt   DateTime       @default(now()) @db.Timestamptz(3)
+  event       ChronicleEvent @relation("ChronicleEventNpcEvent", fields: [eventId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  npc         ChronicleNpc   @relation("ChronicleEventNpcNpc", fields: [npcId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([eventId, npcId])
   @@index([npcId])
@@ -1258,12 +1259,12 @@ model ChronicleEventNpc {
 }
 
 model ChronicleEventLocation {
-  eventId String @db.Uuid
-  locationId String @db.Uuid
-  chronicleId String @db.Uuid
-  createdAt DateTime @default(now()) @db.Timestamptz(3)
-  event ChronicleEvent @relation("ChronicleEventLocationEvent", fields: [eventId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
-  location ChronicleLocation @relation("ChronicleEventLocationLocation", fields: [locationId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  eventId     String            @db.Uuid
+  locationId  String            @db.Uuid
+  chronicleId String            @db.Uuid
+  createdAt   DateTime          @default(now()) @db.Timestamptz(3)
+  event       ChronicleEvent    @relation("ChronicleEventLocationEvent", fields: [eventId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  location    ChronicleLocation @relation("ChronicleEventLocationLocation", fields: [locationId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([eventId, locationId])
   @@index([locationId])
@@ -1302,37 +1303,37 @@ enum ChronicleStoryMilestoneKey {
 }
 
 model ChronicleStory {
-  id              String                   @id @default(uuid()) @db.Uuid
-  chronicleId     String                   @db.Uuid
-  createdById     String                   @db.Uuid
-  title           String
-  type            ChronicleStoryType       @default(MAIN_ARC)
-  premise         String?
-  stakes          String?
-  resolution      String?
-  narratorNotes   String?
-  sharedSummary   String?
-  visibility      ChronicleStoryVisibility @default(NARRATOR_ONLY)
-  status          ChronicleStoryStatus     @default(PLANNED)
-  sortOrder       Int
-  revision        Int                      @default(1)
-  startedAt       DateTime?                @db.Timestamptz(3)
-  completedAt     DateTime?                @db.Timestamptz(3)
-  archivedAt      DateTime?                @db.Timestamptz(3)
-  createdAt       DateTime                 @default(now()) @db.Timestamptz(3)
-  updatedAt       DateTime                 @updatedAt @db.Timestamptz(3)
+  id            String                   @id @default(uuid()) @db.Uuid
+  chronicleId   String                   @db.Uuid
+  createdById   String                   @db.Uuid
+  title         String
+  type          ChronicleStoryType       @default(MAIN_ARC)
+  premise       String?
+  stakes        String?
+  resolution    String?
+  narratorNotes String?
+  sharedSummary String?
+  visibility    ChronicleStoryVisibility @default(NARRATOR_ONLY)
+  status        ChronicleStoryStatus     @default(PLANNED)
+  sortOrder     Int
+  revision      Int                      @default(1)
+  startedAt     DateTime?                @db.Timestamptz(3)
+  completedAt   DateTime?                @db.Timestamptz(3)
+  archivedAt    DateTime?                @db.Timestamptz(3)
+  createdAt     DateTime                 @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime                 @updatedAt @db.Timestamptz(3)
 
-  chronicle Chronicle @relation("ChronicleStoryChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  createdBy User @relation("ChronicleStoryCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  milestones ChronicleStoryMilestone[] @relation("ChronicleStoryMilestoneStory")
-  reminders ChronicleStoryReminder[] @relation("ChronicleStoryReminderStory")
-  sessionLinks ChronicleStorySession[] @relation("ChronicleStorySessionStory")
-  eventLinks ChronicleStoryEvent[] @relation("ChronicleStoryEventStory")
-  characterLinks ChronicleStoryCharacter[] @relation("ChronicleStoryCharacterStory")
-  npcLinks ChronicleStoryNpc[] @relation("ChronicleStoryNpcStory")
-  locationLinks ChronicleStoryLocation[] @relation("ChronicleStoryLocationStory")
+  chronicle           Chronicle                          @relation("ChronicleStoryChronicle", fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  createdBy           User                               @relation("ChronicleStoryCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  milestones          ChronicleStoryMilestone[]          @relation("ChronicleStoryMilestoneStory")
+  reminders           ChronicleStoryReminder[]           @relation("ChronicleStoryReminderStory")
+  sessionLinks        ChronicleStorySession[]            @relation("ChronicleStorySessionStory")
+  eventLinks          ChronicleStoryEvent[]              @relation("ChronicleStoryEventStory")
+  characterLinks      ChronicleStoryCharacter[]          @relation("ChronicleStoryCharacterStory")
+  npcLinks            ChronicleStoryNpc[]                @relation("ChronicleStoryNpcStory")
+  locationLinks       ChronicleStoryLocation[]           @relation("ChronicleStoryLocationStory")
   completionOperation ChronicleStoryCompletionOperation? @relation("ChronicleStoryCompletionStory")
-  experienceMovements CharacterExperienceMovement[] @relation("CharacterExperienceStory")
+  experienceMovements CharacterExperienceMovement[]      @relation("CharacterExperienceStory")
 
   @@unique([id, chronicleId])
   @@unique([chronicleId, sortOrder])
@@ -1354,8 +1355,8 @@ model ChronicleStoryMilestone {
   createdAt     DateTime                   @default(now()) @db.Timestamptz(3)
   updatedAt     DateTime                   @updatedAt @db.Timestamptz(3)
 
-  story ChronicleStory @relation("ChronicleStoryMilestoneStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
-  completedBy User? @relation("ChronicleStoryMilestoneCompletedBy", fields: [completedById], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  story       ChronicleStory @relation("ChronicleStoryMilestoneStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  completedBy User?          @relation("ChronicleStoryMilestoneCompletedBy", fields: [completedById], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   @@unique([storyId, key])
   @@unique([storyId, sortOrder])
@@ -1365,15 +1366,15 @@ model ChronicleStoryMilestone {
 }
 
 model ChronicleStoryReminder {
-  id          String   @id @default(uuid()) @db.Uuid
-  storyId     String   @db.Uuid
-  chronicleId String   @db.Uuid
+  id          String    @id @default(uuid()) @db.Uuid
+  storyId     String    @db.Uuid
+  chronicleId String    @db.Uuid
   text        String
   sortOrder   Int
   resolvedAt  DateTime? @db.Timestamptz(3)
-  revision    Int      @default(1)
-  createdAt   DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+  revision    Int       @default(1)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime  @updatedAt @db.Timestamptz(3)
 
   story ChronicleStory @relation("ChronicleStoryReminderStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
 
@@ -1383,13 +1384,13 @@ model ChronicleStoryReminder {
 }
 
 model ChronicleStorySession {
-  storyId      String   @db.Uuid
-  sessionId    String   @db.Uuid
-  chronicleId  String   @db.Uuid
+  storyId       String   @db.Uuid
+  sessionId     String   @db.Uuid
+  chronicleId   String   @db.Uuid
   progressNotes String?
-  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
 
-  story ChronicleStory @relation("ChronicleStorySessionStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  story   ChronicleStory   @relation("ChronicleStorySessionStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
   session ChronicleSession @relation("ChronicleStorySessionSession", fields: [sessionId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([storyId, sessionId])
@@ -1419,8 +1420,8 @@ model ChronicleStoryCharacter {
   chronicleId String   @db.Uuid
   createdAt   DateTime @default(now()) @db.Timestamptz(3)
 
-  story ChronicleStory @relation("ChronicleStoryCharacterStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
-  character Character @relation("ChronicleStoryCharacterCharacter", fields: [characterId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  story     ChronicleStory @relation("ChronicleStoryCharacterStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  character Character      @relation("ChronicleStoryCharacterCharacter", fields: [characterId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([storyId, characterId])
   @@index([characterId])
@@ -1435,7 +1436,7 @@ model ChronicleStoryNpc {
   createdAt   DateTime @default(now()) @db.Timestamptz(3)
 
   story ChronicleStory @relation("ChronicleStoryNpcStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
-  npc ChronicleNpc @relation("ChronicleStoryNpcNpc", fields: [npcId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  npc   ChronicleNpc   @relation("ChronicleStoryNpcNpc", fields: [npcId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([storyId, npcId])
   @@index([npcId])
@@ -1449,7 +1450,7 @@ model ChronicleStoryLocation {
   chronicleId String   @db.Uuid
   createdAt   DateTime @default(now()) @db.Timestamptz(3)
 
-  story ChronicleStory @relation("ChronicleStoryLocationStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  story    ChronicleStory    @relation("ChronicleStoryLocationStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
   location ChronicleLocation @relation("ChronicleStoryLocationLocation", fields: [locationId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([storyId, locationId])
@@ -1469,7 +1470,7 @@ model ChronicleStoryCompletionOperation {
   completedAt   DateTime @default(now()) @db.Timestamptz(3)
 
   story ChronicleStory @relation("ChronicleStoryCompletionStory", fields: [storyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  actor User @relation("ChronicleStoryCompletionActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  actor User           @relation("ChronicleStoryCompletionActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   @@index([actorId, completedAt])
   @@map("chronicle_story_completion_operations")
@@ -1482,20 +1483,20 @@ enum ChronicleResourceKind {
 }
 
 model ChronicleResource {
-  id String @id @default(uuid()) @db.Uuid
-  chronicleId String @db.Uuid
-  locationId String? @map("location_id") @db.Uuid
-  kind ChronicleResourceKind
-  name String
-  summary String?
+  id            String                @id @default(uuid()) @db.Uuid
+  chronicleId   String                @db.Uuid
+  locationId    String?               @map("location_id") @db.Uuid
+  kind          ChronicleResourceKind
+  name          String
+  summary       String?
   narratorNotes String?
-  visibility String @default("narrator_only")
-  metadata Json?
-  status String @default("active")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  chronicle Chronicle @relation(fields: [chronicleId], references: [id], onDelete: Cascade)
-  location ChronicleLocation? @relation("ChronicleResourceLocation", fields: [locationId], references: [id], onDelete: SetNull)
+  visibility    String                @default("narrator_only")
+  metadata      Json?
+  status        String                @default("active")
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  chronicle     Chronicle             @relation(fields: [chronicleId], references: [id], onDelete: Cascade)
+  location      ChronicleLocation?    @relation("ChronicleResourceLocation", fields: [locationId], references: [id], onDelete: SetNull)
 
   @@index([chronicleId, kind, status])
   @@index([chronicleId, visibility, status])
@@ -1517,12 +1518,12 @@ model ChronicleAssetImage {
 }
 
 model ChronicleSessionResource {
-  sessionId String @db.Uuid
-  resourceId String @db.Uuid
-  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  sessionId  String   @db.Uuid
+  resourceId String   @db.Uuid
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
 
-  session ChronicleSession @relation("ChronicleSessionResourceSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  resource LibraryResource @relation("ChronicleSessionResourceResource", fields: [resourceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  session  ChronicleSession @relation("ChronicleSessionResourceSession", fields: [sessionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  resource LibraryResource  @relation("ChronicleSessionResourceResource", fields: [resourceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([sessionId, resourceId])
   @@index([resourceId])
@@ -1530,10 +1531,10 @@ model ChronicleSessionResource {
 }
 
 model UserDashboardContext {
-  userId String @id @db.Uuid
-  chronicleId String? @db.Uuid
-  characterId String? @db.Uuid
-  sessionId String? @db.Uuid
+  userId       String   @id @db.Uuid
+  chronicleId  String?  @db.Uuid
+  characterId  String?  @db.Uuid
+  sessionId    String?  @db.Uuid
   lastOpenedAt DateTime @updatedAt @db.Timestamptz(3)
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
@@ -1543,19 +1544,19 @@ model UserDashboardContext {
 
 // Recurso canónico reutilizable del narrador.
 model LibraryResource {
-  id            String   @id @default(uuid()) @db.Uuid
-  ownerId       String   @db.Uuid
+  id            String                     @id @default(uuid()) @db.Uuid
+  ownerId       String                     @db.Uuid
   kind          String
   name          String
   summary       String?
   narratorNotes String?
   metadata      Json?
   legacyType    String?
-  legacyId      String?  @db.Uuid
-  status        String   @default("active")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  owner         User     @relation("LibraryResourceOwner", fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  legacyId      String?                    @db.Uuid
+  status        String                     @default("active")
+  createdAt     DateTime                   @default(now())
+  updatedAt     DateTime                   @updatedAt
+  owner         User                       @relation("LibraryResourceOwner", fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   bindings      ChronicleResourceBinding[]
   sessionLinks  ChronicleSessionResource[] @relation("ChronicleSessionResourceResource")
   mapMarkers    ChronicleMapMarker[]       @relation("ChronicleMapMarkerResource")
@@ -1569,16 +1570,16 @@ model LibraryResource {
 
 // Contexto local del recurso sin duplicar su ficha base.
 model ChronicleResourceBinding {
-  id             String   @id @default(uuid()) @db.Uuid
-  chronicleId    String   @db.Uuid
-  resourceId     String   @db.Uuid
-  visibility     String   @default("narrator_only")
+  id             String          @id @default(uuid()) @db.Uuid
+  chronicleId    String          @db.Uuid
+  resourceId     String          @db.Uuid
+  visibility     String          @default("narrator_only")
   chronicleNotes String?
   localLabel     String?
-  status         String   @default("attached")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  chronicle      Chronicle @relation(fields: [chronicleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  status         String          @default("attached")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  chronicle      Chronicle       @relation(fields: [chronicleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   resource       LibraryResource @relation(fields: [resourceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   audiences      ChronicleResourceAudience[] @relation("ChronicleResourceAudienceBinding")
 
@@ -1603,10 +1604,10 @@ model ChronicleResourceAudience {
 
 model ChronicleSpaceBoard {
   chronicleId String   @id @db.Uuid
-  state      Json
-  revision   Int       @default(1)
-  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
-  updatedAt  DateTime  @updatedAt @db.Timestamptz(3)
+  state       Json
+  revision    Int      @default(1)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
 
   chronicle Chronicle @relation("ChronicleSpaceBoardChronicle", fields: [chronicleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 

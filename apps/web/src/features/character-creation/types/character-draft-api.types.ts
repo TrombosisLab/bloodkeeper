@@ -156,6 +156,7 @@ export interface CharacterDraftApiAdvantageSelection {
 export interface CharacterDraftApiHumanity {
   value: number
   stains: number
+  notes?: string
   convictions: {
     convictionId: string
     text: string
@@ -282,6 +283,7 @@ export interface UpdateCharacterDraftApiRequest {
   humanityValue?: number
   humanityStains?: number
   humanityNarrative?: {
+    notes?: string
     convictions:
       CharacterDraftApiHumanity['convictions']
     touchstones:

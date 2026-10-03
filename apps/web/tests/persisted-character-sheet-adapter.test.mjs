@@ -412,6 +412,8 @@ test(
             key: 'conviction-1',
             text:
               'Nunca abandonar a un aliado',
+            touchstoneKey:
+              'touchstone-1',
           },
         ],
         touchstones: [

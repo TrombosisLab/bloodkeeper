@@ -7,10 +7,12 @@ export const demoNarrativeState: CharacterNarrativeState = {
     {
       key: 'protect-weak',
       text: 'No abandonar a quien no puede defenderse',
+      touchstoneKey: 'maria',
     },
     {
       key: 'keep-word',
       text: 'La palabra dada tiene un precio',
+      touchstoneKey: 'daniel',
     },
   ],
 
