@@ -72,6 +72,8 @@ export class ListChronicleSessionsUseCase {
       items: page.items.map((session) => ({
         ...session,
         narratorNotes: null,
+        objective: null,
+        plannedSummary: null,
       })),
     }
   }

@@ -12,6 +12,7 @@ import type {
 import {
   globalHistoryGateway,
 } from '../infrastructure/global-history.api'
+import { ChronicleArchive } from './ChronicleArchive'
 
 import type {
   GlobalHistoryCategory,
@@ -35,6 +36,7 @@ const categories = [
   'place',
   'other',
 ] as const satisfies readonly GlobalHistoryCategory[]
+const HISTORY_PAGE_SIZE = 5
 
 const categoryLabels:
   Record<GlobalHistoryCategory, string> = {
@@ -224,6 +226,9 @@ export function GlobalHistoryPage() {
     useState('')
   const [category, setCategory] =
     useState<GlobalHistoryCategory | 'all'>('all')
+  const [historyView, setHistoryView] =
+    useState<'world' | 'chronicles'>('world')
+  const [entryPage, setEntryPage] = useState(0)
   const [statusFilter, setStatusFilter] =
     useState<'all' | 'published' | 'draft'>('all')
   const [oldestFirst, setOldestFirst] =
@@ -336,10 +341,20 @@ export function GlobalHistoryPage() {
     statusFilter,
   ])
 
+  const pageCount = Math.ceil(filtered.length / HISTORY_PAGE_SIZE)
+  const currentEntryPage = Math.min(entryPage, Math.max(0, pageCount - 1))
+  const pageEntries = filtered.slice(
+    currentEntryPage * HISTORY_PAGE_SIZE,
+    (currentEntryPage + 1) * HISTORY_PAGE_SIZE,
+  )
   const selected =
-    filtered.find(
+    pageEntries.find(
       (entry) => entry.id === selectedId,
-    ) ?? filtered[0] ?? null
+    ) ?? pageEntries[0] ?? null
+
+  useEffect(() => {
+    setEntryPage(0)
+  }, [category, oldestFirst, search, statusFilter])
 
   useEffect(() => {
     if (editing === null && preview === null && !expandedImage) return
@@ -490,7 +505,7 @@ export function GlobalHistoryPage() {
 
   return (
     <main className="global-history">
-      {headerActions !== null &&
+      {historyView === 'world' && headerActions !== null &&
       data?.canManage
         ? createPortal(
             <button
@@ -506,16 +521,16 @@ export function GlobalHistoryPage() {
 
       <nav
         className="global-history__categories"
-        aria-label="Categorías históricas"
+        aria-label="Archivo de Historia"
       >
         <button
           type="button"
           className={
-            category === 'all'
+            historyView === 'world' && category === 'all'
               ? 'is-active'
               : undefined
           }
-          onClick={() => setCategory('all')}
+          onClick={() => { setHistoryView('world'); setCategory('all') }}
         >
           <span>Todo</span>
           <strong>{data?.items.length ?? 0}</strong>
@@ -526,11 +541,11 @@ export function GlobalHistoryPage() {
             type="button"
             key={item}
             className={
-              category === item
+              historyView === 'world' && category === item
                 ? 'is-active'
                 : undefined
             }
-            onClick={() => setCategory(item)}
+            onClick={() => { setHistoryView('world'); setCategory(item) }}
           >
             <span>{categoryLabels[item]}</span>
             <strong>
@@ -541,9 +556,17 @@ export function GlobalHistoryPage() {
             </strong>
           </button>
         ))}
+        <button
+          type="button"
+          className={historyView === 'chronicles' ? 'is-active' : undefined}
+          aria-pressed={historyView === 'chronicles'}
+          onClick={() => setHistoryView('chronicles')}
+        >
+          <span>Crónicas</span>
+        </button>
       </nav>
 
-      <section className="global-history__workspace">
+      {historyView === 'chronicles' ? <ChronicleArchive /> : <section className="global-history__workspace">
         <aside className="global-history__timeline">
           <div className="global-history__filters">
             <label>
@@ -612,7 +635,7 @@ export function GlobalHistoryPage() {
             </p>
           ) : (
             <ol>
-              {filtered.map((entry) => (
+              {pageEntries.map((entry) => (
                 <li key={entry.id}>
                   <button
                     type="button"
@@ -641,6 +664,40 @@ export function GlobalHistoryPage() {
               ))}
             </ol>
           )}
+          {!loading && filtered.length > HISTORY_PAGE_SIZE ? (
+            <nav className="global-history__pagination" aria-label="Páginas de entradas históricas">
+              <span>
+                {currentEntryPage * HISTORY_PAGE_SIZE + 1}–{Math.min((currentEntryPage + 1) * HISTORY_PAGE_SIZE, filtered.length)} de {filtered.length}
+              </span>
+              <div>
+                <button
+                  type="button"
+                  aria-label="Entradas anteriores"
+                  disabled={currentEntryPage === 0}
+                  onClick={() => {
+                    const nextPage = Math.max(0, currentEntryPage - 1)
+                    setEntryPage(nextPage)
+                    setSelectedId(filtered[nextPage * HISTORY_PAGE_SIZE]?.id ?? null)
+                  }}
+                >
+                  ← Anterior
+                </button>
+                <strong aria-live="polite">{currentEntryPage + 1} / {pageCount}</strong>
+                <button
+                  type="button"
+                  aria-label="Entradas siguientes"
+                  disabled={currentEntryPage + 1 >= pageCount}
+                  onClick={() => {
+                    const nextPage = Math.min(pageCount - 1, currentEntryPage + 1)
+                    setEntryPage(nextPage)
+                    setSelectedId(filtered[nextPage * HISTORY_PAGE_SIZE]?.id ?? null)
+                  }}
+                >
+                  Siguiente →
+                </button>
+              </div>
+            </nav>
+          ) : null}
         </aside>
 
         <section className="global-history__detail">
@@ -769,7 +826,7 @@ export function GlobalHistoryPage() {
             </div>
           )}
         </section>
-      </section>
+      </section>}
 
       {message ? (
         <p

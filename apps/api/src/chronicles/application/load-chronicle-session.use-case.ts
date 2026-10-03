@@ -62,6 +62,8 @@ export class LoadChronicleSessionUseCase {
     return {
       ...session,
       narratorNotes: null,
+      objective: null,
+      plannedSummary: null,
     }
   }
 }

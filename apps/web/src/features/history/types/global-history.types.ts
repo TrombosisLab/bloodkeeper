@@ -26,6 +26,20 @@ export interface GlobalHistoryChronicle {
   readonly name: string
 }
 
+export interface ChronicleArchiveItem {
+  readonly id: string
+  readonly kind: 'session' | 'story'
+  readonly title: string
+  readonly sessionNumber: number | null
+  readonly date: string | null
+  readonly summary: string
+}
+
+export interface ChronicleArchive {
+  readonly chronicle: GlobalHistoryChronicle
+  readonly items: readonly ChronicleArchiveItem[]
+}
+
 export interface GlobalHistoryAuthor {
   readonly id: string
   readonly displayName: string

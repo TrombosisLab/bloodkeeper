@@ -2,6 +2,8 @@ import type {
   GlobalHistoryEntry,
   GlobalHistoryEntryInput,
   GlobalHistoryList,
+  ChronicleArchive,
+  GlobalHistoryChronicle,
   HistoryReference,
 } from '../types/global-history.types'
 
@@ -32,6 +34,12 @@ async function request<T>(
 }
 
 export const globalHistoryGateway = {
+  chronicles(): Promise<{ items: GlobalHistoryChronicle[] }> {
+    return request('/history/chronicles')
+  },
+  chronicleArchive(chronicleId: string): Promise<ChronicleArchive> {
+    return request(`/history/chronicles/${encodeURIComponent(chronicleId)}`)
+  },
   catalog(): Promise<{ items: HistoryReference[] }> { return request('/history/reference-catalog') },
   reference(id: string, key: string): Promise<{label: string; category: string; description: string}> {
     return request(`/history/${encodeURIComponent(id)}/reference?key=${encodeURIComponent(key)}`)
