@@ -180,6 +180,15 @@ export function AppNavigation({
           <button type="button" aria-current={activeSection === 'resources' ? 'page' : undefined} onClick={() => selectSection('resources')}><span>Recursos</span><small>Biblioteca reutilizable</small></button>
         ) : null}
 
+        <button
+          type="button"
+          aria-current={activeSection === 'history' ? 'page' : undefined}
+          onClick={() => selectSection('history')}
+        >
+          <span>Historia</span>
+          <small>Memoria global del mundo</small>
+        </button>
+
         {canAccessChronicles ? (
           <button type="button" aria-current={activeSection === 'map' ? 'page' : undefined} onClick={() => selectSection('map')}><span>Mapa</span><small>Cartografía de la crónica</small></button>
         ) : null}
@@ -214,15 +223,22 @@ export function AppNavigation({
             <small>Participación y gestión</small>
           </button>
         ) : null}
-            <button
-        type="button"
-        aria-current={activeSection === 'manual' ? 'page' : undefined}
-        onClick={() => selectSection('manual')}
-      >
-        <span>Manual</span>
-        <small>Guía de uso</small>
-      </button>
-</nav>
+
+        <button
+          type="button"
+          aria-current={
+            activeSection === 'manual'
+              ? 'page'
+              : undefined
+          }
+          onClick={() =>
+            selectSection('manual')
+          }
+        >
+          <span>Manual</span>
+          <small>Guía de uso por permisos</small>
+        </button>
+      </nav>
     </aside>
   )
 }

@@ -8,6 +8,7 @@ import { HealthModule } from './health/health.module'
 import { DiceModule } from './dice/dice.module'
 import { SystemOperationsModule } from './administration/system-operations.module'
 import { DashboardModule } from './dashboard/dashboard.module'
+import { HistoryModule } from './history/history.module'
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { DashboardModule } from './dashboard/dashboard.module'
     DiceModule,
     SystemOperationsModule,
     DashboardModule,
+    HistoryModule,
   ],
 })
 export class AppModule {}

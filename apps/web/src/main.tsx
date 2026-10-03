@@ -19,6 +19,7 @@ import { createChronicleCharacterReadGateways } from './features/character-sheet
 import { ChronicleListCreate } from './features/chronicles/components/ChronicleListCreate'
 import { PlayHub } from './features/chronicles/components/PlayHub'
 import { ResourceLibrary } from './features/resources/components/ResourceLibrary'
+import { GlobalHistoryPage } from './features/history/components/GlobalHistoryPage'
 import { Dashboard } from './features/dashboard/components/Dashboard'
 import { NotebookWorkspace } from './features/notebook/components/NotebookWorkspace'
 import { ChronicleSpacePrototype } from './features/chronicle-space/components/ChronicleSpacePrototype'
@@ -241,6 +242,10 @@ function App() {
         navigateTo('resources')
         return
 
+      case 'history':
+        navigateTo('history')
+        return
+
       case 'map':
         navigateTo('map')
         return
@@ -319,6 +324,8 @@ function App() {
     >
       {view === 'resources' && canCreateChronicles ? (
         <ResourceLibrary />
+      ) : view === 'history' ? (
+        <GlobalHistoryPage />
       ) : view === 'map' && canAccessChronicles ? (
         <ChronicleMapPage />
       ) : view === 'manual' ? (

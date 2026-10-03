@@ -15,12 +15,14 @@ export function AppHeader({ displayName = 'jugador' }: { displayName?: string })
             ? { eyebrow: 'JUGAR', title: 'Mesa de juego', subtitle: 'Prepara y continúa la partida.' }
             : currentHash.startsWith('#/resources')
               ? { eyebrow: 'RECURSOS', title: 'Recursos', subtitle: 'Biblioteca reutilizable.' }
+              : currentHash.startsWith('#/history')
+                ? { eyebrow: 'HISTORIA', title: 'Historia del mundo', subtitle: 'Cronología, acontecimientos y memoria compartida.' }
               : currentHash.startsWith('#/chronicles')
                 ? { eyebrow: 'CRÓNICAS', title: 'Crónicas', subtitle: 'Participación y gestión.' }
                 : currentHash.startsWith('#/map')
                   ? { eyebrow: 'MAPA', title: 'Cartografía de la crónica', subtitle: 'Mapas, lugares y zonas de la historia.' }
-                     : currentHash.startsWith('#/manual')
-                       ? { eyebrow: 'MANUAL DE USO', title: 'Cómo usar BloodKeeper', subtitle: 'Guía práctica por perfiles y permisos.' }
+                  : currentHash.startsWith('#/manual')
+                    ? { eyebrow: 'MANUAL DE USO', title: 'Cómo usar BloodKeeper', subtitle: 'Guía práctica por perfiles y permisos.' }
                   : { eyebrow: '', title: '', subtitle: '' }
   const isDashboard = typeof window !== 'undefined' && window.location.hash === '#/dashboard'
   useActiveChronicleHeader()

@@ -1,5 +1,6 @@
 export type AppView =
   | 'resources'
+  | 'history'
   | 'map'
   | 'dashboard'
   | 'characters'
@@ -7,11 +8,12 @@ export type AppView =
   | 'chronicles'
   | 'administration'
   | 'notebook'
-  | 'manual'
   | 'play'
+  | 'manual'
 
 export type AppSection =
   | 'resources'
+  | 'history'
   | 'dashboard'
   | 'characters'
   | 'chronicles'

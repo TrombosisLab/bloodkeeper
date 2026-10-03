@@ -232,6 +232,7 @@ model User {
   chronicleResourceAudiences        ChronicleResourceAudience[]               @relation("ChronicleResourceAudienceUser")
   chronicleSpaceBoardPersonalStates ChronicleSpaceBoardPersonalState[]       @relation("ChronicleSpaceBoardPersonalStateUser")
   chronicleMapRequests              ChronicleMapRequest[]                    @relation("ChronicleMapRequestRequester")
+  globalHistoryEntries             GlobalHistoryEntry[]                     @relation("GlobalHistoryEntryAuthor")
 
   @@index([status])
   @@map("users")
@@ -289,6 +290,7 @@ model Chronicle {
   libraryResourceBindings  ChronicleResourceBinding[]
   spaceBoardPersonalStates ChronicleSpaceBoardPersonalState[] @relation("ChronicleSpaceBoardPersonalStateChronicle")
   chronicleMaps            ChronicleMap[]                     @relation("ChronicleMapChronicle")
+  globalHistoryLinks       GlobalHistoryEntryChronicle[]      @relation("GlobalHistoryEntryChronicleChronicle")
 
   @@index([narratorId])
   @@index([status])
@@ -1717,6 +1719,62 @@ model ChronicleMapArea {
   @@map("chronicle_map_areas")
 }
 
+enum GlobalHistoryEntryStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum GlobalHistoryEntryVisibility {
+  ALL_USERS
+  NARRATORS_ONLY
+  PRIVATE
+}
+
+model GlobalHistoryEntry {
+  id          String                       @id @default(uuid()) @db.Uuid
+  authorId    String                       @db.Uuid
+  title       String
+  periodLabel String?
+  startYear   Int?
+  endYear     Int?
+  category    String                       @default("event")
+  summary     String?
+  content     String                       @default("")
+  sourceKind  String                       @default("custom")
+  visibility  GlobalHistoryEntryVisibility @default(ALL_USERS)
+  status      GlobalHistoryEntryStatus     @default(DRAFT)
+  tags        String[]                     @default([])
+  createdAt   DateTime                     @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime                     @updatedAt @db.Timestamptz(3)
+
+  author     User                          @relation("GlobalHistoryEntryAuthor", fields: [authorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  chronicles GlobalHistoryEntryChronicle[] @relation("GlobalHistoryEntryChronicleEntry")
+
+  @@index([status, visibility, startYear])
+  @@index([authorId, status])
+  @@index([category, status])
+  @@map("global_history_entries")
+  references Json @default("[]")
+  imageCaption String?
+  imageCredit String?
+  image GlobalHistoryImage?
+
+}
+
+model GlobalHistoryEntryChronicle {
+  entryId    String   @db.Uuid
+  chronicleId String  @db.Uuid
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+
+  entry     GlobalHistoryEntry @relation("GlobalHistoryEntryChronicleEntry", fields: [entryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chronicle Chronicle          @relation("GlobalHistoryEntryChronicleChronicle", fields: [chronicleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([entryId, chronicleId])
+  @@index([chronicleId])
+  @@map("global_history_entry_chronicles")
+}
+
 model ChronicleMapRequest {
   id          String                    @id @default(uuid()) @db.Uuid
   mapId       String                    @db.Uuid
@@ -1739,4 +1797,14 @@ model ChronicleMapRequest {
   @@index([mapId, status])
   @@index([requesterId, status])
   @@map("chronicle_map_requests")
+}
+
+model GlobalHistoryImage {
+  entryId String @id @db.Uuid
+  mimeType String
+  byteSize Int
+  data Bytes
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  entry GlobalHistoryEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  @@map("global_history_images")
 }
