@@ -369,3 +369,33 @@ body:has(.dashboard) .dashboard {
     rgba(10, 8, 10, .12) 58%,
     rgba(10, 8, 10, .60) 100%) !important;
 }
+
+/* MOBILE_CHRONICLE_CARDS_V1 — preserva imagen, texto y acción en tarjetas estrechas. */
+@media (max-width: 600px) {
+  .dashboard { padding: 14px 12px calc(6rem + env(safe-area-inset-bottom)); }
+  .dashboard-chronicle-card, .dashboard-chronicle-card:only-child { grid-template-columns: 68px minmax(0, 1fr) 18px; gap: 9px; align-items: center; }
+  .dashboard-chronicle-card__image { min-height: 88px; padding: 5px; font-size: 20px; }
+  .dashboard-chronicle-card__body strong { font-size: 1rem; overflow-wrap: anywhere; }
+  .dashboard-chronicle-card__meta { font-size: .75rem; }
+  .dashboard-chronicle-card__arrow { font-size: 1.25rem; }
+}
+
+/* MOBILE_CHRONICLE_CARDS_V1 — preserva imagen, texto y acción en tarjetas estrechas. */
+@media (max-width: 600px) {
+  .dashboard { padding: 14px 12px calc(6rem + env(safe-area-inset-bottom)); }
+  .dashboard-chronicle-card, .dashboard-chronicle-card:only-child { grid-template-columns: 68px minmax(0, 1fr) 18px; gap: 9px; align-items: center; }
+  .dashboard-chronicle-card__image { min-height: 88px; padding: 5px; font-size: 20px; }
+  .dashboard-chronicle-card__body strong { font-size: 1rem; overflow-wrap: anywhere; }
+  .dashboard-chronicle-card__meta { font-size: .75rem; }
+  .dashboard-chronicle-card__arrow { font-size: 1.25rem; }
+}
+
+/* MOBILE_CHRONICLE_CARDS_V1 — preserva imagen, texto y acción en tarjetas estrechas. */
+@media (max-width: 600px) {
+  .dashboard { padding: 14px 12px calc(6rem + env(safe-area-inset-bottom)); }
+  .dashboard-chronicle-card, .dashboard-chronicle-card:only-child { grid-template-columns: 68px minmax(0, 1fr) 18px; gap: 9px; align-items: center; }
+  .dashboard-chronicle-card__image { min-height: 88px; padding: 5px; font-size: 20px; }
+  .dashboard-chronicle-card__body strong { font-size: 1rem; overflow-wrap: anywhere; }
+  .dashboard-chronicle-card__meta { font-size: .75rem; }
+  .dashboard-chronicle-card__arrow { font-size: 1.25rem; }
+}

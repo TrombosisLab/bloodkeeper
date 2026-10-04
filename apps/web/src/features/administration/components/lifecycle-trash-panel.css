@@ -206,3 +206,25 @@
 @media (max-width: 1120px) { .lifecycle-trash__overview { grid-template-columns: repeat(2, minmax(0, 1fr)); } .lifecycle-trash__item { grid-template-columns: 2.4rem minmax(12rem, 2fr) minmax(7rem, .8fr) auto; } .lifecycle-trash__item-date, .lifecycle-trash__item-retention { display: none; } .lifecycle-trash__actions { grid-column: 2 / -1; justify-content: flex-start; } }
 @media (max-width: 900px) { .lifecycle-trash__layout { grid-template-columns: 1fr; } .lifecycle-trash__details { position: static; } .lifecycle-trash__filters { grid-template-columns: 1fr 1fr; } .lifecycle-trash__filters button { grid-column: 1 / -1; justify-self: start; } }
 @media (max-width: 620px) { .lifecycle-trash__overview { grid-template-columns: 1fr; } .lifecycle-trash__filters { grid-template-columns: 1fr; } .lifecycle-trash__filters button { grid-column: auto; } .lifecycle-trash__item { grid-template-columns: 2.4rem minmax(0, 1fr) auto; } .lifecycle-trash__item-kind { grid-column: 2; } .lifecycle-trash__actions { grid-column: 2 / -1; } }
+
+/* BLOODKEEPER_TRASH_ACTIONS_LAYOUT_V2: mantiene los controles dentro de la lista. */
+.lifecycle-trash__item {
+  grid-template-columns: 2.4rem minmax(0, 1.7fr) minmax(0, .7fr) minmax(0, 1fr) minmax(0, .8fr) minmax(9rem, auto);
+}
+.lifecycle-trash__item-main,
+.lifecycle-trash__item-kind,
+.lifecycle-trash__item-date,
+.lifecycle-trash__item-retention,
+.lifecycle-trash__actions { min-width: 0; }
+.lifecycle-trash__actions {
+  grid-column: 6;
+  grid-row: 1;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+@media (max-width: 1120px) {
+  .lifecycle-trash__actions { grid-column: 2 / -1; grid-row: 2; justify-content: flex-start; }
+}
+@media (max-width: 620px) {
+  .lifecycle-trash__actions { grid-row: auto; }
+}

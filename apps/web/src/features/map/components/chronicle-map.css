@@ -238,3 +238,86 @@
     justify-content: flex-start;
   }
 }
+
+/* MOBILE_CHRONICLE_MAP_V1 — compacta los controles y mantiene el desplazamiento dentro del lienzo. */
+@media (max-width: 600px) {
+  .app-header:has(.chronicle-map-global-actions) { min-height: 0 !important; grid-template-rows: auto auto !important; }
+  .app-header:has(.chronicle-map-global-actions) .app-header__page-actions { margin: 0 12px 12px !important; min-width: 0; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; gap: .45rem; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > * { min-width: 0; width: 100%; box-sizing: border-box; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions select,
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-button,
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-global-actions__upload { min-width: 0; max-width: 100%; white-space: normal; text-align: center; }
+  .chronicle-map-page { padding: 12px 12px calc(6rem + env(safe-area-inset-bottom)) !important; }
+  .chronicle-map-workspace { grid-template-columns: minmax(0, 1fr); min-width: 0; }
+  .chronicle-map-detail, .chronicle-map-tree { min-width: 0; }
+  .chronicle-map-canvas { max-width: calc(100% - 1rem); touch-action: pan-x pan-y; }
+}
+
+/* MOBILE_CHRONICLE_MAP_V1 — compacta los controles y mantiene el desplazamiento dentro del lienzo. */
+@media (max-width: 600px) {
+  .app-header:has(.chronicle-map-global-actions) { min-height: 0 !important; grid-template-rows: auto auto !important; }
+  .app-header:has(.chronicle-map-global-actions) .app-header__page-actions { margin: 0 12px 12px !important; min-width: 0; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; gap: .45rem; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > * { min-width: 0; width: 100%; box-sizing: border-box; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-global-actions__parent,
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-global-actions__chronicle { min-width: 0; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions select,
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-button,
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-global-actions__upload { min-width: 0; max-width: 100%; white-space: normal; text-align: center; }
+  .chronicle-map-page { padding: 12px 12px calc(6rem + env(safe-area-inset-bottom)) !important; }
+  .chronicle-map-workspace { grid-template-columns: minmax(0, 1fr); min-width: 0; }
+  .chronicle-map-detail, .chronicle-map-tree { min-width: 0; }
+  .chronicle-map-canvas { max-width: calc(100% - 1rem); touch-action: pan-x pan-y; }
+}
+
+/* MOBILE_CHRONICLE_MAP_WIDTH_V2 — neutraliza el ancho mínimo heredado del selector de mapa. */
+@media (max-width: 600px) {
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-global-actions__parent,
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-global-actions__chronicle { min-width: 0; }
+}
+
+/* MOBILE_CHRONICLE_MAP_V1 — compacta los controles y mantiene el desplazamiento dentro del lienzo. */
+@media (max-width: 600px) {
+  .app-header:has(.chronicle-map-global-actions) { min-height: 0 !important; grid-template-rows: auto auto !important; }
+  .app-header:has(.chronicle-map-global-actions) .app-header__page-actions { margin: 0 12px 12px !important; min-width: 0; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; gap: .45rem; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > * { min-width: 0; width: 100%; box-sizing: border-box; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-global-actions__parent,
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-global-actions__chronicle { min-width: 0; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions select,
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-button,
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-global-actions__upload { min-width: 0; max-width: 100%; white-space: normal; text-align: center; }
+  .chronicle-map-page { padding: 12px 12px calc(6rem + env(safe-area-inset-bottom)) !important; }
+  .chronicle-map-workspace { grid-template-columns: minmax(0, 1fr); min-width: 0; }
+  .chronicle-map-detail, .chronicle-map-tree { min-width: 0; }
+  .chronicle-map-canvas { max-width: calc(100% - 1rem); touch-action: pan-x pan-y; }
+}
+
+/* MOBILE_CHRONICLE_MAP_WIDTH_V2 — neutraliza el ancho mínimo heredado del selector de mapa. */
+@media (max-width: 600px) {
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-global-actions__parent,
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-global-actions__chronicle { min-width: 0; }
+}
+
+
+/* GLOBAL_VISUAL_MAP_HEADER_LAYOUT_V1 */
+.app-header:has(.chronicle-map-global-actions) {
+  grid-template-rows: minmax(82px, 1fr) auto !important;
+  min-height: 162px !important;
+}
+.app-header:has(.chronicle-map-global-actions) .app-header__page-context {
+  padding-right: clamp(240px, 28vw, 400px) !important;
+}
+.app-header:has(.chronicle-map-global-actions) .app-header__page-actions {
+  margin-bottom: 8px !important;
+}
+@media (max-width: 900px) {
+  .app-header:has(.chronicle-map-global-actions) {
+    min-height: 176px !important;
+    grid-template-rows: auto auto !important;
+  }
+  .app-header:has(.chronicle-map-global-actions) .app-header__page-context {
+    padding-right: 16px !important;
+  }
+}

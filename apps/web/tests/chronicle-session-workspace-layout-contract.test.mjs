@@ -140,7 +140,7 @@ test(
     )
     assert.match(
       sessions,
-      /workspace-dice-panel[\s\S]*DiceRollPanel[\s\S]*DiceHistoryPanel/,
+      /workspace-dice-panel[\s\S]*ChronicleSessionDiceLauncher/,
     )
   },
 )
@@ -241,5 +241,15 @@ test(
       contextStyles,
       /:has\(input:checked\)[\s\S]*color-border-accent/,
     )
+  },
+)
+
+
+test(
+  'UX Sesiones fuerza una sola columna móvil por encima de los estilos globales de Crónicas',
+  () => {
+    assert.ok(styles.includes('.chronicle-detail .chronicle-session-panel .chronicle-session-panel__workspace-layout'))
+    assert.ok(styles.includes('grid-template-columns: minmax(0, 1fr) !important'))
+    assert.ok(styles.includes('.chronicle-detail .chronicle-session-panel .chronicle-session-panel__browser'))
   },
 )

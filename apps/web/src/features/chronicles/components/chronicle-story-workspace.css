@@ -69,7 +69,9 @@
 .story-detail__title > span { grid-column: 1 / -1; }
 .story-workspace .story-detail__title input { min-width: 0; min-height: 38px; padding: 0; border: 0; background: transparent; color: var(--color-text-primary); font-family: Georgia, serif; font-size: clamp(1.25rem, 2vw, 1.7rem); font-weight: 700; box-shadow: none; }
 .story-workspace .story-detail__title select { min-height: 32px; border-color: var(--story-line-soft); background: #101214; font-size: 0.72rem; }
-.story-detail__header-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+.story-detail__header-actions { display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 8px; }
+.story-detail__header { grid-template-columns: minmax(0, 1fr); }
+/* GLOBAL_VISUAL_STORY_HEADER_LAYOUT_V1 */
 .story-detail__header-actions button, .story-section__heading button, .story-session-list article button, .story-notes > button, .story-archive { min-height: 30px !important; padding: 5px 9px !important; border-color: var(--story-line) !important; background: #1b1d20 !important; font-size: 0.7rem !important; }
 .story-premise-grid { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--story-line); }
 .story-premise-grid label { display: grid; gap: 8px; padding: 16px 20px; }

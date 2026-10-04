@@ -1799,3 +1799,51 @@
 }
 @media(max-width:900px){.app-header .app-header__page-actions:has(.chronicle-space-global-actions){width:auto!important;max-width:none!important}.chronicle-space-global-actions{gap:7px}}
 @media(max-width:600px){.app-header .app-header__page-actions:has(.chronicle-space-global-actions){margin-inline:12px!important}.app-header .app-header__page-actions .chronicle-space-global-actions__nav button{min-height:38px!important;padding:6px 8px!important;font-size:11px!important}}
+
+/* MOBILE_INVESTIGATION_HEADER_V1 — corrige el desbordamiento de la cabecera de Investigación en móvil. */
+@media (max-width: 600px) {
+  .app-header .app-header__page-actions:has(.chronicle-space-global-actions) { width: auto !important; max-width: none !important; min-width: 0; }
+  .chronicle-space-global-actions { width: 100%; max-width: 100%; box-sizing: border-box; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: 'new chronicle' 'counts counts' 'nav nav'; }
+  .chronicle-space-global-actions__chronicle, .chronicle-space-global-actions__counts, .chronicle-space-global-actions__nav { min-width: 0; }
+  .chronicle-space-global-actions__counts { width: 100%; justify-content: space-around; gap: .4rem; }
+  .chronicle-space-global-actions__nav { width: 100%; }
+}
+
+/* MOBILE_INVESTIGATION_HEADER_V1 — corrige el desbordamiento de la cabecera de Investigación en móvil. */
+@media (max-width: 600px) {
+  .app-header .app-header__page-actions:has(.chronicle-space-global-actions) { width: auto !important; max-width: none !important; min-width: 0; }
+  .chronicle-space-global-actions { width: 100%; max-width: 100%; box-sizing: border-box; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: 'new chronicle' 'counts counts' 'nav nav'; }
+  .chronicle-space-global-actions__chronicle, .chronicle-space-global-actions__counts, .chronicle-space-global-actions__nav { min-width: 0; }
+  .chronicle-space-global-actions__counts { width: 100%; justify-content: space-around; gap: .4rem; }
+  .chronicle-space-global-actions__nav { width: 100%; }
+}
+
+
+/* INVESTIGATION_DESKTOP_HEADER_V2 — título y controles en filas distintas en pantallas amplias. */
+@media (min-width: 1361px) {
+  .app-header:has(.chronicle-space-global-actions) {
+    grid-template-rows: minmax(104px, 1fr) auto !important;
+    min-height: 174px !important;
+  }
+  .app-header:has(.chronicle-space-global-actions) .app-brand { grid-column: 1 !important; grid-row: 1 !important; }
+  .app-header:has(.chronicle-space-global-actions) .app-header__page-context { grid-column: 2 !important; grid-row: 1 !important; padding-right: 24px !important; }
+  .app-header:has(.chronicle-space-global-actions) .app-header__status { grid-column: 3 !important; grid-row: 1 !important; }
+  .app-header .app-header__page-actions:has(.chronicle-space-global-actions) {
+    position: static !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    justify-self: stretch !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 24px 12px !important;
+  }
+}
+
+
+/* INVESTIGATION_DESKTOP_HEADER_V3 — misma altura que el resto; acciones superpuestas en una banda compacta. */
+@media (min-width: 1361px) {
+  .app-header:has(.chronicle-space-global-actions) { height: 162px !important; min-height: 162px !important; grid-template-rows: minmax(0, 1fr) !important; box-sizing: border-box !important; }
+  .app-header:has(.chronicle-space-global-actions) .app-brand, .app-header:has(.chronicle-space-global-actions) .app-header__status { grid-row: 1 !important; }
+  .app-header:has(.chronicle-space-global-actions) .app-header__page-context { grid-row: 1 !important; justify-self: start !important; width: 360px !important; max-width: 360px !important; padding-right: 16px !important; }
+  .app-header .app-header__page-actions:has(.chronicle-space-global-actions) { position: absolute !important; right: 32px !important; bottom: 8px !important; left: auto !important; grid-column: auto !important; grid-row: auto !important; justify-self: auto !important; width: min(820px, calc(100vw - 700px)) !important; max-width: none !important; margin: 0 !important; }
+}

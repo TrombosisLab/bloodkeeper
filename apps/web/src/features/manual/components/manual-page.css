@@ -247,3 +247,21 @@
   .manual-role-tabs { padding-inline: 1rem; }
   .manual-page__hero h1 { font-size: 2.45rem; }
 }
+
+/* MOBILE_MANUAL_TABS_V1 — las tres secciones caben sin una barra horizontal de desplazamiento. */
+@media (max-width: 600px) {
+  .manual-role-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .35rem; overflow: visible; }
+  .manual-role-tabs button { min-width: 0; padding-inline: .3rem; font-size: .82rem; overflow-wrap: anywhere; }
+}
+
+/* MOBILE_MANUAL_TABS_V1 — las tres secciones caben sin una barra horizontal de desplazamiento. */
+@media (max-width: 600px) {
+  .manual-role-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .35rem; overflow: visible; }
+  .manual-role-tabs button { min-width: 0; padding-inline: .3rem; font-size: .82rem; overflow-wrap: anywhere; }
+}
+
+/* MOBILE_MANUAL_TABS_V1 — las tres secciones caben sin una barra horizontal de desplazamiento. */
+@media (max-width: 600px) {
+  .manual-role-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .35rem; overflow: visible; }
+  .manual-role-tabs button { min-width: 0; padding-inline: .3rem; font-size: .82rem; overflow-wrap: anywhere; }
+}

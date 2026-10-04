@@ -360,7 +360,7 @@ export function DiceHistoryPanel({
                 <span className="dice-history-panel__identity">
                   <strong>{item.actorDisplayName}</strong>
                   <small>
-                    {item.description !== null ? `{item.description} · ` : ''}{sourceLabels[item.source]} · {contextText(item)}
+                    {item.description !== null ? `${item.description} · ` : ''}{sourceLabels[item.source]} · {contextText(item)}
                     {item.visibility === 'private' ? ' · Privada' : ''}
                   </small>
                 </span>

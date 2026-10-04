@@ -29,7 +29,8 @@
 .space-board{display:block;position:relative;min-height:690px;overflow:visible;padding:0;border-color:rgba(201,150,115,.32)}
 .board-connections-layer{position:absolute;z-index:0;inset:0;width:100%;height:100%;pointer-events:none}
 .board-link{stroke:rgba(224,157,119,.7);stroke-width:.42;stroke-dasharray:1.3 1.1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
-.board-connect-hint{position:absolute;z-index:2;top:16px;left:22px;right:22px;color:rgba(245,211,181,.68);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;pointer-events:none}
+/* INVESTIGATION_BOARD_HINT_V2 — la ayuda queda fuera del lienzo para no tapar tarjetas. */
+.board-connect-hint{position:relative;z-index:auto;inset:auto;display:flex;align-items:center;min-height:36px;margin:0 0 9px;padding:8px 12px;border:1px solid rgba(224,157,119,.24);border-radius:7px;background:rgba(36,23,27,.72);color:rgba(245,211,181,.78);font-size:10px;font-weight:750;letter-spacing:.04em;line-height:1.4;pointer-events:auto}
 .board-card{position:absolute;z-index:1;width:21%;min-height:188px;display:flex;align-items:stretch;padding:0;border:1px solid rgba(221,179,141,.34);border-radius:5px;background:linear-gradient(145deg,#f1dfb3,#d8bd87);color:var(--ink);box-shadow:8px 10px 0 rgba(10,6,8,.22),0 13px 24px rgba(0,0,0,.2);touch-action:none;transition:box-shadow .18s ease,filter .18s ease}
 .board-card:hover{filter:brightness(1.04);box-shadow:10px 15px 0 rgba(10,6,8,.25),0 18px 27px rgba(0,0,0,.25)}
 .board-card.is-dragging{z-index:4;cursor:grabbing;box-shadow:12px 18px 0 rgba(10,6,8,.3),0 22px 35px rgba(0,0,0,.3);filter:brightness(1.08)}

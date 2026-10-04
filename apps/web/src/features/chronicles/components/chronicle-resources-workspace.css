@@ -20,7 +20,25 @@
   min-width: 0;
   max-width: 100%;
   overflow: hidden;
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
   white-space: normal;
   line-height: 1.15;
+}
+
+
+/* GLOBAL_VISUAL_RESOURCE_LABELS_V2 */
+.chronicle-resources-workspace__tab {
+}
+.chronicle-resources-workspace__tabs {
+  grid-template-columns: minmax(0, 1fr);
+}
+.chronicle-resources-workspace__tab:first-child {
+  grid-column: 1;
+}
+@media (max-width: 760px) {
+  .chronicle-resources-workspace__tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

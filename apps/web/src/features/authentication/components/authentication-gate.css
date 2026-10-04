@@ -111,3 +111,24 @@
     justify-content: space-between;
   }
 }
+
+/* MOBILE_SESSION_SAFE_AREA_V1 — deja espacio para que la barra fija no tape el final de la vista. */
+@media (max-width: 40rem) {
+  .application-content { padding-bottom: calc(5.75rem + env(safe-area-inset-bottom)) !important; }
+  .authentication-session { bottom: calc(.5rem + env(safe-area-inset-bottom)); min-height: 3rem; padding: .4rem .55rem; gap: .5rem; }
+  .authentication-session button { min-height: 2.4rem; }
+}
+
+/* MOBILE_SESSION_SAFE_AREA_V1 — deja espacio para que la barra fija no tape el final de la vista. */
+@media (max-width: 40rem) {
+  .application-content { padding-bottom: calc(5.75rem + env(safe-area-inset-bottom)) !important; }
+  .authentication-session { bottom: calc(.5rem + env(safe-area-inset-bottom)); min-height: 3rem; padding: .4rem .55rem; gap: .5rem; }
+  .authentication-session button { min-height: 2.4rem; }
+}
+
+/* MOBILE_SESSION_SAFE_AREA_V1 — deja espacio para que la barra fija no tape el final de la vista. */
+@media (max-width: 40rem) {
+  .application-content { padding-bottom: calc(5.75rem + env(safe-area-inset-bottom)) !important; }
+  .authentication-session { bottom: calc(.5rem + env(safe-area-inset-bottom)); min-height: 3rem; padding: .4rem .55rem; gap: .5rem; }
+  .authentication-session button { min-height: 2.4rem; }
+}

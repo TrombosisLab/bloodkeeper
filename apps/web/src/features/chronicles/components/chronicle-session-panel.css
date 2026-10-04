@@ -503,3 +503,55 @@
 
 /* CHRONICLE_SESSION_IMAGE_MANAGEMENT_V1 — la portada se gestiona sólo desde Crónicas > Sesiones. */
 .chronicle-session-panel__visual{display:grid;gap:8px;margin:0 0 22px}.chronicle-session-panel__visual-frame{position:relative;display:grid;place-items:center;min-height:180px;overflow:hidden;border:1px solid rgba(224,157,119,.32);border-radius:10px;background:radial-gradient(circle at 50% 25%,rgba(133,49,68,.5),transparent 55%),linear-gradient(145deg,#2a171e,#120f12);box-shadow:0 16px 34px rgba(0,0,0,.2)}.chronicle-session-panel__visual img{display:block;width:100%;height:100%;min-height:180px;object-fit:cover}.chronicle-session-panel__visual-frame.is-missing img{display:none}.chronicle-session-panel__visual-frame>span{position:absolute;inset:0;display:grid;place-items:center;color:rgba(228,177,143,.72);font-family:Georgia,serif;font-size:28px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}.chronicle-session-panel__visual-frame:not(.is-missing)>span{display:none}.chronicle-session-panel__visual figcaption{color:#a99597;font-size:10px;letter-spacing:.1em;text-transform:uppercase}.chronicle-session-panel__image-tools{display:grid;gap:10px;margin:0 0 18px;padding:14px;border:1px solid rgba(224,157,119,.2);border-radius:8px;background:rgba(42,23,30,.45)}.chronicle-session-panel__image-tools label{display:flex;align-items:center;justify-content:space-between;gap:14px;color:#c9afb0;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.chronicle-session-panel__image-tools input{max-width:230px;color:#d8b9b0;font-size:11px;letter-spacing:normal;text-transform:none}.chronicle-session-panel__image-tools small{color:#d99d89;font-size:11px}@media(max-width:760px){.chronicle-session-panel__visual-frame,.chronicle-session-panel__visual img{min-height:145px}.chronicle-session-panel__image-tools label{align-items:flex-start;flex-direction:column}.chronicle-session-panel__image-tools input{max-width:100%}}
+
+/* MOBILE_SESSION_WORKSPACE_V1 — apila las zonas para que el editor no quede recortado en móvil. */
+@media (max-width: 760px) {
+  .chronicle-session-panel__workspace-layout { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; gap: .75rem; }
+  .chronicle-session-panel__browser, .chronicle-session-panel__workspace, .session-operational-sidebar { grid-column: 1 / -1; width: 100%; min-width: 0; }
+  .chronicle-session-panel__browser { max-height: 19rem; }
+  .chronicle-session-panel__list { max-height: 13rem; }
+  .session-operational-sidebar { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .chronicle-session-panel__workspace-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .chronicle-session-panel__workspace-tab { min-height: 2.75rem; padding-inline: .35rem !important; }
+}
+
+/* MOBILE_SESSION_WORKSPACE_V1 — apila las zonas para que el editor no quede recortado en móvil. */
+@media (max-width: 760px) {
+  .chronicle-session-panel__workspace-layout { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; gap: .75rem; }
+  .chronicle-session-panel__browser, .chronicle-session-panel__workspace, .session-operational-sidebar { grid-column: 1 / -1; width: 100%; min-width: 0; }
+  .chronicle-session-panel__browser { max-height: 19rem; }
+  .chronicle-session-panel__list { max-height: 13rem; }
+  .session-operational-sidebar { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .chronicle-session-panel__workspace-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .chronicle-session-panel__workspace-tab { min-height: 2.75rem; padding-inline: .35rem !important; }
+}
+
+/* MOBILE_SESSION_WORKSPACE_V1 — apila las zonas para que el editor no quede recortado en móvil. */
+@media (max-width: 760px) {
+  .chronicle-session-panel__workspace-layout { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; gap: .75rem; }
+  .chronicle-session-panel__browser, .chronicle-session-panel__workspace, .session-operational-sidebar { grid-column: 1 / -1; width: 100%; min-width: 0; }
+  .chronicle-session-panel__browser { max-height: 19rem; }
+  .chronicle-session-panel__list { max-height: 13rem; }
+  .session-operational-sidebar { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .chronicle-session-panel__workspace-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .chronicle-session-panel__workspace-tab { min-height: 2.75rem; padding-inline: .35rem !important; }
+}
+
+/* MOBILE_SESSION_WORKSPACE_V3 — vence el selector global de .chronicle-detail en móvil. */
+@media (max-width: 760px) {
+  .chronicle-detail .chronicle-session-panel .chronicle-session-panel__workspace-layout {
+    box-sizing: border-box !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+  }
+  .chronicle-detail .chronicle-session-panel .chronicle-session-panel__browser,
+  .chronicle-detail .chronicle-session-panel .chronicle-session-panel__workspace,
+  .chronicle-detail .chronicle-session-panel .session-operational-sidebar {
+    box-sizing: border-box !important;
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
