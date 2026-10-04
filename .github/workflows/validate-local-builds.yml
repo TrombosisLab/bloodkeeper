@@ -48,6 +48,9 @@ jobs:
       - name: Validate portable installer
         run: ./scripts/check-portable-installer.sh
 
+      - name: Test console update and retry behavior
+        run: node --test scripts/tests/console-update.test.mjs
+
       - name: Validate deployment Compose
         run: docker compose --file compose.deploy.yaml config --quiet
 

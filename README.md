@@ -19,6 +19,31 @@ git clone https://github.com/TrombosisLab/bloodkeeper.git && cd bloodkeeper && .
 
 La guía completa está en `docs/PORTABLE_INSTALLATION.md`.
 
+## Actualización por consola
+
+En instalaciones Linux desde Git, el instalador registra el comando:
+
+```bash
+bloodkeeper-update
+```
+
+Ejecútalo como el usuario configurado, sin `sudo` delante. Descarga `main`
+por HTTPS, crea una copia de datos y código, construye, aplica migraciones
+y verifica los servicios. Conserva la rama `main` y el remoto existente.
+Si falla, corrige el problema y repite el mismo comando: una descarga no
+se considera un despliegue completado.
+
+Para registrar el comando en una instalación existente:
+
+```bash
+sudo bash scripts/install-update-command.sh --user "$(id -un)"
+```
+
+Este ejemplo usa `compose.yaml`. Para producción, indica el archivo y el
+nombre de proyecto que ya utiliza esa instalación; no cambies el proyecto
+porque sus volúmenes de datos dependen de él. Consulta
+`docs/CONSOLE_UPDATES.md` para configuración, copias y recuperación.
+
 ## Desarrollo y adaptadores heredados
 
 `compose.yaml` se conserva para desarrollo. La distribución construye

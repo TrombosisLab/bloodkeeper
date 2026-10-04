@@ -355,6 +355,30 @@ create_initial_admin() {
 
 create_initial_admin
 
+install_console_update() {
+  if [ "${BLOODKEEPER_SKIP_UPDATE_COMMAND:-0}" = '1' ]; then
+    return
+  fi
+  if [ ! -e "$ROOT/.git" ] || [ "$(uname -s)" != Linux ]; then
+    printf 'Actualizador de consola: requiere un checkout Git en Linux.\n'
+    return
+  fi
+  update_arguments=(
+    --repo "$ROOT" --compose-file "$COMPOSE_FILE"
+    --env-file "$ENV_FILE" --project-name "$PROJECT_NAME"
+  )
+  if [ "$(id -u)" -eq 0 ]; then
+    bash "$ROOT/scripts/install-update-command.sh" "${update_arguments[@]}"
+  elif command -v sudo >/dev/null 2>&1; then
+    sudo bash "$ROOT/scripts/install-update-command.sh" \
+      --user "$(id -un)" "${update_arguments[@]}"
+  else
+    printf 'Para registrar bloodkeeper-update, ejecuta scripts/install-update-command.sh como root.\n'
+  fi
+}
+
+install_console_update
+
 web_port="$(sed -n 's/^BLOODKEEPER_WEB_PORT=//p' "$ENV_FILE" | tail -n 1)"
 web_port="${web_port:-5173}"
 
