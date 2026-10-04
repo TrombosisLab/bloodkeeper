@@ -260,17 +260,32 @@ function revision(
 
 function parseNarratorGuide(value: unknown): ChronicleStoryGuide {
   const guide = record(value)
-  supportedKeys(guide, ['cards', 'connections'])
+  supportedKeys(guide, ['pages', 'cards', 'connections'])
   if (!Array.isArray(guide.cards) || guide.cards.length > 120 || !Array.isArray(guide.connections) || guide.connections.length > 240) {
     throw new InvalidChronicleStoryRequestError('narratorGuide has too many cards or connections')
   }
 
   const cardKinds: readonly ChronicleStoryGuideCardKind[] = ['clue', 'npc', 'location', 'document', 'event', 'decision', 'outcome']
   const cardStates: readonly ChronicleStoryGuideCardState[] = ['hidden', 'discovered', 'resolved']
+  const pageIds = new Set<string>()
+  let pages: { id: string; title: string }[] | undefined
+  if (guide.pages !== undefined) {
+    if (!Array.isArray(guide.pages) || guide.pages.length === 0 || guide.pages.length > 30) {
+      throw new InvalidChronicleStoryRequestError('narratorGuide must have between 1 and 30 pages')
+    }
+    pages = guide.pages.map((item, index) => {
+      const page = record(item)
+      supportedKeys(page, ['id', 'title'])
+      const id = uuid(page.id, `narratorGuide.pages[${index}].id`)
+      if (pageIds.has(id)) throw new InvalidChronicleStoryRequestError('narratorGuide page IDs must be unique')
+      pageIds.add(id)
+      return { id, title: requiredText(page.title, `narratorGuide.pages[${index}].title`, 80) }
+    })
+  }
   const ids = new Set<string>()
   const cards: ChronicleStoryGuideCard[] = guide.cards.map((item, index) => {
     const card = record(item)
-    supportedKeys(card, ['id', 'kind', 'state', 'title', 'summary', 'narratorNote', 'x', 'y'])
+    supportedKeys(card, ['id', 'pageId', 'appearances', 'kind', 'state', 'title', 'summary', 'narratorNote', 'x', 'y'])
     const id = uuid(card.id, `narratorGuide.cards[${index}].id`)
     if (ids.has(id)) throw new InvalidChronicleStoryRequestError('narratorGuide card IDs must be unique')
     ids.add(id)
@@ -282,8 +297,45 @@ function parseNarratorGuide(value: unknown): ChronicleStoryGuide {
     if (typeof x !== 'number' || !Number.isFinite(x) || x < 0 || x > 5000 || typeof y !== 'number' || !Number.isFinite(y) || y < 0 || y > 5000) {
       throw new InvalidChronicleStoryRequestError(`narratorGuide.cards[${index}] has invalid canvas coordinates`)
     }
+    const pageId = card.pageId === undefined ? pages?.[0]?.id : uuid(card.pageId, 'card.pageId')
+    if (pageId !== undefined && !pageIds.has(pageId)) throw new InvalidChronicleStoryRequestError('Card references an invalid page')
+    let appearances: { pageId: string; sourcePageId: string; x: number; y: number }[] | undefined
+    if (card.appearances !== undefined) {
+      if (!Array.isArray(card.appearances) || card.appearances.length > 29 || pageId === undefined) {
+        throw new InvalidChronicleStoryRequestError('Card appearances require valid pages and at most 29 entries')
+      }
+      const seenPages = new Set<string>([pageId])
+      appearances = card.appearances.map((item) => {
+        const appearance = record(item)
+        supportedKeys(appearance, ['pageId', 'sourcePageId', 'x', 'y'])
+        const target = uuid(appearance.pageId, 'appearance.pageId')
+        const source = uuid(appearance.sourcePageId, 'appearance.sourcePageId')
+        if (!pageIds.has(target) || !pageIds.has(source) || seenPages.has(target) || target === source) {
+          throw new InvalidChronicleStoryRequestError('Card appearance references invalid or duplicate pages')
+        }
+        seenPages.add(target)
+        const { x: ax, y: ay } = appearance
+        if (typeof ax !== 'number' || !Number.isFinite(ax) || ax < 0 || ax > 5000 ||
+          typeof ay !== 'number' || !Number.isFinite(ay) || ay < 0 || ay > 5000) {
+          throw new InvalidChronicleStoryRequestError('Card appearance has invalid coordinates')
+        }
+        return { pageId: target, sourcePageId: source, x: ax, y: ay }
+      })
+      const origins = new Map(appearances.map((item) => [item.pageId, item.sourcePageId]))
+      for (const appearance of appearances) {
+        const visited = new Set<string>()
+        let source = appearance.sourcePageId
+        while (source !== pageId) {
+          if (visited.has(source) || !origins.has(source)) throw new InvalidChronicleStoryRequestError('Card appearance has no valid origin')
+          visited.add(source)
+          source = origins.get(source)!
+        }
+      }
+    }
     return {
       id,
+      ...(pageId === undefined ? {} : { pageId }),
+      ...(appearances === undefined ? {} : { appearances }),
       kind: card.kind as ChronicleStoryGuideCardKind,
       state: card.state as ChronicleStoryGuideCardState,
       title: requiredText(card.title, `narratorGuide.cards[${index}].title`, 140),
@@ -315,7 +367,7 @@ function parseNarratorGuide(value: unknown): ChronicleStoryGuide {
     }
   })
 
-  return { cards, connections }
+  return { ...(pages === undefined ? {} : { pages }), cards, connections }
 }
 
 function storyType(

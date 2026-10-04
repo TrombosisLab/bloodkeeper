@@ -156,6 +156,7 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
   const [selectedMilestoneKey, setSelectedMilestoneKey] = useState<ChronicleStoryMilestoneApiKey | null>(null)
   const [storyView, setStoryView] = useState<'story' | 'guide'>('story')
   const [guideDirty, setGuideDirty] = useState(false)
+  const [guidePage, setGuidePage] = useState<{ storyId: string; pageId: string } | null>(null)
   const [milestoneNoteDrafts, setMilestoneNoteDrafts] = useState<Readonly<Partial<Record<ChronicleStoryMilestoneApiKey, string>>>>({})
 
   const selected = stories.find((story) => story.id === selectedId) ?? null
@@ -361,6 +362,8 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
           {storyView === 'guide' ? <ChronicleStoryGuideWorkspace
             key={`${selected.id}-${selected.revision}`}
             guide={selected.narratorGuide}
+            initialPageId={guidePage?.storyId === selected.id ? guidePage.pageId : undefined}
+            onPageChange={(pageId) => setGuidePage({ storyId: selected.id, pageId })}
             readOnly={readOnly}
             saving={operation === 'guide'}
             onDirtyChange={setGuideDirty}
