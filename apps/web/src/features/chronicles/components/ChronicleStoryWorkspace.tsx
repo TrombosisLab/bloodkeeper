@@ -15,12 +15,14 @@ import type {
   ChronicleStoryApiVisibility,
   ChronicleStoryMilestoneApiKey,
   ChronicleStoryMilestoneApiSnapshot,
+  ChronicleStoryGuide,
 } from '../types/chronicle-story-api.types'
 import { createChronicleGateway } from '../infrastructure/chronicle.api'
 import {
   ChronicleStoryApiError,
   createChronicleStoryGateway,
 } from '../infrastructure/chronicle-story.api'
+import { ChronicleStoryGuideWorkspace } from './ChronicleStoryGuideWorkspace'
 
 import './chronicle-story-workspace.css'
 
@@ -152,6 +154,8 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
   const [completionOperationId, setCompletionOperationId] = useState(storyCompletionOperationId)
   const [sessionNotes, setSessionNotes] = useState<Readonly<Record<string, string>>>({})
   const [selectedMilestoneKey, setSelectedMilestoneKey] = useState<ChronicleStoryMilestoneApiKey | null>(null)
+  const [storyView, setStoryView] = useState<'story' | 'guide'>('story')
+  const [guideDirty, setGuideDirty] = useState(false)
   const [milestoneNoteDrafts, setMilestoneNoteDrafts] = useState<Readonly<Partial<Record<ChronicleStoryMilestoneApiKey, string>>>>({})
 
   const selected = stories.find((story) => story.id === selectedId) ?? null
@@ -202,7 +206,16 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
 
   useEffect(() => {
     setSelectedMilestoneKey(null)
+    setStoryView('story')
+    setGuideDirty(false)
   }, [selectedId])
+
+  function leaveGuideAllowed(): boolean {
+    if (!guideDirty) return true
+    const discard = globalThis.confirm('Hay cambios del guion sin guardar. ¿Quieres descartarlos?')
+    if (discard) setGuideDirty(false)
+    return discard
+  }
 
   useEffect(() => {
     if (selected === null) return
@@ -235,6 +248,25 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
     } catch (operationError: unknown) {
       setError(storyError(operationError))
       if (operationError instanceof ChronicleStoryApiError && operationError.code === 'CHRONICLE_STORY_REVISION_CONFLICT') await load()
+    } finally {
+      setOperation(null)
+    }
+  }
+
+  async function saveNarratorGuide(guide: ChronicleStoryGuide): Promise<boolean> {
+    if (selected === null || readOnly) return false
+    setOperation('guide')
+    setError(null)
+    try {
+      storeStory(await storyGateway.update(chronicleId, selected.id, {
+        expectedRevision: selected.revision,
+        narratorGuide: guide,
+      }))
+      return true
+    } catch (saveError: unknown) {
+      setError(storyError(saveError))
+      if (saveError instanceof ChronicleStoryApiError && saveError.code === 'CHRONICLE_STORY_REVISION_CONFLICT') await load()
+      return false
     } finally {
       setOperation(null)
     }
@@ -292,7 +324,7 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
   const selectedMilestone = selected?.milestones.find((milestone) => milestone.key === selectedMilestoneKey) ?? null
 
   return (
-    <section className="story-workspace" aria-label="Historias de la crónica">
+    <section className={`story-workspace${storyView === 'guide' ? ' story-workspace--guide' : ''}`} aria-label="Historias de la crónica">
       {error !== null ? <div className="story-workspace__alert" role="alert">{error}<button type="button" onClick={() => setError(null)}>Cerrar</button></div> : null}
 
       <aside className="story-browser">
@@ -304,7 +336,7 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
         <button type="button" className="story-primary story-browser__new" onClick={() => setShowCreate((value) => !value)}>＋ Nueva historia</button>
         {showCreate ? <form className="story-create" onSubmit={createStory}><input name="title" maxLength={160} required placeholder="Título de la historia" /><select name="type" defaultValue="main_arc"><option value="main_arc">Arco principal</option><option value="secondary_arc">Arco secundario</option><option value="personal_arc">Arco personal</option></select><button type="submit" disabled={operation === 'create'}>{operation === 'create' ? 'Creando…' : 'Crear historia'}</button></form> : null}
         <div className="story-browser__list">
-          {filteredStories.map((story) => <button type="button" key={story.id} className={`story-card${story.id === selectedId ? ' story-card--selected' : ''}`} onClick={() => setSelectedId(story.id)}>
+          {filteredStories.map((story) => <button type="button" key={story.id} className={`story-card${story.id === selectedId ? ' story-card--selected' : ''}`} onClick={() => { if (story.id !== selectedId && (storyView !== 'guide' || leaveGuideAllowed())) setSelectedId(story.id) }}>
             <span className="story-card__top"><strong>{story.title}</strong><span className={`story-status story-status--${story.status}`}>{statusLabels[story.status]}</span></span>
             <small>{typeLabels[story.type]}</small><span className="story-card__progress"><i style={{ width: `${story.progress.percentage}%` }} /></span><span className="story-card__meta">{story.progress.completed}/5 hitos · {story.counts.sessions} sesiones</span>
             {story.status === 'completed' ? <span className="story-card__xp">✓ +1 XP · {story.closure.completion?.grantedCount ?? 0} personaje{story.closure.completion?.grantedCount === 1 ? '' : 's'}</span> : null}
@@ -320,6 +352,20 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
             <div className="story-detail__title"><span>Historia seleccionada</span><input value={titleDraft} disabled={readOnly} onChange={(event) => setTitleDraft(event.target.value)} aria-label="Título de la historia" /><select value={typeDraft} disabled={readOnly} onChange={(event) => setTypeDraft(event.target.value as ChronicleStoryApiType)}><option value="main_arc">Arco principal</option><option value="secondary_arc">Arco secundario</option><option value="personal_arc">Arco personal</option></select></div>
             <div className="story-detail__header-actions"><span className={`story-status story-status--${selected.status}`}>{statusLabels[selected.status]}</span>{selected.status === 'planned' ? <button type="button" onClick={() => void perform('activate', () => storyGateway.activate(chronicleId, selected.id, selected.revision))}>Activar</button> : null}<button type="button" disabled={readOnly || operation !== null} onClick={() => void perform('save-main', () => storyGateway.update(chronicleId, selected.id, { expectedRevision: selected.revision, title: titleDraft, type: typeDraft, premise: premiseDraft.trim() || null, stakes: stakesDraft.trim() || null }))}>Guardar cambios</button></div>
           </header>
+
+          <nav className="story-detail__subnav" aria-label="Vistas de la historia">
+            <button type="button" className={storyView === 'story' ? 'is-active' : ''} aria-pressed={storyView === 'story'} onClick={() => { if (storyView !== 'guide' || leaveGuideAllowed()) setStoryView('story') }}>Ficha de historia</button>
+            <button type="button" className={storyView === 'guide' ? 'is-active' : ''} aria-pressed={storyView === 'guide'} onClick={() => setStoryView('guide')}>✦ Guion privado del Narrador</button>
+          </nav>
+
+          {storyView === 'guide' ? <ChronicleStoryGuideWorkspace
+            key={`${selected.id}-${selected.revision}`}
+            guide={selected.narratorGuide}
+            readOnly={readOnly}
+            saving={operation === 'guide'}
+            onDirtyChange={setGuideDirty}
+            onSave={saveNarratorGuide}
+          /> : <>
 
           <section className="story-premise-grid">
             <label><span>Premisa</span><textarea value={premiseDraft} disabled={readOnly} onChange={(event) => setPremiseDraft(event.target.value)} placeholder="¿Qué pone esta historia en movimiento?" /></label>
@@ -382,17 +428,18 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
           <section className="story-section story-cast"><div className="story-section__heading"><div><span>Reparto</span><h3>Personajes implicados</h3></div><button type="button" onClick={() => openContext('cast')} disabled={readOnly}>＋ Gestionar reparto</button></div><div className="story-cast__columns"><div><h4>Personajes jugadores</h4>{selected.characters.map((link) => { const character = associatedCharacters.find((item) => item.characterId === link.id); return <article key={link.id}><span className="story-avatar">PJ</span><div><strong>{character?.name || 'Personaje sin nombre'}</strong><small>{character?.concept ?? 'Sin concepto'}</small></div></article> })}{selected.characters.length === 0 ? <p className="story-empty">Ningún PJ implicado.</p> : null}</div><div><h4>PNJ</h4>{selected.npcs.map((npc) => <article key={npc.id}><span className="story-avatar story-avatar--npc">PNJ</span><div><strong>{npc.name}</strong><small>{npc.narrativeRole ?? npc.category ?? 'Sin rol definido'}</small></div></article>)}{selected.npcs.length === 0 ? <p className="story-empty">Ningún PNJ implicado.</p> : null}</div></div></section>
 
           <section className="story-section"><div className="story-section__heading"><div><span>Escenarios</span><h3>Localizaciones</h3></div><button type="button" onClick={() => openContext('locations')} disabled={readOnly}>＋ Añadir localización</button></div><div className="story-compact-grid">{selected.locations.map((location) => <article key={location.id}><span className="story-resource-icon">⌂</span><div><strong>{location.name}</strong><small>{location.category ?? 'Localización'}</small></div></article>)}{selected.locations.length === 0 ? <button type="button" className="story-add-card" onClick={() => openContext('locations')}>＋ Relacionar localización</button> : null}</div></section>
+          </>}
         </>}
       </main>
 
-      <aside className="story-sidebar">
+      {storyView !== 'guide' ? <aside className="story-sidebar">
         {selected === null ? <div className="story-sidebar__placeholder">Selecciona una historia para ver su resumen.</div> : <>
           <section className="story-side-card story-summary"><div className="story-side-card__heading"><span>◈</span><h3>Resumen</h3></div><div className="story-summary__metrics"><div><strong>{selected.counts.sessions}</strong><small>Sesiones vinculadas</small></div><div><strong>{selected.counts.characters}</strong><small>Personajes implicados</small></div><div><strong>{selected.counts.events}</strong><small>Sucesos registrados</small></div></div></section>
           <section className="story-side-card story-sharing"><div className="story-side-card__heading"><span>◇</span><div><h3>Publicación</h3><small>Visibilidad para participantes</small></div></div><label><span>Acceso</span><select aria-label="Visibilidad de la historia" value={visibilityDraft} disabled={readOnly} onChange={(event) => setVisibilityDraft(event.target.value as ChronicleStoryApiVisibility)}><option value="narrator_only">Solo Narrador</option><option value="chronicle_participants">Participantes de la Crónica</option></select></label><label><span>Resumen compartido</span><textarea aria-label="Resumen compartido" value={sharedSummaryDraft} disabled={readOnly} onChange={(event) => setSharedSummaryDraft(event.target.value)} placeholder="Lo que los participantes pueden conocer sobre este arco…" maxLength={8000} /></label><p>{visibilityDraft === 'chronicle_participants' ? 'Esta Historia aparecerá en la vista de los participantes activos.' : 'La Historia y este resumen permanecen privados.'}</p><button type="button" disabled={readOnly || operation !== null} onClick={() => void perform('sharing', () => storyGateway.update(chronicleId, selected.id, { expectedRevision: selected.revision, visibility: visibilityDraft, sharedSummary: sharedSummaryDraft.trim() || null }))}>{operation === 'sharing' ? 'Guardando…' : 'Guardar publicación'}</button></section>
           <section className="story-side-card story-notes"><div className="story-side-card__heading"><span>✦</span><div><h3>Notas del Narrador</h3><small>Solo Narrador</small></div></div><textarea value={notesDraft} disabled={readOnly} onChange={(event) => setNotesDraft(event.target.value)} placeholder="Secretos, pistas y próximos movimientos…" /><button type="button" disabled={readOnly || operation !== null} onClick={() => void perform('notes', () => storyGateway.update(chronicleId, selected.id, { expectedRevision: selected.revision, narratorNotes: notesDraft.trim() || null }))}>Guardar notas</button><div className="story-reminders"><h4>Recordatorios</h4>{selected.reminders.map((reminder) => <div key={reminder.id} className={reminder.resolved ? 'is-resolved' : ''}><button type="button" aria-label="Cambiar estado" disabled={readOnly} onClick={() => void perform(`reminder:${reminder.id}`, () => storyGateway.updateReminder(chronicleId, selected.id, reminder.id, { expectedRevision: selected.revision, resolved: !reminder.resolved }))}>{reminder.resolved ? '✓' : '○'}</button><span>{reminder.text}</span><button type="button" aria-label="Eliminar recordatorio" disabled={readOnly} onClick={() => void perform(`remove:${reminder.id}`, () => storyGateway.removeReminder(chronicleId, selected.id, reminder.id, selected.revision))}>×</button></div>)}<form onSubmit={(event) => { event.preventDefault(); const text = reminderText.trim(); if (text.length > 0) void perform('add-reminder', () => storyGateway.addReminder(chronicleId, selected.id, { expectedRevision: selected.revision, text })).then(() => setReminderText('')) }}><input value={reminderText} disabled={readOnly} onChange={(event) => setReminderText(event.target.value)} placeholder="Añadir recordatorio" /><button type="submit" disabled={readOnly}>＋</button></form></div></section>
           <section className="story-side-card story-closure"><div className="story-side-card__heading"><span>♜</span><h3>Cierre de historia</h3></div><p>{hasCompletedClosure ? `Historia cerrada: ${selected.closure.completion?.grantedCount ?? 0} concesiones de +1 XP registradas.` : selected.status === 'archived' ? selected.startedAt === null ? 'Esta planificación fue archivada sin iniciarse y no generó experiencia.' : 'Esta historia se archivó sin completar el cierre y no generó experiencia.' : selected.closure.eligibleCharacterCount === 0 ? 'No hay personajes elegibles. Puedes cerrar, pero no se concederá experiencia.' : 'El cierre otorgará +1 XP según la asistencia real a las sesiones de esta historia.'}</p><ul><li className={selected.progress.completed === 5 ? 'is-ready' : ''}>{selected.progress.completed}/5 hitos completados</li><li className={selected.closure.hasEligibleSession && !selected.closure.hasPreparationSession ? 'is-ready' : ''}>Sesiones finalizadas, sin sesiones en preparación</li><li className={selected.closure.hasEligibleSession ? 'is-ready' : ''}>{selected.closure.eligibleCharacterCount} personajes elegibles por asistencia</li></ul>{selected.status === 'active' ? <><label className="story-closure__resolution"><span>Resolución narrativa</span><textarea value={resolutionDraft} disabled={readOnly} onChange={(event) => setResolutionDraft(event.target.value)} placeholder="Cómo termina esta historia…" maxLength={8000} /></label><label className={`story-closure__confirm${selected.closure.eligibleCharacterCount === 0 ? ' is-warning' : ''}`}><input type="checkbox" checked={completionConfirmed} disabled={readOnly} onChange={(event) => setCompletionConfirmed(event.target.checked)} /><span>{selected.closure.eligibleCharacterCount === 0 ? 'Confirmo el cierre sin conceder experiencia' : `Confirmo el cierre y la concesión de +1 XP a ${selected.closure.eligibleCharacterCount} personaje${selected.closure.eligibleCharacterCount === 1 ? '' : 's'}`}</span></label><button type="button" className="story-closure__button" disabled={!closureEligible || operation !== null} onClick={() => void perform('complete', () => storyGateway.complete(chronicleId, selected.id, { expectedRevision: selected.revision, operationId: completionOperationId, resolution: resolutionDraft.trim(), confirmed: true }))}>{operation === 'complete' ? 'Cerrando historia…' : 'Cerrar historia · +1 XP'}</button></> : hasCompletedClosure ? <button type="button" className="story-closure__button" disabled>✓ Historia cerrada · +1 XP</button> : null}{selected.status === 'completed' || selected.status === 'archived' ? selected.resolution?.trim() ? <div className="story-closure__resolution-readonly"><span>Resolución narrativa</span><p>{selected.resolution}</p></div> : null : null}{selected.status === 'planned' || selected.status === 'completed' ? <button type="button" className="story-archive" disabled={operation !== null} onClick={() => void perform('archive', () => storyGateway.archive(chronicleId, selected.id, selected.revision))}>{selected.status === 'planned' ? 'Archivar planificación' : 'Archivar historia cerrada'}</button> : null}</section>
         </>}
-      </aside>
+      </aside> : null}
 
       {showContext && selected !== null ? <div className="story-modal" role="dialog" aria-modal="true" aria-labelledby="story-context-title"><div className="story-modal__panel"><header><div><span>Relaciones de la historia</span><h3 id="story-context-title">Vincular contenido</h3></div><button type="button" onClick={() => setShowContext(false)} aria-label="Cerrar">×</button></header><div className="story-modal__grid">
         {contextFocus === 'sessions' || contextFocus === 'all' ? <ContextGroup title="Sesiones" items={sessions.map((item) => ({ id: item.id, label: `${item.sessionNumber === null ? 'Sesión' : `Sesión ${item.sessionNumber}`} · ${item.title ?? 'Sin título'}` }))} selected={context.sessionIds} onToggle={(id) => setContext((current) => ({ ...current, sessionIds: toggleId(current.sessionIds, id) }))} /> : null}

@@ -15,6 +15,7 @@ import type {
   ChronicleStoryListQuery,
   ChronicleStoryMilestoneKey,
   ChronicleStorySnapshot,
+  ChronicleStoryGuide,
   ChronicleStoryType,
   ChronicleStoryVisibility,
 } from '../domain/chronicle-story.types'
@@ -242,6 +243,7 @@ export interface UpdateChronicleStoryCommand {
   readonly premise?: string | null
   readonly stakes?: string | null
   readonly narratorNotes?: string | null
+  readonly narratorGuide?: ChronicleStoryGuide
   readonly sharedSummary?: string | null
   readonly visibility?: ChronicleStoryVisibility
 }

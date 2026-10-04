@@ -5,6 +5,12 @@ import type {
   ChronicleStoryListQuery,
   ChronicleStoryMilestoneKey,
   ChronicleStorySnapshot,
+  ChronicleStoryGuide,
+  ChronicleStoryGuideCard,
+  ChronicleStoryGuideCardKind,
+  ChronicleStoryGuideCardState,
+  ChronicleStoryGuideConnection,
+  ChronicleStoryGuideConnectionColor,
   ChronicleStoryStatus,
   ChronicleStoryType,
   ChronicleStoryVisibility,
@@ -33,6 +39,7 @@ export interface ChronicleStoryResponseDto {
   readonly stakes: string | null
   readonly resolution: string | null
   readonly narratorNotes: string | null
+  readonly narratorGuide: ChronicleStoryGuide | null
   readonly sharedSummary: string | null
   readonly visibility: ChronicleStoryVisibility
   readonly status: ChronicleStoryStatus
@@ -251,6 +258,66 @@ function revision(
   return value
 }
 
+function parseNarratorGuide(value: unknown): ChronicleStoryGuide {
+  const guide = record(value)
+  supportedKeys(guide, ['cards', 'connections'])
+  if (!Array.isArray(guide.cards) || guide.cards.length > 120 || !Array.isArray(guide.connections) || guide.connections.length > 240) {
+    throw new InvalidChronicleStoryRequestError('narratorGuide has too many cards or connections')
+  }
+
+  const cardKinds: readonly ChronicleStoryGuideCardKind[] = ['clue', 'npc', 'location', 'document', 'event', 'decision', 'outcome']
+  const cardStates: readonly ChronicleStoryGuideCardState[] = ['hidden', 'discovered', 'resolved']
+  const ids = new Set<string>()
+  const cards: ChronicleStoryGuideCard[] = guide.cards.map((item, index) => {
+    const card = record(item)
+    supportedKeys(card, ['id', 'kind', 'state', 'title', 'summary', 'narratorNote', 'x', 'y'])
+    const id = uuid(card.id, `narratorGuide.cards[${index}].id`)
+    if (ids.has(id)) throw new InvalidChronicleStoryRequestError('narratorGuide card IDs must be unique')
+    ids.add(id)
+    if (!cardKinds.includes(card.kind as ChronicleStoryGuideCardKind) || !cardStates.includes(card.state as ChronicleStoryGuideCardState)) {
+      throw new InvalidChronicleStoryRequestError(`narratorGuide.cards[${index}] has an invalid kind or state`)
+    }
+    const x = card.x
+    const y = card.y
+    if (typeof x !== 'number' || !Number.isFinite(x) || x < 0 || x > 5000 || typeof y !== 'number' || !Number.isFinite(y) || y < 0 || y > 5000) {
+      throw new InvalidChronicleStoryRequestError(`narratorGuide.cards[${index}] has invalid canvas coordinates`)
+    }
+    return {
+      id,
+      kind: card.kind as ChronicleStoryGuideCardKind,
+      state: card.state as ChronicleStoryGuideCardState,
+      title: requiredText(card.title, `narratorGuide.cards[${index}].title`, 140),
+      summary: optionalText(card.summary, `narratorGuide.cards[${index}].summary`, 1200) ?? '',
+      narratorNote: optionalText(card.narratorNote, `narratorGuide.cards[${index}].narratorNote`, 4000) ?? '',
+      x,
+      y,
+    }
+  })
+
+  const connectionIds = new Set<string>()
+  const colors: readonly ChronicleStoryGuideConnectionColor[] = ['rose', 'gold', 'blue', 'green']
+  const connections: ChronicleStoryGuideConnection[] = guide.connections.map((item, index) => {
+    const connection = record(item)
+    supportedKeys(connection, ['id', 'from', 'to', 'label', 'color'])
+    const id = uuid(connection.id, `narratorGuide.connections[${index}].id`)
+    if (connectionIds.has(id)) throw new InvalidChronicleStoryRequestError('narratorGuide connection IDs must be unique')
+    connectionIds.add(id)
+    const from = uuid(connection.from, `narratorGuide.connections[${index}].from`)
+    const to = uuid(connection.to, `narratorGuide.connections[${index}].to`)
+    if (!ids.has(from) || !ids.has(to) || from === to) throw new InvalidChronicleStoryRequestError(`narratorGuide.connections[${index}] references an invalid card`)
+    if (!colors.includes(connection.color as ChronicleStoryGuideConnectionColor)) throw new InvalidChronicleStoryRequestError(`narratorGuide.connections[${index}] has an invalid color`)
+    return {
+      id,
+      from,
+      to,
+      label: optionalText(connection.label, `narratorGuide.connections[${index}].label`, 120) ?? '',
+      color: connection.color as ChronicleStoryGuideConnectionColor,
+    }
+  })
+
+  return { cards, connections }
+}
+
 function storyType(
   value: unknown,
 ): ChronicleStoryType {
@@ -446,6 +513,7 @@ export function parseUpdateChronicleStoryRequest(
     'premise',
     'stakes',
     'narratorNotes',
+    'narratorGuide',
     'sharedSummary',
     'visibility',
   ] as const
@@ -504,6 +572,9 @@ export function parseUpdateChronicleStoryRequest(
             12000,
           ),
         }),
+    ...(value.narratorGuide === undefined
+      ? {}
+      : { narratorGuide: parseNarratorGuide(value.narratorGuide) }),
     ...(value.sharedSummary === undefined
       ? {}
       : {
@@ -734,6 +805,7 @@ export function toChronicleStoryResponse(
     stakes: story.stakes,
     resolution: story.resolution,
     narratorNotes: story.narratorNotes,
+    narratorGuide: story.narratorGuide,
     sharedSummary: story.sharedSummary,
     visibility: story.visibility,
     status: story.status,

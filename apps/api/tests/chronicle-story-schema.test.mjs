@@ -66,6 +66,7 @@ test('SPEC-060-A declara agregado, relaciones, privacidad y trazabilidad XP', ()
     assert.match(schema, new RegExp(`model ${model} \\{`))
   }
   assert.match(schema, /narratorNotes\s+String\?/)
+  assert.match(schema, /narratorGuide\s+Json\?/)
   assert.match(schema, /experiencePace\s+ChronicleExperiencePace/)
   assert.match(schema, /experiencePaceSnapshot\s+ChronicleExperiencePace\?/)
   assert.match(schema, /storyId\s+String\?\s+@db\.Uuid/)

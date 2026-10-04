@@ -20,6 +20,50 @@ export type ChronicleStoryMilestoneKey =
   | 'climax'
   | 'resolution'
 
+export type ChronicleStoryGuideCardKind =
+  | 'clue'
+  | 'npc'
+  | 'location'
+  | 'document'
+  | 'event'
+  | 'decision'
+  | 'outcome'
+
+export type ChronicleStoryGuideCardState =
+  | 'hidden'
+  | 'discovered'
+  | 'resolved'
+
+export type ChronicleStoryGuideConnectionColor =
+  | 'rose'
+  | 'gold'
+  | 'blue'
+  | 'green'
+
+export interface ChronicleStoryGuideCard {
+  readonly id: string
+  readonly kind: ChronicleStoryGuideCardKind
+  readonly state: ChronicleStoryGuideCardState
+  readonly title: string
+  readonly summary: string
+  readonly narratorNote: string
+  readonly x: number
+  readonly y: number
+}
+
+export interface ChronicleStoryGuideConnection {
+  readonly id: string
+  readonly from: string
+  readonly to: string
+  readonly label: string
+  readonly color: ChronicleStoryGuideConnectionColor
+}
+
+export interface ChronicleStoryGuide {
+  readonly cards: readonly ChronicleStoryGuideCard[]
+  readonly connections: readonly ChronicleStoryGuideConnection[]
+}
+
 export interface ChronicleStoryMilestoneDefinition {
   readonly key: ChronicleStoryMilestoneKey
   readonly label: string
@@ -122,6 +166,7 @@ export interface ChronicleStorySnapshot {
   readonly stakes: string | null
   readonly resolution: string | null
   readonly narratorNotes: string | null
+  readonly narratorGuide: ChronicleStoryGuide | null
   readonly sharedSummary: string | null
   readonly visibility: ChronicleStoryVisibility
   readonly status: ChronicleStoryStatus
@@ -170,6 +215,7 @@ export interface UpdateChronicleStoryData {
   readonly premise?: string | null
   readonly stakes?: string | null
   readonly narratorNotes?: string | null
+  readonly narratorGuide?: ChronicleStoryGuide
   readonly sharedSummary?: string | null
   readonly visibility?: ChronicleStoryVisibility
 }

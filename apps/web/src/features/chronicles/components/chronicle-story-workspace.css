@@ -64,14 +64,19 @@
 .story-status--archived { opacity: 0.58; }
 
 .story-detail { overflow: hidden; }
+.story-detail__subnav { display: flex; gap: 0; border-bottom: 1px solid var(--story-line); background: #100e0f; }
+.story-detail__subnav button { min-height: 38px; flex: 1; border: 0; border-bottom: 2px solid transparent; background: transparent; color: #b6aaab; font-size: .72rem; font-weight: 700; }
+.story-detail__subnav button.is-active { border-bottom-color: var(--story-red-bright); background: #241416; color: #f1dfe0; }
+.chronicle-detail .story-workspace.story-workspace--guide { grid-template-columns: minmax(210px,240px) minmax(0,1fr) !important; width: 100%; max-width: none; margin: 0; transform: none; }
+.story-workspace.story-workspace--guide .story-detail { grid-column: 2; }
 .story-detail__header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; padding: 18px 20px; border-bottom: 1px solid var(--story-line); }
 .story-detail__title { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; }
 .story-detail__title > span { grid-column: 1 / -1; }
 .story-workspace .story-detail__title input { min-width: 0; min-height: 38px; padding: 0; border: 0; background: transparent; color: var(--color-text-primary); font-family: Georgia, serif; font-size: clamp(1.25rem, 2vw, 1.7rem); font-weight: 700; box-shadow: none; }
 .story-workspace .story-detail__title select { min-height: 32px; border-color: var(--story-line-soft); background: #101214; font-size: 0.72rem; }
-.story-detail__header-actions { display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 8px; }
+.story-detail__header-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
 .story-detail__header { grid-template-columns: minmax(0, 1fr); }
-/* GLOBAL_VISUAL_STORY_HEADER_LAYOUT_V1 */
+.story-detail__header-actions { justify-content: flex-start; }
 .story-detail__header-actions button, .story-section__heading button, .story-session-list article button, .story-notes > button, .story-archive { min-height: 30px !important; padding: 5px 9px !important; border-color: var(--story-line) !important; background: #1b1d20 !important; font-size: 0.7rem !important; }
 .story-premise-grid { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--story-line); }
 .story-premise-grid label { display: grid; gap: 8px; padding: 16px 20px; }
@@ -182,6 +187,8 @@
 }
 
 @media (max-width: 820px) {
+  .chronicle-detail .story-workspace.story-workspace--guide { grid-template-columns: minmax(0,1fr) !important; }
+  .chronicle-detail .story-workspace.story-workspace--guide .story-detail { grid-column: 1; }
   .story-workspace { width: 100%; margin: 12px 0 0; transform: none; grid-template-columns: 1fr; }
   .story-browser { min-height: auto; }
   .story-browser__list { max-height: 360px; }

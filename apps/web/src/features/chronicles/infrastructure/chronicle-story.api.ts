@@ -3,6 +3,7 @@ import type {
   ChronicleSharedStoryApiSnapshot,
   ChronicleStoryApiPage,
   ChronicleStoryApiSnapshot,
+  ChronicleStoryGuide,
   ChronicleStoryMilestoneApiKey,
   CreateChronicleStoryApiRequest,
   CompleteChronicleStoryApiRequest,
@@ -48,6 +49,7 @@ function parseStory(value: unknown): ChronicleStoryApiSnapshot {
     !nullableString(item.stakes) ||
     !nullableString(item.resolution) ||
     !nullableString(item.narratorNotes) ||
+    !(item.narratorGuide === null || item.narratorGuide === undefined || (typeof item.narratorGuide === 'object' && item.narratorGuide !== null)) ||
     !nullableString(item.sharedSummary) ||
     typeof item.sortOrder !== 'number' ||
     typeof item.revision !== 'number' ||
@@ -67,6 +69,7 @@ function parseStory(value: unknown): ChronicleStoryApiSnapshot {
   return {
     ...item,
     sessionIds: Array.isArray(item.sessionIds) ? item.sessionIds : [],
+    narratorGuide: (item.narratorGuide ?? null) as ChronicleStoryGuide | null,
   } as unknown as ChronicleStoryApiSnapshot
 }
 

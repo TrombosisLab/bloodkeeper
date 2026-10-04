@@ -29,6 +29,7 @@ import type {
   ChronicleStoryMilestoneSnapshot,
   ChronicleStoryReminderSnapshot,
   ChronicleStorySnapshot,
+  ChronicleStoryGuide,
   ChronicleStoryStatus,
   ChronicleStoryType,
   ChronicleStoryVisibility,
@@ -279,6 +280,7 @@ function toDomain(
     stakes: row.stakes,
     resolution: row.resolution,
     narratorNotes: row.narratorNotes,
+    narratorGuide: row.narratorGuide as unknown as ChronicleStoryGuide | null,
     sharedSummary: row.sharedSummary,
     visibility:
       visibilityFromPrisma[row.visibility],
@@ -589,6 +591,12 @@ export class PrismaChronicleStoryRepository
             : {
                 narratorNotes:
                   data.narratorNotes,
+              }),
+          ...(data.narratorGuide === undefined
+            ? {}
+            : {
+                narratorGuide:
+                  data.narratorGuide as unknown as Prisma.InputJsonValue,
               }),
           ...(data.sharedSummary === undefined
             ? {}

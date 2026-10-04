@@ -1315,6 +1315,7 @@ model ChronicleStory {
   resolution    String?
   narratorNotes String?
   sharedSummary String?
+  narratorGuide Json?
   visibility    ChronicleStoryVisibility @default(NARRATOR_ONLY)
   status        ChronicleStoryStatus     @default(PLANNED)
   sortOrder     Int
