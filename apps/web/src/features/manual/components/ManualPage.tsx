@@ -20,6 +20,11 @@ interface ManualRoleDefinition {
   readonly quickStart: string
 }
 
+const relationshipManual: ManualSection = {
+  title: 'Relaciones: mapa privado y mapas compartidos',
+  paragraphs: ['Sala de Investigación → Relaciones ofrece dos mapas por persona y por crónica, tanto para jugadores como para el Narrador. Mi mapa privado solo puede verlo y editarlo su propietario; ni dirigir la mesa ni tener rol de administrador permite consultar el mapa privado de otra persona.', 'Mapas compartidos reúne los mapas visibles para la coterie en un selector. Mi mapa compartido es editable; los de los demás son de solo lectura. Compartido no significa accesible fuera de la crónica: hace falta ser el Narrador de esa mesa o mantener participación activa.'],
+  bullets: ['Añade tarjetas con un nombre libre o vincúlalas a un PJ o PNJ disponible. Ver el nombre no concede acceso a la ficha: Abrir ficha vinculada comprueba los permisos habituales.', 'En el privado, guarda primero y pulsa Mostrar en mi mapa compartido en la tarjeta. Solo se publican el nombre y el vínculo a la ficha: no se copian descripción, nota privada, relaciones, posiciones ni páginas. Una vez publicada, puedes escribir una descripción y relaciones distintas en el compartido; las ediciones posteriores de ambos mapas son independientes.', 'Retirar de mi mapa compartido quita esa tarjeta de todas las páginas compartidas y elimina sus relaciones compartidas, sin cambiar el privado. Eliminar la tarjeta privada también retira su publicación cuando guardas. Revisa los avisos antes de confirmar.', 'Crea relaciones de familia, sire/chiquillo, mentor/protegido, amistad, alianza, amor, rivalidad, enemistad, autoridad, deuda/favor, vínculo de sangre, manipulación o sospecha. Son categorías de organización del mapa, no efectos automáticos de las reglas de V5.', 'El tipo determina el color de la línea. Personalizada permite escribir otro nombre y escoger su color. Puedes detallar cualquier relación, añadir varias entre dos personas y elegir una flecha, ambas direcciones o ninguna.', 'Abre una tarjeta para consultar y editar sus relaciones entrantes y salientes. Una relación con una sola flecha va desde la primera persona hacia la segunda; no implica reciprocidad.', 'Nueva página desde una tarjeta conserva la misma tarjeta en la original y la coloca al inicio de la nueva. Nombre, descripción y nota son comunes dentro de ese mapa; la posición es independiente. Las continuaciones y páginas nunca se trasladan entre el privado y el compartido.', 'Usa los enlaces de continuación para volver o avanzar, el zoom para leer y el desplazamiento del lienzo para recorrerlo. Quitar solo de esta página retira una aparición; Eliminar tarjeta de todas las páginas también elimina sus relaciones.', 'Guarda mapa conserva tarjetas, relaciones y páginas. Publicar o retirar una tarjeta guardada se aplica directamente al servidor. Si aparece un conflicto por otra sesión tuya, tu borrador se conserva: no se sobrescribe automáticamente.', 'Cada mapa admite 30 páginas, 120 tarjetas y 240 relaciones. Solo se pueden eliminar páginas vacías.'],
+}
 const manualRoles: Record<ManualRole, ManualRoleDefinition> = {
   admin: {
     label: 'Administrador',
@@ -179,6 +184,7 @@ const manualRoles: Record<ManualRole, ManualRoleDefinition> = {
         paragraphs: ['La Sala de Investigación reúne pizarra, cronología y archivo. Las notas pueden ser privadas, compartidas o vinculadas a una sesión.'],
         bullets: ['Indica quién puede leer una anotación antes de compartirla.', 'Relaciona personas, lugares y recursos para que la pista tenga contexto.', 'La vista personal de la pizarra permite filtrar por una sesión, notas generales o todas las sesiones.', 'La posición, selección y conexiones ayudan a preparar la escena sin alterar la información original.'],
       },
+      relationshipManual,
       {
         title: 'Mapas y cartografía',
         paragraphs: ['En Mapa puedes trabajar con varias escalas: por ejemplo, una provincia, una ciudad y un barrio.'],
@@ -237,6 +243,7 @@ const manualRoles: Record<ManualRole, ManualRoleDefinition> = {
         paragraphs: ['En Historia, pulsa Crónicas y elige una mesa en la que seas participante activo. Encontrarás los resúmenes de sesiones completadas y las historias cerradas que el Narrador haya compartido con la crónica.', 'Este archivo permite repasar la partida sin consultar la preparación del Narrador. No incluye su guion privado, notas privadas, hitos secretos ni la nota privada de resolución.'],
         bullets: ['Las sesiones necesitan estar completadas y tener resumen. Las historias necesitan estar completadas, tener un resumen compartido y acceso para participantes.', 'La fecha de una sesión es su fecha real o, si falta, su última actualización; la de una historia es su fecha de finalización.', 'Si todavía no hay resúmenes, el archivo muestra un mensaje vacío. No significa que puedas acceder a las notas privadas de preparación.', 'Solo se muestran las crónicas en las que mantienes participación activa. Pertenecer a una mesa no permite consultar la memoria de otras.', 'Si falta un resumen que esperabas, pide al Narrador que revise el cierre y la publicación en el registro original.'],
       },
+      relationshipManual,
       {
         title: 'La pizarra personal',
         paragraphs: ['En la Sala de Investigación, la pizarra personal te permite ordenar lo que sabes sin modificar la biblioteca de la crónica.'],

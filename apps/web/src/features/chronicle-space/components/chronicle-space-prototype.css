@@ -544,3 +544,50 @@ body main.application-content--chronicle-space { padding: 0; }
 .connection-scope-badge{display:inline-block;margin-right:7px;padding:2px 5px;border:1px solid currentColor;border-radius:999px;font-family:Inter,system-ui,sans-serif;font-size:8px;font-style:normal;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.connection-scope-badge--personal{color:#8ac7df}.connection-scope-badge--shared{color:#f2a35f}
 .connection-readonly{padding:5px 8px;color:#9e8f8a;font-size:9px;font-weight:800;text-transform:uppercase}.board-card__connect:disabled,.board-focus-actions button:disabled,.board-mobile-actions button:disabled{cursor:not-allowed;opacity:.4}
 @media(max-width:900px){.connection-scope-label{min-height:52px}}
+
+/* BOARD_DARK_CARDS_V1: presentation only; retain dimensions, positions and scope. */
+.space-board .board-card {
+  --board-card-accent: #d47b87;
+  --board-card-border: #80515b;
+  --board-card-surface: #292021;
+  --board-card-base: #1d191a;
+  border-color: var(--board-card-border);
+  border-radius: 9px;
+  background: linear-gradient(145deg,var(--board-card-surface),var(--board-card-base) 72%);
+  color: #f0e6df;
+  transform: none;
+  box-shadow: 0 9px 22px #0007;
+}
+.space-board .board-card:has(.card-pin--pnj),
+.space-board .board-card:has(.card-pin--personaje) {
+  --board-card-accent: #d3b173; --board-card-border: #80673e;
+  --board-card-surface: #2b241a; --board-card-base: #1e1915;
+}
+.space-board .board-card:has(.card-pin--lugar) {
+  --board-card-accent: #92bf9d; --board-card-border: #4d7259;
+  --board-card-surface: #1e2a22; --board-card-base: #171e19;
+}
+.space-board .board-card:has(.card-pin--documento) {
+  --board-card-accent: #91b0ce; --board-card-border: #52667a;
+  --board-card-surface: #1d252c; --board-card-base: #171b20;
+}
+.space-board .board-card:has(.card-pin--organizacion) {
+  --board-card-accent: #bfa4d6; --board-card-border: #756087;
+  --board-card-surface: #28212f; --board-card-base: #1e1923;
+}
+.space-board .board-card:has(.card-pin--artefacto) {
+  --board-card-accent: #deb18d; --board-card-border: #876649;
+  --board-card-surface: #2d231d; --board-card-base: #211a16;
+}
+.space-board .board-card:hover { transform: none; box-shadow: 0 12px 28px #0009; }
+.space-board .board-card__open { padding: 14px 12px 32px; }
+.space-board .board-card__open small { color: var(--board-card-accent); padding-right: 54px; }
+.space-board .board-card__open strong { color: #f0e6df; margin: 8px 0 0; font-size: 17px; line-height: 1.15; overflow-wrap: anywhere; }
+.space-board .board-card__drag-handle,
+.space-board .board-card__connect { border-color: var(--board-card-border); background: #ffffff08; color: var(--board-card-accent); }
+.space-board .board-card__connect:hover,
+.space-board .board-card__drag-handle:active { background: #ffffff16; }
+.space-board .board-card__open:focus-visible,
+.space-board .board-card__connect:focus-visible { outline: 2px solid var(--board-card-accent); outline-offset: -3px; }
+.space-board .board-card.is-highlighted { box-shadow: 0 0 0 7px #c94b632e,0 12px 28px #0009; }
+.space-board .board-card.is-dragging { box-shadow: 0 18px 35px #000a; }

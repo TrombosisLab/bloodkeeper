@@ -270,6 +270,7 @@ import {
     } from './presentation/chronicle.controller'
 import { ChronicleNotebookController } from './presentation/chronicle-notebook.controller'
 import { ChronicleSpaceBoardController } from './presentation/chronicle-space-board.controller'
+import { RelationshipMapController } from './presentation/relationship-map.controller'
 import { ChronicleSpaceBoardPersonalController } from './presentation/chronicle-space-board-personal.controller'
 import { ChronicleMapController } from './presentation/chronicle-map.controller'
 
@@ -330,6 +331,7 @@ import { ChronicleCoverController } from './presentation/chronicle-cover.control
     ChronicleCoverController,
     ChronicleNotebookController,
     ChronicleSpaceBoardController,
+    RelationshipMapController,
     ChronicleSpaceBoardPersonalController,
     ChronicleMapController,
 

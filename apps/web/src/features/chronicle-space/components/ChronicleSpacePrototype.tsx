@@ -12,8 +12,9 @@ import { chronicleSpaceBoardPersonalApi } from '../infrastructure/chronicle-spac
 import { ChronicleSpaceBoardConflictError, chronicleSpaceBoardApi } from '../infrastructure/chronicle-space-board.api'
 import type { NotebookContext, NotebookNote, NotebookResourcePreview } from '../../notebook/types/notebook.types'
 import './chronicle-space-prototype.css'
+import { RelationshipMaps } from './RelationshipMaps'
 
-type Section = 'BOARD' | 'TIMELINE' | 'ARCHIVE'
+type Section = 'BOARD' | 'TIMELINE' | 'ARCHIVE' | 'RELATIONSHIPS'
 type TimelineFilter = 'ALL' | 'PREPARATION' | 'COMPLETED' | 'WITH_NOTES' | 'WITHOUT_NOTES'
 type ArchiveFilter = 'ALL' | 'NOTES' | 'PEOPLE' | 'PLACES' | 'ORGANIZATIONS' | 'ARTIFACTS' | 'DOCUMENTS'
 type ArchiveSort = 'DEFAULT' | 'NAME' | 'RECENT'
@@ -55,7 +56,7 @@ const gateway = createChronicleGateway()
 function readChronicleSpaceSection(): Section {
   if (typeof window === 'undefined') return 'BOARD'
   const value = new URLSearchParams(window.location.search).get('section')
-  return value === 'TIMELINE' || value === 'ARCHIVE' ? value : 'BOARD'
+  return value === 'TIMELINE' || value === 'ARCHIVE' || value === 'RELATIONSHIPS' ? value : 'BOARD'
 }
 function rememberChronicleSpaceSection(section: Section) {
   if (typeof window === 'undefined') return
@@ -191,7 +192,14 @@ export function ChronicleSpacePrototype() {
   const [notes, setNotes] = useState<readonly NotebookNote[]>([])
   const [sessions, setSessions] = useState<readonly ChronicleSessionApiSnapshot[]>([])
   const [section, setSection] = useState<Section>(() => readChronicleSpaceSection())
+  const relationshipDirty = useRef(false)
+  function allowRelationshipNavigation() {
+    if (relationshipDirty.current && !window.confirm('Hay cambios sin guardar en Relaciones. ¿Descartarlos y salir?')) return false
+    relationshipDirty.current = false
+    return true
+  }
   function changeChronicleSpaceSection(next: Section) {
+    if (next !== section && !allowRelationshipNavigation()) return
     rememberChronicleSpaceSection(next)
     setSection(next)
   }
@@ -1100,6 +1108,19 @@ export function ChronicleSpacePrototype() {
     closeTimelineSession()
     void openCard({ id: 'mention-' + targetType + '-' + targetId, kind, title: label, meta: targetType, description: 'Referencia enlazada: ' + label, targetType: kind === 'NOTA' ? undefined : targetType, targetId: kind === 'NOTA' ? undefined : targetId })
   }
+  async function openRelationReference(label: string, targetType: string, targetId: string) {
+    const card: Card = { id: 'relationship-' + targetId, kind: targetType === 'CHARACTER' ? 'PERSONAJE' : 'PNJ', title: label, meta: targetType === 'CHARACTER' ? 'Personaje jugador' : 'PNJ', description: '', targetType, targetId }
+    setSelected(card)
+    setPreview(null)
+    setPreviewLoading(true)
+    try {
+      setPreview(await notebookApi.resourcePreview(chronicleId, targetType, targetId))
+    } catch {
+      setSelected({ ...card, description: 'No conoces los datos de esta ficha o no está disponible. Ver su nombre en el mapa no concede acceso a su información.' })
+    } finally {
+      setPreviewLoading(false)
+    }
+  }
 
   // CHRONICLE_SPACE_RESOURCE_RELATED_NOTES_V2
   function openRelatedResourceNote(note: NotebookNote) {
@@ -1145,19 +1166,20 @@ export function ChronicleSpacePrototype() {
     setPreview(null)
     openBoardCardPreview({ id: 'note-' + note.id, kind: 'NOTA', title: note.title, meta: note.visibility === 'PRIVATE' ? 'Privada' : 'Compartida', description: note.content })
   }
-  const nav = [{ id: 'BOARD' as const, label: 'Pizarra', note: 'Mapa de investigación' }, { id: 'TIMELINE' as const, label: 'Cronología', note: 'Memoria de la crónica' }, { id: 'ARCHIVE' as const, label: 'Archivo', note: 'Material consultable' }]
+  const nav = [{ id: 'BOARD' as const, label: 'Pizarra', note: 'Mapa de investigación' }, { id: 'RELATIONSHIPS' as const, label: 'Relaciones', note: 'Vínculos personales' }, { id: 'TIMELINE' as const, label: 'Cronología', note: 'Memoria de la crónica' }, { id: 'ARCHIVE' as const, label: 'Archivo', note: 'Material consultable' }]
 
   return <main className="chronicle-space" aria-label="Sala de investigación">
     {typeof document !== 'undefined' && document.getElementById('app-header-page-actions') !== null ? createPortal(
       <div className="chronicle-space-global-actions" aria-label="Controles de la Sala de Investigación">
         <button className="chronicle-space-global-actions__new-note" type="button" onClick={openNewNote}>+ Nueva nota</button>
-        <label className="chronicle-space-global-actions__chronicle"><span>Crónica</span><select value={chronicleId} onChange={(event) => { rememberChronicleSpaceSelection(event.target.value); setChronicleId(event.target.value) }}>{activeChronicles.length ? <optgroup label="Activas">{activeChronicles.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</optgroup> : null}{archivedChronicles.length ? <optgroup label="Archivadas">{archivedChronicles.map((item) => <option key={item.id} value={item.id}>{item.name} · Archivada</option>)}</optgroup> : null}</select></label>
+        <label className="chronicle-space-global-actions__chronicle"><span>Crónica</span><select value={chronicleId} onChange={(event) => { if (!allowRelationshipNavigation()) return; rememberChronicleSpaceSelection(event.target.value); setChronicleId(event.target.value) }}>{activeChronicles.length ? <optgroup label="Activas">{activeChronicles.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</optgroup> : null}{archivedChronicles.length ? <optgroup label="Archivadas">{archivedChronicles.map((item) => <option key={item.id} value={item.id}>{item.name} · Archivada</option>)}</optgroup> : null}</select></label>
         <div className="chronicle-space-global-actions__counts" aria-label="Resumen de la crónica"><b>{cards.length}<small>elementos visibles</small></b><b>{sessions.length}<small>sesiones</small></b><b>{notes.length}<small>anotaciones</small></b></div>
         <nav className="chronicle-space-global-actions__nav" aria-label="Secciones de la Sala de Investigación">{nav.map((item) => <button key={item.id} className={section === item.id ? 'is-active' : ''} type="button" onClick={() => changeChronicleSpaceSection(item.id)}><small>{item.note}</small>{item.label}</button>)}</nav>
       </div>,
       document.getElementById('app-header-page-actions')!,
     ) : null}
     {error ? <p className="space-alert" role="alert">{error}</p> : null}{loading ? <p className="space-status">Cargando la crónica seleccionada…</p> : <>
+      {section === 'RELATIONSHIPS' && chronicleId ? <RelationshipMaps key={chronicleId} chronicleId={chronicleId} options={chronicleMentionOptions} onOpenReference={(label, type, id) => { void openRelationReference(label, type, id) }} onDirtyChange={dirty => { relationshipDirty.current = dirty }} /> : null}
       {section === 'BOARD' ? <section className="space-panel"><div className="panel-heading"><div><span>MAPA DE INVESTIGACIÓN</span><h2>Lo que sabemos hasta ahora</h2></div><p>Una superficie limitada y ordenada. Cada tarjeta abre su ficha o anotación.</p></div><div className="board-filter-bar" aria-label="Filtrar tarjetas de la pizarra"><span>Mostrar</span>{([['ALL', 'Todo'], ['PNJ', 'Personas'], ['LUGAR', 'Lugares'], ['NOTA', 'Anotaciones']] as const).map(([value, label]) => <button key={value} className={boardFilter === value ? 'is-active' : ''} type="button" onClick={() => setBoardFilter(value)}>{label}<b>{value === 'ALL' ? cards.length : cards.filter((card) => card.kind === value).length}</b></button>)}</div>      <div className="board-quick-search">
         <label htmlFor="board-quick-search-input">Buscar en la pizarra</label>
         <div><input id="board-quick-search-input" value={boardQuickQuery} onChange={(event) => setBoardQuickQuery(event.target.value)} placeholder="Título, autor o texto…" /><button type="button" onClick={() => setBoardQuickQuery('')} disabled={!boardQuickQuery} aria-label="Limpiar búsqueda de la pizarra">×</button></div>
@@ -1204,11 +1226,10 @@ export function ChronicleSpacePrototype() {
         <button type="button" onClick={() => setBoardZoom(1)}>Restablecer</button>
         <button type="button" onClick={() => fitBoardToViewport()}>Ver toda</button>
       </div>
-<div className="board-connect-hint">{boardUpdateAvailable ? <span className="board-update-notice">Hay cambios oficiales nuevos.<button type="button" onClick={() => window.location.reload()}>Recargar pizarra</button></span> : boardSaving ? 'Guardando la vista oficial…' : connectionSourceId ? 'Selecciona otra tarjeta para conectarla.' : boardViewMode === 'ALL' && !canManageSharedBoard ? 'Vista oficial en modo consulta. Cambia a «Mi vista» para organizar tus propias teorías.' : 'Arrastra las tarjetas libremente; pueden solaparse. Usa «Conectar» para crear una relación.'}</div>
-        <div className={'space-board' + (focusedConnectionId ? ' has-focused-connection' : '') + (focusedBoardCardId ? ' has-focused-card' : '')} style={{ minHeight: boardHeight, transform: 'scale(' + boardZoom + ')', transformOrigin: 'top left', width: (100 / boardZoom) + '%' }}>
+      <div className="board-connect-hint">{boardUpdateAvailable ? <span className="board-update-notice">Hay cambios oficiales nuevos.<button type="button" onClick={() => window.location.reload()}>Recargar pizarra</button></span> : boardSaving ? 'Guardando la vista oficial…' : connectionSourceId ? 'Selecciona otra tarjeta para conectarla.' : boardViewMode === 'ALL' && !canManageSharedBoard ? 'Vista oficial en modo consulta. Cambia a «Mi vista» para organizar tus propias teorías.' : 'Arrastra las tarjetas libremente; pueden solaparse. Usa «Conectar» para crear una relación.'}</div>
+<div className={'space-board' + (focusedConnectionId ? ' has-focused-connection' : '') + (focusedBoardCardId ? ' has-focused-card' : '')} style={{ minHeight: boardHeight, transform: 'scale(' + boardZoom + ')', transformOrigin: 'top left', width: (100 / boardZoom) + '%' }}>
         <svg className="board-connections-layer" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">{visibleBoardConnections.map((connection) => { const fromIndex = cards.findIndex((card) => card.id === connection.fromId); const toIndex = cards.findIndex((card) => card.id === connection.toId); if (fromIndex < 0 || toIndex < 0 || (boardFilter !== 'ALL' && (!visibleCards.some((card) => card.id === connection.fromId) || !visibleCards.some((card) => card.id === connection.toId)))) return null; const from = boardConnectionPosition(boardPosition(connection.fromId, fromIndex)); const to = boardConnectionPosition(boardPosition(connection.toId, toIndex)); const endpoints = boardConnectionEndpoints(from, to); return <line className={'board-link board-link--' + connection.type.toLowerCase() + ' board-link--scope-' + connection.scope.toLowerCase() + (focusedConnectionId === boardConnectionKey(connection) || Boolean(focusedBoardCardId && (connection.fromId === focusedBoardCardId || connection.toId === focusedBoardCardId)) ? ' is-focused' : '')} key={boardConnectionKey(connection)} x1={endpoints.from.x} y1={endpoints.from.y} x2={endpoints.to.x} y2={endpoints.to.y} style={{ stroke: connection.color || undefined }} onClick={() => focusConnection(connection)} onDoubleClick={() => editConnection(connection)} aria-label={connection.scope === 'PERSONAL' ? 'Enfocar relación privada; doble pulsación para editar' : canManageSharedBoard ? 'Enfocar relación oficial; doble pulsación para editar' : 'Enfocar relación oficial'} /> })}</svg>
         <svg className="board-arrows-layer" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="board-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L6,3 z" fill="context-stroke" /></marker></defs>{visibleBoardConnections.filter((connection) => connection.arrow).map((connection) => { const fromIndex = cards.findIndex((card) => card.id === connection.fromId); const toIndex = cards.findIndex((card) => card.id === connection.toId); if (fromIndex < 0 || toIndex < 0 || (boardFilter !== 'ALL' && (!visibleCards.some((card) => card.id === connection.fromId) || !visibleCards.some((card) => card.id === connection.toId)))) return null; const from = boardConnectionPosition(boardPosition(connection.fromId, fromIndex)); const to = boardConnectionPosition(boardPosition(connection.toId, toIndex)); const endpoints = boardConnectionArrowEndpoints(from, to); return <line className={'board-link board-link--arrow board-link--' + connection.type.toLowerCase() + ' board-link--scope-' + connection.scope.toLowerCase()} key={'arrow-' + boardConnectionKey(connection)} x1={endpoints.from.x} y1={endpoints.from.y} x2={endpoints.to.x} y2={endpoints.to.y} style={{ stroke: connection.color || undefined }} markerEnd="url(#board-arrow)" /> })}</svg>
-
         {visibleCards.length ? visibleCards.map((card) => { const index = cards.findIndex((item) => item.id === card.id); const position = boardPosition(card.id, index); return <article className={'board-card board-card--' + ((index % 6) + 1) + (connectionSourceId === card.id ? ' is-connect-source' : '') + (draggingBoardId === card.id ? ' is-dragging' : '') + (highlightedBoardCardId === card.id ? ' is-highlighted' : '') + (isFocusedConnectionEndpoint(card.id) ? ' is-focused-endpoint' : '') + (isFocusedBoardCardEndpoint(card.id) ? ' is-focused-card' : '')} key={card.id} data-board-card-id={card.id} style={{ left: position.x + '%', top: (position.y / 100 * BOARD_POSITION_HEIGHT) + 'px' }} onPointerDown={(event) => beginBoardDrag(event, card.id)} onPointerMove={(event) => moveBoardCard(event, card.id)} onPointerUp={finishBoardDrag}><span className="board-card__drag-handle" title="Arrastrar tarjeta">⠿ Mover</span>
           <button className="board-card__open" data-card-id={card.id} type="button" onClick={() => focusBoardCard(card)}><i className={'card-pin card-pin--' + card.kind.toLowerCase()} /><small>{kindLabel(card.kind)}</small><strong>{card.title}</strong></button>
           <button className="board-card__connect" type="button" onClick={() => startConnection(card)} disabled={!canCreateBoardConnection} title={!canCreateBoardConnection ? 'Las relaciones oficiales solo puede modificarlas el Narrador' : undefined}>{connectionSourceId === card.id ? 'Origen seleccionado' : 'Conectar'}</button>
