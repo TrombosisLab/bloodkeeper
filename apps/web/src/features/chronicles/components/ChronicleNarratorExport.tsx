@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ChronicleApiSnapshot } from '../types/chronicle-api.types.ts'
-import { EXPORT_INSTRUCTIONS } from '../domain/chronicle-context-export.ts'
-import { buildNarratorContext } from '../domain/chronicle-narrator-export.ts'
+import { buildNarratorContext, NARRATOR_EXPORT_INSTRUCTIONS } from '../domain/chronicle-narrator-export.ts'
 import { loadNarratorExport } from '../infrastructure/chronicle-narrator-export.api.ts'
 import './chronicle-context-export.css'
 
@@ -46,7 +45,7 @@ export function ChronicleNarratorExport({ chronicle, active = true }: { readonly
     void generate()
   }
   function download() {
-    const content = document + (instructions ? '\n\n' + EXPORT_INSTRUCTIONS : '')
+    const content = document + (instructions ? '\n\n' + NARRATOR_EXPORT_INSTRUCTIONS : '')
     const url = URL.createObjectURL(new Blob([content], { type: 'text/markdown;charset=utf-8' }))
     const link = window.document.createElement('a')
     const name = chronicle.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9_-]+/g, '-').slice(0, 80) || 'cronica'
@@ -55,7 +54,7 @@ export function ChronicleNarratorExport({ chronicle, active = true }: { readonly
     link.click()
     window.setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
-  const bytes = new TextEncoder().encode(document + (instructions ? '\n\n' + EXPORT_INSTRUCTIONS : '')).byteLength
+  const bytes = new TextEncoder().encode(document + (instructions ? '\n\n' + NARRATOR_EXPORT_INSTRUCTIONS : '')).byteLength
   return <>
     <button className="summary-inline-button" type="button" onClick={open}>Exportar contexto privado del narrador</button>
     <dialog ref={dialog} className="chronicle-context-export" aria-labelledby="chronicle-narrator-export-title" onClose={clear}>
@@ -69,7 +68,7 @@ export function ChronicleNarratorExport({ chronicle, active = true }: { readonly
           <p>Vista previa · {(bytes / 1024).toFixed(1)} KiB · Markdown de texto</p>
           <pre tabIndex={0} aria-label="Vista previa del contexto">{document}</pre>
           <label className="chronicle-context-export__option"><input type="checkbox" checked={instructions} onChange={event => setInstructions(event.target.checked)} /> Incluir instrucciones para IA al final del archivo</label>
-          <details><summary>Ver instrucciones para IA</summary><pre>{EXPORT_INSTRUCTIONS}</pre></details>
+          <details><summary>Ver instrucciones para IA</summary><pre>{NARRATOR_EXPORT_INSTRUCTIONS}</pre></details>
         </> : null}
       </div>
       <footer><span>Se genera en memoria, sin guardar archivos en el servidor.</span><button type="button" disabled={busy || !document} onClick={download}>Descargar .md</button></footer>

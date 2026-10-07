@@ -16,13 +16,26 @@ const quote = (value: string | null | undefined) => (safeExportText(value).trim(
 const kinds: Record<string, string> = { clue: 'Pista', npc: 'PNJ', location: 'Lugar', document: 'Documento', event: 'Evento', decision: 'Decisión', outcome: 'Consecuencia' }
 const states: Record<string, string> = { hidden: 'Secreto / pendiente', discovered: 'Descubierto por la coterie', resolved: 'Resuelto' }
 const statuses: Record<string, string> = { planned: 'Planificada', active: 'En curso', completed: 'Completada', archived: 'Archivada' }
+const milestones: Record<string, string> = { hook: 'Inicio / gancho', first_turn: 'Primer giro', revelation: 'Revelación', climax: 'Clímax', resolution: 'Resolución' }
+const sessionStatuses: Record<string, string> = { preparation: 'En preparación', in_progress: 'En curso', completed: 'Completada', archived: 'Archivada' }
+
+export const NARRATOR_EXPORT_INSTRUCTIONS = EXPORT_INSTRUCTIONS + `
+### Tratamiento del contexto privado del narrador
+
+Este documento completo es privado y contiene secretos. El apartado Alcance del bloque compartido describe únicamente la primera parte, no el archivo completo.
+Distingue tres capas: acontecimientos registrados en sesiones realizadas; planificación y posibilidades del guion; secretos y notas privadas del narrador. No presentes escenas previstas ni consecuencias posibles como hechos ocurridos.
+Los estados Secreto, Descubierto y Resuelto de las tarjetas no publican su contenido ni demuestran por sí solos cuándo ocurrió un acontecimiento. Los hitos pendientes no son sucesos realizados.
+GN1-P1 identifica una página y GN1-T1 una tarjeta única. Las continuaciones repiten la misma tarjeta en varias páginas, no son acontecimientos ni personajes distintos.
+Revisa coherencia y preparación usando las referencias del documento. Indica lo que falta; no inventes contenido de fichas, adjuntos ni mapas privados ausentes.
+No produzcas una versión para jugadores ni reveles secretos a otros destinatarios salvo petición explícita del narrador. Si se pide una versión compartible, usa únicamente el bloque compartido y no introduzcas información privada.
+`
 
 export function buildNarratorContext(input: NarratorExportSources, generatedAt?: string): string {
   if (!input.viewerUserId || input.viewerUserId !== input.narratorId) throw new Error('Solo el narrador de esta crónica puede generar este documento.')
   const lines = ['# PRIVADO — CONTIENE SECRETOS DE LA CRÓNICA', '',
     'Solo para el narrador. No compartir con jugadores. Lo descargado queda fuera de los permisos de BloodKeeper.',
     'El guion es planificación: sus escenas, conexiones y consecuencias no prueban que hayan sucedido. Los estados de tarjeta no publican su contenido.', '',
-    buildChronicleContext(input.shared, generatedAt), '', '## Contexto privado del narrador', '',
+    buildChronicleContext(input.shared, generatedAt, 'narrator-section'), '', '## Contexto privado del narrador', '',
     'Lo anterior es contexto compartido. Lo siguiente contiene información privada. No se consultan mapas privados ni notas privadas de otros jugadores.',
     'GN = guion; GN1-P1 = página; GN1-T1 = tarjeta única. Una tarjeta puede aparecer en varias páginas sin convertirse en otra tarjeta.', '']
   for (const [index, story] of input.stories.entries()) {
@@ -30,7 +43,7 @@ export function buildNarratorContext(input: NarratorExportSources, generatedAt?:
     lines.push(`### ${title(story.title)} [${ref}]`, `Estado: ${statuses[story.status] ?? title(story.status)}.`,
       'Premisa privada:', quote(story.premise), 'Qué está en juego:', quote(story.stakes),
       'Notas del narrador:', quote(story.narratorNotes), 'Resolución registrada:', quote(story.resolution))
-    for (const milestone of story.milestones) lines.push(`Hito ${title(milestone.key)} — ${milestone.completed ? 'Alcanzado' : 'Pendiente'}; nota privada:`, quote(milestone.note))
+    for (const milestone of story.milestones) lines.push(`Hito ${title(milestones[milestone.key] ?? milestone.key)} — ${milestone.completed ? 'Alcanzado' : 'Pendiente'}; nota privada:`, quote(milestone.note))
     for (const reminder of story.reminders) lines.push(`Recordatorio — ${reminder.resolved ? 'Resuelto' : 'Pendiente'}:`, quote(reminder.text))
     for (const session of story.sessions) lines.push(`Progreso vinculado a ${title(session.title) || 'Sesión sin título'} (no implica que se haya jugado):`, quote(session.progressNotes))
     if (!story.narratorGuide) { lines.push('Sin guion visual registrado.', ''); continue }
@@ -68,8 +81,10 @@ export function buildNarratorContext(input: NarratorExportSources, generatedAt?:
   if (!ownNotes.length) lines.push('Ninguna.')
   for (const [i, note] of ownNotes.entries()) lines.push(`#### ${title(note.title)} [NP${i + 1}]`, quote(note.content))
   lines.push('### Notas privadas de sesiones (incluye preparación; no confirma acontecimientos)')
-  for (const session of input.shared.sessions.filter(item => item.narratorNotes?.trim())) lines.push(`#### ${title(session.title) || 'Sesión sin título'} — ${title(session.status)}`, quote(session.narratorNotes))
+  const sessionNotes = input.shared.sessions.filter(item => item.narratorNotes?.trim())
+  if (!sessionNotes.length) lines.push('Ninguna.')
+  for (const session of sessionNotes) lines.push(`#### ${title(session.title) || 'Sesión sin título'} — ${title(sessionStatuses[session.status] ?? session.status)}`, quote(session.narratorNotes))
   const result = lines.join('\n')
-  if (new TextEncoder().encode(result + EXPORT_INSTRUCTIONS).byteLength > EXPORT_MAX_BYTES) throw new Error('El documento supera 2 MiB. No se genera un archivo parcial.')
+  if (new TextEncoder().encode(result + '\n\n' + NARRATOR_EXPORT_INSTRUCTIONS).byteLength > EXPORT_MAX_BYTES) throw new Error('El documento supera 2 MiB. No se genera un archivo parcial.')
   return result
 }

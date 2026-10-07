@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { buildNarratorContext } from '../src/features/chronicles/domain/chronicle-narrator-export.ts'
+import { buildNarratorContext, NARRATOR_EXPORT_INSTRUCTIONS } from '../src/features/chronicles/domain/chronicle-narrator-export.ts'
 import { buildChronicleContext, safeExportText } from '../src/features/chronicles/domain/chronicle-context-export.ts'
 import { loadNarratorExport } from '../src/features/chronicles/infrastructure/chronicle-narrator-export.api.ts'
 
@@ -100,4 +100,36 @@ test('authorized load never queries private maps or other users private notes', 
     assert.ok(!paths.some(path => path.includes('/relationships/me') || path.includes('/private')))
     assert.match(buildNarratorContext(loaded), /CONTIENE SECRETOS/)
   } finally { globalThis.fetch = original }
+})
+test('private scope explicitly applies exclusions only to shared block', () => {
+  const result = buildNarratorContext(input())
+  assert.match(result, /## Alcance del bloque compartido/)
+  assert.match(result, /se aplica solo a este bloque/)
+  assert.match(result, /El documento completo es privado/)
+  assert.doesNotMatch(result, /## Alcance y privacidad/)
+  assert.match(buildChronicleContext(shared()), /## Alcance y privacidad/)
+})
+test('all private milestone keys are rendered in Spanish', () => {
+  const data = input()
+  data.stories[0].milestones = ['hook', 'first_turn', 'revelation', 'climax', 'resolution'].map(key => ({ key, completed: false, note: '' }))
+  const result = buildNarratorContext(data)
+  for (const label of ['Inicio / gancho', 'Primer giro', 'Revelación', 'Clímax', 'Resolución']) assert.ok(result.includes('Hito ' + label + ' — Pendiente'))
+  assert.doesNotMatch(result, /Hito hook|Hito first/)
+})
+test('session notes have Spanish states and preserve unknown values safely', () => {
+  const data = input()
+  data.shared.sessions = ['preparation', 'completed', 'archived', 'unknown'].map(status => ({ id: status, status, title: 'Notas ' + status, narratorNotes: 'Nota propia', realDate: null, sessionNumber: 1 }))
+  const result = buildNarratorContext(data)
+  for (const label of ['En preparación', 'Completada', 'Archivada', 'unknown']) assert.ok(result.includes(' — ' + label))
+})
+test('empty session notes explicitly show Ninguna', () => {
+  const result = buildNarratorContext(input())
+  assert.match(result, /### Notas privadas de sesiones[^\n]*\nNinguna\./)
+})
+test('private AI instructions distinguish planning and do not claim technical access control', () => {
+  assert.match(NARRATOR_EXPORT_INSTRUCTIONS, /acontecimientos registrados/)
+  assert.match(NARRATOR_EXPORT_INSTRUCTIONS, /planificación y posibilidades/)
+  assert.match(NARRATOR_EXPORT_INSTRUCTIONS, /secretos y notas privadas/)
+  assert.match(NARRATOR_EXPORT_INSTRUCTIONS, /no son acontecimientos ni personajes distintos/)
+  assert.match(NARRATOR_EXPORT_INSTRUCTIONS, /usa únicamente el bloque compartido/)
 })
