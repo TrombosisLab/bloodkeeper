@@ -148,6 +148,27 @@ restore_menu() {
   pause_menu
 }
 
+database_password_menu_action() {
+  local result=0
+  printf '\nBLOODKEEPER — CAMBIAR CONTRASEÑA DE POSTGRESQL\n'
+  printf 'Esta opción cambia la contraseña de la base de datos, no la de los usuarios de la aplicación.\n'
+  printf 'La herramienta comprueba la configuración, crea una copia y pide la contraseña dos veces de forma visible.\n'
+  printf 'No continúes durante otra actualización, restauración o copia de seguridad.\n'
+  if [[ ! -f "$ROOT/scripts/change-database-password.sh" || ! -f "$ROOT/scripts/change-database-password.py" ]]; then
+    printf 'ERROR: falta la herramienta de cambio de contraseña; no se modificó nada.\n' >&2
+    pause_menu
+    return
+  fi
+  if bash "$ROOT/scripts/change-database-password.sh" --repo "$ROOT"; then
+    printf '\nLa herramienta ha finalizado correctamente.\n'
+  else
+    result=$?
+    printf '\nLa herramienta terminó con código %s. Lee su resultado y conserva cualquier copia indicada.\n' "$result" >&2
+    printf 'No se presupone que el cambio o la recuperación hayan terminado correctamente.\n' >&2
+  fi
+  pause_menu
+}
+
 operations_menu() {
   while true; do
     printf '\n============================================================\n'
@@ -206,6 +227,7 @@ while true; do
   printf '[6] Cloudflare Tunnel\n'
   printf '[7] Operación, actualización y rollback\n'
   printf '[8] Limpiar completamente la base de datos\n'
+  printf '[9] Cambiar contraseña de PostgreSQL\n'
   printf '[q] Salir\n'
   read -r -p 'Elige una opción: ' option
 
@@ -227,6 +249,7 @@ while true; do
       fi
       pause_menu
       ;;
+    9) database_password_menu_action ;;
     q|Q) printf 'Panel cerrado.\n'; exit 0 ;;
     *) printf 'Opción no válida.\n' ;;
   esac
