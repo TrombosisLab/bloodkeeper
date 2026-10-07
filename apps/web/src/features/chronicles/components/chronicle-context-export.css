@@ -1,0 +1,13 @@
+.chronicle-context-export { width: min(60rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); padding: 0; color: #eee6df; background: #161112; border: 1px solid #65404a; border-radius: .8rem; box-shadow: 0 1rem 4rem #000a; }
+.chronicle-context-export::backdrop { background: #000b; }
+.chronicle-context-export > header, .chronicle-context-export > footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.2rem; background: #211619; }
+.chronicle-context-export h2 { margin: .3rem 0 0; }
+.chronicle-context-export small { color: #d59a9f; letter-spacing: .08em; }
+.chronicle-context-export__content { padding: 0 1.2rem 1rem; max-height: calc(100dvh - 13rem); overflow: auto; }
+.chronicle-context-export__notice { border-left: 3px solid #b99453; padding: .65rem .85rem; background: #241e17; }
+.chronicle-context-export pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 1rem; border: 1px solid #49313a; border-radius: .4rem; background: #100d0e; font: .85rem/1.55 monospace; max-height: 45dvh; overflow: auto; }
+.chronicle-context-export__option { display: flex; align-items: center; gap: .6rem; margin: 1rem 0; }
+.chronicle-context-export__option input { width: auto; flex: 0 0 auto; }
+.chronicle-context-export footer span { font-size: .8rem; color: #bfb2ac; }
+.chronicle-context-export button { padding: .55rem .8rem; border-radius: .4rem; }
+@media (max-width: 600px) { .chronicle-context-export > header, .chronicle-context-export > footer { flex-wrap: wrap; padding: .8rem; } .chronicle-context-export__content { padding: 0 .8rem .8rem; max-height: calc(100dvh - 15rem); } .chronicle-context-export > footer button { width: 100%; } }

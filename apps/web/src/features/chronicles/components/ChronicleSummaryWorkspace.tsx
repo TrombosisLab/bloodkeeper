@@ -11,6 +11,7 @@ import type {
   ChronicleSessionApiSnapshot,
 } from '../types/chronicle-api.types.ts'
 import type { ChronicleStoryApiSnapshot } from '../types/chronicle-story-api.types.ts'
+import { ChronicleContextExport } from './ChronicleContextExport.tsx'
 import './chronicle-summary-workspace.css'
 import './chronicle-summary-progress-containment.css'
 
@@ -243,6 +244,7 @@ export function ChronicleSummaryWorkspace({
         <section className="summary-card summary-card--overview">
           <div className="summary-card__heading">
             <h3>Visi&oacute;n general</h3>
+            <ChronicleContextExport key={chronicle.id} chronicle={chronicle} active={active} />
           </div>
           <div className="summary-block-grid">
             <article>
