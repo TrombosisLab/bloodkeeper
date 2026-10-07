@@ -47,7 +47,7 @@ const date = (value: string | null | undefined) => {
   const part = (type: string) => parts.find(item => item.type === type)?.value ?? ''
   return `${part('day')}/${part('month')}/${part('year')} ${part('hour')}:${part('minute')}:${part('second')} UTC`
 }
-const storyStatusNames: Record<string, string> = { active: 'En curso', completed: 'Completada', archived: 'Archivada', draft: 'Borrador', preparation: 'En preparación' }
+const storyStatusNames: Record<string, string> = { planned: 'Planificada', active: 'En curso', completed: 'Completada', archived: 'Archivada', draft: 'Borrador', preparation: 'En preparación' }
 const sessionTitle = (session: ChronicleSessionApiSnapshot) => text(session.title) || (session.sessionNumber === null ? 'Sesión sin título' : `Sesión ${session.sessionNumber}`)
 
 export function buildChronicleContext(sources: ChronicleExportSources, generatedAt = new Date().toISOString()): string {
