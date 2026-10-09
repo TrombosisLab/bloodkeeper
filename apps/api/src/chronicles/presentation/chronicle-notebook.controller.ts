@@ -85,7 +85,7 @@ export class ChronicleNotebookController {
         select: { id: true, name: true, category: true, description: true, parentLocationId: true },
       }),
       db.libraryResource.findMany({
-        where: { status: 'active', kind: { in: ['document', 'artifact', 'organization'] }, bindings: { some: { chronicleId, status: 'attached', ...(narrator ? {} : { OR: [{ visibility: 'chronicle_participants' }, { visibility: 'selected_players', audiences: { some: { userId } } }] }) } } },
+        where: { status: 'active', kind: { in: ['npc', 'location', 'document', 'artifact', 'organization'] }, bindings: { some: { chronicleId, status: 'attached', ...(narrator ? {} : { OR: [{ visibility: 'chronicle_participants' }, { visibility: 'selected_players', audiences: { some: { userId } } }] }) } } },
         orderBy: { name: 'asc' },
         select: { id: true, kind: true, name: true, summary: true, metadata: true, bindings: { where: { chronicleId }, select: { visibility: true }, take: 1 } },
       }),
@@ -99,6 +99,15 @@ export class ChronicleNotebookController {
         select: { id: true, ownerId: true, status: true, identity: { select: { name: true, concept: true } } },
       }),
     ])
+    const completedSessions = await db.chronicleSession.findMany({
+      where: { chronicleId, status: { in: ['COMPLETED', 'ARCHIVED'] } },
+      orderBy: [{ realDate: 'asc' }, { sessionNumber: 'asc' }, { id: 'asc' }],
+      select: { id: true, title: true, sessionNumber: true, realDate: true },
+    })
+    const portraitRows = await db.characterPortrait.findMany({ where: { characterId: { in: characters.map((item: any) => item.id) } }, select: { characterId: true } })
+    const portraitIds = new Set(portraitRows.map((item: any) => String(item.characterId)))
+    const sessionImages = await db.chronicleAssetImage.findMany({ where: { assetType: 'SESSION', entityId: { in: completedSessions.map((item: any) => item.id) } }, select: { entityId: true } })
+    const sessionImageIds = new Set(sessionImages.map((item: any) => String(item.entityId)))
     const sharedResources = resources.map((resource: any) => ({
       id: resource.id,
       kind: String(resource.kind).toUpperCase(),
@@ -111,9 +120,15 @@ export class ChronicleNotebookController {
     const contextImageRows = await db.chronicleAssetImage.findMany({ where: { assetType: { in: ['NPC', 'LOCATION', 'RESOURCE'] }, entityId: { in: [...npcs, ...locations, ...resources].map((item: any) => item.id) } }, select: { assetType: true, entityId: true } })
     const contextImageSet = new Set(contextImageRows.map((row: any) => row.assetType + ':' + String(row.entityId)))
     const contextImageCandidates = [
+      ...characters.filter((item: any) => portraitIds.has(String(item.id))).map((item: any) => ({ targetType: 'CHARACTER', targetId: item.id, name: 'Retrato de PJ: ' + String(item.identity?.name || 'Personaje sin nombre'), imageUrl: '/api/chronicles/' + chronicleId + '/assets/CHARACTER/' + item.id + '/image' })),
+      ...completedSessions.filter((item: any) => sessionImageIds.has(String(item.id))).map((item: any) => ({ targetType: 'SESSION', targetId: item.id, name: 'Portada de sesión: ' + String(item.title || 'Sesión ' + item.sessionNumber) + (item.realDate ? ' · ' + item.realDate.toISOString().slice(0, 10) : ''), imageUrl: '/api/chronicles/' + chronicleId + '/assets/SESSION/' + item.id + '/image' })),
       ...npcs.filter((item: any) => contextImageSet.has('NPC:' + String(item.id))).map((item: any) => ({ targetType: 'NPC', targetId: item.id, name: item.name, imageUrl: '/api/chronicles/' + chronicleId + '/assets/NPC/' + item.id + '/image' })),
       ...locations.filter((item: any) => contextImageSet.has('LOCATION:' + String(item.id))).map((item: any) => ({ targetType: 'LOCATION', targetId: item.id, name: item.name, imageUrl: '/api/chronicles/' + chronicleId + '/assets/LOCATION/' + item.id + '/image' })),
-      ...resources.filter((item: any) => contextImageSet.has('RESOURCE:' + String(item.id))).map((item: any) => ({ targetType: String(item.kind ?? 'RESOURCE').toUpperCase(), targetId: item.id, name: item.name ?? item.title ?? item.label ?? 'Recurso', imageUrl: '/api/chronicles/' + chronicleId + '/assets/RESOURCE/' + item.id + '/image' }))
+      ...resources.flatMap((item: any) => {
+        const imageType = item.kind === 'npc' ? 'NPC' : item.kind === 'location' ? 'LOCATION' : 'RESOURCE'
+        if (!contextImageSet.has(imageType + ':' + String(item.id))) return []
+        return [{ targetType: String(item.kind ?? 'RESOURCE').toUpperCase(), targetId: item.id, name: item.name ?? 'Recurso', imageUrl: '/api/chronicles/' + chronicleId + '/assets/' + imageType + '/' + item.id + '/image' }]
+      })
     ]
     return { npcs, locations: locations.map((location: any) => ({ ...location, imageUrl: '/api/chronicles/' + chronicleId + '/assets/LOCATION/' + location.id + '/image', hasImage: locationImageIds.has(String(location.id)) })), characters: characters.map((item: any) => ({ id: String(item.id), ownerId: String(item.ownerId), status: String(item.status).toLowerCase(), name: String(item.identity?.name || 'Personaje sin nombre'), concept: item.identity?.concept ?? null })).sort((left: any, right: any) => left.name.localeCompare(right.name, 'es')), resources: sharedResources, players: participants.map((item: any) => item.user), imageCandidates: contextImageCandidates, viewerUserId: userId }
   }

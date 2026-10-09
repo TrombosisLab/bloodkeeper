@@ -3,6 +3,8 @@ import type { ChronicleApiSnapshot } from '../types/chronicle-api.types.ts'
 import { buildChronicleContext, EXPORT_INSTRUCTIONS } from '../domain/chronicle-context-export.ts'
 import { loadChronicleExport } from '../infrastructure/chronicle-context-export.api.ts'
 import './chronicle-context-export.css'
+import { ChronicleVisualPackage } from './ChronicleVisualPackage.tsx'
+import { ChronicleRelationshipExport } from './ChronicleRelationshipExport.tsx'
 
 export function ChronicleContextExport({ chronicle, active = true }: { readonly chronicle: ChronicleApiSnapshot; readonly active?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null)
@@ -11,6 +13,7 @@ export function ChronicleContextExport({ chronicle, active = true }: { readonly 
   const [document, setDocument] = useState('')
   const [error, setError] = useState('')
   const [instructions, setInstructions] = useState(true)
+  const [kind, setKind] = useState<'context' | 'relationships'>('context')
   function clear() {
     request.current?.abort()
     request.current = null
@@ -40,7 +43,7 @@ export function ChronicleContextExport({ chronicle, active = true }: { readonly 
     }
   }
   function open() {
-    clear(); setInstructions(true)
+    clear(); setInstructions(true); setKind('context')
     dialog.current?.showModal()
     void generate()
   }
@@ -60,8 +63,10 @@ export function ChronicleContextExport({ chronicle, active = true }: { readonly 
     <dialog ref={dialog} className="chronicle-context-export" aria-labelledby="chronicle-context-export-title" onClose={clear}>
       <header><div><small>CRÓNICA · INFORMACIÓN COMPARTIDA</small><h2 id="chronicle-context-export-title">Exportar contexto</h2></div><button type="button" onClick={() => dialog.current?.close()} aria-label="Cerrar exportación">Cerrar</button></header>
       <div className="chronicle-context-export__content">
+        <label className="chronicle-context-export__option">Qué quieres exportar <select aria-label="Qué quieres exportar" value={kind} onChange={event => { const next = event.target.value as 'context' | 'relationships'; clear(); setKind(next); if (next === 'context') void generate() }}><option value="context">Contexto de la crónica</option><option value="relationships">Relaciones compartidas</option></select></label>
+        {kind === 'relationships' ? <ChronicleRelationshipExport chronicle={chronicle} /> : <>
         <p>Sesiones realizadas, hitos de historias compartidas, notas publicadas, Sala de investigación y mapas compartidos. Los datos sin fecha se separan de la cronología.</p>
-        <p className="chronicle-context-export__notice">No incluye guiones ni notas o mapas privados, tampoco imágenes o fichas completas. Revisa el texto antes de compartirlo: lo descargado deja de estar protegido por los permisos de la web. No se envía a ninguna IA.</p>
+        <p className="chronicle-context-export__notice">No incluye guiones, notas o mapas privados ni fichas completas. El Markdown es solo texto; el ZIP opcional añade fotos y mapas autorizados. Revisa el contenido antes de compartirlo: lo descargado deja de estar protegido por los permisos de la web. No se envía a ninguna IA.</p>
         {busy ? <p role="status">Consultando fuentes autorizadas…</p> : null}
         {error ? <div role="alert"><p>{error}</p><button type="button" onClick={() => void generate()}>Reintentar</button></div> : null}
         {document ? <>
@@ -69,9 +74,11 @@ export function ChronicleContextExport({ chronicle, active = true }: { readonly 
           <pre tabIndex={0} aria-label="Vista previa del contexto">{document}</pre>
           <label className="chronicle-context-export__option"><input type="checkbox" checked={instructions} onChange={event => setInstructions(event.target.checked)} /> Incluir instrucciones para IA al final del archivo</label>
           <details><summary>Ver instrucciones para IA</summary><pre>{EXPORT_INSTRUCTIONS}</pre></details>
+          <ChronicleVisualPackage chronicle={chronicle} scope="shared" includeInstructions={instructions} />
         </> : null}
+        </>}
       </div>
-      <footer><span>Se genera en memoria, sin guardar archivos en el servidor.</span><button type="button" disabled={busy || !document} onClick={download}>Descargar .md</button></footer>
+      <footer><span>Se genera en memoria, sin guardar archivos en el servidor.</span>{kind === 'context' ? <button type="button" disabled={busy || !document} onClick={download}>Descargar .md</button> : null}</footer>
     </dialog>
   </>
 }

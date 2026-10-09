@@ -18,6 +18,15 @@ test('chronology uses game dates, not update or insertion order', () => {
   assert.ok(result.indexOf('### second') < result.indexOf('### undated'))
   assert.match(result, /orden por número, no cronología inferida/)
 })
+
+test('format notice distinguishes text Markdown from optional ZIP images in both scopes', () => {
+  for (const scope of ['shared', 'narrator-section']) {
+    const result = buildChronicleContext(sources(), '2026-10-07', scope)
+    assert.match(result, /Este Markdown contiene únicamente texto/)
+    assert.match(result, /puede incluir fotos y mapas autorizados, descritos en indice-de-material.md/)
+    assert.doesNotMatch(result, /fichas completas, imágenes ni documentos adjuntos/)
+  }
+})
 test('private notes, private guide, restricted resources and private edges never serialize', () => {
   const result = buildChronicleContext(sources())
   assert.doesNotMatch(result, /PRIVATE|Secret resource/)

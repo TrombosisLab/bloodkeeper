@@ -18,7 +18,7 @@ export type NotebookContextImageCandidate = { readonly targetType: string; reado
 export type NotebookContext = {
   readonly characters: readonly { readonly id: string; readonly ownerId: string; readonly status: string; readonly name: string; readonly concept: string | null }[]
   readonly npcs: readonly NotebookContextNpc[]; readonly locations: readonly NotebookContextLocation[]
-  readonly resources: readonly { id: string; kind: 'ORGANIZATION' | 'ARTIFACT' | 'DOCUMENT'; name: string; summary: string | null; visibility: string; locationId: string | null }[]
+  readonly resources: readonly { id: string; kind: 'NPC' | 'LOCATION' | 'ORGANIZATION' | 'ARTIFACT' | 'DOCUMENT'; name: string; summary: string | null; visibility: string; locationId: string | null }[]
   readonly players: readonly NotebookPlayer[]; readonly imageCandidates: readonly NotebookContextImageCandidate[]; readonly viewerUserId: string
 }
 export type NotebookResourcePreview = {

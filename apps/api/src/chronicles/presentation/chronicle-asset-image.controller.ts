@@ -28,7 +28,7 @@ export class ChronicleAssetImageController {
     const resourceAccess = narrator ? {} : { OR: [{ visibility: 'chronicle_participants' }, { visibility: 'selected_players', audiences: { some: { userId } } }] }
     const where = { id: entityId, chronicleId }
     const row = type === 'NPC'
-      ? await this.db.chronicleNpc.findFirst({ where: { ...where, status: 'ACTIVE' }, select: { id: true } })
+      ? (await this.db.chronicleNpc.findFirst({ where: { ...where, status: 'ACTIVE' }, select: { id: true } })) ?? await this.db.libraryResource.findFirst({ where: { id: entityId, status: 'active', kind: 'npc', bindings: { some: { chronicleId, status: 'attached', ...resourceAccess } } }, select: { id: true } })
       : type === 'LOCATION'
         ? (await this.db.chronicleLocation.findFirst({ where: { ...where, status: 'ACTIVE' }, select: { id: true } })) ?? await this.db.libraryResource.findFirst({ where: { id: entityId, status: 'active', kind: 'location', bindings: { some: { chronicleId, status: 'attached', ...resourceAccess } } }, select: { id: true } })
       : type === 'SESSION'
@@ -38,7 +38,22 @@ export class ChronicleAssetImageController {
             : await this.db.libraryResource.findFirst({ where: { id: entityId, status: 'active', bindings: { some: { chronicleId, status: 'attached', ...resourceAccess } } }, select: { id: true } })
     if (!row) throw new NotFoundException({ code: 'CHRONICLE_ASSET_NOT_FOUND' })
   }
-  @Get(':assetType/:assetId/image') async load(@Req() request: ImageRequest, @Param('chronicleId') chronicle: unknown, @Param('assetType') rawType: unknown, @Param('assetId') rawId: unknown) { const { chronicleId, narrator, userId } = await this.access(request, chronicle); const type = assetType(rawType), entityId = uuid(rawId); await this.target(chronicleId, narrator, userId, type, entityId); const image = await this.db.chronicleAssetImage.findUnique({ where: { assetType_entityId: { assetType: type, entityId } } }); if (!image) throw new NotFoundException({ code: 'CHRONICLE_ASSET_IMAGE_NOT_FOUND' }); return new StreamableFile(Buffer.from(image.data), { type: image.mimeType, length: image.byteSize, disposition: 'inline' }) }
+  @Get(':assetType/:assetId/image') async load(@Req() request: ImageRequest, @Param('chronicleId') chronicle: unknown, @Param('assetType') rawType: unknown, @Param('assetId') rawId: unknown) {
+    const { chronicleId, narrator, userId } = await this.access(request, chronicle)
+    const entityId = uuid(rawId)
+    if (rawType === 'CHARACTER') {
+      const character = await this.db.character.findFirst({ where: { id: entityId, chronicleId, status: 'ACTIVE' }, select: { id: true } })
+      if (!character) throw new NotFoundException({ code: 'CHRONICLE_ASSET_NOT_FOUND' })
+      const portrait = await this.db.characterPortrait.findUnique({ where: { characterId: entityId } })
+      if (!portrait) throw new NotFoundException({ code: 'CHARACTER_PORTRAIT_NOT_FOUND' })
+      return new StreamableFile(Buffer.from(portrait.data), { type: portrait.mimeType, length: portrait.byteSize, disposition: 'inline' })
+    }
+    const type = assetType(rawType)
+    await this.target(chronicleId, narrator, userId, type, entityId)
+    const image = await this.db.chronicleAssetImage.findUnique({ where: { assetType_entityId: { assetType: type, entityId } } })
+    if (!image) throw new NotFoundException({ code: 'CHRONICLE_ASSET_IMAGE_NOT_FOUND' })
+    return new StreamableFile(Buffer.from(image.data), { type: image.mimeType, length: image.byteSize, disposition: 'inline' })
+  }
   @Put(':assetType/:assetId/image') async save(@Req() request: ImageRequest, @Param('chronicleId') chronicle: unknown, @Param('assetType') rawType: unknown, @Param('assetId') rawId: unknown) { const { chronicleId, narrator, userId } = await this.access(request, chronicle); if (!narrator) throw new ForbiddenException({ code: 'CHRONICLE_ASSET_IMAGE_PERMISSION_DENIED' }); const type = assetType(rawType), entityId = uuid(rawId); await this.target(chronicleId, narrator, userId, type, entityId); const bytes = await body(request), detected = mime(bytes), declared = request.headers['content-type']?.split(';', 1)[0].trim().toLowerCase(); if (!detected || declared !== detected) throw new BadRequestException({ code: 'CHRONICLE_ASSET_IMAGE_INVALID_FORMAT', allowed: ['image/jpeg', 'image/png', 'image/webp'] }); const image = await this.db.chronicleAssetImage.upsert({ where: { assetType_entityId: { assetType: type, entityId } }, create: { assetType: type, entityId, mimeType: detected, byteSize: bytes.byteLength, sha256: createHash('sha256').update(bytes).digest('hex'), data: Uint8Array.from(bytes) }, update: { mimeType: detected, byteSize: bytes.byteLength, sha256: createHash('sha256').update(bytes).digest('hex'), data: Uint8Array.from(bytes), updatedAt: new Date() } }); return { mimeType: image.mimeType, byteSize: image.byteSize, updatedAt: image.updatedAt.toISOString() } }
   @Delete(':assetType/:assetId/image') async remove(@Req() request: ImageRequest, @Param('chronicleId') chronicle: unknown, @Param('assetType') rawType: unknown, @Param('assetId') rawId: unknown) { const { chronicleId, narrator, userId } = await this.access(request, chronicle); if (!narrator) throw new ForbiddenException({ code: 'CHRONICLE_ASSET_IMAGE_PERMISSION_DENIED' }); const type = assetType(rawType), entityId = uuid(rawId); await this.target(chronicleId, narrator, userId, type, entityId); const result = await this.db.chronicleAssetImage.deleteMany({ where: { assetType: type, entityId } }); return { removed: result.count > 0 } }
 }

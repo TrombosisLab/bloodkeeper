@@ -75,7 +75,7 @@ export class ChronicleMapController {
   }
 
   private presentMap(row: any, chronicleId: string, narrator: boolean, userId?: string) {
-    const markers = (row.markers ?? []).filter((marker: any) => narrator || (marker.visibility !== 'narrator_only' && (!marker.resource || marker.resource.bindings?.some((binding: any) => binding.visibility === 'chronicle_participants' || (binding.visibility === 'selected_players' && binding.audiences?.some((audience: any) => audience.userId === userId)))))).map((marker: any) => ({ id: marker.id, mapId: marker.mapId, resourceId: marker.resourceId, locationId: marker.locationId, kind: marker.kind, label: marker.label, x: marker.x, y: marker.y, size: marker.size ?? 'large', visibility: marker.visibility, resource: marker.resource ? { id: marker.resource.id, kind: marker.resource.kind, name: marker.resource.name, summary: marker.resource.summary, imageUrl: `/api/chronicles/${chronicleId}/assets/${resourceAssetType(marker.resource.kind)}/${marker.resource.id}/image` } : null, location: marker.location ? { id: marker.location.id, name: marker.location.name, category: marker.location.category } : null }))
+    const markers = (row.markers ?? []).filter((marker: any) => narrator || (marker.visibility !== 'narrator_only' && (!marker.resource || marker.resource.bindings?.some((binding: any) => binding.visibility === 'chronicle_participants' || (binding.visibility === 'selected_players' && binding.audiences?.some((audience: any) => audience.userId === userId)))))).map((marker: any) => ({ id: marker.id, mapId: marker.mapId, resourceId: marker.resourceId, locationId: marker.locationId, kind: marker.kind, label: marker.label, description: marker.description ?? null, x: marker.x, y: marker.y, size: marker.size ?? 'large', visibility: marker.visibility, resource: marker.resource ? { id: marker.resource.id, kind: marker.resource.kind, name: marker.resource.name, summary: marker.resource.summary, imageUrl: `/api/chronicles/${chronicleId}/assets/${resourceAssetType(marker.resource.kind)}/${marker.resource.id}/image` } : null, location: marker.location ? { id: marker.location.id, name: marker.location.name, category: marker.location.category } : null }))
     return { id: row.id, chronicleId, parentMapId: row.parentMapId, linkedLocationId: row.linkedLocationId, linkedResourceId: narrator || row.linkedResource?.bindings?.length ? row.linkedResourceId : null, name: row.name, description: row.description, status: String(row.status).toLowerCase(), sortOrder: row.sortOrder, imageUrl: `/api/chronicles/${chronicleId}/assets/MAP/${row.id}/image`, hasImage: Boolean(row.hasImage), markers, areas: (narrator ? row.areas ?? [] : (row.areas ?? []).filter((area: any) => area.visibility !== 'narrator_only')).map((area: any) => ({ ...area, color: area.color ?? '#bd3e57', fillColor: area.fillColor ?? area.color ?? '#bd3e57', labelColor: area.labelColor ?? '#fff3ed', labelSize: area.labelSize ?? 'medium', labelVertical: area.labelVertical ?? 'top', labelHorizontal: area.labelHorizontal ?? 'left' })) }
   }
 
@@ -166,7 +166,7 @@ export class ChronicleMapController {
     if (!resourceId && !locationId && !text(body.label, 'label', 160)) throw new BadRequestException({ code: 'CHRONICLE_MAP_MARKER_TARGET_REQUIRED' })
     await this.assertResource(db, chronicleId, userId, resourceId)
     if (locationId && !await db.chronicleLocation.findFirst({ where: { id: locationId, chronicleId }, select: { id: true } })) throw new BadRequestException({ code: 'CHRONICLE_MAP_LOCATION_NOT_AVAILABLE' })
-    const marker = await db.chronicleMapMarker.create({ data: { mapId, resourceId, locationId, kind: markerKind(body.kind), label: text(body.label, 'label', 160), x: coordinate(body.x, 'x'), y: coordinate(body.y, 'y'), size: markerSize(body.size), visibility: body.visibility === 'narrator_only' ? 'narrator_only' : 'chronicle_participants' } })
+    const marker = await db.chronicleMapMarker.create({ data: { mapId, resourceId, locationId, kind: markerKind(body.kind), label: text(body.label, 'label', 160), description: text(body.description, 'description', 2000), x: coordinate(body.x, 'x'), y: coordinate(body.y, 'y'), size: markerSize(body.size), visibility: body.visibility === 'narrator_only' ? 'narrator_only' : 'chronicle_participants' } })
     return marker
   }
 
@@ -183,6 +183,7 @@ export class ChronicleMapController {
     if (body.kind !== undefined) data.kind = markerKind(body.kind)
     if (body.size !== undefined) data.size = markerSize(body.size)
     if (body.label !== undefined) data.label = text(body.label, 'label', 160)
+    if (body.description !== undefined) data.description = text(body.description, 'description', 2000)
     if (body.resourceId !== undefined) { const resourceId = body.resourceId ? id(body.resourceId) : null; await this.assertResource(db, chronicleId, userId, resourceId); data.resourceId = resourceId }
     if (body.locationId !== undefined) { const locationId = body.locationId ? id(body.locationId) : null; if (locationId && !await db.chronicleLocation.findFirst({ where: { id: locationId, chronicleId }, select: { id: true } })) throw new BadRequestException({ code: 'CHRONICLE_MAP_LOCATION_NOT_AVAILABLE' }); data.locationId = locationId }
     if (body.visibility !== undefined) data.visibility = body.visibility === 'narrator_only' ? 'narrator_only' : 'chronicle_participants'
@@ -275,11 +276,11 @@ export class ChronicleMapController {
     await this.mapOrThrow(db, chronicleId, mapId, true)
     if (!record(body)) throw new BadRequestException({ code: 'INVALID_CHRONICLE_MAP_REQUEST' })
     const status = requestStatus(body.status), reviewNote = text(body.reviewNote, 'reviewNote', 2000)
-    const row = await db.chronicleMapRequest.findFirst({ where: { id: requestId, mapId }, select: { id: true, status: true, resourceId: true, title: true, kind: true, x: true, y: true } })
+    const row = await db.chronicleMapRequest.findFirst({ where: { id: requestId, mapId }, select: { id: true, status: true, resourceId: true, title: true, description: true, kind: true, x: true, y: true } })
     if (!row) throw new NotFoundException({ code: 'CHRONICLE_MAP_REQUEST_NOT_FOUND' })
     const result = await db.$transaction(async (transaction: any) => {
       const updated = await transaction.chronicleMapRequest.update({ where: { id: requestId }, data: { status, reviewNote } })
-      if (status === 'APPROVED' && row.status !== 'APPROVED') await transaction.chronicleMapMarker.create({ data: { mapId, resourceId: row.resourceId, kind: row.kind, label: row.title, x: row.x, y: row.y, size: 'large', visibility: 'chronicle_participants' } })
+      if (status === 'APPROVED' && row.status !== 'APPROVED') await transaction.chronicleMapMarker.create({ data: { mapId, resourceId: row.resourceId, kind: row.kind, label: row.title, description: row.description, x: row.x, y: row.y, size: 'large', visibility: 'chronicle_participants' } })
       return updated
     })
     return { id: result.id, status: String(result.status).toLowerCase(), reviewNote: result.reviewNote }

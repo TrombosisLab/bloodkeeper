@@ -3,6 +3,7 @@ import type { ChronicleApiSnapshot } from '../types/chronicle-api.types.ts'
 import { buildNarratorContext, NARRATOR_EXPORT_INSTRUCTIONS } from '../domain/chronicle-narrator-export.ts'
 import { loadNarratorExport } from '../infrastructure/chronicle-narrator-export.api.ts'
 import './chronicle-context-export.css'
+import { ChronicleVisualPackage } from './ChronicleVisualPackage.tsx'
 
 export function ChronicleNarratorExport({ chronicle, active = true }: { readonly chronicle: ChronicleApiSnapshot; readonly active?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null)
@@ -69,6 +70,7 @@ export function ChronicleNarratorExport({ chronicle, active = true }: { readonly
           <pre tabIndex={0} aria-label="Vista previa del contexto">{document}</pre>
           <label className="chronicle-context-export__option"><input type="checkbox" checked={instructions} onChange={event => setInstructions(event.target.checked)} /> Incluir instrucciones para IA al final del archivo</label>
           <details><summary>Ver instrucciones para IA</summary><pre>{NARRATOR_EXPORT_INSTRUCTIONS}</pre></details>
+          <ChronicleVisualPackage chronicle={chronicle} scope="narrator" includeInstructions={instructions} />
         </> : null}
       </div>
       <footer><span>Se genera en memoria, sin guardar archivos en el servidor.</span><button type="button" disabled={busy || !document} onClick={download}>Descargar .md</button></footer>

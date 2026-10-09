@@ -5,7 +5,7 @@ import { V5VisualMark } from '../../v5-visuals/V5VisualMark'
 
 import './character-portrait.css'
 
-const MAX_PORTRAIT_BYTES = 2 * 1024 * 1024
+const MAX_PORTRAIT_BYTES = 5 * 1024 * 1024
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 interface CharacterPortraitProps {

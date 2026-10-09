@@ -1,6 +1,6 @@
 export type ChronicleMapResource = { readonly id: string; readonly kind: string; readonly name: string; readonly summary: string | null; readonly imageUrl: string | null }
 export type ChronicleMapMarkerSize = 'small' | 'medium' | 'large'
-export type ChronicleMapMarker = { readonly id: string; readonly mapId: string; readonly resourceId: string | null; readonly locationId: string | null; readonly kind: string; readonly label: string | null; readonly x: number; readonly y: number; readonly size: ChronicleMapMarkerSize; readonly visibility: string; readonly resource: ChronicleMapResource | null; readonly location: { readonly id: string; readonly name: string; readonly category: string | null } | null }
+export type ChronicleMapMarker = { readonly id: string; readonly mapId: string; readonly resourceId: string | null; readonly locationId: string | null; readonly kind: string; readonly label: string | null; readonly description?: string | null; readonly x: number; readonly y: number; readonly size: ChronicleMapMarkerSize; readonly visibility: string; readonly resource: ChronicleMapResource | null; readonly location: { readonly id: string; readonly name: string; readonly category: string | null } | null }
 export type ChronicleMapAreaLabelSize = 'small' | 'medium' | 'large'
 export type ChronicleMapAreaLabelVertical = 'top' | 'center' | 'bottom'
 export type ChronicleMapAreaLabelHorizontal = 'left' | 'center' | 'right'

@@ -1700,6 +1700,7 @@ model ChronicleMapMarker {
   locationId String?  @db.Uuid
   kind       String   @default("LOCATION")
   label      String?
+  description String?
   x          Float
   y          Float
   size       String   @default("large")
