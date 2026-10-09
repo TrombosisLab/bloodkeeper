@@ -26,6 +26,7 @@ Este documento completo es privado y contiene secretos. El apartado Alcance del 
 Distingue tres capas: acontecimientos registrados en sesiones realizadas; planificación y posibilidades del guion; secretos y notas privadas del narrador. No presentes escenas previstas ni consecuencias posibles como hechos ocurridos.
 Los estados Secreto, Descubierto y Resuelto de las tarjetas no publican su contenido ni demuestran por sí solos cuándo ocurrió un acontecimiento. Los hitos pendientes no son sucesos realizados.
 GN1-P1 identifica una página y GN1-T1 una tarjeta única. Las continuaciones repiten la misma tarjeta en varias páginas, no son acontecimientos ni personajes distintos.
+Los enlaces entre historias son rutas de preparación: conserva su origen, destino y significado. No demuestran que la historia de destino se haya iniciado ni que una escena haya ocurrido. Inicio del guion no identifica una tarjeta específica. Un destino no disponible no debe reconstruirse ni inventarse.
 Revisa coherencia y preparación usando las referencias del documento. Indica lo que falta; no inventes contenido de fichas, adjuntos ni mapas privados ausentes.
 No produzcas una versión para jugadores ni reveles secretos a otros destinatarios salvo petición explícita del narrador. Si se pide una versión compartible, usa únicamente el bloque compartido y no introduzcas información privada.
 `
@@ -56,6 +57,21 @@ export function buildNarratorContext(input: NarratorExportSources, generatedAt?:
     for (const card of guide.cards) {
       lines.push(`#### ${label(card.id)}`, `Tipo: ${kinds[card.kind] ?? title(card.kind)}. Estado: ${states[card.state] ?? title(card.state)}.`,
         'Descripción:', quote(card.summary), 'Nota privada:', quote(card.narratorNote))
+      for (const link of card.storyLinks ?? []) {
+        const destinationIndex = input.stories.findIndex((item) => item.id === link.storyId && item.chronicleId === story.chronicleId)
+        const destination = input.stories[destinationIndex]
+        let target = 'Historia no disponible'
+        if (destination) {
+          const destinationRef = `GN${destinationIndex + 1}`
+          target = `${title(destination.title)} [${destinationRef}] · Inicio del guion`
+          if (link.cardId !== undefined) {
+            const targetIndex = destination.narratorGuide?.cards.findIndex((item) => item.id === link.cardId) ?? -1
+            const targetCard = destination.narratorGuide?.cards[targetIndex]
+            target = `${title(destination.title)} [${destinationRef}] · ${targetCard ? `${title(targetCard.title)} [${destinationRef}-T${targetIndex + 1}]` : 'Tarjeta no disponible'}`
+          }
+        }
+        lines.push(`- Enlace entre historias (planificación): ${label(card.id)} → ${target}. Significado: ${title(link.label) || 'Sin significado registrado'}.`)
+      }
     }
     for (const page of pages) {
       lines.push(`#### Página: ${title(page.title)} [${pageRefs.get(page.id)}]`)

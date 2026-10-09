@@ -3,6 +3,7 @@ import type { FormEvent, PointerEvent as ReactPointerEvent } from 'react'
 
 import type {
   ChronicleStoryGuide,
+  ChronicleStoryApiSnapshot,
   ChronicleStoryGuideCard,
   ChronicleStoryGuideCardKind,
   ChronicleStoryGuideCardState,
@@ -11,6 +12,7 @@ import type {
 } from '../types/chronicle-story-api.types'
 
 import './chronicle-story-guide-workspace.css'
+import { resolveStoryGuideLink } from '../domain/story-guide-links'
 import { FIRST_GUIDE_PAGE, continueGuideOnNewPage, guideCardPages, guidePageCards, guidePageConnections, normalizeGuidePages, removeGuideCardAppearance, updateGuideCardPosition } from '../domain/story-guide-pages'
 
 const emptyGuide: ChronicleStoryGuide = { cards: [], connections: [] }
@@ -47,6 +49,10 @@ function newId(): string {
 }
 
 interface Props {
+  readonly storyId: string
+  readonly stories: readonly ChronicleStoryApiSnapshot[]
+  readonly initialCardId?: string
+  readonly onStoryLink: (storyId: string, cardId?: string) => void
   readonly initialPageId?: string
   readonly onPageChange?: (pageId: string) => void
   readonly guide: ChronicleStoryGuide | null | undefined
@@ -56,7 +62,7 @@ interface Props {
   readonly onSave: (guide: ChronicleStoryGuide) => Promise<boolean>
 }
 
-export function ChronicleStoryGuideWorkspace({ guide, readOnly, saving, onDirtyChange, onSave, initialPageId, onPageChange }: Props) {
+export function ChronicleStoryGuideWorkspace({ guide, readOnly, saving, onDirtyChange, onSave, initialPageId, onPageChange, storyId, stories, initialCardId, onStoryLink }: Props) {
   const [draft, setDraft] = useState<ChronicleStoryGuide>(() => normalizeGuidePages(guide ?? emptyGuide))
   const [pageId, setPageId] = useState(() => guide?.pages?.some((page) => page.id === initialPageId) ? initialPageId! : guide?.pages?.[0]?.id ?? FIRST_GUIDE_PAGE)
   const [pageEditorOpen, setPageEditorOpen] = useState(false)
@@ -65,8 +71,11 @@ export function ChronicleStoryGuideWorkspace({ guide, readOnly, saving, onDirtyC
   const [continuingCardId, setContinuingCardId] = useState<string | null>(null)
   const pageDialogRef = useRef<HTMLDialogElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
-  const [focusedCard, setFocusedCard] = useState<string | null>(null)
-  const [selectedId, setSelectedId] = useState<string | null>(guide?.cards[0]?.id ?? null)
+  const [focusedCard, setFocusedCard] = useState<string | null>(initialCardId ?? null)
+  const [selectedId, setSelectedId] = useState<string | null>(initialCardId ?? guide?.cards[0]?.id ?? null)
+  const [targetStoryId, setTargetStoryId] = useState('')
+  const [targetCardId, setTargetCardId] = useState('')
+  const [storyLinkLabel, setStoryLinkLabel] = useState('')
   const [zoom, setZoom] = useState(1)
   const [newKind, setNewKind] = useState<ChronicleStoryGuideCardKind>('clue')
   const [newTitle, setNewTitle] = useState('')
@@ -97,6 +106,9 @@ export function ChronicleStoryGuideWorkspace({ guide, readOnly, saving, onDirtyC
     setSelectedId(id)
     setConnectionTarget('')
     setConnectionLabel('')
+    setTargetStoryId('')
+    setTargetCardId('')
+    setStoryLinkLabel('')
     setEditorOpen(true)
   }
 
@@ -211,6 +223,7 @@ export function ChronicleStoryGuideWorkspace({ guide, readOnly, saving, onDirtyC
   }
 
   function onCardPointerDown(event: ReactPointerEvent<HTMLElement>, card: ChronicleStoryGuideCard) {
+    // Link controls must not start a drag.
     if (readOnly || (event.target as HTMLElement).closest('button, select')) return
     event.currentTarget.setPointerCapture(event.pointerId)
     event.currentTarget.dataset.dragStartX = String(event.clientX)
@@ -234,6 +247,15 @@ export function ChronicleStoryGuideWorkspace({ guide, readOnly, saving, onDirtyC
   }
 
   const canvasWidth = Math.max(1200, ...visibleCards.map((card) => card.x + 280))
+  function addStoryLink(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (readOnly || selected === null || !targetStoryId || targetStoryId === storyId) return
+    const links = selected.storyLinks ?? []
+    const link = { id: newId(), storyId: targetStoryId, ...(targetCardId ? { cardId: targetCardId } : {}), label: storyLinkLabel.trim() }
+    if (links.length >= 8 || !resolveStoryGuideLink(stories, link).available || links.some((item) => item.storyId === targetStoryId && item.cardId === link.cardId)) return
+    updateCard(selected.id, { storyLinks: [...links, link] })
+    setStoryLinkLabel('')
+  }
   const canvasHeight = Math.max(700, ...visibleCards.map((card) => card.y + 260))
 
   return (
@@ -332,6 +354,13 @@ export function ChronicleStoryGuideWorkspace({ guide, readOnly, saving, onDirtyC
                       <button className="story-guide-card__edit" type="button" onClick={(event) => { event.stopPropagation(); openEditor(card.id) }}>Editar</button>
                     </div>
                     {renderPageLinks(card)}
+                    {(card.storyLinks?.length ?? 0) > 0 ? <select className="story-guide-card__page-link" aria-label={`Enlaces a otras historias desde ${card.title}`} value="" onClick={(event) => event.stopPropagation()} onChange={(event) => {
+                      const link = card.storyLinks?.find((item) => item.id === event.target.value)
+                      if (link && resolveStoryGuideLink(stories, link).available) onStoryLink(link.storyId, link.cardId)
+                    }}><option value="">↗ Otra historia… ({card.storyLinks!.length})</option>{card.storyLinks!.map((link) => {
+                      const target = resolveStoryGuideLink(stories, link)
+                      return <option key={link.id} value={link.id} disabled={!target.available}>{target.label}</option>
+                    })}</select> : null}
                   </article>)}
                 </div>
               </div>
@@ -370,6 +399,18 @@ export function ChronicleStoryGuideWorkspace({ guide, readOnly, saving, onDirtyC
             <label className="story-guide__field">Nota privada del Narrador<textarea value={selected.narratorNote} disabled={readOnly} maxLength={4000} rows={3} onChange={(event) => updateCard(selected.id, { narratorNote: event.target.value })} placeholder="La verdad, condición o consecuencia…" /></label>
             <label className="story-guide__field">Estado<select value={selected.state} disabled={readOnly} onChange={(event) => updateCard(selected.id, { state: event.target.value as ChronicleStoryGuideCardState })}>{cardStates.map((state) => <option value={state.value} key={state.value}>{state.label}</option>)}</select></label>
 
+            <form className="story-guide__connection-form" onSubmit={addStoryLink}>
+              <strong>Enlazar con otra historia</strong>
+              <label>Historia de destino<select value={targetStoryId} disabled={readOnly} onChange={(event) => { setTargetStoryId(event.target.value); setTargetCardId('') }}><option value="">Elige otra historia</option>{stories.filter((item) => item.id !== storyId).map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>
+              <label>Destino<select value={targetCardId} disabled={readOnly || !targetStoryId} onChange={(event) => setTargetCardId(event.target.value)}><option value="">Inicio del guion</option>{stories.find((item) => item.id === targetStoryId)?.narratorGuide?.cards.map((card) => <option key={card.id} value={card.id}>{card.title}</option>)}</select></label>
+              <label>Significado<input maxLength={120} value={storyLinkLabel} disabled={readOnly} onChange={(event) => setStoryLinkLabel(event.target.value)} placeholder="Ej. Esta pista abre el arco personal" /></label>
+              <button type="submit" disabled={readOnly || !targetStoryId || (selected.storyLinks?.length ?? 0) >= 8}>＋ Añadir enlace</button>
+              <small>Preparación privada. No mueve tarjetas ni publica información.</small>
+            </form>
+            <div className="story-guide__selected-connections"><strong>Otras historias</strong>{(selected.storyLinks ?? []).map((link) => {
+              const target = resolveStoryGuideLink(stories, link)
+              return <div key={link.id}><span>{link.label || 'Continúa en'} → {target.label}</span><button type="button" disabled={!target.available} onClick={() => onStoryLink(link.storyId, link.cardId)}>Abrir destino</button><button type="button" aria-label="Eliminar enlace entre historias" disabled={readOnly} onClick={() => updateCard(selected.id, { storyLinks: selected.storyLinks?.filter((item) => item.id !== link.id) })}>×</button></div>
+            })}</div>
             <form className="story-guide__connection-form" onSubmit={addConnection}>
               <strong>Crear conexión</strong>
               <label>Esta tarjeta lleva a<select value={connectionTarget} disabled={readOnly || draft.cards.length < 2} onChange={(event) => setConnectionTarget(event.target.value)}><option value="">Elige otra tarjeta</option>{pages.map((page) => <optgroup key={page.id} label={page.title}>{guidePageCards(draft, page.id).filter((card) => card.id !== selected.id).map((card) => <option key={card.id} value={card.id}>{card.title}</option>)}</optgroup>)}</select></label>

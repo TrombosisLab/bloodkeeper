@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 
 import type {
@@ -155,6 +155,8 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
   const [sessionNotes, setSessionNotes] = useState<Readonly<Record<string, string>>>({})
   const [selectedMilestoneKey, setSelectedMilestoneKey] = useState<ChronicleStoryMilestoneApiKey | null>(null)
   const [storyView, setStoryView] = useState<'story' | 'guide'>('story')
+  const linkNavigation = useRef(false)
+  const [guideDestination, setGuideDestination] = useState<{ storyId: string; cardId?: string } | null>(null)
   const [guideDirty, setGuideDirty] = useState(false)
   const [guidePage, setGuidePage] = useState<{ storyId: string; pageId: string } | null>(null)
   const [milestoneNoteDrafts, setMilestoneNoteDrafts] = useState<Readonly<Partial<Record<ChronicleStoryMilestoneApiKey, string>>>>({})
@@ -207,7 +209,8 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
 
   useEffect(() => {
     setSelectedMilestoneKey(null)
-    setStoryView('story')
+    setStoryView(linkNavigation.current ? 'guide' : 'story')
+    linkNavigation.current = false
     setGuideDirty(false)
   }, [selectedId])
 
@@ -361,6 +364,20 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
 
           {storyView === 'guide' ? <ChronicleStoryGuideWorkspace
             key={`${selected.id}-${selected.revision}`}
+            storyId={selected.id}
+            stories={stories}
+            initialCardId={guideDestination?.storyId === selected.id ? guideDestination.cardId : undefined}
+            onStoryLink={(storyId, cardId) => {
+              if (!leaveGuideAllowed()) return
+              const target = stories.find((item) => item.id === storyId)
+              if (!target) return
+              const card = target.narratorGuide?.cards.find((item) => item.id === cardId)
+              if (cardId !== undefined && !card) return
+              linkNavigation.current = true
+              setGuideDestination({ storyId, ...(cardId === undefined ? {} : { cardId }) })
+              setGuidePage({ storyId, pageId: card?.pageId ?? target.narratorGuide?.pages?.[0]?.id ?? '00000000-0000-4000-8000-000000000001' })
+              setSelectedId(storyId)
+            }}
             guide={selected.narratorGuide}
             initialPageId={guidePage?.storyId === selected.id ? guidePage.pageId : undefined}
             onPageChange={(pageId) => setGuidePage({ storyId: selected.id, pageId })}

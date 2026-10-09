@@ -285,7 +285,7 @@ function parseNarratorGuide(value: unknown): ChronicleStoryGuide {
   const ids = new Set<string>()
   const cards: ChronicleStoryGuideCard[] = guide.cards.map((item, index) => {
     const card = record(item)
-    supportedKeys(card, ['id', 'pageId', 'appearances', 'kind', 'state', 'title', 'summary', 'narratorNote', 'x', 'y'])
+    supportedKeys(card, ['id', 'pageId', 'appearances', 'storyLinks', 'kind', 'state', 'title', 'summary', 'narratorNote', 'x', 'y'])
     const id = uuid(card.id, `narratorGuide.cards[${index}].id`)
     if (ids.has(id)) throw new InvalidChronicleStoryRequestError('narratorGuide card IDs must be unique')
     ids.add(id)
@@ -332,8 +332,27 @@ function parseNarratorGuide(value: unknown): ChronicleStoryGuide {
         }
       }
     }
+    let storyLinks: ChronicleStoryGuideCard['storyLinks']
+    if (card.storyLinks !== undefined) {
+      if (!Array.isArray(card.storyLinks) || card.storyLinks.length > 8) throw new InvalidChronicleStoryRequestError('A card supports at most 8 story links')
+      const linkIds = new Set<string>()
+      const destinations = new Set<string>()
+      storyLinks = card.storyLinks.map((item) => {
+        const link = record(item)
+        supportedKeys(link, ['id', 'storyId', 'cardId', 'label'])
+        const linkId = uuid(link.id, 'storyLink.id')
+        const storyId = uuid(link.storyId, 'storyLink.storyId')
+        const cardId = link.cardId === undefined ? undefined : uuid(link.cardId, 'storyLink.cardId')
+        const destination = `${storyId}:${cardId ?? ''}`
+        if (linkIds.has(linkId) || destinations.has(destination)) throw new InvalidChronicleStoryRequestError('Duplicate story link')
+        linkIds.add(linkId)
+        destinations.add(destination)
+        return { id: linkId, storyId, ...(cardId === undefined ? {} : { cardId }), label: optionalText(link.label, 'storyLink.label', 120) ?? '' }
+      })
+    }
     return {
       id,
+      ...(storyLinks === undefined ? {} : { storyLinks }),
       ...(pageId === undefined ? {} : { pageId }),
       ...(appearances === undefined ? {} : { appearances }),
       kind: card.kind as ChronicleStoryGuideCardKind,

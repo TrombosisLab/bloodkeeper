@@ -31,6 +31,7 @@ import {
 } from './chronicle-story-permission'
 import {
   CHRONICLE_STORY_REPOSITORY,
+  ChronicleStoryContextReferenceError,
 } from './chronicle-story.repository'
 import type {
   ChronicleStoryRepository,
@@ -263,6 +264,23 @@ export class UpdateChronicleStoryUseCase
       command.chronicleId,
       command.storyId,
     )
+
+    const targets = new Map<string, ChronicleStorySnapshot>()
+    for (const card of command.narratorGuide?.cards ?? []) {
+      for (const link of card.storyLinks ?? []) {
+        if (link.storyId === command.storyId) throw new ChronicleStoryContextReferenceError('other story', link.storyId)
+        let target = targets.get(link.storyId)
+        if (!target) {
+          const found = await this.stories.findById(command.chronicleId, link.storyId)
+          if (!found) throw new ChronicleStoryContextReferenceError('story', link.storyId)
+          target = found
+          targets.set(link.storyId, target)
+        }
+        if (link.cardId !== undefined && !target.narratorGuide?.cards.some((item) => item.id === link.cardId)) {
+          throw new ChronicleStoryContextReferenceError('guide card', link.cardId)
+        }
+      }
+    }
 
     return this.stories.update({
       ...command,

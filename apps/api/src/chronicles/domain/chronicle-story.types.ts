@@ -42,6 +42,7 @@ export type ChronicleStoryGuideConnectionColor =
 
 export interface ChronicleStoryGuideCard {
   readonly id: string
+  readonly storyLinks?: readonly { readonly id: string; readonly storyId: string; readonly cardId?: string; readonly label: string }[]
   readonly pageId?: string
   readonly appearances?: readonly { readonly pageId: string; readonly sourcePageId: string; readonly x: number; readonly y: number }[]
   readonly kind: ChronicleStoryGuideCardKind
