@@ -13,6 +13,7 @@ import type {
 
 import './chronicle-story-guide-workspace.css'
 import { resolveStoryGuideLink } from '../domain/story-guide-links'
+import { routeGuideConnections } from '../domain/story-guide-routing'
 import { StoryGuideResources } from './StoryGuideResources'
 import { FIRST_GUIDE_PAGE, continueGuideOnNewPage, guideCardPages, guidePageCards, guidePageConnections, normalizeGuidePages, removeGuideCardAppearance, updateGuideCardPosition } from '../domain/story-guide-pages'
 
@@ -73,6 +74,8 @@ export function ChronicleStoryGuideWorkspace({ chronicleId, guide, readOnly, sav
   const [continuingCardId, setContinuingCardId] = useState<string | null>(null)
   const pageDialogRef = useRef<HTMLDialogElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<HTMLDivElement>(null)
+  const [cardSizes, setCardSizes] = useState<Record<string, { width: number; height: number }>>({})
   const [focusedCard, setFocusedCard] = useState<string | null>(initialCardId ?? null)
   const [selectedId, setSelectedId] = useState<string | null>(initialCardId ?? guide?.cards[0]?.id ?? null)
   const [targetStoryId, setTargetStoryId] = useState('')
@@ -121,6 +124,25 @@ export function ChronicleStoryGuideWorkspace({ chronicleId, guide, readOnly, sav
   const visibleCards = guidePageCards(draft, pageId)
   const visibleConnections = guidePageConnections(draft, pageId)
   const visibleById = new Map(visibleCards.map((card) => [card.id, card]))
+  const geometryKey = visibleCards.map(card => `${card.id}:${card.title}:${card.summary}:${card.narratorNote}:${card.appearances?.length}:${card.storyLinks?.length}`).join('|')
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const measure = () => {
+      const sizes: Record<string, { width: number; height: number }> = {}
+      canvas.querySelectorAll<HTMLElement>('[data-route-card]').forEach(element => {
+        sizes[element.dataset.routeCard!] = { width: element.offsetWidth, height: element.offsetHeight }
+      })
+      setCardSizes(previous => JSON.stringify(previous) === JSON.stringify(sizes) ? previous : sizes)
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    canvas.querySelectorAll('[data-route-card]').forEach(element => observer.observe(element))
+    return () => observer.disconnect()
+  }, [pageId, geometryKey])
+  const routeBoxes = visibleCards.map(card => ({ id: card.id, x: card.x, y: card.y, width: cardSizes[card.id]?.width ?? 260, height: cardSizes[card.id]?.height ?? 180 }))
+  const routeKey = JSON.stringify([routeBoxes, visibleConnections])
+  const routes = useMemo(() => routeGuideConnections(routeBoxes, visibleConnections), [routeKey])
   const pageName = (id: string | undefined) => pages.find((page) => page.id === id)?.title ?? 'Inicio'
 
   function goToCard(id: string, destinationPageId?: string) {
@@ -258,7 +280,7 @@ export function ChronicleStoryGuideWorkspace({ chronicleId, guide, readOnly, sav
     updateCard(selected.id, { storyLinks: [...links, link] })
     setStoryLinkLabel('')
   }
-  const canvasHeight = Math.max(700, ...visibleCards.map((card) => card.y + 260))
+  const canvasHeight = Math.max(700, ...visibleCards.map((card) => card.y + 260), ...Array.from(routes.values(), route => route.labelY + route.labelLines.length * 14 + 24))
 
   return (
     <section className="story-guide" aria-label="Guion privado del Narrador">
@@ -315,26 +337,25 @@ export function ChronicleStoryGuideWorkspace({ chronicleId, guide, readOnly, sav
               <div className="story-guide__empty"><span>✦</span><h3>Empieza con una pista</h3><p>Añade lo que la coterie encuentra primero. Después conecta esa pista con personas, lugares, documentos o decisiones.</p></div>
             ) : (
               <div className="story-guide__canvas-scale" style={{ width: canvasWidth * zoom, height: canvasHeight * zoom }}>
-                <div className="story-guide__canvas" style={{ width: canvasWidth, height: canvasHeight, transform: `scale(${zoom})` }}>
+                <div ref={canvasRef} className="story-guide__canvas" onClick={(event) => { if (!(event.target as HTMLElement).closest('.story-guide-card')) setSelectedId(null) }} style={{ width: canvasWidth, height: canvasHeight, transform: `scale(${zoom})` }}>
                   <svg className="story-guide__edges" width={canvasWidth} height={canvasHeight} aria-label="Conexiones entre tarjetas">
                     <defs>{colors.map((color) => <marker key={color.value} id={`story-guide-arrow-${color.value}`} markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" /></marker>)}</defs>
                     {visibleConnections.map((connection) => {
                       const from = visibleById.get(connection.from)
                       const to = visibleById.get(connection.to)
                       if (from === undefined || to === undefined) return null
-                      const x1 = from.x + 260
-                      const y1 = from.y + 62
-                      const x2 = to.x
-                      const y2 = to.y + 62
-                      const bend = Math.max(42, Math.abs(x2 - x1) * 0.45)
-                      const path = `M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}`
-                      const middleX = (x1 + x2) / 2
-                      const middleY = (y1 + y2) / 2 - 9
-                      return <g key={connection.id} className={`is-${connection.color}`}><path d={path} markerEnd={`url(#story-guide-arrow-${connection.color})`} /><text x={middleX} y={middleY}>{connection.label || 'se relaciona con'}</text></g>
+                      const route = routes.get(connection.id)
+                      if (!route) return null
+                      const path = route.path
+                      const middleX = route.labelX
+                      const middleY = route.labelY
+                      const related = selectedId === connection.from || selectedId === connection.to
+                      return <g key={connection.id} className={`is-${connection.color}${selectedId !== null ? related ? ' is-focused' : ' is-muted' : ''}`}><path d={path} markerEnd={`url(#story-guide-arrow-${connection.color})`} />{route.labelLeader ? <path className="story-guide__label-leader" d={route.labelLeader} /> : null}<text x={middleX} y={middleY}><title>{connection.label || 'se relaciona con'}</title>{route.labelLines.map((line, index) => <tspan key={index} x={middleX} dy={index === 0 ? 0 : 14}>{line}</tspan>)}</text></g>
                     })}
                   </svg>
                   {visibleCards.map((card) => <article
                     key={card.id}
+                    data-route-card={card.id}
                     className={`story-guide-card story-guide-card--${card.kind} story-guide-card--${card.state}${selectedId === card.id ? ' is-selected' : ''}`}
                     style={{ left: card.x, top: card.y }}
                     role="button"

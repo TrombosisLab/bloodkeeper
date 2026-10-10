@@ -21,6 +21,10 @@
 .story-guide__canvas { position: absolute; top: 0; left: 0; transform-origin: top left; background-image: linear-gradient(#ffffff06 1px,transparent 1px),linear-gradient(90deg,#ffffff06 1px,transparent 1px); background-size: 28px 28px; }
 .story-guide__edges { position: absolute; z-index: 1; inset: 0; overflow: visible; pointer-events: none; }
 .story-guide__edges g path { fill: none; stroke-width: 2.4; }
+.story-guide__edges g.is-muted { opacity: .32; }
+.story-guide__edges g.is-focused path { stroke-width: 3.2; }
+.story-guide__edges g.is-focused text { fill: #fff2e9; }
+.story-guide__edges g path.story-guide__label-leader { stroke-width: 1; stroke-dasharray: 3 3; opacity: .6; }
 .story-guide__edges g text { fill: #d4c8c5; stroke: #191517; stroke-width: 5px; paint-order: stroke; font: 700 10px Inter,Segoe UI,Arial,sans-serif; letter-spacing: .07em; text-anchor: middle; }
 .story-guide__edges .is-rose path { stroke: #c76573; fill: none; }
 .story-guide__edges #story-guide-arrow-rose path { stroke: #c76573; fill: #c76573; }
