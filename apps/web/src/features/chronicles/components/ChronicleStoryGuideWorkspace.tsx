@@ -13,6 +13,7 @@ import type {
 
 import './chronicle-story-guide-workspace.css'
 import { resolveStoryGuideLink } from '../domain/story-guide-links'
+import { StoryGuideResources } from './StoryGuideResources'
 import { FIRST_GUIDE_PAGE, continueGuideOnNewPage, guideCardPages, guidePageCards, guidePageConnections, normalizeGuidePages, removeGuideCardAppearance, updateGuideCardPosition } from '../domain/story-guide-pages'
 
 const emptyGuide: ChronicleStoryGuide = { cards: [], connections: [] }
@@ -49,6 +50,7 @@ function newId(): string {
 }
 
 interface Props {
+  readonly chronicleId: string
   readonly storyId: string
   readonly stories: readonly ChronicleStoryApiSnapshot[]
   readonly initialCardId?: string
@@ -62,7 +64,7 @@ interface Props {
   readonly onSave: (guide: ChronicleStoryGuide) => Promise<boolean>
 }
 
-export function ChronicleStoryGuideWorkspace({ guide, readOnly, saving, onDirtyChange, onSave, initialPageId, onPageChange, storyId, stories, initialCardId, onStoryLink }: Props) {
+export function ChronicleStoryGuideWorkspace({ chronicleId, guide, readOnly, saving, onDirtyChange, onSave, initialPageId, onPageChange, storyId, stories, initialCardId, onStoryLink }: Props) {
   const [draft, setDraft] = useState<ChronicleStoryGuide>(() => normalizeGuidePages(guide ?? emptyGuide))
   const [pageId, setPageId] = useState(() => guide?.pages?.some((page) => page.id === initialPageId) ? initialPageId! : guide?.pages?.[0]?.id ?? FIRST_GUIDE_PAGE)
   const [pageEditorOpen, setPageEditorOpen] = useState(false)
@@ -399,6 +401,7 @@ export function ChronicleStoryGuideWorkspace({ guide, readOnly, saving, onDirtyC
             <label className="story-guide__field">Nota privada del Narrador<textarea value={selected.narratorNote} disabled={readOnly} maxLength={4000} rows={3} onChange={(event) => updateCard(selected.id, { narratorNote: event.target.value })} placeholder="La verdad, condición o consecuencia…" /></label>
             <label className="story-guide__field">Estado<select value={selected.state} disabled={readOnly} onChange={(event) => updateCard(selected.id, { state: event.target.value as ChronicleStoryGuideCardState })}>{cardStates.map((state) => <option value={state.value} key={state.value}>{state.label}</option>)}</select></label>
 
+            <StoryGuideResources key={selected.id} chronicleId={chronicleId} ids={selected.resourceIds ?? []} readOnly={readOnly} onChange={resourceIds => updateCard(selected.id, { resourceIds })} />
             <form className="story-guide__connection-form" onSubmit={addStoryLink}>
               <strong>Enlazar con otra historia</strong>
               <label>Historia de destino<select value={targetStoryId} disabled={readOnly} onChange={(event) => { setTargetStoryId(event.target.value); setTargetCardId('') }}><option value="">Elige otra historia</option>{stories.filter((item) => item.id !== storyId).map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label>

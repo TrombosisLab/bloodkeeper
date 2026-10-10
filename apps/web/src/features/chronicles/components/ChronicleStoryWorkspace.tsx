@@ -365,6 +365,7 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
           {storyView === 'guide' ? <ChronicleStoryGuideWorkspace
             key={`${selected.id}-${selected.revision}`}
             storyId={selected.id}
+            chronicleId={chronicleId}
             stories={stories}
             initialCardId={guideDestination?.storyId === selected.id ? guideDestination.cardId : undefined}
             onStoryLink={(storyId, cardId) => {

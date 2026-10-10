@@ -3,6 +3,8 @@ import type { ChronicleStoryApiSnapshot } from '../types/chronicle-story-api.typ
 import type { NotebookPage } from '../../notebook/types/notebook.types.ts'
 import type { NarratorExportSources } from '../domain/chronicle-narrator-export.ts'
 import { loadChronicleExport } from './chronicle-context-export.api.ts'
+import { readGuideResource } from './story-guide-resources.api.ts'
+import type { GuideResource } from './story-guide-resources.api.ts'
 
 export async function loadNarratorExport(chronicle: ChronicleApiSnapshot, signal: AbortSignal): Promise<NarratorExportSources> {
   const base = '/api/chronicles/' + encodeURIComponent(chronicle.id)
@@ -44,6 +46,19 @@ export async function loadNarratorExport(chronicle: ChronicleApiSnapshot, signal
     offset = page.nextOffset
   }
   const shared = await loadChronicleExport(chronicle, signal)
+  const resourceIds = [...new Set(stories.flatMap(story => story.narratorGuide?.cards.flatMap(card => card.resourceIds ?? []) ?? []))]
+  if (resourceIds.length > 200) throw new Error('La exportación supera 200 recursos relacionados; no se genera un documento parcial.')
+  const resources: GuideResource[] = []
+  let resourceBytes = 0
+  for (const id of resourceIds) {
+    const resource = await readGuideResource<GuideResource>(chronicle.id, '/' + encodeURIComponent(id), signal)
+    if (resource) {
+      resourceBytes += new TextEncoder().encode(JSON.stringify(resource)).length
+      if (resourceBytes > 8 * 1024 * 1024) throw new Error('Las fichas relacionadas superan 8 MiB.')
+      if (resource.id !== id) throw new Error('Referencia de recurso inválida.')
+      resources.push(resource)
+    }
+  }
   signal.throwIfAborted()
-  return { shared, stories, notes: notebook.items.filter(note => note.author.id === notebook.viewerUserId && note.visibility === 'PRIVATE'), narratorId: chronicle.narratorId, viewerUserId: notebook.viewerUserId }
+  return { shared, stories, resources, notes: notebook.items.filter(note => note.author.id === notebook.viewerUserId && note.visibility === 'PRIVATE'), narratorId: chronicle.narratorId, viewerUserId: notebook.viewerUserId }
 }

@@ -285,7 +285,7 @@ function parseNarratorGuide(value: unknown): ChronicleStoryGuide {
   const ids = new Set<string>()
   const cards: ChronicleStoryGuideCard[] = guide.cards.map((item, index) => {
     const card = record(item)
-    supportedKeys(card, ['id', 'pageId', 'appearances', 'storyLinks', 'kind', 'state', 'title', 'summary', 'narratorNote', 'x', 'y'])
+    supportedKeys(card, ['id', 'pageId', 'appearances', 'storyLinks', 'resourceIds', 'kind', 'state', 'title', 'summary', 'narratorNote', 'x', 'y'])
     const id = uuid(card.id, `narratorGuide.cards[${index}].id`)
     if (ids.has(id)) throw new InvalidChronicleStoryRequestError('narratorGuide card IDs must be unique')
     ids.add(id)
@@ -353,6 +353,7 @@ function parseNarratorGuide(value: unknown): ChronicleStoryGuide {
     return {
       id,
       ...(storyLinks === undefined ? {} : { storyLinks }),
+      ...(card.resourceIds === undefined ? {} : { resourceIds: uuidArray(card.resourceIds, 'resourceIds', 12) }),
       ...(pageId === undefined ? {} : { pageId }),
       ...(appearances === undefined ? {} : { appearances }),
       kind: card.kind as ChronicleStoryGuideCardKind,

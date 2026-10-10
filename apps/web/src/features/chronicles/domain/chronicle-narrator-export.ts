@@ -3,8 +3,10 @@ import type { ChronicleExportSources } from './chronicle-context-export.ts'
 import type { ChronicleStoryApiSnapshot } from '../types/chronicle-story-api.types.ts'
 import type { NotebookNote } from '../../notebook/types/notebook.types.ts'
 import { normalizeGuidePages, guidePageCards, guidePageConnections } from './story-guide-pages.ts'
+import type { GuideResource } from '../infrastructure/story-guide-resources.api.ts'
 
 export interface NarratorExportSources {
+  resources?: readonly GuideResource[]
   shared: ChronicleExportSources
   narratorId: string
   viewerUserId: string
@@ -27,6 +29,7 @@ Distingue tres capas: acontecimientos registrados en sesiones realizadas; planif
 Los estados Secreto, Descubierto y Resuelto de las tarjetas no publican su contenido ni demuestran por sí solos cuándo ocurrió un acontecimiento. Los hitos pendientes no son sucesos realizados.
 GN1-P1 identifica una página y GN1-T1 una tarjeta única. Las continuaciones repiten la misma tarjeta en varias páginas, no son acontecimientos ni personajes distintos.
 Los enlaces entre historias son rutas de preparación: conserva su origen, destino y significado. No demuestran que la historia de destino se haya iniciado ni que una escena haya ocurrido. Inicio del guion no identifica una tarjeta específica. Un destino no disponible no debe reconstruirse ni inventarse.
+Los recursos RG son fichas originales consultadas al exportar, no copias de las tarjetas. Su descripción y nota privada aparecen una sola vez. Relacionar un recurso no prueba su aparición en una sesión ni lo publica. No reconstruyas recursos no disponibles.
 Revisa coherencia y preparación usando las referencias del documento. Indica lo que falta; no inventes contenido de fichas, adjuntos ni mapas privados ausentes.
 No produzcas una versión para jugadores ni reveles secretos a otros destinatarios salvo petición explícita del narrador. Si se pide una versión compartible, usa únicamente el bloque compartido y no introduzcas información privada.
 `
@@ -39,6 +42,9 @@ export function buildNarratorContext(input: NarratorExportSources, generatedAt?:
     buildChronicleContext(input.shared, generatedAt, 'narrator-section'), '', '## Contexto privado del narrador', '',
     'Lo anterior es contexto compartido. Lo siguiente contiene información privada. No se consultan mapas privados ni notas privadas de otros jugadores.',
     'GN = guion; GN1-P1 = página; GN1-T1 = tarjeta única. Una tarjeta puede aparecer en varias páginas sin convertirse en otra tarjeta.', '']
+  const linkedIds = [...new Set(input.stories.flatMap(story => story.narratorGuide?.cards.flatMap(card => card.resourceIds ?? []) ?? []))]
+  const resourceRefs = new Map(linkedIds.map((id, index) => [id, `RG${index + 1}`]))
+  const resourceById = new Map((input.resources ?? []).map(resource => [resource.id, resource]))
   for (const [index, story] of input.stories.entries()) {
     const ref = `GN${index + 1}`
     lines.push(`### ${title(story.title)} [${ref}]`, `Estado: ${statuses[story.status] ?? title(story.status)}.`,
@@ -57,6 +63,7 @@ export function buildNarratorContext(input: NarratorExportSources, generatedAt?:
     for (const card of guide.cards) {
       lines.push(`#### ${label(card.id)}`, `Tipo: ${kinds[card.kind] ?? title(card.kind)}. Estado: ${states[card.state] ?? title(card.state)}.`,
         'Descripción:', quote(card.summary), 'Nota privada:', quote(card.narratorNote))
+      for (const id of card.resourceIds ?? []) lines.push(`- Recurso relacionado: ${resourceById.has(id) ? title(resourceById.get(id)!.name) : 'Recurso no disponible'} [${resourceRefs.get(id)}]. Referencia privada, no confirma un acontecimiento.`)
       for (const link of card.storyLinks ?? []) {
         const destinationIndex = input.stories.findIndex((item) => item.id === link.storyId && item.chronicleId === story.chronicleId)
         const destination = input.stories[destinationIndex]
@@ -92,6 +99,14 @@ export function buildNarratorContext(input: NarratorExportSources, generatedAt?:
     lines.push('')
   }
   if (!input.stories.length) lines.push('Sin historias registradas.')
+  lines.push('### Fichas originales de recursos relacionados (privadas)')
+  if (!linkedIds.length) lines.push('Ninguna.')
+  for (const id of linkedIds) {
+    const resource = resourceById.get(id)
+    lines.push(`#### ${resource ? title(resource.name) : 'Recurso no disponible'} [${resourceRefs.get(id)}]`)
+    if (!resource) { lines.push('No se reconstruye su contenido.'); continue }
+    lines.push(`Tipo: ${title(resource.kind)}. Estado: ${title(resource.status)}. Origen: ${resource.inChronicle ? 'vinculado a la crónica' : 'biblioteca reutilizable, sin incorporación automática'}.`, 'Descripción original:', quote(resource.summary), 'Nota privada original del narrador:', quote(resource.narratorNotes))
+  }
   lines.push('### Notas privadas propias del narrador')
   const ownNotes = input.notes.filter(note => note.author.id === input.viewerUserId && note.visibility === 'PRIVATE')
   if (!ownNotes.length) lines.push('Ninguna.')
