@@ -25,6 +25,15 @@
 .story-guide__edges g.is-focused path { stroke-width: 3.2; }
 .story-guide__edges g.is-focused text { fill: #fff2e9; }
 .story-guide__edges g path.story-guide__label-leader { stroke-width: 1; stroke-dasharray: 3 3; opacity: .6; }
+.story-guide__color-legend { position: relative; margin-left: auto; font-size: .75rem; }
+.story-guide__color-legend summary { cursor: pointer; padding: 8px; color: #e5d7ce; }
+.story-guide__color-legend > div { position: absolute; z-index: 5; right: 0; top: 100%; width: min(340px, 75vw); display: grid; gap: 12px; padding: 16px; border: 1px solid #605254; border-radius: 8px; background: #201a1c; box-shadow: 0 8px 24px #0009; }
+.story-guide__color-legend span { display: flex; align-items: center; gap: 9px; line-height: 1.5; }
+.story-guide__color-legend i { width: 22px; height: 3px; flex-shrink: 0; background: #c76573; }
+.story-guide__color-legend i.is-gold { background: #c69a55; }
+.story-guide__color-legend i.is-blue { background: #719fc2; }
+.story-guide__color-legend i.is-green { background: #70a586; }
+.story-guide__color-legend small { line-height: 1.5; color: #cbbdb8; }
 .story-guide__edges g text { fill: #d4c8c5; stroke: #191517; stroke-width: 5px; paint-order: stroke; font: 700 10px Inter,Segoe UI,Arial,sans-serif; letter-spacing: .07em; text-anchor: middle; }
 .story-guide__edges .is-rose path { stroke: #c76573; fill: none; }
 .story-guide__edges #story-guide-arrow-rose path { stroke: #c76573; fill: #c76573; }

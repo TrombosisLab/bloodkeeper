@@ -33,10 +33,10 @@ const cardStates: readonly { readonly value: ChronicleStoryGuideCardState; reado
   { value: 'resolved', label: 'Resuelto' },
 ]
 const colors: readonly { readonly value: ChronicleStoryGuideConnectionColor; readonly label: string }[] = [
-  { value: 'rose', label: 'Carmesí' },
-  { value: 'gold', label: 'Oro' },
-  { value: 'blue', label: 'Azul' },
-  { value: 'green', label: 'Verde' },
+  { value: 'rose', label: 'Carmesí · Peligro, conflicto o consecuencia negativa' },
+  { value: 'gold', label: 'Oro · Pista, descubrimiento o información' },
+  { value: 'blue', label: 'Azul · Desplazamiento o continuación entre escenas' },
+  { value: 'green', label: 'Verde · Alternativa, solución o resultado favorable' },
 ]
 const kindLabel = Object.fromEntries(cardKinds.map((kind) => [kind.value, kind.label])) as Record<ChronicleStoryGuideCardKind, string>
 
@@ -331,6 +331,10 @@ export function ChronicleStoryGuideWorkspace({ chronicleId, guide, readOnly, sav
             <button type="button" disabled={readOnly} onClick={() => setZoom((value) => Math.min(1.25, value + 0.1))}>＋</button>
             <span className="story-guide__tool-separator" />
             <span className="story-guide__board-hint">Arrastra las tarjetas para ordenar el flujo · Editar abre notas y conexiones</span>
+            <details className="story-guide__color-legend">
+              <summary>Leyenda de flechas</summary>
+              <div>{colors.map(color => <span key={color.value}><i className={`is-${color.value}`} aria-hidden="true" />{color.label}</span>)}<small>Convención orientativa. Las flechas anteriores conservan su color: revisa su significado escrito. El color de las tarjetas indica su tipo, no esta leyenda.</small></div>
+            </details>
           </div>
           <div className="story-guide__viewport" ref={viewportRef}>
             {visibleCards.length === 0 ? (
