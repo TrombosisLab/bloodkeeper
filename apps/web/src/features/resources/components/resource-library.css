@@ -272,3 +272,64 @@
     padding: 8px 12px 20px !important;
   }
 }
+
+/* BLOODKEEPER_RESOURCE_TREE_LAYOUT_V1 */
+/* Tree height must not determine photo height. Keep the hierarchy intact. */
+.resource-library-reference .resource-showcase {
+  align-items: start;
+}
+.resource-library-reference .resource-tree {
+  display: flex;
+  flex-direction: column;
+  align-self: start;
+  min-height: 0;
+  max-height: clamp(240px, 65vh, 720px);
+  max-height: clamp(240px, 65dvh, 720px);
+  overflow: hidden;
+}
+.resource-library-reference .resource-tree > h2 {
+  flex: 0 0 auto;
+}
+.resource-library-reference .resource-tree > ul {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #86505a #130f10;
+}
+.resource-library-reference .resource-tree button:focus-visible {
+  outline: 2px solid #d7a75d;
+  outline-offset: -2px;
+}
+.resource-library-reference .resource-preview {
+  align-items: start;
+}
+.resource-library-reference .resource-preview__image {
+  align-self: start;
+  min-height: 0;
+  height: auto;
+}
+.resource-library-reference .resource-preview__image img {
+  display: block;
+  position: static;
+  inset: auto;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center top;
+}
+@media (max-width: 900px) {
+  .resource-library-reference .resource-tree {
+    max-height: 320px;
+    overflow: hidden;
+  }
+}
+@media (max-width: 720px) {
+  .resource-library-reference .resource-tree {
+    max-height: min(40vh, 320px);
+    max-height: min(40dvh, 320px);
+  }
+}
