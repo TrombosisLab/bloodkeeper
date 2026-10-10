@@ -69,3 +69,13 @@
   .relationship-canvas .story-guide__board-tools { height:auto; min-height:42px; flex-wrap:wrap; padding-block:8px; }
   .relationship-canvas .story-guide-card__actions button { min-height:36px; }
 }
+
+/* BLOODKEEPER_RELATIONS_MOBILE_V2 */
+@media (max-width: 720px) {
+  .relationship-canvas__header button, .relationship-canvas__header select, .relationship-canvas__header summary { min-height: 44px; }
+  .relationship-canvas__header select { font-size: 16px; }
+  .relationship-canvas__header .relationship-maps__views { min-width: 0; flex-wrap: wrap; }
+  .relationship-canvas__header .relationship-maps__views label { min-width: 0; flex-wrap: wrap; }
+  .relationship-canvas__header .relationship-maps__views select { width: 100%; max-width: 100%; min-width: 0; }
+  .relationship-canvas__header .relationship-canvas__legend > div { width: min(300px, calc(100vw - 64px)); grid-template-columns: minmax(0, 1fr); max-height: 45dvh; overflow: auto; }
+}

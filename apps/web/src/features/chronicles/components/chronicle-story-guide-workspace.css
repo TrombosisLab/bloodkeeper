@@ -133,3 +133,20 @@
 @media (pointer: coarse) {
   .story-guide__pages button,.story-guide__page-context button,.story-guide__portal button { min-height: 44px; }
 }
+
+/* BLOODKEEPER_GUIDE_MOBILE_V2 — préserver cartes, coordonnées, chemins et interactions. */
+@media (max-width: 720px) {
+  .story-guide__toolbar { padding: 10px; gap: 10px; min-height: 0; }
+  .story-guide__toolbar-actions { flex-wrap: wrap; justify-content: flex-start; gap: 8px; }
+  .story-guide__toolbar-actions button { min-height: 44px; }
+  .story-guide__pages { padding: 10px; gap: 6px; }
+  .story-guide__pages button { min-height: 44px; }
+  .story-guide__board-wrap { grid-template-rows: auto minmax(0, 1fr); }
+  .story-guide__board-tools { flex-wrap: wrap; gap: 8px; padding: 8px 10px; }
+  .story-guide__board-tools button { width: 44px; height: 44px; }
+  .story-guide__board-hint { flex-basis: 100%; }
+  .story-guide__dialog { width: calc(100vw - 24px); max-height: calc(100dvh - 24px); }
+  .story-guide__dialog-header, .story-guide__dialog-footer, .story-guide__inspector { padding: 12px; }
+  .story-guide__dialog :is(input, select, textarea) { font-size: 16px; }
+  .story-guide__dialog button { min-height: 44px; }
+}

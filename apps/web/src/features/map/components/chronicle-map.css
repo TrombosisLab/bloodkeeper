@@ -321,3 +321,26 @@
     padding-right: 16px !important;
   }
 }
+
+/* BLOODKEEPER_MAP_MOBILE_V2 — no modificar geometría del mapa ni sus marcas. */
+@media (max-width: 720px) {
+  .app-header.app-header:has(.chronicle-map-global-actions) { grid-template-rows: auto auto auto !important; }
+  .app-header.app-header:has(.chronicle-map-global-actions) .app-header__page-context { grid-row: 2 !important; }
+  .app-header.app-header:has(.chronicle-map-global-actions) .app-header__page-actions { grid-row: 3 !important; margin: 0 !important; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > * { min-width: 0 !important; max-width: 100%; width: 100%; box-sizing: border-box; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-page__chronicle-select { grid-column: 1 / -1; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions select { width: 100%; min-width: 0; font-size: 16px; }
+  .app-header:has(.chronicle-map-global-actions) .chronicle-map-global-actions > .chronicle-map-button { min-height: 44px !important; height: auto; white-space: normal; }
+  .chronicle-map-workspace { grid-template-columns: minmax(0, 1fr); }
+  .chronicle-map-detail__header { padding: 12px; gap: 8px; }
+  .chronicle-map-detail__header h2 { font-size: 1.4rem; line-height: 1.2; overflow-wrap: anywhere; }
+  .chronicle-map-detail__header p { font-size: .85rem; line-height: 1.45; }
+  .chronicle-map-tree > ul { max-height: 220px; overflow-y: auto; }
+  .chronicle-map-canvas__controls { flex-wrap: wrap; padding: 8px 12px; }
+  .chronicle-map-canvas__controls button { min-height: 44px; }
+  .chronicle-map-dialog, .chronicle-map-resource-dialog { box-sizing: border-box; min-width: 0; max-width: 100%; max-height: calc(100dvh - 24px); overflow: auto; padding: 20px 14px; }
+  .chronicle-map-dialog :is(input, select, textarea) { box-sizing: border-box; min-width: 0; width: 100%; max-width: 100%; font-size: 16px; }
+  .chronicle-map-dialog footer { flex-wrap: wrap; }
+  .chronicle-map-inspector { box-sizing: border-box; max-height: 45dvh; overflow: auto; padding: 12px; }
+}

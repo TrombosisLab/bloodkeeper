@@ -591,3 +591,19 @@ body main.application-content--chronicle-space { padding: 0; }
 .space-board .board-card__connect:focus-visible { outline: 2px solid var(--board-card-accent); outline-offset: -3px; }
 .space-board .board-card.is-highlighted { box-shadow: 0 0 0 7px #c94b632e,0 12px 28px #0009; }
 .space-board .board-card.is-dragging { box-shadow: 0 18px 35px #000a; }
+
+/* BLOODKEEPER_INVESTIGATION_MOBILE_V2 */
+@media (max-width: 720px) {
+  .space-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; gap: 6px; }
+  .space-nav button { min-width: 0; min-height: 44px; padding: 10px; white-space: normal; }
+  .space-nav small { overflow-wrap: anywhere; }
+  .space-intro { padding: 14px; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+  .space-intro h2, .panel-heading h2 { font-size: 1.5rem; line-height: 1.2; }
+  .panel-heading { flex-wrap: wrap; gap: 10px; }
+  .panel-heading p { text-align: left; }
+  .board-mobile-actions { flex-wrap: wrap; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+  .board-mobile-actions__title { flex: 1 1 100%; max-width: none; }
+  .board-mobile-actions__title strong { max-width: 100%; }
+  .board-mobile-actions button { min-height: 44px; flex: 1; }
+  .timeline-search input, .archive-search input, .archive-sort select { font-size: 16px; min-height: 44px; }
+}
