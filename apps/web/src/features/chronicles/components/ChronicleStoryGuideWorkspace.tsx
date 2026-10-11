@@ -14,6 +14,7 @@ import type {
 import './chronicle-story-guide-workspace.css'
 import { resolveStoryGuideLink } from '../domain/story-guide-links'
 import { routeGuideConnections } from '../domain/story-guide-routing'
+import { storyGraphUrl } from '../domain/story-guide-graph'
 import { StoryGuideResources } from './StoryGuideResources'
 import { FIRST_GUIDE_PAGE, continueGuideOnNewPage, guideCardPages, guidePageCards, guidePageConnections, normalizeGuidePages, removeGuideCardAppearance, updateGuideCardPosition } from '../domain/story-guide-pages'
 
@@ -288,6 +289,8 @@ export function ChronicleStoryGuideWorkspace({ chronicleId, guide, readOnly, sav
         <div><span>FLUJO DE PISTAS</span><p>Organiza la verdad y las rutas posibles. Solo tú ves este guion.</p></div>
         <div className="story-guide__toolbar-actions">
           <span className="story-guide__private"><i /> Solo visible para ti</span>
+          <a href={storyGraphUrl(window.location.origin, chronicleId, storyId)} target="_blank" rel="noopener noreferrer">Mapa completo del guion ↗</a>
+          {dirty ? <span className="story-guide__unsaved">El mapa mostrará la última versión guardada.</span> : null}
           <button type="button" className="story-guide__add-toolbar" disabled={readOnly || draft.cards.length >= 120} onClick={() => openEditor(null)}>＋ Añadir tarjeta</button>
           {dirty ? <span className="story-guide__unsaved">Cambios sin guardar</span> : null}
           <button type="button" disabled={readOnly || saving || !dirty} onClick={() => void onSave(draft).then((saved) => { if (saved) { setDirty(false); onDirtyChange(false) } })}>{saving ? 'Guardando…' : dirty ? 'Guardar guion' : '✓ Guardado'}</button>

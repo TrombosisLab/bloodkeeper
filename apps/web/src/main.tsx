@@ -25,6 +25,7 @@ import { NotebookWorkspace } from './features/notebook/components/NotebookWorksp
 import { ChronicleSpacePrototype } from './features/chronicle-space/components/ChronicleSpacePrototype'
 import { ChronicleMapPage } from './features/map/components/ChronicleMapPage'
 import { ManualPage } from './features/manual/components/ManualPage'
+import { ChronicleStoryGraphPage } from './features/chronicles/components/ChronicleStoryGraphPage'
 import { NotebookFreshPrototype } from './features/notebook/components/NotebookFreshPrototype'
 import { AppBreadcrumbs } from './features/navigation/components/AppBreadcrumbs'
 import { AppNavigation } from './features/navigation/components/AppNavigation'
@@ -82,6 +83,12 @@ function CharacterCreationModal({
 }
 
 function App() {
+  const graphRoute = new URLSearchParams(window.location.search).get('story-graph') === '1'
+    && window.location.hash === '#/story-graph'
+  return graphRoute ? <ChronicleStoryGraphPage /> : <ApplicationWorkspace />
+}
+
+function ApplicationWorkspace() {
   const authenticatedUser =
     useAuthenticatedUser()
 
