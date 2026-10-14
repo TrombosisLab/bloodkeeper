@@ -3,6 +3,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { ChronicleBackdropWorkspace } from './ChronicleBackdropWorkspace'
 
 import type {
   FormEvent,
@@ -138,6 +139,7 @@ type ChronicleDetailSection =
   | 'summary'
   | 'participants'
   | 'stories'
+  | 'backdrop'
   | 'sessions'
   | 'timeline'
   | 'resources'
@@ -394,6 +396,8 @@ export function ChronicleDetail({
   )
 
   const [storyCreateRequestKey, setStoryCreateRequestKey] = useState(0)
+  const [backdropDirty, setBackdropDirty] = useState(false)
+  const [backdropStoryId, setBackdropStoryId] = useState('')
   const [sessionCreateRequestKey, setSessionCreateRequestKey] = useState(0)
   const [eventCreateRequestKey, setEventCreateRequestKey] = useState(0)
 
@@ -1023,7 +1027,7 @@ export function ChronicleDetail({
               {coverAvailable ? <button type="button" disabled={coverBusy} onClick={() => void removeCover()}>Quitar portada</button> : null}
             </>
           ) : null}
-          <button type="button" onClick={onBack}>Volver a cronicas</button>
+          <button type="button" onClick={() => { if (!backdropDirty || window.confirm('Hay cambios sin guardar en Trasfondo y tramas. ¿Salir y descartarlos?')) onBack() }}>Volver a cronicas</button>
         </div>
       </header>
 
@@ -1111,6 +1115,8 @@ export function ChronicleDetail({
               Historias
             </button>
           ) : null}
+
+          {canManageStories ? <button id="chronicle-section-backdrop-tab" type="button" role="tab" aria-selected={activeSection === 'backdrop'} aria-controls="chronicle-section-backdrop-panel" className={activeSection === 'backdrop' ? 'chronicle-detail__section-tab chronicle-detail__section-tab--active' : 'chronicle-detail__section-tab'} onClick={() => setActiveSection('backdrop')}>Trasfondo y tramas</button> : null}
 
           {canViewSessions ? (
             <button
@@ -1469,6 +1475,7 @@ canManageParticipants ? (
         {canManageStories ? (
           <ChronicleStoryWorkspace
             chronicleId={chronicleId}
+            onOpenBackdrop={storyId => { setBackdropStoryId(storyId); setActiveSection('backdrop') }}
             associatedCharacters={associatedCharacters}
             createRequestKey={storyCreateRequestKey}
           />
@@ -1478,6 +1485,10 @@ canManageParticipants ? (
           />
         ) : null}
       </div>
+
+      {canManageStories ? <div id="chronicle-section-backdrop-panel" hidden={activeSection !== 'backdrop'}>
+        <ChronicleBackdropWorkspace chronicleId={chronicleId} initialStoryId={backdropStoryId} onDirtyChange={setBackdropDirty} />
+      </div> : null}
 
       <div
         id="chronicle-section-sessions-panel"

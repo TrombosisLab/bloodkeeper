@@ -270,6 +270,7 @@ model Chronicle {
   status           ChronicleStatus         @default(PREPARATION)
   experiencePace   ChronicleExperiencePace @default(STANDARD)
   currentSituation String?
+  backdrop         ChronicleBackdrop?
   createdAt        DateTime                @default(now()) @db.Timestamptz(3)
   updatedAt        DateTime                @updatedAt @db.Timestamptz(3)
 
@@ -297,6 +298,16 @@ model Chronicle {
   @@index([narratorId])
   @@index([status])
   @@map("chronicles")
+}
+
+model ChronicleBackdrop {
+  chronicleId String    @id @db.Uuid
+  revision    Int       @default(1)
+  state       Json
+  updatedAt   DateTime  @updatedAt @db.Timestamptz(3)
+  chronicle   Chronicle @relation(fields: [chronicleId], references: [id], onDelete: Cascade)
+
+  @@map("chronicle_backdrops")
 }
 
 model ChronicleCoverImage {

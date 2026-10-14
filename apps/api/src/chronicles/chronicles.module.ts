@@ -3,6 +3,7 @@ import {
 } from '@nestjs/common'
 import { ChronicleResourceController } from './presentation/chronicle-resource.controller'
 import { StoryGuideResourceController } from './presentation/story-guide-resource.controller'
+import { ChronicleBackdropController } from './presentation/chronicle-backdrop.controller'
 import { ChronicleAssetImageController } from './presentation/chronicle-asset-image.controller'
 import { LibraryResourceController } from './presentation/library-resource.controller'
 import {
@@ -316,6 +317,7 @@ import { ChronicleCoverController } from './presentation/chronicle-cover.control
   controllers: [
     ChronicleResourceController,
     StoryGuideResourceController,
+    ChronicleBackdropController,
     LibraryResourceController,
     ChronicleAssetImageController,
     ChronicleParticipantNotesController,

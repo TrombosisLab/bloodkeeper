@@ -54,6 +54,7 @@ interface Props {
   readonly chronicleId: string
   readonly associatedCharacters: readonly ChronicleCharacterApiSummary[]
   readonly createRequestKey?: number
+  readonly onOpenBackdrop?: (storyId: string) => void
 }
 
 interface ContextSelection {
@@ -125,7 +126,7 @@ function storyCompletionOperationId(): string {
   return `${hexadecimal.slice(0, 8)}-${hexadecimal.slice(8, 12)}-${hexadecimal.slice(12, 16)}-${hexadecimal.slice(16, 20)}-${hexadecimal.slice(20)}`
 }
 
-export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, createRequestKey = 0 }: Props) {
+export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, createRequestKey = 0, onOpenBackdrop }: Props) {
   const [stories, setStories] = useState<readonly ChronicleStoryApiSnapshot[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [sessions, setSessions] = useState<readonly ChronicleSessionApiSnapshot[]>([])
@@ -367,6 +368,7 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
             storyId={selected.id}
             chronicleId={chronicleId}
             stories={stories}
+            onOpenBackdrop={onOpenBackdrop}
             initialCardId={guideDestination?.storyId === selected.id ? guideDestination.cardId : undefined}
             onStoryLink={(storyId, cardId) => {
               if (!leaveGuideAllowed()) return

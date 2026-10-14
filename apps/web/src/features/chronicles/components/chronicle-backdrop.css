@@ -1,0 +1,47 @@
+.chronicle-backdrop { background: #303a43; color: #eef2f5; border: 1px solid #657583; border-radius: 10px; overflow: hidden; font-family: system-ui, sans-serif; }
+.chronicle-backdrop * { box-sizing: border-box; }
+.chronicle-backdrop header, .chronicle-backdrop__bar, .chronicle-backdrop__connect { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 12px; }
+.chronicle-backdrop h2 { margin: 0; font: 22px system-ui, sans-serif; }
+.chronicle-backdrop p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.chronicle-backdrop__controls { display: flex; flex-wrap: wrap; gap: 6px; }
+.chronicle-backdrop button { min-height: 40px; border: 1px solid #8394a0; border-radius: 6px; padding: 8px 12px; background: #44535f; color: #eef2f5; font: inherit; cursor: pointer; }
+.chronicle-backdrop button:disabled { opacity: .5; cursor: default; }
+.chronicle-backdrop button:focus-visible, .chronicle-backdrop select:focus-visible, .chronicle-backdrop input:focus-visible, .chronicle-backdrop textarea:focus-visible { outline: 2px solid #9acafa; outline-offset: 2px; }
+.chronicle-backdrop label { display: flex; flex-direction: column; gap: 5px; font-size: 13px; }
+.chronicle-backdrop input, .chronicle-backdrop textarea, .chronicle-backdrop select { max-width: 100%; min-width: 0; padding: 8px; color: #edf2f5; background: #26323b; border: 1px solid #8595a3; border-radius: 5px; font: inherit; }
+.chronicle-backdrop input[type=checkbox] { width: auto; }
+.chronicle-backdrop__body { display: flex; min-height: 540px; height: 70vh; max-height: 900px; }
+.chronicle-backdrop__surface { position: relative; flex: 1; min-width: 0; background: #394650; background-image: radial-gradient(#61717d 1px, transparent 1px); background-size: 24px 24px; }
+.chronicle-backdrop__surface svg { width: 100%; height: 100%; touch-action: none; user-select: none; }
+.chronicle-backdrop__empty { position: absolute; inset: 30px; pointer-events: none; color: #c7d1d9; font-size: 18px; }
+.chronicle-backdrop__group { fill: #57717b; fill-opacity: .18; stroke: #81959e; }
+.chronicle-backdrop__group-handle { fill: transparent; cursor: move; }
+.chronicle-backdrop svg text { fill: #edf2f5; font: 13px system-ui, sans-serif; pointer-events: none; }
+.chronicle-backdrop__note { cursor: move; }
+.chronicle-backdrop__note rect { fill: #303e48; stroke: #8498a6; stroke-width: 1.5; }
+.chronicle-backdrop__note circle { fill: #a6b1ba; }
+.chronicle-backdrop__note--confirmed circle { fill: #85caa0; }
+.chronicle-backdrop__note--developing circle { fill: #e5bc76; }
+.chronicle-backdrop__note.is-selected rect, .chronicle-backdrop__note:focus rect { stroke: #9acafa; stroke-width: 3; }
+.chronicle-backdrop svg .chronicle-backdrop__title { font-size: 16px; font-weight: 600; }
+.chronicle-backdrop svg .chronicle-backdrop__status, .chronicle-backdrop svg .chronicle-backdrop__meta { font-size: 11px; fill: #c6d4dd; }
+.chronicle-backdrop__line { fill: none; stroke: #b9c9d4; stroke-width: 2; pointer-events: none; }
+.chronicle-backdrop__line-hit { fill: none; stroke: transparent; stroke-width: 18; cursor: pointer; }
+.chronicle-backdrop svg .chronicle-backdrop__edge-label { paint-order: stroke; stroke: #394650; stroke-width: 5; stroke-linejoin: round; pointer-events: auto; cursor: pointer; }
+.chronicle-backdrop__dim { opacity: .22; }
+.chronicle-backdrop__inspector { flex: 0 0 320px; padding: 12px; overflow: auto; border-left: 1px solid #657583; }
+.chronicle-backdrop fieldset { border: 0; margin: 12px 0; padding: 0; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.chronicle-backdrop__coordinates { display: flex; gap: 10px; }
+.chronicle-backdrop__coordinates label { flex: 1; min-width: 0; }
+.chronicle-backdrop__reference { display: flex; gap: 8px; align-items: center; overflow-wrap: anywhere; }
+.chronicle-backdrop__reference span { flex: 1; min-width: 0; }
+.chronicle-backdrop small { color: #c3d1dc; }
+.chronicle-backdrop footer { padding: 12px; font-size: 12px; border-top: 1px solid #657583; }
+.chronicle-backdrop [role=alert] { padding: 12px; color: #ffd0b2; }
+@media (max-width: 720px) {
+  .chronicle-backdrop__body { display: block; height: auto; max-height: none; }
+  .chronicle-backdrop__surface { height: 55vh; min-height: 320px; }
+  .chronicle-backdrop__inspector { max-height: 60vh; border-left: 0; border-top: 1px solid #657583; }
+  .chronicle-backdrop button { min-height: 44px; }
+  .chronicle-backdrop__bar label, .chronicle-backdrop__connect label { max-width: 100%; }
+}

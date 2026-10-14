@@ -52,6 +52,7 @@ function newId(): string {
 }
 
 interface Props {
+  readonly onOpenBackdrop?: (storyId: string) => void
   readonly chronicleId: string
   readonly storyId: string
   readonly stories: readonly ChronicleStoryApiSnapshot[]
@@ -66,7 +67,7 @@ interface Props {
   readonly onSave: (guide: ChronicleStoryGuide) => Promise<boolean>
 }
 
-export function ChronicleStoryGuideWorkspace({ chronicleId, guide, readOnly, saving, onDirtyChange, onSave, initialPageId, onPageChange, storyId, stories, initialCardId, onStoryLink }: Props) {
+export function ChronicleStoryGuideWorkspace({ chronicleId, guide, readOnly, saving, onDirtyChange, onSave, initialPageId, onPageChange, storyId, stories, initialCardId, onStoryLink, onOpenBackdrop }: Props) {
   const [draft, setDraft] = useState<ChronicleStoryGuide>(() => normalizeGuidePages(guide ?? emptyGuide))
   const [pageId, setPageId] = useState(() => guide?.pages?.some((page) => page.id === initialPageId) ? initialPageId! : guide?.pages?.[0]?.id ?? FIRST_GUIDE_PAGE)
   const [pageEditorOpen, setPageEditorOpen] = useState(false)
@@ -289,7 +290,8 @@ export function ChronicleStoryGuideWorkspace({ chronicleId, guide, readOnly, sav
         <div><span>FLUJO DE PISTAS</span><p>Organiza la verdad y las rutas posibles. Solo tú ves este guion.</p></div>
         <div className="story-guide__toolbar-actions">
           <span className="story-guide__private"><i /> Solo visible para ti</span>
-          <a href={storyGraphUrl(window.location.origin, chronicleId, storyId)} target="_blank" rel="noopener noreferrer">Mapa completo del guion ↗</a>
+        <a href={storyGraphUrl(window.location.origin, chronicleId, storyId)} target="_blank" rel="noopener noreferrer">Mapa completo del guion ↗</a>
+        {onOpenBackdrop && <button type="button" onClick={() => onOpenBackdrop(storyId)}>Ver trasfondo relacionado</button>}
           {dirty ? <span className="story-guide__unsaved">El mapa mostrará la última versión guardada.</span> : null}
           <button type="button" className="story-guide__add-toolbar" disabled={readOnly || draft.cards.length >= 120} onClick={() => openEditor(null)}>＋ Añadir tarjeta</button>
           {dirty ? <span className="story-guide__unsaved">Cambios sin guardar</span> : null}
