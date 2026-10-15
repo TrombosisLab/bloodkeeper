@@ -3,7 +3,7 @@ export class BackdropApiError extends Error { constructor(readonly status: numbe
 export async function backdropRequest<T>(chronicleId: string, path: string, signal: AbortSignal, save?: { state: BackdropState; expectedRevision: number }): Promise<T> {
   const response = await fetch('/api/chronicles/' + encodeURIComponent(chronicleId) + '/backdrop' + path, {
     method: save ? 'PUT' : 'GET', credentials: 'include', cache: 'no-store', signal,
-    ...(save ? { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(save) } : {}),
+    ...(save ? { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...save, protocolVersion: 2 }) } : {}),
   })
   if (!response.ok) throw new BackdropApiError(response.status, response.status === 409
     ? 'Otra pestaña ha guardado cambios. Tu borrador sigue aquí: descárgalo antes de recargar.'

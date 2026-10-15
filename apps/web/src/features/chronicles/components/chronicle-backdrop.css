@@ -29,6 +29,21 @@
 .chronicle-backdrop__line-hit { fill: none; stroke: transparent; stroke-width: 18; cursor: pointer; }
 .chronicle-backdrop svg .chronicle-backdrop__edge-label { paint-order: stroke; stroke: #394650; stroke-width: 5; stroke-linejoin: round; pointer-events: auto; cursor: pointer; }
 .chronicle-backdrop__dim { opacity: .22; }
+.chronicle-backdrop__layer .chronicle-backdrop__group { transition: fill-opacity .15s; }
+.chronicle-backdrop__layer[data-depth="1"] .chronicle-backdrop__group { fill: #746486; stroke: #a69abb; }
+.chronicle-backdrop__layer[data-depth="2"] .chronicle-backdrop__group { fill: #887854; stroke: #b5a37a; }
+.chronicle-backdrop__layer.is-collapsed .chronicle-backdrop__group { fill-opacity: .48; stroke-width: 2; }
+.chronicle-backdrop__layer.is-selected .chronicle-backdrop__group { stroke: #a2d0fb; stroke-width: 3; }
+.chronicle-backdrop__layer [data-group-handle]:focus { outline: none; }
+.chronicle-backdrop__layer [data-group-handle]:focus rect { stroke: #a2d0fb; stroke-width: 2; }
+.chronicle-backdrop__toggle { flex-direction: row !important; align-items: center; }
+.chronicle-backdrop__breadcrumbs { display: flex; gap: 6px; padding: 8px 12px; flex-wrap: wrap; border-top: 1px solid #657583; }
+.chronicle-backdrop__references { border-top: 1px solid #657583 !important; padding-top: 12px !important; }
+.chronicle-backdrop__references li { margin: 8px 0; overflow-wrap: anywhere; }
+.chronicle-backdrop__references summary { cursor: pointer; font-size: 13px; margin: 8px 0; }
+.chronicle-backdrop.is-fullscreen { position: fixed; inset: 12px; z-index: 1100; display: flex; flex-direction: column; max-width: none; }
+.chronicle-backdrop.is-fullscreen .chronicle-backdrop__body { flex: 1; min-height: 0; height: auto; max-height: none; }
+.chronicle-backdrop.is-fullscreen header { flex-shrink: 0; }
 .chronicle-backdrop__inspector { flex: 0 0 320px; padding: 12px; overflow: auto; border-left: 1px solid #657583; }
 .chronicle-backdrop fieldset { border: 0; margin: 12px 0; padding: 0; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .chronicle-backdrop__coordinates { display: flex; gap: 10px; }
@@ -39,6 +54,8 @@
 .chronicle-backdrop footer { padding: 12px; font-size: 12px; border-top: 1px solid #657583; }
 .chronicle-backdrop [role=alert] { padding: 12px; color: #ffd0b2; }
 @media (max-width: 720px) {
+  .chronicle-backdrop.is-fullscreen { inset: 0; border-radius: 0; overflow-y: auto; }
+  .chronicle-backdrop.is-fullscreen .chronicle-backdrop__body { flex: none; min-height: 360px; }
   .chronicle-backdrop__body { display: block; height: auto; max-height: none; }
   .chronicle-backdrop__surface { height: 55vh; min-height: 320px; }
   .chronicle-backdrop__inspector { max-height: 60vh; border-left: 0; border-top: 1px solid #657583; }

@@ -4,11 +4,11 @@ export interface BackdropNote {
   time: 'past' | 'present' | 'future' | 'unspecified'; knownBy: string
   x: number; y: number; groupId: string | null; references: BackdropReference[]
 }
-export interface BackdropGroup { id: string; title: string; x: number; y: number; width: number; height: number }
+export interface BackdropGroup { id: string; title: string; x: number; y: number; width: number; height: number; parentId?: string | null; summary?: string; references?: BackdropReference[] }
 export interface BackdropLink { id: string; from: string; to: string; label: string; tentative: boolean }
-export interface BackdropState { version: 1; notes: BackdropNote[]; groups: BackdropGroup[]; links: BackdropLink[] }
+export interface BackdropState { version: 1 | 2; notes: BackdropNote[]; groups: BackdropGroup[]; links: BackdropLink[] }
 export interface BackdropSnapshot { revision: number; state: BackdropState }
-export interface ReferenceOption extends BackdropReference { label: string }
+export interface ReferenceOption extends BackdropReference { label: string; cardCount?: number; milestones?: { label: string; note: string | null; completed: boolean }[] }
 export const emptyBackdrop = (): BackdropState => ({ version: 1, notes: [], groups: [], links: [] })
 export function backdropId(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(16))
@@ -36,9 +36,13 @@ export function removeBackdropNote(state: BackdropState, id: string): BackdropSt
   return { ...state, notes: state.notes.filter(n => n.id !== id), links: state.links.filter(l => l.from !== id && l.to !== id) }
 }
 export function removeBackdropGroup(state: BackdropState, id: string): BackdropState {
-  return { ...state, groups: state.groups.filter(g => g.id !== id), notes: state.notes.map(n => n.groupId === id ? { ...n, groupId: null } : n) }
+  const parentId = state.groups.find(g => g.id === id)?.parentId ?? null
+  return { ...state, groups: state.groups.filter(g => g.id !== id).map(g => g.parentId === id ? { ...g, parentId } : g),
+    notes: state.notes.map(n => n.groupId === id ? { ...n, groupId: parentId } : n), links: state.links.filter(l => l.from !== id && l.to !== id) }
 }
 export function moveBackdropGroup(state: BackdropState, id: string, dx: number, dy: number): BackdropState {
-  return { ...state, groups: state.groups.map(g => g.id === id ? { ...g, x: g.x + dx, y: g.y + dy } : g),
-    notes: state.notes.map(n => n.groupId === id ? { ...n, x: n.x + dx, y: n.y + dy } : n) }
+  const moved = new Set([id])
+  for (let i = 0; i < state.groups.length; i++) for (const g of state.groups) if (g.parentId && moved.has(g.parentId)) moved.add(g.id)
+  return { ...state, groups: state.groups.map(g => moved.has(g.id) ? { ...g, x: g.x + dx, y: g.y + dy } : g),
+    notes: state.notes.map(n => n.groupId && moved.has(n.groupId) ? { ...n, x: n.x + dx, y: n.y + dy } : n) }
 }

@@ -32,7 +32,7 @@ export class ChronicleBackdropController {
   async references(@Req() req: { user?: { id?: unknown } }, @Param('chronicleId') raw: unknown) {
     const { chronicleId, userId } = await this.access(req, raw)
     const [stories, library, resources] = await Promise.all([
-      this.db.chronicleStory.findMany({ where: { chronicleId }, select: { id: true, title: true, narratorGuide: true }, orderBy: { title: 'asc' }, take: 201 }),
+      this.db.chronicleStory.findMany({ where: { chronicleId }, select: { id: true, title: true, narratorGuide: true, milestones: { select: { key: true, note: true, completedAt: true }, orderBy: { sortOrder: 'asc' } } }, orderBy: { title: 'asc' }, take: 201 }),
       this.db.libraryResource.findMany({ where: { ownerId: userId, status: 'active' }, select: { id: true, name: true, bindings: { where: { chronicleId, status: 'attached' }, select: { id: true } } }, orderBy: { name: 'asc' }, take: 1001 }),
       this.db.chronicleResource.findMany({ where: { chronicleId, status: 'active' }, select: { id: true, name: true }, orderBy: { name: 'asc' }, take: 1001 }),
     ])
@@ -40,14 +40,15 @@ export class ChronicleBackdropController {
     return { items: [
       ...stories.flatMap(s => {
         const cards = (s.narratorGuide as { cards?: { id: string; title: string }[] } | null)?.cards ?? []
-        return [{ kind: 'story', id: s.id, label: 'Historia · ' + s.title }, ...cards.map(c => ({ kind: 'card', id: s.id, cardId: c.id, label: 'Guion · ' + s.title + ' / ' + c.title }))]
+        const labels: Record<string, string> = { HOOK: 'Gancho', FIRST_TURN: 'Primer giro', REVELATION: 'Revelación', CLIMAX: 'Clímax', RESOLUTION: 'Resolución' }
+        return [{ kind: 'story', id: s.id, label: 'Historia · ' + s.title, cardCount: cards.length, milestones: s.milestones.map(m => ({ label: labels[m.key] ?? m.key, note: m.note, completed: m.completedAt !== null })) }, ...cards.map(c => ({ kind: 'card', id: s.id, cardId: c.id, label: 'Guion · ' + s.title + ' / ' + c.title }))]
       }),
       ...library.map(r => ({ kind: 'library', id: r.id, label: (r.bindings.length ? 'Recurso de la crónica · ' : 'Biblioteca · ') + r.name })),
       ...resources.map(r => ({ kind: 'resource', id: r.id, label: 'Recurso de la crónica · ' + r.name })),
     ] }
   }
   private async validateReferences(state: BackdropState, chronicleId: string, userId: string) {
-    const unique = new Map(state.notes.flatMap(n => n.references).map(r => [JSON.stringify(r), r]))
+    const unique = new Map([...state.notes.flatMap(n => n.references), ...state.groups.flatMap(g => g.references ?? [])].map(r => [JSON.stringify(r), r]))
     const refs = [...unique.values()]
     const [stories, library, resources] = await Promise.all([
       this.db.chronicleStory.findMany({ where: { chronicleId, id: { in: refs.filter(r => r.kind === 'story' || r.kind === 'card').map(r => r.id) } }, select: { id: true, narratorGuide: true } }),
@@ -66,12 +67,17 @@ export class ChronicleBackdropController {
   }
   @Put()
   @Header('Cache-Control', 'no-store')
-  async save(@Req() req: { user?: { id?: unknown } }, @Param('chronicleId') raw: unknown, @Body() body: { state?: unknown; expectedRevision?: unknown }) {
+  async save(@Req() req: { user?: { id?: unknown } }, @Param('chronicleId') raw: unknown, @Body() body: { state?: unknown; expectedRevision?: unknown; protocolVersion?: unknown }) {
     const { chronicleId, userId } = await this.access(req, raw)
     let state: BackdropState
     try { state = parseBackdrop(body?.state) } catch (e) { throw new BadRequestException(e instanceof Error ? e.message : 'Pizarra no válida.') }
+    if (state.version === 2 && body.protocolVersion !== 2) throw new ConflictException('Recarga la aplicación antes de editar capas anidadas.')
     const revision = body?.expectedRevision
     if (typeof revision !== 'number' || !Number.isSafeInteger(revision) || revision < 0) throw new BadRequestException('Revisión no válida.')
+    if (state.version === 1 && revision > 0) {
+      const current = await this.db.chronicleBackdrop.findUnique({ where: { chronicleId }, select: { state: true } })
+      if ((current?.state as { version?: unknown } | undefined)?.version === 2) throw new ConflictException('No se puede sustituir el mapa de capas por una versión antigua. Recarga la aplicación.')
+    }
     await this.validateReferences(state, chronicleId, userId)
     const data = state as unknown as Prisma.InputJsonValue
     if (revision === 0) {
