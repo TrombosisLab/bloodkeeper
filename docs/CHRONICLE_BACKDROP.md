@@ -2,6 +2,17 @@
 
 ## Capas narrativas y zoom
 
+### Legibilidad con muchos elementos
+
+Se conserva el rango de zoom anterior, hasta el 3 %, sin un mínimo de lectura
+del 40 %. Encajar vuelve a centrar el conjunto completo. Al alejar se ocultan
+los resúmenes antes que las etiquetas identificativas.
+Una capa con muchos hijos se despliega cuando sus etiquetas tienen espacio.
+En burbujas pequeñas se mantiene un título compacto; el resumen y los contadores
+pueden ocultarse. El título y el contenido íntegros se consultan seleccionando
+el elemento. A escalas extremas los títulos próximos pueden requerir acercarse
+para distinguirlos. La distribución manual conserva su rango de zoom anterior.
+
 La vista automática utiliza una burbuja compacta por cada capa del nivel visible
 y por cada nota suelta: no hay un número fijo. Sus dimensiones no dependen de
 los contenedores o posiciones guardados. Los títulos se reparten en líneas y
@@ -11,8 +22,8 @@ la burbuja al acercar el zoom, sin cambiar su geometría exterior.
 Doble clic o Ir a capa centra una rama; las migas permiten volver a un contexto
 superior y Encajar recupera el conjunto. Las relaciones con ramas fuera de la
 vista centrada se consultan al volver al conjunto, no se inventan destinos.
-En mapas grandes Encajar conserva una escala mínima legible: puede ser necesario
-arrastrar para recorrerlo. Los hitos siguen disponibles en el inspector.
+En mapas grandes Encajar reduce el conjunto dentro del rango de zoom anterior;
+puedes acercar o arrastrar para inspeccionarlo. Los hitos siguen en el inspector.
 
 Arrastrar en modo automático desplaza la cámara, no las posiciones persistidas.
 Desactiva Detalle automático con zoom para recuperar la distribución manual,

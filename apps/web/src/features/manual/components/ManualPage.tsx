@@ -181,6 +181,7 @@ const manualRoles: Record<ManualRole, ManualRoleDefinition> = {
       },
       {
         title: 'Trasfondo: burbujas y navegación por capas',
+        bullets: ['Puedes alejar por debajo del 40 %: se conserva el rango de zoom anterior, hasta el 3 %. Encajar vuelve a mostrar el conjunto completo, no solo la primera fila.', 'Las capas con muchos elementos se abren cuando los títulos internos tienen espacio. Las burbujas pequeñas conservan una etiqueta compacta y ocultan el resumen. A escalas extremas puede ser necesario acercar para distinguir títulos próximos; selecciona el elemento para leer el contenido completo en el inspector.'],
         paragraphs: ['La vista automática muestra una burbuja compacta por cada capa del nivel visible y por cada nota suelta. No hereda el rectángulo de sus descendientes. Al acercarte aparecen las capas internas; al alejarte se recogen sin perder sus relaciones.', 'Haz doble clic o usa Ir a capa para centrar una rama. Las migas permiten subir y Encajar recupera el conjunto. En mapas grandes puede ser necesario arrastrar para recorrer la vista manteniendo una escala legible. Las conexiones hacia ramas fuera del contexto centrado se recuperan al volver al conjunto.', 'En modo automático arrastrar desplaza la cámara. Desactiva Detalle automático con zoom para recuperar y editar las posiciones manuales guardadas. Alternar vistas o cambiar el zoom no modifica contenido ni requiere guardar. Las referencias y los hitos de consulta continúan en el inspector.'],
       },
       {

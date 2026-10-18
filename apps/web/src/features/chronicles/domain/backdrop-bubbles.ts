@@ -30,22 +30,24 @@ export function projectBubbles(state: BackdropState, scale: number, storyId = ''
       return
     }
     const original = groups.get(item.id)!
-    const expanded = box.width * scale >= 680 && box.height * scale >= 390
+    const contents = children(item.id)
+    const columns = Math.max(1, Math.ceil(Math.sqrt(contents.length)))
+    const rows = Math.max(1, Math.ceil(contents.length / columns))
+    const padding = box.width * .045, header = box.height * .23, gap = box.width * .03
+    const width = (box.width - padding * 2 - gap * (columns - 1)) / columns
+    const height = (box.height - header - padding - gap * (rows - 1)) / rows
+    // Do not reveal a crowd of anonymous children: unfold only when their
+    // labels have enough screen space. This never changes stored membership.
+    const readableChildren = !contents.length || width * scale >= 140 && height * scale >= 95
+    const expanded = box.width * scale >= 680 && box.height * scale >= 390 && readableChildren
     result.layers.push({ ...original, ...box, depth, expanded })
     if (!expanded) {
       closed(item.id, item.id)
       result.boxes.push(box)
       return
     }
-    const contents = children(item.id)
-    const padding = box.width * .045, header = box.height * .23
     result.boxes.push({ id: item.id, x: box.x, y: box.y, width: box.width, height: header })
     if (!contents.length) return
-    const columns = Math.ceil(Math.sqrt(contents.length))
-    const rows = Math.ceil(contents.length / columns)
-    const gap = box.width * .03
-    const width = (box.width - padding * 2 - gap * (columns - 1)) / columns
-    const height = (box.height - header - padding - gap * (rows - 1)) / rows
     contents.forEach((child, i) => place(child, { id: child.id, x: box.x + padding + (i % columns) * (width + gap),
       y: box.y + header + Math.floor(i / columns) * (height + gap), width, height }, depth + 1))
   }
@@ -67,6 +69,18 @@ export function projectBubbles(state: BackdropState, scale: number, storyId = ''
   // Headers without incident relations are still obstacles, not endpoints.
   for (const box of result.boxes) if (result.layers.some(g => g.id === box.id && g.expanded) && !result.links.some(l => l.from === box.id || l.to === box.id)) box.id = 'header:' + box.id
   return result
+}
+
+// Preserve the original technical range; readability must not lock navigation.
+export const MIN_BUBBLE_SCALE = .03
+export function bubbleOverviewView(boxes: LayerBox[], viewport: { width: number; height: number }) {
+  if (!boxes.length) return { x: 24, y: 24, scale: .8 }
+  const left = Math.min(...boxes.map(b => b.x)), top = Math.min(...boxes.map(b => b.y))
+  const width = Math.max(...boxes.map(b => b.x + b.width)) - left
+  const height = Math.max(...boxes.map(b => b.y + b.height)) - top
+  const scale = Math.max(MIN_BUBBLE_SCALE, Math.min(.8, (viewport.width - 48) / width, (viewport.height - 48) / height))
+  return { scale, x: (viewport.width - width * scale) / 2 - left * scale,
+    y: (viewport.height - height * scale) / 2 - top * scale }
 }
 
 export function bubbleLines(text: string, pixelWidth: number, maxLines: number, fontSize = 14): string[] {

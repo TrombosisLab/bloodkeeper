@@ -6,7 +6,7 @@ import { BackdropApiError, loadBackdrop, loadBackdropReferences, saveBackdrop } 
 import { routeGuideConnections } from '../domain/story-guide-routing'
 import { ancestry, descendants, layerBounds, projectLayers, reparentLayer, upgradeBackdrop, wrapLayer } from '../domain/backdrop-layers'
 import { BackdropReferences } from './BackdropReferences'
-import { bubbleLines, projectBubbles } from '../domain/backdrop-bubbles'
+import { bubbleLines, projectBubbles, bubbleOverviewView, MIN_BUBBLE_SCALE } from '../domain/backdrop-bubbles'
 import { BackdropBubbleLabel } from './BackdropBubbleLabel'
 import './chronicle-backdrop.css'
 
@@ -170,7 +170,7 @@ export function ChronicleBackdropWorkspace({ chronicleId, initialStoryId = '', o
   function zoom(factor: number, anchor?: { x: number; y: number }) {
     const box = canvas.current?.getBoundingClientRect(); if (!box) return
     const x = anchor?.x ?? box.width / 2, y = anchor?.y ?? box.height / 2
-    setView(v => { const scale = Math.max(.03, Math.min(1000000, v.scale * factor)), ratio = scale / v.scale; return { scale, x: x - (x - v.x) * ratio, y: y - (y - v.y) * ratio } })
+    setView(v => { const scale = Math.max(MIN_BUBBLE_SCALE, Math.min(1000000, v.scale * factor)), ratio = scale / v.scale; return { scale, x: x - (x - v.x) * ratio, y: y - (y - v.y) * ratio } })
   }
   useEffect(() => {
     const element = canvas.current
@@ -186,16 +186,17 @@ export function ChronicleBackdropWorkspace({ chronicleId, initialStoryId = '', o
     }
     element.addEventListener('wheel', wheel, { passive: false })
     return () => element.removeEventListener('wheel', wheel)
-  }, [saved !== null, denied])
+  }, [saved !== null, denied, automatic])
   function fit() {
     const box = canvas.current?.getBoundingClientRect(); if (!box) return
     if (automatic) setScope('')
     const overview = automatic ? projectBubbles(state, .01, filter) : projection
     const items = [...overview.notes.map(n => ({ ...n, width: n.displayWidth ?? 260, height: n.displayHeight ?? 140 })), ...overview.layers]
+    if (automatic) { setView(bubbleOverviewView(items, box)); return }
     if (!items.length) { setView({ x: 30, y: 30, scale: .85 }); return }
     const x = Math.min(...items.map(n => n.x)) - 40, y = Math.min(...items.map(n => n.y)) - 40
     const w = Math.max(...items.map(n => n.x + n.width)) - x + 40, h = Math.max(...items.map(n => n.y + n.height)) - y + 40
-    const scale = Math.max(automatic ? .35 : .03, Math.min(automatic ? .8 : 1, box.width / w, box.height / h))
+    const scale = Math.max(.03, Math.min(1, box.width / w, box.height / h))
     setView({ scale, x: (box.width - w * scale) / 2 - x * scale, y: (box.height - h * scale) / 2 - y * scale })
   }
   useEffect(() => { if (saved && automatic) fit() }, [saved !== null, generation, automatic])
