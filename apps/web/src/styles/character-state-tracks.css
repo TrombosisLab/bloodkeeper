@@ -1,0 +1,33 @@
+/* Shared internal indicator layout: desktop, tablet and mobile.
+   Scope to the compact state strip; preserve card layout and game state. */
+body .character-sheet.character-sheet--dashboard .character-sheet__compact-state-strip .humanity-track {
+  display: grid !important;
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important;
+  gap: 2px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
+body .character-sheet.character-sheet--dashboard .character-sheet__compact-state-strip .humanity-box {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 16px !important;
+  height: 14px !important;
+  box-sizing: border-box;
+}
+body .character-sheet.character-sheet--dashboard .state-card--hunger .hunger-track {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  padding: 7px !important;
+  min-width: 0 !important;
+  min-height: 34px !important;
+  width: 100% !important;
+  box-sizing: border-box;
+}
+body .character-sheet.character-sheet--dashboard .state-card--hunger .hunger-drop {
+  flex: 0 0 12px !important;
+  width: 12px !important;
+  height: 15px !important;
+  box-sizing: border-box;
+}

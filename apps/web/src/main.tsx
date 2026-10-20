@@ -50,7 +50,10 @@ import './styles/app-shell-responsive.css';
 import './styles/bloodkeeper-visual-system.css';
 
 import './styles/v5-visual-assets.css'
+import './styles/character-state-tracks.css'
+import './styles/tablet-character-shell.css'
 import './styles/primary-workspaces.css'
+import './styles/tablet-workspaces.css'
 function CharacterCreationModal({
   children,
 }: {
