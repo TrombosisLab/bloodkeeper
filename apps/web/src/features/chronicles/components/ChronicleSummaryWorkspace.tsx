@@ -245,8 +245,8 @@ export function ChronicleSummaryWorkspace({
         <section className="summary-card summary-card--overview">
           <div className="summary-card__heading">
             <h3>Visi&oacute;n general</h3>
-            <ChronicleContextExport key={chronicle.id} chronicle={chronicle} active={active} />
-            {canManage ? <ChronicleNarratorExport key={chronicle.id} chronicle={chronicle} active={active} /> : null}
+            <ChronicleContextExport key={`context-export:${chronicle.id}`} chronicle={chronicle} active={active} />
+            {canManage ? <ChronicleNarratorExport key={`narrator-export:${chronicle.id}`} chronicle={chronicle} active={active} /> : null}
           </div>
           <div className="summary-block-grid">
             <article>
