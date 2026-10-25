@@ -35,6 +35,7 @@ import type {
 } from '../types/user-administration.types'
 
 import { LifecycleTrashPanel } from './LifecycleTrashPanel'
+import { ApplicationIdentityPanel } from './ApplicationIdentityPanel'
 
 import './administration-hub.css'
 
@@ -55,6 +56,7 @@ const roles:
   ]
 
 type AdministrationTab =
+  | 'identity'
   | 'users'
   | 'trash'
   | 'system'
@@ -662,7 +664,10 @@ export function AdministrationHub() {
         >
           Copias de seguridad
         </button>
+        <button type="button" className={activeTab === 'identity' ? 'administration-hub__tab administration-hub__tab--active' : 'administration-hub__tab'} aria-pressed={activeTab === 'identity'} onClick={() => setActiveTab('identity')}>Identidad</button>
       </nav>
+
+      {activeTab === 'identity' && <ApplicationIdentityPanel />}
 
       {activeTab === 'users' ? (
         <div className="administration-hub__workspace">

@@ -3,6 +3,8 @@ import {
 } from '@nestjs/common'
 
 export type AdministrationAuditAction =
+  | 'application.icon.update'
+  | 'application.icon.reset'
   | 'user.admin.create'
   | 'user.admin.update'
   | 'user.admin.roles.update'

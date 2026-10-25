@@ -1,0 +1,10 @@
+.bk-install { margin: 12px 0; min-width: 0; }
+.bk-install .bk-install__button { width: 100%; min-height: 44px; padding: 10px; border: 1px solid #985762; border-radius: 8px; color: #f1e8e3; background: #35171e; font: inherit; cursor: pointer; white-space: normal; }
+.bk-install__message, .bk-install__installed { margin: 8px 0; font-size: .8rem; line-height: 1.4; overflow-wrap: anywhere; }
+.bk-install .bk-install__dialog { box-sizing: border-box; width: min(560px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto; padding: 22px; color: #f1e8e3; background: #171013; border: 1px solid #985762; border-radius: 12px; line-height: 1.5; }
+.bk-install__dialog::backdrop { background: rgb(0 0 0 / .75); }
+.bk-install__dialog h2 { margin-top: 0; font-family: Georgia, serif; }
+.bk-install__dialog li { margin: 10px 0; }
+.bk-install__dialog form { display: flex; justify-content: flex-end; }
+.bk-install__dialog form button { min-height: 44px; padding: 8px 18px; color: #f1e8e3; background: #35171e; border: 1px solid #985762; border-radius: 6px; font: inherit; cursor: pointer; }
+.bk-install button:focus-visible { outline: 2px solid #e4b680; outline-offset: 3px; }

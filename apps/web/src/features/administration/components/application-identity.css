@@ -1,0 +1,9 @@
+.application-identity { min-width: 0; overflow-wrap: anywhere; }
+.application-identity__previews { display: flex; flex-wrap: wrap; gap: 20px; margin-block: 20px; }
+.application-identity figure { margin: 0; max-width: 200px; }
+.application-identity figure img { width: 144px; height: 144px; object-fit: contain; background: #171013; border: 1px solid #985762; border-radius: 16px; }
+.application-identity figcaption { margin-top: 8px; }
+.application-identity label { display: grid; gap: 8px; }
+.application-identity input { max-width: 100%; min-width: 0; box-sizing: border-box; }
+.application-identity__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-block: 20px; }
+.application-identity button { min-height: 44px; white-space: normal; }

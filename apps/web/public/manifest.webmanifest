@@ -1,0 +1,18 @@
+{
+  "id": "/",
+  "name": "BloodKeeper",
+  "short_name": "BloodKeeper",
+  "description": "Crónicas de Vampiro V5. Requiere conexión al servidor; sin modo sin conexión.",
+  "lang": "es",
+  "start_url": "/?chronicle-space=fresh&source=installed#/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#100d0e",
+  "theme_color": "#171013",
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "/icons/bloodkeeper-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/bloodkeeper-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/bloodkeeper-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

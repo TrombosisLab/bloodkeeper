@@ -4,6 +4,8 @@ import React, {
   useState,
 } from 'react'
 import ReactDOM from 'react-dom/client'
+import { refreshApplicationIdentity } from './features/installation/application-identity'
+void refreshApplicationIdentity()
 import { createPortal } from 'react-dom'
 
 import { AdministrationHub } from './features/administration/components/AdministrationHub'

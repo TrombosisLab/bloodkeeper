@@ -8,6 +8,7 @@ import { SystemOperationsController } from './system-operations.controller'
 import { LifecycleTrashController } from './lifecycle-trash.controller'
 import { LifecycleTrashService } from './lifecycle-trash.service'
 import { StorageUsageController } from './storage-usage.controller'
+import { ApplicationIdentityController } from './application-identity.controller'
 
 @Module({
   imports: [DatabaseModule],
@@ -17,6 +18,7 @@ import { StorageUsageController } from './storage-usage.controller'
     BackupRequestController,
     LifecycleTrashController,
     StorageUsageController,
+    ApplicationIdentityController,
   ],
   providers: [
     BackupStatusService,

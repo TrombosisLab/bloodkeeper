@@ -20,6 +20,16 @@ interface ManualRoleDefinition {
   readonly quickStart: string
 }
 
+const installationManual: ManualSection = {
+  title: 'Instalar BloodKeeper como aplicación',
+  paragraphs: ['Abre la dirección HTTPS de BloodKeeper. Cloudflare gestiona el certificado público: no hay que instalar certificados en el dispositivo. El acceso por IP local con HTTP no ofrece las mismas condiciones de instalación.', 'En el menú de secciones encontrarás Instalar aplicación. Si el navegador ofrece la instalación, ese botón abre su confirmación; en caso contrario muestra instrucciones. Android: menú de Chrome → Instalar aplicación o Añadir a pantalla de inicio. iPhone/iPad: Compartir → Añadir a pantalla de inicio. PC: icono de instalación de Chrome/Edge o su menú.', 'La aplicación siempre necesita conexión al servidor; no incorpora modo offline, cola de escrituras ni caché de datos privados. Mantiene las mismas cuentas y permisos. Cerrar la ventana no cierra la sesión: utiliza Cerrar sesión en dispositivos compartidos. La instalación pertenece a la dirección utilizada: los entornos de prueba y producción son distintos.'],
+}
+
+const applicationIdentityManual: ManualSection = {
+  title: 'Identidad de la aplicación: icono de instalación',
+  paragraphs: ['Administración → Identidad permite previsualizar y guardar un icono común para toda BloodKeeper, o restaurar el predeterminado. Solo los administradores pueden cambiarlo. El icono es público: no uses imágenes privadas de la crónica.', 'Admite PNG, JPEG y WebP estáticos, hasta 5 MB y 16 megapíxeles. Se generan los tamaños necesarios sin recortar, conservando la proporción y añadiendo margen sobre fondo oscuro para las formas redondas. El icono se conserva en la base de datos y en sus copias de seguridad; reconstruir Docker no lo elimina.', 'El navegador decide cuándo actualizar el icono de una aplicación ya instalada. No cambia las cuentas, permisos ni requisitos de conexión. El acceso HTTP por IP local sigue funcionando; HTTPS solo es necesario para la instalación compatible.'],
+}
+
 const relationshipManual: ManualSection = {
   title: 'Relaciones: mapa privado y mapas compartidos',
   paragraphs: ['Sala de Investigación → Relaciones ofrece dos mapas por persona y por crónica, tanto para jugadores como para el Narrador. Mi mapa privado solo puede verlo y editarlo su propietario; ni dirigir la mesa ni tener rol de administrador permite consultar el mapa privado de otra persona.', 'Mapas compartidos reúne los mapas visibles para la coterie en un selector. Mi mapa compartido es editable; los de los demás son de solo lectura. Compartido no significa accesible fuera de la crónica: hace falta ser el Narrador de esa mesa o mantener participación activa.'],
@@ -31,6 +41,7 @@ const manualRoles: Record<ManualRole, ManualRoleDefinition> = {
     badge: 'Rol global · admin',
     introduction: 'Se ocupa de la instalación, la salud técnica y las cuentas globales. El rol de administrador no sustituye el papel de narrador dentro de una crónica.',
     sections: [
+      applicationIdentityManual,
       {
         title: 'Primer arranque e instalación',
         paragraphs: ['La instalación se hace desde una máquina anfitriona con Docker y acceso SSH. Clona el repositorio, entra en su carpeta y ejecuta el instalador.'],
@@ -362,7 +373,7 @@ function RolePanel({ role }: { readonly role: ManualRole }) {
       </div>
 
       <div className="manual-guide-grid">
-        {definition.sections.map((section, index) => <GuideSection key={section.title} section={section} index={index} />)}
+        {[installationManual, ...definition.sections].map((section, index) => <GuideSection key={section.title} section={section} index={index} />)}
       </div>
 
       <div className="manual-quick-start">

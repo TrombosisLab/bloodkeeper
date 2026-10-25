@@ -9,6 +9,7 @@ import type {
 } from '../types/app-navigation.types'
 
 import './app-navigation.css'
+import { InstallApplication } from '../../installation/InstallApplication'
 
 interface AppNavigationProps {
   readonly 'aria-label': string
@@ -238,6 +239,7 @@ export function AppNavigation({
           <span>Manual</span>
           <small>Guía de uso por permisos</small>
         </button>
+        <InstallApplication />
       </nav>
     </aside>
   )
