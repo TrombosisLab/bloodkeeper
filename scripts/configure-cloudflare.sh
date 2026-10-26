@@ -105,12 +105,14 @@ COMPOSE=(
 )
 
 prepare_cloudflared_image() {
-  if "${DOCKER[@]}" image inspect "$CLOUDFLARED_IMAGE" >/dev/null 2>&1; then
-    return
-  fi
+  local version oldest
 
-  printf 'Descargando la imagen de Cloudflare: %s\n' "$CLOUDFLARED_IMAGE"
   "${DOCKER[@]}" pull "$CLOUDFLARED_IMAGE"
+  version="$("${DOCKER[@]}" run --rm --entrypoint cloudflared "$CLOUDFLARED_IMAGE" --version 2>&1 | sed -nE 's/^cloudflared version ([0-9]+\.[0-9]+\.[0-9]+).*/\1/p')"
+  [ -n "$version" ] || die "No se pudo comprobar la versión de Cloudflared."
+  oldest="$(printf '%s\n%s\n' '2026.10.2' "$version" | sort -V | sed -n '1p')"
+  [ "$oldest" = '2026.10.2' ] || die "Cloudflared $version es anterior al mínimo seguro 2026.10.2."
+  printf 'Versión de Cloudflared verificada: %s\n' "$version"
 }
 
 write_host_override() {
