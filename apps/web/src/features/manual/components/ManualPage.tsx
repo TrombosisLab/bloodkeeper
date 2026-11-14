@@ -9,6 +9,13 @@ interface ManualSection {
   readonly paragraphs?: readonly string[]
   readonly bullets?: readonly string[]
   readonly commands?: readonly string[]
+  readonly steps?: readonly ManualGuideStep[]
+}
+
+interface ManualGuideStep {
+  readonly title: string
+  readonly description: string
+  readonly bullets?: readonly string[]
 }
 
 interface ManualRoleDefinition {
@@ -275,6 +282,56 @@ const manualRoles: Record<ManualRole, ManualRoleDefinition> = {
         bullets: ['Inicio resume tus crónicas y accesos.', 'Personajes crea y consulta tus fichas.', 'Jugar permite participar en la mesa.', 'Mapa consulta la cartografía disponible.', 'Sala de Investigación reúne tus notas y la memoria compartida.', 'Crónicas revisa tu participación y sesiones.', 'Historia reúne la documentación del mundo y, en su pestaña Crónicas, los resúmenes compartidos de tus mesas.'],
       },
       {
+        title: 'Guía rápida: crear un personaje desde cero',
+        paragraphs: ['No necesitas conocer las reglas para empezar. Abre Personajes → Crear personaje y sigue el asistente en orden. Si tienes dudas sobre una decisión de la historia, consúltala con el Narrador; la guía no elige por ti ni cambia tu ficha.'],
+        steps: [
+          {
+            title: 'Piensa en una idea sencilla',
+            description: 'Antes de rellenar números, imagina quién es, qué quiere y qué problema podría complicarle la vida. Una frase basta: «una médica que quiere proteger a su barrio, pero no confía en nadie». Puedes cambiar la idea mientras avanzas.',
+          },
+          {
+            title: 'Elige cómo empieza',
+            description: 'El asistente ofrece dos caminos. Elige el que haya acordado la mesa; no son dos grados de dificultad.',
+            bullets: [
+              'Comenzar como humano (Sesión 0): crea primero la vida mortal del personaje. Si la historia incluye el Abrazo más adelante, el Narrador podrá iniciar esa transición; no hace falta inventar ahora sus decisiones vampíricas.',
+              'Creación vampírica estándar: crea un vampiro desde el principio y recorre también los pasos de Sangre y Disciplinas.',
+            ],
+          },
+          {
+            title: 'Identidad: ponle cara a la idea',
+            description: 'Escribe su nombre y completa los datos que pida la pantalla, como concepto y crónica. El concepto es una frase corta sobre quién es, no una historia larga. Elige Clan solo cuando hayas escogido la creación vampírica estándar o cuando el flujo te lo solicite.',
+          },
+          {
+            title: 'Atributos: qué se le da bien por naturaleza',
+            description: 'Representan capacidades físicas, sociales y mentales. Reparte los puntos que indique el asistente pensando en cómo resuelve problemas tu personaje; no necesitas memorizar las reglas. Si no sabes qué priorizar, vuelve a tu idea y pregunta al Narrador.',
+          },
+          {
+            title: 'Habilidades: qué ha aprendido',
+            description: 'Elige las habilidades que encajen con su vida y experiencia. Una habilidad alta describe algo que sabe hacer; no obliga a interpretar al personaje de una sola manera. Añade especialidades si el asistente las ofrece y tienes claro en qué destaca.',
+          },
+          {
+            title: 'Sigue el camino elegido',
+            description: 'La creación estándar añade los pasos propios del vampiro; Sesión 0 los omite para que primero construyas al humano.',
+            bullets: [
+              'Vampiro estándar: completa Sangre y después Disciplinas siguiendo las opciones y avisos del asistente. Si no entiendes una elección, déjala para hablarla con el Narrador.',
+              'Sesión 0 humana: continúa directamente con Ventajas. No necesitas escoger generación, poderes ni otros rasgos vampíricos todavía.',
+            ],
+          },
+          {
+            title: 'Ventajas y defectos: apoyos y complicaciones',
+            description: 'Escoge opciones que den juego a la idea del personaje. Lee su descripción y sus límites; no elijas algo solo por el nombre. Algunas opciones tienen valor fijo o requisitos: el asistente muestra cómo se seleccionan. Los defectos son complicaciones para interpretar, no un castigo que debas ocultar.',
+          },
+          {
+            title: 'Humanidad, revisión y guardado',
+            description: 'Completa las convicciones, piedras de toque y demás campos que aparezcan. Después revisa el resumen: corrige los avisos que muestre el asistente y guarda o finaliza la ficha. La pantalla confirma cuando se ha guardado; salir antes puede dejar el proceso sin terminar.',
+          },
+          {
+            title: 'Ya en partida: usa la ficha como referencia',
+            description: 'Cuando el Narrador te pida una tirada, explica qué intentas hacer y consulta con él qué capacidades aplicar. La ficha ayuda a describir al personaje; no hace falta conocer de memoria todas las reglas para jugar.',
+          },
+        ],
+      },
+      {
         title: 'Crear y cuidar tu personaje',
         paragraphs: ['En Personajes crea la ficha por pasos y guarda los cambios antes de salir.'],
         bullets: ['Completa identidad, concepto, clan, atributos, habilidades y demás campos.', 'El nombre de la crónica asociada se obtiene de la asociación persistida.', 'Puedes conservar la ficha independiente hasta asociarla a una crónica.', 'Desasociar retira la relación con la crónica, pero conserva la ficha y su historial.', 'Archiva una ficha que ya no uses en vez de borrarla sin necesidad.'],
@@ -346,6 +403,24 @@ function GuideSection({ section, index }: { readonly section: ManualSection; rea
       <summary>{section.title}</summary>
       <div className="manual-guide-card__body">
         {section.paragraphs?.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+        {section.steps?.length ? (
+          <ol className="manual-guide-steps">
+            {section.steps.map((step) => (
+              <li key={step.title}>
+                <div>
+                  <strong>{step.title}</strong>
+                  <p>{step.description}</p>
+                  {step.bullets?.length ? (
+                    <ul>
+                      {step.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ol>
+        ) : null}
+
         {section.commands?.length ? (
           <div className="manual-guide-card__commands" aria-label="Comandos">
             {section.commands.map((command) => <code key={command}>{command}</code>)}

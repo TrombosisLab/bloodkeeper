@@ -265,3 +265,45 @@
   .manual-role-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .35rem; overflow: visible; }
   .manual-role-tabs button { min-width: 0; padding-inline: .3rem; font-size: .82rem; overflow-wrap: anywhere; }
 }
+
+
+.manual-guide-steps {
+  display: grid;
+  gap: .65rem;
+  margin: .9rem 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: manual-step;
+}
+
+.manual-guide-steps > li {
+  display: grid;
+  grid-template-columns: 1.8rem minmax(0, 1fr);
+  align-items: start;
+  gap: .65rem;
+  counter-increment: manual-step;
+}
+
+.manual-guide-steps > li::before {
+  display: grid;
+  width: 1.7rem;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid rgba(215, 91, 115, .55);
+  border-radius: 50%;
+  color: #f0b6c0;
+  background: rgba(84, 24, 43, .3);
+  content: counter(manual-step);
+  font-size: .75rem;
+  font-weight: 800;
+}
+
+.manual-guide-steps > li > div {
+  min-width: 0;
+  padding: 0 0 .6rem;
+  border-bottom: 1px solid rgba(105, 53, 68, .42);
+}
+
+.manual-guide-steps strong { color: #f3dfd9; }
+.manual-guide-steps p { margin: .25rem 0 .35rem; }
+.manual-guide-steps ul { margin: .35rem 0 0; padding-left: 1.15rem; }
