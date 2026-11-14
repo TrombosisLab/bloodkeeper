@@ -3545,3 +3545,26 @@
     padding-left: clamp(12px, 4vw, 24px);
   }
 }
+.advantage-sheet-entry.advantage-sheet-entry--selected {
+  border-color: var(--color-border-accent);
+  box-shadow: inset 3px 0 0 var(--color-border-accent);
+}
+
+.advantage-fixed-rating-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.advantage-fixed-rating-control__status {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+}
+
+.advantage-fixed-rating-control--selected
+.advantage-fixed-rating-control__status {
+  color: var(--color-accent);
+  font-weight: 700;
+}

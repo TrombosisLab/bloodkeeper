@@ -1095,18 +1095,39 @@ export function AdvantagesStep({
                             (() => {
                               const selected =
                                 selections[0]
+                              const fixedRating =
+                                definition.allowedRatings.length === 1
+                              const rating =
+                                definition.allowedRatings[0]
 
                               if (!selected) {
+                                if (fixedRating) {
+                                  return (
+                                    <div className="advantage-fixed-rating-control">
+                                      <span className="advantage-fixed-rating-control__status">
+                                        Valor fijo · {rating}{' '}
+                                        {rating === 1 ? 'punto' : 'puntos'}
+                                      </span>
+                                      <button
+                                        type="button"
+                                        className="advantage-action-button"
+                                        aria-pressed="false"
+                                        onClick={() =>
+                                          addSelection(
+                                            definition,
+                                            rating,
+                                          )
+                                        }
+                                      >
+                                        Seleccionar
+                                      </button>
+                                    </div>
+                                  )
+                                }
+
                                 return (
                                   <AdvantageRatingControl
-                                    value={
-                                      definition.allowedRatings.length === 1
-                                        ? definition.allowedRatings[0]
-                                        : 0
-                                    }
-                                    fixedRating={
-                                      definition.allowedRatings.length === 1
-                                    }
+                                    value={0}
                                     allowedRatings={
                                       definition.allowedRatings
                                     }
@@ -1116,17 +1137,36 @@ export function AdvantagesStep({
                                         definition.allowedRatings.length - 1
                                       ]
                                     }
-                                    onChange={(
-                                      rating,
-                                    ) =>
+                                    onChange={(rating) =>
                                       addSelection(
                                         definition,
-                                        definition.allowedRatings.length === 1
-                                          ? definition.allowedRatings[0]
-                                          : rating,
+                                        rating,
                                       )
                                     }
                                   />
+                                )
+                              }
+
+                              if (fixedRating) {
+                                return (
+                                  <div className="advantage-fixed-rating-control advantage-fixed-rating-control--selected">
+                                    <span className="advantage-fixed-rating-control__status">
+                                      Seleccionada · {selected.rating}{' '}
+                                      {selected.rating === 1 ? 'punto' : 'puntos'}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      className="advantage-action-button"
+                                      aria-pressed="true"
+                                      onClick={() =>
+                                        removeSelection(
+                                          selected.selectionId,
+                                        )
+                                      }
+                                    >
+                                      Quitar
+                                    </button>
+                                  </div>
                                 )
                               }
 
