@@ -129,3 +129,7 @@
     min-height: 0;
   }
 }
+
+/* BLOODKEEPER_RESOURCE_LIST_COMPACT_V1 */
+.chronicle-resource-catalog__browser li strong{grid-column:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.chronicle-resource-catalog__browser li em{grid-column:2;grid-row:1;align-self:center;color:var(--color-success);font-size:.68rem;font-style:normal;white-space:nowrap}
