@@ -328,10 +328,16 @@ export function ChronicleSpacePrototype() {
   const archiveQuery = archiveSearch.trim().toLocaleLowerCase()
   const archiveTextMatches = (values: readonly (string | null | undefined)[]) => !archiveQuery || values.filter(Boolean).join(' ').toLocaleLowerCase().includes(archiveQuery)
   const archiveNotes = useMemo(() => sortArchiveItems(archiveFilter !== 'ALL' && archiveFilter !== 'NOTES' ? [] : notes.filter((note) => archiveTextMatches([note.title, note.content, note.visibility])), archiveSort, (item) => item.title, (item) => item.updatedAt), [archiveFilter, archiveQuery, archiveSort, notes])
-  const archivePeople = useMemo(() => sortArchiveItems(archiveFilter !== 'ALL' && archiveFilter !== 'PEOPLE' ? [] : (context?.npcs || []).filter((item) => archiveTextMatches([item.name, item.category, item.narrativeRole, item.description])), archiveSort, (item) => item.name), [archiveFilter, archiveQuery, archiveSort, context])
-  const archivePlaces = useMemo(() => sortArchiveItems(archiveFilter !== 'ALL' && archiveFilter !== 'PLACES' ? [] : (context?.locations || []).filter((item) => archiveTextMatches([item.name, item.category, item.description])), archiveSort, (item) => item.name), [archiveFilter, archiveQuery, archiveSort, context])
   // CHRONICLE_SPACE_ARCHIVE_RESOURCE_KINDS_V1
   const archiveResources = context?.resources || []
+  const archivePeople = useMemo(() => sortArchiveItems(archiveFilter !== 'ALL' && archiveFilter !== 'PEOPLE' ? [] : [
+    ...(context?.npcs || []).map((item) => ({ id: item.id, name: item.name, category: item.category, narrativeRole: item.narrativeRole, description: item.description })),
+    ...archiveResources.filter((item) => item.kind === 'NPC').map((item) => ({ id: item.id, name: item.name, category: null, narrativeRole: null, description: item.summary })),
+  ].filter((item) => archiveTextMatches([item.name, item.category, item.narrativeRole, item.description])), archiveSort, (item) => item.name), [archiveFilter, archiveQuery, archiveSort, archiveResources, context])
+  const archivePlaces = useMemo(() => sortArchiveItems(archiveFilter !== 'ALL' && archiveFilter !== 'PLACES' ? [] : [
+    ...(context?.locations || []).map((item) => ({ id: item.id, name: item.name, category: item.category, description: item.description })),
+    ...archiveResources.filter((item) => item.kind === 'LOCATION').map((item) => ({ id: item.id, name: item.name, category: null, description: item.summary })),
+  ].filter((item) => archiveTextMatches([item.name, item.category, item.description])), archiveSort, (item) => item.name), [archiveFilter, archiveQuery, archiveSort, archiveResources, context])
   const archiveOrganizations = useMemo(() => sortArchiveItems(archiveFilter !== 'ALL' && archiveFilter !== 'ORGANIZATIONS' ? [] : archiveResources.filter((item) => item.kind === 'ORGANIZATION' && archiveTextMatches([item.name, item.summary])), archiveSort, (item) => item.name), [archiveFilter, archiveQuery, archiveResources, archiveSort])
   const archiveArtifacts = useMemo(() => sortArchiveItems(archiveFilter !== 'ALL' && archiveFilter !== 'ARTIFACTS' ? [] : archiveResources.filter((item) => item.kind === 'ARTIFACT' && archiveTextMatches([item.name, item.summary])), archiveSort, (item) => item.name), [archiveFilter, archiveQuery, archiveResources, archiveSort])
   const archiveDocuments = useMemo(() => sortArchiveItems(archiveFilter !== 'ALL' && archiveFilter !== 'DOCUMENTS' ? [] : archiveResources.filter((item) => item.kind === 'DOCUMENT' && archiveTextMatches([item.name, item.summary])), archiveSort, (item) => item.name), [archiveFilter, archiveQuery, archiveResources, archiveSort])

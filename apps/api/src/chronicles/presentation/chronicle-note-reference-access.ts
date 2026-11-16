@@ -155,18 +155,36 @@ export async function findNoteReferenceTarget(
           deepProfile: true,
         },
       })
-      if (!row) return null
-      return {
-        ...emptyTarget(row.id),
-        label: row.name,
-        category: row.category,
-        description: row.description,
-        status: row.status,
-        narrativeRole: row.narrativeRole,
-        detailLevel: row.detailLevel,
-        narratorDetails: row.notes,
-        deepProfile: row.deepProfile,
+      if (row) {
+        return {
+          ...emptyTarget(row.id),
+          label: row.name,
+          category: row.category,
+          description: row.description,
+          status: row.status,
+          narrativeRole: row.narrativeRole,
+          detailLevel: row.detailLevel,
+          narratorDetails: row.notes,
+          deepProfile: row.deepProfile,
+        }
       }
+      const resource = await database.libraryResource.findFirst({
+        where: {
+          id: targetId,
+          status: 'active',
+          kind: 'npc',
+          bindings: {
+            some: {
+              chronicleId,
+              status: 'attached',
+              ...(narrator ? {} : { OR: [{ visibility: 'chronicle_participants' }, ...(options.userId ? [{ visibility: 'selected_players', audiences: { some: { userId: options.userId } } }] : [])] }),
+            },
+          },
+        },
+        select: { id: true, name: true, kind: true, summary: true, narratorNotes: true, metadata: true, status: true },
+      })
+      if (!resource) return null
+      return resourceTarget(resource)
     }
     case 'LOCATION': {
       const row = await database.chronicleLocation.findFirst({
@@ -181,16 +199,33 @@ export async function findNoteReferenceTarget(
           parentLocationId: true,
         },
       })
-      if (!row) return null
-      return {
-        ...emptyTarget(row.id),
-        label: row.name,
-        category: row.category,
-        description: row.description,
-        status: row.status,
-        narratorDetails: row.narratorNotes,
-        parentLocationId: row.parentLocationId,
+      if (row) {
+        return {
+          ...emptyTarget(row.id),
+          label: row.name,
+          category: row.category,
+          description: row.description,
+          status: row.status,
+          narratorDetails: row.narratorNotes,
+          parentLocationId: row.parentLocationId,
+        }
       }
+      const resource = await database.libraryResource.findFirst({
+        where: {
+          id: targetId,
+          status: 'active',
+          kind: 'location',
+          bindings: {
+            some: {
+              chronicleId,
+              status: 'attached',
+              ...(narrator ? {} : { OR: [{ visibility: 'chronicle_participants' }, ...(options.userId ? [{ visibility: 'selected_players', audiences: { some: { userId: options.userId } } }] : [])] }),
+            },
+          },
+        },
+        select: { id: true, name: true, kind: true, summary: true, narratorNotes: true, metadata: true, status: true },
+      })
+      return resource ? resourceTarget(resource) : null
     }
     case 'EVENT': {
       const row = await database.chronicleEvent.findFirst({

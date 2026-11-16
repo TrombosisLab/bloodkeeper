@@ -41,7 +41,7 @@ test(
 
     assert.equal(target.label, 'Informe')
     assert.equal(
-      database.calls[0].where.bindings.some.visibility,
+      database.calls[0].where.bindings.some.OR[0].visibility,
       'chronicle_participants',
     )
     assert.equal(database.calls[0].where.kind, 'document')
@@ -107,3 +107,66 @@ test(
     assert.equal(previewImageType('DOCUMENT'), 'RESOURCE')
   },
 )
+
+test('archive preview resolves linked library NPCs while enforcing binding visibility', async () => {
+  const calls = []
+  const database = {
+    chronicleNpc: { async findFirst() { return null } },
+    libraryResource: {
+      async findFirst(args) {
+        calls.push(args)
+        return {
+          id: 'shared-npc',
+          name: 'Alba Varela',
+          kind: 'npc',
+          summary: 'La descripción compartida.',
+          narratorNotes: 'Secreto del Narrador.',
+          metadata: { secret: true },
+          status: 'active',
+        }
+      },
+    },
+  }
+
+  const target = await findNoteReferenceTarget(database, {
+    chronicleId: 'chronicle-id',
+    targetType: 'NPC',
+    targetId: 'shared-npc',
+    narrator: false,
+    userId: 'player-id',
+  })
+
+  assert.equal(target.label, 'Alba Varela')
+  assert.equal(target.description, 'La descripción compartida.')
+  assert.equal(target.narratorDetails, 'Secreto del Narrador.')
+  assert.deepEqual(calls[0].where.bindings.some.OR, [
+    { visibility: 'chronicle_participants' },
+    { visibility: 'selected_players', audiences: { some: { userId: 'player-id' } } },
+  ])
+})
+
+test('archive preview cannot resolve a narrator-only linked location for a player', async () => {
+  const calls = []
+  const database = {
+    chronicleLocation: { async findFirst() { return null } },
+    libraryResource: {
+      async findFirst(args) {
+        calls.push(args)
+        return null
+      },
+    },
+  }
+
+  const target = await findNoteReferenceTarget(database, {
+    chronicleId: 'chronicle-id',
+    targetType: 'LOCATION',
+    targetId: 'private-place',
+    narrator: false,
+    userId: 'player-id',
+  })
+
+  assert.equal(target, null)
+  assert.equal(calls[0].where.kind, 'location')
+  assert.equal(calls[0].where.bindings.some.OR[0].visibility, 'chronicle_participants')
+  assert.equal(calls[0].where.bindings.some.OR[1].visibility, 'selected_players')
+})
