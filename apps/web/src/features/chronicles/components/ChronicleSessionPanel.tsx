@@ -69,6 +69,8 @@ interface SessionFormState {
   readonly realDate: string
   readonly summary: string
   readonly narratorNotes: string
+  readonly objective: string
+  readonly plannedSummary: string
 }
 
 const emptyForm: SessionFormState = {
@@ -77,6 +79,8 @@ const emptyForm: SessionFormState = {
   realDate: '',
   summary: '',
   narratorNotes: '',
+  objective: '',
+  plannedSummary: '',
 }
 
 interface ChronicleSessionPanelProps {
@@ -160,6 +164,8 @@ function requestFromForm(
       optionalText(
         form.narratorNotes,
       ),
+    objective: optionalText(form.objective),
+    plannedSummary: optionalText(form.plannedSummary),
   }
 }
 
@@ -179,6 +185,8 @@ function formFromSession(
     summary: session.summary ?? '',
     narratorNotes:
       session.narratorNotes ?? '',
+    objective: session.objective ?? '',
+    plannedSummary: session.plannedSummary ?? '',
   }
 }
 
@@ -775,11 +783,38 @@ export function ChronicleSessionPanel({
         </label>
 
         <label className="chronicle-session-panel__wide-field">
-          <span>Resumen narrativo</span>
+          <span>Objetivo de la sesión</span>
+          <textarea
+            name={`${prefix}-objective`}
+            rows={2}
+            value={form.objective}
+            placeholder="Qué quieres que avance o cambie durante la sesión"
+            onChange={(event) =>
+              updateField('objective', event.target.value)
+            }
+          />
+        </label>
+
+        <label className="chronicle-session-panel__wide-field">
+          <span>Resumen previsto · preparación privada</span>
+          <textarea
+            name={`${prefix}-planned-summary`}
+            rows={3}
+            value={form.plannedSummary}
+            placeholder="Qué podría ocurrir, qué está en juego y qué consecuencias prevés"
+            onChange={(event) =>
+              updateField('plannedSummary', event.target.value)
+            }
+          />
+        </label>
+
+        <label className="chronicle-session-panel__wide-field">
+          <span>Resumen de lo sucedido</span>
           <textarea
             name={`${prefix}-summary`}
             rows={3}
             value={form.summary}
+            placeholder="Anota aquí lo ocurrido después de jugar; este resumen puede compartirse con la crónica"
             onChange={(event) =>
               updateField(
                 'summary',
@@ -790,7 +825,7 @@ export function ChronicleSessionPanel({
         </label>
 
         <label className="chronicle-session-panel__wide-field">
-          <span>Notas privadas del Narrador</span>
+          <span>Notas privadas del Narrador · secretos y recordatorios</span>
           <textarea
             name={`${prefix}-narrator-notes`}
             rows={3}
@@ -1256,11 +1291,31 @@ export function ChronicleSessionPanel({
 
                       <div className="chronicle-session-panel__detail-section chronicle-session-panel__detail-wide">
                         <div className="chronicle-session-panel__detail-section-heading">
-                          Resumen narrativo
+                          Objetivo de la sesión
+                        </div>
+                        <dd className="chronicle-session-panel__detail-section-content">
+                          {selectedSession.objective ??
+                            'Sin objetivo definido'}
+                        </dd>
+                      </div>
+
+                      <div className="chronicle-session-panel__detail-section chronicle-session-panel__detail-wide">
+                        <div className="chronicle-session-panel__detail-section-heading">
+                          Resumen previsto · preparación privada
+                        </div>
+                        <dd className="chronicle-session-panel__detail-section-content">
+                          {selectedSession.plannedSummary ??
+                            'Sin resumen previsto'}
+                        </dd>
+                      </div>
+
+                      <div className="chronicle-session-panel__detail-section chronicle-session-panel__detail-wide">
+                        <div className="chronicle-session-panel__detail-section-heading">
+                          Resumen de lo sucedido
                         </div>
                         <dd className="chronicle-session-panel__detail-section-content">
                           {selectedSession.summary ??
-                            'Sin resumen narrativo'}
+                            'Sin resumen de la partida'}
                         </dd>
                       </div>
 

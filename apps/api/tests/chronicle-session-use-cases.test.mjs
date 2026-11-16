@@ -13,6 +13,9 @@ import {
   ListChronicleSessionsUseCase,
 } from '../dist/chronicles/application/list-chronicle-sessions.use-case.js'
 import {
+  LoadChronicleSessionUseCase,
+} from '../dist/chronicles/application/load-chronicle-session.use-case.js'
+import {
   ChronicleSessionPermissionError,
 } from '../dist/chronicles/application/chronicle-session-permission.js'
 import {
@@ -38,8 +41,10 @@ function snapshot(status = 'preparation') {
     title: null,
     realDate: null,
     status,
-    summary: null,
-    narratorNotes: null,
+    summary: 'Lo que ocurrió en la partida',
+    narratorNotes: 'Secreto del Narrador',
+    objective: 'Encontrar una pista fiable',
+    plannedSummary: 'La policía podría intervenir',
     createdAt: new Date(0),
     updatedAt: new Date(0),
   }
@@ -101,8 +106,10 @@ test(
       sessionNumber: null,
       title: null,
       realDate: null,
-      summary: null,
-      narratorNotes: null,
+      summary: 'Relato jugado',
+      narratorNotes: 'Nota privada',
+      objective: 'Encontrar una pista fiable',
+      plannedSummary: 'La policía podría intervenir',
     }
     const created =
       await new CreateChronicleSessionUseCase(
@@ -110,6 +117,8 @@ test(
         participants(),
       ).execute(narratorId, data)
     assert.equal(created.status, 'preparation')
+    assert.equal(created.objective, 'Encontrar una pista fiable')
+    assert.equal(created.plannedSummary, 'La policía podría intervenir')
 
     await assert.rejects(
       new CreateChronicleSessionUseCase(
@@ -150,6 +159,31 @@ test(
 )
 
 test(
+  'los jugadores reciben el resumen real pero nunca objetivo, preparación ni notas privadas en listados ni detalle',
+  async () => {
+    const listed = await new ListChronicleSessionsUseCase(
+      repository(),
+      participants('player'),
+    ).execute(narratorId, chronicleId, { limit: 25, offset: 0 })
+
+    assert.equal(listed.items[0].summary, 'Lo que ocurrió en la partida')
+    assert.equal(listed.items[0].objective, null)
+    assert.equal(listed.items[0].plannedSummary, null)
+    assert.equal(listed.items[0].narratorNotes, null)
+
+    const detail = await new LoadChronicleSessionUseCase(
+      repository(),
+      participants('player'),
+    ).execute(narratorId, chronicleId, sessionId)
+
+    assert.equal(detail.summary, 'Lo que ocurrió en la partida')
+    assert.equal(detail.objective, null)
+    assert.equal(detail.plannedSummary, null)
+    assert.equal(detail.narratorNotes, null)
+  },
+)
+
+test(
   '035-B edita PREPARATION o COMPLETED pero no ARCHIVED',
   async () => {
     const updated =
@@ -160,8 +194,12 @@ test(
         chronicleId,
         sessionId,
         summary: 'Resumen',
+        objective: 'Objetivo nuevo',
+        plannedSummary: 'Consecuencia prevista',
       })
     assert.equal(updated.summary, 'Resumen')
+    assert.equal(updated.objective, 'Objetivo nuevo')
+    assert.equal(updated.plannedSummary, 'Consecuencia prevista')
 
     await assert.rejects(
       new UpdateChronicleSessionUseCase(

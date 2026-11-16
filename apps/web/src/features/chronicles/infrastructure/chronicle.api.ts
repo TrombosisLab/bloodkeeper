@@ -784,6 +784,8 @@ export function parseChronicleSessionResponse(
     ) ||
     !isStringOrNull(value.summary) ||
     !isStringOrNull(value.narratorNotes) ||
+    !isStringOrNull(value.objective) ||
+    !isStringOrNull(value.plannedSummary) ||
     !validTimestamp(value.createdAt) ||
     !validTimestamp(value.updatedAt)
   ) {
@@ -799,6 +801,8 @@ export function parseChronicleSessionResponse(
     status: value.status,
     summary: value.summary,
     narratorNotes: value.narratorNotes,
+    objective: value.objective,
+    plannedSummary: value.plannedSummary,
     createdAt: value.createdAt,
     updatedAt: value.updatedAt,
   }

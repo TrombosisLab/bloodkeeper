@@ -15,8 +15,8 @@ export function ChronicleSessionPreparationWorkspace({chronicleId,session}:Props
  async function addTask(event:FormEvent){event.preventDefault();if(!task.trim())return;await perform(()=>sessionWorkspaceApi.createPreparationItem(chronicleId,session.id,{text:task.trim(),completed:false}));setTask('')}
  return <div className="session-preparation">
   <section className="session-preparation__brief" aria-label="Direccion narrativa de la sesion">
-   <article><span>OBJETIVO DE LA SESION</span><h4>Que debe mover la historia</h4><p>{session.summary ?? 'Define el objetivo narrativo de la sesion desde el Resumen.'}</p></article>
-   <article><span>RESUMEN PREVISTO</span><h4>Lo que esta en juego</h4><p>{session.narratorNotes ?? 'Anota la preparacion y las consecuencias previstas desde el Resumen.'}</p></article>
+   <article><span>OBJETIVO DE LA SESIÓN</span><h4>Qué debe mover la historia</h4><p>{session.objective ?? 'Define el objetivo narrativo desde el apartado Resumen.'}</p></article>
+   <article><span>RESUMEN PREVISTO · SOLO NARRADOR</span><h4>Lo que está en juego</h4><p>{session.plannedSummary ?? 'Anota la preparación y las consecuencias previstas desde el apartado Resumen.'}</p></article>
   </section>
   <section className="session-preparation__main">
    <header><div><span>DESARROLLO</span><h3>Escenas de la sesión</h3></div><strong>{workspace?.scenes.length??0}</strong></header>

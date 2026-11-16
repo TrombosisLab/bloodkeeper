@@ -105,8 +105,10 @@ test(
   () => {
     for (const label of [
       'chronicle-session-workspace-summary-panel',
-      'Resumen narrativo',
-      'Notas privadas del Narrador',
+      'Objetivo de la sesión',
+      'Resumen previsto · preparación privada',
+      'Resumen de lo sucedido',
+      'Notas privadas del Narrador · secretos y recordatorios',
       'Fecha real',
       'Creada',
       'Actualizada',

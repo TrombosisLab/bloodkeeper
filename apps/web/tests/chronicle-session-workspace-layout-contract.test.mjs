@@ -204,11 +204,11 @@ test(
     )
     assert.match(
       sessions,
-      /Resumen narrativo/,
+      /Resumen de lo sucedido/,
     )
     assert.match(
       sessions,
-      /Notas del Narrador/,
+      /Notas privadas del Narrador · secretos y recordatorios/,
     )
     assert.match(
       styles,

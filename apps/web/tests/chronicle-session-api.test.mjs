@@ -20,6 +20,22 @@ const gateway = await readFile(
   'utf8',
 )
 
+const sessionPanel = await readFile(
+  new URL(
+    '../src/features/chronicles/components/ChronicleSessionPanel.tsx',
+    import.meta.url,
+  ),
+  'utf8',
+)
+
+const preparationWorkspace = await readFile(
+  new URL(
+    '../src/features/chronicles/components/ChronicleSessionPreparationWorkspace.tsx',
+    import.meta.url,
+  ),
+  'utf8',
+)
+
 test(
   '035-C modela snapshot y requests exactos de Sesion',
   () => {
@@ -37,6 +53,8 @@ test(
       'status',
       'summary',
       'narratorNotes',
+      'objective',
+      'plannedSummary',
       'createdAt',
       'updatedAt',
     ]) {
@@ -50,6 +68,43 @@ test(
       sessionTypes,
       /eventId|npcId|locationId|characterId|dice|activeSession|shared/i,
     )
+  },
+)
+
+test(
+  'objetivo, preparacion, resumen real y notas privadas conservan campos independientes',
+  () => {
+    for (const field of [
+      'objective',
+      'plannedSummary',
+      'summary',
+      'narratorNotes',
+    ]) {
+      assert.ok(sessionPanel.includes(`form.${field}`))
+      assert.ok(sessionPanel.includes(`session.${field}`))
+    }
+
+    assert.ok(sessionPanel.includes('objective: optionalText(form.objective)'))
+    assert.ok(sessionPanel.includes('plannedSummary: optionalText(form.plannedSummary)'))
+    assert.match(gateway, /!isStringOrNull\(value\.objective\)/)
+    assert.match(gateway, /!isStringOrNull\(value\.plannedSummary\)/)
+    assert.match(preparationWorkspace, /OBJETIVO DE LA SESIÓN[\s\S]*session\.objective/)
+    assert.match(preparationWorkspace, /RESUMEN PREVISTO · SOLO NARRADOR[\s\S]*session\.plannedSummary/)
+    assert.doesNotMatch(preparationWorkspace, /session\.summary|session\.narratorNotes/)
+  },
+)
+
+test(
+  'la edición deja claras las diferencias entre preparacion y relato jugado',
+  () => {
+    for (const label of [
+      'Objetivo de la sesión',
+      'Resumen previsto · preparación privada',
+      'Resumen de lo sucedido',
+      'Notas privadas del Narrador · secretos y recordatorios',
+    ]) {
+      assert.ok(sessionPanel.includes(label), `falta etiqueta: ${label}`)
+    }
   },
 )
 

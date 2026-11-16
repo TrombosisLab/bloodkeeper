@@ -281,6 +281,8 @@ export interface ChronicleSessionApiSnapshot {
   readonly status: ChronicleSessionApiStatus
   readonly summary: string | null
   readonly narratorNotes: string | null
+  readonly objective: string | null
+  readonly plannedSummary: string | null
   readonly createdAt: string
   readonly updatedAt: string
 }
@@ -291,6 +293,8 @@ export interface CreateChronicleSessionApiRequest {
   readonly realDate: string | null
   readonly summary: string | null
   readonly narratorNotes: string | null
+  readonly objective: string | null
+  readonly plannedSummary: string | null
 }
 
 export interface UpdateChronicleSessionApiRequest {
@@ -299,6 +303,8 @@ export interface UpdateChronicleSessionApiRequest {
   readonly realDate?: string | null
   readonly summary?: string | null
   readonly narratorNotes?: string | null
+  readonly objective?: string | null
+  readonly plannedSummary?: string | null
 }
 
 export interface ChronicleListQuery {
