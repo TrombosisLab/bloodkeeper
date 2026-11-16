@@ -529,7 +529,7 @@ export class ReplaceChronicleStoryContextUseCase
   ): Promise<ChronicleStorySnapshot> {
     await this.assertNarrator(actorUserId, command.chronicleId)
     await this.loadMutable(command.chronicleId, command.storyId)
-    return this.stories.replaceContext(command)
+    return this.stories.replaceContext({ ...command, actorUserId })
   }
 }
 

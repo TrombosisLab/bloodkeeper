@@ -266,6 +266,7 @@ export interface RemoveChronicleStoryReminderData {
 }
 
 export interface ReplaceChronicleStoryContextData {
+  readonly actorUserId: string
   readonly chronicleId: string
   readonly storyId: string
   readonly expectedRevision: number
