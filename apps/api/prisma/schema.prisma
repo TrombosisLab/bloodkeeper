@@ -1359,6 +1359,7 @@ model ChronicleStory {
   characterLinks      ChronicleStoryCharacter[]          @relation("ChronicleStoryCharacterStory")
   npcLinks            ChronicleStoryNpc[]                @relation("ChronicleStoryNpcStory")
   locationLinks       ChronicleStoryLocation[]           @relation("ChronicleStoryLocationStory")
+  resourceLinks       ChronicleStoryResource[]            @relation("ChronicleStoryResourceStory")
   completionOperation ChronicleStoryCompletionOperation? @relation("ChronicleStoryCompletionStory")
   experienceMovements CharacterExperienceMovement[]      @relation("CharacterExperienceStory")
 
@@ -1486,6 +1487,21 @@ model ChronicleStoryLocation {
   @@map("chronicle_story_location_links")
 }
 
+model ChronicleStoryResource {
+  storyId     String   @db.Uuid
+  chronicleId String   @db.Uuid
+  resourceId  String   @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  story    ChronicleStory  @relation("ChronicleStoryResourceStory", fields: [storyId, chronicleId], references: [id, chronicleId], onDelete: Restrict, onUpdate: Cascade)
+  resource LibraryResource @relation("ChronicleStoryResourceResource", fields: [resourceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@id([storyId, resourceId])
+  @@index([chronicleId, storyId])
+  @@index([resourceId])
+  @@map("chronicle_story_resource_links")
+}
+
 model ChronicleStoryCompletionOperation {
   id            String   @id @default(uuid()) @db.Uuid
   storyId       String   @unique @db.Uuid
@@ -1589,6 +1605,7 @@ model LibraryResource {
   mapMarkers    ChronicleMapMarker[]       @relation("ChronicleMapMarkerResource")
   mapLinks      ChronicleMap[]             @relation("ChronicleMapResource")
   mapRequests   ChronicleMapRequest[]      @relation("ChronicleMapRequestResource")
+  storyLinks    ChronicleStoryResource[]    @relation("ChronicleStoryResourceResource")
 
   @@unique([legacyType, legacyId])
   @@index([ownerId, kind, status])

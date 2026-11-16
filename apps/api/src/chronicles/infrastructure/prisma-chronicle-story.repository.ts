@@ -206,6 +206,7 @@ const storyDetails = {
       { locationId: 'asc' },
     ],
   },
+  resourceLinks: { include: { resource: { select: { id: true, kind: true, name: true, summary: true, metadata: true, status: true } } }, orderBy: [{ createdAt: 'asc' }, { resourceId: 'asc' }] },
   completionOperation: true,
 } satisfies Prisma.ChronicleStoryInclude
 
@@ -332,20 +333,14 @@ function toDomain(
     characters: row.characterLinks.map((link) => ({
       id: link.characterId,
     })),
-    npcs: row.npcLinks.map((link) => ({
-      id: link.npc.id,
-      name: link.npc.name,
-      status: link.npc.status.toLowerCase(),
-      category: link.npc.category,
-      narrativeRole: link.npc.narrativeRole,
-    })),
-    locations: row.locationLinks.map((link) => ({
-      id: link.location.id,
-      name: link.location.name,
-      status: link.location.status.toLowerCase(),
-      category: link.location.category,
-      parentLocationId: link.location.parentLocationId,
-    })),
+    npcs: [
+      ...row.npcLinks.map((link) => ({ id: link.npc.id, name: link.npc.name, status: link.npc.status.toLowerCase(), category: link.npc.category, narrativeRole: link.npc.narrativeRole })),
+      ...row.resourceLinks.filter((link) => link.resource.kind.toLowerCase() === 'npc').map((link) => ({ id: link.resource.id, name: link.resource.name, status: link.resource.status.toLowerCase(), category: null, narrativeRole: link.resource.summary })),
+    ],
+    locations: [
+      ...row.locationLinks.map((link) => ({ id: link.location.id, name: link.location.name, status: link.location.status.toLowerCase(), category: link.location.category, parentLocationId: link.location.parentLocationId })),
+      ...row.resourceLinks.filter((link) => link.resource.kind.toLowerCase() === 'location').map((link) => ({ id: link.resource.id, name: link.resource.name, status: link.resource.status.toLowerCase(), category: null, parentLocationId: null })),
+    ],
     closure: {
       hasEligibleSession: row.sessionLinks.some((link) =>
         link.session.status === PrismaSessionStatus.COMPLETED ||
@@ -878,7 +873,7 @@ export class PrismaChronicleStoryRepository
         data.expectedRevision,
       )
 
-      await this.assertContextReferences(transaction, data)
+      const contextReferences = await this.assertContextReferences(transaction, data)
 
       await Promise.all([
         transaction.chronicleStorySession.deleteMany({
@@ -896,6 +891,7 @@ export class PrismaChronicleStoryRepository
         transaction.chronicleStoryLocation.deleteMany({
           where: { storyId: data.storyId, chronicleId: data.chronicleId },
         }),
+        transaction.chronicleStoryResource.deleteMany({ where: { storyId: data.storyId, chronicleId: data.chronicleId } }),
       ])
 
       await Promise.all([
@@ -926,24 +922,27 @@ export class PrismaChronicleStoryRepository
                 characterId,
               })),
             }),
-        data.npcIds.length === 0
+        contextReferences.legacyNpcIds.length === 0
           ? Promise.resolve()
           : transaction.chronicleStoryNpc.createMany({
-              data: data.npcIds.map((npcId) => ({
+              data: contextReferences.legacyNpcIds.map((npcId) => ({
                 storyId: data.storyId,
                 chronicleId: data.chronicleId,
                 npcId,
               })),
             }),
-        data.locationIds.length === 0
+        contextReferences.legacyLocationIds.length === 0
           ? Promise.resolve()
           : transaction.chronicleStoryLocation.createMany({
-              data: data.locationIds.map((locationId) => ({
+              data: contextReferences.legacyLocationIds.map((locationId) => ({
                 storyId: data.storyId,
                 chronicleId: data.chronicleId,
                 locationId,
               })),
             }),
+        contextReferences.libraryNpcIds.length + contextReferences.libraryLocationIds.length === 0
+          ? Promise.resolve()
+          : transaction.chronicleStoryResource.createMany({ data: [...contextReferences.libraryNpcIds, ...contextReferences.libraryLocationIds].map((resourceId) => ({ storyId: data.storyId, chronicleId: data.chronicleId, resourceId })) }),
       ])
 
       return toDomain(await this.requiredStoryInTransaction(
@@ -1149,38 +1148,24 @@ export class PrismaChronicleStoryRepository
     return story
   }
 
-  private async assertContextReferences(
-    transaction: Prisma.TransactionClient,
-    data: ReplaceChronicleStoryContextData,
-  ): Promise<void> {
-    const [sessions, events, characters, npcs, locations] = await Promise.all([
-      transaction.chronicleSession.findMany({
-        where: { id: { in: [...data.sessionIds] }, chronicleId: data.chronicleId },
-        select: { id: true },
-      }),
-      transaction.chronicleEvent.findMany({
-        where: { id: { in: [...data.eventIds] }, chronicleId: data.chronicleId },
-        select: { id: true },
-      }),
-      transaction.character.findMany({
-        where: { id: { in: [...data.characterIds] }, chronicleId: data.chronicleId },
-        select: { id: true },
-      }),
-      transaction.chronicleNpc.findMany({
-        where: { id: { in: [...data.npcIds] }, chronicleId: data.chronicleId },
-        select: { id: true },
-      }),
-      transaction.chronicleLocation.findMany({
-        where: { id: { in: [...data.locationIds] }, chronicleId: data.chronicleId },
-        select: { id: true },
-      }),
+  private async assertContextReferences(transaction: Prisma.TransactionClient, data: ReplaceChronicleStoryContextData): Promise<{ readonly legacyNpcIds: readonly string[]; readonly libraryNpcIds: readonly string[]; readonly legacyLocationIds: readonly string[]; readonly libraryLocationIds: readonly string[] }> {
+    const [sessions, events, characters, npcs, locations, libraryNpcs, libraryLocations] = await Promise.all([
+      transaction.chronicleSession.findMany({ where: { id: { in: [...data.sessionIds] }, chronicleId: data.chronicleId }, select: { id: true } }),
+      transaction.chronicleEvent.findMany({ where: { id: { in: [...data.eventIds] }, chronicleId: data.chronicleId }, select: { id: true } }),
+      transaction.character.findMany({ where: { id: { in: [...data.characterIds] }, chronicleId: data.chronicleId }, select: { id: true } }),
+      transaction.chronicleNpc.findMany({ where: { id: { in: [...data.npcIds] }, chronicleId: data.chronicleId }, select: { id: true } }),
+      transaction.chronicleLocation.findMany({ where: { id: { in: [...data.locationIds] }, chronicleId: data.chronicleId }, select: { id: true } }),
+      transaction.libraryResource.findMany({ where: { id: { in: [...data.npcIds] }, ownerId: data.actorUserId, kind: 'npc', status: 'active', bindings: { some: { chronicleId: data.chronicleId, status: 'attached' } } }, select: { id: true } }),
+      transaction.libraryResource.findMany({ where: { id: { in: [...data.locationIds] }, ownerId: data.actorUserId, kind: 'location', status: 'active', bindings: { some: { chronicleId: data.chronicleId, status: 'attached' } } }, select: { id: true } }),
     ])
-
     this.assertAllFound('session', data.sessionIds, sessions)
     this.assertAllFound('event', data.eventIds, events)
     this.assertAllFound('character', data.characterIds, characters)
-    this.assertAllFound('npc', data.npcIds, npcs)
-    this.assertAllFound('location', data.locationIds, locations)
+    this.assertAllFound('npc', data.npcIds, [...npcs, ...libraryNpcs])
+    this.assertAllFound('location', data.locationIds, [...locations, ...libraryLocations])
+    const legacyNpcIds = new Set(npcs.map((row) => row.id))
+    const legacyLocationIds = new Set(locations.map((row) => row.id))
+    return { legacyNpcIds: data.npcIds.filter((id) => legacyNpcIds.has(id)), libraryNpcIds: data.npcIds.filter((id) => !legacyNpcIds.has(id)), legacyLocationIds: data.locationIds.filter((id) => legacyLocationIds.has(id)), libraryLocationIds: data.locationIds.filter((id) => !legacyLocationIds.has(id)) }
   }
 
   private assertAllFound(

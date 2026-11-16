@@ -4,8 +4,6 @@ import type { FormEvent } from 'react'
 import type {
   ChronicleCharacterApiSummary,
   ChronicleEventApiSnapshot,
-  ChronicleLocationApiSnapshot,
-  ChronicleNpcApiSnapshot,
   ChronicleSessionApiSnapshot,
 } from '../types/chronicle-api.types'
 import type {
@@ -67,6 +65,8 @@ interface ContextSelection {
 
 type ContextFocus = 'sessions' | 'events' | 'cast' | 'locations' | 'all'
 
+interface StoryResourceOption { readonly id: string; readonly name: string; readonly visibility: 'narrator_only' | 'chronicle_participants' | 'selected_players'; readonly audienceUserIds: readonly string[] }
+
 const emptyContext: ContextSelection = {
   sessionIds: [],
   eventIds: [],
@@ -111,6 +111,32 @@ async function loadAllOffsetItems<T>(
   return items
 }
 
+async function loadStoryResources(chronicleId: string, kind: 'npc' | 'location'): Promise<readonly StoryResourceOption[]> {
+  const items: StoryResourceOption[] = []
+  let offset = 0
+  while (true) {
+    const response = await fetch(`/api/chronicles/${chronicleId}/resources?kind=${kind}&limit=100&offset=${offset}`, { credentials: 'include', headers: { Accept: 'application/json' } })
+    const payload = await response.json().catch(() => null) as { readonly items?: readonly unknown[]; readonly nextOffset?: number | null } | null
+    if (!response.ok || payload === null || !Array.isArray(payload.items)) throw new Error('STORY_RESOURCE_CATALOG_FAILED')
+    for (const value of payload.items) {
+      if (typeof value !== 'object' || value === null) throw new Error('STORY_RESOURCE_CATALOG_INVALID')
+      const item = value as Record<string, unknown>
+      if (typeof item.id !== 'string' || typeof item.name !== 'string') throw new Error('STORY_RESOURCE_CATALOG_INVALID')
+      const visibility = item.visibility
+      if (visibility !== 'narrator_only' && visibility !== 'chronicle_participants' && visibility !== 'selected_players') throw new Error('STORY_RESOURCE_CATALOG_INVALID')
+      items.push({ id: item.id, name: item.name, visibility, audienceUserIds: Array.isArray(item.audienceUserIds) ? item.audienceUserIds.filter((id): id is string => typeof id === 'string') : [] })
+    }
+    if (payload.nextOffset === null || payload.nextOffset === undefined) return items
+    if (!Number.isInteger(payload.nextOffset) || payload.nextOffset <= offset) throw new Error('STORY_RESOURCE_CATALOG_INVALID')
+    offset = payload.nextOffset
+  }
+}
+function resourceVisibilityLabel(resource: StoryResourceOption): string {
+  if (resource.visibility === 'narrator_only') return 'Solo Narrador'
+  if (resource.visibility === 'chronicle_participants') return 'Todos los jugadores'
+  return `Jugadores seleccionados${resource.audienceUserIds.length ? ` (${resource.audienceUserIds.length})` : ''}`
+}
+
 function storyCompletionOperationId(): string {
   const bytes = new Uint8Array(16)
   if (globalThis.crypto?.getRandomValues !== undefined) {
@@ -131,8 +157,8 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [sessions, setSessions] = useState<readonly ChronicleSessionApiSnapshot[]>([])
   const [events, setEvents] = useState<readonly ChronicleEventApiSnapshot[]>([])
-  const [npcs, setNpcs] = useState<readonly ChronicleNpcApiSnapshot[]>([])
-  const [locations, setLocations] = useState<readonly ChronicleLocationApiSnapshot[]>([])
+  const [npcs, setNpcs] = useState<readonly StoryResourceOption[]>([])
+  const [locations, setLocations] = useState<readonly StoryResourceOption[]>([])
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [loading, setLoading] = useState(true)
@@ -140,6 +166,8 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
   const [error, setError] = useState<string | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [showContext, setShowContext] = useState(false)
+  const [contextCatalogLoading, setContextCatalogLoading] = useState(false)
+  const [contextCatalogError, setContextCatalogError] = useState<string | null>(null)
   const [contextFocus, setContextFocus] = useState<ContextFocus>('all')
   const [context, setContext] = useState<ContextSelection>(emptyContext)
   const [reminderText, setReminderText] = useState('')
@@ -173,26 +201,41 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
     setSelectedId(story.id)
   }
 
-  function openContext(focus: ContextFocus) {
+  async function openContext(focus: ContextFocus) {
     setContextFocus(focus)
     setShowContext(true)
+    setContextCatalogError(null)
+    if (focus !== 'cast' && focus !== 'locations' && focus !== 'all') return
+    setContextCatalogLoading(true)
+    try {
+      const [loadedNpcs, loadedLocations] = await Promise.all([
+        focus === 'cast' || focus === 'all' ? loadStoryResources(chronicleId, 'npc') : Promise.resolve(npcs),
+        focus === 'locations' || focus === 'all' ? loadStoryResources(chronicleId, 'location') : Promise.resolve(locations),
+      ])
+      setNpcs(loadedNpcs)
+      setLocations(loadedLocations)
+    } catch {
+      setContextCatalogError('No se pudieron cargar los recursos de la crónica. Revisa el catálogo de Recursos e inténtalo de nuevo.')
+    } finally {
+      setContextCatalogLoading(false)
+    }
   }
 
   async function load() {
     setLoading(true)
     setError(null)
     try {
-      const [storyPage, sessionPage, loadedEvents, npcPage, loadedLocations] = await Promise.all([
+      const [storyPage, sessionPage, loadedEvents, loadedNpcs, loadedLocations] = await Promise.all([
         storyGateway.list(chronicleId),
         loadAllOffsetItems((offset) => chronicleGateway.sessions(chronicleId, { limit: 50, offset })),
         chronicleGateway.events(chronicleId),
-        loadAllOffsetItems((offset) => chronicleGateway.npcs(chronicleId, { limit: 50, offset })),
-        chronicleGateway.locations(chronicleId),
+        loadStoryResources(chronicleId, 'npc'),
+        loadStoryResources(chronicleId, 'location'),
       ])
       setStories(storyPage.items)
       setSessions(sessionPage)
       setEvents(loadedEvents)
-      setNpcs(npcPage)
+      setNpcs(loadedNpcs)
       setLocations(loadedLocations)
       setSelectedId((current) => storyPage.items.some((story) => story.id === current) ? current : storyPage.items[0]?.id ?? null)
     } catch (loadError: unknown) {
@@ -468,15 +511,15 @@ export function ChronicleStoryWorkspace({ chronicleId, associatedCharacters, cre
         {contextFocus === 'sessions' || contextFocus === 'all' ? <ContextGroup title="Sesiones" items={sessions.map((item) => ({ id: item.id, label: `${item.sessionNumber === null ? 'Sesión' : `Sesión ${item.sessionNumber}`} · ${item.title ?? 'Sin título'}` }))} selected={context.sessionIds} onToggle={(id) => setContext((current) => ({ ...current, sessionIds: toggleId(current.sessionIds, id) }))} /> : null}
         {contextFocus === 'events' || contextFocus === 'all' ? <ContextGroup title="Sucesos" items={events.map((item) => ({ id: item.id, label: item.title }))} selected={context.eventIds} onToggle={(id) => setContext((current) => ({ ...current, eventIds: toggleId(current.eventIds, id) }))} /> : null}
         {contextFocus === 'cast' || contextFocus === 'all' ? <ContextGroup title="Personajes jugadores" items={associatedCharacters.map((item) => ({ id: item.characterId, label: item.name || 'Personaje sin nombre' }))} selected={context.characterIds} onToggle={(id) => setContext((current) => ({ ...current, characterIds: toggleId(current.characterIds, id) }))} /> : null}
-        {contextFocus === 'cast' || contextFocus === 'all' ? <ContextGroup title="PNJ" items={npcs.map((item) => ({ id: item.id, label: item.name }))} selected={context.npcIds} onToggle={(id) => setContext((current) => ({ ...current, npcIds: toggleId(current.npcIds, id) }))} /> : null}
-        {contextFocus === 'locations' || contextFocus === 'all' ? <ContextGroup title="Localizaciones" items={locations.map((item) => ({ id: item.id, label: item.name }))} selected={context.locationIds} onToggle={(id) => setContext((current) => ({ ...current, locationIds: toggleId(current.locationIds, id) }))} /> : null}
+        {contextFocus === 'cast' || contextFocus === 'all' ? <ContextGroup title="PNJ" items={npcs.map((item) => ({ id: item.id, label: `${item.name} · ${resourceVisibilityLabel(item)}` }))} selected={context.npcIds} onToggle={(id) => setContext((current) => ({ ...current, npcIds: toggleId(current.npcIds, id) }))} loading={contextCatalogLoading} error={contextCatalogError} /> : null}
+        {contextFocus === 'locations' || contextFocus === 'all' ? <ContextGroup title="Localizaciones" items={locations.map((item) => ({ id: item.id, label: `${item.name} · ${resourceVisibilityLabel(item)}` }))} selected={context.locationIds} onToggle={(id) => setContext((current) => ({ ...current, locationIds: toggleId(current.locationIds, id) }))} loading={contextCatalogLoading} error={contextCatalogError} /> : null}
       </div><footer><button type="button" onClick={() => setShowContext(false)}>Cancelar</button><button type="button" className="story-primary" disabled={operation !== null} onClick={() => void perform('context', () => storyGateway.replaceContext(chronicleId, selected.id, { expectedRevision: selected.revision, ...context })).then(() => setShowContext(false))}>Guardar relaciones</button></footer></div></div> : null}
     </section>
   )
 }
 
-function ContextGroup({ title, items, selected, onToggle }: { readonly title: string; readonly items: readonly { readonly id: string; readonly label: string }[]; readonly selected: readonly string[]; readonly onToggle: (id: string) => void }) {
-  return <fieldset><legend>{title}</legend>{items.map((item) => <label key={item.id}><input type="checkbox" checked={selected.includes(item.id)} onChange={() => onToggle(item.id)} /><span>{item.label}</span></label>)}{items.length === 0 ? <p>No hay elementos disponibles.</p> : null}</fieldset>
+function ContextGroup({ title, items, selected, onToggle, loading = false, error = null }: { readonly title: string; readonly items: readonly { readonly id: string; readonly label: string }[]; readonly selected: readonly string[]; readonly onToggle: (id: string) => void; readonly loading?: boolean; readonly error?: string | null }) {
+  return <fieldset><legend>{title}</legend>{items.map((item) => <label key={item.id}><input type="checkbox" checked={selected.includes(item.id)} onChange={() => onToggle(item.id)} /><span>{item.label}</span></label>)}{loading ? <p>Cargando recursos…</p> : error ? <p role="alert">{error}</p> : items.length === 0 ? <p>No hay recursos vinculados a esta crónica.</p> : null}</fieldset>
 }
 
 // CHRONICLE_STORY_MILESTONE_EDITOR_V1
