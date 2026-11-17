@@ -43,8 +43,11 @@
 .chronicle-map-marker--size-large { width: 1.55rem; height: 1.55rem; font-size: .68rem; }
 .chronicle-map-marker.is-selected { outline: 3px solid #f7c4a9; outline-offset: 3px; }
 .chronicle-map-marker::first-letter { rotate: 45deg; }
-.chronicle-map-marker--refuge { background: #b48739; }
-.chronicle-map-marker--danger { background: #782d38; }
+.chronicle-map-marker--location { background: #3979b7; }
+.chronicle-map-marker--refuge { background: #2f8a57; rotate: 0deg; border-radius: 0; clip-path: polygon(50% 0%, 100% 38%, 82% 38%, 82% 100%, 18% 100%, 18% 38%, 0 38%); }
+.chronicle-map-marker--landmark { background: #d6a72c; border-color: #21180b; color: #21180b; rotate: 0deg; border-radius: 0; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 95%, 50% 72%, 21% 95%, 32% 57%, 2% 35%, 39% 35%); }
+.chronicle-map-marker--danger { background: #782d38; rotate: 0deg; border-radius: 0; clip-path: polygon(50% 0%, 100% 100%, 0 100%); }
+.chronicle-map-marker--danger::first-letter { rotate: 0deg; }
 .chronicle-map-area { position: absolute; z-index: 1; display: flex; box-sizing: border-box; align-items: flex-start; justify-content: flex-start; border: 2px solid; background: rgba(189, 62, 87, .16); pointer-events: auto; color: #fff3ed; padding: .35rem; font-size: .75rem; font-weight: 700; overflow: hidden; cursor: pointer; }
 .chronicle-map-area--size-small { font-size: .6rem; }
 .chronicle-map-area--size-medium { font-size: .75rem; }
@@ -344,3 +347,14 @@
   .chronicle-map-dialog footer { flex-wrap: wrap; }
   .chronicle-map-inspector { box-sizing: border-box; max-height: 45dvh; overflow: auto; padding: 12px; }
 }
+
+/* CHRONICLE_MAP_TEMPORARY_LAYER_FILTERS_V1 */
+.chronicle-map-canvas__controls { position: relative; z-index: 5; flex-wrap: wrap; }
+.chronicle-map-layer-filter { position: relative; margin-right: auto; }
+.chronicle-map-layer-filter > button { min-height: 2.2rem; }
+.chronicle-map-layer-panel { position: absolute; right: auto; left: 0; bottom: calc(100% + .55rem); z-index: 20; display: grid; gap: .45rem; width: min(17rem, calc(100vw - 2.5rem)); margin: 0; padding: .8rem; border: 1px solid rgba(220, 144, 156, .5); border-radius: .55rem; background: #1a1016; color: #f3e8df; box-shadow: 0 12px 32px rgba(0,0,0,.5); }
+.chronicle-map-layer-panel legend { padding: 0 .25rem; color: #e46a80; font-size: .78rem; font-weight: 800; }
+.chronicle-map-layer-panel label { display: flex; align-items: center; gap: .55rem; min-height: 2rem; cursor: pointer; }
+.chronicle-map-layer-panel input { accent-color: #bd3e57; width: 1rem; height: 1rem; margin: 0; flex: 0 0 auto; }
+.chronicle-map-layer-panel__all { justify-self: start; margin-top: .25rem; border: 0; padding: .35rem 0; background: transparent; color: #f3a6b5; font: inherit; font-weight: 700; cursor: pointer; }
+@media (max-width: 600px) { .chronicle-map-canvas__controls { justify-content: flex-start; padding-inline: .75rem; } .chronicle-map-layer-panel { left: 0; } }
