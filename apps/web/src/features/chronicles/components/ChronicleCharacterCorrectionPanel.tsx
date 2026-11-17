@@ -186,7 +186,7 @@ export function ChronicleCharacterCorrectionPanel({ characterId, gateway, onSave
       {activeSection === 'skills' ? <section className="character-correction-section">
         <h5>Habilidades</h5>
         <div className="character-correction-grid">
-          {Object.entries(skills).map(([key, value]) => <label key={key}>{skillNames.get(key) ?? key}<input type="number" min="0" max="5" value={value} onChange={(event) => setSkills((current) => ({ ...current, [key]: Number(event.target.value) }))} /></label>)}
+          {Object.entries(skills).map(([key, value]) => <label key={key}>{skillNames.get(key as Parameters<typeof skillNames.get>[0]) ?? key}<input type="number" min="0" max="5" value={value} onChange={(event) => setSkills((current) => ({ ...current, [key]: Number(event.target.value) }))} /></label>)}
         </div>
       </section> : null}
       {activeSection === 'disciplines' ? <section className="character-correction-section">

@@ -113,6 +113,7 @@ const advantageOriginLabels = {
   predatorType: 'Tipo de Depredador',
   thinBlood: 'Sangre Débil',
   evolution: 'Evolución',
+  narratorCorrection: 'Corrección del Narrador',
 } as const
 
 const disciplineOriginLabels = {

@@ -48,6 +48,7 @@ const ORIGIN_LABELS:
     predatorType: 'Tipo de Depredador',
     thinBlood: 'Sangre Débil',
     evolution: 'Evolución',
+    narratorCorrection: 'Corrección del Narrador',
   }
 
 const SOURCE_LABELS:
