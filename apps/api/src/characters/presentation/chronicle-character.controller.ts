@@ -1,13 +1,17 @@
 import {
   BadRequestException,
+  Body,
+  ConflictException,
   Controller,
   ForbiddenException,
   Get,
   NotFoundException,
   Param,
+  Patch,
   Query,
   Req,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common'
 
 import {
@@ -30,7 +34,20 @@ import {
 } from '../application/load-character-profile-phase.use-case'
 
 import {
+  CharacterCorrectionConflictError,
+  CharacterCorrectionRuleViolationError,
+  CorrectChronicleCharacterUseCase,
+} from '../application/correct-chronicle-character.use-case'
+
+import {
+  CharacterDraftWriteConflictError,
+  ChronicleCharacterCorrectionPermissionError,
+} from '../application/character-draft.repository'
+
+import {
   toCharacterDraftResponse,
+  InvalidCharacterDraftRequestError,
+  parseChronicleCharacterCorrectionRequest,
 } from './character-draft.dto'
 
 import {
@@ -125,6 +142,8 @@ export class ChronicleCharacterController {
       LoadChronicleCharacterUseCase,
     private readonly loadProfilePhase:
       LoadCharacterProfilePhaseUseCase,
+    private readonly correctCharacter:
+      CorrectChronicleCharacterUseCase,
   ) {}
 
   @Get(':chronicleId/characters')
@@ -273,6 +292,56 @@ export class ChronicleCharacterController {
         throw new NotFoundException({
           code: 'CHRONICLE_CHARACTER_NOT_FOUND',
         })
+      }
+      throw error
+    }
+  }
+
+  @Patch(':chronicleId/characters/:characterId/correction')
+  async correct(
+    @Req() request: AuthenticatedChronicleCharacterRequest,
+    @Param('chronicleId') chronicleIdInput: unknown,
+    @Param('characterId') characterIdInput: unknown,
+    @Body() body: unknown,
+  ) {
+    const actorId = authenticatedUserId(request)
+    const targetChronicleId = chronicleId(chronicleIdInput)
+    const targetCharacterId = characterId(characterIdInput)
+    try {
+      const command = parseChronicleCharacterCorrectionRequest(
+        targetCharacterId,
+        body,
+      )
+      return toCharacterDraftResponse(await this.correctCharacter.execute(
+        actorId,
+        targetChronicleId,
+        targetCharacterId,
+        command,
+      ))
+    } catch (error: unknown) {
+      if (
+        error instanceof ChronicleCharacterReadPermissionError ||
+        error instanceof ChronicleCharacterCorrectionPermissionError
+      ) {
+        throw new ForbiddenException({ code: 'CHRONICLE_CHARACTER_CORRECTION_PERMISSION_DENIED' })
+      }
+      if (error instanceof ChronicleCharacterNotFoundError) {
+        throw new NotFoundException({ code: 'CHRONICLE_CHARACTER_NOT_FOUND' })
+      }
+      if (error instanceof CharacterDraftWriteConflictError) {
+        throw new ConflictException({ code: 'CHRONICLE_CHARACTER_CORRECTION_CONFLICT' })
+      }
+      if (error instanceof CharacterCorrectionConflictError) {
+        throw new ConflictException({ code: 'CHRONICLE_CHARACTER_CORRECTION_CONFLICT' })
+      }
+      if (error instanceof CharacterCorrectionRuleViolationError) {
+        throw new UnprocessableEntityException({
+          code: 'CHRONICLE_CHARACTER_CORRECTION_RULE_VIOLATION',
+          violations: error.violations,
+        })
+      }
+      if (error instanceof InvalidCharacterDraftRequestError) {
+        throw new BadRequestException({ code: 'INVALID_CHRONICLE_CHARACTER_CORRECTION', message: error.message })
       }
       throw error
     }

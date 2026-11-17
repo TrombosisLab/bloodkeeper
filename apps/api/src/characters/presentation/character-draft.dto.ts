@@ -633,7 +633,7 @@ function validateAdvantages(
     stringValue(required(selection, 'definitionKey', itemPath), `${itemPath}.definitionKey`)
     oneOf(required(selection, 'category', itemPath), ['merit', 'background', 'flaw'], `${itemPath}.category`)
     integer(required(selection, 'rating', itemPath), `${itemPath}.rating`)
-    oneOf(required(selection, 'origin', itemPath), ['creation', 'predatorType', 'thinBlood'], `${itemPath}.origin`)
+    oneOf(required(selection, 'origin', itemPath), ['creation', 'predatorType', 'thinBlood', 'evolution', 'narratorCorrection'], `${itemPath}.origin`)
     nullableString(required(selection, 'parentSelectionId', itemPath), `${itemPath}.parentSelectionId`)
     const details = required(selection, 'details', itemPath)
     if (details !== null) {
@@ -1093,6 +1093,37 @@ export function parseUpdateCharacterDraftRequest(
   return {
     characterId,
     ...(input as UpdateCharacterDraftRequestDto),
+  }
+}
+
+export function parseChronicleCharacterCorrectionRequest(
+  characterIdInput: unknown,
+  input: unknown,
+): UpdateCharacterDraftData & { reason: string } {
+  const value = record(input, 'body')
+  onlyKeys(value, [
+    'expectedRevision',
+    'reason',
+    'attributes',
+    'skills',
+    'disciplines',
+    'advantages',
+  ], 'body')
+  integer(required(value, 'expectedRevision', 'body'), 'body.expectedRevision')
+  stringValue(required(value, 'reason', 'body'), 'body.reason')
+  const reason = (value.reason as string).trim()
+  if (reason.length < 5 || reason.length > 500) {
+    throw new InvalidCharacterDraftRequestError('body.reason', 'must contain between 5 and 500 characters')
+  }
+  const changes = Object.fromEntries(
+    Object.entries(value).filter(([key]) => key !== 'reason'),
+  )
+  if (Object.keys(changes).length <= 1) {
+    throw new InvalidCharacterDraftRequestError('body', 'must include at least one character change')
+  }
+  return {
+    ...parseUpdateCharacterDraftRequest(characterIdInput, changes),
+    reason,
   }
 }
 

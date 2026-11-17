@@ -29,7 +29,7 @@ test(
       definitions.filter(
         ({ category }) => category === 'background',
       ).length,
-      12,
+      11,
     )
     assert.equal(
       definitions.filter(
@@ -41,7 +41,7 @@ test(
       definitions.filter(
         ({ category }) => category === 'flaw',
       ).length,
-      44,
+      45,
     )
     assert.equal(
       characterRulesCatalogManifest.domains.advantages,

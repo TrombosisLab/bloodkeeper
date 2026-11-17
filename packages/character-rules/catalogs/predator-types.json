@@ -452,7 +452,7 @@
             "grant": {
               "type": "advantage",
               "definitionKey": "dark-secret",
-              "category": "background",
+              "category": "flaw",
               "rating": 2
             }
           },
@@ -483,7 +483,7 @@
       "advantages": [
         {
           "definitionKey": "dark-secret",
-          "category": "background",
+          "category": "flaw",
           "rating": 2
         },
         {
@@ -554,7 +554,7 @@
       "advantages": [
         {
           "definitionKey": "dark-secret",
-          "category": "background",
+          "category": "flaw",
           "rating": 1
         },
         {

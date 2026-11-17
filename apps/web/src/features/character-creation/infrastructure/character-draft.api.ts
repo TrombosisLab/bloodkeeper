@@ -102,6 +102,7 @@ const advantageOrigins = [
   'predatorType',
   'thinBlood',
   'evolution',
+  'narratorCorrection',
 ] as const
 
 const alchemyMethods = [

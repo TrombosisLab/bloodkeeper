@@ -90,6 +90,10 @@ import {
 } from './application/load-chronicle-character.use-case'
 
 import {
+  CorrectChronicleCharacterUseCase,
+} from './application/correct-chronicle-character.use-case'
+
+import {
   LoadCharacterAttributeSkillRatingsUseCase,
 } from './application/load-character-attribute-skill-ratings.use-case'
 
@@ -818,6 +822,23 @@ const useCaseProviders = [
           repository,
           participants,
         ),
+    },
+    {
+      provide: CorrectChronicleCharacterUseCase,
+      inject: [
+        LoadChronicleCharacterUseCase,
+        CHARACTER_DRAFT_REPOSITORY,
+        CharacterValidator,
+      ],
+      useFactory: (
+        load: LoadChronicleCharacterUseCase,
+        repository: PrismaCharacterDraftRepository,
+        validator: CharacterValidator,
+      ) => new CorrectChronicleCharacterUseCase(
+        load,
+        repository,
+        validator,
+      ),
     },
   ],
   exports: [

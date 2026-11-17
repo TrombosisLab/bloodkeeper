@@ -212,6 +212,7 @@ export type CharacterAdvantageSelectionOrigin =
   | 'predatorType'
   | 'thinBlood'
   | 'evolution'
+  | 'narratorCorrection'
 
 export type AdvantageMaskBenefitKey =
   | 'erased'

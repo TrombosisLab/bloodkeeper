@@ -13,7 +13,7 @@ import {
 } from '../src/features/character-creation/domain/advantage-definition-rules.ts'
 
 test(
-  'el catálogo Core parcial contiene los seis Trasfondos implementados',
+  'el catálogo Core parcial contiene las definiciones de Trasfondo implementadas',
   () => {
     assert.deepEqual(
       characterAdvantageDefinitions
@@ -37,7 +37,6 @@ test(
         'mawla',
         'herd',
         'resources',
-        'dark-secret',
         'haven',
       ],
     )
@@ -81,7 +80,31 @@ test(
 )
 
 test(
-  'las tres definiciones pertenecen a Trasfondos Core',
+  'Secreto Oscuro es un Defecto Core, no un Trasfondo',
+  () => {
+    const definition =
+      getCharacterAdvantageDefinition(
+        'dark-secret',
+      )
+
+    assert.ok(definition)
+    assert.equal(definition.category, 'flaw')
+    assert.equal(definition.instanceDetailsKind, 'darkSecret')
+    assert.equal(
+      getCharacterAdvantageDefinitionsByCategory('background')
+        .some((candidate) => candidate.key === 'dark-secret'),
+      false,
+    )
+    assert.equal(
+      getCharacterAdvantageDefinitionsByCategory('flaw')
+        .some((candidate) => candidate.key === 'dark-secret'),
+      true,
+    )
+  },
+)
+
+test(
+  'las definiciones de Trasfondo pertenecen a Core',
   () => {
     for (
       const definition of
@@ -217,7 +240,7 @@ test(
 )
 
 test(
-  'la consulta por categoría devuelve los tres Trasfondos',
+  'la consulta por categoría separa Trasfondos de Defectos',
   () => {
     assert.deepEqual(
       getCharacterAdvantageDefinitionsByCategory(
@@ -237,7 +260,6 @@ test(
         'mawla',
         'herd',
         'resources',
-        'dark-secret',
         'haven',
       ],
     )

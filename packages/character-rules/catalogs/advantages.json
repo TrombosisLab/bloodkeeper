@@ -166,7 +166,7 @@
   {
     "key": "dark-secret",
     "name": "Secreto Oscuro",
-    "category": "background",
+    "category": "flaw",
     "allowedRatings": [
       1,
       2

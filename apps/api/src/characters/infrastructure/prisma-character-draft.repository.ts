@@ -98,6 +98,7 @@ import {
 
 import {
   CharacterDraftWriteConflictError,
+  ChronicleCharacterCorrectionPermissionError,
   CharacterEmbraceWriteConflictError,
   CharacterInitialVampireResolutionWriteConflictError,
   CharacterLifecycleWriteConflictError,
@@ -106,6 +107,11 @@ import {
 import type {
   CharacterDraftRepository,
 } from '../application/character-draft.repository'
+
+import type {
+  CharacterCorrectionAuditData,
+  CharacterCorrectionRepository,
+} from '../application/character-correction.repository'
 
 import type {
   AdvantageMaskBenefitKey,
@@ -492,6 +498,8 @@ const advantageOriginToPrisma: Record<
     PrismaAdvantageSelectionOrigin.THIN_BLOOD,
   evolution:
     PrismaAdvantageSelectionOrigin.EVOLUTION,
+  narratorCorrection:
+    PrismaAdvantageSelectionOrigin.NARRATOR_CORRECTION,
 }
 
 const advantageOriginFromPrisma: Record<
@@ -502,6 +510,7 @@ const advantageOriginFromPrisma: Record<
   PREDATOR_TYPE: 'predatorType',
   THIN_BLOOD: 'thinBlood',
   EVOLUTION: 'evolution',
+  NARRATOR_CORRECTION: 'narratorCorrection',
 }
 
 const maskBenefitToPrisma: Record<
@@ -1418,7 +1427,7 @@ function createCharacterScopedSkillSpecialtyId(
 
 @Injectable()
 export class PrismaCharacterDraftRepository
-  implements CharacterDraftRepository {
+  implements CharacterDraftRepository, CharacterCorrectionRepository {
   constructor(
     private readonly database: DatabaseService,
   ) {}
@@ -2581,6 +2590,22 @@ export class PrismaCharacterDraftRepository
     ownerId: string,
     data: UpdateCharacterDraftData,
   ): Promise<PersistedCharacterDraft> {
+    return this.updateInTransaction(ownerId, data)
+  }
+
+  async correctByNarrator(
+    ownerId: string,
+    data: UpdateCharacterDraftData,
+    audit: CharacterCorrectionAuditData,
+  ): Promise<PersistedCharacterDraft> {
+    return this.updateInTransaction(ownerId, data, audit)
+  }
+
+  private async updateInTransaction(
+    ownerId: string,
+    data: UpdateCharacterDraftData,
+    audit?: CharacterCorrectionAuditData,
+  ): Promise<PersistedCharacterDraft> {
     const changedSections =
       Object.keys(data).filter(
         (key) =>
@@ -2614,6 +2639,36 @@ export class PrismaCharacterDraftRepository
 
     return this.database.$transaction(
       async (transaction) => {
+        let correctionBefore: PersistedCharacterDraft | null = null
+        if (audit !== undefined) {
+          const narrator = await transaction.chronicleParticipant.findFirst({
+            where: {
+              chronicleId: audit.chronicleId,
+              userId: audit.actorId,
+              role: 'NARRATOR',
+              status: 'ACTIVE',
+            },
+            select: { id: true },
+          })
+          if (narrator === null) {
+            throw new ChronicleCharacterCorrectionPermissionError()
+          }
+          const current = await transaction.character.findUnique({
+            where: { id: data.characterId },
+            include: characterRelations,
+          })
+          if (
+            current === null ||
+            current.ownerId !== ownerId ||
+            current.chronicleId !== audit.chronicleId ||
+            current.revision !== data.expectedRevision ||
+            current.status === PrismaCharacterStatus.ARCHIVED
+          ) {
+            throw new CharacterDraftWriteConflictError(data.characterId)
+          }
+          correctionBefore = toPersistedDraft(current)
+        }
+
         const characterData:
           Prisma.CharacterUncheckedUpdateManyInput = {
             revision: { increment: 1 },
@@ -2631,7 +2686,9 @@ export class PrismaCharacterDraftRepository
               ownerId,
               revision: data.expectedRevision,
               status:
-                updatesOnlyEditableSheetFields
+                audit !== undefined
+                  ? { not: PrismaCharacterStatus.ARCHIVED }
+                  : updatesOnlyEditableSheetFields
                   ? {
                       not:
                         PrismaCharacterStatus.ARCHIVED,
@@ -3080,8 +3137,36 @@ export class PrismaCharacterDraftRepository
             where: { id: data.characterId },
             include: characterRelations,
           })
+        const updated = toPersistedDraft(row)
+        if (audit !== undefined && correctionBefore !== null) {
+          const changed = Object.keys(data).filter(
+            (key) => key !== 'characterId' && key !== 'expectedRevision',
+          )
+          const before: Record<string, unknown> = {}
+          const after: Record<string, unknown> = {}
+          const beforeRecord = correctionBefore as unknown as Record<string, unknown>
+          const afterRecord = updated as unknown as Record<string, unknown>
+          for (const key of changed) {
+            if (key === 'attributes' || key === 'skills' || key === 'disciplines' || key === 'advantages') {
+              before[key] = beforeRecord[key]
+              after[key] = afterRecord[key]
+            }
+          }
+          await transaction.characterCorrectionAudit.create({
+            data: {
+              characterId: data.characterId,
+              chronicleId: audit.chronicleId,
+              actorId: audit.actorId,
+              reason: audit.reason,
+              before: JSON.parse(JSON.stringify(before)) as Prisma.InputJsonValue,
+              after: JSON.parse(JSON.stringify(after)) as Prisma.InputJsonValue,
+              revisionBefore: data.expectedRevision,
+              revisionAfter: updated.revision,
+            },
+          })
+        }
 
-        return toPersistedDraft(row)
+        return updated
       },
     )
   }

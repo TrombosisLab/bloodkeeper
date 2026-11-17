@@ -169,6 +169,7 @@ enum AdvantageSelectionOrigin {
   PREDATOR_TYPE
   THIN_BLOOD
   EVOLUTION
+  NARRATOR_CORRECTION
 }
 
 enum AdvantageDetailsKind {
@@ -234,6 +235,7 @@ model User {
   chronicleNoteAudiences            ChronicleNoteAudience[]                  @relation("ChronicleNoteAudienceUser")
   notebookFavorites                 ChronicleNoteFavorite[]
   experienceMovements               CharacterExperienceMovement[]            @relation("CharacterExperienceActor")
+  characterCorrections              CharacterCorrectionAudit[]                @relation("CharacterCorrectionActor")
   executedDiceRolls                 DiceRollRecord[]                         @relation("DiceRollActor")
   rouseCheckOperations              CharacterRouseCheckOperation[]           @relation("RouseCheckActor")
   blushOfLifeExemptions             CharacterBlushOfLifeExemptionOperation[] @relation("BlushOfLifeExemptionActor")
@@ -305,6 +307,7 @@ model Chronicle {
   relationshipMaps         ChronicleRelationshipMap[]
   chronicleMaps            ChronicleMap[]                     @relation("ChronicleMapChronicle")
   globalHistoryLinks       GlobalHistoryEntryChronicle[]      @relation("GlobalHistoryEntryChronicleChronicle")
+  characterCorrections     CharacterCorrectionAudit[]
 
   @@index([narratorId])
   @@index([status])
@@ -750,6 +753,28 @@ model CharacterExperienceMovement {
   @@map("character_experience_movements")
 }
 
+model CharacterCorrectionAudit {
+  id             String   @id @default(uuid()) @db.Uuid
+  characterId    String   @db.Uuid
+  chronicleId    String   @db.Uuid
+  actorId        String   @db.Uuid
+  reason         String
+  before         Json
+  after          Json
+  revisionBefore Int
+  revisionAfter  Int
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+
+  character Character @relation("CharacterCorrectionCharacter", fields: [characterId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  chronicle Chronicle @relation(fields: [chronicleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  actor     User      @relation("CharacterCorrectionActor", fields: [actorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([characterId, createdAt])
+  @@index([chronicleId, createdAt])
+  @@index([actorId, createdAt])
+  @@map("character_correction_audits")
+}
+
 model Character {
   id          String          @id @default(uuid()) @db.Uuid
   ownerId     String          @db.Uuid
@@ -788,6 +813,7 @@ model Character {
   notes                    CharacterNote[]
   historyEntries           CharacterHistoryEntry[]
   experienceMovements      CharacterExperienceMovement[]            @relation("CharacterExperienceCharacter")
+  corrections              CharacterCorrectionAudit[]                @relation("CharacterCorrectionCharacter")
   diceRolls                DiceRollRecord[]                         @relation("DiceRollCharacter")
   sessionAttendances       ChronicleSessionAttendance[]             @relation("ChronicleSessionAttendanceCharacter")
   portrait                 CharacterPortrait?

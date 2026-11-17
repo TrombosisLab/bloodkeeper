@@ -8,6 +8,7 @@ export type CharacterAdvantageSelectionOrigin =
   | 'predatorType'
   | 'thinBlood'
   | 'evolution'
+  | 'narratorCorrection'
 
 /*
  * Configuración específica por instancia.

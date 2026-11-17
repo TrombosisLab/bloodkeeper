@@ -23,10 +23,13 @@ test('056-D registra origen evolution en modelos canonicos', () => {
   PREDATOR_TYPE
   THIN_BLOOD
   EVOLUTION
+  NARRATOR_CORRECTION
 }`,
   ]
   for (const enumDeclaration of expectedEnums) {
     assert.ok(schema.includes(enumDeclaration))
   }
   assert.equal((migration.match(/ADD VALUE 'EVOLUTION'/g) ?? []).length, 3)
+  const correctionMigration = readFileSync(new URL('../prisma/migrations/20261117100000_add_character_correction_audit/migration.sql', import.meta.url), 'utf8')
+  assert.match(correctionMigration, /ALTER TYPE "AdvantageSelectionOrigin" ADD VALUE 'NARRATOR_CORRECTION'/)
 })

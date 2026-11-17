@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 
 import { chronicleParticipantNotesApi } from '../infrastructure/chronicle-participant-notes.api'
 import { createCharacterExperienceGateway } from '../../character-sheet/infrastructure/character-experience.api.ts'
 import { PersistedCharacterSheet } from '../../character-sheet/components/PersistedCharacterSheet'
+import { ChronicleCharacterCorrectionPanel } from './ChronicleCharacterCorrectionPanel'
 import { createChronicleCharacterReadGateways } from '../../character-sheet/infrastructure/chronicle-character-read.api'
 import { createChronicleGateway } from '../infrastructure/chronicle.api.ts'
 import { createChronicleStoryGateway } from '../infrastructure/chronicle-story.api.ts'
@@ -16,6 +17,7 @@ import type {
 import type { ChronicleStoryApiSnapshot } from '../types/chronicle-story-api.types.ts'
 
 import './chronicle-participants-workspace.css'
+import './chronicle-character-correction.css'
 
 const gateway = createChronicleGateway()
 const storyGateway = createChronicleStoryGateway()
@@ -86,6 +88,9 @@ export function ChronicleParticipantsWorkspace({
   const [experience, setExperience] = useState<{ readonly total: number; readonly available: number } | null>(null)
   const [experienceError, setExperienceError] = useState(false)
   const [openedCharacterId, setOpenedCharacterId] = useState<string | null>(null)
+  const [correctionOpen, setCorrectionOpen] = useState(false)
+  const [characterSheetRevision, setCharacterSheetRevision] = useState(0)
+  const closeCorrection = useCallback(() => setCorrectionOpen(false), [])
 
   const characterReadGateways = useMemo(
     () => createChronicleCharacterReadGateways(chronicleId),
@@ -277,7 +282,7 @@ export function ChronicleParticipantsWorkspace({
       <ul className="participant-list">
             {visible.map((item) => (
               <li key={item.id} className={item.id === selectedId ? 'is-selected' : ''}>
-                <button type="button" onClick={() => setSelectedId(item.id)}>
+                <button type="button" onClick={() => { setSelectedId(item.id); setOpenedCharacterId(null); setCorrectionOpen(false) }}>
                   <span className="participant-list__topline"><strong>{item.displayName}</strong><em className={'participant-role participant-role--' + item.role}>{roles[item.role]}</em></span>
                   <small>{item.username}</small>
                   <span className="participant-list__state"><i />{states[item.status]}{character?.ownerId === item.userId ? ' · ' + character.name : ''}</span>
@@ -330,13 +335,13 @@ export function ChronicleParticipantsWorkspace({
                   </div>
                 ) : <p>Sin personaje asociado a esta crónica.</p>}
                 {canManage && character ? (
-                  <button className="participant-secondary-button" type="button" onClick={() => setOpenedCharacterId(character.characterId)}>Abrir ficha</button>
+                  <button className="participant-secondary-button" type="button" onClick={() => { setCorrectionOpen(false); setOpenedCharacterId(character.characterId) }}>Abrir ficha</button>
                 ) : null}
                 {selected.userId === authenticatedUserId ? characterAssociation : null}
               </section>
             </div>
 
-            {openedCharacterId !== null && canManage ? (
+            {openedCharacterId !== null && openedCharacterId === character?.characterId && canManage ? (
               <section className="participant-card participant-card--character-sheet" aria-labelledby="participant-character-sheet-title">
                 <div className="participant-card__heading">
                   <div>
@@ -344,9 +349,12 @@ export function ChronicleParticipantsWorkspace({
                     <h3 id="participant-character-sheet-title">Ficha de {character?.name ?? 'personaje'}</h3>
                   </div>
                   <button className="participant-secondary-button" type="button" onClick={() => setOpenedCharacterId(null)}>Cerrar ficha</button>
+                  <button className="participant-secondary-button" type="button" onClick={() => setCorrectionOpen(true)}>Editar ficha</button>
                 </div>
                 <p className="participant-helper">Consulta narrativa. El jugador conserva el control de edición de su ficha.</p>
+                {correctionOpen ? <ChronicleCharacterCorrectionPanel characterId={openedCharacterId} gateway={characterReadGateways} onSaved={() => setCharacterSheetRevision((value) => value + 1)} onClose={closeCorrection} /> : null}
                 <PersistedCharacterSheet
+                  key={`${openedCharacterId}:${characterSheetRevision}`}
                   characterId={openedCharacterId}
                   gateway={characterReadGateways.character}
                   profilePhaseGateway={characterReadGateways.profilePhase}

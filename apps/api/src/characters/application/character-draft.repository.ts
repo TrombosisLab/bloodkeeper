@@ -71,6 +71,7 @@ export interface CharacterDraftRepository {
     data: UpdateCharacterDraftData,
   ): Promise<PersistedCharacterDraft>
 
+
   hasHistoryEntries(
     ownerId: string,
     characterId: string,
@@ -129,6 +130,13 @@ export class CharacterDraftWriteConflictError
       `Character draft ${characterId} was not found or has changed`,
     )
     this.name = 'CharacterDraftWriteConflictError'
+  }
+}
+
+export class ChronicleCharacterCorrectionPermissionError extends Error {
+  constructor() {
+    super('An active chronicle narrator is required to correct a character')
+    this.name = 'ChronicleCharacterCorrectionPermissionError'
   }
 }
 
