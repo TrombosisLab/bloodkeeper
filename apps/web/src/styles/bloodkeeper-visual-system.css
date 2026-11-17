@@ -2510,3 +2510,18 @@ select:focus {
 }
 
 /* BLOODKEEPER_CREATION_REVIEW_DENSITY_V1_END */
+
+/* CHRONICLE_RESOURCE_BROWSER_MOBILE_SCROLL_V1 */
+@media (max-width: 760px) {
+  .chronicle-detail .chronicle-resource-catalog__browser {
+    height: min(42rem, 70vh);
+    max-height: min(42rem, 70vh);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-accent) transparent;
+  }
+}
