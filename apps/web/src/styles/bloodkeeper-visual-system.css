@@ -2525,3 +2525,21 @@ select:focus {
     scrollbar-color: var(--color-border-accent) transparent;
   }
 }
+
+
+/* BLOODKEEPER_PLAY_SESSION_SELECTOR_GRID_V1 */
+#chronicle-section-play-panel .chronicle-play-workspace {
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 18.5rem) !important;
+}
+
+@media (max-width: 72rem) {
+  #chronicle-section-play-panel .chronicle-play-workspace {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@container chronicle-panel (max-width: 72rem) {
+  #chronicle-section-play-panel .chronicle-play-workspace {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
