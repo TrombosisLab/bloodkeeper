@@ -345,7 +345,12 @@ export function ChroniclePlayWorkspace({ chronicleId, characterId, characterName
       {contextLoading ? <p className="chronicle-play-workspace__context-state" role="status">Actualizando contexto de juego…</p> : null}
       {contextError ? <p className="chronicle-play-workspace__context-state is-warning" role="alert">{contextError}</p> : null}
 
-      <section className="chronicle-play-workspace__dice-launcher" aria-label="Lanzador e historial de dados">
+      <details className="chronicle-play-workspace__disclosure" aria-label="Dados e historial de tiradas">
+        <summary className="chronicle-play-workspace__disclosure-summary">
+          <span><small>HERRAMIENTAS DE MESA</small><strong>Dados e historial</strong></span>
+          <span className="chronicle-play-workspace__disclosure-hint">Abrir el lanzador o consultar las tiradas recientes</span>
+        </summary>
+        <section className="chronicle-play-workspace__dice-launcher" aria-label="Lanzador e historial de dados">
 
         <div className="chronicle-play-workspace__dice-launcher-card">
           <div>
@@ -366,7 +371,8 @@ export function ChroniclePlayWorkspace({ chronicleId, characterId, characterName
         <div className="chronicle-play-workspace__recent-rolls" key={diceHistoryReload}>
           <DiceHistoryPanel chronicleId={chronicleId} refreshIntervalMs={5000} contextLabel="Historial de tiradas" />
         </div>
-      </section>
+        </section>
+      </details>
 
       {diceLauncherOpen ? (
         <div
@@ -499,21 +505,33 @@ export function ChroniclePlayWorkspace({ chronicleId, characterId, characterName
         </div>
       ) : null}
 
-      <section className="chronicle-play-workspace__vampire" aria-labelledby="chronicle-play-vampire-title">
-        <header><small>ESTADO VAMPÍRICO</small><h2 id="chronicle-play-vampire-title">Recursos de Sangre</h2></header>
+      <details className="chronicle-play-workspace__disclosure" aria-label="Recursos de sangre">
+        <summary className="chronicle-play-workspace__disclosure-summary">
+          <span><small>ESTADO VAMPÍRICO</small><strong>Recursos de Sangre</strong></span>
+          <span className="chronicle-play-workspace__disclosure-hint">Hambre actual: {hunger} / 5</span>
+        </summary>
+        <section className="chronicle-play-workspace__vampire">
         {model && characterId ? <div className="chronicle-play-workspace__vampire-grid">
 
           <article><h3>Alimentación</h3><p>Registra presa, resonancia y Hambre saciada.</p><PersistedCharacterFeeding characterId={characterId} revision={characterRevision} hunger={hunger} onApplied={() => setReload((item) => item + 1)} /></article>
           <article className="chronicle-play-workspace__hunger"><h3>Hambre actual</h3><strong>{hunger} / 5</strong><i aria-label={`Hambre ${hunger} de 5`}>{Array.from({ length: 5 }, (_, index) => <b key={index} className={index < hunger ? 'is-filled' : ''} />)}</i><span>{hunger >= 4 ? 'Crítica' : hunger >= 2 ? 'Moderada' : 'Controlada'}</span></article>
         </div> : <p className="chronicle-play-workspace__empty">Asocia un personaje activo para utilizar Enardecimiento y Alimentación.</p>}
-      </section>
+        </section>
+      </details>
 
-      <section className="chronicle-play-workspace__notes" aria-label="Notas e información de la sesión">
+      {notesError ? <p className="chronicle-play-workspace__notes-error" role="alert">{notesError}</p> : null}
+
+      <details className="chronicle-play-workspace__disclosure" aria-label="Notas e información de la sesión">
+        <summary className="chronicle-play-workspace__disclosure-summary">
+          <span><small>APUNTES Y HALLAZGOS</small><strong>Notas e información</strong></span>
+          <span className="chronicle-play-workspace__disclosure-hint">{notes.sharedNotes.length} notas compartidas · {discovered.length} elementos descubiertos</span>
+        </summary>
+        <section className="chronicle-play-workspace__notes" aria-label="Notas e información de la sesión">
         <article><header><h2>Notas privadas</h2><small>Solo tú</small></header><textarea value={privateNotes} disabled={notesLoading || !session} onChange={(event) => { setPrivateNotes(event.target.value); setSavedNote(null) }} placeholder="Escribe tus notas privadas..." /><button type="button" disabled={notesLoading || savingNote !== null || !session} onClick={() => void saveNote('private')}>{savingNote === 'private' ? 'Guardando…' : 'Guardar nota privada'}</button>{savedNote === 'private' ? <small role="status">Nota privada guardada en Cuaderno</small> : null}</article>
         <article><header><h2>Notas compartidas</h2><small>Participantes de la crónica</small></header><textarea value={publicNotes} disabled={notesLoading || !session} onChange={(event) => { setPublicNotes(event.target.value); setSavedNote(null) }} placeholder="Escribe una nota para compartir..." /><button type="button" disabled={notesLoading || savingNote !== null || !session} onClick={() => void saveNote('public')}>{savingNote === 'public' ? 'Guardando…' : 'Guardar nota compartida'}</button>{savedNote === 'public' ? <small role="status">Nota compartida guardada en Cuaderno</small> : null}{notes.sharedNotes.length ? <ul className="chronicle-play-workspace__shared-notes">{notes.sharedNotes.slice(0, 3).map((note) => <li key={note.authorUserId}><strong>{note.authorName}</strong><span>{note.content}</span></li>)}</ul> : null}</article>
         <article className="chronicle-play-workspace__discoveries"><header><h2>Información descubierta</h2><small>Contexto público</small></header>{discovered.length ? <ul>{discovered.map((item) => <li key={item.id}><strong>{item.label}</strong><span>{item.kind}</span></li>)}</ul> : <p>No hay información pública vinculada.</p>}</article>
-        {notesError ? <p className="chronicle-play-workspace__notes-error" role="alert">{notesError}</p> : null}
-      </section>
+        </section>
+      </details>
     </main>
 
     <aside className="chronicle-play-workspace__character">

@@ -224,6 +224,47 @@
   .chronicle-play-workspace__situation > div + div { border-top: 1px solid var(--play-border); border-left: 0; }
 }
 
+/* BLOODKEEPER_PLAY_WORKSPACE_DISCLOSURES_V1_START */
+.chronicle-play-workspace__disclosure {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--play-border);
+  border-radius: .6rem;
+  background: linear-gradient(145deg, rgba(21, 21, 22, .98), rgba(13, 12, 13, .98));
+}
+.chronicle-play-workspace__disclosure > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem 1rem;
+  min-height: 3.5rem;
+  padding: .7rem .85rem;
+  cursor: pointer;
+  list-style: none;
+}
+.chronicle-play-workspace__disclosure > summary::-webkit-details-marker { display: none; }
+.chronicle-play-workspace__disclosure > summary::after {
+  flex: 0 0 auto;
+  color: var(--play-red);
+  content: '+';
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+.chronicle-play-workspace__disclosure[open] > summary { border-bottom: 1px solid var(--play-border); }
+.chronicle-play-workspace__disclosure[open] > summary::after { content: '−'; }
+.chronicle-play-workspace__disclosure > summary:focus-visible { outline: 2px solid var(--play-red); outline-offset: -3px; }
+.chronicle-play-workspace__disclosure-summary > span:first-child { display: grid; gap: .15rem; }
+.chronicle-play-workspace__disclosure-summary strong { font-family: Georgia, serif; font-size: 1.05rem; }
+.chronicle-play-workspace__disclosure-hint { color: var(--play-muted); font-size: .76rem; text-align: right; }
+.chronicle-play-workspace__disclosure > .chronicle-play-workspace__dice-launcher,
+.chronicle-play-workspace__disclosure > .chronicle-play-workspace__vampire,
+.chronicle-play-workspace__disclosure > .chronicle-play-workspace__notes { margin: 0; border: 0; border-radius: 0; background: transparent; padding: .7rem; }
+@media (max-width: 620px) {
+  .chronicle-play-workspace__disclosure > summary { align-items: flex-start; }
+  .chronicle-play-workspace__disclosure-hint { max-width: 45%; }
+}
+/* BLOODKEEPER_PLAY_WORKSPACE_DISCLOSURES_V1_END */
+
 /* BLOODKEEPER_CHRONICLE_PLAY_DICE_LAUNCHER_V1_START */
 .chronicle-play-workspace__dice-launcher {
   display: grid;
