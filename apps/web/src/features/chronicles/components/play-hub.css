@@ -5,7 +5,7 @@
 .play-hub__header p,.play-hub__card p{margin:.4rem 0}
 .play-hub__header button,.play-hub__enter,.play-hub__pager button{border:1px solid var(--color-border-accent);border-radius:var(--radius-control);background:transparent;color:inherit;padding:.65rem 1rem;font:inherit;font-weight:800;cursor:pointer}
 .play-hub__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,24rem),1fr));gap:1.25rem;margin-top:1.5rem}
-.play-hub__card{display:grid;grid-template-columns:6.5rem minmax(0,1fr);gap:1rem;min-height:14rem;padding:1rem;border:1px solid var(--color-border-default);border-radius:var(--radius-xl);background:var(--color-surface-translucent)}
+.play-hub__card{display:grid;grid-template-columns:6.5rem minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;gap:1rem;min-height:14rem;padding:1rem;border:1px solid var(--color-border-default);border-radius:var(--radius-xl);background:var(--color-surface-translucent)}
 .play-hub__cover{overflow:hidden;display:grid;place-items:center;align-self:start;aspect-ratio:2/3;border:1px solid var(--color-border-default);border-radius:var(--radius-control);background:var(--color-surface-emphasis);font-family:var(--font-family-display);font-size:1.4rem}
 .play-hub__cover>*{grid-area:1/1}.play-hub__cover img{width:100%;height:100%;object-fit:cover}
 .play-hub__content{min-width:0}.play-hub__content h2{overflow-wrap:anywhere}.play-hub__card p{font-size:.9rem}.play-hub__card span{font-size:.76rem;opacity:.72}
@@ -45,6 +45,7 @@
   cursor: pointer;
 }
 .play-hub__description-toggle:hover { color: var(--color-text-primary); }
+.play-hub__updated { display: block; margin-top: .45rem; }
 
 .play-hub__actions,
 .resource-library-reference__actions {
