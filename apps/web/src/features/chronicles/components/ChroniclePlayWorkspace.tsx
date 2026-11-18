@@ -132,7 +132,6 @@ export function ChroniclePlayWorkspace({ chronicleId, characterId, characterName
   const [sessionsError, setSessionsError] = useState<string | null>(null)
   const [sessionsReload, setSessionsReload] = useState(0)
   const [session, setSession] = useState<any | null>(null)
-  const [showAllSessions, setShowAllSessions] = useState(false)
   const [context, setContext] = useState<ChronicleSessionContextApiSnapshot>(emptyContext)
   const [workspace, setWorkspace] = useState<SessionWorkspaceSnapshot | null>(null)
   const [stories, setStories] = useState<readonly ChronicleSharedStoryApiSnapshot[]>([])
@@ -298,7 +297,6 @@ export function ChroniclePlayWorkspace({ chronicleId, characterId, characterName
   const document = context.resources.find((item) => item.kind === 'document') ?? context.resources[0] ?? null
   const organization = context.resources.find((item) => item.kind === 'organization') ?? null
   const latestEvent = [...context.events].sort((left, right) => right.timelineOrder - left.timelineOrder)[0] ?? null
-  const visibleSessions = showAllSessions ? sessions : sessions.slice(0, 7)
   const discovered = useMemo(() => [
     ...context.events.map((item) => ({ id: `event-${item.id}`, label: item.title, kind: 'Suceso' })),
     ...context.resources.map((item) => ({ id: `resource-${item.id}`, label: item.name, kind: item.kind === 'document' ? 'Documento' : item.kind === 'artifact' ? 'Artefacto' : 'Organización' })),
@@ -306,19 +304,29 @@ export function ChroniclePlayWorkspace({ chronicleId, characterId, characterName
   ].slice(0, 5), [context])
 
   return <section className="chronicle-play-workspace" aria-labelledby="chronicle-play-title">
-    <aside className="chronicle-play-workspace__rail">
-      <header><small>CRÓNICA ACTIVA</small><h2>Jugar</h2><span>{sessionStatus(session)}</span></header>
-      <article className="chronicle-play-workspace__session-card"><small>SESIÓN ACTIVA</small><strong>{sessionTitle(session)}</strong><b>{formatDate(session?.realDate)}</b><span className="chronicle-play-workspace__selection-state">{session ? 'Sesión seleccionada' : 'Esperando al Narrador'}</span></article>
-      <h3>Sesiones</h3>
-      <ul className="chronicle-play-workspace__session-list">{visibleSessions.map((item: any) => <li key={item.id}><button type="button" className={item.id === session?.id ? 'is-active' : ''} onClick={() => setSession(item)}><strong>{item.title || `Sesión ${item.sessionNumber ?? ''}`}</strong><small>{sessionStatus(item)}</small><time>{formatDate(item.realDate)}</time></button></li>)}</ul>
-      {sessionsLoading ? <p role="status">Cargando sesiones…</p> : null}
+    <div className="chronicle-play-workspace__session-switcher">
+      <label htmlFor="chronicle-play-session-select">
+        <small>SESIÓN DE LA CRÓNICA</small>
+        <select
+          id="chronicle-play-session-select"
+          aria-label="Seleccionar sesión"
+          value={session?.id ?? ''}
+          disabled={sessionsLoading || sessions.length === 0}
+          onChange={(event) => setSession(sessions.find((item: any) => item.id === event.target.value) ?? null)}
+        >
+          {!sessions.length ? <option value="">{sessionsLoading ? 'Cargando sesiones…' : 'No hay sesiones disponibles'}</option> : null}
+          {sessions.map((item: any) => <option key={item.id} value={item.id}>{sessionTitle(item)} · {sessionStatus(item)} · {formatDate(item.realDate)}</option>)}
+        </select>
+      </label>
+      <strong className={session?.status === 'preparation' ? 'is-live' : ''} aria-live="polite">
+        {session?.status === 'preparation' ? '● EN JUEGO' : sessionStatus(session).toUpperCase()}
+      </strong>
       {sessionsError ? <div className="chronicle-play-workspace__sessions-error" role="alert"><span>{sessionsError}</span><button type="button" onClick={() => setSessionsReload((current) => current + 1)}>Reintentar carga de sesiones</button></div> : null}
-      {sessions.length > 7 ? <button type="button" className="chronicle-play-workspace__rail-action" onClick={() => setShowAllSessions((current) => !current)}>{showAllSessions ? 'Mostrar sesiones recientes' : `Ver todas las sesiones (${sessions.length})`}</button> : null}
-    </aside>
+    </div>
 
     <main className="chronicle-play-workspace__main">
       <header className="chronicle-play-workspace__hero">
-        <div className="chronicle-play-workspace__hero-title"><div><small>{sessionStatus(session).toUpperCase()}</small><h1 id="chronicle-play-title">{sessionTitle(session)}</h1></div><strong>{session?.status === 'preparation' ? '● EN JUEGO' : sessionStatus(session).toUpperCase()}</strong></div>
+        <div className="chronicle-play-workspace__hero-title"><div><small>SESIÓN SELECCIONADA</small><h1 id="chronicle-play-title">{sessionTitle(session)}</h1></div></div>
         <dl className="chronicle-play-workspace__situation"><div><dt>Historia</dt><dd>{linkedStory?.title ?? 'Sin historia vinculada'}</dd></div><div><dt>Escena actual</dt><dd>{currentScene?.title ?? 'Esperando al Narrador'}</dd></div><div><dt>Ubicación</dt><dd>{location?.name ?? 'Sin localización vinculada'}</dd></div><div><dt>Momento narrativo</dt><dd>{latestEvent?.narrativeTimeLabel ?? formatDate(session?.realDate)}</dd></div></dl>
       </header>
 
