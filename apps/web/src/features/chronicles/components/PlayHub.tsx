@@ -122,7 +122,7 @@ export function PlayHub({ onOpenCharacter }: PlayHubProps) {
                         {isExpanded ? 'Mostrar menos' : 'Leer descripción completa'}
                       </button>
                     ) : null}
-                    <span>Actualizada {formatDate(chronicle.updatedAt)}</span>
+                    <span className="play-hub__updated">Actualizada {formatDate(chronicle.updatedAt)}</span>
                   </div>
                   <button className="play-hub__enter" onClick={() => setSelectedId(chronicle.id)} type="button">
                     Entrar a jugar →
