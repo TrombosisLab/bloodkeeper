@@ -51,10 +51,7 @@ export class LoadChronicleCharacterUseCase {
         requesterId,
       )
 
-    if (
-      membership === null ||
-      membership.role !== 'narrator'
-    ) {
+    if (membership === null) {
       throw new ChronicleCharacterReadPermissionError()
     }
 
@@ -70,6 +67,13 @@ export class LoadChronicleCharacterUseCase {
       throw new ChronicleCharacterNotFoundError(
         characterId,
       )
+    }
+
+    if (
+      membership.role !== 'narrator' &&
+      character.ownerId !== requesterId
+    ) {
+      throw new ChronicleCharacterReadPermissionError()
     }
 
     return character
