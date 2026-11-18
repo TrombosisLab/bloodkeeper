@@ -27,6 +27,7 @@ export function PlayHub({ onOpenCharacter }: PlayHubProps) {
   const [error, setError] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(0)
+  const [expandedChronicleId, setExpandedChronicleId] = useState<string | null>(null)
 
   const pageCount = Math.max(1, Math.ceil(chronicles.length / PAGE_SIZE))
   const visibleChronicles = useMemo(
@@ -90,27 +91,45 @@ export function PlayHub({ onOpenCharacter }: PlayHubProps) {
       {!loading && !error && chronicles.length > 0 ? (
         <>
           <div className="play-hub__grid">
-            {visibleChronicles.map((chronicle) => (
-              <article className="play-hub__card" key={chronicle.id}>
-                <div className="play-hub__cover">
-                  <span aria-hidden="true">V5</span>
-                  <img
-                    alt=""
-                    onError={(event) => { event.currentTarget.style.display = 'none' }}
-                    src={`/api/chronicles/${chronicle.id}/cover`}
-                  />
-                </div>
-                <div className="play-hub__content">
-                  <small>CRÓNICA ACTIVA</small>
-                  <h2>{chronicle.name}</h2>
-                  <p>{chronicle.description || 'Sin descripción.'}</p>
-                  <span>Actualizada {formatDate(chronicle.updatedAt)}</span>
-                </div>
-                <button className="play-hub__enter" onClick={() => setSelectedId(chronicle.id)} type="button">
-                  Entrar a jugar →
-                </button>
-              </article>
-            ))}
+            {visibleChronicles.map((chronicle) => {
+              const description = chronicle.description || 'Sin descripción.'
+              const isExpanded = expandedChronicleId === chronicle.id
+              const canExpandDescription = description.length > 180
+              const descriptionId = `play-hub-description-${chronicle.id}`
+
+              return (
+                <article className={`play-hub__card${isExpanded ? ' is-expanded' : ''}`} key={chronicle.id}>
+                  <div className="play-hub__cover">
+                    <span aria-hidden="true">V5</span>
+                    <img
+                      alt=""
+                      onError={(event) => { event.currentTarget.style.display = 'none' }}
+                      src={`/api/chronicles/${chronicle.id}/cover`}
+                    />
+                  </div>
+                  <div className="play-hub__content">
+                    <small>CRÓNICA ACTIVA</small>
+                    <h2>{chronicle.name}</h2>
+                    <p className="play-hub__description" id={descriptionId}>{description}</p>
+                    {canExpandDescription ? (
+                      <button
+                        aria-controls={descriptionId}
+                        aria-expanded={isExpanded}
+                        className="play-hub__description-toggle"
+                        onClick={() => setExpandedChronicleId(isExpanded ? null : chronicle.id)}
+                        type="button"
+                      >
+                        {isExpanded ? 'Mostrar menos' : 'Leer descripción completa'}
+                      </button>
+                    ) : null}
+                    <span>Actualizada {formatDate(chronicle.updatedAt)}</span>
+                  </div>
+                  <button className="play-hub__enter" onClick={() => setSelectedId(chronicle.id)} type="button">
+                    Entrar a jugar →
+                  </button>
+                </article>
+              )
+            })}
           </div>
           {pageCount > 1 ? (
             <nav aria-label="Navegación de crónicas" className="play-hub__pager">
