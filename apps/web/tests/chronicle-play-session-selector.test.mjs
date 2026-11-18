@@ -4,6 +4,7 @@ import test from 'node:test'
 
 const component = readFileSync(new URL('../src/features/chronicles/components/ChroniclePlayWorkspace.tsx', import.meta.url), 'utf8')
 const styles = readFileSync(new URL('../src/features/chronicles/components/chronicle-play-workspace.css', import.meta.url), 'utf8')
+const globalStyles = readFileSync(new URL('../src/styles/bloodkeeper-visual-system.css', import.meta.url), 'utf8')
 
 test('Jugar keeps every session in one accessible selector and removes the redundant rail', () => {
   assert.match(component, /aria-label="Seleccionar sesión"/)
@@ -12,4 +13,6 @@ test('Jugar keeps every session in one accessible selector and removes the redun
   assert.doesNotMatch(component, /chronicle-play-workspace__session-list|chronicle-play-workspace__rail/)
   assert.match(styles, /\.chronicle-play-workspace__session-switcher/)
   assert.match(styles, /grid-template-columns: minmax\(0, 1fr\) minmax\(16rem, 18\.5rem\)/)
+  assert.match(globalStyles, /#chronicle-section-play-panel \.chronicle-play-workspace\s*\{\s*grid-template-columns: minmax\(0, 1fr\) minmax\(16rem, 18\.5rem\) !important;/)
+  assert.match(globalStyles, /@container chronicle-panel \(max-width: 72rem\)[\s\S]*?#chronicle-section-play-panel \.chronicle-play-workspace[\s\S]*?grid-template-columns: minmax\(0, 1fr\) !important;/)
 })
