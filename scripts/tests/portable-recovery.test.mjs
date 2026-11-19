@@ -51,6 +51,8 @@ test('portable restore verifies in staging, requires confirmation, and keeps rol
   assert.match(restore, /api\/health/)
   assert.match(restore, /PRE_RESTORE_BACKUP/)
   assert.match(restore, /merge-base --is-ancestor/)
+  assert.doesNotMatch(restore, /tar -xOzf "\$ARCHIVE" \.\/database\.dump \|[^\n]*pg_restore --list/)
+  assert.match(restore, /tar -xOzf "\$ARCHIVE" \.\/database\.dump \|[^\n]*pg_restore --username="\$USERNAME" --dbname="\$TEMP_DATABASE"/)
   assert.doesNotMatch(restore, /pg_restore --list -/)
   assert.doesNotMatch(restore, /--exit-on-error -/)
   assert.doesNotMatch(restore, /docker compose down --volumes/)
