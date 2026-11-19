@@ -28,11 +28,17 @@ volumen Docker.
 
 ## Exportar copias al anfitrión
 
-Exportar una vez a una carpeta local:
+Exportar una vez. En una terminal, el script pregunta qué carpeta usar; puedes
+escribir, por ejemplo, `/home/trombosis/bloodkeeper-copias` o la ruta de un
+disco montado. Si se deja vacía, usa la carpeta sugerida:
 
 ```bash
-./scripts/export-portable-backups.sh --destination "$HOME/bloodkeeper-copias" --keep 30
+sudo ./scripts/export-portable-backups.sh --keep 30
 ```
+
+También se puede indicar la ruta directamente con `--destination RUTA`. Al
+ejecutarlo mediante `sudo`, el destino y las copias quedan privados y con
+propietario del usuario que llamó a `sudo`, no de `root`.
 
 El exportador solo copia una copia de hoy cuyo estado sea correcto. Verifica
 los checksums externo e interno antes de publicarla en el destino. No borra
@@ -59,12 +65,16 @@ cron del anfitrión. Elige una hora posterior a la copia diaria:
 ```bash
 sudo ./scripts/install-host-backup-export.sh \
   --enable \
-  --destination /mnt/bloodkeeper \
   --hour 4 \
   --minute 0 \
   --keep 30 \
   --require-mounted
 ```
+
+Si se omite `--destination`, el instalador pregunta dónde guardar las copias
+y recuerda esa ruta para la tarea diaria. La ejecución automática conserva
+como propietario al usuario que configuró la tarea, para que pueda gestionar
+los archivos sin tener que abrirlos como `root`.
 
 Consulta o desactiva la tarea:
 

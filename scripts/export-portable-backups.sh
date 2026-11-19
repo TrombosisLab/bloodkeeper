@@ -3,18 +3,22 @@ set -Eeuo pipefail
 umask 077
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DESTINATION="${BLOODKEEPER_HOST_BACKUP_DIR:-$ROOT/backups/host/portable}"
+DESTINATION="${BLOODKEEPER_HOST_BACKUP_DIR:-}"
 KEEP="${BLOODKEEPER_HOST_BACKUP_KEEP:-30}"
+OWNER="${BLOODKEEPER_HOST_BACKUP_OWNER:-}"
+if [[ -z "$OWNER" && -n "${SUDO_UID:-}" && -n "${SUDO_GID:-}" ]]; then OWNER="$SUDO_UID:$SUDO_GID"; fi
 REQUIRE_MOUNT=false
 
 usage() {
   cat <<'EOF'
 Uso:
-  ./scripts/export-portable-backups.sh [--destination RUTA] [--keep NUMERO] [--require-mounted]
+  ./scripts/export-portable-backups.sh [--destination RUTA] [--keep NUMERO] [--owner UID:GID] [--require-mounted]
 
 Exporta al anfitrión las copias portables ya terminadas en Docker, valida
 checksum y contenido y conserva los NUMERO conjuntos más recientes.
 Use --keep 0 para no eliminar copias antiguas.
+Si no indicas destino en una terminal, el script te preguntará la carpeta.
+Al ejecutarlo con sudo, la copia quedará accesible para el usuario que llamó a sudo.
 EOF
 }
 
@@ -28,6 +32,9 @@ while (($#)); do
     --keep)
       (($# >= 2)) || die 'falta el número de copias a conservar.'
       KEEP=$2; shift 2 ;;
+    --owner)
+      (($# >= 2)) || die 'falta UID:GID para el propietario de los archivos.'
+      OWNER=$2; shift 2 ;;
     --require-mounted) REQUIRE_MOUNT=true; shift ;;
     --help|-h) usage; exit 0 ;;
     *) usage; die "opción no reconocida: $1" ;;
@@ -36,6 +43,20 @@ done
 
 [[ "$KEEP" =~ ^[0-9]+$ ]] || die '--keep debe ser un entero no negativo.'
 KEEP=$((10#$KEEP))
+if [[ -z "$DESTINATION" ]]; then
+  default_destination="$ROOT/backups/host/portable"
+  if [[ -n "${SUDO_UID:-}" ]]; then
+    caller_home="$(getent passwd "$SUDO_UID" | cut -d: -f6)"
+    [[ -n "$caller_home" ]] && default_destination="$caller_home/bloodkeeper-backups"
+  fi
+  if [[ -t 0 ]]; then
+    read -r -p "Carpeta anfitriona para las copias [$default_destination]: " selected_destination
+    DESTINATION="${selected_destination:-$default_destination}"
+  else
+    die 'indica --destination o BLOODKEEPER_HOST_BACKUP_DIR cuando no haya una terminal interactiva.'
+  fi
+fi
+[[ -z "$OWNER" || "$OWNER" =~ ^[0-9]+:[0-9]+$ ]] || die '--owner debe tener el formato UID:GID numérico.'
 if [[ "$DESTINATION" != /* ]]; then DESTINATION="$ROOT/$DESTINATION"; fi
 [[ "$DESTINATION" != / ]] || die 'no se permite usar / como destino.'
 command -v docker >/dev/null || die 'Docker no está instalado o no está disponible.'
@@ -56,6 +77,7 @@ fi
 mkdir -p -- "$DESTINATION"
 [[ -d "$DESTINATION" && ! -L "$DESTINATION" ]] || die 'el destino debe ser una carpeta real, no un enlace simbólico.'
 chmod 700 -- "$DESTINATION" 2>/dev/null || true
+if [[ -n "$OWNER" ]]; then chown -- "$OWNER" "$DESTINATION" || die "no se pudo asignar el destino a $OWNER."; fi
 stage="$(mktemp -d "$DESTINATION/.bloodkeeper-export.XXXXXX")"
 cleanup() { rm -rf -- "$stage"; }
 trap cleanup EXIT
@@ -119,6 +141,15 @@ if ((KEEP > 0)); then
     [[ -f "$old" && ! -L "$old" ]] || continue
     printf 'Retirando copia antigua por retención (%s): %s\n' "$KEEP" "$(basename "$old")"
     rm -f -- "$old" "$old.sha256" "$old.meta"
+  done
+fi
+
+if [[ -n "$OWNER" ]]; then
+  for item in "$DESTINATION"/bloodkeeper_full_*; do
+    [[ -e "$item" ]] || continue
+    [[ -f "$item" && ! -L "$item" ]] || die "elemento de exportación inesperado: $item"
+    chmod 600 -- "$item"
+    chown -- "$OWNER" "$item" || die "no se pudo asignar el archivo a $OWNER: $item"
   done
 fi
 

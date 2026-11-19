@@ -22,6 +22,9 @@ test('host export validates a successful backup from today and preserves the Doc
   assert.match(exporter, /sha256sum -c/)
   assert.match(exporter, /checksum_line.*name/)
   assert.match(exporter, /database\.dump/)
+  assert.match(exporter, /Carpeta anfitriona para las copias/)
+  assert.match(exporter, /--owner UID:GID/)
+  assert.match(exporter, /chown -- "\$OWNER"/)
   assert.match(exporter, /portable-compose\.sh" cp backup-worker:\/backups\//)
   assert.doesNotMatch(exporter, /portable-compose\.sh" rm/)
   assert.match(exporter, /--require-mounted/)
@@ -34,6 +37,8 @@ test('host scheduling is optional, UTC-based, serialized, and reversible', async
   assert.match(installer, /CRON_TZ=UTC/)
   assert.match(installer, /flock -n/)
   assert.match(installer, /--require-mounted/)
+  assert.match(installer, /Carpeta anfitriona para exportación diaria/)
+  assert.match(installer, /--owner \$qowner/)
   assert.match(installer, /rm -f -- "\$CRON_FILE"/)
 })
 

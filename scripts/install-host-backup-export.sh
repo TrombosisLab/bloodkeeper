@@ -4,16 +4,18 @@ set -Eeuo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CRON_FILE=/etc/cron.d/bloodkeeper-portable-backup-export
 ACTION=""
-DESTINATION="${BLOODKEEPER_HOST_BACKUP_DIR:-$ROOT/backups/host/portable}"
+DESTINATION="${BLOODKEEPER_HOST_BACKUP_DIR:-}"
 HOUR=4
 MINUTE=0
 KEEP=30
+OWNER="${BLOODKEEPER_HOST_BACKUP_OWNER:-}"
+if [[ -z "$OWNER" && -n "${SUDO_UID:-}" && -n "${SUDO_GID:-}" ]]; then OWNER="$SUDO_UID:$SUDO_GID"; fi
 REQUIRE_MOUNT=false
 
 usage() {
   cat <<'EOF'
 Uso:
-  sudo ./scripts/install-host-backup-export.sh --enable [--destination RUTA] [--hour UTC] [--minute N] [--keep N] [--require-mounted]
+  sudo ./scripts/install-host-backup-export.sh --enable [--destination RUTA] [--hour UTC] [--minute N] [--keep N] [--owner UID:GID] [--require-mounted]
   sudo ./scripts/install-host-backup-export.sh --disable
   sudo ./scripts/install-host-backup-export.sh --status
 
@@ -27,13 +29,14 @@ while (($#)); do
     --enable|--disable|--status)
       [[ -z "$ACTION" ]] || die 'indica solo una acción.'
       ACTION="${1#--}"; shift ;;
-    --destination|--hour|--minute|--keep)
+    --destination|--hour|--minute|--keep|--owner)
       (($# >= 2)) || die "falta valor para $1."
       case "$1" in
         --destination) DESTINATION=$2 ;;
         --hour) HOUR=$2 ;;
         --minute) MINUTE=$2 ;;
         --keep) KEEP=$2 ;;
+        --owner) OWNER=$2 ;;
       esac
       shift 2 ;;
     --require-mounted) REQUIRE_MOUNT=true; shift ;;
@@ -51,6 +54,20 @@ if [[ "$ACTION" == disable ]]; then
   exit 0
 fi
 
+if [[ -z "$DESTINATION" ]]; then
+  default_destination="$ROOT/backups/host/portable"
+  if [[ -n "${SUDO_UID:-}" ]]; then
+    caller_home="$(getent passwd "$SUDO_UID" | cut -d: -f6)"
+    [[ -n "$caller_home" ]] && default_destination="$caller_home/bloodkeeper-backups"
+  fi
+  if [[ -t 0 ]]; then
+    read -r -p "Carpeta anfitriona para exportación diaria [$default_destination]: " selected_destination
+    DESTINATION="${selected_destination:-$default_destination}"
+  else
+    die 'indica --destination cuando no haya una terminal interactiva.'
+  fi
+fi
+
 [[ "$HOUR" =~ ^[0-9]+$ ]] || die '--hour debe ser un entero entre 0 y 23 UTC.'
 [[ "$MINUTE" =~ ^[0-9]+$ ]] || die '--minute debe ser un entero entre 0 y 59.'
 [[ "$KEEP" =~ ^[0-9]+$ ]] || die '--keep debe ser un entero no negativo.'
@@ -59,6 +76,8 @@ HOUR=$((10#$HOUR)); MINUTE=$((10#$MINUTE)); KEEP=$((10#$KEEP))
 ((MINUTE <= 59)) || die '--minute debe estar entre 0 y 59.'
 [[ "$DESTINATION" != / ]] || die 'no se permite usar / como destino.'
 [[ "$DESTINATION" != *%* && "$DESTINATION" != *$'\n'* ]] || die 'la ruta de destino contiene caracteres no válidos para cron.'
+[[ -z "$OWNER" || "$OWNER" =~ ^[0-9]+:[0-9]+$ ]] || die '--owner debe tener el formato UID:GID numérico.'
+if [[ -z "$OWNER" && -n "${SUDO_UID:-}" && -n "${SUDO_GID:-}" ]]; then OWNER="$SUDO_UID:$SUDO_GID"; fi
 if [[ "$DESTINATION" != /* ]]; then DESTINATION="$ROOT/$DESTINATION"; fi
 [[ -x "$ROOT/scripts/export-portable-backups.sh" ]] || die 'no se encuentra el exportador portable.'
 command -v cron >/dev/null 2>&1 || command -v crond >/dev/null 2>&1 || die 'no se detecta cron; no se instaló ninguna tarea.'
@@ -70,6 +89,8 @@ fi
 printf -v qscript '%q' "$ROOT/scripts/export-portable-backups.sh"
 printf -v qdestination '%q' "$DESTINATION"
 printf -v qflock '%q' "$flock_path"
+owner_arg=''
+if [[ -n "$OWNER" ]]; then printf -v qowner '%q' "$OWNER"; owner_arg=" --owner $qowner"; fi
 require_mount_arg=''
 if [[ "$REQUIRE_MOUNT" == true ]]; then require_mount_arg=' --require-mounted'; fi
 tmp="$(mktemp /etc/cron.d/.bloodkeeper-export.XXXXXX)"
@@ -78,7 +99,7 @@ cat > "$tmp" <<EOF
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 CRON_TZ=UTC
-$MINUTE $HOUR * * * root $qflock -n /run/lock/bloodkeeper-host-backup-export.lock $qscript --destination $qdestination --keep $KEEP$require_mount_arg >> /var/log/bloodkeeper-backup-export.log 2>&1
+$MINUTE $HOUR * * * root $qflock -n /run/lock/bloodkeeper-host-backup-export.lock $qscript --destination $qdestination --keep $KEEP$owner_arg$require_mount_arg >> /var/log/bloodkeeper-backup-export.log 2>&1
 EOF
 chmod 644 "$tmp"
 mv -f -- "$tmp" "$CRON_FILE"
