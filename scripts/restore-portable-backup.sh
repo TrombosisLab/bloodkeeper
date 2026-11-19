@@ -98,7 +98,7 @@ internal_checksum="$(tar -xOzf "$ARCHIVE" ./SHA256SUMS 2>/dev/null)" || die 'fal
 expected_dump_hash="${BASH_REMATCH[1]}"
 actual_dump_hash="$(tar -xOzf "$ARCHIVE" ./database.dump 2>/dev/null | sha256sum | awk '{print $1}')" || die 'falta database.dump en el paquete.'
 [[ "$actual_dump_hash" == "$expected_dump_hash" ]] || die 'el checksum interno de la base no coincide.'
-tar -xOzf "$ARCHIVE" ./database.dump | "${COMPOSE[@]}" exec -T postgres pg_restore --list - >/dev/null || die 'PostgreSQL no puede leer el dump.'
+tar -xOzf "$ARCHIVE" ./database.dump | "${COMPOSE[@]}" exec -T postgres pg_restore --list >/dev/null || die 'PostgreSQL no puede leer el dump.'
 
 DATABASE="$("${COMPOSE[@]}" exec -T postgres printenv POSTGRES_DB | tr -d '\r\n')"
 USERNAME="$("${COMPOSE[@]}" exec -T postgres printenv POSTGRES_USER | tr -d '\r\n')"
@@ -128,7 +128,7 @@ validate_database() {
 }
 "${COMPOSE[@]}" up -d --wait --wait-timeout 180 postgres || die 'PostgreSQL no está saludable.'
 create_database "$TEMP_DATABASE"
-tar -xOzf "$ARCHIVE" ./database.dump | "${COMPOSE[@]}" exec -T postgres pg_restore --username="$USERNAME" --dbname="$TEMP_DATABASE" --no-owner --no-privileges --exit-on-error - || die 'no se pudo restaurar el dump temporal.'
+tar -xOzf "$ARCHIVE" ./database.dump | "${COMPOSE[@]}" exec -T postgres pg_restore --username="$USERNAME" --dbname="$TEMP_DATABASE" --no-owner --no-privileges --exit-on-error || die 'no se pudo restaurar el dump temporal.'
 validate_database "$TEMP_DATABASE"
 if [[ "$MODE" == verify ]]; then
   drop_database "$TEMP_DATABASE"
