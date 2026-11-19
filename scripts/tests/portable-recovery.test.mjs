@@ -42,6 +42,28 @@ test('host scheduling is optional, UTC-based, serialized, and reversible', async
   assert.match(installer, /rm -f -- "\$CRON_FILE"/)
 })
 
+test('admin script centralizes portable backup, export, scheduling, and restore actions', async () => {
+  const menu = await source('scripts/admin-menu.sh')
+  assert.match(menu, /BLOODKEEPER — COPIAS PORTABLES/)
+  assert.match(menu, /\[1\] Exportar copias ahora \(elegir carpeta\)/)
+  assert.match(menu, /\[2\] Consultar exportación automática/)
+  assert.match(menu, /\[3\] Activar exportación diaria \(elegir carpeta\)/)
+  assert.match(menu, /\[4\] Desactivar exportación diaria/)
+  assert.match(menu, /\[5\] Importar y restaurar una copia portable en este servidor/)
+  assert.match(menu, /export-portable-backups\.sh" --keep/)
+  assert.match(menu, /install-host-backup-export\.sh" --enable/)
+  assert.match(menu, /install-host-backup-export\.sh" --status/)
+  assert.match(menu, /install-host-backup-export\.sh" --disable/)
+  assert.match(menu, /restore-portable-backup\.sh" --verify "\$archive"/)
+  assert.match(menu, /Verificación correcta\. ¿Aplicar esta copia a este servidor\?/)
+  assert.match(menu, /restore-portable-backup\.sh" --apply "\$archive" --confirm/)
+  assert.match(menu, /no se ofrecerá aplicar esta copia/)
+  assert.match(menu, /1\) portable_backup_menu/)
+  assert.match(menu, /La operación terminó con código .*El panel sigue abierto/)
+  assert.match(menu, /\[1\] Gestionar copias portables \(exportar, programar e importar\)/)
+  assert.doesNotMatch(menu, /scripts\/backup\.sh|scripts\/backup-full\.sh|install-backup-schedule\.sh|restore-full\.sh|scripts\/restore\.sh/)
+})
+
 test('portable restore verifies in staging, requires confirmation, and keeps rollback data', async () => {
   const restore = await source('scripts/restore-portable-backup.sh')
   assert.match(restore, /--verify/)

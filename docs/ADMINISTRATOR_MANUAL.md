@@ -169,82 +169,29 @@ Instalación:
 ./scripts/install-manual-backup-request-service.sh --install
 ```
 
-### Backup por SSH
+Las órdenes `backup.sh` y `backup-full.sh` pertenecen al sistema heredado de
+instalación desde fuentes; no son el flujo de las instalaciones portables.
+Para el flujo actual usa el panel de copias portables.
 
-Copia lógica:
+### Exportación portable al anfitrión desde el panel
 
-```bash
-./scripts/backup.sh
-```
+En el menú SSH entra en **Copias y recuperación portable** → **Gestionar
+copias portables**. Ahí están centralizadas estas acciones:
 
-Copia completa:
+- Exportar copias verificadas al anfitrión y elegir la carpeta.
+- Consultar, activar o desactivar la exportación automática diaria.
+- Importar una copia portable y verificarla antes de ofrecer su aplicación.
 
-```bash
-./scripts/backup-full.sh
-```
+La aplicación de una copia sustituye los datos actuales. Exige una segunda
+confirmación y el restaurador crea una copia previa, valida los servicios y
+conserva un mecanismo de recuperación si algo falla. La programación diaria
+es opcional; las copias internas de Docker continúan funcionando de forma
+independiente. El detalle del traslado a un servidor limpio está en
+`RECOVERY.md`.
 
-La política completa se documenta en `RECOVERY.md`.
-
-## Restauración
-
-La restauración no se ejecuta desde la Web. Continúa siendo una operación SSH
-desde el panel común de administración:
-
-```bash
-sudo bash scripts/admin-menu.sh
-```
-
-En el menú principal elige **Restaurar un dump o paquete completo**. La misma
-opción está disponible dentro de **Copias de seguridad**. El panel pide la
-ruta, conserva la separación entre verificación y aplicación, y nunca aplica
-una restauración destructiva sin la confirmación correspondiente.
-
-Verificación no destructiva de un dump:
-
-```bash
-./scripts/restore.sh --verify backups/ARCHIVO.dump
-```
-
-Aplicación confirmada:
-
-```bash
-./scripts/restore.sh \
-  --apply backups/ARCHIVO.dump \
-  --confirm
-```
-
-Verificación de un paquete completo:
-
-```bash
-./scripts/restore-full.sh \
-  --verify /ruta/bloodkeeper_full_FECHA.tar.gz
-```
-
-Para una recuperación completa automatizada, el panel verifica primero el
-paquete, lo extrae a una ruta nueva, detiene la instalación actual sin borrar
-sus volúmenes, reconstruye API/Web, verifica el dump incluido, pide una
-confirmación explícita y aplica los datos. Si el proceso falla, intenta volver
-a levantar la instalación anterior. La instalación anterior no se elimina
-automáticamente.
-
-Desde el menú, elige **Restaurar un dump o paquete completo**, indica el
-archivo `.tar.gz` y selecciona **Ejecutar restauración completa automatizada**.
-El flujo requiere escribir `CONTINUAR` antes de detener la instalación y
-`RESTAURAR` antes de sustituir la base de datos.
-
-También se puede ejecutar directamente:
-
-```bash
-./scripts/restore-full-guided.sh \
-  --archive /ruta/bloodkeeper_full_FECHA.tar.gz \
-  --target-dir /ruta/bloodkeeper-restored
-```
-
-La copia del paquete a la máquina destino sigue siendo un paso previo manual
-o externo. No se debe iniciar la ruta recuperada con una imagen Web antigua
-mediante `docker compose up -d`; el flujo ejecuta el bootstrap correspondiente.
-
-No aplicar una restauración sin comprobar antes qué datos serán sustituidos.
+Los menús de restauración `.dump` y de paquetes completos source-build se han
+retirado del panel portable. Sus scripts se conservan en el repositorio para
+instalaciones heredadas, pero no forman parte del flujo centralizado actual.
 
 ## Inicio, parada y reinicio
 
@@ -362,7 +309,12 @@ Antes de cambios importantes debe valorarse:
 El snapshot de VirtualBox es una operación manual del host. No se automatiza
 desde la VM.
 
-## Programación de backups
+## Programación heredada de instalaciones source-build
+
+Esta programación pertenece al flujo antiguo de instalaciones desde fuentes.
+No se utiliza en instalaciones portables y ya no aparece en el panel de
+administración portable. Para exportación portable al anfitrión, usa
+**Copias y recuperación portable** en `scripts/admin-menu.sh`.
 
 Estado:
 

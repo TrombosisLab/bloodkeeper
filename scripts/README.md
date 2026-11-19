@@ -18,9 +18,9 @@ despliegue y mantenimiento mediante SSH.
 | `check-development-workflow.sh` | Valida el flujo oficial de desarrollo |
 | `check-deployment.sh` | Valida el despliegue oficial de SPEC-006 |
 | `logs.sh` | Consulta los registros de Docker Compose |
-| `export-portable-backups.sh` | Exporta al anfitrión copias verificadas; permite elegir la ruta y conserva el acceso del usuario |
-| `install-host-backup-export.sh` | Activa, consulta o desactiva la exportación cron opcional, con selección de destino |
-| `restore-portable-backup.sh` | Verifica una copia portable o la restaura con copia previa y rollback |
+| `export-portable-backups.sh` | Exporta al anfitrión copias verificadas; integrado en `admin-menu.sh`, permite elegir la ruta y conserva el acceso del usuario |
+| `install-host-backup-export.sh` | Activa, consulta o desactiva la exportación cron opcional desde el menú, con selección de destino |
+| `restore-portable-backup.sh` | Verifica e importa una copia portable desde el menú con confirmación, copia previa y rollback |
 | `check-backup-recovery.sh` | Valida el flujo portable y puede probar una copia sin sustituir la activa |
 | `backup.sh`, `restore.sh` | Herramientas antiguas source-build; no usar en despliegues portables |
 | `backup-full.sh`, `restore-full.sh` | Recuperación source-build heredada; no usar en despliegues portables |

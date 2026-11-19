@@ -2,7 +2,6 @@
 set -Eeuo pipefail
 
 ROOT="$({ cd "$(dirname "${BASH_SOURCE[0]}")/.."; pwd; })"
-HOST_BACKUP_DIR="${BLOODKEEPER_HOST_BACKUP_DIR:-$ROOT/backups/host}"
 
 if [ "${EUID:-$(id -u)}" -ne 0 ]; then
   printf 'ERROR: ejecuta este panel con sudo:\n  sudo bash scripts/admin-menu.sh\n' >&2
@@ -17,79 +16,76 @@ pause_menu() {
   printf '\n'
 }
 
-ask_path() {
-  local prompt="$1"
-  local default="$2"
-  local value=""
-
-  read -r -p "$prompt [$default]: " value
-  printf '%s\n' "${value:-$default}"
+run_menu_action() {
+  local result=0
+  "$@" || result=$?
+  if ((result != 0)); then
+    printf '\nLa operación terminó con código %s. El panel sigue abierto.\n' "$result" >&2
+  fi
 }
 
-backup_menu() {
+portable_backup_menu() {
   while true; do
     printf '\n============================================================\n'
-    printf 'BLOODKEEPER — COPIAS DE SEGURIDAD\n'
+    printf 'BLOODKEEPER — COPIAS PORTABLES\n'
     printf '============================================================\n'
-    printf '[1] Crear copia PostgreSQL inmediata\n'
-    printf '[2] Crear paquete completo inmediato\n'
-    printf '[3] Programar copias completas\n'
-    printf '[4] Consultar programación\n'
-    printf '[5] Copiar archivos del volumen Docker al host\n'
-    printf '[6] Consultar servicio de petición web\n'
-    printf '[7] Restaurar un dump o paquete completo\n'
+    printf '[1] Exportar copias ahora (elegir carpeta)\n'
+    printf '[2] Consultar exportación automática\n'
+    printf '[3] Activar exportación diaria (elegir carpeta)\n'
+    printf '[4] Desactivar exportación diaria\n'
+    printf '[5] Importar y restaurar una copia portable en este servidor\n'
     printf '[q] Volver\n'
     read -r -p 'Elige una opción: ' option
 
     case "$option" in
       1)
-        mkdir -p "$HOST_BACKUP_DIR/logical"
-        "$ROOT/scripts/backup.sh" --output-dir "$HOST_BACKUP_DIR/logical"
+        keep=""
+        read -r -p 'Conjuntos a conservar [30; 0 no elimina ninguno]: ' keep
+        run_menu_action "$ROOT/scripts/export-portable-backups.sh" --keep "${keep:-30}"
         pause_menu
         ;;
       2)
-        mirror=""
-        read -r -p 'Ruta espejo externa (opcional, Intro para omitir): ' mirror
-        mkdir -p "$HOST_BACKUP_DIR/full"
-        if [ -n "$mirror" ]; then
-          "$ROOT/scripts/backup-full.sh" --output-dir "$HOST_BACKUP_DIR/full" --mirror-dir "$mirror"
-        else
-          "$ROOT/scripts/backup-full.sh" --output-dir "$HOST_BACKUP_DIR/full"
-        fi
+        run_menu_action "$ROOT/scripts/install-host-backup-export.sh" --status
         pause_menu
         ;;
       3)
         hour=""
         minute=""
         keep=""
-        read -r -p 'Hora UTC [3]: ' hour
+        read -r -p 'Hora UTC posterior a la copia interna [4]: ' hour
         read -r -p 'Minuto [0]: ' minute
-        read -r -p 'Conjuntos a conservar [7]: ' keep
-        "$ROOT/scripts/install-backup-schedule.sh" --install \
-          --hour "${hour:-3}" \
+        read -r -p 'Conjuntos a conservar [30; 0 no elimina ninguno]: ' keep
+        run_menu_action "$ROOT/scripts/install-host-backup-export.sh" --enable \
+          --hour "${hour:-4}" \
           --minute "${minute:-0}" \
-          --keep "${keep:-7}" \
-          --output-dir "$HOST_BACKUP_DIR/full"
+          --keep "${keep:-30}"
         pause_menu
         ;;
       4)
-        "$ROOT/scripts/install-backup-schedule.sh" --status
+        run_menu_action "$ROOT/scripts/install-host-backup-export.sh" --disable
         pause_menu
         ;;
       5)
-        destination="$(ask_path 'Ruta de destino en la máquina anfitriona' "$HOST_BACKUP_DIR/from-docker")"
-        mkdir -p "$destination"
-        docker compose cp backup-worker:/backups/. "$destination/"
-        chmod 700 "$destination" 2>/dev/null || true
-        printf '✓ Archivos copiados a: %s\n' "$destination"
+        archive=""
+        read -r -p 'Ruta completa del archivo portable .tar.gz: ' archive
+        if [[ -z "$archive" ]]; then
+          printf 'Operación cancelada.\n'
+        elif [[ ! -f "$archive" || -L "$archive" ]]; then
+          printf 'ERROR: la ruta no apunta a un archivo normal.\n' >&2
+        elif "$ROOT/scripts/restore-portable-backup.sh" --verify "$archive"; then
+          answer=""
+          read -r -p 'Verificación correcta. ¿Aplicar esta copia a este servidor? [s/N]: ' answer
+          case "$answer" in
+            s|S|si|SI|sí|Sí)
+              run_menu_action "$ROOT/scripts/restore-portable-backup.sh" --apply "$archive" --confirm
+              ;;
+            *) printf 'Restauración no aplicada; los datos actuales no se cambiaron.\n' ;;
+          esac
+        else
+          result=$?
+          printf 'La verificación falló (código %s); no se ofrecerá aplicar esta copia.\n' "$result" >&2
+        fi
         pause_menu
-        ;;
-      6)
-        "$ROOT/scripts/install-manual-backup-request-service.sh" --status
-        pause_menu
-        ;;
-      7)
-        restore_menu
         ;;
       q|Q) return ;;
       *) printf 'Opción no válida.\n' ;;
@@ -97,55 +93,26 @@ backup_menu() {
   done
 }
 
-restore_menu() {
-  local archive=""
-  local mode=""
+backup_menu() {
+  while true; do
+    printf '\n============================================================\n'
+    printf 'BLOODKEEPER — COPIAS Y RECUPERACIÓN\n'
+    printf '============================================================\n'
+    printf '[1] Gestionar copias portables (exportar, programar e importar)\n'
+    printf '[2] Consultar servicio de petición manual desde la Web\n'
+    printf '[q] Volver\n'
+    read -r -p 'Elige una opción: ' option
 
-  printf '\n============================================================\n'
-  printf 'BLOODKEEPER — RESTAURACIÓN\n'
-  printf '============================================================\n'
-  read -r -p 'Ruta del archivo .dump o .tar.gz: ' archive
-  [ -n "$archive" ] || return
-  [ -f "$archive" ] || { printf 'ERROR: no existe el archivo.\n'; pause_menu; return; }
-
-  case "$archive" in
-    *.dump)
-      printf '[1] Verificar sin modificar la base\n'
-      printf '[2] Aplicar restauración (crea copia previa y exige confirmación)\n'
-      read -r -p 'Elige una opción: ' mode
-      case "$mode" in
-        1) "$ROOT/scripts/restore.sh" --verify "$archive" ;;
-        2) "$ROOT/scripts/restore.sh" --apply "$archive" --confirm ;;
-        *) printf 'Opción no válida.\n' ;;
-      esac
-      ;;
-    *.tar.gz)
-      printf '[1] Verificar el paquete completo sin desplegarlo\n'
-      printf '[2] Ejecutar restauración completa automatizada\n'
-      printf '[3] Preparar recuperación sin aplicar datos\n'
-      read -r -p 'Elige una opción: ' mode
-      case "$mode" in
-        1) "$ROOT/scripts/restore-full.sh" --verify "$archive" ;;
-        2)
-          target=""
-          read -r -p "Ruta nueva de recuperación [$ROOT-restored]: " target
-          target="${target:-$ROOT-restored}"
-          "$ROOT/scripts/restore-full-guided.sh" --archive "$archive" --target-dir "$target"
-          ;;
-        3)
-          target=""
-          read -r -p "Ruta nueva de recuperación [$ROOT-restored]: " target
-          target="${target:-$ROOT-restored}"
-          "$ROOT/scripts/restore-full.sh" --verify "$archive"
-          "$ROOT/scripts/restore-full.sh" --extract "$archive" --target-dir "$target" --confirm
-          printf '\nSiguiente paso: entra en la ruta recuperada y ejecuta el bootstrap indicado.\n'
-          ;;
-        *) printf 'Opción no válida.\n' ;;
-      esac
-      ;;
-    *) printf 'ERROR: el archivo debe terminar en .dump o .tar.gz.\n' ;;
-  esac
-  pause_menu
+    case "$option" in
+      1) portable_backup_menu ;;
+      2)
+        "$ROOT/scripts/install-manual-backup-request-service.sh" --status
+        pause_menu
+        ;;
+      q|Q) return ;;
+      *) printf 'Opción no válida.\n' ;;
+    esac
+  done
 }
 
 database_password_menu_action() {
@@ -222,12 +189,11 @@ while true; do
   printf '[1] Estado del sistema\n'
   printf '[2] Comprobación operativa\n'
   printf '[3] Logs\n'
-  printf '[4] Copias de seguridad\n'
-  printf '[5] Restaurar un dump o paquete completo\n'
-  printf '[6] Cloudflare Tunnel\n'
-  printf '[7] Operación, actualización y rollback\n'
-  printf '[8] Limpiar completamente la base de datos\n'
-  printf '[9] Cambiar contraseña de PostgreSQL\n'
+  printf '[4] Copias y recuperación portable\n'
+  printf '[5] Cloudflare Tunnel\n'
+  printf '[6] Operación, actualización y rollback\n'
+  printf '[7] Limpiar completamente la base de datos\n'
+  printf '[8] Cambiar contraseña de PostgreSQL\n'
   printf '[q] Salir\n'
   read -r -p 'Elige una opción: ' option
 
@@ -236,10 +202,9 @@ while true; do
     2) "$ROOT/scripts/check.sh"; pause_menu ;;
     3) "$ROOT/scripts/logs.sh"; pause_menu ;;
     4) backup_menu ;;
-    5) restore_menu ;;
-    6) "$ROOT/scripts/configure-cloudflare.sh"; pause_menu ;;
-    7) operations_menu ;;
-    8)
+    5) "$ROOT/scripts/configure-cloudflare.sh"; pause_menu ;;
+    6) operations_menu ;;
+    7)
       printf '\nATENCIÓN: se creará una copia y después se borrará la base actual.\n'
       read -r -p 'Escribe LIMPIAR para continuar: ' confirmation
       if [ "$confirmation" = 'LIMPIAR' ]; then
@@ -249,7 +214,7 @@ while true; do
       fi
       pause_menu
       ;;
-    9) database_password_menu_action ;;
+    8) database_password_menu_action ;;
     q|Q) printf 'Panel cerrado.\n'; exit 0 ;;
     *) printf 'Opción no válida.\n' ;;
   esac
