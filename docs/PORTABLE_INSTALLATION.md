@@ -115,7 +115,9 @@ gestor de secretos del entorno.
 Los datos se guardan en volúmenes Docker del proyecto. El worker de
 copias usa también volúmenes con nombre y no monta rutas personales del
 host ni el socket Docker. Para extraer copias fuera de la máquina debe
-seguirse el procedimiento de recuperación y exportación documentado.
+seguirse el procedimiento de recuperación y exportación documentado en
+`docs/RECOVERY.md`. La exportación diaria al anfitrión es opcional; las
+copias internas siguen ejecutándose aunque cron no esté configurado.
 
 ## Adaptador heredado de Ubuntu
 

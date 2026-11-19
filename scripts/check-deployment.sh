@@ -6,18 +6,17 @@ ROOT="$(
   pwd
 )"
 
-WITH_BACKUP="false"
-TEMP_DIR=""
+WITH_BACKUP_ARCHIVE=""
 
 usage() {
   cat <<'EOF'
 Uso:
   ./scripts/check-deployment.sh
-  ./scripts/check-deployment.sh --with-backup
+  ./scripts/check-deployment.sh --with-backup COPIA.tar.gz
   ./scripts/check-deployment.sh --help
 
 Opciones:
-  --with-backup  Crea una copia temporal y verifica su restauración
+  --with-backup  Verifica una copia portable en una base temporal,
                  sin sustituir la base activa.
 EOF
 }
@@ -27,19 +26,12 @@ die() {
   return 1
 }
 
-cleanup() {
-  if [ -n "$TEMP_DIR" ] && [ -d "$TEMP_DIR" ]; then
-    rm -rf "$TEMP_DIR"
-  fi
-}
-
-trap cleanup EXIT
-
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --with-backup)
-      WITH_BACKUP="true"
-      shift
+      [ "$#" -ge 2 ] || die "Falta la ruta del paquete portable."
+      WITH_BACKUP_ARCHIVE="$2"
+      shift 2
       ;;
     --help|-h)
       usage
@@ -67,8 +59,7 @@ for file in \
   scripts/stop.sh \
   scripts/check.sh \
   scripts/logs.sh \
-  scripts/backup.sh \
-  scripts/restore.sh
+  scripts/restore-portable-backup.sh
 do
   test -f "$file" ||
     die "Falta $file."
@@ -136,13 +127,8 @@ then
   die "stop.sh elimina volúmenes."
 fi
 
-grep -Fq './scripts/backup.sh' \
-  docs/DEPLOYMENT.md ||
-  die "El backup previo no está documentado."
-
-grep -Fq './scripts/restore.sh --verify' \
-  docs/DEPLOYMENT.md ||
-  die "La verificación de backup no está documentada."
+grep -Fq 'scripts/restore-portable-backup.sh' docs/DEPLOYMENT.md ||
+  die "La recuperación de copia portable no está documentada."
 
 grep -Fq '## Recuperación desde servidor limpio' \
   docs/RECOVERY.md ||
@@ -151,8 +137,8 @@ grep -Fq '## Recuperación desde servidor limpio' \
 grep -Fq 'distribución portable' docs/RECOVERY.md ||
   die "La recuperación no documenta la distribución portable."
 
-grep -Fqi 'no se requiere crontab' docs/RECOVERY.md ||
-  die "La recuperación depende indebidamente del host."
+grep -Fqi 'No se requiere crontab para las copias internas' docs/RECOVERY.md ||
+  die "Las copias internas no documentan su independencia del programador anfitrión."
 
 grep -Fq 'backup-worker' compose.yaml ||
   die "Falta el ejecutor Docker de backups."
@@ -160,27 +146,15 @@ grep -Fq 'backup-worker' compose.yaml ||
 grep -Fq 'backup-scheduler' compose.yaml ||
   die "Falta el scheduler Docker de backups."
 
-grep -Fq './scripts/restore-full.sh' \
-  docs/RECOVERY.md ||
-  die "La recuperación completa no documenta restore-full.sh."
-
-grep -Fq './scripts/bootstrap-server.sh' \
-  docs/RECOVERY.md ||
-  die "La recuperación completa no documenta bootstrap-server.sh."
-
-grep -Fq 'restore.sh --apply' \
-  docs/RECOVERY.md ||
-  die "La recuperación completa no documenta la restauración de base."
-
-grep -Fq './scripts/check.sh' \
-  docs/RECOVERY.md ||
-  die "La recuperación completa no documenta la validación final."
-
-test -x scripts/restore-full.sh ||
-  die "restore-full.sh no está disponible o no es ejecutable."
-
-test -x scripts/restore.sh ||
-  die "restore.sh no está disponible o no es ejecutable."
+grep -Fq 'restore-portable-backup.sh --verify' docs/RECOVERY.md ||
+  die "Falta el comando de verificación de copias portables."
+grep -Fq 'restore-portable-backup.sh --apply' docs/RECOVERY.md ||
+  die "Falta el comando de restauración portable."
+grep -Fq 'install-host-backup-export.sh' docs/RECOVERY.md ||
+  die "Falta la exportación opcional al anfitrión."
+test -f scripts/restore-portable-backup.sh || die "Falta el restaurador portable."
+test -f scripts/export-portable-backups.sh || die "Falta el exportador portable."
+test -f scripts/install-host-backup-export.sh || die "Falta el instalador cron opcional."
 
 grep -Fq 'SPEC-006' \
   docs/DEPLOYMENT.md ||
@@ -193,33 +167,10 @@ echo "== Estado operativo =="
 
 ./scripts/check-docker-architecture.sh
 
-if [ "$WITH_BACKUP" = "true" ]; then
+if [ -n "$WITH_BACKUP_ARCHIVE" ]; then
   echo
-  echo "== Backup y restauración temporal =="
-
-  TEMP_DIR="$(
-    mktemp -d /tmp/bloodkeeper-spec006-check.XXXXXX
-  )"
-
-  archive="$(
-    ./scripts/backup.sh \
-      --output-dir "$TEMP_DIR" \
-      --quiet |
-    tail -n 1
-  )"
-
-  test -s "$archive" ||
-    die "El backup está vacío."
-
-  test -s "$archive.sha256" ||
-    die "Falta el checksum del backup."
-
-  test -s "$archive.meta" ||
-    die "Faltan los metadatos del backup."
-
-  ./scripts/restore.sh --verify "$archive"
-
-  echo "✓ Backup real y restauración temporal correctos"
+  echo "== Verificación portable sin sustituir datos =="
+  ./scripts/restore-portable-backup.sh --verify "$WITH_BACKUP_ARCHIVE"
 fi
 
 echo

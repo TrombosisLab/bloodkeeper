@@ -141,6 +141,7 @@ services:
       PGDATABASE: ${POSTGRES_DB:?POSTGRES_DB es obligatoria; definela en .env}
       PGUSER: ${POSTGRES_USER:?POSTGRES_USER es obligatoria; definela en .env}
       PGPASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD es obligatoria; definela en .env}
+      BLOODKEEPER_SOURCE_REVISION: ${BLOODKEEPER_SOURCE_REVISION:-unknown}
       BACKUP_KEEP: ${BLOODKEEPER_BACKUP_KEEP:-7}
     volumes:
       - backup_status:/status

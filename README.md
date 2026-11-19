@@ -18,6 +18,8 @@ git clone https://github.com/TrombosisLab/bloodkeeper.git && cd bloodkeeper && .
 ```
 
 La guía completa está en `docs/PORTABLE_INSTALLATION.md`.
+Para copiar datos a otro anfitrión o recuperar una copia, sigue
+`docs/RECOVERY.md`.
 
 ## Actualización por consola
 

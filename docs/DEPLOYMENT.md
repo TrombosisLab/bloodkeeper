@@ -95,8 +95,11 @@ servicios.
 
 El servicio `backup-worker` consume las solicitudes administrativas y
 guarda los paquetes en volúmenes Docker. No usa el socket Docker ni rutas
-personales del host. La extracción a almacenamiento externo y la
-recuperación se describen en `docs/RECOVERY.md`.
+personales del host. El respaldo interno funciona sin cron en el anfitrión.
+Si se quiere una segunda copia fuera de Docker, se puede exportar manualmente
+o activar una tarea cron opcional con `scripts/install-host-backup-export.sh`.
+La restauración portable y el traslado a un servidor limpio están descritos,
+paso a paso, en `docs/RECOVERY.md`.
 
 ## Adaptador Ubuntu heredado
 
@@ -115,23 +118,9 @@ Los secretos permanecen en `.env`, ignorado por Git. Docker Compose exige
 variables de puertos tienen valores seguros por defecto y
 pueden personalizarse localmente.
 
-## Contrato operativo SPEC-006
+## Recuperación
 
-Antes de una actualización o de una recuperación se conserva una copia previa
-del sistema mediante el flujo source-build:
-
-```bash
-./scripts/backup.sh
-```
-
-La copia se verifica antes de considerarla utilizable:
-
-```bash
-./scripts/restore.sh --verify
-```
-
-## Recuperación desde servidor limpio
-
-La recuperación desde servidor limpio parte de un checkout Git nuevo, conserva
-los paquetes fuera de la máquina Docker y vuelve a validar los health checks
-después de levantar los servicios.
+Para recuperación portable, verifica y restaura con
+`scripts/restore-portable-backup.sh`; no uses los scripts source-build
+heredados. El proceso completo —incluido traslado a un servidor limpio— está
+en `docs/RECOVERY.md`.

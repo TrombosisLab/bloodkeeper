@@ -18,12 +18,13 @@ despliegue y mantenimiento mediante SSH.
 | `check-development-workflow.sh` | Valida el flujo oficial de desarrollo |
 | `check-deployment.sh` | Valida el despliegue oficial de SPEC-006 |
 | `logs.sh` | Consulta los registros de Docker Compose |
-| `backup.sh` | Crea y verifica una copia PostgreSQL |
-| `restore.sh` | Verifica o aplica una restauración segura |
-| `backup-full.sh` | Crea el paquete completo de SPEC-007 |
-| `restore-full.sh` | Verifica o extrae un paquete completo |
-| `install-backup-schedule.sh` | Gestiona la tarea diaria de backup |
-| `check-backup-recovery.sh` | Valida backup y recuperación de SPEC-007 |
+| `export-portable-backups.sh` | Exporta al anfitrión copias del worker tras verificar checksums y estado |
+| `install-host-backup-export.sh` | Activa, consulta o desactiva la exportación cron opcional |
+| `restore-portable-backup.sh` | Verifica una copia portable o la restaura con copia previa y rollback |
+| `check-backup-recovery.sh` | Valida el flujo portable y puede probar una copia sin sustituir la activa |
+| `backup.sh`, `restore.sh` | Herramientas antiguas source-build; no usar en despliegues portables |
+| `backup-full.sh`, `restore-full.sh` | Recuperación source-build heredada; no usar en despliegues portables |
+| `install-backup-schedule.sh` | Programador heredado para instalaciones source-build |
 | `check-system-monitoring.sh` | Valida la supervisión oficial de SPEC-008 |
 | `prepare-update.sh` | Comprueba y prepara actualizaciones sin aplicarlas |
 | `check-maintenance-operations.sh` | Valida el mantenimiento de SPEC-009 |

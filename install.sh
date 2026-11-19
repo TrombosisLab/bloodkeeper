@@ -182,6 +182,9 @@ EOF
 
 create_environment
 
+BLOODKEEPER_SOURCE_REVISION="$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || printf 'unknown')"
+export BLOODKEEPER_SOURCE_REVISION
+
 COMPOSE=(
   "${DOCKER_COMMAND[@]}"
   compose

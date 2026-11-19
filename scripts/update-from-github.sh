@@ -123,6 +123,7 @@ printf '%s\n' "$target" > "$pending_file"
 
 phase='integración del código'
 git merge --ff-only "$target"
+export BLOODKEEPER_SOURCE_REVISION="$target"
 # Refresh tracking only when origin really is this project's public repository.
 origin_url=$(git config --get remote.origin.url || true)
 case "$origin_url" in

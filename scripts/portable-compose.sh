@@ -33,6 +33,11 @@ esac
   exit 1
 }
 
+if [[ -z "${BLOODKEEPER_SOURCE_REVISION:-}" ]]; then
+  BLOODKEEPER_SOURCE_REVISION="$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || printf 'unknown')"
+  export BLOODKEEPER_SOURCE_REVISION
+fi
+
 exec docker compose \
   --env-file "$ENV_FILE" \
   --project-name "$PROJECT_NAME" \

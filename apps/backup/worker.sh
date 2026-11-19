@@ -101,6 +101,7 @@ format=bloodkeeper_portable_database_v1
 created_utc=$stamp
 database=${PGDATABASE}
 retention_sets=$KEEP
+source_revision=${BLOODKEEPER_SOURCE_REVISION:-unknown}
 EOF
 
   tar -czf "$partial" -C "$stage" . || {
