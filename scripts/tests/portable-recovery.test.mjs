@@ -63,3 +63,14 @@ test('clean-server instructions use the portable flow and distinguish historical
   assert.match(recovery, /no se usan para una instalación portable nueva/)
   assert.match(recovery, /no se requiere crontab para las copias internas/i)
 })
+
+test('interactive and retry admin creation preserve credentials through sudo', async () => {
+  const installer = await source('install.sh')
+  const adminScript = await source('scripts/create-initial-admin.sh')
+  for (const script of [installer, adminScript]) {
+    assert.match(script, /--preserve-env=ADMIN_USERNAME,ADMIN_DISPLAY_NAME,ADMIN_PASSWORD/)
+    assert.match(script, /-e ADMIN_USERNAME[\s\S]*-e ADMIN_DISPLAY_NAME[\s\S]*-e ADMIN_PASSWORD/)
+  }
+  assert.match(installer, /admin_compose=\([\s\S]*"\$\{COMPOSE\[@\]:1\}"[\s\S]*\)/)
+  assert.match(adminScript, /sudo docker info/)
+})

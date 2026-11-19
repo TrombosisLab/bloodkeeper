@@ -343,10 +343,19 @@ create_initial_admin() {
     die 'BLOODKEEPER_ADMIN_USERNAME, DISPLAY_NAME y PASSWORD deben proporcionarse juntas'
   fi
 
+  admin_compose=("${COMPOSE[@]}")
+  if [ "${DOCKER_COMMAND[0]}" = 'sudo' ]; then
+    admin_compose=(
+      sudo
+      --preserve-env=ADMIN_USERNAME,ADMIN_DISPLAY_NAME,ADMIN_PASSWORD
+      "${COMPOSE[@]:1}"
+    )
+  fi
+
   ADMIN_USERNAME="$admin_username" \
   ADMIN_DISPLAY_NAME="$admin_display_name" \
   ADMIN_PASSWORD="$admin_password" \
-    "${COMPOSE[@]}" run --rm -T \
+    "${admin_compose[@]}" run --rm -T \
       -e ADMIN_USERNAME \
       -e ADMIN_DISPLAY_NAME \
       -e ADMIN_PASSWORD \

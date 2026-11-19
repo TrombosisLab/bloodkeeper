@@ -49,10 +49,21 @@ else
     exit 1
   fi
 
+  admin_compose=("$COMPOSE")
+  if ! docker info >/dev/null 2>&1 \
+    && command -v sudo >/dev/null 2>&1 \
+    && sudo docker info >/dev/null 2>&1; then
+    admin_compose=(
+      sudo
+      --preserve-env=ADMIN_USERNAME,ADMIN_DISPLAY_NAME,ADMIN_PASSWORD
+      "$COMPOSE"
+    )
+  fi
+
   ADMIN_USERNAME="$username" \
   ADMIN_DISPLAY_NAME="$display_name" \
   ADMIN_PASSWORD="$password" \
-    "$COMPOSE" run --rm -T \
+    "${admin_compose[@]}" run --rm -T \
       -e ADMIN_USERNAME \
       -e ADMIN_DISPLAY_NAME \
       -e ADMIN_PASSWORD \
