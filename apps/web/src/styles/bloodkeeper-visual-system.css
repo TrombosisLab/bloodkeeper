@@ -2543,3 +2543,16 @@ select:focus {
     grid-template-columns: minmax(0, 1fr) !important;
   }
 }
+
+
+/* PLAY_CHARACTER_CONTAINER_OVERRIDE_V3 — evita que el contenedor vuelva a abrir dos columnas en tablet estrecha. */
+@media (max-width: 860px) {
+  #chronicle-section-play-panel .chronicle-play-workspace__character {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #chronicle-section-play-panel .chronicle-play-workspace__character > * {
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+}

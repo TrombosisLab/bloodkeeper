@@ -1,6 +1,8 @@
 .character-list-workspace {
   display: grid;
   gap: 1.5rem;
+  container-type: inline-size;
+  container-name: character-list;
 }
 
 .character-list-workspace__header,
@@ -106,8 +108,11 @@
 }
 
 /* UX Personajes: listado guardado compacto y acotado. */
+/* CHARACTER_LIST_CARD_TRACK_SIZE_V1 — conserva el alto intrínseco de cada tarjeta dentro del scroll. */
 .character-list__cards {
   max-height: min(36rem, 62vh);
+  align-content: start;
+  grid-auto-rows: max-content;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-right: 0.25rem;
@@ -190,6 +195,38 @@
   .character-list-card__updated {
     grid-column: 2;
     grid-row: 1;
+  }
+}
+
+/* CHARACTER_LIST_TABLET_LAYOUT_V1 — no fuerza tres columnas dentro de una ventana estrecha. */
+@media (min-width: 641px) and (max-width: 1100px) {
+  .character-list-card {
+    grid-template-columns: 64px minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .character-list-card__portrait {
+    grid-row: 1 / span 2;
+    min-height: 96px;
+  }
+
+  .character-list-card__body {
+    grid-column: 2;
+    grid-template-columns: minmax(0, 1fr);
+    gap: .3rem;
+  }
+
+  .character-list-card__concept,
+  .character-list-card__updated {
+    grid-column: 1;
+    grid-row: auto;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .character-list-card__actions {
+    grid-column: 2;
+    justify-self: start;
   }
 }
 
@@ -285,5 +322,182 @@
 
   .character-list-card__portrait img {
     min-height: 96px;
+  }
+}
+
+/* CHARACTER_LIST_FLUID_LAYOUT_V2 — adapta la tarjeta al ancho real del panel. */
+@container character-list (min-width: 72rem) {
+  .character-list-card {
+    grid-template-columns: clamp(4rem, 5cqi, 5.25rem) minmax(0, 1fr) auto;
+    grid-template-rows: auto;
+    align-items: center;
+    min-height: 7.25rem;
+  }
+
+  .character-list-card__portrait {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: stretch;
+    min-height: 6rem;
+  }
+
+  .character-list-card__body {
+    grid-column: 2;
+    grid-row: 1;
+    grid-template-columns: minmax(12rem, 0.9fr) minmax(16rem, 1.2fr) minmax(9rem, 0.7fr);
+    align-items: center;
+    gap: 0.5rem clamp(0.75rem, 1.4cqi, 1.25rem);
+  }
+
+  .character-list-card__concept {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .character-list-card__updated {
+    grid-column: 3;
+    grid-row: 1;
+    min-width: 0;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .character-list-card__actions {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    align-self: center;
+    width: auto;
+  }
+}
+
+/* CHARACTER_LIST_TABLET_ACTION_BELOW_V1 — en el ancho intermedio la acción va debajo. */
+@container character-list (min-width: 40rem) and (max-width: 71.99rem) {
+  .character-list-card {
+    grid-template-columns: clamp(3.5rem, 7cqi, 4.25rem) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-items: start;
+    min-height: 0;
+  }
+
+  .character-list-card__portrait {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    height: 7rem;
+    min-height: 0;
+  }
+
+  .character-list-card__portrait img {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: cover;
+  }
+
+  .character-list-card__body {
+    grid-column: 2;
+    grid-row: 1;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-content: center;
+    gap: 0.3rem;
+  }
+
+  .character-list-card__identity {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .character-list-card__concept {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .character-list-card__updated {
+    grid-column: 1;
+    grid-row: 3;
+    min-width: 0;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .character-list-card__actions {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: stretch;
+    align-self: start;
+    width: 100%;
+  }
+
+  .character-list-card__actions button {
+    width: 100%;
+  }
+}
+
+@container character-list (max-width: 39.99rem) {
+  .character-list__cards {
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+  }
+
+  .character-list-card {
+    grid-template-columns: clamp(3.25rem, 16cqi, 4.25rem) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-items: start;
+    gap: 0.65rem;
+    min-height: 0;
+    padding: 0.85rem;
+  }
+
+  .character-list-card__portrait {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    min-height: 0;
+    aspect-ratio: 3 / 4;
+  }
+
+  .character-list-card__portrait img {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: cover;
+  }
+
+  .character-list-card__body {
+    grid-column: 2;
+    grid-row: 1;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: 0.35rem;
+  }
+
+  .character-list-card__concept,
+  .character-list-card__updated {
+    grid-column: 1;
+    grid-row: auto;
+    min-width: 0;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .character-list-card__actions {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: stretch;
+    width: 100%;
+  }
+
+  .character-list-card__actions button {
+    width: 100%;
   }
 }

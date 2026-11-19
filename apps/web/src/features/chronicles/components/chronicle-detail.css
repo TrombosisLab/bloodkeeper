@@ -511,7 +511,8 @@
   .chronicle-detail__header h1, .chronicle-detail__header h2 { font-size: 1.6rem; line-height: 1.15; overflow-wrap: anywhere; }
   .chronicle-detail__header-actions { gap: 8px; }
   .chronicle-detail__header-actions button { width: auto; min-height: 44px; white-space: normal; }
-  .chronicle-detail__section-tabs { flex-wrap: wrap; overflow-x: visible; gap: 6px; }
-  .chronicle-detail button.chronicle-detail__section-tab { flex: 1 1 40%; min-height: 44px; white-space: normal; }
+  .chronicle-detail__section-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; gap: 6px; }
+  .chronicle-detail button.chronicle-detail__section-tab { min-width: 0; min-height: 44px; white-space: normal; }
+  .chronicle-detail button.chronicle-detail__section-tab:last-child { grid-column: 1 / -1; }
   .chronicle-detail__metadata { grid-template-columns: minmax(0, 1fr); }
 }

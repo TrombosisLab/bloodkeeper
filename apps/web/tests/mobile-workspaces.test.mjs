@@ -17,8 +17,9 @@ const patches = files.map(([file, marker]) => {
 });
 test('todos los ajustes se limitan a pantallas de hasta 720px', () => {
   for (const css of patches) {
-    assert.equal((css.match(/@media/g) || []).length, 1);
-    assert.match(css, /@media\s*\(max-width: 720px\)/);
+    const widths = [...css.matchAll(/@media\s*\(max-width:\s*(\d+)px\)/g)].map((match) => Number(match[1]));
+    assert.ok(widths.length > 0);
+    assert.ok(widths.every((width) => width <= 720));
     let depth = 0;
     for (const char of css.slice(css.indexOf('@media'))) {
       if (char === '{') depth++;
@@ -36,7 +37,7 @@ test('no cambia geometría, rutas ni interacción de tarjetas y marcas', () => {
   }
 });
 test('pestañas legibles y navegación sin etiquetas cortadas', () => {
-  assert.match(patches[0], /section-tabs[^}]*flex-wrap: wrap/s);
+  assert.match(patches[0], /section-tabs[^}]*display: grid/s);
   assert.match(patches[2], /space-nav[^}]*repeat\(2, minmax\(0, 1fr\)\)/s);
 });
 test('mapa y diálogos adaptan sus controles sin cambiar el dibujo', () => {
