@@ -1,7 +1,11 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-const css = readFileSync(new URL('../src/features/chronicle-space/components/chronicle-space-prototype.css', import.meta.url), 'utf8').split('/* BOARD_DARK_CARDS_V1:')[1]
+const source = readFileSync(new URL('../src/features/chronicle-space/components/chronicle-space-prototype.css', import.meta.url), 'utf8')
+const start = source.indexOf('/* BOARD_DARK_CARDS_V1:')
+const end = source.indexOf('/* BLOODKEEPER_INVESTIGATION_MOBILE_V2 */', start + 1)
+assert.ok(start >= 0 && end > start, 'se encuentra el bloque visual de tarjetas')
+const css = source.slice(start, end)
 test('every research card type has an automatic presentation', () => {
   for (const kind of ['pnj', 'personaje', 'lugar', 'documento', 'organizacion', 'artefacto']) assert.ok(css.includes(`:has(.card-pin--${kind})`))
   assert.match(css, /--board-card-accent: #d47b87/)

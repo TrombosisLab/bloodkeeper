@@ -4,6 +4,7 @@
   body .application-shell { grid-template-columns: 176px minmax(0, 1fr); }
   body .application-shell__content { min-width: 0; }
   body .app-navigation-shell { padding: 12px; padding-bottom: 112px; }
+  body .application-shell:has(.chronicle-space) .app-navigation-shell { padding-bottom: 12px; }
   body .app-navigation-shell nav button { min-height: 44px; padding: 10px; }
   body .authentication-session {
     position: static !important;

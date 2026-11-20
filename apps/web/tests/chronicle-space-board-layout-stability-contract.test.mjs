@@ -15,6 +15,9 @@ test('la pizarra reinicia la geometría al cambiar de crónica o vista', () => {
 })
 
 test('la altura de posiciones guardadas no crece de forma inversa al porcentaje', () => {
-  assert.match(source, /\(maxY \/ 100\) \* layoutHeight \+ 160/)
-  assert.doesNotMatch(source, /1 - maxY \/ 100/)
+  assert.match(source, /const heightForStoredPosition = maxStoredY > 0 \? \(\(maxStoredY \/ 100\) \* BOARD_POSITION_HEIGHT \+ 160\) : 0/)
+  assert.match(source, /Math\.max\(layoutHeight, heightForStoredPosition, boardHeightFloor\)/)
+  assert.match(source, /top: \(position\.y \/ 100 \* BOARD_POSITION_HEIGHT\) \+ 'px'/)
+  assert.match(source, /y: \(topPx \/ BOARD_POSITION_HEIGHT\) \* 100/)
+  assert.doesNotMatch(source, /1 - max(?:Stored)?Y \/ 100/)
 })
