@@ -377,7 +377,7 @@ test(
       validateCharacterAdvantageSelectionsAgainstDefinitions(
         {
           selections: [
-            haven(1),
+            haven(2),
             child(
               'haven-cell',
               1,
@@ -402,7 +402,7 @@ test(
       validateCharacterAdvantageSelectionsAgainstDefinitions(
         {
           selections: [
-            haven(1),
+            haven(2),
             child(
               'haven-laboratory',
               1,

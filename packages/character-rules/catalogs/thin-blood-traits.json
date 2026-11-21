@@ -100,5 +100,89 @@
     "category": "merit",
     "source": "core",
     "incompatibleWithKeys": ["dead-flesh"]
+  },
+  {
+    "key": "thin-blood-abominable-blood",
+    "name": "Sangre Abominable",
+    "category": "merit",
+    "source": "core"
+  },
+  {
+    "key": "thin-blood-faith-proof",
+    "name": "A Prueba de Fe",
+    "category": "merit",
+    "source": "core"
+  },
+  {
+    "key": "thin-blood-low-appetite",
+    "name": "Poco Apetito",
+    "category": "merit",
+    "source": "core"
+  },
+  {
+    "key": "thin-blood-lucid-dream",
+    "name": "Sueño Lúcido",
+    "category": "merit",
+    "source": "core"
+  },
+  {
+    "key": "thin-blood-mortal-countenance",
+    "name": "Semblante de Mortalidad",
+    "category": "merit",
+    "source": "core"
+  },
+  {
+    "key": "thin-blood-fast-drinker",
+    "name": "Bebedor Rápido",
+    "category": "merit",
+    "source": "core"
+  },
+  {
+    "key": "thin-blood-heliophobia",
+    "name": "Heliofobia",
+    "category": "flaw",
+    "source": "core"
+  },
+  {
+    "key": "thin-blood-night-terrors",
+    "name": "Terrores Nocturnos",
+    "category": "flaw",
+    "source": "core"
+  },
+  {
+    "key": "thin-blood-plague-carriers",
+    "name": "Portadores de la Plaga",
+    "category": "flaw",
+    "source": "core"
+  },
+  {
+    "key": "thin-blood-clumsy-drinker",
+    "name": "Bebedor Torpe",
+    "category": "flaw",
+    "source": "core"
+  },
+  {
+    "key": "thin-blood-sun-faded",
+    "name": "Desvaído por el Sol",
+    "category": "flaw",
+    "source": "core"
+  },
+  {
+    "key": "thin-blood-supernatural-tell",
+    "name": "Delator Sobrenatural",
+    "category": "flaw",
+    "source": "core"
+  },
+  {
+    "key": "thin-blood-twilight-presence",
+    "name": "Presencia Crepuscular",
+    "category": "flaw",
+    "source": "core"
+  },
+  {
+    "key": "thin-blood-endless-hunger",
+    "name": "Ansia Sin Fin",
+    "category": "flaw",
+    "source": "core"
   }
 ]

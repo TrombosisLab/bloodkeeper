@@ -3568,3 +3568,200 @@
   color: var(--color-accent);
   font-weight: 700;
 }
+
+.advantages-catalog-tools {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border-hairline);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-card);
+}
+
+.advantages-catalog-tools > label,
+.advantages-catalog-tools__selected > strong {
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+
+.advantages-catalog-tools__search-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.advantages-catalog-tools__search-row input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--color-border-hairline);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+}
+
+.advantages-catalog-tools__clear {
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--color-border-hairline);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.advantages-catalog-tools__selected {
+  display: grid;
+  gap: 0.4rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--color-border-hairline);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.advantages-catalog-tools__selected ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.advantages-catalog-tools__selected li {
+  max-width: 100%;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--color-border-hairline);
+  border-radius: 999px;
+  overflow-wrap: anywhere;
+}
+
+.advantages-catalog-category {
+  border: 1px solid var(--color-border-hairline);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-card);
+  overflow: clip;
+}
+
+.advantages-catalog-category > summary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 4rem;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.advantages-catalog-category > summary::-webkit-details-marker,
+.advantages-catalog-subgroup > summary::-webkit-details-marker {
+  display: none;
+}
+
+.advantages-catalog-category > summary::after,
+.advantages-catalog-subgroup > summary::after {
+  content: '+';
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.advantages-catalog-category[open] > summary::after,
+.advantages-catalog-subgroup[open] > summary::after {
+  content: '−';
+}
+
+.advantages-catalog-category > summary strong {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+.advantages-catalog-groups {
+  border-top: 1px solid var(--color-border-hairline);
+}
+
+.advantages-catalog-subgroup + .advantages-catalog-subgroup {
+  border-top: 1px solid var(--color-border-hairline);
+}
+
+.advantages-catalog-subgroup > summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(5.5rem, 12rem) 1rem;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.25rem;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.advantages-catalog-subgroup > summary span {
+  font-weight: 700;
+}
+
+.advantages-catalog-subgroup > summary small {
+  min-width: 0;
+  margin-left: 0;
+  color: var(--color-text-muted);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.advantages-catalog-subgroup > summary::after {
+  justify-self: end;
+  margin-left: 0;
+}
+
+.advantages-catalog-subgroup .advantages-catalog-grid {
+  padding: 0 0.85rem 0.85rem;
+}
+
+@media (max-width: 760px) {
+  .advantages-catalog-tools__search-row {
+    flex-direction: column;
+  }
+
+  .advantages-catalog-tools__clear {
+    width: 100%;
+  }
+
+  .advantages-catalog-category > summary {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .advantages-catalog-category > summary strong {
+    order: 2;
+    width: 100%;
+    margin-left: 0;
+    text-align: left;
+  }
+
+  .advantages-catalog-category > summary::after {
+    margin-left: auto;
+  }
+
+  .advantages-catalog-subgroup > summary {
+    grid-template-columns: minmax(0, 1fr) minmax(5.5rem, 8rem) 1rem;
+    align-items: center;
+  }
+
+  .advantages-catalog-subgroup > summary small {
+    width: auto;
+    margin-left: 0;
+    text-align: right;
+  }
+
+  .advantages-catalog-subgroup > summary::after {
+    margin-left: 0;
+  }
+}

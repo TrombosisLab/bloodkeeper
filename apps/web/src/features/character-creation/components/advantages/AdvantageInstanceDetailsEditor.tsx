@@ -279,7 +279,7 @@ export function AdvantageInstanceDetailsEditor({
 
 
   /*
-   * Despreciado.
+   * Desagradable.
    *
    * Guarda el motivo por el que el personaje es rechazado.
    */
@@ -289,7 +289,7 @@ export function AdvantageInstanceDetailsEditor({
     return (
       <div className="advantage-instance-editor">
         <h5>
-          Configuración de Despreciado
+          Configuración de Desagradable
         </h5>
 
         <label>
@@ -355,7 +355,7 @@ export function AdvantageInstanceDetailsEditor({
 
 
   /*
-   * Expulsado.
+   * Prohibido en.
    *
    * Guarda la causa o la organización de la expulsión.
    */
@@ -365,7 +365,7 @@ export function AdvantageInstanceDetailsEditor({
     return (
       <div className="advantage-instance-editor">
         <h5>
-          Configuración de Expulsado
+          Configuración de Prohibido en
         </h5>
 
         <label>
@@ -653,7 +653,7 @@ export function AdvantageInstanceDetailsEditor({
 
 
   /*
-   * Semblante de Matusalén.
+   * Semejanza con el Matusalén.
    *
    * Guarda la identidad de la figura
    * a la que se parece el personaje.
@@ -664,7 +664,7 @@ export function AdvantageInstanceDetailsEditor({
     return (
       <div className="advantage-instance-editor">
         <h5>
-          Configuración de Semblante de Matusalén
+          Configuración de Semejanza con el Matusalén
         </h5>
 
         <label>
@@ -691,7 +691,7 @@ export function AdvantageInstanceDetailsEditor({
 
 
   /*
-   * Cara Famosa.
+   * Rostro Famoso.
    *
    * Guarda la identidad por la que el personaje
    * es reconocido.
@@ -702,7 +702,7 @@ export function AdvantageInstanceDetailsEditor({
     return (
       <div className="advantage-instance-editor">
         <h5>
-          Configuración de Cara Famosa
+          Configuración de Rostro Famoso
         </h5>
 
         <label>
@@ -729,7 +729,7 @@ export function AdvantageInstanceDetailsEditor({
 
 
   /*
-   * Niño de la Escena.
+   * Joven de la Escena.
    *
    * Guarda la subcultura o escena social
    * asociada al personaje.
@@ -740,7 +740,7 @@ export function AdvantageInstanceDetailsEditor({
     return (
       <div className="advantage-instance-editor">
         <h5>
-          Configuración de Niño de la Escena
+          Configuración de Joven de la Escena
         </h5>
 
         <label>

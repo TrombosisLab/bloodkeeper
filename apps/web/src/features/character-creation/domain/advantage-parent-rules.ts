@@ -118,6 +118,21 @@ export function validateAdvantageParentRelations(
         )
       }
     }
+
+    if (
+      selection.definitionKey === 'enemy' &&
+      parent.definitionKey === 'allies' &&
+      parent.details?.kind === 'allies'
+    ) {
+      const expectedRating =
+        parent.details.effectiveness - 2
+
+      if (selection.rating !== expectedRating) {
+        errors.push(
+          'Enemigo debe tener una puntuación dos puntos inferior a la Efectividad de Aliados vinculado.',
+        )
+      }
+    }
   }
 
 

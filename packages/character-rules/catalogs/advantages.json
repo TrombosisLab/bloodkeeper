@@ -8,8 +8,7 @@
       3,
       4,
       5,
-      6,
-      7
+      6
     ],
     "source": "core",
     "allowMultiple": true,
@@ -184,7 +183,9 @@
     "allowedRatings": [
       1,
       2,
-      3
+      3,
+      4,
+      5
     ],
     "source": "core",
     "sourcePage": 192,
@@ -245,13 +246,7 @@
     "key": "haven-cell",
     "name": "Celda",
     "category": "merit",
-    "allowedRatings": [
-      1,
-      2,
-      3,
-      4,
-      5
-    ],
+    "allowedRatings": [1, 2, 3, 4, 5],
     "source": "core",
     "allowMultiple": true,
     "requiresInstanceDetails": false,
@@ -259,6 +254,7 @@
     "allowedParentDefinitionKeys": [
       "haven"
     ],
+    "minimumParentRating": 2,
     "active": true
   },
   {
@@ -279,6 +275,7 @@
     "allowedParentDefinitionKeys": [
       "haven"
     ],
+    "minimumParentRating": 2,
     "active": true
   },
   {
@@ -530,11 +527,13 @@
     "allowMultiple": true,
     "requiresInstanceDetails": true,
     "instanceDetailsKind": "enemy",
+    "allowsOptionalParentSelection": true,
+    "allowedParentDefinitionKeys": ["allies"],
     "active": true
   },
   {
     "key": "stalker",
-    "name": "Acosador",
+    "name": "Acechadores",
     "category": "flaw",
     "allowedRatings": [
       1
@@ -566,7 +565,7 @@
   },
   {
     "key": "despised",
-    "name": "Despreciado",
+    "name": "Desagradable",
     "category": "flaw",
     "allowedRatings": [
       1
@@ -580,7 +579,7 @@
   },
   {
     "key": "hatred",
-    "name": "Odio",
+    "name": "Odiado",
     "category": "flaw",
     "allowedRatings": [
       2
@@ -594,7 +593,7 @@
   },
   {
     "key": "exiled",
-    "name": "Expulsado",
+    "name": "Prohibido en",
     "category": "flaw",
     "allowedRatings": [
       1,
@@ -652,7 +651,7 @@
   },
   {
     "key": "beautiful",
-    "name": "Bello",
+    "name": "Hermoso",
     "category": "merit",
     "allowedRatings": [
       2
@@ -665,7 +664,7 @@
   },
   {
     "key": "stunning",
-    "name": "Despampanante",
+    "name": "Deslumbrante",
     "category": "merit",
     "allowedRatings": [
       4
@@ -678,7 +677,7 @@
   },
   {
     "key": "methuselah-visage",
-    "name": "Semblante de Matusalén",
+    "name": "Semejanza con el Matusalén",
     "category": "merit",
     "allowedRatings": [
       1,
@@ -692,7 +691,7 @@
   },
   {
     "key": "famous-face",
-    "name": "Cara Famosa",
+    "name": "Rostro Famoso",
     "category": "merit",
     "allowedRatings": [
       1
@@ -705,7 +704,7 @@
   },
   {
     "key": "innocent-face",
-    "name": "Cara Inocente",
+    "name": "Ingenua",
     "category": "merit",
     "allowedRatings": [
       1
@@ -717,7 +716,7 @@
   },
   {
     "key": "distinctive-feature",
-    "name": "Rasgo Llamativo",
+    "name": "Rasgo Destacable",
     "category": "merit",
     "allowedRatings": [
       1
@@ -729,12 +728,9 @@
   },
   {
     "key": "awake-all-night",
-    "name": "Despierto Toda la Noche",
+    "name": "Toda la Noche en Pie",
     "category": "merit",
-    "allowedRatings": [
-      2,
-      4
-    ],
+    "allowedRatings": [1, 4],
     "source": "core",
     "allowMultiple": false,
     "requiresInstanceDetails": false,
@@ -742,7 +738,7 @@
   },
   {
     "key": "child-of-the-scene",
-    "name": "Niño de la Escena",
+    "name": "Joven de la Escena",
     "category": "merit",
     "allowedRatings": [
       1
@@ -837,12 +833,9 @@
     "source": "other",
     "allowMultiple": false,
     "requiresInstanceDetails": false,
-    "requirementRules": [
-      {
-        "type": "generation",
-        "max": 11
-      }
-    ],
+    "requirements": {
+      "minimumAgeCategory": "ancilla"
+    },
     "active": true
   },
   {
@@ -1007,7 +1000,7 @@
   },
   {
     "key": "iron-stomach",
-    "name": "Garganta de Hierro",
+    "name": "Gaznate de Hierro",
     "category": "merit",
     "allowedRatings": [
       3
@@ -1169,11 +1162,9 @@
   },
   {
     "key": "demon-luck",
-    "name": "Suerte del Demonio",
+    "name": "Suerte del Diablo",
     "category": "merit",
-    "allowedRatings": [
-      4
-    ],
+    "allowedRatings": [3],
     "source": "core",
     "allowMultiple": false,
     "requiresInstanceDetails": false,
@@ -1347,7 +1338,7 @@
   },
   {
     "key": "side-hustler",
-    "name": "Trabajo Secundario / Negocio Propio",
+    "name": "Trapicheador",
     "category": "merit",
     "allowedRatings": [
       2
@@ -1420,11 +1411,9 @@
   },
   {
     "key": "imperishable-face",
-    "name": "Rostro Imperecedero",
+    "name": "Semblante Inmutable",
     "category": "flaw",
-    "allowedRatings": [
-      2
-    ],
+    "allowedRatings": [1, 2],
     "source": "core",
     "allowMultiple": false,
     "requiresInstanceDetails": false,
@@ -1456,7 +1445,7 @@
   },
   {
     "key": "vein-extractor",
-    "name": "Extractor de Venas",
+    "name": "Aprovechador de Venas",
     "category": "flaw",
     "allowedRatings": [
       1
@@ -1468,7 +1457,7 @@
   },
   {
     "key": "obsolete-preference",
-    "name": "Preferencia Obsoleta",
+    "name": "Preferencia Anticuada",
     "category": "flaw",
     "allowedRatings": [
       2
@@ -1492,7 +1481,7 @@
   },
   {
     "key": "resonance-mimicry",
-    "name": "Mimetismo de Resonancia",
+    "name": "Mímica de Resonancia",
     "category": "flaw",
     "allowedRatings": [
       2
@@ -1504,7 +1493,7 @@
   },
   {
     "key": "hungry-decay",
-    "name": "Decadencia Hambrienta",
+    "name": "Decadencia Famélica",
     "category": "flaw",
     "allowedRatings": [
       2
@@ -1552,7 +1541,7 @@
   },
   {
     "key": "trapped-on-land",
-    "name": "Atrapado en Tierra",
+    "name": "Atado a la Tierra",
     "category": "flaw",
     "allowedRatings": [
       1
@@ -1560,6 +1549,609 @@
     "source": "core",
     "allowMultiple": false,
     "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "immutable-countenance",
+    "name": "Semblante Inmutable",
+    "category": "flaw",
+    "allowedRatings": [1, 2],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "rancher",
+    "name": "Ganadero",
+    "category": "flaw",
+    "allowedRatings": [2],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {"excludedClanKeys": ["ventrue"]},
+    "active": true
+  },
+  {
+    "key": "two-masters",
+    "name": "Dos Amos",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "careless-predator",
+    "name": "Depredador Descuidado",
+    "category": "flaw",
+    "allowedRatings": [2],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "corpse-meat",
+    "name": "Carne de Cadáver",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "blasphemy-beacon",
+    "name": "Faro de Profanidad",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "crisis-of-faith",
+    "name": "Crisis de Fe",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "penitence-scars",
+    "name": "Horribles Cicatrices de Penitencia",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "servile-worm",
+    "name": "Gusano Servil",
+    "category": "flaw",
+    "allowedRatings": [2],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "incompatibleDefinitionKeys": ["penitence"],
+    "active": true
+  },
+  {
+    "key": "disease-vector",
+    "name": "Vector de Enfermedad",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "plague-carrier",
+    "name": "Portador de Plaga",
+    "category": "flaw",
+    "allowedRatings": [1, 2],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "diabolist-evident",
+    "name": "Diabolista Evidente",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "inherited-bane",
+    "name": "Perdición Heredada",
+    "category": "flaw",
+    "allowedRatings": [2],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "knowledge-hunger",
+    "name": "Hambre de Conocimiento",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "boon-debts",
+    "name": "Deudas de Prestación",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "daring",
+    "name": "Atrevido",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "timid",
+    "name": "Timorato",
+    "category": "flaw",
+    "allowedRatings": [2],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "obvious-predator",
+    "name": "Depredador Obvio",
+    "category": "flaw",
+    "allowedRatings": [2],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "incompatibleDefinitionKeys": ["herd"],
+    "active": true
+  },
+  {
+    "key": "fame-influencer",
+    "name": "Influencer",
+    "category": "merit",
+    "allowedRatings": [1],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["fame"],
+    "minimumParentRating": 2,
+    "active": true
+  },
+  {
+    "key": "lasting-fame",
+    "name": "Fama Duradera",
+    "category": "merit",
+    "allowedRatings": [1],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["fame"],
+    "minimumParentRating": 3,
+    "active": true
+  },
+  {
+    "key": "known-corpse",
+    "name": "Cadáver Conocido",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "known-neutral-body",
+    "name": "Cuerpo Neutro Conocido",
+    "category": "flaw",
+    "allowedRatings": [2],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "erased-identity",
+    "name": "Borrado",
+    "category": "merit",
+    "allowedRatings": [1],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["mask"],
+    "minimumParentRating": 2,
+    "active": true
+  },
+  {
+    "key": "mask-maker",
+    "name": "Zapatero",
+    "category": "merit",
+    "allowedRatings": [1],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["mask"],
+    "minimumParentRating": 2,
+    "active": true
+  },
+  {
+    "key": "adversary-mawla",
+    "name": "Adversario",
+    "category": "flaw",
+    "allowedRatings": [3, 4, 5, 6, 7],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["mawla"],
+    "parentRatingConstraints": [
+      {"parentRating": 1, "allowedRatings": [3]},
+      {"parentRating": 2, "allowedRatings": [4]},
+      {"parentRating": 3, "allowedRatings": [5]},
+      {"parentRating": 4, "allowedRatings": [6]},
+      {"parentRating": 5, "allowedRatings": [7]}
+    ],
+    "active": true
+  },
+  {
+    "key": "secret-master",
+    "name": "Amo Secreto",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["mawla"],
+    "active": true
+  },
+  {
+    "key": "shameful-childe",
+    "name": "Chiquillo Vergonzoso",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "enemy-embraced-touchstone",
+    "name": "Piedra de Toque Abrazada por tus Enemigos",
+    "category": "flaw",
+    "allowedRatings": [2],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "indigent",
+    "name": "Indigente",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "sacred-ground",
+    "name": "Suelo Sagrado",
+    "category": "merit",
+    "allowedRatings": [1],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["haven"],
+    "active": true
+  },
+  {
+    "key": "haven-sanctuary",
+    "name": "Santuario",
+    "category": "merit",
+    "allowedRatings": [1, 2, 3, 4, 5],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["haven"],
+    "active": true
+  },
+  {
+    "key": "commercial-establishment",
+    "name": "Establecimiento Comercial",
+    "category": "merit",
+    "allowedRatings": [2, 3],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["haven"],
+    "active": true
+  },
+  {
+    "key": "furcus",
+    "name": "Furcus",
+    "category": "merit",
+    "allowedRatings": [1, 2, 3],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["haven"],
+    "active": true
+  },
+  {
+    "key": "mechanic-workshop",
+    "name": "Taller Mecánico",
+    "category": "merit",
+    "allowedRatings": [1, 2, 3, 4, 5],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["haven"],
+    "active": true
+  },
+  {
+    "key": "haven-mobile",
+    "name": "Móvil",
+    "category": "merit",
+    "allowedRatings": [1, 2, 3, 4],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["haven"],
+    "active": true
+  },
+  {
+    "key": "haven-armored",
+    "name": "Blindado",
+    "category": "merit",
+    "allowedRatings": [1],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["haven-mobile"],
+    "active": true
+  },
+  {
+    "key": "smuggler-cache",
+    "name": "Alijo de Contrabandista",
+    "category": "merit",
+    "allowedRatings": [1, 2],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["haven-mobile"],
+    "active": true
+  },
+  {
+    "key": "spare-plates",
+    "name": "Matrículas de Repuesto",
+    "category": "merit",
+    "allowedRatings": [2],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["haven-mobile"],
+    "active": true
+  },
+  {
+    "key": "haven-no-safehouse",
+    "name": "Sin Refugio",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "active": true
+  },
+  {
+    "key": "haven-shared",
+    "name": "Compartido",
+    "category": "flaw",
+    "allowedRatings": [1, 2],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["haven"],
+    "active": true
+  },
+  {
+    "key": "haven-railbound",
+    "name": "Sobre Raíles",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["haven-mobile"],
+    "active": true
+  },
+  {
+    "key": "haven-temperamental",
+    "name": "Temperamental",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "core",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requiresParentSelection": true,
+    "allowedParentDefinitionKeys": ["haven-mobile"],
+    "active": true
+  },
+  {
+    "key": "caitiff-favored-blood",
+    "name": "Sangre Favorecida",
+    "category": "merit",
+    "allowedRatings": [4],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {"characterKinds": ["caitiff"]},
+    "active": true
+  },
+  {
+    "key": "caitiff-mark-of-caine",
+    "name": "Marca de Caín",
+    "category": "merit",
+    "allowedRatings": [2],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {"characterKinds": ["caitiff"]},
+    "active": true
+  },
+  {
+    "key": "caitiff-mimic",
+    "name": "Sinsonte",
+    "category": "merit",
+    "allowedRatings": [3],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {"characterKinds": ["caitiff"]},
+    "active": true
+  },
+  {
+    "key": "caitiff-marked-by-sun",
+    "name": "Marcado por el Sol",
+    "category": "merit",
+    "allowedRatings": [4],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {"characterKinds": ["caitiff"]},
+    "active": true
+  },
+  {
+    "key": "caitiff-uncle-fangs",
+    "name": "Tío Colmillos",
+    "category": "merit",
+    "allowedRatings": [3],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {"characterKinds": ["caitiff"]},
+    "active": true
+  },
+  {
+    "key": "caitiff-contaminated-vitae",
+    "name": "Vitae Contaminante",
+    "category": "flaw",
+    "allowedRatings": [2],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {"characterKinds": ["caitiff"]},
+    "active": true
+  },
+  {
+    "key": "caitiff-clan-curse",
+    "name": "Maldición de Clan",
+    "category": "flaw",
+    "allowedRatings": [2],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {"characterKinds": ["caitiff"]},
+    "active": true
+  },
+  {
+    "key": "caitiff-debt-servant",
+    "name": "Siervo de Deuda",
+    "category": "flaw",
+    "allowedRatings": [2],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {"characterKinds": ["caitiff"]},
+    "active": true
+  },
+  {
+    "key": "caitiff-liquidator",
+    "name": "Liquidificador",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {"characterKinds": ["caitiff"]},
+    "active": true
+  },
+  {
+    "key": "caitiff-pregnant-blood",
+    "name": "Sangre Embarazada",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {"characterKinds": ["caitiff"]},
+    "incompatibleDefinitionKeys": ["caitiff-favored-blood"],
+    "active": true
+  },
+  {
+    "key": "caitiff-walking-omen",
+    "name": "Presagio Andante",
+    "category": "flaw",
+    "allowedRatings": [2],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {"characterKinds": ["caitiff"]},
+    "active": true
+  },
+  {
+    "key": "caitiff-marked-by-word",
+    "name": "Marcado por la Palabra",
+    "category": "flaw",
+    "allowedRatings": [1],
+    "source": "other",
+    "allowMultiple": false,
+    "requiresInstanceDetails": false,
+    "requirements": {"characterKinds": ["caitiff"]},
     "active": true
   },
   {

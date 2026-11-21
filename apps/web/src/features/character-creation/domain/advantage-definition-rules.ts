@@ -73,10 +73,7 @@ export function validateCharacterAdvantageDefinitions(
         (rating) =>
           !Number.isInteger(rating) ||
           rating < 1 ||
-          (
-            rating > 6 &&
-            definition.instanceDetailsKind !== 'allies'
-          ),
+          rating > 7,
       )
     ) {
       errors.push(

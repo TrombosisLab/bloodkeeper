@@ -33,13 +33,13 @@ const EXPECTED = [
   },
   {
     key: 'beautiful',
-    name: 'Bello',
+    name: 'Hermoso',
     category: 'merit',
     ratings: [2],
   },
   {
     key: 'stunning',
-    name: 'Despampanante',
+    name: 'Deslumbrante',
     category: 'merit',
     ratings: [4],
   },
@@ -51,19 +51,19 @@ const EXPECTED = [
     },
     {
       key: 'despised',
-      name: 'Despreciado',
+      name: 'Desagradable',
       category: 'flaw',
       ratings: [1],
     },
     {
       key: 'hatred',
-      name: 'Odio',
+      name: 'Odiado',
       category: 'flaw',
       ratings: [2],
     },
     {
       key: 'exiled',
-      name: 'Expulsado',
+      name: 'Prohibido en',
       category: 'flaw',
       ratings: [1, 2, 3],
     },

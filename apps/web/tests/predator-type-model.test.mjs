@@ -2075,7 +2075,7 @@ test(
 )
 
 test(
-  '003-H.PREDATOR.SCENE-QUEEN aplica la elección Despreciado',
+  '003-H.PREDATOR.SCENE-QUEEN aplica la elección Desagradable',
   async () => {
     const {
       applyPredatorTypeEffects,

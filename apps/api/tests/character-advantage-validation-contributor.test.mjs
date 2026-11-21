@@ -350,7 +350,7 @@ test(
 )
 
 test(
-  'SPEC-026 backend aplica la Generación máxima declarada por Custodio de la Historia',
+  'Custodio de la Historia requiere edad Ancilla o superior',
   () => {
     const custodian = selection({
       selectionId: 'custodian-generation',
@@ -360,15 +360,15 @@ test(
       details: null,
     })
 
-    const validateGeneration = (
-      generation,
+    const validateAge = (
+      ageCategory,
       context = 'editing',
     ) =>
       characterAdvantageValidationContributor
         .validate(
           {
             identity: {
-              generation,
+              ageCategory,
             },
             advantages: {
               selections: [
@@ -380,14 +380,16 @@ test(
         )[0]
 
     const unknown =
-      validateGeneration(
+      validateAge(
         null,
         'draftSave',
       )
-    const tooHigh =
-      validateGeneration(12)
+    const tooYoung =
+      validateAge('neonate')
     const allowed =
-      validateGeneration(11)
+      validateAge('ancilla')
+    const elder =
+      validateAge('elder')
 
     assert.equal(
       unknown.state,
@@ -395,29 +397,36 @@ test(
     )
     assert.ok(
       codes(unknown).includes(
-        'CHARACTER_ADVANTAGE_GENERATION_REQUIRED',
+        'CHARACTER_ADVANTAGE_AGE_CATEGORY_REQUIRED',
       ),
     )
 
     assert.equal(
-      tooHigh.state,
+      tooYoung.state,
       'invalid',
     )
     assert.ok(
-      codes(tooHigh).includes(
-        'CHARACTER_ADVANTAGE_GENERATION_TOO_HIGH',
+      codes(tooYoung).includes(
+        'CHARACTER_ADVANTAGE_AGE_CATEGORY_TOO_YOUNG',
       ),
     )
 
     assert.equal(
       codes(allowed).includes(
-        'CHARACTER_ADVANTAGE_GENERATION_TOO_HIGH',
+        'CHARACTER_ADVANTAGE_AGE_CATEGORY_TOO_YOUNG',
       ),
       false,
     )
     assert.equal(
       codes(allowed).includes(
-        'CHARACTER_ADVANTAGE_GENERATION_REQUIRED',
+        'CHARACTER_ADVANTAGE_AGE_CATEGORY_REQUIRED',
+      ),
+      false,
+    )
+
+    assert.equal(
+      codes(elder).includes(
+        'CHARACTER_ADVANTAGE_AGE_CATEGORY_TOO_YOUNG',
       ),
       false,
     )
@@ -762,6 +771,137 @@ test(
           'CHARACTER_LORESHEET_CLAN_REQUIRED',
       )?.severity,
       'warning',
+    )
+  },
+)
+
+test(
+  'el servidor limita los méritos Caitiff al tipo de personaje correcto',
+  () => {
+    const caitiffMerit = selection({
+      selectionId: 'caitiff-favored-blood',
+      definitionKey: 'caitiff-favored-blood',
+      category: 'merit',
+      rating: 4,
+      parentSelectionId: null,
+      details: null,
+    })
+
+    const validateForClan = (clanKey) =>
+      characterAdvantageValidationContributor
+        .validate(
+          {
+            identity: { clanKey },
+            advantages: { selections: [caitiffMerit] },
+          },
+          'activation',
+        )[0]
+
+    const caitiff = validateForClan('caitiff')
+    const standard = validateForClan('toreador')
+
+    assert.equal(
+      codes(caitiff).includes(
+        'CHARACTER_ADVANTAGE_CHARACTER_KIND_NOT_ALLOWED',
+      ),
+      false,
+    )
+    assert.ok(
+      codes(standard).includes(
+        'CHARACTER_ADVANTAGE_CHARACTER_KIND_NOT_ALLOWED',
+      ),
+    )
+  },
+)
+
+test(
+  'el servidor impide instalar Celda o Laboratorio en un Refugio de un punto',
+  () => {
+    const haven = (rating) => selection({
+      selectionId: 'haven-parent',
+      definitionKey: 'haven',
+      category: 'background',
+      rating,
+      parentSelectionId: null,
+      details: { kind: 'haven', identity: 'Refugio de prueba' },
+    })
+    const validateAtHavenRating = (rating, definitionKey) => {
+      const child = selection({
+        selectionId: `${definitionKey}-child`,
+        definitionKey,
+        category: 'merit',
+        rating: 1,
+        parentSelectionId: 'haven-parent',
+        details: null,
+      })
+      return characterAdvantageValidationContributor
+        .validate(
+          { advantages: { selections: [haven(rating), child] } },
+          'activation',
+        )[0]
+    }
+
+    for (const definitionKey of ['haven-cell', 'haven-laboratory']) {
+      const oneDot = validateAtHavenRating(1, definitionKey)
+      const twoDots = validateAtHavenRating(2, definitionKey)
+
+      assert.ok(
+        codes(oneDot).includes(
+          'CHARACTER_ADVANTAGE_PARENT_RATING_TOO_LOW',
+        ),
+        `${definitionKey} debe rechazar Refugio 1`,
+      )
+      assert.equal(
+        codes(twoDots).includes(
+          'CHARACTER_ADVANTAGE_PARENT_RATING_TOO_LOW',
+        ),
+        false,
+        `${definitionKey} debe aceptar Refugio 2`,
+      )
+    }
+  },
+)
+
+test(
+  'Enemigo vinculado a Aliados cuesta dos puntos menos que su Efectividad',
+  () => {
+    const allies = selection({
+      selectionId: 'allies-parent',
+      definitionKey: 'allies',
+      category: 'background',
+      rating: 5,
+      parentSelectionId: null,
+      details: {
+        kind: 'allies',
+        effectiveness: 4,
+        reliability: 1,
+      },
+    })
+    const enemy = (rating) => selection({
+      selectionId: `enemy-${rating}`,
+      definitionKey: 'enemy',
+      category: 'flaw',
+      rating,
+      parentSelectionId: 'allies-parent',
+      details: { kind: 'enemy', identity: 'Rival conocido' },
+    })
+    const validateEnemy = (rating) =>
+      characterAdvantageValidationContributor
+        .validate(
+          { advantages: { selections: [allies, enemy(rating)] } },
+          'editing',
+        )[0]
+
+    assert.equal(
+      codes(validateEnemy(2)).includes(
+        'CHARACTER_ENEMY_ALLIES_RATING_MISMATCH',
+      ),
+      false,
+    )
+    assert.ok(
+      codes(validateEnemy(1)).includes(
+        'CHARACTER_ENEMY_ALLIES_RATING_MISMATCH',
+      ),
     )
   },
 )

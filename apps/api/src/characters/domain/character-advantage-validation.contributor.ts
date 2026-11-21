@@ -713,6 +713,29 @@ function validateCatalogSelections(
             ),
           )
         }
+
+        if (
+          selection.definitionKey === 'enemy' &&
+          parent.definitionKey === 'allies' &&
+          parent.details?.kind === 'allies' &&
+          selection.rating !==
+            parent.details.effectiveness - 2
+        ) {
+          issues.push(
+            errorIssue(
+              'CHARACTER_ENEMY_ALLIES_RATING_MISMATCH',
+              'advantages',
+              'Enemigo debe tener una puntuación dos puntos inferior a la Efectividad de Aliados vinculado.',
+              {
+                selectionId: selection.selectionId,
+                parentSelectionId: parentId,
+                enemyRating: selection.rating,
+                alliesEffectiveness:
+                  parent.details.effectiveness,
+              },
+            ),
+          )
+        }
       }
     }
   }
@@ -875,7 +898,7 @@ function validateAgeRequirements(
  * ya evalúa:
  *
  * - requirementRules: generation.max
- * - requirements: excludedClanKeys
+ * - requirements: characterKinds + excludedClanKeys
  *
  * minimumAgeCategory permanece en validateAgeRequirements.
  *
@@ -912,6 +935,35 @@ function validateDeclaredRequirements(
 
     const clanKey =
       character.identity?.clanKey ?? null
+
+    const characterKind =
+      clanKey === 'thinBlood'
+        ? 'thinBlood'
+        : clanKey === 'caitiff'
+          ? 'caitiff'
+          : 'standard'
+    const allowedCharacterKinds =
+      definition.requirements?.characterKinds
+
+    if (
+      allowedCharacterKinds !== undefined &&
+      !allowedCharacterKinds.includes(
+        characterKind,
+      )
+    ) {
+      issues.push(
+        issue(
+          'CHARACTER_ADVANTAGE_CHARACTER_KIND_NOT_ALLOWED',
+          completionSeverity(context),
+          'identity.clanKey',
+          'La Ventaja seleccionada no está disponible para este tipo de personaje.',
+          {
+            definitionKey: definition.key,
+            characterKind,
+          },
+        ),
+      )
+    }
 
     if (
       clanKey !== null &&

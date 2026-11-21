@@ -5,6 +5,11 @@ import {
 } from '../data/character-advantage-definitions'
 
 import {
+  filterAdvantageCatalogDefinitions,
+  groupAdvantageCatalogDefinitions,
+} from '../data/advantage-catalog-groups'
+
+import {
   getCharacterAdvantagesBudget,
 } from '../domain/advantage-rules'
 
@@ -208,6 +213,9 @@ export function AdvantagesStep({
     havenConfigurationOpen,
     setHavenConfigurationOpen,
   ] = useState(true)
+
+  const [catalogSearchTerm, setCatalogSearchTerm] =
+    useState('')
 
   const sessionZero =
     creationMode === 'sessionZero' &&
@@ -476,6 +484,53 @@ export function AdvantagesStep({
         </div>
       </section>
 
+      <section className="advantages-catalog-tools" aria-label="Buscar y revisar selecciones">
+        <label htmlFor="advantages-catalog-search">
+          Buscar en Trasfondos, Méritos y Defectos
+        </label>
+        <div className="advantages-catalog-tools__search-row">
+          <input
+            id="advantages-catalog-search"
+            type="search"
+            value={catalogSearchTerm}
+            onChange={(event) => setCatalogSearchTerm(event.currentTarget.value)}
+            placeholder="Buscar por nombre o tipo…"
+          />
+          {catalogSearchTerm && (
+            <button
+              type="button"
+              className="advantages-catalog-tools__clear"
+              onClick={() => setCatalogSearchTerm('')}
+            >
+              Restablecer
+            </button>
+          )}
+        </div>
+        <div className="advantages-catalog-tools__selected" aria-live="polite">
+          <strong>Seleccionados</strong>
+          {value.selections.filter((selection) => selection.origin === 'creation').length === 0 ? (
+            <span>Aún no has elegido rasgos.</span>
+          ) : (
+            <ul>
+              {value.selections
+                .filter((selection) => selection.origin === 'creation')
+                .map((selection) => {
+                  const definition = characterAdvantageDefinitions.find(
+                    (candidate) => candidate.key === selection.definitionKey,
+                  )
+                  return (
+                    <li key={selection.selectionId}>
+                      {definition?.name ?? selection.definitionKey}
+                      {' · '}{categoryLabels[selection.category]}
+                      {' · '}{'•'.repeat(selection.rating)}
+                    </li>
+                  )
+                })}
+            </ul>
+          )}
+        </div>
+      </section>
+
 
       {predatorTypeSelections.length > 0 && (
         <section className="advantages-category">
@@ -637,7 +692,17 @@ export function AdvantagesStep({
                     selection.definitionKey ===
                     definition.key,
                 ),
+            ).filter(
+              (definition) =>
+                filterAdvantageCatalogDefinitions(
+                  [definition],
+                  catalogSearchTerm,
+                ).length > 0,
             )
+
+          if (definitions.length === 0) {
+            return null
+          }
 
           return (
             <section
@@ -646,32 +711,48 @@ export function AdvantagesStep({
                 `advantages-category advantages-category--${category}`
               }
             >
-              <header className="advantages-category__heading">
-                <div>
-                  <span>
-                    Catálogo CORE
-                  </span>
+              <details
+                className="advantages-catalog-category"
+                open={catalogSearchTerm.trim() ? true : undefined}
+              >
+                <summary className="advantages-category__heading">
+                  <div>
+                    <span>Catálogo</span>
+                    <h3>{categoryLabels[category]}</h3>
+                  </div>
+                  <strong>
+                    {definitions.length} disponibles
+                    {' · '}
+                    {value.selections.filter(
+                      (selection) =>
+                        selection.origin === 'creation' &&
+                        selection.category === category,
+                    ).length} seleccionados
+                  </strong>
+                </summary>
 
-                  <h3>
-                    {
-                      categoryLabels[
-                        category
-                      ]
-                    }
-                  </h3>
-                </div>
+                <div className="advantages-catalog-groups">
+                  {groupAdvantageCatalogDefinitions(definitions).map((group) => {
+                    const selectedCount = group.definitions.filter(
+                      (definition) =>
+                        getDefinitionSelections(value, definition.key).length > 0,
+                    ).length
 
-                <strong>
-                  {definitions.length}
-                </strong>
-              </header>
-
-              <div
-              className={
-                "advantages-catalog-grid advantages-catalog-grid--merit"
-              }
-            >
-                {definitions.map(
+                    return (
+                      <details
+                        key={group.key}
+                        className="advantages-catalog-subgroup"
+                        open={catalogSearchTerm.trim() ? true : undefined}
+                      >
+                        <summary>
+                          <span>{group.label}</span>
+                          <small>
+                            {group.definitions.length} rasgos
+                            {selectedCount > 0 ? ` · ${selectedCount} seleccionados` : ''}
+                          </small>
+                        </summary>
+                        <div className={`advantages-catalog-grid advantages-catalog-grid--${category}`}>
+                  {group.definitions.map(
                   (definition) => {
                     const selections =
                       getDefinitionSelections(
@@ -1266,7 +1347,12 @@ export function AdvantagesStep({
                     )
                   },
                 )}
-              </div>
+                        </div>
+                      </details>
+                    )
+                  })}
+                </div>
+              </details>
             </section>
           )
         },

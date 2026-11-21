@@ -9,6 +9,14 @@ import {
   initialCharacterDraft,
 } from '../src/features/character-creation/data/initial-character-draft.ts'
 
+import {
+  validateAdvantageParentRelations,
+} from '../src/features/character-creation/domain/advantage-parent-rules.ts'
+
+import {
+  characterAdvantageDefinitions,
+} from '../src/features/character-creation/data/character-advantage-definitions.ts'
+
 
 function draftWithAdvantages(
   selections,
@@ -20,6 +28,51 @@ function draftWithAdvantages(
     },
   }
 }
+
+test(
+  'Enemigo vinculado a Aliados cuesta dos puntos menos que su Efectividad',
+  () => {
+    const allies = {
+      selectionId: 'allies-parent',
+      definitionKey: 'allies',
+      category: 'background',
+      rating: 5,
+      origin: 'creation',
+      details: {
+        kind: 'allies',
+        effectiveness: 4,
+        reliability: 1,
+      },
+    }
+    const enemy = (rating) => ({
+      selectionId: `enemy-${rating}`,
+      definitionKey: 'enemy',
+      category: 'flaw',
+      rating,
+      origin: 'creation',
+      parentSelectionId: 'allies-parent',
+      details: {
+        kind: 'enemy',
+        identity: 'Rival conocido',
+      },
+    })
+
+    const valid = validateAdvantageParentRelations(
+      { selections: [allies, enemy(2)] },
+      characterAdvantageDefinitions,
+    )
+    const invalid = validateAdvantageParentRelations(
+      { selections: [allies, enemy(1)] },
+      characterAdvantageDefinitions,
+    )
+
+    assert.equal(valid.valid, true)
+    assert.equal(invalid.valid, false)
+    assert.ok(invalid.errors.some((error) =>
+      error.includes('dos puntos inferior'),
+    ))
+  },
+)
 
 
 test(
