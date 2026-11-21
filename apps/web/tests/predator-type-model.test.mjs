@@ -2629,7 +2629,7 @@ test(
         {
           type: 'advantage',
           definitionKey: 'dark-secret',
-          category: 'background',
+          category: 'flaw',
           rating: 2,
         },
         {
@@ -2761,7 +2761,7 @@ test(
       [
         {
           definitionKey: 'dark-secret',
-          category: 'background',
+          category: 'flaw',
           rating: 2,
         },
         {
@@ -2865,7 +2865,7 @@ test(
       [
         {
           definitionKey: 'dark-secret',
-          category: 'background',
+          category: 'flaw',
           rating: 1,
         },
         {
