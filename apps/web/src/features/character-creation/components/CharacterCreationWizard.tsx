@@ -111,6 +111,7 @@ import { IdentityStep } from './IdentityStep'
 import { SkillsStep } from './SkillsStep'
 import { SkillsIntroductionStep } from './SkillsIntroductionStep'
 import { BloodIntroductionStep } from './BloodIntroductionStep'
+import { DisciplineIntroductionStep } from './DisciplineIntroductionStep'
 import { BloodStep } from './BloodStep'
 import { DisciplinesStep } from './DisciplinesStep'
 import { AdvantagesStep } from './AdvantagesStep'
@@ -242,6 +243,11 @@ export function CharacterCreationWizard({
   ] = useState(false)
 
   const [
+    hasCompletedDisciplinesIntroduction,
+    setHasCompletedDisciplinesIntroduction,
+  ] = useState(false)
+
+  const [
     persistenceState,
     setPersistenceState,
   ] = useState<CharacterDraftPersistenceUiState>(
@@ -359,6 +365,10 @@ export function CharacterCreationWizard({
     journeyMode === 'guided' &&
     currentStepId === 'blood' &&
     !hasCompletedBloodIntroduction
+  const disciplinesIntroductionActive =
+    journeyMode === 'guided' &&
+    currentStepId === 'disciplines' &&
+    !hasCompletedDisciplinesIntroduction
 
   const persistenceBusy =
     persistenceState === 'loading' ||
@@ -571,6 +581,7 @@ export function CharacterCreationWizard({
     setGuidedIdentityErrors([])
     setHasCompletedSkillsIntroduction(false)
     setHasCompletedBloodIntroduction(false)
+    setHasCompletedDisciplinesIntroduction(false)
     setDraft(
       prepareDraftForCreationMode(
         initialCharacterDraft,
@@ -786,6 +797,16 @@ export function CharacterCreationWizard({
       return
     }
 
+    if (
+      journeyMode === 'guided' &&
+      currentStepId === 'disciplines' &&
+      hasCompletedDisciplinesIntroduction
+    ) {
+      setHasCompletedDisciplinesIntroduction(false)
+      setShowValidation(false)
+      return
+    }
+
     if (isFirst) {
       return
     }
@@ -813,6 +834,12 @@ export function CharacterCreationWizard({
 
     if (bloodIntroductionActive) {
       setHasCompletedBloodIntroduction(true)
+      setShowValidation(false)
+      return
+    }
+
+    if (disciplinesIntroductionActive) {
+      setHasCompletedDisciplinesIntroduction(true)
       setShowValidation(false)
       return
     }
@@ -1380,6 +1407,9 @@ export function CharacterCreationWizard({
             'disciplines' &&
             draft.identity.clan !==
               null ? (
+            disciplinesIntroductionActive ? (
+              <DisciplineIntroductionStep clanKey={draft.identity.clan} />
+            ) : (
             <DisciplinesStep
               clanKey={
                 draft.identity.clan
@@ -1425,6 +1455,7 @@ export function CharacterCreationWizard({
                 )
               }
             />
+            )
           ) : currentStepId ===
             'advantages' ? (
             <AdvantagesStep
@@ -1643,7 +1674,9 @@ export function CharacterCreationWizard({
                 ? `Habilidades · introducción`
                 : bloodIntroductionActive
                   ? 'Sangre · introducción'
-                  : guidedIdentityActive
+                  : disciplinesIntroductionActive
+                    ? 'Disciplinas · introducción'
+                    : guidedIdentityActive
                     ? `Identidad · paso ${guidedIdentityStageIndex + 1} de ${guidedIdentityStages.length}`
                     : `Paso ${currentStep.number} de ${activeCreationSteps.length}`}
             </span>
@@ -1661,7 +1694,9 @@ export function CharacterCreationWizard({
                 ? 'Continuar: elegir perfil'
                 : bloodIntroductionActive
                   ? 'Continuar: ajustar Sangre'
-                  : 'Siguiente'}
+                  : disciplinesIntroductionActive
+                    ? 'Continuar: elegir Disciplinas'
+                    : 'Siguiente'}
             </button>
           </footer>
         </section>
