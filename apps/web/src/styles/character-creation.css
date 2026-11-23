@@ -4295,3 +4295,140 @@
   .identity-guided-group:not(.identity-guided-group--generation) {
   display: none;
 }
+
+
+/* MILESTONE-003-E — INTRODUCCIÓN GUIADA DE HABILIDADES */
+.skills-introduction {
+  flex: 1;
+  padding: clamp(30px, 5vw, 64px);
+}
+
+.skills-introduction__section {
+  margin-top: 28px;
+}
+
+.skills-introduction__section h3,
+.skills-introduction__specialties h3 {
+  margin: 0 0 14px;
+  color: var(--color-text-primary);
+  font-family: var(--font-family-heading);
+  font-size: clamp(1.25rem, 2vw, 1.7rem);
+  font-weight: 400;
+}
+
+.skills-introduction__levels {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.skills-introduction__level,
+.skills-introduction__profile {
+  min-width: 0;
+  border: 1px solid var(--color-option-border);
+  background: var(--color-surface-option);
+}
+
+.skills-introduction__level {
+  padding: 12px 14px;
+}
+
+.skills-introduction__level strong,
+.skills-introduction__level span {
+  display: block;
+}
+
+.skills-introduction__level strong {
+  margin-bottom: 4px;
+  color: var(--color-text-option);
+  font-family: var(--font-family-heading);
+  font-size: 0.92rem;
+  font-weight: 400;
+}
+
+.skills-introduction__level span {
+  color: var(--color-text-option-muted);
+  font-size: 0.72rem;
+  line-height: var(--line-height-normal);
+}
+
+.skills-introduction__profiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.skills-introduction__profile {
+  padding: var(--space-4);
+}
+
+.skills-introduction__profile h4 {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-option);
+  font-family: var(--font-family-heading);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.skills-introduction__profile p {
+  margin: 0;
+  color: var(--color-text-option-muted);
+  font-size: 0.75rem;
+  line-height: var(--line-height-normal);
+}
+
+.skills-introduction__profile small {
+  display: block;
+  margin-top: 12px;
+  color: var(--color-text-option-muted);
+  font-size: 0.69rem;
+  line-height: var(--line-height-normal);
+}
+
+.skills-introduction__method-note {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  border-left: 2px solid var(--color-accent-active);
+  color: var(--color-text-muted);
+  background: var(--color-surface-inset-subtle);
+  font-size: 0.78rem;
+  line-height: var(--line-height-normal);
+}
+
+.skills-introduction__specialties {
+  margin-top: 22px;
+  padding: 16px 18px;
+  border: 1px solid var(--color-panel-border-soft);
+  background: var(--color-panel-glass);
+}
+
+.skills-introduction__specialties h3 {
+  margin-bottom: 8px;
+}
+
+.skills-introduction__specialties p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  line-height: var(--line-height-normal);
+}
+
+@media (max-width: 900px) {
+  .skills-introduction__profiles {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .skills-introduction {
+    padding: 24px 18px;
+  }
+
+  .skills-introduction__levels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .skills-introduction__profiles {
+    grid-template-columns: 1fr;
+  }
+}
