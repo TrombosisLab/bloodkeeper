@@ -109,6 +109,7 @@ import { CreationProgress } from './CreationProgress'
 import { CreationStepPlaceholder } from './CreationStepPlaceholder'
 import { IdentityStep } from './IdentityStep'
 import { SkillsStep } from './SkillsStep'
+import { SkillsIntroductionStep } from './SkillsIntroductionStep'
 import { BloodStep } from './BloodStep'
 import { DisciplinesStep } from './DisciplinesStep'
 import { AdvantagesStep } from './AdvantagesStep'
@@ -230,6 +231,11 @@ export function CharacterCreationWizard({
   ] = useState<string[]>([])
 
   const [
+    hasCompletedSkillsIntroduction,
+    setHasCompletedSkillsIntroduction,
+  ] = useState(false)
+
+  const [
     persistenceState,
     setPersistenceState,
   ] = useState<CharacterDraftPersistenceUiState>(
@@ -339,6 +345,10 @@ export function CharacterCreationWizard({
   const guidedIdentityActive =
     journeyMode === 'guided' &&
     currentStepId === 'identity'
+  const skillsIntroductionActive =
+    journeyMode === 'guided' &&
+    currentStepId === 'skills' &&
+    !hasCompletedSkillsIntroduction
 
   const persistenceBusy =
     persistenceState === 'loading' ||
@@ -549,6 +559,7 @@ export function CharacterCreationWizard({
     setCreationMode(selectedMode)
     setGuidedIdentityStage('profile')
     setGuidedIdentityErrors([])
+    setHasCompletedSkillsIntroduction(false)
     setDraft(
       prepareDraftForCreationMode(
         initialCharacterDraft,
@@ -744,6 +755,16 @@ export function CharacterCreationWizard({
       return
     }
 
+    if (
+      journeyMode === 'guided' &&
+      currentStepId === 'skills' &&
+      hasCompletedSkillsIntroduction
+    ) {
+      setHasCompletedSkillsIntroduction(false)
+      setShowValidation(false)
+      return
+    }
+
     if (isFirst) {
       return
     }
@@ -760,6 +781,12 @@ export function CharacterCreationWizard({
 
   function goNext() {
     if (isLast) {
+      return
+    }
+
+    if (skillsIntroductionActive) {
+      setHasCompletedSkillsIntroduction(true)
+      setShowValidation(false)
       return
     }
 
@@ -1224,7 +1251,10 @@ export function CharacterCreationWizard({
             />
           ) : currentStepId ===
             'skills' ? (
-            <SkillsStep
+            skillsIntroductionActive ? (
+              <SkillsIntroductionStep />
+            ) : (
+<SkillsStep
               value={
                 sessionZero
                   ? draft.skills
@@ -1294,7 +1324,9 @@ export function CharacterCreationWizard({
                 )
               }
             />
-          ) : currentStepId ===
+          ) 
+            )
+          : currentStepId ===
             'blood' ? (
             <BloodStep
               value={draft.blood}
@@ -1577,9 +1609,11 @@ export function CharacterCreationWizard({
             </button>
 
             <span className="creation-actions__position">
-              {guidedIdentityActive
-                ? `Identidad · paso ${guidedIdentityStageIndex + 1} de ${guidedIdentityStages.length}`
-                : `Paso ${currentStep.number} de ${activeCreationSteps.length}`}
+              {skillsIntroductionActive
+                ? `Habilidades · introducción`
+                : guidedIdentityActive
+                  ? `Identidad · paso ${guidedIdentityStageIndex + 1} de ${guidedIdentityStages.length}`
+                  : `Paso ${currentStep.number} de ${activeCreationSteps.length}`}
             </span>
 
             <button
@@ -1591,7 +1625,7 @@ export function CharacterCreationWizard({
                 interactionBusy
               }
             >
-              Siguiente
+              {skillsIntroductionActive ? 'Continuar: elegir perfil' : 'Siguiente'}
             </button>
           </footer>
         </section>
