@@ -331,7 +331,9 @@ export function CharacterCreationWizard({
   const guidedIdentityStages: GuidedIdentityStage[] =
     creationMode === 'sessionZero'
       ? ['profile', 'story']
-      : ['profile', 'story', 'clan', 'predator', 'generation']
+      : draft.identity.clan === 'thinBlood'
+        ? ['profile', 'story', 'clan', 'generation']
+        : ['profile', 'story', 'clan', 'predator', 'generation']
   const guidedIdentityStageIndex =
     guidedIdentityStages.indexOf(guidedIdentityStage)
   const guidedIdentityActive =
@@ -599,6 +601,7 @@ export function CharacterCreationWizard({
   ) {
     invalidateReview()
     setShowValidation(false)
+    setGuidedIdentityErrors([])
     setHasUnsavedChanges(true)
     setDraft(candidate)
   }
