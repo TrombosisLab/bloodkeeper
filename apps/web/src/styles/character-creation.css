@@ -4176,3 +4176,21 @@
   margin: 0;
   color: var(--color-text-subtle);
 }
+
+
+.identity-guided-group {
+  display: contents;
+}
+
+.identity-step[data-guided-stage="profile"]
+  .identity-guided-group:not(.identity-guided-group--profile),
+.identity-step[data-guided-stage="story"]
+  .identity-guided-group:not(.identity-guided-group--story),
+.identity-step[data-guided-stage="clan"]
+  .identity-guided-group:not(.identity-guided-group--clan),
+.identity-step[data-guided-stage="predator"]
+  .identity-guided-group:not(.identity-guided-group--predator),
+.identity-step[data-guided-stage="generation"]
+  .identity-guided-group:not(.identity-guided-group--generation) {
+  display: none;
+}
