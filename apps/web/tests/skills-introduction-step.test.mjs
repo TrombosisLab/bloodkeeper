@@ -25,6 +25,9 @@ test('la introducción explica niveles, repartos y especializaciones', () => {
     '7 básicas · 5 competentes · 3 destacadas · 12 sin puntos',
     '3 básicas · 3 competentes · 3 destacadas · 1 experta · 17 sin puntos',
     'Reparto aleatorio válido',
+    'Tienes una especialización libre para cualquiera de las 27',
+    'requieren además una propia cuando',
+    'no consumen esos cupos.',
     'Academicismo, Artesanía, Ciencia e Interpretación',
     'Las del Tipo de Depredador se añaden aparte.',
   ]) {
