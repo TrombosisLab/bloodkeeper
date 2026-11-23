@@ -101,10 +101,11 @@ export function SkillsIntroductionStep() {
           Especializaciones
         </h3>
         <p>
-          Puedes elegir una especialización gratuita para una habilidad con
-          puntos. Academicismo, Artesanía, Ciencia e Interpretación requieren
-          elegir una al tener puntuación. Las del Tipo de Depredador se añaden
-          aparte.
+          Tienes una especialización libre para cualquiera de las 27
+          habilidades, siempre que tenga al menos 1 punto. Academicismo,
+          Artesanía, Ciencia e Interpretación requieren además una propia cuando
+          tienen puntuación. Las del Tipo de Depredador se añaden aparte y no
+          consumen esos cupos.
         </p>
       </section>
     </section>
