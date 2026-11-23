@@ -56,4 +56,7 @@ test('Guiado divide Identidad en pasos breves y Directo conserva el formulario c
   for (const group of ['profile', 'story', 'clan', 'predator', 'generation']) {
     assert.match(identityStep, new RegExp(`identity-guided-group--${group}`))
   }
+  assert.match(wizard, /creationMode === 'sessionZero'[\\s\\S]*?\\['profile', 'story'\\]/)
+  assert.match(wizard, /draft\\.identity\\.clan === 'thinBlood'[\\s\\S]*?\\['profile', 'story', 'clan', 'generation'\\]/)
+  assert.match(wizard, /setGuidedIdentityErrors\\(\\[\\]\\)/)
 })
