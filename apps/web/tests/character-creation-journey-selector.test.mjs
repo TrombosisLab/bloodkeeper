@@ -44,7 +44,7 @@ test('Guiado y Directo conservan el mapa lateral de fases', () => {
   assert.match(wizard, /<CreationProgress/)
   assert.match(wizard, /className="creation-layout"/)
   assert.match(wizard, /journeyMode === 'guided' \? \(/)
-  assert.match(wizard, /La fase actual agrupa decisiones relacionadas/)
+  assert.match(wizard, /El menú lateral mantiene visible la fase general/)
   assert.match(journeySelector, /Conserva el menú lateral/)
 })
 
