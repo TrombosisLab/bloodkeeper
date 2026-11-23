@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import { attributeDefinitions } from '../data/attribute-definitions'
 
 import {
@@ -13,7 +15,16 @@ import type {
 
 import { AttributeEditorRow } from './AttributeEditorRow'
 
+type AttributeCategory = 'physical' | 'social' | 'mental'
+
+const categories: AttributeCategory[] = [
+  'physical',
+  'social',
+  'mental',
+]
+
 interface AttributesStepProps {
+  guided?: boolean
   value: CharacterAttributesDraft
   onChange: (
     value: CharacterAttributesDraft,
@@ -27,9 +38,11 @@ const categoryLabels = {
 } as const
 
 export function AttributesStep({
+  guided = false,
   value,
   onChange,
 }: AttributesStepProps) {
+  const [activeCategory, setActiveCategory] = useState<AttributeCategory>('physical')
   const validation =
     validateAttributeDistribution(value)
 
@@ -51,12 +64,6 @@ export function AttributesStep({
       randomizeAttributes(),
     )
   }
-
-  const categories = [
-    'physical',
-    'social',
-    'mental',
-  ] as const
 
   return (
     <div className="attributes-step">
@@ -89,8 +96,47 @@ export function AttributesStep({
         </button>
       </div>
 
-      <div className="attributes-editor-grid">
-        {categories.map((category) => (
+      {guided && (
+        <div className="attributes-step__guided-navigation">
+          <div className="attributes-step__guided-categories" role="group" aria-label="Grupo de Atributos">
+            {categories.map((category, index) => (
+              <button
+                type="button"
+                key={category}
+                className="attributes-step__guided-category"
+                aria-pressed={activeCategory === category}
+                onClick={() => setActiveCategory(category)}
+              >
+                <span>{categoryLabels[category]}</span>
+                <small>{index + 1} de {categories.length}</small>
+              </button>
+            ))}
+          </div>
+          <div className="attributes-step__guided-controls">
+            <button
+              type="button"
+              className="creation-button creation-button--secondary"
+              disabled={activeCategory === categories[0]}
+              onClick={() => setActiveCategory(categories[categories.indexOf(activeCategory) - 1])}
+            >
+              Grupo anterior
+            </button>
+            <span>{categoryLabels[activeCategory]} · {categories.indexOf(activeCategory) + 1} de {categories.length}</span>
+            <button
+              type="button"
+              className="creation-button creation-button--secondary"
+              disabled={activeCategory === categories[categories.length - 1]}
+              onClick={() => setActiveCategory(categories[categories.indexOf(activeCategory) + 1])}
+            >
+              Siguiente grupo
+            </button>
+          </div>
+          <p>Los puntos se reparten entre los tres grupos y se validan en conjunto.</p>
+        </div>
+      )}
+
+      <div className={\`attributes-editor-grid\${guided ? ' attributes-editor-grid--guided' : ''}\`}>
+        {(guided ? [activeCategory] : categories).map((category) => (
           <section
             className="attributes-editor-category"
             key={category}
