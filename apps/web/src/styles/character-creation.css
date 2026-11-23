@@ -4158,11 +4158,6 @@
 }
 
 
-/* Recorrido guiado: una sola columna y orientación breve antes de cada fase. */
-.creation-layout--guided {
-  grid-template-columns: minmax(0, 1fr);
-}
-
 .creation-guided-note {
   margin-bottom: var(--space-4);
   padding: var(--space-3) var(--space-4);
