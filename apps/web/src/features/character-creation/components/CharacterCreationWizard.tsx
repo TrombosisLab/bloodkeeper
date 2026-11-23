@@ -782,7 +782,9 @@ export function CharacterCreationWizard({
               ? draft.identity.clan !== 'thinBlood' &&
                 draft.identity.predatorType === ''
                 ? ['Elige un Tipo de Depredador para continuar.']
-                : []
+                : currentValidation.errors.filter(
+                    (error) => error !== 'La generación es obligatoria.',
+                  )
               : guidedIdentityStage === 'generation'
                 ? currentValidation.errors
                 : []
