@@ -4552,3 +4552,64 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* GUIDED ADVANTAGES INTRODUCTION */
+.advantages-introduction {
+  flex: 1;
+  padding: clamp(30px, 5vw, 64px);
+}
+
+.advantages-introduction__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.advantages-introduction__card {
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-option-border);
+  background: var(--color-surface-option);
+}
+
+.advantages-introduction__card > span {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--color-text-option-muted);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.advantages-introduction__card h3 {
+  margin: 0;
+  color: var(--color-text-option);
+  font-family: var(--font-family-heading);
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+.advantages-introduction__card p,
+.advantages-introduction__note {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-option-muted);
+  font-size: 0.82rem;
+  line-height: var(--line-height-normal);
+}
+
+.advantages-introduction__card--derived {
+  border-left: 2px solid var(--color-accent-active);
+  background: var(--color-surface-inset-subtle);
+}
+
+@media (max-width: 700px) {
+  .advantages-introduction {
+    padding: 24px 18px;
+  }
+
+  .advantages-introduction__grid {
+    grid-template-columns: 1fr;
+  }
+}
