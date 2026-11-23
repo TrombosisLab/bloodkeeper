@@ -1038,8 +1038,7 @@ export function CharacterCreationWizard({
         </div>
       </header>
 
-      <div className={journeyMode === 'guided' ? 'creation-layout creation-layout--guided' : 'creation-layout'}>
-        {journeyMode !== 'guided' ? (
+      <div className="creation-layout">
         <aside className="creation-sidebar">
           <div className="creation-sidebar__heading">
             <span>Progreso</span>
@@ -1060,15 +1059,14 @@ export function CharacterCreationWizard({
             }
           />
         </aside>
-        ) : null}
 
         <section className="creation-workspace">
           {journeyMode === 'guided' ? (
             <div className="creation-guided-note" role="note">
               <strong>Recorrido guiado</strong>
               <p>
-                Avanza una fase cada vez con «Siguiente». Puedes volver atrás
-                cuando quieras; aquí solo verás la decisión que toca ahora.
+                La fase actual agrupa decisiones relacionadas. Usa el mapa
+                lateral para orientarte y «Siguiente» para avanzar.
               </p>
             </div>
           ) : null}
