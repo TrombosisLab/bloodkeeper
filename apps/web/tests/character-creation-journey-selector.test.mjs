@@ -35,9 +35,11 @@ test('los borradores existentes conservan su carga sin mostrar el nuevo selector
   assert.match(wizard, /Recuperando el modo y el progreso guardados/)
 })
 
-test('Guiado oculta el mapa libre de fases y Directo lo conserva', () => {
-  assert.match(wizard, /journeyMode !== 'guided' \? \([\s\S]*?<CreationProgress/)
-  assert.match(wizard, /creation-layout--guided/)
-  assert.match(wizard, /Avanza una fase cada vez/)
-  assert.match(journeySelector, /mapa de fases/)
+test('Guiado y Directo conservan el mapa lateral de fases', () => {
+  assert.match(wizard, /<aside className="creation-sidebar">/)
+  assert.match(wizard, /<CreationProgress/)
+  assert.match(wizard, /className="creation-layout"/)
+  assert.match(wizard, /journeyMode === 'guided' \? \(/)
+  assert.match(wizard, /La fase actual agrupa decisiones relacionadas/)
+  assert.match(journeySelector, /Conserva el menú lateral/)
 })
