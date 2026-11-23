@@ -43,6 +43,12 @@ export function AttributesStep({
   onChange,
 }: AttributesStepProps) {
   const [activeCategory, setActiveCategory] = useState<AttributeCategory>('physical')
+
+  function moveCategory(direction: -1 | 1) {
+    const nextCategory = categories[categories.indexOf(activeCategory) + direction]
+    if (nextCategory) setActiveCategory(nextCategory)
+  }
+
   const validation =
     validateAttributeDistribution(value)
 
@@ -117,7 +123,7 @@ export function AttributesStep({
               type="button"
               className="creation-button creation-button--secondary"
               disabled={activeCategory === categories[0]}
-              onClick={() => setActiveCategory(categories[categories.indexOf(activeCategory) - 1])}
+              onClick={() => moveCategory(-1)}
             >
               Grupo anterior
             </button>
@@ -126,7 +132,7 @@ export function AttributesStep({
               type="button"
               className="creation-button creation-button--secondary"
               disabled={activeCategory === categories[categories.length - 1]}
-              onClick={() => setActiveCategory(categories[categories.indexOf(activeCategory) + 1])}
+              onClick={() => moveCategory(1)}
             >
               Siguiente grupo
             </button>
