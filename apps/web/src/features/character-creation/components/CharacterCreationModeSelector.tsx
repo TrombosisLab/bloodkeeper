@@ -1,16 +1,23 @@
 import type {
   CharacterDraftApiCreationMode,
 } from '../types/character-draft-api.types'
+import type {
+  CharacterCreationJourney,
+} from './CharacterCreationJourneySelector'
 
 interface CharacterCreationModeSelectorProps {
+  journeyMode: CharacterCreationJourney
   onSelect: (
     creationMode: CharacterDraftApiCreationMode,
   ) => void
+  onBackToJourney: () => void
   onCancel: () => void
 }
 
 export function CharacterCreationModeSelector({
+  journeyMode,
   onSelect,
+  onBackToJourney,
   onCancel,
 }: CharacterCreationModeSelectorProps) {
   return (
@@ -22,19 +29,19 @@ export function CharacterCreationModeSelector({
           </p>
           <h1>Crear personaje</h1>
           <p className="creation-header__description">
-            Elige cómo comienza la historia del personaje.
-            El modo no se deduce de campos incompletos.
+            Primero elegiste el recorrido {journeyMode === 'guided' ? 'Guiado' : 'Directo'}.
+            Ahora decide desde qué punto comienza la historia.
           </p>
         </div>
       </header>
 
       <section className="creation-workspace">
         <div className="creation-step-heading">
-          <span>Modo de creación</span>
-          <h2>¿Cómo comienza el personaje?</h2>
+          <span>Inicio de la historia</span>
+          <h2>¿Desde dónde comienza el personaje?</h2>
           <p>
-            Ambas rutas usan el mismo creador y conservan
-            la identidad del personaje.
+            Esta elección define si la historia empieza como vampiro
+            o como humano en una Sesión 0.
           </p>
         </div>
 
@@ -77,6 +84,13 @@ export function CharacterCreationModeSelector({
         </div>
 
         <div className="creation-actions">
+          <button
+            type="button"
+            className="creation-button creation-button--secondary"
+            onClick={onBackToJourney}
+          >
+            Cambiar recorrido
+          </button>
           <button
             type="button"
             className="creation-button creation-button--secondary"
