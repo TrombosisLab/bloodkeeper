@@ -54,24 +54,28 @@ const methods: {
   key: SkillDistributionMethod
   label: string
   description: string
+  target: string
 }[] = [
   {
     key: 'generalist',
     label: 'Generalista',
     description:
-      'Muchas capacidades a niveles bajos y medios.',
+      'Amplia cobertura: la mayoría quedan en niveles básicos y medios, sin una habilidad de nivel 4.',
+    target: '10 a nivel 1 · 8 a nivel 2 · 1 a nivel 3 · 8 sin puntos',
   },
   {
     key: 'balanced',
     label: 'Equilibrado',
     description:
-      'Una distribución versátil y compensada.',
+      'Equilibra amplitud y profundidad, con varias capacidades destacadas.',
+    target: '7 a nivel 1 · 5 a nivel 2 · 3 a nivel 3 · 12 sin puntos',
   },
   {
     key: 'specialist',
     label: 'Especialista',
     description:
-      'Menos habilidades, pero mayor especialización.',
+      'Menos habilidades entrenadas, pero permite concentrar experiencia hasta nivel 4.',
+    target: '3 a nivel 1 · 3 a nivel 2 · 3 a nivel 3 · 1 a nivel 4 · 17 sin puntos',
   },
 ]
 
@@ -109,12 +113,6 @@ export function SkillsStep({
       SkillDistributionMethod,
   ) {
     onMethodChange(nextMethod)
-
-    onChange(
-      randomizeSkills(
-        nextMethod,
-      ),
-    )
   }
 
   function randomize() {
@@ -160,9 +158,18 @@ export function SkillsStep({
             <span>
               {option.description}
             </span>
+
+            <small>
+              Reparto objetivo: {option.target}
+            </small>
           </button>
         ))}
       </div>
+
+      <p className="skills-step__method-guidance">
+        El perfil define las cantidades objetivo, pero no mueve tus puntos.
+        Usa “Reparto aleatorio válido” si quieres que se asignen automáticamente.
+      </p>
 
       <div className="skills-step__toolbar">
         <div>
