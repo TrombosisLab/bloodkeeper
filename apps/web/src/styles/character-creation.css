@@ -831,6 +831,12 @@
   font-size: 0.8rem;
 }
 
+@media (max-width: 1280px) {
+  .attributes-editor-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 980px) {
   .attributes-editor-grid {
     grid-template-columns: 1fr;
