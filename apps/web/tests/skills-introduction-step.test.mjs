@@ -27,12 +27,12 @@ test('la introducción explica niveles, repartos y especializaciones', () => {
     'Reparto aleatorio válido',
     'Tienes una especialización libre para cualquiera de las 27',
     'requieren además una propia cuando',
-    'no consumen esos cupos.',
     'Academicismo, Artesanía, Ciencia e Interpretación',
     'Las del Tipo de Depredador se añaden aparte.',
   ]) {
     assert.ok(introduction.includes(text), `Falta explicación: ${text}`)
   }
+  assert.match(introduction, /no\\s+consumen esos cupos\\./)
   assert.match(introduction, /skills-introduction__profiles/)
   assert.match(introduction, /skills-introduction__specialties/)
 })
