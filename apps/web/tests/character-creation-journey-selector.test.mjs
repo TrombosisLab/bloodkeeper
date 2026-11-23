@@ -2,6 +2,10 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
+const identityStep = await readFile(
+  new URL('../src/features/character-creation/components/IdentityStep.tsx', import.meta.url),
+  'utf8',
+)
 const wizard = await readFile(
   new URL('../src/features/character-creation/components/CharacterCreationWizard.tsx', import.meta.url),
   'utf8',
@@ -42,4 +46,14 @@ test('Guiado y Directo conservan el mapa lateral de fases', () => {
   assert.match(wizard, /journeyMode === 'guided' \? \(/)
   assert.match(wizard, /La fase actual agrupa decisiones relacionadas/)
   assert.match(journeySelector, /Conserva el menú lateral/)
+})
+
+test('Guiado divide Identidad en pasos breves y Directo conserva el formulario completo', () => {
+  assert.match(wizard, /guidedIdentityStages: GuidedIdentityStage\[\]/)
+  assert.match(wizard, /setGuidedIdentityStage\(/)
+  assert.match(wizard, /Identidad · paso/)
+  assert.match(identityStep, /data-guided-stage=\{guidedStage \?\? "all"\}/)
+  for (const group of ['profile', 'story', 'clan', 'predator', 'generation']) {
+    assert.match(identityStep, new RegExp(`identity-guided-group--${group}`))
+  }
 })
