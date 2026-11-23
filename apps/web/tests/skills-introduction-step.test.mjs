@@ -32,7 +32,7 @@ test('la introducción explica niveles, repartos y especializaciones', () => {
   ]) {
     assert.ok(introduction.includes(text), `Falta explicación: ${text}`)
   }
-  assert.match(introduction, /no\\s+consumen esos cupos\\./)
+  assert.match(introduction, /no\s+consumen esos cupos\./)
   assert.match(introduction, /skills-introduction__profiles/)
   assert.match(introduction, /skills-introduction__specialties/)
 })
