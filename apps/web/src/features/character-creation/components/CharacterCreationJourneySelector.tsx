@@ -1,6 +1,6 @@
 import type {
   CharacterCreationJourney,
-} from './CharacterCreationJourneySelector'
+} from './character-creation-journey.types'
 
 interface CharacterCreationJourneySelectorProps {
   onSelect: (journey: CharacterCreationJourney) => void
