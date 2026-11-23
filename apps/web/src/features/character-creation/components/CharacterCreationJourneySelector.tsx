@@ -44,8 +44,8 @@ export function CharacterCreationJourneySelector({
               <span>Recomendado para empezar</span>
               <h3>Guiado</h3>
               <p>
-                Avanza una fase cada vez, con una indicación clara de qué
-                decisión toca y cómo continuar. No necesitas conocer el sistema.
+                Conserva el menú lateral y añade orientación clara en cada
+                fase, para avanzar sin conocer previamente todas las reglas.
               </p>
             </div>
             <button
