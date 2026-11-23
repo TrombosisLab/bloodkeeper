@@ -3,7 +3,7 @@ import type {
 } from '../types/character-draft-api.types'
 import type {
   CharacterCreationJourney,
-} from './CharacterCreationJourneySelector'
+} from './character-creation-journey.types'
 
 interface CharacterCreationModeSelectorProps {
   journeyMode: CharacterCreationJourney
