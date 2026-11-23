@@ -117,6 +117,7 @@ import { ReviewStep } from './ReviewStep'
 import { CharacterCreationModeSelector } from './CharacterCreationModeSelector'
 import { CharacterCreationJourneySelector } from './CharacterCreationJourneySelector'
 import type { CharacterCreationJourney } from './character-creation-journey.types'
+import type { GuidedIdentityStage } from './character-creation-journey.types'
 
 type ReviewUiState =
   | 'idle'
@@ -219,6 +220,16 @@ export function CharacterCreationWizard({
   ] = useState<CharacterCreationJourney | null>(null)
 
   const [
+    guidedIdentityStage,
+    setGuidedIdentityStage,
+  ] = useState<GuidedIdentityStage>('profile')
+
+  const [
+    guidedIdentityErrors,
+    setGuidedIdentityErrors,
+  ] = useState<string[]>([])
+
+  const [
     persistenceState,
     setPersistenceState,
   ] = useState<CharacterDraftPersistenceUiState>(
@@ -316,6 +327,16 @@ export function CharacterCreationWizard({
 
   const currentValidation =
     validations[currentStepId]
+
+  const guidedIdentityStages: GuidedIdentityStage[] =
+    creationMode === 'sessionZero'
+      ? ['profile', 'story']
+      : ['profile', 'story', 'clan', 'predator', 'generation']
+  const guidedIdentityStageIndex =
+    guidedIdentityStages.indexOf(guidedIdentityStage)
+  const guidedIdentityActive =
+    journeyMode === 'guided' &&
+    currentStepId === 'identity'
 
   const persistenceBusy =
     persistenceState === 'loading' ||
@@ -524,6 +545,8 @@ export function CharacterCreationWizard({
     }
 
     setCreationMode(selectedMode)
+    setGuidedIdentityStage('profile')
+    setGuidedIdentityErrors([])
     setDraft(
       prepareDraftForCreationMode(
         initialCharacterDraft,
@@ -710,10 +733,19 @@ export function CharacterCreationWizard({
   }
 
   function goPrevious() {
+    if (guidedIdentityActive && guidedIdentityStageIndex > 0) {
+      setGuidedIdentityErrors([])
+      setGuidedIdentityStage(
+        guidedIdentityStages[guidedIdentityStageIndex - 1],
+      )
+      return
+    }
+
     if (isFirst) {
       return
     }
 
+    setGuidedIdentityErrors([])
     setShowValidation(false)
 
     changeCurrentStep(
@@ -726,6 +758,45 @@ export function CharacterCreationWizard({
   function goNext() {
     if (isLast) {
       return
+    }
+
+    if (guidedIdentityActive) {
+      const stageErrors =
+        guidedIdentityStage === 'profile'
+          ? [
+              ...(!draft.identity.name.trim()
+                ? ['Escribe el nombre del personaje para continuar.']
+                : []),
+              ...(!draft.identity.concept.trim()
+                ? ['Añade una frase que describa al personaje.']
+                : []),
+            ]
+          : guidedIdentityStage === 'clan'
+            ? draft.identity.clan === null
+              ? ['Elige un Clan o Caitiff para continuar.']
+              : []
+            : guidedIdentityStage === 'predator'
+              ? draft.identity.clan !== 'thinBlood' &&
+                draft.identity.predatorType === ''
+                ? ['Elige un Tipo de Depredador para continuar.']
+                : []
+              : guidedIdentityStage === 'generation'
+                ? currentValidation.errors
+                : []
+
+      if (stageErrors.length > 0) {
+        setGuidedIdentityErrors(stageErrors)
+        setShowValidation(false)
+        return
+      }
+
+      setGuidedIdentityErrors([])
+      if (guidedIdentityStageIndex < guidedIdentityStages.length - 1) {
+        setGuidedIdentityStage(
+          guidedIdentityStages[guidedIdentityStageIndex + 1],
+        )
+        return
+      }
     }
 
     if (!currentValidation.valid) {
@@ -1065,14 +1136,20 @@ export function CharacterCreationWizard({
             <div className="creation-guided-note" role="note">
               <strong>Recorrido guiado</strong>
               <p>
-                La fase actual agrupa decisiones relacionadas. Usa el mapa
-                lateral para orientarte y «Siguiente» para avanzar.
+                {guidedIdentityActive
+                  ? 'Una pregunta cada vez. El menú lateral mantiene visible la fase general.'
+                  : 'Sigue las indicaciones de esta fase; el menú lateral muestra tu progreso general.'}
               </p>
             </div>
           ) : null}
           {currentStepId === 'identity' ? (
             <IdentityStep
               creationMode={creationMode}
+              guidedStage={
+                journeyMode === 'guided'
+                  ? guidedIdentityStage
+                  : undefined
+              }
               value={draft.identity}
               choiceSelections={
                 draft.predatorTypeChoices ?? {}
@@ -1385,6 +1462,17 @@ export function CharacterCreationWizard({
             />
           )}
 
+          {guidedIdentityErrors.length > 0 ? (
+            <div className="creation-step-errors" role="alert">
+              <strong>Completa esta parte para continuar</strong>
+              <ul>
+                {guidedIdentityErrors.map(error => (
+                  <li key={error}>{error}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
           {pendingDraftUpdate !== null ? (
             <div
               className="creation-step-errors"
@@ -1474,7 +1562,8 @@ export function CharacterCreationWizard({
               className="creation-button creation-button--secondary creation-session-style-button"
               onClick={goPrevious}
               disabled={
-                isFirst ||
+                (isFirst &&
+                  (!guidedIdentityActive || guidedIdentityStageIndex === 0)) ||
                 interactionBusy
               }
             >
@@ -1482,9 +1571,9 @@ export function CharacterCreationWizard({
             </button>
 
             <span className="creation-actions__position">
-              Paso {currentStep.number}
-              {' de '}
-              {activeCreationSteps.length}
+              {guidedIdentityActive
+                ? `Identidad · paso ${guidedIdentityStageIndex + 1} de ${guidedIdentityStages.length}`
+                : `Paso ${currentStep.number} de ${activeCreationSteps.length}`}
             </span>
 
             <button
