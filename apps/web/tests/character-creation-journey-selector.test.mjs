@@ -60,3 +60,10 @@ test('Guiado divide Identidad en pasos breves y Directo conserva el formulario c
   assert.match(wizard, /draft\.identity\.clan === 'thinBlood'[\s\S]*?\['profile', 'story', 'clan', 'generation'\]/)
   assert.match(wizard, /setGuidedIdentityErrors\(\[\]\)/)
 })
+
+test('Guiado valida las opciones del depredador en su paso y aplaza solo la generación', () => {
+  assert.match(
+    wizard,
+    /guidedIdentityStage === 'predator'[\\s\\S]*?currentValidation\\.errors\\.filter\\([\\s\\S]*?La generación es obligatoria/,
+  )
+})
