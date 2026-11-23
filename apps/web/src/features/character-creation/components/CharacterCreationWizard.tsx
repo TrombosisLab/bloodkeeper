@@ -115,6 +115,8 @@ import { AdvantagesStep } from './AdvantagesStep'
 import { HumanityStep } from './HumanityStep'
 import { ReviewStep } from './ReviewStep'
 import { CharacterCreationModeSelector } from './CharacterCreationModeSelector'
+import { CharacterCreationJourneySelector } from './CharacterCreationJourneySelector'
+import type { CharacterCreationJourney } from './CharacterCreationJourneySelector'
 
 type ReviewUiState =
   | 'idle'
@@ -210,6 +212,11 @@ export function CharacterCreationWizard({
   ] = useState<CharacterDraftApiCreationMode | null>(
     null,
   )
+
+  const [
+    journeyMode,
+    setJourneyMode,
+  ] = useState<CharacterCreationJourney | null>(null)
 
   const [
     persistenceState,
@@ -911,9 +918,20 @@ export function CharacterCreationWizard({
       )
     }
 
+    if (journeyMode === null) {
+      return (
+        <CharacterCreationJourneySelector
+          onSelect={setJourneyMode}
+          onCancel={onBackToSheet}
+        />
+      )
+    }
+
     return (
       <CharacterCreationModeSelector
+        journeyMode={journeyMode}
         onSelect={selectCreationMode}
+        onBackToJourney={() => setJourneyMode(null)}
         onCancel={onBackToSheet}
       />
     )
