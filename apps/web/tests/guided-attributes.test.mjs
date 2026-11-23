@@ -16,6 +16,7 @@ const styles = await readFile(
 )
 
 test('el modo guiado recorre Atributos por grupos sin cambiar las reglas globales', () => {
+  assert.match(wizard, /<AttributesStep\s+guided=\{journeyMode === 'guided'\}/)
   assert.match(attributesStep, /guided\?: boolean/)
   assert.match(attributesStep, /Grupo de Atributos/)
   assert.match(attributesStep, /Grupo anterior/)
@@ -29,5 +30,6 @@ test('la navegaciÃ³n guiada usa los tokens visuales existentes y se adapta en mÃ
   assert.match(styles, /\.attributes-step__guided-navigation/)
   assert.match(styles, /\.attributes-step__guided-category\[aria-pressed="true"\]/)
   assert.match(styles, /var\(--color-accent-active\)/)
-  assert.match(styles, /@media \(max-width: 700px\)/)
+  assert.match(styles, /@media \(max-width: 700px\)[\s\S]*?attributes-step__guided-categories[\s\S]*?grid-template-columns: 1fr/)
+  assert.match(styles, /attributes-step__guided-controls span[\s\S]*?grid-column: 1 \/ -1/)
 })
