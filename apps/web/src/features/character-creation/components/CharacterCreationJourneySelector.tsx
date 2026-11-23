@@ -44,8 +44,8 @@ export function CharacterCreationJourneySelector({
               <span>Recomendado para empezar</span>
               <h3>Guiado</h3>
               <p>
-                Avanza con explicaciones y ayuda en cada decisión,
-                sin tener que conocer previamente todas las reglas.
+                Avanza una fase cada vez, con una indicación clara de qué
+                decisión toca y cómo continuar. No necesitas conocer el sistema.
               </p>
             </div>
             <button
@@ -62,8 +62,8 @@ export function CharacterCreationJourneySelector({
               <span>Para quien ya conoce el sistema</span>
               <h3>Directo</h3>
               <p>
-                Abre el creador completo y decide por tu cuenta en sus fases,
-                con acceso directo a todas las opciones.
+                Mantiene el creador completo con su mapa de fases y acceso
+                directo para moverte por las decisiones que ya conoces.
               </p>
             </div>
             <button
