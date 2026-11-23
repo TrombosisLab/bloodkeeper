@@ -19,7 +19,7 @@ test('la creación nueva ofrece primero recorrido guiado o directo', () => {
   assert.match(journeySelector, /onSelect\('guided'\)/)
   assert.match(journeySelector, /onSelect\('direct'\)/)
   assert.match(journeySelector, /mismas reglas y opciones/)
-  assert.ok(wizard.indexOf('CharacterCreationJourneySelector') < wizard.indexOf('CharacterCreationModeSelector'))
+  assert.ok(wizard.indexOf('<CharacterCreationJourneySelector') < wizard.indexOf('<CharacterCreationModeSelector'))
   assert.match(wizard, /journeyMode === null/)
 })
 
