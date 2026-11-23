@@ -28,7 +28,7 @@ test('la introducción explica niveles, repartos y especializaciones', () => {
     'Tienes una especialización libre para cualquiera de las 27',
     'requieren además una propia cuando',
     'Academicismo, Artesanía, Ciencia e Interpretación',
-    'Las del Tipo de Depredador se añaden aparte.',
+    'Las del Tipo de Depredador se añaden aparte y',
   ]) {
     assert.ok(introduction.replace(/\s+/g, ' ').includes(text), `Falta explicación: ${text}`)
   }
