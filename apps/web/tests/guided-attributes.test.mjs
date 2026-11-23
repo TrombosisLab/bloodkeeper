@@ -18,6 +18,7 @@ const styles = await readFile(
 test('el modo guiado recorre Atributos por grupos sin cambiar las reglas globales', () => {
   assert.match(wizard, /<AttributesStep\s+guided=\{journeyMode === 'guided'\}/)
   assert.match(attributesStep, /guided\?: boolean/)
+  assert.match(attributesStep, /className=\{`attributes-editor-grid/)
   assert.match(attributesStep, /Grupo de Atributos/)
   assert.match(attributesStep, /Grupo anterior/)
   assert.match(attributesStep, /Siguiente grupo/)
