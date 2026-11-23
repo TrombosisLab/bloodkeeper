@@ -1211,6 +1211,7 @@ export function CharacterCreationWizard({
           ) : currentStepId ===
             'attributes' ? (
             <AttributesStep
+              guided={journeyMode === 'guided'}
               value={draft.attributes}
               onChange={(attributes) =>
                 updateDraft(
