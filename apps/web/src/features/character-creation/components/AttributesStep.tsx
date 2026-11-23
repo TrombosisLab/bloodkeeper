@@ -141,7 +141,7 @@ export function AttributesStep({
         </div>
       )}
 
-      <div className={\`attributes-editor-grid\${guided ? ' attributes-editor-grid--guided' : ''}\`}>
+      <div className={`attributes-editor-grid${guided ? ' attributes-editor-grid--guided' : ''}`}>
         {(guided ? [activeCategory] : categories).map((category) => (
           <section
             className="attributes-editor-category"
