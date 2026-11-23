@@ -6,6 +6,10 @@ const identityStep = await readFile(
   new URL('../src/features/character-creation/components/IdentityStep.tsx', import.meta.url),
   'utf8',
 )
+const characterCreationStyles = await readFile(
+  new URL('../src/styles/character-creation.css', import.meta.url),
+  'utf8',
+)
 const wizard = await readFile(
   new URL('../src/features/character-creation/components/CharacterCreationWizard.tsx', import.meta.url),
   'utf8',
@@ -65,5 +69,16 @@ test('Guiado valida las opciones del depredador en su paso y aplaza solo la gene
   assert.match(
     wizard,
     /guidedIdentityStage === 'predator'[\s\S]*?currentValidation\.errors\.filter\([\s\S]*?La generación es obligatoria/,
+  )
+})
+
+test('la cuadrícula de Atributos se adapta antes de que sus controles se compriman', () => {
+  assert.match(
+    characterCreationStyles,
+    /@media \(max-width: 1280px\)[\s\S]*?\.attributes-editor-grid \{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/,
+  )
+  assert.match(
+    characterCreationStyles,
+    /@media \(max-width: 980px\)[\s\S]*?\.attributes-editor-grid \{\s*grid-template-columns: 1fr/,
   )
 })
