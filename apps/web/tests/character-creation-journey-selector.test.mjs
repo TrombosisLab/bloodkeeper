@@ -34,3 +34,10 @@ test('los borradores existentes conservan su carga sin mostrar el nuevo selector
   assert.match(wizard, /if \(characterId !== null\)[\s\S]*?Cargando creación/)
   assert.match(wizard, /Recuperando el modo y el progreso guardados/)
 })
+
+test('Guiado oculta el mapa libre de fases y Directo lo conserva', () => {
+  assert.match(wizard, /journeyMode !== 'guided' \? \([\s\S]*?<CreationProgress/)
+  assert.match(wizard, /creation-layout--guided/)
+  assert.match(wizard, /Avanza una fase cada vez/)
+  assert.match(journeySelector, /mapa de fases/)
+})
