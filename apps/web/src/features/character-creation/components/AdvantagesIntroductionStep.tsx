@@ -1,0 +1,64 @@
+interface AdvantagesIntroductionStepProps {
+  profileNature: 'human' | 'vampire'
+}
+
+export function AdvantagesIntroductionStep({
+  profileNature,
+}: AdvantagesIntroductionStepProps) {
+  return (
+    <section className="advantages-introduction" aria-labelledby="advantages-introduction-title">
+      <div className="creation-step-heading">
+        <span>Fase 6 · Ventajas y Defectos</span>
+        <h2 id="advantages-introduction-title">Antes de abrir el catálogo</h2>
+        <p>
+          “Ventajas” es el nombre general de este apartado. Dentro encontrarás
+          Méritos y Trasfondos; los Defectos son el lado negativo.
+        </p>
+      </div>
+
+      <div className="advantages-introduction__grid">
+        <article className="advantages-introduction__card">
+          <span>El apartado completo</span>
+          <h3>Ventajas</h3>
+          <p>
+            Es el conjunto de opciones favorables que ayudan a definir qué sabe
+            hacer tu personaje y con qué cuenta.
+          </p>
+        </article>
+
+        <article className="advantages-introduction__card">
+          <span>Rasgos del personaje</span>
+          <h3>Méritos</h3>
+          <p>
+            Son cualidades, aptitudes o particularidades especiales del personaje
+            que ofrecen un beneficio concreto.
+          </p>
+        </article>
+
+        <article className="advantages-introduction__card">
+          <span>Lo que tiene a su alcance</span>
+          <h3>Trasfondos</h3>
+          <p>
+            Representan recursos y relaciones externas: contactos, aliados,
+            refugio, rebaño, influencia o recursos económicos.
+          </p>
+        </article>
+
+        <article className="advantages-introduction__card advantages-introduction__card--derived">
+          <span>Complicaciones</span>
+          <h3>Defectos</h3>
+          <p>
+            Añaden desventajas o problemas narrativos. Algunos son personales;
+            otros afectan a un Trasfondo, como un refugio comprometido.
+            {profileNature === 'vampire' && ' Las concesiones del Tipo de Depredador se indican aparte para no comprarlas de nuevo.'}
+          </p>
+        </article>
+      </div>
+
+      <p className="advantages-introduction__note">
+        No hace falta memorizar costes ni límites: el catálogo siguiente mostrará
+        el presupuesto y las reglas de cada elección.
+      </p>
+    </section>
+  )
+}
