@@ -110,6 +110,7 @@ import { CreationStepPlaceholder } from './CreationStepPlaceholder'
 import { IdentityStep } from './IdentityStep'
 import { SkillsStep } from './SkillsStep'
 import { SkillsIntroductionStep } from './SkillsIntroductionStep'
+import { BloodIntroductionStep } from './BloodIntroductionStep'
 import { BloodStep } from './BloodStep'
 import { DisciplinesStep } from './DisciplinesStep'
 import { AdvantagesStep } from './AdvantagesStep'
@@ -236,6 +237,11 @@ export function CharacterCreationWizard({
   ] = useState(false)
 
   const [
+    hasCompletedBloodIntroduction,
+    setHasCompletedBloodIntroduction,
+  ] = useState(false)
+
+  const [
     persistenceState,
     setPersistenceState,
   ] = useState<CharacterDraftPersistenceUiState>(
@@ -349,6 +355,10 @@ export function CharacterCreationWizard({
     journeyMode === 'guided' &&
     currentStepId === 'skills' &&
     !hasCompletedSkillsIntroduction
+  const bloodIntroductionActive =
+    journeyMode === 'guided' &&
+    currentStepId === 'blood' &&
+    !hasCompletedBloodIntroduction
 
   const persistenceBusy =
     persistenceState === 'loading' ||
@@ -560,6 +570,7 @@ export function CharacterCreationWizard({
     setGuidedIdentityStage('profile')
     setGuidedIdentityErrors([])
     setHasCompletedSkillsIntroduction(false)
+    setHasCompletedBloodIntroduction(false)
     setDraft(
       prepareDraftForCreationMode(
         initialCharacterDraft,
@@ -765,6 +776,16 @@ export function CharacterCreationWizard({
       return
     }
 
+    if (
+      journeyMode === 'guided' &&
+      currentStepId === 'blood' &&
+      hasCompletedBloodIntroduction
+    ) {
+      setHasCompletedBloodIntroduction(false)
+      setShowValidation(false)
+      return
+    }
+
     if (isFirst) {
       return
     }
@@ -786,6 +807,12 @@ export function CharacterCreationWizard({
 
     if (skillsIntroductionActive) {
       setHasCompletedSkillsIntroduction(true)
+      setShowValidation(false)
+      return
+    }
+
+    if (bloodIntroductionActive) {
+      setHasCompletedBloodIntroduction(true)
       setShowValidation(false)
       return
     }
@@ -1328,24 +1355,27 @@ export function CharacterCreationWizard({
             )
           : currentStepId ===
             'blood' ? (
-            <BloodStep
-              value={draft.blood}
-              attributes={
-                draft.attributes
-              }
-              generation={
-                draft.identity.generation ??
-                13
-              }
-              onChange={(blood) =>
-                updateDraft(
-                  (current) => ({
-                    ...current,
-                    blood,
-                  }),
-                )
-              }
-            />
+            bloodIntroductionActive ? (
+              <BloodIntroductionStep
+                generation={draft.identity.generation ?? 13}
+                bloodPotency={draft.blood.bloodPotency}
+                hunger={draft.blood.hunger}
+              />
+            ) : (
+              <BloodStep
+                value={draft.blood}
+                attributes={draft.attributes}
+                generation={draft.identity.generation ?? 13}
+                onChange={(blood) =>
+                  updateDraft(
+                    (current) => ({
+                      ...current,
+                      blood,
+                    }),
+                  )
+                }
+              />
+            )
           ) : currentStepId ===
             'disciplines' &&
             draft.identity.clan !==
@@ -1611,9 +1641,11 @@ export function CharacterCreationWizard({
             <span className="creation-actions__position">
               {skillsIntroductionActive
                 ? `Habilidades · introducción`
-                : guidedIdentityActive
-                  ? `Identidad · paso ${guidedIdentityStageIndex + 1} de ${guidedIdentityStages.length}`
-                  : `Paso ${currentStep.number} de ${activeCreationSteps.length}`}
+                : bloodIntroductionActive
+                  ? 'Sangre · introducción'
+                  : guidedIdentityActive
+                    ? `Identidad · paso ${guidedIdentityStageIndex + 1} de ${guidedIdentityStages.length}`
+                    : `Paso ${currentStep.number} de ${activeCreationSteps.length}`}
             </span>
 
             <button
@@ -1625,7 +1657,11 @@ export function CharacterCreationWizard({
                 interactionBusy
               }
             >
-              {skillsIntroductionActive ? 'Continuar: elegir perfil' : 'Siguiente'}
+              {skillsIntroductionActive
+                ? 'Continuar: elegir perfil'
+                : bloodIntroductionActive
+                  ? 'Continuar: ajustar Sangre'
+                  : 'Siguiente'}
             </button>
           </footer>
         </section>
