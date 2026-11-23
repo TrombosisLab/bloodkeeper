@@ -959,9 +959,13 @@ export function CharacterCreationWizard({
           </h1>
 
           <p className="creation-header__description">
-            {sessionZero
-              ? 'Sesión 0 · construye la base humana antes del Abrazo.'
-              : 'Construye el personaje paso a paso. Cada fase completará una parte de su ficha.'}
+            {journeyMode === 'guided'
+              ? sessionZero
+                ? 'Recorrido guiado · construirás la base humana por fases antes del Abrazo.'
+                : 'Recorrido guiado · construirás el personaje por fases con orientación en cada decisión.'
+              : sessionZero
+                ? 'Sesión 0 · construye la base humana antes del Abrazo.'
+                : 'Construye el personaje paso a paso. Cada fase completará una parte de su ficha.'}
           </p>
         </div>
 
@@ -1034,7 +1038,8 @@ export function CharacterCreationWizard({
         </div>
       </header>
 
-      <div className="creation-layout">
+      <div className={journeyMode === 'guided' ? 'creation-layout creation-layout--guided' : 'creation-layout'}>
+        {journeyMode !== 'guided' ? (
         <aside className="creation-sidebar">
           <div className="creation-sidebar__heading">
             <span>Progreso</span>
@@ -1055,8 +1060,18 @@ export function CharacterCreationWizard({
             }
           />
         </aside>
+        ) : null}
 
         <section className="creation-workspace">
+          {journeyMode === 'guided' ? (
+            <div className="creation-guided-note" role="note">
+              <strong>Recorrido guiado</strong>
+              <p>
+                Avanza una fase cada vez con «Siguiente». Puedes volver atrás
+                cuando quieras; aquí solo verás la decisión que toca ahora.
+              </p>
+            </div>
+          ) : null}
           {currentStepId === 'identity' ? (
             <IdentityStep
               creationMode={creationMode}
