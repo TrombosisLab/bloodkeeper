@@ -116,7 +116,7 @@ import { HumanityStep } from './HumanityStep'
 import { ReviewStep } from './ReviewStep'
 import { CharacterCreationModeSelector } from './CharacterCreationModeSelector'
 import { CharacterCreationJourneySelector } from './CharacterCreationJourneySelector'
-import type { CharacterCreationJourney } from './CharacterCreationJourneySelector'
+import type { CharacterCreationJourney } from './character-creation-journey.types'
 
 type ReviewUiState =
   | 'idle'
