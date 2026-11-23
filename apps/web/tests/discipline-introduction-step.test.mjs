@@ -23,21 +23,21 @@ test('la introducción explica el reparto 2 + 1, la elección de Poderes y las c
     'Tipo de Depredador',
     'no consume el reparto 2 + 1',
   ]) {
-    assert.ok(introduction.replace(/\\s+/g, ' ').includes(text), 'Falta explicación: ' + text)
+    assert.ok(introduction.replace(/\s+/g, ' ').includes(text), 'Falta explicación: ' + text)
   }
   assert.match(introduction, /clan\.kind === 'thinBlood'/)
   assert.match(introduction, /clan\.kind === 'caitiff'/)
 })
 
 test('la explicación solo aparece en modo guiado, antes del selector, y permite volver', () => {
-  assert.match(wizard, /journeyMode === 'guided' &&\\s*currentStepId === 'disciplines' &&\\s*!hasCompletedDisciplinesIntroduction/)
-  assert.match(wizard, /if \\(disciplinesIntroductionActive\\) \\{[\\s\\S]*?setHasCompletedDisciplinesIntroduction\\(true\\)/)
-  assert.match(wizard, /currentStepId === 'disciplines' &&\\s*hasCompletedDisciplinesIntroduction[\\s\\S]*?setHasCompletedDisciplinesIntroduction\\(false\\)/)
+  assert.match(wizard, /journeyMode === 'guided' &&\s*currentStepId === 'disciplines' &&\s*!hasCompletedDisciplinesIntroduction/)
+  assert.match(wizard, /if \(disciplinesIntroductionActive\) \{[\s\S]*?setHasCompletedDisciplinesIntroduction\(true\)/)
+  assert.match(wizard, /currentStepId === 'disciplines' &&\s*hasCompletedDisciplinesIntroduction[\s\S]*?setHasCompletedDisciplinesIntroduction\(false\)/)
   assert.match(wizard, /<DisciplineIntroductionStep/)
   assert.match(wizard, /Continuar: elegir Disciplinas/)
 })
 
 test('la pantalla introductoria se adapta a pantallas estrechas', () => {
-  assert.match(styles, /\.discipline-introduction__grid\\s*\\{[\\s\\S]*?grid-template-columns/)
-  assert.match(styles, /@media \\(max-width: 700px\\)[\\s\\S]*?discipline-introduction__grid/)
+  assert.match(styles, /\.discipline-introduction__grid\s*\{[\s\S]*?grid-template-columns/)
+  assert.match(styles, /@media \(max-width: 700px\)[\s\S]*?discipline-introduction__grid/)
 })
