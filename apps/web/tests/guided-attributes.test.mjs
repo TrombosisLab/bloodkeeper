@@ -6,6 +6,10 @@ const attributesStep = await readFile(
   new URL('../src/features/character-creation/components/AttributesStep.tsx', import.meta.url),
   'utf8',
 )
+const wizard = await readFile(
+  new URL('../src/features/character-creation/components/CharacterCreationWizard.tsx', import.meta.url),
+  'utf8',
+)
 const styles = await readFile(
   new URL('../src/styles/character-creation.css', import.meta.url),
   'utf8',
