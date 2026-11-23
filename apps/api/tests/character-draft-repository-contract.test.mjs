@@ -198,3 +198,44 @@ test(
     )
   },
 )
+
+test(
+  '004-C reintenta la transacción completa ante colisión del ID',
+  () => {
+    const start = repository.indexOf(
+      '  async create(\n    data: CreateCharacterDraftData,',
+    )
+    const end = repository.indexOf('\n  listByOwner(', start)
+    assert.ok(start >= 0 && end > start, 'No se encontró el método create')
+    const createDraft = repository.slice(start, end)
+
+    assert.match(
+      repository,
+      /meta\.modelName !== 'Character'/,
+    )
+    assert.match(repository, /target\.includes\('id'\)/)
+    assert.match(
+      createDraft,
+      /for \(let attempt = 1; attempt <= 3; attempt \+= 1\)/,
+    )
+    assert.match(
+      createDraft,
+      /return await this\.database\.\$transaction/,
+    )
+
+    const transactionStart = createDraft.indexOf(
+      'async (transaction) => {',
+    )
+    const newId = createDraft.indexOf(
+      'const characterId = randomUUID()',
+    )
+    assert.ok(
+      transactionStart >= 0 && newId > transactionStart,
+      'Cada transacción debe generar su propio UUID',
+    )
+    assert.match(
+      createDraft,
+      /!isCharacterIdUniqueConstraintError\(error\)[\s\S]*attempt === 3[\s\S]*throw error/,
+    )
+  },
+)

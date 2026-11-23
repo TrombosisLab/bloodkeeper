@@ -46,8 +46,12 @@ import {
 } from './thin-blood/ThinBloodSection'
 
 import {
-  AdvantageInstanceDetailsEditor,
-} from './advantages/AdvantageInstanceDetailsEditor'
+  AdvantageInstanceDetailsDialog,
+} from './advantages/AdvantageInstanceDetailsDialog'
+
+import {
+  AdvantageCatalogInfoDialog,
+} from './advantages/AdvantageCatalogInfoDialog'
 
 import {
   AdvantageRatingControl,
@@ -217,6 +221,27 @@ export function AdvantagesStep({
   const [catalogSearchTerm, setCatalogSearchTerm] =
     useState('')
 
+  const [editingDetailsSelectionId, setEditingDetailsSelectionId] =
+    useState<string | null>(null)
+
+  const [catalogInfo, setCatalogInfo] = useState<{
+    definition: CharacterAdvantageDefinition
+    description: string
+  } | null>(null)
+
+  async function openCatalogInfo(
+    definition: CharacterAdvantageDefinition,
+  ) {
+    const { advantageCatalogHelp } = await import(
+      '../data/advantage-catalog-help'
+    )
+    setCatalogInfo({
+      definition,
+      description: advantageCatalogHelp[definition.key]
+        ?? 'Consulta con el Narrador el efecto concreto de este rasgo y cómo aplicarlo en la crónica.',
+    })
+  }
+
   const sessionZero =
     creationMode === 'sessionZero' &&
     profileNature === 'human'
@@ -375,11 +400,19 @@ export function AdvantagesStep({
         selection,
       ],
     })
+
+    if (definition.requiresInstanceDetails === true) {
+      setEditingDetailsSelectionId(selection.selectionId)
+    }
   }
 
   function removeSelection(
     selectionId: string,
   ) {
+    if (editingDetailsSelectionId === selectionId) {
+      setEditingDetailsSelectionId(null)
+    }
+
     onChange({
       selections:
         value.selections.filter(
@@ -409,6 +442,32 @@ export function AdvantagesStep({
         ),
     })
   }
+
+  function updateSelectionDetails(
+    updated: CharacterAdvantageSelectionDraft,
+  ) {
+    onChange({
+      selections: value.selections.map((current) =>
+        current.selectionId === updated.selectionId
+          ? updated
+          : current,
+      ),
+    })
+  }
+
+  const editingDetailsSelection =
+    value.selections.find(
+      (selection) =>
+        selection.selectionId === editingDetailsSelectionId,
+    )
+
+  const editingDetailsDefinition =
+    editingDetailsSelection
+      ? characterAdvantageDefinitions.find(
+          (definition) =>
+            definition.key === editingDetailsSelection.definitionKey,
+        )
+      : undefined
 
   return (
     <div className="advantages-step">
@@ -553,7 +612,7 @@ export function AdvantagesStep({
             </strong>
           </header>
 
-          <div className="advantages-catalog-grid advantages-catalog-grid--merit">
+          <div className="advantages-instance-compact-list">
             {predatorTypeSelections.map(
               (selection) => {
                 const definition =
@@ -563,64 +622,42 @@ export function AdvantagesStep({
                       selection.definitionKey,
                   )
 
+                const narrativeState = definition
+                  ? getCharacterAdvantageNarrativeState(
+                      definition,
+                      selection.details,
+                    )
+                  : { status: 'pending' as const }
+
                 return (
                   <article
                     key={selection.selectionId}
-                    className="advantage-sheet-entry advantage-sheet-entry--selected"
+                    className="advantage-instance-compact-row"
                   >
-                    <header>
-                      <div>
-                        <span>
-                          {
-                            categoryLabels[
-                              selection.category
-                            ]
-                          }
-                        </span>
-
-                        <h4>
-                          {
-                            definition?.name ??
-                            selection.definitionKey
-                          }
-                        </h4>
-                      </div>
-
+                    <div className="advantage-instance-compact-row__label">
                       <strong>
-                        {'•'.repeat(
-                          selection.rating,
-                        )}
+                        {definition?.name ?? selection.definitionKey}
                       </strong>
-                    </header>
-
-                    <p className="advantage-catalog-card__pending">
-                      Concedido por el Tipo de Depredador.
-                    </p>
+                      <span>
+                        Concedido por el Tipo de Depredador · {'•'.repeat(selection.rating)}
+                      </span>
+                    </div>
 
                     {definition?.requiresInstanceDetails ===
                       true &&
                       !automaticGrantDetailsReadOnly && (
-                      <AdvantageInstanceDetailsEditor
-                        selection={
-                          selection
-                        }
-                        onChange={(
-                          updated,
-                        ) =>
-                          onChange({
-                            selections:
-                              value.selections.map(
-                                (
-                                  current,
-                                ) =>
-                                  current.selectionId ===
-                                  updated.selectionId
-                                    ? updated
-                                    : current,
-                              ),
-                          })
-                        }
-                      />
+                      <div className="advantage-instance-compact-row__action">
+                        <small data-state={narrativeState.status}>
+                          {narrativeState.status === 'pending' ? 'Pendiente' : 'Configurado'}
+                        </small>
+                        <button
+                          type="button"
+                          className="advantage-action-button"
+                          onClick={() => setEditingDetailsSelectionId(selection.selectionId)}
+                        >
+                          {narrativeState.status === 'pending' ? 'Completar detalles' : 'Editar detalles'}
+                        </button>
+                      </div>
                     )}
                   </article>
                 )
@@ -796,6 +833,15 @@ export function AdvantagesStep({
                               }
                             </h4>
                           </div>
+
+                          <button
+                            type="button"
+                            className="advantage-catalog-info-button"
+                            aria-label={`Información sobre ${definition.name}`}
+                            onClick={() => void openCatalogInfo(definition)}
+                          >
+                            i
+                          </button>
 
                           {definition.sourcePage && (
                             <small>
@@ -1303,32 +1349,18 @@ export function AdvantagesStep({
                                   }
                                   className="advantage-instance-block"
                                 >
-                                  <AdvantageInstanceDetailsEditor
-                                    selection={
-                                      selection
-                                    }
-                                    onChange={(
-                                      updated,
-                                    ) =>
-                                      onChange({
-                                        selections:
-                                          value.selections.map(
-                                            (current) =>
-                                              current.selectionId ===
-                                              updated.selectionId
-                                                ? updated
-                                                : current,
-                                          ),
-                                      })
-                                    }
-                                  />
-
-                                  {narrativeState.status ===
-                                    'pending' ? (
-                                    <small className="advantage-instance-block__narrative-pending">
-                                      Puedes completar la información narrativa más adelante.
+                                  <div className="advantage-instance-compact-row__action">
+                                    <small data-state={narrativeState.status}>
+                                      {narrativeState.status === 'pending' ? 'Pendiente' : 'Configurado'}
                                     </small>
-                                  ) : null}
+                                    <button
+                                      type="button"
+                                      className="advantage-action-button"
+                                      onClick={() => setEditingDetailsSelectionId(selection.selectionId)}
+                                    >
+                                      {narrativeState.status === 'pending' ? 'Completar detalles' : 'Editar detalles'}
+                                    </button>
+                                  </div>
                                 </div>
                               )
                             },
@@ -1397,17 +1429,15 @@ export function AdvantagesStep({
             <header className="advantages-category__heading">
               <div>
                 <span>
-                  Trasfondos seleccionados
+                  Información adicional
                 </span>
 
                 <h3>
-                  Configuración de Trasfondos
+                  Trasfondos seleccionados
                 </h3>
 
                 <p>
-                  Completa aquí los datos propios de
-                  cada Trasfondo sin alterar el
-                  catálogo de selección.
+                  Los datos se abren solo cuando quieras editarlos.
                 </p>
               </div>
 
@@ -1419,7 +1449,7 @@ export function AdvantagesStep({
               </strong>
             </header>
 
-            <div className="advantages-background-configurations__grid">
+            <div className="advantages-instance-compact-list">
               {configurableBackgroundSelections.map(
                 (selection) => {
                   const definition =
@@ -1440,54 +1470,33 @@ export function AdvantagesStep({
                     )
 
                   return (
-                    <details
+                    <article
                       key={
                         selection.selectionId
                       }
-                      className="advantages-background-configuration"
-                      open
+                      className="advantage-instance-compact-row"
                     >
-                      <summary>
-                        <span>
-                          {definition.name}
-                        </span>
-
+                      <div className="advantage-instance-compact-row__label">
                         <strong>
-                          {'•'.repeat(
-                            selection.rating,
-                          )}
+                          {definition.name}
                         </strong>
-                      </summary>
-
-                      <div className="advantages-background-configuration__body">
-                        <AdvantageInstanceDetailsEditor
-                          selection={
-                            selection
-                          }
-                          onChange={(
-                            updated,
-                          ) =>
-                            onChange({
-                              selections:
-                                value.selections.map(
-                                  (current) =>
-                                    current.selectionId ===
-                                    updated.selectionId
-                                      ? updated
-                                      : current,
-                                ),
-                            })
-                          }
-                        />
-
-                        {narrativeState.status ===
-                          'pending' ? (
-                          <small className="advantage-instance-block__narrative-pending">
-                            Puedes completar la información narrativa más adelante.
-                          </small>
-                        ) : null}
+                        <span>
+                          Nivel {selection.rating} · {'•'.repeat(selection.rating)}
+                        </span>
                       </div>
-                    </details>
+                      <div className="advantage-instance-compact-row__action">
+                        <small data-state={narrativeState.status}>
+                          {narrativeState.status === 'pending' ? 'Pendiente' : 'Configurado'}
+                        </small>
+                        <button
+                          type="button"
+                          className="advantage-action-button"
+                          onClick={() => setEditingDetailsSelectionId(selection.selectionId)}
+                        >
+                          {narrativeState.status === 'pending' ? 'Completar detalles' : 'Editar detalles'}
+                        </button>
+                      </div>
+                    </article>
                   )
                 },
               )}
@@ -1594,9 +1603,17 @@ export function AdvantagesStep({
                               : 'advantage-sheet-entry'
                           }
                         >
-                          <h4>
-                            {definition.name}
-                          </h4>
+                          <header className="advantage-sheet-entry__compact-header">
+                            <h4>{definition.name}</h4>
+                            <button
+                              type="button"
+                              className="advantage-catalog-info-button"
+                              aria-label={`Información sobre ${definition.name}`}
+                              onClick={() => void openCatalogInfo(definition)}
+                            >
+                              i
+                            </button>
+                          </header>
 
                           <div className="advantage-catalog-card__ratings">
                             {(() => {
@@ -1713,9 +1730,17 @@ export function AdvantagesStep({
                             }
                             className="advantage-sheet-entry"
                           >
-                            <h4>
-                              {definition.name}
-                            </h4>
+                            <header className="advantage-sheet-entry__compact-header">
+                              <h4>{definition.name}</h4>
+                              <button
+                                type="button"
+                                className="advantage-catalog-info-button"
+                                aria-label={`Información sobre ${definition.name}`}
+                                onClick={() => void openCatalogInfo(definition)}
+                              >
+                                i
+                              </button>
+                            </header>
 
                                                           <div className="advantage-catalog-card__ratings">
                                 {(() => {
@@ -1778,6 +1803,24 @@ export function AdvantagesStep({
             </section>
           )}
 
+      {editingDetailsSelection && editingDetailsDefinition ? (
+        <AdvantageInstanceDetailsDialog
+          key={editingDetailsSelection.selectionId}
+          selection={editingDetailsSelection}
+          title={editingDetailsDefinition.name}
+          onSave={updateSelectionDetails}
+          onClose={() => setEditingDetailsSelectionId(null)}
+        />
+      ) : null}
+      {catalogInfo ? (
+        <AdvantageCatalogInfoDialog
+          key={catalogInfo.definition.key}
+          definition={catalogInfo.definition}
+          categoryLabel={categoryLabels[catalogInfo.definition.category]}
+          description={catalogInfo.description}
+          onClose={() => setCatalogInfo(null)}
+        />
+      ) : null}
     </div>
   )
 }

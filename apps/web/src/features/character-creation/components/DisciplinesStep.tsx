@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import {
   getClanDefinition,
 } from '../data/clan-definitions'
@@ -5,6 +7,9 @@ import {
 import {
   disciplineDefinitions,
 } from '../data/discipline-definitions'
+import {
+  disciplineCatalogHelp,
+} from '../data/discipline-catalog-help'
 
 import {
   getAvailableDisciplinesForClan,
@@ -33,6 +38,7 @@ import type {
 } from '../types/oblivion-ceremony.types'
 
 import { DisciplineEditorCard } from './DisciplineEditorCard'
+import { DisciplineCatalogInfoDialog } from './DisciplineCatalogInfoDialog'
 import { DisciplinePowerSelector } from './DisciplinePowerSelector'
 import { BloodSorceryRitualSelector } from './BloodSorceryRitualSelector'
 import { OblivionCeremonySelector } from './OblivionCeremonySelector'
@@ -85,6 +91,9 @@ export function DisciplinesStep({
   ceremonies,
   onCeremoniesChange,
 }: DisciplinesStepProps) {
+  const [infoDisciplineKey, setInfoDisciplineKey] =
+    useState<DisciplineKey | null>(null)
+
   const clan =
     getClanDefinition(
       clanKey,
@@ -202,7 +211,23 @@ export function DisciplinesStep({
             incluida Alquimia de Sangre Débil,
             sin simular tres Disciplinas de clan.
           </p>
+          <button
+            type="button"
+            className="discipline-info-button"
+            aria-label="Información sobre Alquimia de Sangre Débil"
+            onClick={() => setInfoDisciplineKey('thinBloodAlchemy')}
+          >
+            ¿Qué es la Alquimia de Sangre Débil?
+          </button>
         </section>
+        {infoDisciplineKey && (
+          <DisciplineCatalogInfoDialog
+            title={getDisciplineName(infoDisciplineKey)}
+            categoryLabel="Disciplina"
+            summary={disciplineCatalogHelp[infoDisciplineKey]}
+            onClose={() => setInfoDisciplineKey(null)}
+          />
+        )}
       </div>
     )
   }
@@ -278,6 +303,7 @@ export function DisciplinesStep({
                   disciplineKey,
                 )
               }
+              onInfo={() => setInfoDisciplineKey(disciplineKey)}
               onChange={
                 changeDiscipline
               }
@@ -315,6 +341,15 @@ export function DisciplinesStep({
                 </strong>
                 {' · '}
                 {discipline.value}
+                {' '}
+                <button
+                  type="button"
+                  className="discipline-info-button"
+                  aria-label={`Información sobre ${getDisciplineName(discipline.key)}`}
+                  onClick={() => setInfoDisciplineKey(discipline.key)}
+                >
+                  Información
+                </button>
               </p>
             ),
           )}
@@ -360,6 +395,15 @@ export function DisciplinesStep({
           onCeremoniesChange
         }
       />
+
+      {infoDisciplineKey && (
+        <DisciplineCatalogInfoDialog
+          title={getDisciplineName(infoDisciplineKey)}
+          categoryLabel="Disciplina"
+          summary={disciplineCatalogHelp[infoDisciplineKey]}
+          onClose={() => setInfoDisciplineKey(null)}
+        />
+      )}
 
       <div
         className={

@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import {
   disciplinePowerDefinitions,
 } from '../data/discipline-power-definitions'
@@ -19,6 +21,10 @@ import type {
   CharacterDisciplinesDraft,
   DisciplineKey,
 } from '../types/discipline.types'
+import type {
+  DisciplinePowerDefinition,
+} from '../types/discipline-power.types'
+import { DisciplineCatalogInfoDialog } from './DisciplineCatalogInfoDialog'
 
 interface DisciplinePowerSelectorProps {
   disciplineKey: DisciplineKey
@@ -39,6 +45,9 @@ export function DisciplinePowerSelector({
   disciplines,
   onChange,
 }: DisciplinePowerSelectorProps) {
+  const [infoPower, setInfoPower] =
+    useState<DisciplinePowerDefinition | null>(null)
+
   const level =
     getCharacterDisciplineLevel(
       disciplines,
@@ -120,46 +129,71 @@ export function DisciplinePowerSelector({
               !learnability.valid
 
             return (
-              <button
+              <div
                 key={power.key}
-                type="button"
-                className={
-                  selected
-                    ? 'discipline-power-option discipline-power-option--selected'
-                    : 'discipline-power-option'
-                }
-                disabled={disabled}
-                onClick={() =>
-                  onChange(
-                    updateSelectedPower(
-                      disciplines,
-                      disciplineKey,
-                      power.key,
-                      !selected,
-                    ),
-                  )
-                }
+                className="discipline-power-option-card"
               >
-                <span className="discipline-power-option__level">
-                  Nivel {power.level}
-                </span>
+                <button
+                  type="button"
+                  className={
+                    selected
+                      ? 'discipline-power-option discipline-power-option--selected'
+                      : 'discipline-power-option'
+                  }
+                  disabled={disabled}
+                  aria-pressed={selected}
+                  onClick={() =>
+                    onChange(
+                      updateSelectedPower(
+                        disciplines,
+                        disciplineKey,
+                        power.key,
+                        !selected,
+                      ),
+                    )
+                  }
+                >
+                  <span className="discipline-power-option__level">
+                    Nivel {power.level}
+                  </span>
 
-                <strong>
-                  {power.name}
-                </strong>
+                  <strong>
+                    {power.name}
+                  </strong>
 
-                <span className="discipline-power-option__state">
-                  {selected
-                    ? 'Seleccionado'
-                    : disabled
-                      ? 'No disponible'
-                      : 'Seleccionar'}
-                </span>
-              </button>
+                  <span className="discipline-power-option__state">
+                    {selected
+                      ? 'Seleccionado'
+                      : disabled
+                        ? 'No disponible'
+                        : 'Seleccionar'}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className="discipline-info-button discipline-power-info-button"
+                  aria-label={`Información sobre ${power.name}`}
+                  onClick={() => setInfoPower(power)}
+                >
+                  i
+                </button>
+              </div>
             )
           },
         )}
       </div>
+
+      {infoPower && (
+        <DisciplineCatalogInfoDialog
+          title={infoPower.name}
+          categoryLabel={`Poder · ${disciplineName}`}
+          level={infoPower.level}
+          summary={infoPower.summary ?? 'No hay un resumen disponible para este Poder.'}
+          detail={infoPower.mechanics?.systemSummary}
+          sourcePage={infoPower.sourcePage}
+          onClose={() => setInfoPower(null)}
+        />
+      )}
 
       <div
         className={

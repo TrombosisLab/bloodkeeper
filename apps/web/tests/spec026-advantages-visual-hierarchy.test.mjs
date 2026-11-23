@@ -93,7 +93,7 @@ test(
 )
 
 test(
-  'SPEC-026 UI mantiene el catálogo compacto y configura Trasfondos fuera de la cuadrícula',
+  'SPEC-026 UI mantiene el catálogo compacto y abre en ventana los detalles de Trasfondos',
   () => {
     assert.match(
       advantagesStep,
@@ -107,22 +107,17 @@ test(
 
     assert.match(
       advantagesStep,
-      /<details[\s\S]*?advantages-background-configuration[\s\S]*?open/,
+      /Trasfondos seleccionados/,
+    )
+
+    assert.match(
+      styles,
+      /\.advantage-instance-compact-row/,
     )
 
     assert.match(
       advantagesStep,
-      /Configuración de Trasfondos/,
-    )
-
-    assert.match(
-      styles,
-      /\.advantages-background-configurations__grid[\s\S]*?repeat\(2, minmax\(0, 1fr\)\)/,
-    )
-
-    assert.match(
-      styles,
-      /\.advantages-step > \.advantages-background-configurations[\s\S]*?order:\s*11/,
+      /<AdvantageInstanceDetailsDialog[\s\S]*?onSave=\{updateSelectionDetails\}/,
     )
   },
 )
@@ -268,7 +263,14 @@ test(
 
     assert.notEqual(start, -1)
 
-    const block = styles.slice(start)
+    const modalStart = styles.indexOf(
+      '/* CHARACTER_CREATION_MODAL_V1 */',
+      start,
+    )
+    const block = styles.slice(
+      start,
+      modalStart === -1 ? undefined : modalStart,
+    )
 
     assert.match(
       block,
@@ -310,7 +312,7 @@ test(
         /className="advantage-action-button"/g,
       ) ?? []
 
-    assert.equal(actionButtons.length, 10)
+    assert.equal(actionButtons.length, 15)
 
     for (const label of [
       'Configurar',

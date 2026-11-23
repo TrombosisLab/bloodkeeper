@@ -416,7 +416,7 @@ test(
 
     const labelIndex =
       source.indexOf(
-        'Concedido por el Tipo de Depredador.',
+        'Concedido por el Tipo de Depredador ·',
       )
 
     assert.notEqual(
@@ -435,18 +435,23 @@ test(
 
     assert.match(
       automaticCard,
-      /AdvantageInstanceDetailsEditor/,
-    )
-
-    assert.match(
-      automaticCard,
       /definition\?\.requiresInstanceDetails/,
     )
 
     assert.match(
       automaticCard,
-      /updated\.selectionId/,
+      /setEditingDetailsSelectionId\(selection\.selectionId\)/,
     )
+
+    const dialog = await readFile(
+      new URL(
+        '../src/features/character-creation/components/advantages/AdvantageInstanceDetailsDialog.tsx',
+        import.meta.url,
+      ),
+      'utf8',
+    )
+    assert.match(dialog, /AdvantageInstanceDetailsEditor/)
+    assert.match(dialog, /onSave\(draftSelection\)/)
   },
 )
 

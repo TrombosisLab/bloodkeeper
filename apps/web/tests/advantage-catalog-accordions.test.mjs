@@ -84,3 +84,23 @@ test('el creador mantiene puntos, selección, búsqueda y acordeones accesibles 
   assert.match(component, /advantages-catalog-subgroup/)
   assert.match(styles, /@media \(max-width: 760px\)[\s\S]*?\.advantages-catalog-category > summary/)
 })
+
+test('los contadores de subgrupo mantienen una columna alineada en escritorio y móvil', async () => {
+  const styles = await readFile(
+    new URL('../src/styles/character-creation.css', import.meta.url),
+    'utf8',
+  )
+
+  assert.match(
+    styles,
+    /\.advantages-catalog-subgroup > summary\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\) minmax\(5\.5rem,\s*12rem\) 1rem;/,
+  )
+  assert.match(
+    styles,
+    /\.advantages-catalog-subgroup > summary small\s*\{[^}]*text-align:\s*right;/,
+  )
+  assert.match(
+    styles,
+    /@media \(max-width: 760px\)[\s\S]*?\.advantages-catalog-subgroup > summary\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\) minmax\(5\.5rem,\s*8rem\) 1rem;/,
+  )
+})

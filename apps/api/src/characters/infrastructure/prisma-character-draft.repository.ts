@@ -1032,6 +1032,37 @@ function toIdentityCreate(
   }
 }
 
+function isCharacterIdUniqueConstraintError(
+  error: unknown,
+): boolean {
+  if (typeof error !== 'object' || error === null) {
+    return false
+  }
+
+  const candidate = error as {
+    code?: unknown
+    meta?: unknown
+  }
+  if (candidate.code !== 'P2002') {
+    return false
+  }
+
+  if (typeof candidate.meta !== 'object' || candidate.meta === null) {
+    return false
+  }
+
+  const meta = candidate.meta as {
+    modelName?: unknown
+    target?: unknown
+  }
+  if (meta.modelName !== 'Character') return false
+
+  const target = meta.target
+  return Array.isArray(target)
+    ? target.includes('id')
+    : target === 'id'
+}
+
 function toIdentityUpdate(
   identity: Partial<PersistedCharacterIdentity>,
 ): Prisma.CharacterIdentityUpdateInput {
@@ -1435,17 +1466,20 @@ export class PrismaCharacterDraftRepository
   async create(
     data: CreateCharacterDraftData,
   ): Promise<PersistedCharacterDraft> {
-    return this.database.$transaction(
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      try {
+        return await this.database.$transaction(
       async (transaction) => {
         const creationMode =
           data.creation.creationMode ?? 'standard'
         const sessionZero =
           creationMode === 'sessionZero'
 
-        const character =
+        const characterId = randomUUID()
+        try {
           await transaction.character.create({
             data: {
-              id: randomUUID(),
+              id: characterId,
               ownerId: data.ownerId,
               chronicleId: data.chronicleId,
               status: PrismaCharacterStatus.DRAFT,
@@ -1608,10 +1642,20 @@ export class PrismaCharacterDraftRepository
               },
             },
           })
+        } catch (error: unknown) {
+          if (isCharacterIdUniqueConstraintError(error)) {
+            console.error(
+              '[PrismaCharacterDraftRepository] Character id collision',
+              { characterId },
+            )
+          }
+
+          throw error
+        }
 
         await createAdvantageSelections(
           transaction,
-          character.id,
+          characterId,
           data.advantages,
         )
 
@@ -1620,7 +1664,7 @@ export class PrismaCharacterDraftRepository
             .createMany({
               data: data.humanity.convictions.map(
                 (conviction) => ({
-                  characterId: character.id,
+                  characterId,
                   ...conviction,
                 }),
               ),
@@ -1630,13 +1674,29 @@ export class PrismaCharacterDraftRepository
         const row =
           await transaction.character
             .findUniqueOrThrow({
-              where: { id: character.id },
+              where: { id: characterId },
               include: characterRelations,
             })
 
         return toPersistedDraft(row)
       },
-    )
+        )
+      } catch (error: unknown) {
+        if (
+          !isCharacterIdUniqueConstraintError(error) ||
+          attempt === 3
+        ) {
+          throw error
+        }
+
+        console.warn(
+          '[PrismaCharacterDraftRepository] Character id collision; retrying transaction',
+          { attempt, nextAttempt: attempt + 1 },
+        )
+      }
+    }
+
+    throw new Error('Character draft creation retries exhausted')
   }
 
   listByOwner(

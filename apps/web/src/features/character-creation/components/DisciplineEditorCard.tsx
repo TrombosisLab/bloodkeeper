@@ -8,6 +8,7 @@ interface DisciplineEditorCardProps {
   name: string
   value: number
   effectiveValue?: number
+  onInfo: () => void
 
   onChange: (
     key: DisciplineKey,
@@ -20,6 +21,7 @@ export function DisciplineEditorCard({
   name,
   value,
   effectiveValue,
+  onInfo,
   onChange,
 }: DisciplineEditorCardProps) {
   const displayedValue =
@@ -55,6 +57,14 @@ export function DisciplineEditorCard({
 
           <h3>{name}</h3>
           </div>
+          <button
+            type="button"
+            className="discipline-info-button"
+            aria-label={`Información sobre ${name}`}
+            onClick={onInfo}
+          >
+            i
+          </button>
         </div>
 
         <strong>
