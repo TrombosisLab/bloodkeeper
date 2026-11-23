@@ -30,7 +30,7 @@ test('la introducción explica niveles, repartos y especializaciones', () => {
     'Academicismo, Artesanía, Ciencia e Interpretación',
     'Las del Tipo de Depredador se añaden aparte.',
   ]) {
-    assert.ok(introduction.replace(/\\s+/g, ' ').includes(text), `Falta explicación: ${text}`)
+    assert.ok(introduction.replace(/\s+/g, ' ').includes(text), `Falta explicación: ${text}`)
   }
   assert.match(introduction, /no\s+consumen esos cupos\./)
   assert.match(introduction, /skills-introduction__profiles/)
