@@ -50,7 +50,6 @@ export function AdvantagesIntroductionStep({
           <p>
             Añaden desventajas o problemas narrativos. Algunos son personales;
             otros afectan a un Trasfondo, como un refugio comprometido.
-            {profileNature === 'vampire' && ' Las concesiones del Tipo de Depredador se indican aparte para no comprarlas de nuevo.'}
           </p>
         </article>
       </div>
