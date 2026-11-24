@@ -126,11 +126,6 @@ export function PredatorTypeConfiguration({
           Configuración del Tipo de Depredador
         </h3>
 
-        <p>
-          Resuelve aquí las decisiones y repartos
-          que concede {definition.name}. Las fases
-          posteriores consumirán este resultado.
-        </p>
       </div>
 
       <PredatorTypeChoiceSelector
