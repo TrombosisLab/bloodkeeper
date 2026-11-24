@@ -149,7 +149,7 @@ test(
   () => {
     assert.match(
       review,
-      /Comprobar personaje/,
+      /Guardar y comprobar/,
     )
     assert.match(
       review,
@@ -163,5 +163,48 @@ test(
       review,
       /disabled=\{[\s\S]*busy[\s\S]*!canFinalize/,
     )
+  },
+)
+
+
+test(
+  'SPEC-021 el creador explica el guardado y no muestra mensajes de desarrollo',
+  async () => {
+    const advantages = await readFile(
+      new URL(
+        '../src/features/character-creation/components/AdvantagesStep.tsx',
+        import.meta.url,
+      ),
+      'utf8',
+    )
+    const humanity = await readFile(
+      new URL(
+        '../src/features/character-creation/components/HumanityIntroductionStep.tsx',
+        import.meta.url,
+      ),
+      'utf8',
+    )
+    const specialties = await readFile(
+      new URL(
+        '../src/features/character-creation/components/SkillSpecialtiesEditor.tsx',
+        import.meta.url,
+      ),
+      'utf8',
+    )
+
+    assert.match(
+      review,
+      /Al comprobar la ficha, guardaremos automáticamente los cambios pendientes/,
+    )
+    assert.match(wizard, /Cambios sin guardar/)
+    assert.match(wizard, /Cambios guardados/)
+    assert.doesNotMatch(wizard, /Borrador local sin guardar|revisión \d+/)
+    assert.doesNotMatch(
+      advantages,
+      /probar el sistema de selección|se incorporarán progresivamente/i,
+    )
+    assert.doesNotMatch(advantages, /Fase 6/)
+    assert.doesNotMatch(humanity, /Fase final/)
+    assert.match(specialties, /Has elegido todas las especialidades disponibles/)
   },
 )
