@@ -28,15 +28,6 @@ export function BloodIntroductionStep({
 
       <div className="blood-introduction__grid">
         <article className="blood-introduction__card">
-          <span>Decisión anterior</span>
-          <h3>Generación {generation}.ª</h3>
-          <p>
-            La Generación determina qué rango de Potencia de Sangre puede tener
-            el personaje. No hace falta volver a elegirla aquí.
-          </p>
-        </article>
-
-        <article className="blood-introduction__card">
           <span>Valor ajustable</span>
           <h3>Potencia de Sangre</h3>
           <p>
