@@ -26,7 +26,7 @@ test('la introducción distingue Ventajas, Méritos, Trasfondos y Defectos', () 
   ]) {
     assert.ok(introduction.replace(/\s+/g, ' ').includes(text), 'Falta explicación: ' + text)
   }
-  assert.match(introduction, /profileNature === 'vampire'/)
+  assert.doesNotMatch(introduction, /profileNature/)
 })
 
 test('la introducción solo se interpone en el recorrido guiado y se puede volver a abrir', () => {
