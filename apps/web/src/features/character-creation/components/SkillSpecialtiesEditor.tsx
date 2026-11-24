@@ -18,6 +18,7 @@ import type {
 } from '../types/character-skills-draft.types'
 
 interface SkillSpecialtiesEditorProps {
+  guided?: boolean
   skills: CharacterSkillsDraft
   value: SkillSpecialty[]
 
@@ -27,6 +28,7 @@ interface SkillSpecialtiesEditorProps {
 }
 
 export function SkillSpecialtiesEditor({
+  guided = false,
   skills,
   value,
   onChange,
@@ -145,11 +147,9 @@ export function SkillSpecialtiesEditor({
         </div>
 
         <p>
-          Una especialidad libre, más una
-          obligatoria en Academicismo,
-          Artesanía, Ciencia e Interpretación
-          cuando tengan puntuación. Las del
-          Tipo de Depredador se añaden aparte.
+          {guided
+            ? 'El contador muestra las especialidades disponibles y las que te faltan.'
+            : 'Una especialidad libre, más una obligatoria en Academicismo, Artesanía, Ciencia e Interpretación cuando tengan puntuación. Las del Tipo de Depredador se añaden aparte.'}
         </p>
       </div>
 
