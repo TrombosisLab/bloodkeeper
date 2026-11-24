@@ -8,7 +8,6 @@ export function AdvantagesIntroductionStep({
   return (
     <section className="advantages-introduction" aria-labelledby="advantages-introduction-title">
       <div className="creation-step-heading">
-        <span>Fase 6 · Ventajas y Defectos</span>
         <h2 id="advantages-introduction-title">Antes de abrir el catálogo</h2>
         <p>
           “Ventajas” es el nombre general de este apartado. Dentro encontrarás
@@ -55,10 +54,6 @@ export function AdvantagesIntroductionStep({
         </article>
       </div>
 
-      <p className="advantages-introduction__note">
-        No hace falta memorizar costes ni límites: el catálogo siguiente mostrará
-        el presupuesto y las reglas de cada elección.
-      </p>
     </section>
   )
 }
