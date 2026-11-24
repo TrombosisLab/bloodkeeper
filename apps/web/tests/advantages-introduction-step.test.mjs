@@ -22,7 +22,7 @@ test('la introducción distingue Ventajas, Méritos, Trasfondos y Defectos', () 
     'cualidades, aptitudes o particularidades',
     'recursos y relaciones externas',
     'otros afectan a un Trasfondo',
-    'presupuesto y las reglas',
+    'El catálogo indicará el coste y las reglas de cada opción.',
   ]) {
     assert.ok(introduction.replace(/\s+/g, ' ').includes(text), 'Falta explicación: ' + text)
   }
