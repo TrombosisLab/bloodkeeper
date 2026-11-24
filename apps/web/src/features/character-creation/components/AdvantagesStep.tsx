@@ -472,7 +472,7 @@ export function AdvantagesStep({
   return (
     <div className="advantages-step">
       <div className="creation-step-heading">
-        <span>Fase 6</span>
+        <span>Selección de rasgos</span>
 
         <h2>
           Ventajas, Trasfondos y Defectos
@@ -481,7 +481,7 @@ export function AdvantagesStep({
         <p>
           {sessionZero
             ? 'Selecciona únicamente Ventajas, Trasfondos y Defectos válidos durante la fase humana.'
-            : 'Este panel permite probar el sistema de selección construido en el dominio. Los elementos complejos se incorporarán progresivamente.'}
+            : 'Elige los rasgos que mejor representen las cualidades, los recursos y las complicaciones de tu personaje.'}
         </p>
       </div>
 
