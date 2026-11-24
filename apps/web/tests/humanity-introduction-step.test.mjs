@@ -28,21 +28,21 @@ test('la introducción explica Humanidad, Convicciones y Piedras de Toque', () =
     'de una a tres Convicciones',
     'peso en la crónica',
   ]) {
-    assert.ok(introduction.replace(/\\s+/g, ' ').includes(text), 'Falta explicación: ' + text)
+    assert.ok(introduction.replace(/\s+/g, ' ').includes(text), 'Falta explicación: ' + text)
   }
   assert.match(humanityStep, /Humanidad inicial/)
   assert.match(humanityStep, /vinculada a una Piedra/)
 })
 
 test('la introducción solo aparece antes de Humanidad en modo guiado y permite volver a abrirla', () => {
-  assert.match(wizard, /journeyMode === 'guided' &&\\s*currentStepId === 'humanity' &&\\s*!hasCompletedHumanityIntroduction/)
-  assert.match(wizard, /if \\(humanityIntroductionActive\\) \\{[\\s\\S]*?setHasCompletedHumanityIntroduction\\(true\\)/)
-  assert.match(wizard, /currentStepId === 'humanity' &&\\s*hasCompletedHumanityIntroduction[\\s\\S]*?setHasCompletedHumanityIntroduction\\(false\\)/)
+  assert.match(wizard, /journeyMode === 'guided' &&\s*currentStepId === 'humanity' &&\s*!hasCompletedHumanityIntroduction/)
+  assert.match(wizard, /if \\(humanityIntroductionActive\\) \\{[\s\S]*?setHasCompletedHumanityIntroduction\\(true\\)/)
+  assert.match(wizard, /currentStepId === 'humanity' &&\s*hasCompletedHumanityIntroduction[\s\S]*?setHasCompletedHumanityIntroduction\\(false\\)/)
   assert.match(wizard, /<HumanityIntroductionStep/)
   assert.match(wizard, /Continuar: definir vínculos/)
 })
 
 test('la introducción mantiene el estilo adaptable de las demás fases', () => {
-  assert.match(styles, /\\.humanity-introduction__grid\\s*\\{[\\s\\S]*?grid-template-columns/)
-  assert.match(styles, /@media \\(max-width: 700px\\)[\\s\\S]*?humanity-introduction__grid/)
+  assert.match(styles, /\.humanity-introduction__grid\\s*\\{[\s\S]*?grid-template-columns/)
+  assert.match(styles, /@media \\(max-width: 700px\\)[\s\S]*?humanity-introduction__grid/)
 })
