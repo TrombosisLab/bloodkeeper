@@ -4,6 +4,7 @@ interface ClanInfoDialogProps {
   clanName: string
   kindLabel: string
   summary: string
+  bane: string
   disciplines: string[]
   onClose: () => void
 }
@@ -12,6 +13,7 @@ export function ClanInfoDialog({
   clanName,
   kindLabel,
   summary,
+  bane,
   disciplines,
   onClose,
 }: ClanInfoDialogProps) {
@@ -27,7 +29,7 @@ export function ClanInfoDialog({
       ref={dialogRef}
       className="advantage-info-dialog"
       aria-labelledby="clan-info-dialog-title"
-      aria-describedby="clan-info-dialog-description"
+      aria-describedby="clan-info-dialog-description clan-info-dialog-bane"
       onCancel={(event) => {
         event.preventDefault()
         dialogRef.current?.close()
@@ -55,6 +57,11 @@ export function ClanInfoDialog({
           <p id="clan-info-dialog-description">{summary}</p>
         </section>
 
+        <section aria-labelledby="clan-info-dialog-bane-title">
+          <h3 id="clan-info-dialog-bane-title">Maldición del clan</h3>
+          <p id="clan-info-dialog-bane">{bane}</p>
+        </section>
+
         <section aria-labelledby="clan-info-dialog-disciplines-title">
           <h3 id="clan-info-dialog-disciplines-title">Disciplinas del clan</h3>
           <ul>
@@ -65,7 +72,7 @@ export function ClanInfoDialog({
         </section>
 
         <p className="advantage-info-dialog__source">
-          Es una pincelada orientativa, no una limitación para interpretar al personaje.
+          La Maldición tiene efecto en las reglas, pero no define por sí sola la personalidad; interprétala a tu manera.
         </p>
 
         <footer className="advantage-info-dialog__actions">
