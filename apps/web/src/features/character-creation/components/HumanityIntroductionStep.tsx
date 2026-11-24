@@ -2,7 +2,7 @@ export function HumanityIntroductionStep() {
   return (
     <section className="humanity-introduction" aria-labelledby="humanity-introduction-title">
       <div className="creation-step-heading">
-        <span>Fase final · Humanidad</span>
+        <span>Humanidad y vínculos personales</span>
         <h2 id="humanity-introduction-title">Lo que aún te mantiene humano</h2>
         <p>
           Antes de definir los vínculos de tu personaje, entiende qué representa
