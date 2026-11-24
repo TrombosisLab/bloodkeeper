@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
 const base = '../src/features/character-creation/components/'
-const [wizard, attributes, skills, specialties, humanity, advantages, placeholder] = await Promise.all([
+const [wizard, attributes, skills, specialties, humanity, advantages, placeholder, identity, bloodIntro, blood, disciplines, powerSelector, advantagesStep] = await Promise.all([
   readFile(new URL(base + 'CharacterCreationWizard.tsx', import.meta.url), 'utf8'),
   readFile(new URL(base + 'AttributesStep.tsx', import.meta.url), 'utf8'),
   readFile(new URL(base + 'SkillsStep.tsx', import.meta.url), 'utf8'),
@@ -11,10 +11,16 @@ const [wizard, attributes, skills, specialties, humanity, advantages, placeholde
   readFile(new URL(base + 'HumanityIntroductionStep.tsx', import.meta.url), 'utf8'),
   readFile(new URL(base + 'AdvantagesIntroductionStep.tsx', import.meta.url), 'utf8'),
   readFile(new URL(base + 'CreationStepPlaceholder.tsx', import.meta.url), 'utf8'),
+  readFile(new URL(base + 'IdentityStep.tsx', import.meta.url), 'utf8'),
+  readFile(new URL(base + 'BloodIntroductionStep.tsx', import.meta.url), 'utf8'),
+  readFile(new URL(base + 'BloodStep.tsx', import.meta.url), 'utf8'),
+  readFile(new URL(base + 'DisciplinesStep.tsx', import.meta.url), 'utf8'),
+  readFile(new URL(base + 'DisciplinePowerSelector.tsx', import.meta.url), 'utf8'),
+  readFile(new URL(base + 'AdvantagesStep.tsx', import.meta.url), 'utf8'),
 ])
 
 test('el recorrido no repite instrucciones visibles en el menú ni en el pie', () => {
-  assert.doesNotMatch(wizard, /creation-guided-note|Una pregunta cada vez|muestra tu progreso general/)
+  assert.doesNotMatch(wizard, /creation-guided-note|Una pregunta cada vez|muestra tu progreso general|Recorrido guiado · construirás/)
   assert.match(wizard, /guidedIdentityActive[\s\S]*?Paso \$\{guidedIdentityStageIndex/)
   assert.doesNotMatch(wizard, /Paso \$\{currentStep\.number\} de \$\{activeCreationSteps\.length\}/)
   assert.doesNotMatch(placeholder, /Fase \{step\.number\}/)
@@ -37,4 +43,16 @@ test('la explicación de Habilidades se conserva en modo directo y no se repite 
 test('las introducciones no repiten instrucciones que aparecen en el paso siguiente', () => {
   assert.doesNotMatch(humanity, /humanity-introduction__note/)
   assert.doesNotMatch(advantages, /advantages-introduction__note/)
+})
+
+
+test('elimina repeticiones entre fases y no muestra texto interno de validación', () => {
+  assert.doesNotMatch(identity, /Identidad · paso|clan-card-selector__help/)
+  assert.doesNotMatch(bloodIntro, /Decisión anterior|ya se decidió en Identidad/)
+  assert.match(blood, /Ajusta la Potencia de Sangre y el Hambre iniciales/)
+  assert.doesNotMatch(disciplines, /Esta concesión no consume el reparto inicial/)
+  assert.doesNotMatch(powerSelector, /temporal para validar|discipline-power-selector__help/)
+  assert.doesNotMatch(advantages, /Las concesiones del Tipo de Depredador se indican aparte/)
+  assert.doesNotMatch(advantagesStep, /Elige los rasgos que mejor representen/)
+  assert.doesNotMatch(humanity, /Cada principio se vincula a una persona/)
 })
