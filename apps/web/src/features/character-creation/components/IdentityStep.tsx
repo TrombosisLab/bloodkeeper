@@ -17,6 +17,10 @@ import {
 } from '../data/clan-catalog-help'
 
 import {
+  clanBaneHelp,
+} from '../data/clan-catalog-help'
+
+import {
   generationOptions,
 } from '../data/identity-options'
 
@@ -501,6 +505,7 @@ export function IdentityStep({
                 : 'Clan'
           }
           summary={clanCatalogHelp[infoClan.key]}
+          bane={clanBaneHelp[infoClan.key]}
           disciplines={infoClan.inClanDisciplines.map(getDisciplineName)}
           onClose={() => setInfoClan(null)}
         />
