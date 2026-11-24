@@ -298,6 +298,17 @@ export function IdentityStep({
             ))}
           </div>
 
+          <button
+            type="button"
+            className="clan-card-selector__clear"
+            onClick={() => updateClan(null)}
+            disabled={value.clan === null}
+          >
+            Dejar el clan sin seleccionar
+          </button>
+        </fieldset>
+        </div>
+
         <div className="identity-guided-group identity-guided-group--predator">
         <label className="creation-field">
           <span>Depredador</span>
