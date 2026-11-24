@@ -4613,3 +4613,65 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* GUIDED HUMANITY INTRODUCTION */
+.humanity-introduction {
+  flex: 1;
+  padding: clamp(30px, 5vw, 64px);
+}
+
+.humanity-introduction__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.humanity-introduction__card {
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-option-border);
+  background: var(--color-surface-option);
+}
+
+.humanity-introduction__card > span {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--color-text-option-muted);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.humanity-introduction__card h3 {
+  margin: 0;
+  color: var(--color-text-option);
+  font-family: var(--font-family-heading);
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+.humanity-introduction__card p,
+.humanity-introduction__note {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-option-muted);
+  font-size: 0.82rem;
+  line-height: var(--line-height-normal);
+}
+
+.humanity-introduction__card {
+  border-left: 2px solid var(--color-accent-active);
+}
+
+@media (max-width: 900px) {
+  .humanity-introduction__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .humanity-introduction {
+    padding: 24px 18px;
+  }
+}
