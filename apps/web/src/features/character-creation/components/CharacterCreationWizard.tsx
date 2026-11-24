@@ -1502,7 +1502,7 @@ export function CharacterCreationWizard({
           ) : currentStepId ===
             'advantages' ? (
             advantagesIntroductionActive ? (
-              <AdvantagesIntroductionStep profileNature={sessionZero ? 'human' : 'vampire'} />
+              <AdvantagesIntroductionStep />
             ) : (
             <AdvantagesStep
               creationMode={creationMode}
