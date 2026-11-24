@@ -19,6 +19,7 @@ import type {
 } from '../types/character-generation.types'
 
 interface BloodStepProps {
+  guided?: boolean
   value: CharacterBloodDraft
   attributes: CharacterAttributesDraft
   generation: CharacterGeneration
@@ -39,6 +40,7 @@ const generations: CharacterGeneration[] = [
 ]
 
 export function BloodStep({
+  guided = false,
   value,
   attributes,
   generation,
@@ -66,10 +68,12 @@ export function BloodStep({
 
         <h2>Sangre</h2>
 
-        <p>
-          Ajusta la Potencia de Sangre y el Hambre iniciales.
-          La Salud y la Fuerza de Voluntad se calculan automáticamente.
-        </p>
+        {!guided && (
+          <p>
+            Ajusta la Potencia de Sangre y el Hambre iniciales.
+            La Salud y la Fuerza de Voluntad se calculan automáticamente.
+          </p>
+        )}
       </div>
 
       <div className="blood-step__grid">
