@@ -43,12 +43,6 @@ export function HumanityIntroductionStep() {
         </article>
       </div>
 
-      <p className="humanity-introduction__note">
-        En el siguiente paso verás la Humanidad inicial ya calculada y podrás
-        definir de una a tres Convicciones, cada una ligada a su Piedra de Toque.
-        Estos vínculos dan al Narrador y al jugador motivos personales para que
-        las decisiones morales tengan peso en la crónica.
-      </p>
     </section>
   )
 }
