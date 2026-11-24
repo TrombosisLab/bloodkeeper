@@ -14,7 +14,6 @@ export function DisciplineIntroductionStep({
     return (
       <section className="discipline-introduction" aria-labelledby="discipline-introduction-title">
         <div className="creation-step-heading">
-          <span>Fase 5 · Disciplinas</span>
           <h2 id="discipline-introduction-title">Una excepción: Sangre Débil</h2>
           <p>
             No recibirás el reparto inicial 2 + 1 de los vampiros de clan.
@@ -40,7 +39,6 @@ export function DisciplineIntroductionStep({
   return (
     <section className="discipline-introduction" aria-labelledby="discipline-introduction-title">
       <div className="creation-step-heading">
-        <span>Fase 5 · Disciplinas</span>
         <h2 id="discipline-introduction-title">Antes de elegir tus Disciplinas</h2>
         <p>
           Las Disciplinas son capacidades sobrenaturales. Primero elegirás cuáles desarrolla
