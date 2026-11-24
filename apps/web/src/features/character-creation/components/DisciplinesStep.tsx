@@ -187,7 +187,6 @@ export function DisciplinesStep({
     return (
       <div className="disciplines-step">
         <div className="creation-step-heading">
-          <span>Fase 5</span>
 
           <h2>Disciplinas</h2>
 
@@ -235,7 +234,6 @@ export function DisciplinesStep({
   return (
     <div className="disciplines-step">
       <div className="creation-step-heading">
-        <span>Fase 5</span>
 
         <h2>Disciplinas</h2>
 
