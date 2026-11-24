@@ -113,6 +113,7 @@ import { SkillsIntroductionStep } from './SkillsIntroductionStep'
 import { BloodIntroductionStep } from './BloodIntroductionStep'
 import { DisciplineIntroductionStep } from './DisciplineIntroductionStep'
 import { AdvantagesIntroductionStep } from './AdvantagesIntroductionStep'
+import { HumanityIntroductionStep } from './HumanityIntroductionStep'
 import { BloodStep } from './BloodStep'
 import { DisciplinesStep } from './DisciplinesStep'
 import { AdvantagesStep } from './AdvantagesStep'
@@ -254,6 +255,11 @@ export function CharacterCreationWizard({
   ] = useState(false)
 
   const [
+    hasCompletedHumanityIntroduction,
+    setHasCompletedHumanityIntroduction,
+  ] = useState(false)
+
+  const [
     persistenceState,
     setPersistenceState,
   ] = useState<CharacterDraftPersistenceUiState>(
@@ -379,6 +385,10 @@ export function CharacterCreationWizard({
     journeyMode === 'guided' &&
     currentStepId === 'advantages' &&
     !hasCompletedAdvantagesIntroduction
+  const humanityIntroductionActive =
+    journeyMode === 'guided' &&
+    currentStepId === 'humanity' &&
+    !hasCompletedHumanityIntroduction
 
   const persistenceBusy =
     persistenceState === 'loading' ||
@@ -593,6 +603,7 @@ export function CharacterCreationWizard({
     setHasCompletedBloodIntroduction(false)
     setHasCompletedDisciplinesIntroduction(false)
     setHasCompletedAdvantagesIntroduction(false)
+    setHasCompletedHumanityIntroduction(false)
     setDraft(
       prepareDraftForCreationMode(
         initialCharacterDraft,
@@ -828,6 +839,16 @@ export function CharacterCreationWizard({
       return
     }
 
+    if (
+      journeyMode === 'guided' &&
+      currentStepId === 'humanity' &&
+      hasCompletedHumanityIntroduction
+    ) {
+      setHasCompletedHumanityIntroduction(false)
+      setShowValidation(false)
+      return
+    }
+
     if (isFirst) {
       return
     }
@@ -867,6 +888,12 @@ export function CharacterCreationWizard({
 
     if (advantagesIntroductionActive) {
       setHasCompletedAdvantagesIntroduction(true)
+      setShowValidation(false)
+      return
+    }
+
+    if (humanityIntroductionActive) {
+      setHasCompletedHumanityIntroduction(true)
       setShowValidation(false)
       return
     }
@@ -1544,6 +1571,9 @@ export function CharacterCreationWizard({
             )
           ) : currentStepId ===
             'humanity' ? (
+            humanityIntroductionActive ? (
+              <HumanityIntroductionStep />
+            ) : (
             <HumanityStep
               value={
                 draft.humanity
@@ -1559,6 +1589,7 @@ export function CharacterCreationWizard({
                 )
               }
             />
+            )
           ) : currentStepId ===
             'review' ? (
             <ReviewStep
@@ -1709,7 +1740,9 @@ export function CharacterCreationWizard({
                     ? 'Disciplinas · introducción'
                     : advantagesIntroductionActive
                       ? 'Ventajas · introducción'
-                      : guidedIdentityActive
+                      : humanityIntroductionActive
+                        ? 'Humanidad · introducción'
+                        : guidedIdentityActive
                     ? `Identidad · paso ${guidedIdentityStageIndex + 1} de ${guidedIdentityStages.length}`
                     : `Paso ${currentStep.number} de ${activeCreationSteps.length}`}
             </span>
@@ -1731,7 +1764,9 @@ export function CharacterCreationWizard({
                     ? 'Continuar: elegir Disciplinas'
                     : advantagesIntroductionActive
                       ? 'Continuar: abrir catálogo'
-                      : 'Siguiente'}
+                      : humanityIntroductionActive
+                        ? 'Continuar: definir vínculos'
+                        : 'Siguiente'}
             </button>
           </footer>
         </section>
