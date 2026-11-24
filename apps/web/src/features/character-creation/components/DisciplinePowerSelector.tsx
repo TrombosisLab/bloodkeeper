@@ -98,14 +98,6 @@ export function DisciplinePowerSelector({
         </strong>
       </header>
 
-      <p className="discipline-power-selector__help">
-        Selecciona {level === 1
-          ? '1 poder'
-          : `${level} poderes`}.
-        El catálogo mostrado es temporal para
-        validar el sistema de creación.
-      </p>
-
       <div className="discipline-power-selector__options">
         {availablePowers.map(
           (power) => {
