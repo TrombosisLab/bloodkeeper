@@ -1,10 +1,4 @@
-interface AdvantagesIntroductionStepProps {
-  profileNature: 'human' | 'vampire'
-}
-
-export function AdvantagesIntroductionStep({
-  profileNature,
-}: AdvantagesIntroductionStepProps) {
+export function AdvantagesIntroductionStep() {
   return (
     <section className="advantages-introduction" aria-labelledby="advantages-introduction-title">
       <div className="creation-step-heading">
