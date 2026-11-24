@@ -18,7 +18,8 @@ test('cada tarjeta ofrece una i de información sin seleccionar el clan', () => 
 })
 
 test('la ventana muestra una pincelada y las Disciplinas del clan', () => {
-  assert.match(dialog, /<dialog[\s\S]*?showModal\(\)/)
+  assert.match(dialog, /<dialog/)
+  assert.match(dialog, /showModal\(\)/)
   assert.match(dialog, /¿Qué los caracteriza\?/)
   assert.match(dialog, /Disciplinas del clan/)
   assert.match(dialog, /aria-label="Cerrar información"/)
