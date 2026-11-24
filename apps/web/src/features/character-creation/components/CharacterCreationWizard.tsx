@@ -1106,7 +1106,7 @@ export function CharacterCreationWizard({
       ? 'Borrador aún sin guardar'
       : hasUnsavedChanges
         ? 'Cambios sin guardar'
-        : 'Cambios guardados'`
+        : 'Cambios guardados'
 
   if (creationMode === null) {
     if (characterId !== null) {
