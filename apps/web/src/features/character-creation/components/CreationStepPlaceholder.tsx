@@ -11,10 +11,6 @@ export function CreationStepPlaceholder({
 }: CreationStepPlaceholderProps) {
   return (
     <div className="creation-placeholder">
-      <span className="creation-placeholder__eyebrow">
-        Fase {step.number}
-      </span>
-
       <h2>{step.title}</h2>
 
       <p>{step.description}</p>
