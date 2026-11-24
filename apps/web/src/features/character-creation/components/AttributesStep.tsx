@@ -74,7 +74,6 @@ export function AttributesStep({
   return (
     <div className="attributes-step">
       <div className="creation-step-heading">
-        <span>Fase 2</span>
 
         <h2>Atributos</h2>
 
@@ -105,7 +104,7 @@ export function AttributesStep({
       {guided && (
         <div className="attributes-step__guided-navigation">
           <div className="attributes-step__guided-categories" role="group" aria-label="Grupo de Atributos">
-            {categories.map((category, index) => (
+            {categories.map((category) => (
               <button
                 type="button"
                 key={category}
@@ -114,7 +113,6 @@ export function AttributesStep({
                 onClick={() => setActiveCategory(category)}
               >
                 <span>{categoryLabels[category]}</span>
-                <small>{index + 1} de {categories.length}</small>
               </button>
             ))}
           </div>
