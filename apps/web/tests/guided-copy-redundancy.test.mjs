@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
 const base = '../src/features/character-creation/components/'
+const predatorSummary = await readFile(new URL(base + 'PredatorTypeAdvantageSummary.tsx', import.meta.url), 'utf8')
 const modeSelector = await readFile(new URL(base + 'CharacterCreationModeSelector.tsx', import.meta.url), 'utf8')
 const predatorConfiguration = await readFile(new URL(base + 'PredatorTypeConfiguration.tsx', import.meta.url), 'utf8')
 const [wizard, attributes, skills, specialties, humanity, advantages, placeholder, identity, bloodIntro, blood, disciplines, powerSelector, advantagesStep] = await Promise.all([
@@ -57,6 +58,8 @@ test('elimina repeticiones entre fases y no muestra texto interno de validación
   assert.doesNotMatch(modeSelector, /Primero elegiste el recorrido|Ahora decide desde qué punto comienza la historia/)
   assert.match(modeSelector, /Esta elección define si la historia empieza como vampiro/)
   assert.doesNotMatch(predatorConfiguration, /fases posteriores consumirán este resultado/)
+  assert.match(predatorSummary, /Estas Ventajas y Defectos vienen incluidas[\s\S]*?7 para Ventajas[\s\S]*?2 para Defectos/)
+  assert.doesNotMatch(predatorSummary, /origen Tipo de Depredador|presupuesto ordinario 7\/2/)
   assert.doesNotMatch(disciplines, /Esta concesión no consume el reparto inicial/)
   assert.doesNotMatch(powerSelector, /temporal para validar|discipline-power-selector__help/)
   assert.doesNotMatch(advantages, /Las concesiones del Tipo de Depredador se indican aparte/)
