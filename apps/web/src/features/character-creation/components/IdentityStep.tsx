@@ -2,6 +2,7 @@ import { V5VisualMark } from '../../v5-visuals/V5VisualMark'
 import type {
   ChangeEvent,
 } from 'react'
+import { useState } from 'react'
 
 import {
   clanDefinitions,
@@ -10,6 +11,10 @@ import {
 import {
   disciplineDefinitions,
 } from '../data/discipline-definitions'
+
+import {
+  clanCatalogHelp,
+} from '../data/clan-catalog-help'
 
 import {
   generationOptions,
@@ -23,7 +28,12 @@ import {
   PredatorTypeConfiguration,
 } from './PredatorTypeConfiguration'
 
+import {
+  ClanInfoDialog,
+} from './ClanInfoDialog'
+
 import type {
+  ClanDefinition,
   ClanKey,
 } from '../types/clan.types'
 
@@ -91,6 +101,8 @@ export function IdentityStep({
 }: IdentityStepProps) {
   const sessionZero =
     creationMode === 'sessionZero'
+  const [infoClan, setInfoClan] =
+    useState<ClanDefinition | null>(null)
 
   const predatorTypeOptions =
     getPredatorTypeOptions()
@@ -234,22 +246,20 @@ export function IdentityStep({
         <fieldset className="creation-field creation-field--wide clan-card-selector">
           <legend>Clan</legend>
 <div className="clan-card-selector__grid">
-            {clanDefinitions.map(
-              (clan) => (
+            {clanDefinitions.map((clan) => (
+              <article
+                key={clan.key}
+                className="clan-card-selector__item"
+              >
                 <button
-                  key={clan.key}
                   type="button"
                   className={
                     value.clan === clan.key
                       ? 'clan-card-selector__card clan-card-selector__card--selected'
                       : 'clan-card-selector__card'
                   }
-                  aria-pressed={
-                    value.clan === clan.key
-                  }
-                  onClick={() =>
-                    updateClan(clan.key)
-                  }
+                  aria-pressed={value.clan === clan.key}
+                  onClick={() => updateClan(clan.key)}
                 >
                   <V5VisualMark kind="clan-symbol" value={clan.key} className="clan-card-selector__visual" decorative />
 
@@ -261,42 +271,32 @@ export function IdentityStep({
                         : 'Clan'}
                   </span>
 
-                  <strong>
-                    {clan.name}
-                  </strong>
+                  <strong>{clan.name}</strong>
 
                   <span className="clan-card-selector__disciplines-label">
                     Disciplinas
                   </span>
 
                   <span className="clan-card-selector__disciplines">
-                    {clan.inClanDisciplines.map(
-                      discipline => (
-                        <span key={discipline}>
-                          {getDisciplineName(
-                            discipline,
-                          )}
-                        </span>
-                      ),
-                    )}
+                    {clan.inClanDisciplines.map((discipline) => (
+                      <span key={discipline}>
+                        {getDisciplineName(discipline)}
+                      </span>
+                    ))}
                   </span>
                 </button>
-              ),
-            )}
-          </div>
 
-          <button
-            type="button"
-            className="clan-card-selector__clear"
-            onClick={() =>
-              updateClan(null)
-            }
-            disabled={value.clan === null}
-          >
-            Dejar el clan sin seleccionar
-          </button>
-        </fieldset>
-        </div>
+                <button
+                  type="button"
+                  className="discipline-info-button clan-card-selector__info"
+                  aria-label={`Información sobre ${clan.name}`}
+                  onClick={() => setInfoClan(clan)}
+                >
+                  i
+                </button>
+              </article>
+            ))}
+          </div>
 
         <div className="identity-guided-group identity-guided-group--predator">
         <label className="creation-field">
@@ -478,6 +478,22 @@ export function IdentityStep({
         </label>
         </div>
       </div>
+
+      {infoClan !== null ? (
+        <ClanInfoDialog
+          clanName={infoClan.name}
+          kindLabel={
+            infoClan.kind === 'thinBlood'
+              ? 'Sangre débil'
+              : infoClan.kind === 'caitiff'
+                ? 'Caitiff'
+                : 'Clan'
+          }
+          summary={clanCatalogHelp[infoClan.key]}
+          disciplines={infoClan.inClanDisciplines.map(getDisciplineName)}
+          onClose={() => setInfoClan(null)}
+        />
+      ) : null}
     </div>
   )
 }
