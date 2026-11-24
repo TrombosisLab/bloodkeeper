@@ -169,7 +169,7 @@ function reviewErrorMessage(
     }
 
     if (error.status === 422) {
-      return 'La validación global rechazó la finalización del personaje.'
+      return 'No se pudo completar la comprobación de la ficha.'
     }
   }
 
@@ -982,7 +982,7 @@ export function CharacterCreationWizard({
     setReviewRevision(null)
     setReviewState('checking')
     setReviewMessage(
-      'Guardando y comprobando el personaje...',
+      'Guardando los cambios y comprobando la ficha...',
     )
 
     const persisted =
@@ -991,7 +991,7 @@ export function CharacterCreationWizard({
     if (persisted === null) {
       setReviewState('error')
       setReviewMessage(
-        'No se pudo guardar el borrador antes de la validación final.',
+        'No se pudieron guardar los cambios. Comprueba la conexión e inténtalo de nuevo.',
       )
       return
     }
@@ -1011,12 +1011,12 @@ export function CharacterCreationWizard({
       if (report.canProceed) {
         setReviewState('ready')
         setReviewMessage(
-          'La validación global permite finalizar el personaje.',
+          'La ficha está completa y lista para finalizar.',
         )
       } else {
         setReviewState('blocked')
         setReviewMessage(
-          'El personaje todavía tiene errores o decisiones pendientes.',
+          'Aún hay errores o decisiones pendientes por resolver.',
         )
       }
     } catch (error: unknown) {
@@ -1103,10 +1103,10 @@ export function CharacterCreationWizard({
 
   const persistenceSummary =
     editorState === null
-      ? 'Borrador local sin guardar'
+      ? 'Borrador aún sin guardar'
       : hasUnsavedChanges
-        ? `Cambios pendientes · revisión ${editorState.revision}`
-        : `Guardado · revisión ${editorState.revision}`
+        ? 'Cambios sin guardar'
+        : 'Cambios guardados'`
 
   if (creationMode === null) {
     if (characterId !== null) {
