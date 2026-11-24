@@ -11,7 +11,8 @@ export function AdvantagesIntroductionStep({
         <h2 id="advantages-introduction-title">Antes de abrir el catálogo</h2>
         <p>
           “Ventajas” es el nombre general de este apartado. Dentro encontrarás
-          Méritos y Trasfondos; los Defectos son el lado negativo.
+          Méritos y Trasfondos; los Defectos son el lado negativo. El catálogo
+          indicará el coste y las reglas de cada opción.
         </p>
       </div>
 
