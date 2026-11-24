@@ -19,6 +19,7 @@ import { SkillEditorRow } from './SkillEditorRow'
 import { SkillSpecialtiesEditor } from './SkillSpecialtiesEditor'
 
 interface SkillsStepProps {
+  guided?: boolean
   value: CharacterSkillsDraft
   effectiveSkills?: CharacterSkillsDraft
   predatorTypeBonusSkillKey?: SkillKey | null
@@ -80,6 +81,7 @@ const methods: {
 ]
 
 export function SkillsStep({
+  guided = false,
   value,
   effectiveSkills = value,
   predatorTypeBonusSkillKey = null,
@@ -124,7 +126,6 @@ export function SkillsStep({
   return (
     <div className="skills-step">
       <div className="creation-step-heading">
-        <span>Fase 3</span>
 
         <h2>Habilidades</h2>
 
@@ -155,21 +156,22 @@ export function SkillsStep({
               {option.label}
             </strong>
 
-            <span>
-              {option.description}
-            </span>
-
-            <small>
-              Reparto objetivo: {option.target}
-            </small>
+            {!guided ? (
+              <>
+                <span>{option.description}</span>
+                <small>Reparto objetivo: {option.target}</small>
+              </>
+            ) : null}
           </button>
         ))}
       </div>
 
-      <p className="skills-step__method-guidance">
-        El perfil define las cantidades objetivo, pero no mueve tus puntos.
-        Usa “Reparto aleatorio válido” si quieres que se asignen automáticamente.
-      </p>
+      {!guided ? (
+        <p className="skills-step__method-guidance">
+          El perfil define las cantidades objetivo, pero no mueve tus puntos.
+          Usa “Reparto aleatorio válido” si quieres que se asignen automáticamente.
+        </p>
+      ) : null}
 
       <div className="skills-step__toolbar">
         <div>
@@ -185,6 +187,12 @@ export function SkillsStep({
               )?.label
             }
           </strong>
+          {guided ? (
+            <small>
+              Reparto objetivo:{' '}
+              {methods.find((option) => option.key === method)?.target}
+            </small>
+          ) : null}
         </div>
 
         <button
@@ -264,6 +272,7 @@ export function SkillsStep({
       ) : null}
 
       <SkillSpecialtiesEditor
+        guided={guided}
         skills={effectiveSkills}
         value={specialties}
         onChange={onSpecialtiesChange}
