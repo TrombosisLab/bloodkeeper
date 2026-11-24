@@ -17,10 +17,12 @@ test('cada tarjeta ofrece una i de información sin seleccionar el clan', () => 
   assert.match(identity, /className="clan-card-selector__item"[\s\S]*?clan-card-selector__card[\s\S]*?<\/button>[\s\S]*?clan-card-selector__info/)
 })
 
-test('la ventana muestra una pincelada y las Disciplinas del clan', () => {
+test('la ventana explica la Maldición como orientación y muestra las Disciplinas', () => {
   assert.match(dialog, /<dialog/)
   assert.match(dialog, /showModal\(\)/)
   assert.match(dialog, /¿Qué los caracteriza\?/)
+  assert.match(dialog, /Maldición del clan/)
+  assert.match(dialog, /La Maldición tiene efecto en las reglas, pero no define/)
   assert.match(dialog, /Disciplinas del clan/)
   assert.match(dialog, /aria-label="Cerrar información"/)
   assert.match(dialog, /Es una pincelada orientativa/)
@@ -29,7 +31,9 @@ test('la ventana muestra una pincelada y las Disciplinas del clan', () => {
 test('el catálogo ofrece una descripción breve para cada clan y tipo especial', () => {
   const keys = ['banuHaqim', 'brujah', 'caitiff', 'gangrel', 'hecata', 'lasombra', 'malkavian', 'ministry', 'nosferatu', 'ravnos', 'salubri', 'thinBlood', 'toreador', 'tremere', 'tzimisce', 'ventrue']
   for (const key of keys) assert.match(catalog, new RegExp('\\b' + key + ':'))
-  assert.match(catalog, /Record<ClanKey, string>/)
+  assert.match(catalog, /export const clanCatalogHelp: Record<ClanKey, string>/)
+  assert.match(catalog, /export const clanBaneHelp: Record<ClanKey, string>/)
+  for (const key of keys) assert.match(catalog, new RegExp('\\b' + key + ':'))
 })
 
 test('el botón queda superpuesto en la tarjeta y conserva el diseño adaptable', () => {
