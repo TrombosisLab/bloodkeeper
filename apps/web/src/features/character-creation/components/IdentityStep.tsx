@@ -176,7 +176,7 @@ export function IdentityStep({
   return (
     <div className="identity-step" data-guided-stage={guidedStage ?? "all"}>
       <div className="creation-step-heading">
-        <span>{guidedStage ? 'Identidad · paso' : 'Fase 1'}</span>
+        {guidedStage ? <span>Identidad · paso</span> : null}
 
         <h2>
           {guidedStage === 'profile' ? 'Quién es'
