@@ -478,11 +478,11 @@ export function AdvantagesStep({
           Ventajas, Trasfondos y Defectos
         </h2>
 
-        <p>
-          {sessionZero
-            ? 'Selecciona únicamente Ventajas, Trasfondos y Defectos válidos durante la fase humana.'
-            : 'Elige los rasgos que mejor representen las cualidades, los recursos y las complicaciones de tu personaje.'}
-        </p>
+        {sessionZero && (
+          <p>
+            Selecciona únicamente Ventajas, Trasfondos y Defectos válidos durante la fase humana.
+          </p>
+        )}
       </div>
 
       <section className="advantages-budget">
