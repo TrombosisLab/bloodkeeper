@@ -176,7 +176,7 @@ export function SkillSpecialtiesEditor({
 
         {budget.complete && (
           <p className="skill-validation__ok">
-            Cupo de especialidades completo.
+            Has elegido todas las especialidades disponibles.
           </p>
         )}
       </div>
