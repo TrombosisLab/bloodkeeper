@@ -1063,10 +1063,10 @@ export function ReviewStep({
         <header className="creation-step-section__header">
           <div>
             <span>
-              Validación global
+              Comprobación final
             </span>
             <h3>
-              Estado para finalización
+              Estado de la ficha
             </h3>
           </div>
         </header>
@@ -1126,9 +1126,7 @@ export function ReviewStep({
 
           {validationReport === null ? (
             <p>
-              Ejecuta la comprobación
-              final para validar el
-              personaje completo.
+              Guarda y comprueba la ficha para saber si está completa y lista para finalizar.
             </p>
           ) : validationReport
               .canProceed ? (
@@ -1235,7 +1233,7 @@ export function ReviewStep({
             }
             onClick={onCheck}
           >
-            Comprobar personaje
+            Guardar y comprobar
           </button>
 
           {validationReport?.canProceed ===
@@ -1255,15 +1253,17 @@ export function ReviewStep({
           ) : null}
         </div>
 
+        <p className="creation-step-section__description">
+          Al comprobar la ficha, guardaremos automáticamente los cambios pendientes antes de revisarla.
+        </p>
+
         {validationReport?.canProceed ===
           true &&
         lifecycleStatus === 'draft' &&
         !canFinalize &&
         !busy ? (
           <p>
-            Vuelve a comprobar el personaje
-            si el borrador cambió desde la
-            última validación.
+            Vuelve a comprobar la ficha si la has modificado desde la última revisión.
           </p>
         ) : null}
 
