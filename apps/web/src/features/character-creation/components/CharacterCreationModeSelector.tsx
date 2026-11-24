@@ -1,12 +1,7 @@
 import type {
   CharacterDraftApiCreationMode,
 } from '../types/character-draft-api.types'
-import type {
-  CharacterCreationJourney,
-} from './character-creation-journey.types'
-
 interface CharacterCreationModeSelectorProps {
-  journeyMode: CharacterCreationJourney
   onSelect: (
     creationMode: CharacterDraftApiCreationMode,
   ) => void
@@ -15,7 +10,6 @@ interface CharacterCreationModeSelectorProps {
 }
 
 export function CharacterCreationModeSelector({
-  journeyMode,
   onSelect,
   onBackToJourney,
   onCancel,
@@ -28,10 +22,6 @@ export function CharacterCreationModeSelector({
             Vampiro: La Mascarada V5
           </p>
           <h1>Crear personaje</h1>
-          <p className="creation-header__description">
-            Primero elegiste el recorrido {journeyMode === 'guided' ? 'Guiado' : 'Directo'}.
-            Ahora decide desde qué punto comienza la historia.
-          </p>
         </div>
       </header>
 
