@@ -191,6 +191,13 @@ test(
       ),
       'utf8',
     )
+    const placeholder = await readFile(
+      new URL(
+        '../src/features/character-creation/components/CreationStepPlaceholder.tsx',
+        import.meta.url,
+      ),
+      'utf8',
+    )
 
     assert.match(
       review,
@@ -206,5 +213,7 @@ test(
     assert.doesNotMatch(advantages, /Fase 6/)
     assert.doesNotMatch(humanity, /Fase final/)
     assert.match(specialties, /Has elegido todas las especialidades disponibles/)
+    assert.doesNotMatch(placeholder, /Próximamente|se implementará/)
+    assert.match(placeholder, /No se puede mostrar esta fase/)
   },
 )
