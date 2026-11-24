@@ -32,7 +32,8 @@ test('la creación nueva ofrece primero recorrido guiado o directo', () => {
 })
 
 test('la selección de recorrido precede a la elección vampiro o Sesión 0', () => {
-  assert.match(startSelector, /journeyMode === 'guided' \? 'Guiado' : 'Directo'/)
+  assert.doesNotMatch(startSelector, /Primero elegiste el recorrido|Ahora decide desde qué punto comienza la historia/)
+  assert.match(startSelector, /Esta elección define si la historia empieza como vampiro/)
   assert.match(startSelector, /onSelect\('standard'\)/)
   assert.match(startSelector, /onSelect\('sessionZero'\)/)
   assert.match(startSelector, /onBackToJourney/)
