@@ -919,7 +919,8 @@ export function AdvantagesStep({
                                     selected.rating
                                   }
                                   min={1}
-                                  max={5}
+                                  max={definition.allowedRatings[definition.allowedRatings.length - 1]}
+                                  allowedRatings={definition.allowedRatings}
                                   onChange={(
                                     rating,
                                   ) =>
@@ -965,7 +966,8 @@ export function AdvantagesStep({
                                     selected.rating
                                   }
                                   min={1}
-                                  max={3}
+                                  max={definition.allowedRatings[definition.allowedRatings.length - 1]}
+                                  allowedRatings={definition.allowedRatings}
                                   onChange={(
                                     rating,
                                   ) =>
@@ -997,7 +999,8 @@ export function AdvantagesStep({
                                           selection.rating
                                         }
                                         min={1}
-                                        max={5}
+                                        max={definition.allowedRatings[definition.allowedRatings.length - 1]}
+                                        allowedRatings={definition.allowedRatings}
                                         onChange={(
                                           rating,
                                         ) =>
@@ -1045,7 +1048,8 @@ export function AdvantagesStep({
                                           selection.rating
                                         }
                                         min={1}
-                                        max={5}
+                                        max={definition.allowedRatings[definition.allowedRatings.length - 1]}
+                                        allowedRatings={definition.allowedRatings}
                                         onChange={(
                                           rating,
                                         ) =>
@@ -1093,7 +1097,8 @@ export function AdvantagesStep({
                                           selection.rating
                                         }
                                         min={1}
-                                        max={5}
+                                        max={definition.allowedRatings[definition.allowedRatings.length - 1]}
+                                        allowedRatings={definition.allowedRatings}
                                         onChange={(
                                           rating,
                                         ) =>
@@ -1155,7 +1160,8 @@ export function AdvantagesStep({
                                     selected.rating
                                   }
                                   min={1}
-                                  max={2}
+                                  max={definition.allowedRatings[definition.allowedRatings.length - 1]}
+                                  allowedRatings={definition.allowedRatings}
                                   onChange={(
                                     rating,
                                   ) =>
@@ -1201,7 +1207,8 @@ export function AdvantagesStep({
                                     selected.rating
                                   }
                                   min={1}
-                                  max={3}
+                                  max={definition.allowedRatings[definition.allowedRatings.length - 1]}
+                                  allowedRatings={definition.allowedRatings}
                                   onChange={(
                                     rating,
                                   ) =>

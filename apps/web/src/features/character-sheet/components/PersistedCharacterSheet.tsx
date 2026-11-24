@@ -62,6 +62,7 @@ import type {
 
 interface PersistedCharacterSheetProps {
   characterId: string
+  portraitReadImageUrl?: string
   gateway?: Pick<CharacterDraftGateway, 'load'>
   narrativeGateway?: Pick<CharacterDraftGateway, 'update'>
   profilePhaseGateway?: CharacterProfilePhaseGateway
@@ -111,6 +112,7 @@ function withOperationalState(
 
 export function PersistedCharacterSheet({
   characterId,
+  portraitReadImageUrl,
   gateway,
   narrativeGateway,
   profilePhaseGateway,
@@ -310,6 +312,7 @@ export function PersistedCharacterSheet({
           loadState.model.characterId
         }
         model={loadState.model}
+        portraitReadImageUrl={portraitReadImageUrl}
         readOnly={readOnly}
         onNarrativeSave={
           readOnly ||

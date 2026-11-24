@@ -1541,7 +1541,10 @@ export class PrismaCharacterDraftRepository
                             skillKey,
                         )
                         .map((specialty) => ({
-                          id: specialty.id,
+                          id: createCharacterScopedSkillSpecialtyId(
+                            characterId,
+                            specialty.id,
+                          ),
                           name: specialty.name,
                           origin:
                             specialty.origin === null

@@ -84,6 +84,7 @@ import type {
 
 interface CharacterSheetProps {
   characterId?: string
+  portraitReadImageUrl?: string
   model?: CharacterSheetModel
   transition?:
     CharacterInitialVampireTransitionReadModel | null
@@ -166,6 +167,7 @@ function persistenceMessage(
 
 export function CharacterSheet({
   characterId,
+  portraitReadImageUrl,
   model,
   transition,
   stateGateway,
@@ -500,6 +502,7 @@ export function CharacterSheet({
       <section className="character-sheet__identity-stage" aria-label="Resumen del personaje">
         <CharacterIdentity
           characterId={characterId}
+          portraitReadImageUrl={portraitReadImageUrl}
           character={model?.identity ?? demoCharacter}
           profilePhase={profilePhase}
           editing={stateEditing && persistedIdentityEditable}

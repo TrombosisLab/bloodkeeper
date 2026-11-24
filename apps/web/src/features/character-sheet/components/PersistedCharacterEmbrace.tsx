@@ -207,17 +207,23 @@ export function PersistedCharacterEmbrace({
         ) : null}
 
         {!confirming ? (
-          <button
-            type="button"
-            className="embrace-section__primary"
-            disabled={busy}
-            onClick={() => {
-              setState('ready')
-              setConfirming(true)
-            }}
-          >
-            Iniciar Abrazo
-          </button>
+          <>
+            <p className="embrace-section__irreversible">
+              No se puede volver atrás
+            </p>
+
+            <button
+              type="button"
+              className="embrace-section__primary"
+              disabled={busy}
+              onClick={() => {
+                setState('ready')
+                setConfirming(true)
+              }}
+            >
+              Iniciar Abrazo
+            </button>
+          </>
         ) : (
           <div
             className="embrace-section__confirmation"

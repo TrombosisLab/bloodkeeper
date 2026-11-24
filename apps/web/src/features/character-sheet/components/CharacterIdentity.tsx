@@ -23,6 +23,7 @@ export interface CharacterIdentityEditableFields {
 
 interface CharacterIdentityProps {
   characterId?: string
+  portraitReadImageUrl?: string
   character: CharacterIdentityData
   profilePhase?: CharacterProfilePhase
   editing?: boolean
@@ -48,6 +49,7 @@ function transitionalValue(
 
 export function CharacterIdentity({
   characterId,
+  portraitReadImageUrl,
   character,
   profilePhase,
   editing = false,
@@ -114,6 +116,7 @@ export function CharacterIdentity({
       <div className="identity-header-layout">
         <CharacterPortrait
           characterId={characterId}
+          readImageUrl={portraitReadImageUrl}
           name={character.name}
           clan={character.clan}
         />

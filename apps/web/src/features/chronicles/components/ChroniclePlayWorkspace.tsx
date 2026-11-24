@@ -23,6 +23,26 @@ import type { ChronicleSessionContextApiSnapshot } from '../types/chronicle-api.
 import './chronicle-play-workspace.css'
 
 type DiceLauncherMode = 'character' | 'rouse' | 'd10' | 'discipline'
+type StoredDiceLauncherState = { readonly open: boolean; readonly mode: DiceLauncherMode }
+
+function diceLauncherStorageKey(chronicleId: string): string {
+  return `bloodkeeper.play.diceLauncher:${chronicleId}`
+}
+
+function readDiceLauncherState(chronicleId: string, defaultMode: DiceLauncherMode): StoredDiceLauncherState {
+  try {
+    const stored = window.sessionStorage.getItem(diceLauncherStorageKey(chronicleId))
+    if (!stored) return { open: false, mode: defaultMode }
+    const parsed = JSON.parse(stored) as Partial<StoredDiceLauncherState>
+    const validModes: readonly DiceLauncherMode[] = ['character', 'rouse', 'd10', 'discipline']
+    return {
+      open: parsed.open === true,
+      mode: validModes.includes(parsed.mode as DiceLauncherMode) ? parsed.mode as DiceLauncherMode : defaultMode,
+    }
+  } catch {
+    return { open: false, mode: defaultMode }
+  }
+}
 
 interface Props {
   readonly chronicleId: string
@@ -127,6 +147,7 @@ function formatDate(value: string | null | undefined): string {
 }
 
 export function ChroniclePlayWorkspace({ chronicleId, characterId, characterName, onOpenCharacter }: Props) {
+  const restoredDiceLauncher = readDiceLauncherState(chronicleId, characterId ? 'character' : 'd10')
   const [sessions, setSessions] = useState<any[]>([])
   const [sessionsLoading, setSessionsLoading] = useState(true)
   const [sessionsError, setSessionsError] = useState<string | null>(null)
@@ -147,8 +168,8 @@ export function ChroniclePlayWorkspace({ chronicleId, characterId, characterName
   const [savingNote, setSavingNote] = useState<'private' | 'public' | null>(null)
   const [notesError, setNotesError] = useState<string | null>(null)
   const [savedNote, setSavedNote] = useState<'private' | 'public' | null>(null)
-  const [diceLauncherOpen, setDiceLauncherOpen] = useState(false)
-  const [diceLauncherMode, setDiceLauncherMode] = useState<DiceLauncherMode>(characterId ? 'character' : 'd10')
+  const [diceLauncherOpen, setDiceLauncherOpen] = useState(restoredDiceLauncher.open)
+  const [diceLauncherMode, setDiceLauncherMode] = useState<DiceLauncherMode>(restoredDiceLauncher.mode)
   const [diceHistoryReload, setDiceHistoryReload] = useState(0)
 
   useEffect(() => {
@@ -236,6 +257,21 @@ export function ChroniclePlayWorkspace({ chronicleId, characterId, characterName
       .finally(() => { if (active) setNotesLoading(false) })
     return () => { active = false }
   }, [chronicleId, session?.id])
+
+  useEffect(() => {
+    try {
+      if (diceLauncherOpen) {
+        window.sessionStorage.setItem(
+          diceLauncherStorageKey(chronicleId),
+          JSON.stringify({ open: true, mode: diceLauncherMode }),
+        )
+      } else {
+        window.sessionStorage.removeItem(diceLauncherStorageKey(chronicleId))
+      }
+    } catch {
+      // Dice remain available even when browser storage is unavailable.
+    }
+  }, [chronicleId, diceLauncherOpen, diceLauncherMode])
 
   useEffect(() => {
     if (!diceLauncherOpen) return

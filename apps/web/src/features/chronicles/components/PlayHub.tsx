@@ -8,6 +8,15 @@ import './play-hub.css'
 
 const gateway = createChronicleGateway()
 const PAGE_SIZE = 3
+const selectedChronicleStorageKey = 'bloodkeeper.play.selectedChronicleId'
+
+function readSelectedChronicleId(): string | null {
+  try {
+    return window.sessionStorage.getItem(selectedChronicleStorageKey)
+  } catch {
+    return null
+  }
+}
 
 function formatDate(value: string): string {
   return new Intl.DateTimeFormat('es-ES', {
@@ -25,7 +34,7 @@ export function PlayHub({ onOpenCharacter }: PlayHubProps) {
   const [chronicles, setChronicles] = useState<readonly ChronicleApiSnapshot[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(readSelectedChronicleId)
   const [currentPage, setCurrentPage] = useState(0)
   const [expandedChronicleId, setExpandedChronicleId] = useState<string | null>(null)
 
@@ -50,6 +59,24 @@ export function PlayHub({ onOpenCharacter }: PlayHubProps) {
     }
   }
 
+  function openChronicle(chronicleId: string) {
+    try {
+      window.sessionStorage.setItem(selectedChronicleStorageKey, chronicleId)
+    } catch {
+      // Keep navigation usable when browser storage is unavailable.
+    }
+    setSelectedId(chronicleId)
+  }
+
+  function returnToChronicles() {
+    try {
+      window.sessionStorage.removeItem(selectedChronicleStorageKey)
+    } catch {
+      // The in-memory navigation still works without browser storage.
+    }
+    setSelectedId(null)
+  }
+
   useEffect(() => {
     void loadChronicles()
   }, [])
@@ -59,7 +86,7 @@ export function PlayHub({ onOpenCharacter }: PlayHubProps) {
       <ChronicleListCreate
         canCreateChronicles={false}
         initialDetailSection="play"
-        onBackFromOpened={() => setSelectedId(null)}
+        onBackFromOpened={returnToChronicles}
         onOpenCharacter={onOpenCharacter}
         openChronicleId={selectedId}
       />
@@ -124,7 +151,7 @@ export function PlayHub({ onOpenCharacter }: PlayHubProps) {
                     ) : null}
                     <span className="play-hub__updated">Actualizada {formatDate(chronicle.updatedAt)}</span>
                   </div>
-                  <button className="play-hub__enter" onClick={() => setSelectedId(chronicle.id)} type="button">
+                  <button className="play-hub__enter" onClick={() => openChronicle(chronicle.id)} type="button">
                     Entrar a jugar →
                   </button>
                 </article>

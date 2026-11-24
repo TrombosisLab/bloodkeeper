@@ -172,10 +172,9 @@ export function PersistedInitialVampirePredatorType({
       <h3>Tipo de Depredador</h3>
 
       <p>
-        Adopta el Tipo de Depredador mediante
-        las reglas canónicas ya utilizadas por
-        el creador. Sus concesiones se aplican
-        de forma atómica en el backend.
+        Elige cómo se alimenta. Cada Tipo puede
+        añadir ventajas, defectos o decisiones
+        propias.
       </p>
 
       <label>

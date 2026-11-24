@@ -10,12 +10,14 @@ const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 interface CharacterPortraitProps {
   readonly characterId?: string
+  readonly readImageUrl?: string
   readonly name: string
   readonly clan: string
 }
 
 export function CharacterPortrait({
   characterId,
+  readImageUrl,
   name,
   clan,
 }: CharacterPortraitProps) {
@@ -79,7 +81,7 @@ export function CharacterPortrait({
       <div className="character-portrait__frame">
         {customAvailable && characterId !== undefined ? (
           <img
-            src={`/api/characters/${characterId}/portrait?v=${version}`}
+            src={`${readImageUrl ?? `/api/characters/${characterId}/portrait`}?v=${version}`}
             alt={`Retrato de ${name}`}
             onError={() => setCustomAvailable(false)}
           />

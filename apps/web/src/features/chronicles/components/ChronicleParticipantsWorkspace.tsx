@@ -356,6 +356,7 @@ export function ChronicleParticipantsWorkspace({
                 <PersistedCharacterSheet
                   key={`${openedCharacterId}:${characterSheetRevision}`}
                   characterId={openedCharacterId}
+                  portraitReadImageUrl={`/api/chronicles/${encodeURIComponent(chronicleId)}/assets/CHARACTER/${encodeURIComponent(openedCharacterId)}/image`}
                   gateway={characterReadGateways.character}
                   profilePhaseGateway={characterReadGateways.profilePhase}
                   readOnly

@@ -19,7 +19,6 @@ import {
 } from '../infrastructure/character-initial-vampire.api'
 
 import {
-  initialVampirePendingDecisionLabels,
   messageForInitialVampireTransitionError,
 } from '../domain/initial-vampire-transition-ui-state'
 
@@ -289,33 +288,11 @@ export function PersistedInitialVampireTransition({
           'initial-vampire-transition__content'
         }
       >
-        <p>
-          Resuelve sólo las decisiones que el
-          backend mantiene pendientes. Las demás
-          partes de la ficha permanecen intactas.
+        <p className="initial-vampire-transition__intro">
+          Puedes avanzar en el orden que prefieras. Clan y
+          Generación habilitan opciones; el Sire se decide
+          por separado.
         </p>
-
-        <div
-          className={
-            'initial-vampire-transition__pending'
-          }
-        >
-          <strong>
-            Decisiones pendientes
-          </strong>
-
-          <ul>
-            {pending.map((decision) => (
-              <li key={decision}>
-                {
-                  initialVampirePendingDecisionLabels[
-                    decision
-                  ]
-                }
-              </li>
-            ))}
-          </ul>
-        </div>
 
         {message !== null ? (
           <p
@@ -358,8 +335,8 @@ export function PersistedInitialVampireTransition({
               <h3>Clan</h3>
 
               <p>
-                Incorpora el Clan canónico cuando
-                sea conocido.
+                El Clan determina qué Disciplinas estarán
+                disponibles.
               </p>
 
               <label>
@@ -435,8 +412,8 @@ export function PersistedInitialVampireTransition({
               <h3>Generación</h3>
 
               <p>
-                Establece la Generación mediante
-                las opciones canónicas existentes.
+                La Generación determina las opciones de
+                Potencia de Sangre.
               </p>
 
               <label>
@@ -519,9 +496,8 @@ export function PersistedInitialVampireTransition({
               <h3>Sire</h3>
 
               <p>
-                Registra la decisión narrativa sin
-                inferirla ni generarla
-                automáticamente.
+                Anota quién te convirtió. Puedes resolverlo
+                en cualquier momento.
               </p>
 
               <label>
@@ -591,11 +567,8 @@ export function PersistedInitialVampireTransition({
               <h3>Estado de Sangre</h3>
 
               <p>
-                Selecciona explícitamente
-                Potencia de Sangre y Hambre. Los
-                rangos proceden de las reglas
-                canónicas ya usadas por el
-                creador.
+                Elige la Potencia de Sangre y el Hambre
+                iniciales de tu personaje.
               </p>
 
               <div
@@ -746,12 +719,9 @@ export function PersistedInitialVampireTransition({
               </h3>
 
               <p>
-                Manifiesta una contribución
-                inicial cada vez. El catálogo y
-                las puntuaciones disponibles se
-                derivan del creador existente; el
-                backend conserva la decisión
-                final.
+                Elige una Disciplina y su puntuación. Las
+                opciones dependen del Clan y de lo ya
+                manifestado.
               </p>
 
               {disciplineChoices.length >
@@ -829,9 +799,9 @@ export function PersistedInitialVampireTransition({
                 </>
               ) : (
                 <p>
-                  No hay una Disciplina inicial
-                  disponible para manifestar con
-                  el estado canónico actual.
+                  {transition.identity.clanKey === null
+                    ? 'Elige primero un Clan para ver las Disciplinas disponibles.'
+                    : 'No hay más Disciplinas iniciales disponibles con las decisiones actuales.'}
                 </p>
               )}
 
@@ -885,12 +855,9 @@ export function PersistedInitialVampireTransition({
               <h3>Poderes iniciales</h3>
 
               <p>
-                Selecciona un Poder aprendible
-                para una Disciplina ya
-                manifestada. Nivel,
-                prerrequisitos y capacidad se
-                resuelven con las reglas de
-                creación existentes.
+                Elige un Poder para una Disciplina
+                manifestada. Solo aparecen los que puedes
+                aprender.
               </p>
 
               {powerDisciplineChoices.length >
@@ -973,9 +940,8 @@ export function PersistedInitialVampireTransition({
                 </>
               ) : (
                 <p>
-                  Manifiesta primero una
-                  Disciplina con capacidad para
-                  nuevos Poderes.
+                  Manifiesta una Disciplina con espacio
+                  disponible para desbloquear sus Poderes.
                 </p>
               )}
 
