@@ -1272,16 +1272,6 @@ export function CharacterCreationWizard({
         </aside>
 
         <section className="creation-workspace">
-          {journeyMode === 'guided' ? (
-            <div className="creation-guided-note" role="note">
-              <strong>Recorrido guiado</strong>
-              <p>
-                {guidedIdentityActive
-                  ? 'Una pregunta cada vez. El menú lateral mantiene visible la fase general.'
-                  : 'Sigue las indicaciones de esta fase; el menú lateral muestra tu progreso general.'}
-              </p>
-            </div>
-          ) : null}
           {currentStepId === 'identity' ? (
             <IdentityStep
               creationMode={creationMode}
@@ -1363,6 +1353,7 @@ export function CharacterCreationWizard({
               <SkillsIntroductionStep />
             ) : (
 <SkillsStep
+              guided={journeyMode === 'guided'}
               value={
                 sessionZero
                   ? draft.skills
@@ -1732,19 +1723,9 @@ export function CharacterCreationWizard({
             </button>
 
             <span className="creation-actions__position">
-              {skillsIntroductionActive
-                ? `Habilidades · introducción`
-                : bloodIntroductionActive
-                  ? 'Sangre · introducción'
-                  : disciplinesIntroductionActive
-                    ? 'Disciplinas · introducción'
-                    : advantagesIntroductionActive
-                      ? 'Ventajas · introducción'
-                      : humanityIntroductionActive
-                        ? 'Humanidad · introducción'
-                        : guidedIdentityActive
-                    ? `Identidad · paso ${guidedIdentityStageIndex + 1} de ${guidedIdentityStages.length}`
-                    : `Paso ${currentStep.number} de ${activeCreationSteps.length}`}
+              {guidedIdentityActive
+                ? `Paso ${guidedIdentityStageIndex + 1} de ${guidedIdentityStages.length}`
+                : null}
             </span>
 
             <button
