@@ -37,7 +37,6 @@ export function SkillsIntroductionStep() {
       aria-labelledby="skills-introduction-title"
     >
       <div className="creation-step-heading">
-        <span>Fase 3 · Habilidades</span>
         <h2 id="skills-introduction-title">
           Antes de repartir, entiende tus opciones
         </h2>
