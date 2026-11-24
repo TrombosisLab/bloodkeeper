@@ -29,6 +29,7 @@ export function AdvantageInstanceDetailsDialog({
   onClose,
 }: AdvantageInstanceDetailsDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const userRequestedCloseRef = useRef(false)
   const [draftSelection, setDraftSelection] =
     useState(selection)
 
@@ -47,7 +48,17 @@ export function AdvantageInstanceDetailsDialog({
   }, [])
 
   function close() {
+    userRequestedCloseRef.current = true
     dialogRef.current?.close()
+  }
+
+  function handleDialogClose() {
+    if (!userRequestedCloseRef.current) {
+      return
+    }
+
+    userRequestedCloseRef.current = false
+    onClose()
   }
 
   function save(event: FormEvent<HTMLFormElement>) {
@@ -65,7 +76,7 @@ export function AdvantageInstanceDetailsDialog({
         event.preventDefault()
         close()
       }}
-      onClose={onClose}
+      onClose={handleDialogClose}
     >
       <form onSubmit={save}>
         <header className="advantage-instance-dialog__header">
