@@ -63,7 +63,6 @@ export function BloodStep({
   return (
     <div className="blood-step">
       <div className="creation-step-heading">
-        <span>Fase 4</span>
 
         <h2>Sangre</h2>
 
