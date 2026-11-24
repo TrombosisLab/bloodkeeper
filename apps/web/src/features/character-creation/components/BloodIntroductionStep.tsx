@@ -19,7 +19,6 @@ export function BloodIntroductionStep({
       aria-labelledby="blood-introduction-title"
     >
       <div className="creation-step-heading">
-        <span>Fase 4 · Sangre</span>
         <h2 id="blood-introduction-title">Antes de ajustar la Sangre</h2>
         <p>
           Esta fase no tiene un reparto de puntos. La Generación ya se decidió
