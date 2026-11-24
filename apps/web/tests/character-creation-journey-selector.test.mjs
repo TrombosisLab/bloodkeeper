@@ -48,15 +48,16 @@ test('Guiado y Directo conservan el mapa lateral de fases', () => {
   assert.match(wizard, /<aside className="creation-sidebar">/)
   assert.match(wizard, /<CreationProgress/)
   assert.match(wizard, /className="creation-layout"/)
-  assert.match(wizard, /journeyMode === 'guided' \? \(/)
-  assert.match(wizard, /El menú lateral mantiene visible la fase general/)
-  assert.match(journeySelector, /Conserva el menú lateral/)
+  assert.match(wizard, /<div className="creation-layout">\s*<aside className="creation-sidebar">[\s\S]*?<CreationProgress/)
+  assert.match(wizard, /creation-sidebar__heading/)
 })
 
 test('Guiado divide Identidad en pasos breves y Directo conserva el formulario completo', () => {
   assert.match(wizard, /guidedIdentityStages: GuidedIdentityStage\[\]/)
   assert.match(wizard, /setGuidedIdentityStage\(/)
-  assert.match(wizard, /Identidad · paso/)
+  assert.match(wizard, /guidedStage=\{[\s\S]*?guidedIdentityStage/)
+  assert.match(wizard, /Paso \$\{guidedIdentityStageIndex \+ 1\} de \$\{guidedIdentityStages.length\}/)
+  assert.match(identityStep, /guidedStage === 'profile' \? 'Quién es/)
   assert.match(identityStep, /data-guided-stage=\{guidedStage \?\? "all"\}/)
   for (const group of ['profile', 'story', 'clan', 'predator', 'generation']) {
     assert.match(identityStep, new RegExp(`identity-guided-group--${group}`))
