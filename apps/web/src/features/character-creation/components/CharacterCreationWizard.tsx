@@ -1169,15 +1169,13 @@ export function CharacterCreationWizard({
               : 'Crear personaje'}
           </h1>
 
-          <p className="creation-header__description">
-            {journeyMode === 'guided'
-              ? sessionZero
-                ? 'Recorrido guiado · construirás la base humana por fases antes del Abrazo.'
-                : 'Recorrido guiado · construirás el personaje por fases con orientación en cada decisión.'
-              : sessionZero
+          {journeyMode !== 'guided' && (
+            <p className="creation-header__description">
+              {sessionZero
                 ? 'Sesión 0 · construye la base humana antes del Abrazo.'
                 : 'Construye el personaje paso a paso. Cada fase completará una parte de su ficha.'}
-          </p>
+            </p>
+          )}
         </div>
 
         <div>
