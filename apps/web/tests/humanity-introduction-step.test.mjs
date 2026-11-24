@@ -25,12 +25,13 @@ test('la introducción explica Humanidad, Convicciones y Piedras de Toque', () =
     'frente a la Bestia',
     'Son reglas propias',
     'personas mortales que representan una Convicción',
-    'de una a tres Convicciones',
-    'peso en la crónica',
+    'puede poner a prueba aquello',
+    'personaje intenta preservar',
   ]) {
     assert.ok(introduction.replace(/\s+/g, ' ').includes(text), 'Falta explicación: ' + text)
   }
   assert.match(humanityStep, /Humanidad inicial/)
+  assert.match(humanityStep, /Define entre una y tres/)
   assert.match(humanityStep, /vinculada a una Piedra/)
 })
 
