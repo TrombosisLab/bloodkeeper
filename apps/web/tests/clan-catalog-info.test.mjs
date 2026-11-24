@@ -25,7 +25,7 @@ test('la ventana explica la Maldición como orientación y muestra las Disciplin
   assert.match(dialog, /La Maldición tiene efecto en las reglas, pero no define/)
   assert.match(dialog, /Disciplinas del clan/)
   assert.match(dialog, /aria-label="Cerrar información"/)
-  assert.match(dialog, /interpreta/)
+  assert.ok(dialog.includes('interprétala a tu manera'))
 })
 
 test('el catálogo ofrece una descripción breve para cada clan y tipo especial', () => {
