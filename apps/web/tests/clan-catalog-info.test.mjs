@@ -11,7 +11,7 @@ const [identity, dialog, catalog, styles] = await Promise.all([
 ])
 
 test('cada tarjeta ofrece una i de información sin seleccionar el clan', () => {
-  assert.match(identity, /className="clan-card-selector__info"/)
+  assert.match(identity, /className="[^"]*\\bclan-card-selector__info\\b[^"]*"/)
   assert.ok(identity.includes('aria-label={`Información sobre ${clan.name}`}'))
   assert.match(identity, /onClick=\{\(\) => setInfoClan\(clan\)\}/)
   assert.match(identity, /className="clan-card-selector__item"[\s\S]*?clan-card-selector__card[\s\S]*?<\/button>[\s\S]*?clan-card-selector__info/)
