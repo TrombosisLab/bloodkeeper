@@ -196,10 +196,9 @@ export function PredatorTypeAdvantageSummary({
       </ul>
 
       <small>
-        Estas Ventajas y Defectos vienen incluidas
-        con el Tipo de Depredador. No descuentan
-        puntos de tu reparto habitual: 7 para Ventajas
-        y 2 para Defectos.
+        El Tipo de Depredador te concede estas Ventajas y
+        Defectos aparte. Conservas tus 7 puntos para elegir
+        Ventajas y tus 2 para elegir Defectos.
       </small>
     </section>
   )
