@@ -36,7 +36,7 @@ test('los detalles se editan en una ventana modal y se guardan desde un borrador
 test('cancelar o cerrar descarta el borrador y conserva la selección sin alterar', () => {
   assert.match(dialog, /onCancel=/)
   assert.match(dialog, /type="button"[\s\S]*?onClick=\{close\}/)
-  assert.match(dialog, /onClose=\{onClose\}/)
+  assert.match(dialog, /onClose=\{handleDialogClose\}/)
   assert.match(dialog, /type="submit"/)
 })
 
