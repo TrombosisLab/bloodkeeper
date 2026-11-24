@@ -36,8 +36,7 @@ export function HumanityIntroductionStep() {
           <h3>Piedras de Toque</h3>
           <p>
             Son personas mortales que representan una Convicción en la vida del
-            Vástago. Cada principio se vincula a una persona y a una relación
-            concreta; lo que les ocurra puede poner a prueba aquello que el
+            Vástago. Su vínculo puede poner a prueba aquello que el
             personaje intenta preservar.
           </p>
         </article>
