@@ -3,6 +3,8 @@ import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
 const base = '../src/features/character-creation/components/'
+const modeSelector = await readFile(new URL(base + 'CharacterCreationModeSelector.tsx', import.meta.url), 'utf8')
+const predatorConfiguration = await readFile(new URL(base + 'PredatorTypeConfiguration.tsx', import.meta.url), 'utf8')
 const [wizard, attributes, skills, specialties, humanity, advantages, placeholder, identity, bloodIntro, blood, disciplines, powerSelector, advantagesStep] = await Promise.all([
   readFile(new URL(base + 'CharacterCreationWizard.tsx', import.meta.url), 'utf8'),
   readFile(new URL(base + 'AttributesStep.tsx', import.meta.url), 'utf8'),
@@ -49,7 +51,12 @@ test('las introducciones no repiten instrucciones que aparecen en el paso siguie
 test('elimina repeticiones entre fases y no muestra texto interno de validación', () => {
   assert.doesNotMatch(identity, /Identidad · paso|clan-card-selector__help/)
   assert.doesNotMatch(bloodIntro, /Decisión anterior|ya se decidió en Identidad/)
-  assert.match(blood, /Ajusta la Potencia de Sangre y el Hambre iniciales/)
+  assert.match(blood, /guided\?: boolean/)
+  assert.match(blood, /!guided && \([\s\S]*Ajusta la Potencia de Sangre y el Hambre iniciales/)
+  assert.match(wizard, /<BloodStep\s+guided=\{journeyMode === 'guided'\}/)
+  assert.doesNotMatch(modeSelector, /Primero elegiste el recorrido|Ahora decide desde qué punto comienza la historia/)
+  assert.match(modeSelector, /Esta elección define si la historia empieza como vampiro/)
+  assert.doesNotMatch(predatorConfiguration, /fases posteriores consumirán este resultado/)
   assert.doesNotMatch(disciplines, /Esta concesión no consume el reparto inicial/)
   assert.doesNotMatch(powerSelector, /temporal para validar|discipline-power-selector__help/)
   assert.doesNotMatch(advantages, /Las concesiones del Tipo de Depredador se indican aparte/)
