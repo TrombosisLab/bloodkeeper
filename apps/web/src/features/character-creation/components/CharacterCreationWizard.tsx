@@ -1140,7 +1140,6 @@ export function CharacterCreationWizard({
 
     return (
       <CharacterCreationModeSelector
-        journeyMode={journeyMode}
         onSelect={selectCreationMode}
         onBackToJourney={() => setJourneyMode(null)}
         onCancel={onBackToSheet}
@@ -1433,6 +1432,7 @@ export function CharacterCreationWizard({
               />
             ) : (
               <BloodStep
+                guided={journeyMode === 'guided'}
                 value={draft.blood}
                 attributes={draft.attributes}
                 generation={draft.identity.generation ?? 13}
