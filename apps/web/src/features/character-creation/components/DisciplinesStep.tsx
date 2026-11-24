@@ -320,12 +320,7 @@ export function DisciplinesStep({
             Disciplina adicional
           </h3>
 
-          <p>
-            Esta concesión no consume el
-            reparto inicial 2 + 1. Debes
-            seleccionar también el Poder
-            correspondiente.
-          </p>
+          
 
           {predatorDisciplines.map(
             discipline => (
