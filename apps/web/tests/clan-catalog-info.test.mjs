@@ -7,12 +7,12 @@ const [identity, dialog, catalog, styles] = await Promise.all([
   readFile(new URL(base + 'components/IdentityStep.tsx', import.meta.url), 'utf8'),
   readFile(new URL(base + 'components/ClanInfoDialog.tsx', import.meta.url), 'utf8'),
   readFile(new URL(base + 'data/clan-catalog-help.ts', import.meta.url), 'utf8'),
-  readFile(new URL('../../../src/styles/bloodkeeper-visual-system.css', import.meta.url), 'utf8'),
+  readFile(new URL('../src/styles/bloodkeeper-visual-system.css', import.meta.url), 'utf8'),
 ])
 
 test('cada tarjeta ofrece una i de información sin seleccionar el clan', () => {
   assert.match(identity, /className="clan-card-selector__info"/)
-  assert.match(identity, /aria-label=\{\`Información sobre \\$\{clan\.name\}\`\}/)
+  assert.ok(identity.includes('aria-label={`Información sobre ${clan.name}`}'))
   assert.match(identity, /onClick=\{\(\) => setInfoClan\(clan\)\}/)
   assert.match(identity, /className="clan-card-selector__item"[\s\S]*?clan-card-selector__card[\s\S]*?<\/button>[\s\S]*?clan-card-selector__info/)
 })
