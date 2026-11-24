@@ -20,11 +20,11 @@ export function CreationStepPlaceholder({
       <p>{step.description}</p>
 
       <div className="creation-placeholder__notice">
-        <span>Próximamente</span>
+        <span>No se puede mostrar esta fase</span>
 
         <p>
-          Esta fase se implementará de forma independiente
-          y validada antes de continuar con la siguiente.
+          Revisa las decisiones anteriores. Puede que falte una opción
+          necesaria para continuar.
         </p>
       </div>
     </div>
