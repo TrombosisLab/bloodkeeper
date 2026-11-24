@@ -58,7 +58,7 @@ test('elimina repeticiones entre fases y no muestra texto interno de validación
   assert.doesNotMatch(modeSelector, /Primero elegiste el recorrido|Ahora decide desde qué punto comienza la historia/)
   assert.match(modeSelector, /Esta elección define si la historia empieza como vampiro/)
   assert.doesNotMatch(predatorConfiguration, /fases posteriores consumirán este resultado/)
-  assert.match(predatorSummary, /Estas Ventajas y Defectos vienen incluidas[\s\S]*?7 para Ventajas[\s\S]*?2 para Defectos/)
+  assert.match(predatorSummary, /El Tipo de Depredador te concede estas Ventajas y[\s\S]*?Defectos aparte\. Conservas tus 7 puntos[\s\S]*?tus 2 para elegir Defectos/)
   assert.doesNotMatch(predatorSummary, /origen Tipo de Depredador|presupuesto ordinario 7\/2/)
   assert.doesNotMatch(disciplines, /Esta concesión no consume el reparto inicial/)
   assert.doesNotMatch(powerSelector, /temporal para validar|discipline-power-selector__help/)
