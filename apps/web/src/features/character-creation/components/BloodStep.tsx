@@ -67,10 +67,8 @@ export function BloodStep({
         <h2>Sangre</h2>
 
         <p>
-          Define la generación y el estado
-          inicial de la Sangre del personaje.
-          Los valores derivados se calculan
-          automáticamente desde sus atributos.
+          Ajusta la Potencia de Sangre y el Hambre iniciales.
+          La Salud y la Fuerza de Voluntad se calculan automáticamente.
         </p>
       </div>
 
