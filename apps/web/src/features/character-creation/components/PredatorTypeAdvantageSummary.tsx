@@ -196,9 +196,10 @@ export function PredatorTypeAdvantageSummary({
       </ul>
 
       <small>
-        Estas concesiones se aplican con origen
-        Tipo de Depredador y no consumen el
-        presupuesto ordinario 7/2.
+        Estas Ventajas y Defectos vienen incluidas
+        con el Tipo de Depredador. No descuentan
+        puntos de tu reparto habitual: 7 para Ventajas
+        y 2 para Defectos.
       </small>
     </section>
   )
