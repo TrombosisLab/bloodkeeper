@@ -25,15 +25,19 @@ test('la ventana explica la Maldición como orientación y muestra las Disciplin
   assert.match(dialog, /La Maldición tiene efecto en las reglas, pero no define/)
   assert.match(dialog, /Disciplinas del clan/)
   assert.match(dialog, /aria-label="Cerrar información"/)
-  assert.match(dialog, /Es una pincelada orientativa/)
+  assert.match(dialog, /interpreta[r]?la a tu manera/)
 })
 
 test('el catálogo ofrece una descripción breve para cada clan y tipo especial', () => {
   const keys = ['banuHaqim', 'brujah', 'caitiff', 'gangrel', 'hecata', 'lasombra', 'malkavian', 'ministry', 'nosferatu', 'ravnos', 'salubri', 'thinBlood', 'toreador', 'tremere', 'tzimisce', 'ventrue']
-  for (const key of keys) assert.match(catalog, new RegExp('\\b' + key + ':'))
+  for (const key of keys) {
+    assert.match(catalog, new RegExp('\\b' + key + ':'))
+  }
   assert.match(catalog, /export const clanCatalogHelp: Record<ClanKey, string>/)
   assert.match(catalog, /export const clanBaneHelp: Record<ClanKey, string>/)
-  for (const key of keys) assert.match(catalog, new RegExp('\\b' + key + ':'))
+  for (const key of keys) {
+    assert.match(catalog, new RegExp('\\b' + key + ':'))
+  }
 })
 
 test('el botón queda superpuesto en la tarjeta y conserva el diseño adaptable', () => {
