@@ -176,9 +176,7 @@ export function IdentityStep({
   return (
     <div className="identity-step" data-guided-stage={guidedStage ?? "all"}>
       <div className="creation-step-heading">
-        {guidedStage ? <span>Identidad · paso</span> : null}
-
-        <h2>
+<h2>
           {guidedStage === 'profile' ? 'Quién es'
             : guidedStage === 'story' ? 'Su historia'
               : guidedStage === 'clan' ? 'Su linaje'
@@ -235,13 +233,7 @@ export function IdentityStep({
         <div className="identity-guided-group identity-guided-group--clan">
         <fieldset className="creation-field creation-field--wide clan-card-selector">
           <legend>Clan</legend>
-
-          <p className="clan-card-selector__help">
-            Elige el linaje del personaje. Las Disciplinas mostradas
-            proceden del catálogo canónico de cada opción.
-          </p>
-
-          <div className="clan-card-selector__grid">
+<div className="clan-card-selector__grid">
             {clanDefinitions.map(
               (clan) => (
                 <button
