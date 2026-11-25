@@ -298,6 +298,47 @@
   .chronicle-play-workspace__mobile-character-tracks > span { display: grid; gap: .1rem; min-width: 0; }
   .chronicle-play-workspace__mobile-character-tracks small { font-size: .56rem; letter-spacing: .04em; }
   .chronicle-play-workspace__mobile-character-tracks strong { font-size: .8rem; }
+  .chronicle-play-workspace__scene {
+    border-color: rgba(190, 137, 105, .42);
+    background: linear-gradient(145deg, rgba(41, 30, 27, .98), rgba(18, 16, 17, .98));
+  }
+  .chronicle-play-workspace__scene-links article {
+    border-color: rgba(190, 137, 105, .24);
+    background: rgba(31, 24, 24, .72);
+  }
+  .chronicle-play-workspace__tension { color: #e2b76e; }
+  .chronicle-play-workspace__mobile-character {
+    border-color: rgba(194, 73, 96, .48);
+    background: linear-gradient(145deg, rgba(61, 23, 34, .96), rgba(23, 15, 19, .99));
+  }
+  .chronicle-play-workspace__mobile-character-tracks > span {
+    border: 1px solid rgba(194, 73, 96, .22);
+    background: rgba(78, 29, 43, .28);
+    padding: .24rem .3rem;
+  }
+  .chronicle-play-workspace__disclosure[aria-label="Dados e historial de tiradas"] {
+    border-color: rgba(211, 71, 94, .56);
+    background: linear-gradient(145deg, rgba(59, 22, 31, .96), rgba(22, 14, 17, .99));
+  }
+  .chronicle-play-workspace__disclosure[aria-label="Dados e historial de tiradas"] .chronicle-play-workspace__disclosure-summary strong {
+    color: #f0a0aa;
+  }
+  .chronicle-play-workspace__disclosure[aria-label="Recursos de sangre"] {
+    border-color: rgba(158, 111, 169, .46);
+    background: linear-gradient(145deg, rgba(38, 27, 43, .96), rgba(17, 14, 19, .99));
+  }
+  .chronicle-play-workspace__disclosure[aria-label="Recursos de sangre"] > summary { border-left: 3px solid #9f73ad; }
+  .chronicle-play-workspace__disclosure[aria-label="Recursos de sangre"] .chronicle-play-workspace__disclosure-summary strong {
+    color: #d4b4df;
+  }
+  .chronicle-play-workspace__disclosure[aria-label="Notas e información de la sesión"] {
+    border-color: rgba(100, 142, 151, .42);
+    background: linear-gradient(145deg, rgba(24, 36, 42, .96), rgba(15, 17, 19, .99));
+  }
+  .chronicle-play-workspace__disclosure[aria-label="Notas e información de la sesión"] > summary { border-left: 3px solid #6e9ba4; }
+  .chronicle-play-workspace__disclosure[aria-label="Notas e información de la sesión"] .chronicle-play-workspace__disclosure-summary strong {
+    color: #b4d1d4;
+  }
   #chronicle-section-play-panel .chronicle-play-workspace__character { display: none !important; }
   .chronicle-play-workspace__mobile-character { display: grid; }
   .chronicle-play-workspace__disclosure > summary { align-items: center; }
