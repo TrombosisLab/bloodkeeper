@@ -291,8 +291,8 @@
   .chronicle-play-workspace__mobile-character-identity { display: flex; align-items: center; gap: .55rem; min-width: 0; }
   .chronicle-play-workspace__mobile-character-identity > div:last-child { display: grid; gap: .12rem; min-width: 0; }
   .chronicle-play-workspace__mobile-character-identity strong { overflow: hidden; font-family: Georgia, serif; font-size: 1rem; text-overflow: ellipsis; white-space: nowrap; }
-  .chronicle-play-workspace__mobile-character-identity button { justify-self: start; padding: .25rem .45rem; font-size: .68rem; }
-  .chronicle-play-workspace__mobile-character-portrait { display: grid; place-items: center; flex: 0 0 3.15rem; width: 3.15rem; height: 3.15rem; overflow: hidden; border: 1px solid rgba(216,64,89,.55); background: #171113; }
+  .chronicle-play-workspace__mobile-character-identity button { justify-self: start; padding: .25rem .45rem; font-size: .68rem; border-color: rgba(111, 156, 168, .48); background: rgba(22, 34, 40, .94); }
+  .chronicle-play-workspace__mobile-character-portrait { display: grid; place-items: center; flex: 0 0 3.15rem; width: 3.15rem; height: 3.15rem; overflow: hidden; border: 1px solid rgba(111,156,168,.58); background: #141c20; }
   .chronicle-play-workspace__mobile-character-portrait img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
   .chronicle-play-workspace__mobile-character-tracks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .25rem; border-top: 1px solid var(--play-border); padding-top: .42rem; }
   .chronicle-play-workspace__mobile-character-tracks > span { display: grid; gap: .1rem; min-width: 0; }
@@ -308,12 +308,13 @@
   }
   .chronicle-play-workspace__tension { color: #e2b76e; }
   .chronicle-play-workspace__mobile-character {
-    border-color: rgba(194, 73, 96, .48);
-    background: linear-gradient(145deg, rgba(61, 23, 34, .96), rgba(23, 15, 19, .99));
+    border-color: rgba(82, 117, 130, .62);
+    border-left-color: #6e9ba4;
+    background: linear-gradient(145deg, rgba(29, 41, 48, .97), rgba(16, 23, 27, .99));
   }
   .chronicle-play-workspace__mobile-character-tracks > span {
-    border: 1px solid rgba(194, 73, 96, .22);
-    background: rgba(78, 29, 43, .28);
+    border: 1px solid rgba(111, 156, 168, .34);
+    background: rgba(42, 64, 73, .46);
     padding: .24rem .3rem;
   }
   .chronicle-play-workspace__disclosure[aria-label="Dados e historial de tiradas"] {

@@ -27,13 +27,14 @@ test('en móvil las referencias vacías se ocultan y las descripciones largas se
 test('el color separa escena, personaje, dados, sangre y notas solo en móvil', () => {
   for (const colorCue of [
     'rgba(41, 30, 27, .98)',
-    'rgba(61, 23, 34, .96)',
+    'rgba(29, 41, 48, .97)',
     'rgba(59, 22, 31, .96)',
     'rgba(38, 27, 43, .96)',
     'rgba(24, 36, 42, .96)',
   ]) {
     assert.ok(mobileStyles.includes(colorCue), `Falta diferenciación cromática móvil: ${colorCue}`)
   }
+  assert.match(mobileStyles, /border-left-color: #6e9ba4/)
   assert.match(mobileStyles, /aria-label="Dados e historial de tiradas"/)
   assert.match(mobileStyles, /aria-label="Recursos de sangre"/)
   assert.match(mobileStyles, /aria-label="Notas e información de la sesión"/)
