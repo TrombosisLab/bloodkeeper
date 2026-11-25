@@ -13,7 +13,7 @@ test('el resumen compacto del personaje solo se muestra en móvil y la ficha com
   assert.match(component, /chronicle-play-workspace__character/)
   assert.match(styles, /\.chronicle-play-workspace__mobile-character \{ display: none; \}/)
   assert.match(mobileStyles, /\.chronicle-play-workspace__mobile-character \{\s*display: grid;/)
-  assert.match(mobileStyles, /\.chronicle-play-workspace__character \{ display: none; \}/)
+  assert.match(mobileStyles, /#chronicle-section-play-panel \.chronicle-play-workspace__character \{ display: none !important; \}/)
 })
 
 test('en móvil las referencias vacías se ocultan y las descripciones largas se compactan', () => {
