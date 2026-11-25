@@ -31,9 +31,14 @@ test('el color separa escena, personaje, dados, sangre y notas solo en móvil', 
     'rgba(59, 22, 31, .96)',
     'rgba(38, 27, 43, .96)',
     'rgba(24, 36, 42, .96)',
+    'rgba(39, 33, 26, .96)',
+    'rgba(46, 37, 26, .97)',
   ]) {
     assert.ok(mobileStyles.includes(colorCue), `Falta diferenciación cromática móvil: ${colorCue}`)
   }
+  assert.match(mobileStyles, /#chronicle-section-play-panel \.chronicle-play-workspace__session-switcher/)
+  assert.match(mobileStyles, /#chronicle-section-play-panel \.chronicle-play-workspace__hero/)
+  assert.match(mobileStyles, /border-left-color: #b79060/)
   assert.match(mobileStyles, /border-left-color: #6e9ba4/)
   assert.match(mobileStyles, /aria-label="Dados e historial de tiradas"/)
   assert.match(mobileStyles, /aria-label="Recursos de sangre"/)
