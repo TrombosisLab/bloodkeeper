@@ -367,14 +367,31 @@ export function ChroniclePlayWorkspace({ chronicleId, characterId, characterName
       </header>
 
       <section className="chronicle-play-workspace__scene">
-        <div className="chronicle-play-workspace__scene-copy"><small>ESCENA ACTUAL</small><p>{currentScene?.purpose ?? session?.summary ?? 'El Narrador todavía no ha publicado el contexto de esta escena.'}</p><strong>Objetivo</strong><p>{session?.objective ?? session?.plannedSummary ?? linkedStory?.sharedSummary ?? 'Sigue la escena y las indicaciones del Narrador.'}</p></div>
+        <div className="chronicle-play-workspace__scene-copy"><small className="chronicle-play-workspace__scene-label--desktop">ESCENA ACTUAL</small><small className="chronicle-play-workspace__scene-label--mobile">{session?.status === 'completed' ? 'ESCENA DESTACADA' : 'ESCENA ACTUAL'}</small><p>{currentScene?.purpose ?? session?.summary ?? 'El Narrador todavía no ha publicado el contexto de esta escena.'}</p><strong>Objetivo</strong><p>{session?.objective ?? session?.plannedSummary ?? linkedStory?.sharedSummary ?? 'Sigue la escena y las indicaciones del Narrador.'}</p></div>
         <div className="chronicle-play-workspace__tension"><small>Tensión visible</small><i aria-label={`Intensidad ${currentScene?.intensity ?? 0} de 5`}>{Array.from({ length: 5 }, (_, index) => <b key={index} className={index < (currentScene?.intensity ?? 0) ? 'is-filled' : ''} />)}</i><strong>{(currentScene?.intensity ?? 0) >= 4 ? 'ALTA' : (currentScene?.intensity ?? 0) >= 2 ? 'MEDIA' : 'BAJA'}</strong></div>
         <div className="chronicle-play-workspace__scene-links">
           <article><small>PERSONAJE PRESENTE</small><strong>{actualCharacterName}</strong><span>{characterId ? 'Tu personaje' : 'Sin asociación'}</span></article>
-          <article><small>PNJ VISIBLE</small><strong>{npc?.name ?? 'Sin PNJ vinculado'}</strong><span>{npc?.narrativeRole ?? npc?.category ?? '—'}</span></article>
-          <article><small>UBICACIÓN ACTUAL</small><strong>{location?.name ?? 'Sin localización'}</strong><span>{location?.category ?? '—'}</span></article>
-          <article><small>PISTA / DOCUMENTO</small><strong>{document?.name ?? 'Sin documento revelado'}</strong><span>{document?.summary ?? '—'}</span></article>
-          <article><small>ORGANIZACIÓN VINCULADA</small><strong>{organization?.name ?? 'Sin organización'}</strong><span>{organization?.summary ?? '—'}</span></article>
+          <article className={!npc?.name ? 'is-unlinked' : undefined}><small>PNJ VISIBLE</small><strong>{npc?.name ?? 'Sin PNJ vinculado'}</strong><span>{npc?.narrativeRole ?? npc?.category ?? '—'}</span></article>
+          <article className={!location?.name ? 'is-unlinked' : undefined}><small>UBICACIÓN ACTUAL</small><strong>{location?.name ?? 'Sin localización'}</strong><span>{location?.category ?? '—'}</span></article>
+          <article className={!document?.name ? 'is-unlinked' : undefined}><small>PISTA / DOCUMENTO</small><strong>{document?.name ?? 'Sin documento revelado'}</strong><span>{document?.summary ?? '—'}</span></article>
+          <article className={!organization?.name ? 'is-unlinked' : undefined}><small>ORGANIZACIÓN VINCULADA</small><strong>{organization?.name ?? 'Sin organización'}</strong><span>{organization?.summary ?? '—'}</span></article>
+        </div>
+      </section>
+
+      <section className="chronicle-play-workspace__mobile-character" aria-label="Resumen de mi personaje">
+        <div className="chronicle-play-workspace__mobile-character-identity">
+          <div className="chronicle-play-workspace__mobile-character-portrait">{characterId && !portraitFailed ? <img src={`/api/characters/${characterId}/portrait`} alt="" onError={() => setPortraitFailed(true)} /> : <V5VisualMark kind="clan-symbol" value={clan} decorative />}</div>
+          <div>
+            <small>MI PERSONAJE</small>
+            <strong>{actualCharacterName}</strong>
+            {characterId && onOpenCharacter ? <button type="button" onClick={() => onOpenCharacter(characterId, chronicleId)}>Ficha completa</button> : null}
+          </div>
+        </div>
+        <div className="chronicle-play-workspace__mobile-character-tracks">
+          <span><small>Hambre</small><strong>{hunger}/5</strong></span>
+          <span><small>Salud</small><strong>{health}</strong></span>
+          <span><small>Voluntad</small><strong>{willpower}</strong></span>
+          <span><small>Humanidad</small><strong>{humanity}</strong></span>
         </div>
       </section>
 

@@ -170,6 +170,8 @@
 .chronicle-play-workspace__notes-error { grid-column: 1 / -1; border: 1px solid #a93348; background: #2a1218; color: #f0a3ad; padding: .65rem; }
 
 .chronicle-play-workspace__character { display: grid; align-content: start; gap: .7rem; padding: .8rem; }
+.chronicle-play-workspace__mobile-character { display: none; }
+.chronicle-play-workspace__scene-label--mobile { display: none; }
 .chronicle-play-workspace__character > header { display: grid; gap: .2rem; }
 .chronicle-play-character__portrait { display: grid; place-items: center; width: 100%; aspect-ratio: 16 / 10; overflow: hidden; border: 1px solid rgba(216,64,89,.55); background: #171113; }
 .chronicle-play-character__portrait img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
@@ -224,14 +226,84 @@
 }
 
 @media (max-width: 620px) {
-  .chronicle-play-workspace__session-switcher { grid-template-columns: 1fr; align-items: stretch; }
-  .chronicle-play-workspace__session-switcher > strong { justify-self: start; }
-  .chronicle-play-workspace__scene { grid-template-columns: 1fr; }
-  .chronicle-play-workspace__tension { border-top: 1px solid var(--play-border); border-left: 0; padding-top: .7rem; }
-  .chronicle-play-workspace__scene-links,
-  .chronicle-play-workspace__situation,
-  .chronicle-play-workspace__dice .dice-roll-panel__form { grid-template-columns: 1fr; }
-  .chronicle-play-workspace__situation > div + div { border-top: 1px solid var(--play-border); border-left: 0; }
+  .chronicle-play-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: .45rem;
+    margin-top: .45rem;
+  }
+  .chronicle-play-workspace__session-switcher {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .35rem .55rem;
+    padding: .55rem .65rem;
+  }
+  .chronicle-play-workspace__session-switcher label { grid-column: 1; grid-row: 1; }
+  .chronicle-play-workspace__session-switcher select { min-height: 2.35rem; padding: .4rem .55rem; }
+  .chronicle-play-workspace__session-switcher > strong {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    align-self: center;
+    padding: .4rem .55rem;
+    font-size: .65rem;
+  }
+  .chronicle-play-workspace__main { gap: .45rem; }
+  .chronicle-play-workspace__hero { gap: .45rem; padding: .65rem; }
+  .chronicle-play-workspace__hero h1 { font-size: clamp(1.35rem, 5.5vw, 1.7rem); line-height: 1.08; }
+  .chronicle-play-workspace__situation { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .chronicle-play-workspace__situation > div { padding: .42rem .5rem; }
+  .chronicle-play-workspace__situation > div:nth-child(3) { border-left: 0; border-top: 1px solid var(--play-border); }
+  .chronicle-play-workspace__situation > div:nth-child(4) { border-top: 1px solid var(--play-border); }
+  .chronicle-play-workspace__scene { grid-template-columns: 1fr; gap: .5rem; padding: .65rem; }
+  .chronicle-play-workspace__scene-copy { gap: .28rem; }
+  .chronicle-play-workspace__scene-copy p { line-height: 1.32; }
+  .chronicle-play-workspace__scene-label--desktop { display: none; }
+  .chronicle-play-workspace__scene-label--mobile { display: block; }
+  .chronicle-play-workspace__tension {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .55rem;
+    border-top: 1px solid var(--play-border);
+    border-left: 0;
+    padding-top: .5rem;
+  }
+  .chronicle-play-workspace__scene-links { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .35rem; }
+  .chronicle-play-workspace__scene-links article { padding: .42rem; }
+  .chronicle-play-workspace__scene-links article:first-child { grid-column: 1 / -1; }
+  .chronicle-play-workspace__scene-links article.is-unlinked { display: none; }
+  .chronicle-play-workspace__scene-links span {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
+    line-height: 1.25;
+  }
+  .chronicle-play-workspace__mobile-character {
+    display: grid;
+    gap: .45rem;
+    border: 1px solid var(--play-border);
+    border-left: 3px solid var(--play-red);
+    background: linear-gradient(145deg, rgba(21, 21, 22, .98), rgba(13, 12, 13, .98));
+    padding: .55rem;
+  }
+  .chronicle-play-workspace__mobile-character-identity { display: flex; align-items: center; gap: .55rem; min-width: 0; }
+  .chronicle-play-workspace__mobile-character-identity > div:last-child { display: grid; gap: .12rem; min-width: 0; }
+  .chronicle-play-workspace__mobile-character-identity strong { overflow: hidden; font-family: Georgia, serif; font-size: 1rem; text-overflow: ellipsis; white-space: nowrap; }
+  .chronicle-play-workspace__mobile-character-identity button { justify-self: start; padding: .25rem .45rem; font-size: .68rem; }
+  .chronicle-play-workspace__mobile-character-portrait { display: grid; place-items: center; flex: 0 0 3.15rem; width: 3.15rem; height: 3.15rem; overflow: hidden; border: 1px solid rgba(216,64,89,.55); background: #171113; }
+  .chronicle-play-workspace__mobile-character-portrait img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
+  .chronicle-play-workspace__mobile-character-tracks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .25rem; border-top: 1px solid var(--play-border); padding-top: .42rem; }
+  .chronicle-play-workspace__mobile-character-tracks > span { display: grid; gap: .1rem; min-width: 0; }
+  .chronicle-play-workspace__mobile-character-tracks small { font-size: .56rem; letter-spacing: .04em; }
+  .chronicle-play-workspace__mobile-character-tracks strong { font-size: .8rem; }
+  .chronicle-play-workspace__character { display: none; }
+  .chronicle-play-workspace__mobile-character { display: grid; }
+  .chronicle-play-workspace__disclosure > summary { align-items: center; }
+  .chronicle-play-workspace__disclosure-hint { max-width: 45%; font-size: .68rem; }
+  .chronicle-play-workspace__disclosure[aria-label="Dados e historial de tiradas"] > summary { border-left: 3px solid var(--play-red); }
+  .chronicle-play-workspace__disclosure[aria-label="Dados e historial de tiradas"] .chronicle-play-workspace__disclosure-summary strong { font-size: 1.1rem; }
 }
 
 /* BLOODKEEPER_PLAY_WORKSPACE_DISCLOSURES_V1_START */
