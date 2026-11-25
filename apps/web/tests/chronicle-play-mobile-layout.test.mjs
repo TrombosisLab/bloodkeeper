@@ -38,7 +38,7 @@ test('el color separa escena, personaje, dados, sangre y notas solo en móvil', 
   }
   assert.match(mobileStyles, /#chronicle-section-play-panel \.chronicle-play-workspace__session-switcher/)
   assert.match(mobileStyles, /#chronicle-section-play-panel \.chronicle-play-workspace__hero/)
-  assert.match(mobileStyles, /border-left-color: #b79060/)
+  assert.match(mobileStyles, /border-left: 3px solid #b79060/)
   assert.match(mobileStyles, /border-left-color: #6e9ba4/)
   assert.match(mobileStyles, /aria-label="Dados e historial de tiradas"/)
   assert.match(mobileStyles, /aria-label="Recursos de sangre"/)
