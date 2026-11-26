@@ -488,7 +488,40 @@
   }
 
   .chronicle-overview {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.4rem;
+    background: transparent;
+  }
+
+  .chronicle-overview__stat {
+    min-width: 0;
+    min-height: 4.1rem;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.55rem 0.6rem;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-control);
+    background: var(--color-surface-card);
+  }
+
+  .chronicle-overview__stat span {
+    font-size: 0.68rem;
+    line-height: 1.2;
+  }
+
+  .chronicle-overview__stat strong {
+    font-size: 1.2rem;
+    line-height: 1.1;
+  }
+
+  .chronicle-card-list-item--continue-duplicate {
+    display: none;
+  }
+
+  .chronicle-continue--single-mobile {
+    display: none;
   }
 
   .chronicle-continue button {

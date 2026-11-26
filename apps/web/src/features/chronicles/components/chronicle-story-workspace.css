@@ -243,3 +243,51 @@
 .story-sharing > button { width: 100%; }
 
 /* CHRONICLE_STORY_MILESTONE_EDITOR_V1 */
+/* HISTORIAS_COMPARTIDAS_MOVIL_LECTURA_V1 */
+.story-mobile-back,
+.story-mobile-milestones-toggle { display: none; }
+
+@media (max-width: 820px) {
+  .story-workspace--shared:not(.story-workspace--mobile-detail) .story-detail,
+  .story-workspace--shared:not(.story-workspace--mobile-detail) .story-sidebar,
+  .story-workspace--shared.story-workspace--mobile-detail .story-browser,
+  .story-workspace--shared.story-workspace--mobile-detail .story-sidebar { display: none; }
+
+  .story-workspace--shared.story-workspace--mobile-detail .story-detail { display: block; }
+  .story-workspace--shared .story-browser { min-height: 0; }
+  .story-workspace--shared .story-browser__list { max-height: none; padding: 0 10px 12px; }
+  .story-workspace--shared .story-browser__shared-notice { display: none; }
+  .story-workspace--shared button.story-card--shared {
+    display: grid;
+    gap: 7px;
+    min-height: 0;
+    padding: 12px 14px;
+    border-radius: 4px;
+  }
+  .story-workspace--shared .story-card__shared-heading { display: grid; gap: 4px; min-width: 0; }
+  .story-workspace--shared .story-card__shared-heading strong {
+    overflow: visible;
+    font-size: 1rem;
+    line-height: 1.25;
+    text-overflow: clip;
+    white-space: normal;
+  }
+  .story-workspace--shared .story-card__shared-heading small { font-size: 0.7rem; }
+  .story-workspace--shared .story-card__shared-meta { display: flex; align-items: center; gap: 8px; color: var(--story-muted); font-size: 0.75rem; }
+  .story-workspace--shared .story-card__status { font-size: 0.7rem; }
+  .story-workspace--shared .story-card__progress { display: none; }
+  .story-mobile-back { display: inline-flex; width: fit-content; min-height: 38px; align-items: center; margin: 12px 14px 0; padding: 0 10px; border: 1px solid var(--story-line); background: #17191c; color: var(--story-text); font: inherit; }
+  .story-workspace--shared .story-detail__header { gap: 10px; padding: 12px 14px; }
+  .story-workspace--shared .story-detail__header > div > span { color: var(--story-muted); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  .story-workspace--shared .story-detail__header h2 { margin: 4px 0 0; font-family: Georgia, serif; font-size: 1.55rem; line-height: 1.15; }
+  .story-workspace--shared .story-detail__header > .story-card__status { width: fit-content; }
+  .story-workspace--shared .story-section { padding: 14px; }
+  .story-workspace--shared .story-shared-summary > p { min-height: 0; font-size: 0.98rem; line-height: 1.6; }
+  .story-workspace--shared .story-mobile-milestones-toggle { display: inline-flex; min-height: 38px; align-items: center; margin: 0 14px 12px; padding: 0 10px; border: 1px solid var(--story-line); background: #17191c; color: var(--story-text); font: inherit; }
+  .story-workspace--shared .story-milestones__track { display: none; }
+  .story-workspace--shared .story-milestones__track.is-expanded { display: grid; }
+  .story-workspace--shared .story-shared-lifecycle > div:last-child { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .story-workspace--shared .story-shared-lifecycle article { gap: 4px; padding: 10px; }
+  .story-workspace--shared .story-shared-lifecycle article small { font-size: 0.62rem; }
+  .story-workspace--shared .story-shared-lifecycle article strong { font-size: 0.78rem; line-height: 1.35; }
+}

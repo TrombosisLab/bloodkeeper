@@ -52,6 +52,34 @@ const states = {
   retired: 'Retirado',
 } as const
 
+function ParticipantCharacterPortrait({
+  chronicleId,
+  character,
+  size = 'regular',
+}: {
+  readonly chronicleId: string
+  readonly character: ChronicleCharacterApiSummary
+  readonly size?: 'regular' | 'compact'
+}) {
+  const [imageFailed, setImageFailed] = useState(false)
+  const imageUrl = `/api/chronicles/${encodeURIComponent(chronicleId)}/assets/CHARACTER/${encodeURIComponent(character.characterId)}/image`
+
+  return (
+    <span className={`participant-character-portrait participant-character-portrait--${size}`}>
+      {imageFailed ? (
+        <span className="character-seal" aria-hidden="true">♜</span>
+      ) : (
+        <img
+          src={imageUrl}
+          alt={`Retrato de ${character.name || 'personaje'}`}
+          loading="lazy"
+          onError={() => setImageFailed(true)}
+        />
+      )}
+    </span>
+  )
+}
+
 function dateLabel(value: string): string {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
@@ -78,6 +106,8 @@ export function ChronicleParticipantsWorkspace({
   const [role, setRole] = useState<'all' | 'narrator' | 'player'>('all')
   const [state, setState] = useState<'all' | 'active' | 'retired'>('active')
   const [selectedId, setSelectedId] = useState<string | null>(participants[0]?.id ?? null)
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false)
+  const [accessExpanded, setAccessExpanded] = useState(false)
   const [context, setContext] = useState<ChronicleContext | null>(null)
   const [contextError, setContextError] = useState(false)
   const [notes, setNotes] = useState('')
@@ -116,6 +146,10 @@ export function ChronicleParticipantsWorkspace({
   const character = selected === null
     ? null
     : characters.find((item) => item.ownerId === selected.userId) ?? null
+
+  useEffect(() => {
+    setAccessExpanded(false)
+  }, [selected?.id])
 
   useEffect(() => {
     if (character === null) {
@@ -245,7 +279,7 @@ export function ChronicleParticipantsWorkspace({
   }
 
   return (
-    <section className="chronicle-participants-workspace" aria-labelledby="chronicle-participants-workspace-title">
+    <section className={`chronicle-participants-workspace${mobileDetailOpen ? ' chronicle-participants-workspace--mobile-detail' : ''}`} aria-labelledby="chronicle-participants-workspace-title">
       <aside className="chronicle-participants-workspace__browser">
         <section className="participant-card participant-card--identity">
           <div className="participant-card__heading">
@@ -263,38 +297,47 @@ export function ChronicleParticipantsWorkspace({
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar participante" aria-label="Buscar participantes" />
           </label>
           <div className="participant-filters">
-            <select value={role} onChange={(event) => setRole(event.target.value as 'all' | 'narrator' | 'player')} aria-label="Filtrar por rol">
+            <label className="participant-filter"><span>Rol</span><select value={role} onChange={(event) => setRole(event.target.value as 'all' | 'narrator' | 'player')} aria-label="Filtrar por rol">
               <option value="all">Todos los roles</option>
               <option value="narrator">Narradores</option>
               <option value="player">Jugadores</option>
-            </select>
-            <select value={state} onChange={(event) => setState(event.target.value as 'all' | 'active' | 'retired')} aria-label="Filtrar por estado">
+            </select></label>
+            <label className="participant-filter"><span>Estado</span><select value={state} onChange={(event) => setState(event.target.value as 'all' | 'active' | 'retired')} aria-label="Filtrar por estado">
               <option value="active">Activos</option>
               <option value="all">Todos los estados</option>
               <option value="retired">Retirados</option>
-            </select>
+            </select></label>
           </div>
           {canManage ? <button className="participant-primary-button" type="button" onClick={openParticipantAdmin}>＋ Incorporar participante</button> : null}
           {participantAdmin ? (
         <div className="participant-admin-inline">{participantAdmin}</div>
       ) : null}
 
-      <ul className="participant-list">
-            {visible.map((item) => (
+          <ul className="participant-list">
+            {visible.map((item) => {
+              const itemCharacter = characters.find((candidate) => candidate.ownerId === item.userId) ?? null
+              return (
               <li key={item.id} className={item.id === selectedId ? 'is-selected' : ''}>
-                <button type="button" onClick={() => { setSelectedId(item.id); setOpenedCharacterId(null); setCorrectionOpen(false) }}>
-                  <span className="participant-list__topline"><strong>{item.displayName}</strong><em className={'participant-role participant-role--' + item.role}>{roles[item.role]}</em></span>
-                  <small>{item.username}</small>
-                  <span className="participant-list__state"><i />{states[item.status]}{character?.ownerId === item.userId ? ' · ' + character.name : ''}</span>
+                <button type="button" onClick={() => { const isMobile = window.matchMedia('(max-width: 780px)').matches; setSelectedId(item.id); setOpenedCharacterId(null); setCorrectionOpen(false); setMobileDetailOpen(isMobile); if (isMobile) window.scrollTo({ top: 0, behavior: 'smooth' }) }}>
+                  <span className="participant-list__portrait" aria-hidden="true">
+                    {itemCharacter ? <ParticipantCharacterPortrait key={itemCharacter.characterId} chronicleId={chronicleId} character={itemCharacter} size="compact" /> : <span className="participant-list__initial">{item.displayName.slice(0, 1).toLocaleUpperCase('es-ES')}</span>}
+                  </span>
+                  <span className="participant-list__identity">
+                    <span className="participant-list__topline"><strong>{item.displayName}</strong><em className={'participant-role participant-role--' + item.role}>{roles[item.role]}</em></span>
+                    <small>{item.username}</small>
+                    <span className="participant-list__state"><i />{states[item.status]}{itemCharacter ? ' · ' + itemCharacter.name : ''}</span>
+                  </span>
                 </button>
               </li>
-            ))}
+              )
+            })}
             {visible.length === 0 ? <li className="participant-empty">No hay participantes con estos filtros.</li> : null}
           </ul>
         </section>
       </aside>
 
       <main className="chronicle-participants-workspace__detail">
+        <button className="participant-mobile-back" type="button" onClick={() => { setMobileDetailOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>← Participantes</button>
         {selected === null ? (
           <section className="participant-card participant-empty">
             <h3>Selecciona un participante</h3>
@@ -308,6 +351,7 @@ export function ChronicleParticipantsWorkspace({
                   <span className="participant-eyebrow">Participante</span>
                   <h2>{selected.displayName}</h2>
                   <div className="participant-profile-meta"><em className={'participant-role participant-role--' + selected.role}>{roles[selected.role]}</em><span className="participant-active-dot" />{states[selected.status]}</div>
+                  <div className="participant-profile-info"><span>@{selected.username}</span><span>Se incorpor&oacute; · {dateLabel(selected.createdAt)}</span></div>
                 </div>
                 <div className="participant-header-actions">
                   {canManage ? <button className="participant-secondary-button" type="button" disabled={notesRevision === null || savingNotes} onClick={() => void saveNotes()}>Guardar cambios</button> : null}
@@ -330,7 +374,7 @@ export function ChronicleParticipantsWorkspace({
                 <div className="participant-card__heading"><h3>Personaje asociado</h3>{selected.userId === authenticatedUserId ? <button className="participant-inline-button" type="button" onClick={openCharacterAssociation}>{character ? 'Cambiar asociación' : 'Asociar personaje'}</button> : null}</div>
                 {character ? (
                   <div className="associated-character">
-                    <span className="character-seal" aria-hidden="true">♜</span>
+                    <ParticipantCharacterPortrait chronicleId={chronicleId} character={character} />
                     <div><strong>{character.name || 'Personaje sin nombre'}</strong><span>{character.concept ?? 'Sin concepto definido'}</span><small>{character.status}</small></div>
                   </div>
                 ) : <p>Sin personaje asociado a esta crónica.</p>}
@@ -397,19 +441,22 @@ export function ChronicleParticipantsWorkspace({
       <aside className="chronicle-participants-workspace__side">
         {selected === null ? <section className="participant-card participant-empty">Selecciona una tarjeta para ver su contexto.</section> : (
           <>
-            <section className="participant-card participant-card--permissions">
-              <h3><span className="participant-side-icon">&#9671;</span> Acceso efectivo</h3>
+            <section className={`participant-card participant-card--permissions${accessExpanded ? ' is-expanded' : ''}`}>
+              <h3 className="participant-permissions-heading"><span className="participant-side-icon">&#9671;</span> Acceso efectivo</h3>
+              <button className="participant-permissions-toggle" type="button" aria-expanded={accessExpanded} onClick={() => setAccessExpanded((expanded) => !expanded)}>Accesos y permisos <span aria-hidden="true">{accessExpanded ? '−' : '+'}</span></button>
+              <div className="participant-permissions-content">
               <p className="participant-helper">Los accesos se calculan desde el rol contextual; no son interruptores editables.</p>
               <div className="permission-row"><div><strong>Ver contenido compartido</strong><small>Resumen, historias publicadas y sesiones compartidas.</small></div><span className="permission-access permission-access--on">Permitido</span></div>
               <div className="permission-row"><div><strong>Gestionar su personaje</strong><small>Solo el propietario puede asociar y editar su personaje.</small></div><span className={'permission-access ' + (selected.userId === authenticatedUserId && character ? 'permission-access--on' : '')}>{selected.userId === authenticatedUserId && character ? 'Permitido' : 'No disponible'}</span></div>
               <div className="permission-row"><div><strong>Participar en sesiones</strong><small>Consulta de sesiones y espacio Jugar.</small></div><span className="permission-access permission-access--on">Permitido</span></div>
               <div className="permission-row"><div><strong>Administrar historias</strong><small>Creaci&oacute;n, contexto y cierre narrativo.</small></div><span className={'permission-access ' + (selected.role === 'narrator' ? 'permission-access--on' : '')}>{selected.role === 'narrator' ? 'Narrador' : 'Restringido'}</span></div>
               <div className="permission-row"><div><strong>Cronolog&iacute;a y recursos privados</strong><small>Incluye notas y relaciones reservadas.</small></div><span className={'permission-access ' + (selected.role === 'narrator' ? 'permission-access--on' : '')}>{selected.role === 'narrator' ? 'Narrador' : 'Restringido'}</span></div>
+              </div>
             </section>
 
             <section className="participant-card participant-card--character-status">
               <span className="participant-eyebrow">Estado del personaje</span>
-              {character ? <div className="character-status-block"><span className="character-seal" aria-hidden="true">♜</span><div><h3>{character.name}</h3><span>{character.concept ?? 'Sin concepto'}</span></div></div> : <p>Sin asociación actual.</p>}
+              {character ? <div className="character-status-block"><ParticipantCharacterPortrait chronicleId={chronicleId} character={character} size="compact" /><div><h3>{character.name}</h3><span>{character.concept ?? 'Sin concepto'}</span></div></div> : <p>Sin asociación actual.</p>}
               <dl className="character-status-grid"><div><dt>Estado</dt><dd>{character?.status ?? '—'}</dd></div><div><dt>PX actual</dt><dd>{character === null || experienceError ? '—' : experience?.available ?? '…'}</dd></div></dl>
               {character ? <p className="participant-helper">La ficha completa se abre desde el apartado Personajes del propietario.</p> : null}
             </section>

@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
+import { useAuthenticatedUser } from '../../authentication/context/authentication.context'
 
 import './manual-page.css'
 
@@ -397,9 +399,9 @@ const manualRoles: Record<ManualRole, ManualRoleDefinition> = {
   },
 }
 
-function GuideSection({ section, index }: { readonly section: ManualSection; readonly index: number }) {
+function GuideSection({ section, defaultOpen }: { readonly section: ManualSection; readonly defaultOpen: boolean }) {
   return (
-    <details className="manual-guide-card" open={index < 2}>
+    <details className="manual-guide-card" open={defaultOpen}>
       <summary>{section.title}</summary>
       <div className="manual-guide-card__body">
         {section.paragraphs?.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
@@ -434,7 +436,7 @@ function GuideSection({ section, index }: { readonly section: ManualSection; rea
   )
 }
 
-function RolePanel({ role }: { readonly role: ManualRole }) {
+function RolePanel({ role, isMobile }: { readonly role: ManualRole; readonly isMobile: boolean }) {
   const definition = manualRoles[role]
 
   return (
@@ -448,7 +450,13 @@ function RolePanel({ role }: { readonly role: ManualRole }) {
       </div>
 
       <div className="manual-guide-grid">
-        {[installationManual, ...definition.sections].map((section, index) => <GuideSection key={section.title} section={section} index={index} />)}
+        {[installationManual, ...definition.sections].map((section, index) => (
+          <GuideSection
+            key={section.title}
+            section={section}
+            defaultOpen={isMobile && role !== 'admin' ? index === 1 : index < 2}
+          />
+        ))}
       </div>
 
       <div className="manual-quick-start">
@@ -460,7 +468,24 @@ function RolePanel({ role }: { readonly role: ManualRole }) {
 }
 
 export function ManualPage() {
-  const [activeRole, setActiveRole] = useState<ManualRole>('admin')
+  const authenticatedUser = useAuthenticatedUser()
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 760px)').matches,
+  )
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 760px)')
+    const update = () => setIsMobile(query.matches)
+    update()
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
+
+  const preferredRole: ManualRole = authenticatedUser.roles.includes('player')
+    ? 'player'
+    : authenticatedUser.roles.includes('narrator')
+      ? 'narrator'
+      : 'admin'
+  const [activeRole, setActiveRole] = useState<ManualRole>(() => isMobile ? preferredRole : 'admin')
   const roles: readonly ManualRole[] = ['admin', 'narrator', 'player']
 
   return (
@@ -495,7 +520,7 @@ export function ManualPage() {
           ))}
         </div>
 
-        <RolePanel role={activeRole} />
+        <RolePanel role={activeRole} isMobile={isMobile} />
       </section>
 
       <p className="manual-page__footer">El manual debe mantenerse sincronizado con las funciones y permisos reales de BloodKeeper.</p>

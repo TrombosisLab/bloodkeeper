@@ -25,7 +25,7 @@ function childrenOf(maps: readonly ChronicleMapSnapshot[], parentMapId: string |
 
 export function ChronicleMapPage() {
   const [chronicles, setChronicles] = useState<readonly Chronicle[]>([])
-  const [chronicleId, setChronicleId] = useState(() => new URLSearchParams(window.location.search).get('chronicleId') ?? '')
+  const [chronicleId, setChronicleId] = useState('')
   const [workspace, setWorkspace] = useState<ChronicleMapWorkspace | null>(null)
   const [selectedMapId, setSelectedMapId] = useState('')
   const [requests, setRequests] = useState<readonly ChronicleMapRequest[]>([])
@@ -79,8 +79,16 @@ export function ChronicleMapPage() {
       try {
         const result = await api<{ items?: Chronicle[] } | Chronicle[]>('/chronicles?limit=50')
         const items = Array.isArray(result) ? result : result.items ?? []
+        const requestedId = new URLSearchParams(window.location.search).get('chronicleId') ?? ''
+        const selectedId = items.some(item => item.id === requestedId) ? requestedId : items[0]?.id ?? ''
         setChronicles(items)
-        if (!chronicleId && items[0]) setChronicleId(items[0].id)
+        setChronicleId(selectedId)
+        if (selectedId !== requestedId) {
+          const url = new URL(window.location.href)
+          if (selectedId) url.searchParams.set('chronicleId', selectedId)
+          else url.searchParams.delete('chronicleId')
+          window.history.replaceState(window.history.state, '', url.toString())
+        }
       } catch { setMessage('No se pudieron cargar las crónicas.') }
     })()
   }, [])
@@ -335,6 +343,7 @@ export function ChronicleMapPage() {
   return <main className="chronicle-map-page">
     {typeof document !== 'undefined' && document.getElementById('app-header-page-actions') ? createPortal(<div className="chronicle-map-global-actions"><label className="chronicle-map-page__chronicle-select">Crónica<select value={chronicleId} onChange={event => selectChronicle(event.target.value)}>{chronicles.map(chronicle => <option key={chronicle.id} value={chronicle.id}>{chronicle.name}</option>)}</select></label>{workspace?.canManage ? <button type="button" className="chronicle-map-button chronicle-map-button--primary" onClick={() => setCreating(true)}>＋ Nuevo mapa</button> : null}{activeMap && workspace?.canManage ? <><button type="button" className={'chronicle-map-button' + (editing ? ' chronicle-map-button--primary' : '')} onClick={enterOrLeaveEditing}>{editing ? 'Salir de edición' : 'Editar mapa'}</button>{editing ? <><button type="button" className="chronicle-map-button" onClick={beginNewArea}>＋ Dibujar zona</button><label className="chronicle-map-upload chronicle-map-global-actions__upload">Subir o reemplazar imagen<input type="file" accept="image/png,image/jpeg,image/webp" onChange={event => { const file = event.currentTarget.files?.[0]; if (file) void uploadMap(file); event.currentTarget.value = '' }} /></label></> : null}<label className="chronicle-map-global-actions__parent">Mapa superior<select value={parentDraft} onChange={event => setParentDraft(event.target.value)}><option value="">Sin mapa superior</option>{maps.filter(map => map.id !== activeMap.id && map.status === 'active').map(map => <option key={map.id} value={map.id}>{map.name}</option>)}</select></label><button type="button" className="chronicle-map-button" onClick={() => void saveParent()}>Guardar jerarquía</button><button type="button" className="chronicle-map-button chronicle-map-button--danger" onClick={() => void removeMap()}>Eliminar mapa</button></> : null}</div>, document.getElementById('app-header-page-actions')!) : null}
     {loading ? <p className="chronicle-map-page__status">Cargando cartografía…</p> : null}
+    {!loading && !chronicleId && chronicles.length === 0 && !message ? <section className="chronicle-map-empty"><h2>El mapa aparecerá cuando formes parte de una crónica</h2><p>Cuando el Narrador te invite, aquí encontrarás los mapas de la historia.</p></section> : null}
     {!loading && workspace && !maps.length ? <section className="chronicle-map-empty"><h2>Aún no hay mapas</h2><p>El narrador puede subir una ciudad, provincia o cualquier otro mapa y añadir después mapas superiores o submapas.</p>{workspace.canManage ? <button type="button" className="chronicle-map-button chronicle-map-button--primary" onClick={() => setCreating(true)}>Crear el primer mapa</button> : null}</section> : null}
     {activeMap ? <section className="chronicle-map-workspace">
       <aside className="chronicle-map-tree"><h2>Mapas de la crónica</h2><p>Selecciona una escala para trabajar con ella.</p>{renderTree(null)}</aside>

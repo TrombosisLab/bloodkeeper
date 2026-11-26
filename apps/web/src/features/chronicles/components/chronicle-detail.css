@@ -511,8 +511,27 @@
   .chronicle-detail__header h1, .chronicle-detail__header h2 { font-size: 1.6rem; line-height: 1.15; overflow-wrap: anywhere; }
   .chronicle-detail__header-actions { gap: 8px; }
   .chronicle-detail__header-actions button { width: auto; min-height: 44px; white-space: normal; }
-  .chronicle-detail__section-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; gap: 6px; }
-  .chronicle-detail button.chronicle-detail__section-tab { min-width: 0; min-height: 44px; white-space: normal; }
-  .chronicle-detail button.chronicle-detail__section-tab:last-child { grid-column: 1 / -1; }
+  .chronicle-detail__section-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 7px;
+    scrollbar-color: rgba(211, 84, 108, .75) rgba(255, 255, 255, .08);
+    scrollbar-width: thin;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+  }
+  .chronicle-detail__section-tabs::-webkit-scrollbar { height: 4px; }
+  .chronicle-detail__section-tabs::-webkit-scrollbar-track { background: rgba(255, 255, 255, .08); border-radius: 99px; }
+  .chronicle-detail__section-tabs::-webkit-scrollbar-thumb { background: rgba(211, 84, 108, .75); border-radius: 99px; }
+  .chronicle-detail button.chronicle-detail__section-tab {
+    flex: 0 0 auto;
+    min-width: max-content;
+    min-height: 44px;
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
   .chronicle-detail__metadata { grid-template-columns: minmax(0, 1fr); }
 }

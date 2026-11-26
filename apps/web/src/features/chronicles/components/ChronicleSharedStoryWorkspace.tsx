@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   ChronicleStoryApiError,
@@ -55,18 +55,37 @@ function errorMessage(error: unknown): string {
 }
 
 export function ChronicleSharedStoryWorkspace({ chronicleId }: Props) {
+  const workspaceRef = useRef<HTMLElement | null>(null)
   const [stories, setStories] = useState<readonly ChronicleSharedStoryApiSnapshot[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false)
+  const [milestonesExpanded, setMilestonesExpanded] = useState(false)
 
   const selected = stories.find((story) => story.id === selectedId) ?? null
   const filteredStories = useMemo(() => stories.filter((story) => {
     const titleMatches = story.title.toLocaleLowerCase('es').includes(search.trim().toLocaleLowerCase('es'))
     return titleMatches && (statusFilter.length === 0 || story.status === statusFilter)
   }), [stories, search, statusFilter])
+
+  function scrollWorkspaceIntoView() {
+    window.requestAnimationFrame(() => workspaceRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' }))
+  }
+
+  function openStory(storyId: string) {
+    setSelectedId(storyId)
+    setMobileDetailOpen(true)
+    setMilestonesExpanded(false)
+    if (window.matchMedia('(max-width: 820px)').matches) scrollWorkspaceIntoView()
+  }
+
+  function returnToStoryList() {
+    setMobileDetailOpen(false)
+    scrollWorkspaceIntoView()
+  }
 
   useEffect(() => {
     let current = true
@@ -92,7 +111,7 @@ export function ChronicleSharedStoryWorkspace({ chronicleId }: Props) {
   }, [chronicleId])
 
   return (
-    <section className="story-workspace story-workspace--shared" aria-label="Historias compartidas de la Crónica">
+    <section ref={workspaceRef} className={`story-workspace story-workspace--shared${mobileDetailOpen ? ' story-workspace--mobile-detail' : ''}`} aria-label="Historias compartidas de la Crónica">
       <aside className="story-browser">
         <header className="story-browser__header">
           <div><span>Crónica</span><h2>Historias</h2></div>
@@ -107,15 +126,15 @@ export function ChronicleSharedStoryWorkspace({ chronicleId }: Props) {
           {loading ? <p className="story-empty">Cargando historias…</p> : null}
           {!loading && error !== null ? <p className="story-empty" role="alert">{error}</p> : null}
           {!loading && error === null && filteredStories.length === 0 ? <p className="story-empty">No hay historias compartidas con estos filtros.</p> : null}
-          {filteredStories.map((story) => <button key={story.id} type="button" className={story.id === selectedId ? 'story-card is-selected' : 'story-card'} onClick={() => setSelectedId(story.id)}><span><strong>{story.title}</strong><small>{typeLabels[story.type]}</small></span><span className="story-card__status">{statusLabels[story.status]}</span><span className="story-card__progress"><i style={{ width: `${story.progress.percentage}%` }} /></span><small>{story.progress.completed}/5 hitos</small></button>)}
+          {filteredStories.map((story) => <button key={story.id} type="button" className={story.id === selectedId ? 'story-card story-card--shared is-selected' : 'story-card story-card--shared'} onClick={() => openStory(story.id)}><span className="story-card__shared-heading"><strong>{story.title}</strong><small>{typeLabels[story.type]}</small></span><span className="story-card__shared-meta"><span className="story-card__status">{statusLabels[story.status]}</span><span>{story.progress.completed}/{story.progress.total} hitos</span></span><span className="story-card__progress" aria-hidden="true"><i style={{ width: `${story.progress.percentage}%` }} /></span></button>)}
         </div>
       </aside>
 
       <main className="story-detail">
         {selected === null ? <div className="story-detail__empty"><span>♜</span><h2>Historias de la Crónica</h2><p>Cuando el Narrador comparta un arco, podrás seguir aquí su progreso.</p></div> : <>
-          <header className="story-detail__header"><div><span>Historia compartida</span><h2>{selected.title}</h2></div><span className="story-card__status">{statusLabels[selected.status]}</span></header>
+          <header className="story-detail__header"><button type="button" className="story-mobile-back" onClick={returnToStoryList}>← Historias</button><div><span>Historia compartida · {typeLabels[selected.type]}</span><h2>{selected.title}</h2></div><span className="story-card__status">{statusLabels[selected.status]} · {selected.progress.completed}/{selected.progress.total} hitos</span></header>
           <section className="story-section story-shared-summary"><div className="story-section__heading"><div><span>Lo que sabe el grupo</span><h3>Resumen compartido</h3></div></div><p>{selected.sharedSummary ?? 'El Narrador todavía no ha publicado un resumen para esta Historia.'}</p></section>
-          <section className="story-section story-milestones"><div className="story-section__heading"><div><span>Progreso narrativo</span><h3>Hitos de la historia</h3></div><strong>{selected.progress.percentage}%</strong></div><div className="story-milestones__track">{selected.milestones.map((milestone, index) => <div key={milestone.key} className={milestone.completed ? 'story-shared-milestone is-complete' : 'story-shared-milestone'}><span>{milestone.completed ? '✓' : index + 1}</span><strong>{milestoneLabels[milestone.key]}</strong><small>{milestone.completed ? 'Completado' : 'Pendiente'}</small></div>)}</div></section>
+          <section className="story-section story-milestones"><div className="story-section__heading"><div><span>Progreso narrativo</span><h3>Hitos de la historia</h3></div><strong>{selected.progress.percentage}%</strong></div><button type="button" className="story-mobile-milestones-toggle" aria-expanded={milestonesExpanded} aria-controls="shared-story-milestones" onClick={() => setMilestonesExpanded((expanded) => !expanded)}>{milestonesExpanded ? 'Ocultar hitos' : `Ver los ${selected.progress.total} hitos`}</button><div id="shared-story-milestones" className={`story-milestones__track${milestonesExpanded ? ' is-expanded' : ''}`}>{selected.milestones.map((milestone, index) => <div key={milestone.key} className={milestone.completed ? 'story-shared-milestone is-complete' : 'story-shared-milestone'}><span>{milestone.completed ? '✓' : index + 1}</span><strong>{milestoneLabels[milestone.key]}</strong><small>{milestone.completed ? 'Completado' : 'Pendiente'}</small></div>)}</div></section>
           <section className="story-section story-shared-lifecycle"><div className="story-section__heading"><div><span>Memoria del arco</span><h3>Estado narrativo</h3></div></div><div><article><small>Activación</small><strong>{dateLabel(selected.startedAt)}</strong></article><article><small>Cierre</small><strong>{dateLabel(selected.completedAt)}</strong></article></div></section>
         </>}
       </main>
