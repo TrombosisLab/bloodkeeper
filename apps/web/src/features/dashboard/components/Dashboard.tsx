@@ -203,6 +203,57 @@ export function Dashboard({
     bloodPotency: metricValue(selectedCharacter?.bloodPotency, 0),
   }), [selectedCharacter])
 
+  const otherChronicles = data.chronicles.filter(
+    (chronicle) => chronicle.id !== selectedId,
+  )
+
+  function renderChronicleCard(
+    chronicle: DashboardChronicle,
+    useSelectedSessionStatus = false,
+  ) {
+    const active = chronicle.id === selectedId
+    const cardCharacterCount = numberValue(chronicle.characterCount, 0)
+    const cardCharacterName = active
+      ? text(selectedCharacter?.name, 'Sin personaje asociado')
+      : cardCharacterCount === 0
+        ? 'Sin personaje asociado'
+        : cardCharacterCount === 1
+          ? '1 personaje asociado'
+          : `${cardCharacterCount} personajes asociados`
+    const cardCharacterMeta = active
+      ? text(selectedCharacter?.clan, 'Clan sin registrar')
+      : 'Selecciona para consultar'
+
+    return (
+      <button
+        type="button"
+        key={chronicle.id}
+        className={'dashboard-chronicle-card' + (active ? ' is-selected' : '')}
+        onClick={() => {
+          setSelectedChronicleId(chronicle.id)
+          setSelectedCharacterId(null)
+          window.localStorage.setItem('bloodkeeper.activeChronicleId', chronicle.id)
+          window.dispatchEvent(new CustomEvent('bloodkeeper:active-chronicle-change', { detail: chronicle.id }))
+        }}
+        aria-pressed={active}
+      >
+        <span className="dashboard-chronicle-card__image" aria-hidden="true">
+          <span>V5</span>
+          <img src={'/api/chronicles/' + chronicle.id + '/cover'} alt="" onError={(event) => { event.currentTarget.style.display = 'none' }} />
+        </span>
+        <span className="dashboard-chronicle-card__body">
+          <strong>{chronicle.name}</strong>
+          <em>{cardCharacterName}</em>
+          <span className="dashboard-chronicle-card__meta">{cardCharacterMeta}</span>
+          <span className="dashboard-badge">
+            {active && useSelectedSessionStatus ? status : statusLabel(chronicle.status)}
+          </span>
+        </span>
+        <span className="dashboard-chronicle-card__arrow" aria-hidden="true">{active ? '✓' : '›'}</span>
+      </button>
+    )
+  }
+
   if (!canAccessChronicles) {
     return <section className="dashboard dashboard--empty"><span className="dashboard__eyebrow">Inicio</span><h1>Bienvenido, {displayName}</h1><p>No tienes acceso a ninguna cronica activa.</p></section>
   }
@@ -240,28 +291,25 @@ export function Dashboard({
         <>
           <section className="dashboard-section" aria-labelledby="dashboard-chronicles-title">
             <div className="dashboard-section__heading"><div><span className="dashboard__eyebrow">Tu mesa de juego</span><h2 id="dashboard-chronicles-title">Tus cronicas activas</h2></div><span className="dashboard-count">{data.chronicles.length}</span></div>
-            <div className="dashboard-chronicle-cards">
-              {data.chronicles.map((chronicle) => {
-                const active = chronicle.id === selectedId
-                const cardCharacterCount = numberValue(chronicle.characterCount, 0)
-                const cardCharacterName = active
-                  ? text(selectedCharacter?.name, 'Sin personaje asociado')
-                  : cardCharacterCount === 0
-                    ? 'Sin personaje asociado'
-                    : cardCharacterCount === 1
-                      ? '1 personaje asociado'
-                      : `${cardCharacterCount} personajes asociados`
-                const cardCharacterMeta = active
-                  ? text(selectedCharacter?.clan, 'Clan sin registrar')
-                  : 'Selecciona para consultar'
-                return (
-                  <button type="button" key={chronicle.id} className={'dashboard-chronicle-card' + (active ? ' is-selected' : '')} onClick={() => { setSelectedChronicleId(chronicle.id); setSelectedCharacterId(null); window.localStorage.setItem('bloodkeeper.activeChronicleId', chronicle.id); window.dispatchEvent(new CustomEvent('bloodkeeper:active-chronicle-change', { detail: chronicle.id })) }} aria-pressed={active}>
-                    <span className="dashboard-chronicle-card__image" aria-hidden="true"><span>V5</span><img src={'/api/chronicles/' + chronicle.id + '/cover'} alt="" onError={(event) => { event.currentTarget.style.display = 'none' }} /></span>
-                    <span className="dashboard-chronicle-card__body"><strong>{chronicle.name}</strong><em>{cardCharacterName}</em><span className="dashboard-chronicle-card__meta">{cardCharacterMeta}</span><span className="dashboard-badge">{statusLabel(chronicle.status)}</span></span>
-                    <span className="dashboard-chronicle-card__arrow" aria-hidden="true">{active ? '✓' : '›'}</span>
-                  </button>
-                )
-              })}
+            <div className="dashboard-chronicle-cards dashboard-chronicle-cards--desktop">
+              {data.chronicles.map((chronicle) => renderChronicleCard(chronicle))}
+            </div>
+            <div className="dashboard-mobile-chronicles">
+              {typeof selectedChronicle?.id === 'string' &&
+                typeof selectedChronicle.name === 'string'
+                ? renderChronicleCard(
+                    { ...selectedChronicle, id: selectedChronicle.id, name: selectedChronicle.name },
+                    true,
+                  )
+                : null}
+              {otherChronicles.length > 0 ? (
+                <details className="dashboard-mobile-chronicles__others">
+                  <summary>Ver mis otras {otherChronicles.length} crónicas</summary>
+                  <div className="dashboard-mobile-chronicles__list">
+                    {otherChronicles.map((chronicle) => renderChronicleCard(chronicle))}
+                  </div>
+                </details>
+              ) : null}
             </div>
           </section>
 
@@ -270,6 +318,36 @@ export function Dashboard({
             <label>Personaje<select value={selectedCharacter?.id ?? ''} onChange={(event) => setSelectedCharacterId(event.target.value || null)} disabled={characters.length < 2}><option value="">{characterName}</option>{characters.filter((character) => character.id !== selectedCharacter?.id).map((character) => <option key={character.id} value={character.id}>{character.name}</option>)}</select></label>
             <button type="button" className="button" onClick={onNavigateChronicles}>Cambiar cronica</button>
           </div>
+
+          <article className="dashboard-panel dashboard-mobile-character">
+            <div className="dashboard-mobile-character__identity">
+              <div className="dashboard-portrait dashboard-mobile-character__portrait">
+                <span>{characterName.slice(0, 1).toUpperCase()}</span>
+                {characterPortrait ? <img src={characterPortrait} alt="" onError={(event) => { event.currentTarget.style.display = 'none' }} /> : null}
+              </div>
+              <div className="dashboard-mobile-character__name">
+                <span className="dashboard__eyebrow">Mi personaje</span>
+                <h2>{characterName}</h2>
+                <span>{text(selectedCharacter?.clan, 'Clan sin registrar')}</span>
+              </div>
+              <button type="button" className="button button--accent" onClick={onNavigateCharacters}>Abrir ficha</button>
+            </div>
+            {characters.length > 1 ? (
+              <label className="dashboard-mobile-character__selector">
+                Personaje
+                <select value={selectedCharacter?.id ?? ''} onChange={(event) => setSelectedCharacterId(event.target.value || null)}>
+                  {characters.map((character) => <option key={character.id} value={character.id}>{character.name}</option>)}
+                </select>
+              </label>
+            ) : null}
+            <div className="dashboard-mobile-character__stats" aria-label="Estado del personaje">
+              <div><span>Hambre</span><strong>{statValues.hunger}</strong></div>
+              <div><span>Salud</span><strong>{statValues.health}</strong></div>
+              <div><span>Voluntad</span><strong>{statValues.willpower}</strong></div>
+              <div><span>Humanidad</span><strong>{statValues.humanity}</strong></div>
+              <div><span>Potencia</span><strong>{statValues.bloodPotency}</strong></div>
+            </div>
+          </article>
 
           <section className="dashboard-primary-grid">
             <article className="dashboard-panel dashboard-character-panel">
@@ -298,6 +376,39 @@ export function Dashboard({
           </section>
 
           <section className="dashboard-panel dashboard-pending"><span className="dashboard__eyebrow">Pendiente</span><div><p><strong>☆</strong><b>{numberValue(pending?.experience)} PX disponibles</b></p><p><strong>↻</strong><span>{pending?.desireNeedsUpdate ? 'Deseo pendiente de actualizar' : 'Deseo al dia'}</span></p><p><strong>✉</strong><span>{numberValue(pending?.publicNotes)} notas nuevas del Narrador</span></p></div></section>
+
+          <section className="dashboard-panel dashboard-mobile-pending" aria-labelledby="dashboard-mobile-pending-title">
+            <span className="dashboard__eyebrow" id="dashboard-mobile-pending-title">Para ti</span>
+            <div>
+              <p><strong aria-hidden="true">☆</strong><span>{numberValue(pending?.experience)} PX disponibles</span></p>
+              <p><strong aria-hidden="true">↻</strong><span>{pending?.desireNeedsUpdate ? 'Deseo pendiente de actualizar' : 'Deseo al dia'}</span></p>
+              <p><strong aria-hidden="true">✉</strong><span>{numberValue(pending?.publicNotes)} notas nuevas del Narrador</span></p>
+            </div>
+          </section>
+
+          <section className="dashboard-mobile-details" aria-label="Más información de la crónica">
+            <details><summary>Descripción de la crónica</summary><p>{text(selectedChronicle?.description, 'La cronica aun no tiene una descripcion publicada.')}</p></details>
+            <details><summary>Anteriormente</summary><p>{previousSummary}</p></details>
+            <details>
+              <summary>Ambición y deseo</summary>
+              <div className="dashboard-mobile-details__paired">
+                <p><b>Ambición</b><span>{text((selectedCharacter as DashboardCharacter & { ambition?: string | null } | null)?.ambition, 'Define hacia donde quiere llevar su historia.')}</span></p>
+                <p><b>Deseo</b><span>{text((selectedCharacter as DashboardCharacter & { desire?: string | null } | null)?.desire, 'Todavia no hay un deseo pendiente de actualizar.')}</span></p>
+              </div>
+            </details>
+            <details>
+              <summary>Ahora mismo</summary>
+              <dl>
+                <div><dt>Sesión</dt><dd>{sessionTitle} · {status}</dd></div>
+                <div><dt>Narrador</dt><dd>{text(selectedChronicle?.narratorName, 'El Narrador')}</dd></div>
+                <div><dt>Localización</dt><dd>{text(context?.locationName ?? selectedChronicle?.locationName)}</dd></div>
+                <div><dt>Objetivo actual</dt><dd>{currentObjective}</dd></div>
+                <div><dt>PNJ relevante</dt><dd>{text(context?.npcName)}</dd></div>
+                <div><dt>Organización</dt><dd>{text(context?.organizationName ?? selectedChronicle?.organizationName)}</dd></div>
+                <div><dt>Amenaza conocida</dt><dd>{text(context?.threatName ?? selectedChronicle?.threatName)}</dd></div>
+              </dl>
+            </details>
+          </section>
         </>
       ) : null}
     </section>

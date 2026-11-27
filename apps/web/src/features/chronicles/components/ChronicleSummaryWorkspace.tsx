@@ -14,7 +14,10 @@ import type { ChronicleStoryApiSnapshot } from '../types/chronicle-story-api.typ
 import { ChronicleContextExport } from './ChronicleContextExport.tsx'
 import { ChronicleNarratorExport } from './ChronicleNarratorExport.tsx'
 import './chronicle-summary-workspace.css'
+import './chronicle-summary-activity-formatting.css'
+import './chronicle-summary-activity-mobile.css'
 import './chronicle-summary-progress-containment.css'
+import './chronicle-summary-mobile.css'
 
 const gateway = createChronicleGateway()
 const storyGateway = createChronicleStoryGateway()
@@ -78,6 +81,7 @@ function averageProgress(stories: readonly SummaryStory[]): number {
 }
 
 function stageFor(progress: number): number {
+  if (progress >= 100) return 4
   if (progress >= 75) return 3
   if (progress >= 50) return 2
   if (progress > 0) return 1
@@ -97,6 +101,9 @@ export function ChronicleSummaryWorkspace({
 }: Props) {
   const [data, setData] = useState<Snapshot | null>(null)
   const [error, setError] = useState(false)
+  const [expandedActivityIds, setExpandedActivityIds] = useState<ReadonlySet<string>>(() => new Set())
+  const [premiseExpanded, setPremiseExpanded] = useState(false)
+  const premiseText = chronicle.description ?? 'Añade una premisa para fijar el tono y el conflicto de esta crónica.'
 
   async function loadSummary() {
     setError(false)
@@ -121,6 +128,10 @@ export function ChronicleSummaryWorkspace({
   }
 
   useEffect(() => {
+    setPremiseExpanded(false)
+  }, [chronicle.id])
+
+  useEffect(() => {
     if (!active) return
     void loadSummary()
   }, [active, chronicle.id, canManage])
@@ -131,10 +142,11 @@ export function ChronicleSummaryWorkspace({
   const activeStories = stories.filter((story) => story.status === 'active')
   const preparationSessions = sessions.filter((session) => session.status === 'preparation')
   const completedSessions = sessions.filter((session) => session.status === 'completed')
+  const latestCompletedSession = [...completedSessions].sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))[0] ?? null
   const nextSession = [...preparationSessions]
     .sort((left, right) => (left.realDate ?? '9999').localeCompare(right.realDate ?? '9999'))[0] ?? null
   const activeParticipants = participants.filter((participant) => participant.status === 'active')
-  const progress = averageProgress(activeStories)
+  const progress = averageProgress(stories)
   const currentStage = stageFor(progress)
   const pending = [
     {
@@ -230,14 +242,41 @@ export function ChronicleSummaryWorkspace({
                 <span className="summary-timeline-dot" aria-hidden="true" />
                 <div>
                   <strong>{item.title}</strong>
-                  <small>{item.description}</small>
+                  <small
+                    id={`summary-activity-${item.id}-description`}
+                    className={
+                      'summary-activity-description' +
+                      (item.description.length > 220 ? ' summary-activity-description--collapsible' : '') +
+                      (expandedActivityIds.has(item.id) ? ' summary-activity-description--expanded' : '')
+                    }
+                  >
+                    {item.description}
+                  </small>
                   <time>{item.kind} · {dateLabel(item.at)}</time>
+                  {item.description.length > 220 ? (
+                    <button
+                      type="button"
+                      className="summary-activity-toggle"
+                      aria-expanded={expandedActivityIds.has(item.id)}
+                      aria-controls={`summary-activity-${item.id}-description`}
+                      onClick={() => setExpandedActivityIds((current) => {
+                        const next = new Set(current)
+                        if (next.has(item.id)) next.delete(item.id)
+                        else next.add(item.id)
+                        return next
+                      })}
+                    >
+                      {expandedActivityIds.has(item.id) ? 'Mostrar menos' : 'Leer resumen completo'}
+                    </button>
+                  ) : null}
                 </div>
               </li>
             ))}
             {recent.length === 0 ? <li className="summary-empty">Sin actividad registrada.</li> : null}
           </ul>
-          <button className="summary-link-button" type="button" onClick={() => onNavigate('timeline')}>Ver toda la actividad <span>›</span></button>
+          {canManage ? (
+            <button className="summary-link-button" type="button" onClick={() => onNavigate('timeline')}>Ver toda la actividad <span>›</span></button>
+          ) : null}
         </section>
       </aside>
 
@@ -249,13 +288,14 @@ export function ChronicleSummaryWorkspace({
             {canManage ? <ChronicleNarratorExport key={`narrator-export:${chronicle.id}`} chronicle={chronicle} active={active} /> : null}
           </div>
           <div className="summary-block-grid">
-            <article>
+            <article className="summary-premise">
               <span className="summary-eyebrow">Premisa</span>
-              <p id="chronicle-summary-premise" tabIndex={-1}>{chronicle.description ?? 'A\u00f1ade una premisa para fijar el tono y el conflicto de esta cr\u00f3nica.'}</p>
+              <p className={premiseExpanded ? 'summary-premise-text summary-premise-text--expanded' : 'summary-premise-text'} id="chronicle-summary-premise" tabIndex={-1}>{premiseText}</p>
+              {premiseText.length > 180 ? <button className="summary-premise-toggle" type="button" aria-expanded={premiseExpanded} aria-controls="chronicle-summary-premise" onClick={() => setPremiseExpanded((expanded) => !expanded)}>{premiseExpanded ? 'Mostrar menos' : 'Leer premisa completa'}</button> : null}
             </article>
             <article>
               <span className="summary-eyebrow">Situaci&oacute;n actual</span>
-              <p>{nextSession?.summary ?? (events[0]?.description ?? 'La situaci\u00f3n actual aparecer\u00e1 al registrar sesiones y sucesos.')}</p>
+              <p>{nextSession?.summary ?? latestCompletedSession?.summary ?? (events[0]?.description ?? 'La situaci\u00f3n actual aparecer\u00e1 al registrar sesiones y sucesos.')}</p>
             </article>
           </div>
         </section>
@@ -281,19 +321,19 @@ export function ChronicleSummaryWorkspace({
         </section>
 
         <div className="summary-split-grid">
-          <section className="summary-card summary-card--session">
+          <section className={'summary-card summary-card--session' + (nextSession === null ? ' summary-card--session-empty' : '')}>
             <div className="summary-card__heading">
               <span className="summary-eyebrow">Pr&oacute;xima sesi&oacute;n</span>
               {nextSession ? <time>{dateLabel(nextSession.realDate)}</time> : null}
             </div>
             <h3>{nextSession ? sessionLabel(nextSession) : 'Sin sesi\u00f3n preparada'}</h3>
-            <p>{nextSession?.summary ?? 'Prepara una sesi\u00f3n para que el siguiente paso de la cr\u00f3nica quede listo.'}</p>
+            <p className={nextSession === null ? 'summary-session-empty-copy' : undefined}>{nextSession?.summary ?? 'Prepara una sesi\u00f3n para que el siguiente paso de la cr\u00f3nica quede listo.'}</p>
             <div className="summary-meter"><span style={{ width: (nextSession ? Math.min(100, Math.max(8, (nextSession.summary?.length ?? 0) / 2)) : 0) + '%' }} /></div>
             <div className="summary-meter-label"><span>Preparaci&oacute;n</span><strong>{nextSession ? 'En curso' : 'Pendiente'}</strong></div>
             {nextSession ? <button className="summary-link-button" type="button" onClick={() => onNavigate('sessions')}>Ver preparaci&oacute;n <span>›</span></button> : null}
           </section>
 
-          <section className="summary-card summary-card--stories">
+          <section className={'summary-card summary-card--stories' + (activeStories.length === 0 ? ' summary-card--stories-empty' : '')}>
             <div className="summary-card__heading">
               <span className="summary-eyebrow">Historias en curso</span>
               <button className="summary-inline-button" type="button" onClick={() => onNavigate('stories')}>Ver todas</button>
@@ -311,10 +351,12 @@ export function ChronicleSummaryWorkspace({
           </section>
         </div>
 
-        <section className="summary-card summary-card--events">
+        <section className={'summary-card summary-card--events' + (events.length === 0 ? ' summary-card--events-empty' : '')}>
           <div className="summary-card__heading">
               <span className="summary-eyebrow">&Uacute;ltimos sucesos</span>
-            <button className="summary-inline-button" type="button" onClick={() => onNavigate('timeline')}>Ver todos los sucesos <span>›</span></button>
+            {canManage ? (
+              <button className="summary-inline-button" type="button" aria-label="Ver todos los sucesos" onClick={() => onNavigate('timeline')}><span className="summary-inline-button__full">Ver todos los sucesos</span><span className="summary-inline-button__mobile">Ver cronología</span><span aria-hidden="true">›</span></button>
+            ) : null}
           </div>
           <ul className="summary-event-list">
             {events.slice(0, 4).map((event) => (

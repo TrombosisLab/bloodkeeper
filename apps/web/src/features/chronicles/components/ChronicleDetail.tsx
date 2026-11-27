@@ -79,6 +79,7 @@ import {
 } from './ChroniclePlayWorkspace'
 
 import './chronicle-detail.css'
+import './chronicle-section-mobile-accents.css'
 
 const gateway =
   createChronicleGateway()

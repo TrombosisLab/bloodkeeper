@@ -1,0 +1,140 @@
+/* Los vacíos ocupan la fila completa, no el espacio de un icono o un porcentaje. */
+.summary-story-list li.summary-empty,
+.summary-event-list li.summary-empty {
+  display: block;
+  grid-column: 1 / -1;
+  padding: .25rem 0;
+}
+
+/* SUMMARY_MOBILE_REFRESH_V1_START */
+@media (max-width: 620px) {
+  .chronicle-summary-workspace .summary-card--identity {
+    border-color: #514331;
+    border-left: 3px solid #b79060;
+    background: linear-gradient(145deg, rgba(39, 33, 26, .96), rgba(17, 15, 15, .99));
+  }
+
+  .chronicle-summary-workspace .summary-card:not(.summary-card--identity) {
+    background-color: rgba(19, 18, 19, .98);
+  }
+
+  .chronicle-summary-workspace .summary-card--overview,
+  .chronicle-summary-workspace .summary-card--events {
+    border-left: 3px solid #6e9ba4;
+    background: linear-gradient(145deg, rgba(24, 36, 42, .96), rgba(16, 19, 22, .99));
+  }
+
+  .chronicle-summary-workspace .summary-card--progress,
+  .chronicle-summary-workspace .summary-card--session {
+    border-left: 3px solid #b79060;
+    background: linear-gradient(145deg, rgba(39, 33, 26, .94), rgba(18, 17, 17, .99));
+  }
+
+  .chronicle-summary-workspace .summary-card--stories {
+    border-left: 3px solid #9a79a7;
+    background: linear-gradient(145deg, rgba(38, 27, 43, .95), rgba(17, 16, 19, .99));
+  }
+
+  .chronicle-summary-workspace .summary-card--activity {
+    border-left: 3px solid #8e4050;
+  }
+
+  .chronicle-summary-workspace .summary-activity-list li:nth-child(n + 3) {
+    display: none;
+  }
+}
+/* SUMMARY_MOBILE_REFRESH_V1_END */
+/* SUMMARY_MOBILE_DENSITY_V1_START */
+@media (max-width: 620px) {
+  .chronicle-summary-workspace .summary-card--identity {
+    padding: .5rem .72rem;
+  }
+
+  .chronicle-summary-workspace .summary-card--identity .summary-card__heading > div {
+    display: flex;
+    align-items: baseline;
+    gap: .4rem;
+  }
+
+  .chronicle-summary-workspace .summary-card--identity .summary-eyebrow {
+    margin: 0;
+  }
+
+  .chronicle-summary-workspace .summary-card--identity h2 {
+    font-size: 1rem;
+    line-height: 1.1;
+  }
+
+  .chronicle-summary-workspace .summary-premise-text:not(.summary-premise-text--expanded) {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+  }
+
+  .chronicle-summary-workspace .summary-premise-toggle {
+    margin-top: .38rem;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: #c4c7ca;
+    cursor: pointer;
+    font: inherit;
+    font-size: .66rem;
+    text-decoration: underline;
+  }
+
+  .chronicle-summary-workspace .summary-card--session-empty {
+    padding-block: .58rem;
+  }
+
+  .chronicle-summary-workspace .summary-card--session-empty > .summary-session-empty-copy,
+  .chronicle-summary-workspace .summary-card--session-empty > .summary-meter {
+    display: none;
+  }
+
+  .chronicle-summary-workspace .summary-card--session-empty .summary-meter-label {
+    margin-top: .42rem;
+  }
+
+  .chronicle-summary-workspace .summary-card--stories-empty,
+  .chronicle-summary-workspace .summary-card--events-empty {
+    padding-block: .58rem;
+  }
+
+  .chronicle-summary-workspace .summary-card--stories-empty .summary-story-list,
+  .chronicle-summary-workspace .summary-card--events-empty .summary-event-list {
+    margin-top: .38rem;
+  }
+
+  .chronicle-summary-workspace .summary-card--stories-empty li.summary-empty,
+  .chronicle-summary-workspace .summary-card--events-empty li.summary-empty {
+    padding: 0;
+  }
+
+  .chronicle-summary-workspace .summary-inline-button__full {
+    display: none;
+  }
+
+  .chronicle-summary-workspace .summary-inline-button__mobile {
+    display: inline;
+  }
+
+  .chronicle-summary-workspace .summary-inline-button__mobile {
+    font-size: .62rem;
+    line-height: normal;
+  }
+}
+
+@media (min-width: 621px) {
+  .chronicle-summary-workspace .summary-premise-toggle,
+  .chronicle-summary-workspace .summary-inline-button__mobile {
+    display: none;
+  }
+
+  .chronicle-summary-workspace .summary-inline-button__full {
+    font-size: .62rem;
+    line-height: normal;
+  }
+}
+/* SUMMARY_MOBILE_DENSITY_V1_END */

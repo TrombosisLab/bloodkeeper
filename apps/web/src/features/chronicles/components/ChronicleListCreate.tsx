@@ -337,7 +337,14 @@ export function ChronicleListCreate({
     chronicle: ChronicleApiSnapshot,
   ) {
     return (
-      <li key={chronicle.id}>
+      <li
+        key={chronicle.id}
+        className={
+          habitualChronicles.length > 1 && chronicle.id === latestChronicle?.id
+            ? 'chronicle-card-list-item--continue-duplicate'
+            : undefined
+        }
+      >
         <article className={
           "chronicle-card chronicle-card--visual chronicle-card--" +
           chronicle.status
@@ -465,7 +472,14 @@ export function ChronicleListCreate({
       </section>
 
       {latestChronicle !== null ? (
-        <section className="chronicle-continue" aria-labelledby="chronicle-continue-title">
+        <section
+          className={
+            habitualChronicles.length === 1
+              ? 'chronicle-continue chronicle-continue--single-mobile'
+              : 'chronicle-continue'
+          }
+          aria-labelledby="chronicle-continue-title"
+        >
           <div className="chronicle-continue__cover" aria-hidden="true">
             <span>V5</span>
             <img
@@ -529,7 +543,7 @@ export function ChronicleListCreate({
           </ViewStateStatus>
         ) : chronicles.length === 0 ? (
           <ViewStateStatus state="empty" className="chronicle-message">
-            Todavía no has creado ninguna crónica.
+            {canCurrentUserCreateChronicles ? 'Todavía no has creado ninguna crónica.' : 'Aún no formas parte de ninguna crónica. Cuando el Narrador te invite, aparecerá aquí.'}
           </ViewStateStatus>
         ) : habitualChronicles.length === 0 ? (
           <ViewStateStatus state="empty" className="chronicle-message">

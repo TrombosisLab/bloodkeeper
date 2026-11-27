@@ -77,3 +77,280 @@
 .participant-card--character .chronicle-detail__association{margin-top:.75rem;border-top:1px solid #343a3f;padding-top:.65rem}.participant-card--character .chronicle-detail__association .chronicle-detail__fold-launcher{width:100%;box-sizing:border-box}.participant-card--character .chronicle-detail__association .chronicle-detail__fold-content{margin-top:.45rem}
 
 .permission-access{flex:0 0 auto;border:1px solid #52585d;border-radius:99px;color:#9aa1a7;background:#23272a;padding:.2rem .45rem;font-size:.55rem;font-weight:800;white-space:nowrap}.permission-access--on{border-color:#9b3447;color:#fff;background:#a73348}
+
+/* Retratos autorizados y navegación móvil por lista/detalle */
+.participant-profile-info,.participant-mobile-back,.participant-permissions-toggle{display:none}
+.participant-filter>span{display:none}
+.participant-list__portrait{display:none}
+.participant-list__identity{display:grid;gap:.25rem;min-width:0}
+.participant-character-portrait{display:inline-grid;flex:0 0 auto;place-items:center;width:3rem;height:3rem;overflow:hidden;border:1px solid #713040;border-radius:4px;background:#171113}
+.participant-character-portrait img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 25%}
+.participant-character-portrait .character-seal{width:100%;height:100%;border:0;border-radius:0;font-size:1.3rem}
+.participant-character-portrait--compact{width:2.65rem;height:2.65rem;border-radius:50%}
+.participant-list__initial{display:grid;width:2.65rem;height:2.65rem;place-items:center;border:1px solid #4b4143;border-radius:50%;color:#d9c8ca;font-family:Georgia,serif;font-size:1rem}
+.participant-permissions-content{display:block}
+
+@media (max-width: 780px) {
+  .chronicle-participants-workspace__detail,
+  .chronicle-participants-workspace__side { display:none; }
+  .chronicle-participants-workspace--mobile-detail .chronicle-participants-workspace__browser { display:none; }
+  .chronicle-participants-workspace--mobile-detail .chronicle-participants-workspace__detail,
+  .chronicle-participants-workspace--mobile-detail .chronicle-participants-workspace__side { display:grid; }
+  .participant-mobile-back{display:inline-flex;justify-self:start;align-items:center;min-height:2.25rem;margin-bottom:.1rem;border:1px solid #363c41;border-radius:4px;background:#1a1d20;color:#e3e5e7;padding:.4rem .65rem;font:inherit;font-size:.72rem;font-weight:700}
+  .participant-profile-info{display:flex;flex-wrap:wrap;gap:.25rem .65rem;margin-top:.35rem;color:#aeb4b9;font-size:.62rem}
+  .participant-filter{display:grid;gap:.2rem;min-width:0}
+  .participant-filter>span{display:block;color:#aeb4b9;font-size:.58rem;letter-spacing:.06em;text-transform:uppercase}
+  .participant-list{max-height:none;overflow:visible}
+  .participant-list button{grid-template-columns:2.65rem minmax(0,1fr);align-items:center;gap:.6rem}
+  .participant-list__portrait{display:grid;place-items:center}
+  .participant-two-column{grid-template-columns:1fr}
+  .participant-card--identity-data,.participant-card--character-status{display:none}
+  .participant-card--character{min-height:0}
+  .participant-metric-grid,.involved-story-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .participant-metric-grid>div{grid-template-columns:1.45rem minmax(0,1fr);min-height:3.4rem}
+  .attendance-list>div{grid-template-columns:minmax(0,1fr) auto;gap:.2rem .5rem}
+  .attendance-list strong{grid-column:1;white-space:normal}
+  .attendance-list time{grid-column:1}
+  .attendance-list .attendance-status{grid-column:2;grid-row:1/span 2}
+  .participant-card--permissions .participant-permissions-heading{display:none}
+  .participant-permissions-toggle{display:flex;width:100%;align-items:center;justify-content:space-between;border:0;background:transparent;color:#e6e7e8;padding:0;font:inherit;font-family:Georgia,serif;font-size:.9rem;font-weight:700;text-align:left}
+  .participant-card--permissions.is-expanded .participant-permissions-content{display:block}
+  .participant-permissions-content{display:none}
+}
+
+
+/* PARTICIPANTS_DESKTOP_VISUAL_V1 — escritorio; móvil y tabletas conservan su diseño. */
+.participant-character-facts { display: none; }
+@media (min-width: 1181px) {
+  .participant-card--identity-data {
+    border-left: 2px solid rgba(194, 151, 78, .78);
+    background: linear-gradient(120deg, rgba(74, 55, 29, .22), rgba(16, 18, 20, .98) 68%);
+  }
+
+  .participant-card--character {
+    border-left: 2px solid rgba(105, 164, 157, .78);
+    background: linear-gradient(120deg, rgba(29, 62, 59, .24), rgba(16, 18, 20, .98) 68%);
+  }
+
+  .participant-card--participation {
+    border-left: 2px solid rgba(194, 151, 78, .78);
+    background: linear-gradient(120deg, rgba(65, 48, 26, .2), rgba(16, 18, 20, .98) 70%);
+  }
+
+  .participant-card--attendance {
+    border-left: 2px solid rgba(184, 71, 91, .72);
+    background: linear-gradient(120deg, rgba(63, 27, 36, .2), rgba(16, 18, 20, .98) 70%);
+  }
+
+  .participant-card--stories {
+    border-left: 2px solid rgba(145, 117, 171, .76);
+    background: linear-gradient(120deg, rgba(48, 37, 61, .2), rgba(16, 18, 20, .98) 70%);
+  }
+
+  .participant-character-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .45rem;
+    margin: .65rem 0 0;
+  }
+
+  .participant-character-facts > div {
+    display: grid;
+    gap: .15rem;
+    border-top: 1px solid rgba(105, 164, 157, .25);
+    padding-top: .4rem;
+  }
+
+  .participant-character-facts dt {
+    color: #91b9b3;
+    font-size: .58rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  .participant-character-facts dd {
+    margin: 0;
+    color: #e2e6e5;
+    font-size: .68rem;
+    font-weight: 700;
+  }
+
+  /* Los mismos datos quedan integrados en Personaje asociado. */
+  .participant-card--character-status { display: none; }
+
+  .participant-card--stories.is-empty .involved-story-grid {
+    display: block;
+    margin-top: .45rem;
+  }
+
+  .participant-card--stories.is-empty .participant-empty {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    border: 0;
+    border-left: 2px solid rgba(145, 117, 171, .56);
+    background: rgba(48, 37, 61, .22);
+    padding: .55rem .7rem;
+    text-align: left;
+  }
+}
+
+
+/* PARTICIPANTS_DESKTOP_VISUAL_V2 — contraste perceptible, solo escritorio. */
+@media (min-width: 1181px) {
+  .participant-card--identity-data {
+    border-top: 2px solid rgba(207, 164, 87, .72);
+    border-left: 4px solid #c69a53;
+    background: linear-gradient(125deg, rgba(94, 68, 31, .38), rgba(27, 23, 17, .96) 72%);
+    box-shadow: inset 0 0 0 1px rgba(207, 164, 87, .12), 0 8px 24px rgba(0, 0, 0, .12);
+  }
+  .participant-card--identity-data h3 { color: #e0bd7c; }
+
+  .participant-card--character {
+    border-top: 2px solid rgba(111, 181, 171, .72);
+    border-left: 4px solid #69a49d;
+    background: linear-gradient(125deg, rgba(35, 81, 75, .4), rgba(16, 27, 26, .97) 72%);
+    box-shadow: inset 0 0 0 1px rgba(111, 181, 171, .12), 0 8px 24px rgba(0, 0, 0, .12);
+  }
+  .participant-card--character .participant-card__heading h3 { color: #a4d4cd; }
+
+  .participant-card--participation {
+    border-top: 2px solid rgba(207, 164, 87, .72);
+    border-left: 4px solid #c69a53;
+    background: linear-gradient(125deg, rgba(83, 60, 27, .38), rgba(25, 22, 17, .97) 72%);
+    box-shadow: inset 0 0 0 1px rgba(207, 164, 87, .12), 0 8px 24px rgba(0, 0, 0, .12);
+  }
+  .participant-card--participation > h3 { color: #e0bd7c; }
+
+  .participant-card--attendance {
+    border-top: 2px solid rgba(196, 79, 98, .72);
+    border-left: 4px solid #b8475b;
+    background: linear-gradient(125deg, rgba(84, 32, 43, .4), rgba(28, 17, 20, .97) 72%);
+    box-shadow: inset 0 0 0 1px rgba(196, 79, 98, .12), 0 8px 24px rgba(0, 0, 0, .12);
+  }
+  .participant-card--attendance .participant-card__heading h3 { color: #e497a2; }
+
+  .participant-card--stories {
+    border-top: 2px solid rgba(161, 132, 190, .72);
+    border-left: 4px solid #9175ab;
+    background: linear-gradient(125deg, rgba(67, 51, 83, .4), rgba(24, 19, 29, .97) 72%);
+    box-shadow: inset 0 0 0 1px rgba(161, 132, 190, .12), 0 8px 24px rgba(0, 0, 0, .12);
+  }
+  .participant-card--stories .participant-card__heading h3 { color: #c4add8; }
+}
+
+
+/* PARTICIPANTS_DESKTOP_VISUAL_V3 — superficies claramente diferenciadas en PC. */
+@media (min-width: 1181px) {
+  .participant-card--identity-data {
+    border: 1px solid rgba(207, 164, 87, .58);
+    border-left: 5px solid #d0a64f;
+    background: #211c12;
+  }
+  .participant-card--identity-data h3 { color: #f0ca7e; }
+
+  .participant-card--character {
+    border: 1px solid rgba(111, 181, 171, .58);
+    border-left: 5px solid #70b5aa;
+    background: #14201e;
+  }
+  .participant-card--character .participant-card__heading h3 { color: #a9ddd5; }
+
+  .participant-card--participation {
+    border: 1px solid rgba(207, 164, 87, .58);
+    border-left: 5px solid #d0a64f;
+    background: #201b12;
+  }
+  .participant-card--participation > h3 { color: #f0ca7e; }
+  .participant-card--participation .participant-metric-grid > div {
+    border-color: rgba(207, 164, 87, .36);
+    background: rgba(11, 10, 8, .3);
+  }
+
+  .participant-card--attendance {
+    border: 1px solid rgba(196, 79, 98, .58);
+    border-left: 5px solid #c85b6b;
+    background: #241519;
+  }
+  .participant-card--attendance .participant-card__heading h3 { color: #f0a1aa; }
+  .participant-card--attendance .attendance-list > div { border-color: rgba(196, 79, 98, .24); }
+
+  .participant-card--stories {
+    border: 1px solid rgba(161, 132, 190, .58);
+    border-left: 5px solid #a184be;
+    background: #1e1925;
+  }
+  .participant-card--stories .participant-card__heading h3 { color: #d4bce9; }
+}
+
+
+/* PARTICIPANTS_DESKTOP_VISUAL_V4 — zonas más legibles y tarjetas sin estiramiento. */
+@media (min-width: 1181px) {
+  .participant-two-column { align-items: start; }
+
+  .participant-card--identity-data {
+    align-self: start;
+    border: 1px solid rgba(218, 174, 91, .7);
+    border-top: 3px solid #d3a84f;
+    border-left: 5px solid #d3a84f;
+    background: linear-gradient(145deg, #332917 0%, #282113 76%);
+  }
+  .participant-card--identity-data h3 { color: #f3d18c; }
+
+  .participant-card--character {
+    border: 1px solid rgba(113, 184, 173, .72);
+    border-top: 3px solid #73b8ad;
+    border-left: 5px solid #73b8ad;
+    background: linear-gradient(145deg, #18332f 0%, #132521 76%);
+  }
+  .participant-card--character .participant-card__heading h3 { color: #b5e4dd; }
+
+  .participant-card--participation {
+    border: 1px solid rgba(221, 174, 93, .68);
+    border-top: 3px solid #ddae5d;
+    border-left: 5px solid #ddae5d;
+    background: linear-gradient(145deg, #302616 0%, #251e13 76%);
+  }
+  .participant-card--participation > h3 { color: #f2cf8b; }
+  .participant-card--participation .participant-metric-grid > div {
+    border-color: rgba(221, 174, 93, .48);
+    background: rgba(10, 9, 7, .42);
+  }
+
+  .participant-card--attendance {
+    border: 1px solid rgba(205, 97, 114, .68);
+    border-top: 3px solid #cd6172;
+    border-left: 5px solid #cd6172;
+    background: linear-gradient(145deg, #321b20 0%, #26171a 76%);
+  }
+  .participant-card--attendance .participant-card__heading h3 { color: #f1aab3; }
+
+  .participant-card--stories {
+    border: 1px solid rgba(169, 145, 196, .68);
+    border-top: 3px solid #a991c4;
+    border-left: 5px solid #a991c4;
+    background: linear-gradient(145deg, #2b2235 0%, #211b29 76%);
+  }
+  .participant-card--stories .participant-card__heading h3 { color: #dbc8ee; }
+}
+
+
+/* PARTICIPANTS_DESKTOP_HIERARCHY_V1 — la ficha resume; la gestión se abre a demanda. */
+@media (min-width: 1181px) {
+  .participant-card--character {
+    align-content: start;
+  }
+
+  .participant-association-toggle {
+    min-height: 2rem;
+    padding-inline: .7rem;
+  }
+
+  .participant-association-management {
+    grid-column: 1 / -1;
+    min-width: 0;
+    margin-top: .15rem;
+    border-top: 1px solid rgba(113, 184, 173, .28);
+    padding-top: .6rem;
+  }
+}

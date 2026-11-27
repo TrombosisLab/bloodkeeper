@@ -1,0 +1,43 @@
+/* Acentos de sección limitados a la navegación y selección móvil. */
+@media (max-width: 760px) {
+  .chronicle-detail #chronicle-section-participants-tab[aria-selected='true'] {
+    border-color: #78b8b0;
+    color: #8fc9c2;
+    box-shadow: inset 0 -2px 0 #78b8b0;
+  }
+
+  .chronicle-detail #chronicle-section-stories-tab[aria-selected='true'] {
+    border-color: #b69acb;
+    color: #c4a9d8;
+    box-shadow: inset 0 -2px 0 #b69acb;
+  }
+
+  .chronicle-detail #chronicle-section-sessions-tab[aria-selected='true'] {
+    border-color: #d3b06b;
+    color: #e2c27e;
+    box-shadow: inset 0 -2px 0 #d3b06b;
+  }
+
+  #chronicle-section-participants-panel .participant-list li.is-selected {
+    border-color: rgb(120 184 176 / 72%);
+    background: rgb(120 184 176 / 5%);
+    box-shadow: inset 0 0 0 1px rgb(120 184 176 / 34%);
+  }
+
+  #chronicle-section-stories-panel .story-card.is-selected {
+    border-color: rgb(182 154 203 / 76%);
+    background: rgb(182 154 203 / 6%);
+    box-shadow: inset 3px 0 0 #b69acb;
+  }
+
+  #chronicle-section-sessions-panel .shared-session-workspace li button.is-selected {
+    border-color: rgb(211 176 107 / 76%);
+    background: rgb(211 176 107 / 6%);
+    box-shadow: inset 3px 0 0 #d3b06b;
+  }
+
+  #chronicle-section-sessions-panel .shared-session-workspace__detail > nav .is-active {
+    border-color: #d3b06b;
+    color: #e2c27e;
+  }
+}

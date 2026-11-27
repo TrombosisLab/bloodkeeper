@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 import { createPortal } from 'react-dom'
@@ -249,6 +250,8 @@ export function GlobalHistoryPage() {
   const [removeImage, setRemoveImage] = useState(false)
   const [preview, setPreview] = useState<{ label: string; description: string; category?: string } | null>(null)
   const [expandedImage, setExpandedImage] = useState(false)
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false)
+  const mobileListScrollPosition = useRef<number | null>(null)
 
   async function load(
     preferredId?: string,
@@ -351,6 +354,19 @@ export function GlobalHistoryPage() {
     pageEntries.find(
       (entry) => entry.id === selectedId,
     ) ?? pageEntries[0] ?? null
+
+  useEffect(() => {
+    if (mobileDetailOpen) {
+      window.scrollTo({ top: 0, behavior: 'auto' })
+      return
+    }
+    const savedPosition = mobileListScrollPosition.current
+    if (savedPosition === null) return
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: savedPosition, behavior: 'auto' })
+    })
+    mobileListScrollPosition.current = null
+  }, [mobileDetailOpen])
 
   useEffect(() => {
     setEntryPage(0)
@@ -503,8 +519,20 @@ export function GlobalHistoryPage() {
     })
   }
 
+  function openHistoryEntry(entryId: string): void {
+    setSelectedId(entryId)
+    if (window.matchMedia('(max-width: 760px)').matches) {
+      mobileListScrollPosition.current = window.scrollY
+      setMobileDetailOpen(true)
+    }
+  }
+
+  function returnToHistoryList(): void {
+    setMobileDetailOpen(false)
+  }
+
   return (
-    <main className="global-history">
+    <main className={`global-history${mobileDetailOpen ? ' is-mobile-detail-open' : ''}`}>
       {historyView === 'world' && headerActions !== null &&
       data?.canManage
         ? createPortal(
@@ -644,9 +672,7 @@ export function GlobalHistoryPage() {
                         ? 'is-active'
                         : undefined
                     }
-                    onClick={() =>
-                      setSelectedId(entry.id)
-                    }
+                    onClick={() => openHistoryEntry(entry.id)}
                   >
                     <time>{periodFor(entry)}</time>
                     <span>
@@ -701,6 +727,7 @@ export function GlobalHistoryPage() {
         </aside>
 
         <section className="global-history__detail">
+          <button type="button" className="global-history__mobile-back" aria-label="Volver al listado" onClick={returnToHistoryList}>← Volver al listado</button>
           {selected ? (
             <article>
               <header>
@@ -745,7 +772,7 @@ export function GlobalHistoryPage() {
               ) : null}
 
               {selected.imageUpdatedAt ? <figure className="history-figure">
-                <button type="button" aria-label="Ampliar imagen" onClick={() => setExpandedImage(true)}><img src={globalHistoryGateway.imageUrl(selected.id, selected.imageUpdatedAt)} alt={selected.imageCaption || selected.title} /></button>
+                <button type="button" className="history-image-button" aria-label="Ampliar imagen" onClick={() => setExpandedImage(true)}><img src={globalHistoryGateway.imageUrl(selected.id, selected.imageUpdatedAt)} alt={selected.imageCaption || selected.title} /></button>
                 <figcaption>{selected.imageCaption}{selected.imageCredit ? <small>Crédito: {selected.imageCredit}</small> : null}</figcaption>
               </figure> : null}
 
