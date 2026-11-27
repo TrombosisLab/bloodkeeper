@@ -13,6 +13,7 @@ interface CharacterPortraitProps {
   readonly readImageUrl?: string
   readonly name: string
   readonly clan: string
+  readonly isHuman?: boolean
 }
 
 export function CharacterPortrait({
@@ -20,6 +21,7 @@ export function CharacterPortrait({
   readImageUrl,
   name,
   clan,
+  isHuman = false,
 }: CharacterPortraitProps) {
   const input = useRef<HTMLInputElement>(null)
   const [version, setVersion] = useState(0)
@@ -68,7 +70,7 @@ export function CharacterPortrait({
       })
       if (!response.ok) throw new Error('remove-failed')
       setCustomAvailable(false)
-      setMessage('Se vuelve a mostrar el emblema del clan.')
+      setMessage(isHuman ? 'Se vuelve a mostrar el emblema humano.' : 'Se vuelve a mostrar el emblema del clan.')
     } catch {
       setMessage('No se pudo quitar el retrato.')
     } finally {
@@ -87,8 +89,17 @@ export function CharacterPortrait({
           />
         ) : (
           <div className="character-portrait__fallback">
-            <V5VisualMark kind="clan-symbol" value={clan} decorative />
-            <span>{displayValue(clan, 'Sin clan')}</span>
+            {isHuman ? (
+              <img
+                className="v5-visual-mark v5-visual-mark--human"
+                src="/assets/v5/clans/symbols/human.png"
+                alt=""
+                aria-hidden="true"
+              />
+            ) : (
+              <V5VisualMark kind="clan-symbol" value={clan} decorative />
+            )}
+            <span>{isHuman ? 'Humano' : displayValue(clan, 'Sin clan')}</span>
           </div>
         )}
       </div>

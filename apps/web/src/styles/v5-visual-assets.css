@@ -465,3 +465,35 @@
     max-width: 17rem !important;
   }
 }
+
+
+/* HUMAN_EMBLEM_DESKTOP_LABEL_STACK_V1
+   En escritorio apila la condición y el tipo para evitar que se toquen. */
+@media (min-width: 761px) {
+  .identity-header-main > .identity-heading .clan-mark--human span {
+    left: 5.7rem !important;
+    bottom: 2.35rem !important;
+  }
+
+  .identity-header-main > .identity-heading .clan-mark--human strong {
+    left: 5.7rem !important;
+    bottom: 1.05rem !important;
+  }
+}
+
+/* HUMAN_EMBLEM_DESKTOP_LABEL_ROW_V2
+   Igual que el rótulo de clan vampírico: etiqueta y valor en una línea. */
+@media (min-width: 761px) {
+  .identity-header-main > .identity-heading .clan-mark--human span,
+  .identity-header-main > .identity-heading .clan-mark--human strong {
+    bottom: 1.05rem !important;
+  }
+
+  .identity-header-main > .identity-heading .clan-mark--human span {
+    left: 5.7rem !important;
+  }
+
+  .identity-header-main > .identity-heading .clan-mark--human strong {
+    left: calc(5.7rem + 4.2rem) !important;
+  }
+}

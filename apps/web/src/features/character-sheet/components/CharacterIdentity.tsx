@@ -119,6 +119,7 @@ export function CharacterIdentity({
           readImageUrl={portraitReadImageUrl}
           name={character.name}
           clan={character.clan}
+          isHuman={human}
         />
 
         <div className="identity-header-main">
@@ -128,7 +129,18 @@ export function CharacterIdentity({
               <h2 id="identity-title">{character.name}</h2>
             </div>
 
-            {!human ? (
+            {human ? (
+              <div className="clan-mark clan-mark--human">
+                <img
+                  className="v5-visual-mark v5-visual-mark--human"
+                  src="/assets/v5/clans/symbols/human.png"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <span>Condición</span>
+                <strong>Humano</strong>
+              </div>
+            ) : (
               <div className="clan-mark">
                 <V5VisualMark
                   kind="clan-symbol"
@@ -140,7 +152,7 @@ export function CharacterIdentity({
                   {transitionalValue(character.clan, profilePhase)}
                 </strong>
               </div>
-            ) : null}
+            )}
           </div>
 
           <div
