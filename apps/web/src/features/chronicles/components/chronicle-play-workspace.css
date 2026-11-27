@@ -626,3 +626,134 @@
   }
 }
 /* BLOODKEEPER_CHRONICLE_PLAY_DICE_LAUNCHER_V1_END */
+
+/* JUGAR_DESKTOP_VISUAL_HIERARCHY_V1_START */
+@media (max-width: 1320px) {
+  .chronicle-play-workspace__scene-title--desktop { display: none; }
+}
+
+@media (min-width: 1321px) {
+  .chronicle-play-workspace {
+    --play-desktop-gold: #c9a66c;
+    --play-desktop-teal: #83b7b4;
+    column-gap: 1rem;
+    row-gap: .85rem;
+  }
+
+  .chronicle-play-workspace__session-switcher {
+    align-items: center;
+    padding: .55rem .75rem;
+    border-color: rgba(122, 92, 98, .34);
+    background: linear-gradient(90deg, rgba(28, 23, 25, .96), rgba(17, 15, 16, .96));
+  }
+
+  .chronicle-play-workspace__session-switcher label { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 1rem; }
+  .chronicle-play-workspace__session-switcher label > small { white-space: nowrap; color: var(--play-muted); }
+  .chronicle-play-workspace__session-switcher select { min-height: 2.45rem; }
+
+  .chronicle-play-workspace__hero {
+    gap: 0;
+    border: 0;
+    border-bottom: 1px solid var(--play-border);
+    background: transparent;
+    padding: 0 .1rem .55rem;
+  }
+
+  /* Keep the page heading available to assistive tech; the session selector already names the session visually. */
+  .chronicle-play-workspace__hero-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+  }
+
+  .chronicle-play-workspace__situation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .45rem 1.1rem;
+    border: 0;
+  }
+
+  .chronicle-play-workspace__situation > div {
+    min-width: 10rem;
+    border-left: 2px solid rgba(201, 166, 108, .48);
+    padding: .28rem .6rem;
+  }
+
+  .chronicle-play-workspace__situation > div + div { border-left: 2px solid rgba(201, 166, 108, .48); }
+  .chronicle-play-workspace__situation-scene { display: none !important; }
+  .chronicle-play-workspace__situation-location.is-unlinked { display: none; }
+  .chronicle-play-workspace__situation dd { font-size: .82rem; }
+
+  .chronicle-play-workspace__scene {
+    grid-template-columns: minmax(0, 1fr) 10rem;
+    gap: 1rem;
+    border-color: rgba(190, 137, 105, .58);
+    border-left: 3px solid var(--play-desktop-gold);
+    background: linear-gradient(130deg, rgba(43, 33, 29, .98), rgba(19, 16, 17, .99) 72%);
+    padding: 1rem;
+  }
+
+  .chronicle-play-workspace__scene-copy { gap: .45rem; }
+  .chronicle-play-workspace__scene-label--desktop { color: var(--play-desktop-gold); }
+  .chronicle-play-workspace__scene-title--desktop {
+    display: block;
+    color: #f2e7dd;
+    font-family: var(--font-family-display, Georgia, serif);
+    font-size: clamp(1.35rem, 1.8vw, 1.8rem);
+    line-height: 1.12;
+  }
+  .chronicle-play-workspace__scene-copy p { max-width: 72ch; line-height: 1.5; }
+  .chronicle-play-workspace__scene-copy > strong { margin-top: .35rem; color: var(--play-desktop-gold); }
+
+  .chronicle-play-workspace__tension {
+    align-content: center;
+    border-left-color: rgba(190, 137, 105, .36);
+    color: var(--play-desktop-gold);
+  }
+
+  .chronicle-play-workspace__scene-links {
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: .55rem;
+  }
+
+  .chronicle-play-workspace__scene-links article {
+    min-height: 5rem;
+    border-color: rgba(122, 92, 98, .34);
+    background: rgba(12, 11, 12, .44);
+    padding: .65rem .7rem;
+  }
+
+  .chronicle-play-workspace__scene-links article.is-unlinked { display: none; }
+  .chronicle-play-workspace__scene-links article:first-child { border-left: 2px solid var(--play-desktop-teal); }
+  .chronicle-play-workspace__scene-links article:nth-child(4) { border-left: 2px solid var(--play-desktop-gold); }
+  .chronicle-play-workspace__scene-links article:nth-child(5) { border-left: 2px solid rgba(216, 64, 89, .7); }
+  .chronicle-play-workspace__scene-links strong,
+  .chronicle-play-workspace__scene-links span { white-space: normal; }
+  .chronicle-play-workspace__scene-links span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height: 1.35; }
+
+  .chronicle-play-workspace__character {
+    border-color: rgba(216, 64, 89, .48);
+    background: linear-gradient(155deg, rgba(35, 24, 27, .98), rgba(14, 13, 14, .99) 58%);
+  }
+
+  .chronicle-play-workspace__disclosure[aria-label="Dados e historial de tiradas"] {
+    border-color: rgba(211, 71, 94, .5);
+    background: linear-gradient(110deg, rgba(48, 23, 29, .82), rgba(19, 15, 17, .98) 68%);
+  }
+  .chronicle-play-workspace__disclosure[aria-label="Dados e historial de tiradas"] .chronicle-play-workspace__disclosure-summary strong { color: #eda0aa; }
+  .chronicle-play-workspace__disclosure[aria-label="Recursos de sangre"] {
+    border-color: rgba(184, 145, 82, .46);
+    background: linear-gradient(110deg, rgba(43, 35, 23, .78), rgba(18, 16, 14, .98) 68%);
+  }
+  .chronicle-play-workspace__disclosure[aria-label="Recursos de sangre"] .chronicle-play-workspace__disclosure-summary strong { color: #d4b578; }
+  .chronicle-play-workspace__disclosure[aria-label="Notas e información de la sesión"] {
+    border-color: rgba(100, 142, 151, .42);
+    background: linear-gradient(110deg, rgba(24, 39, 43, .76), rgba(15, 17, 18, .98) 68%);
+  }
+  .chronicle-play-workspace__disclosure[aria-label="Notas e información de la sesión"] .chronicle-play-workspace__disclosure-summary strong { color: #afd0d1; }
+}
+/* JUGAR_DESKTOP_VISUAL_HIERARCHY_V1_END */

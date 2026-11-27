@@ -108,6 +108,10 @@ export function ChronicleParticipantsWorkspace({
   const [selectedId, setSelectedId] = useState<string | null>(participants[0]?.id ?? null)
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false)
   const [accessExpanded, setAccessExpanded] = useState(false)
+  const [associationOpen, setAssociationOpen] = useState(false)
+  const [isDesktopLayout, setIsDesktopLayout] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 1181px)').matches,
+  )
   const [context, setContext] = useState<ChronicleContext | null>(null)
   const [contextError, setContextError] = useState(false)
   const [notes, setNotes] = useState('')
@@ -149,7 +153,16 @@ export function ChronicleParticipantsWorkspace({
 
   useEffect(() => {
     setAccessExpanded(false)
+    setAssociationOpen(false)
   }, [selected?.id])
+
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 1181px)')
+    const updateLayout = () => setIsDesktopLayout(media.matches)
+    updateLayout()
+    media.addEventListener('change', updateLayout)
+    return () => media.removeEventListener('change', updateLayout)
+  }, [])
 
   useEffect(() => {
     if (character === null) {
@@ -213,7 +226,7 @@ export function ChronicleParticipantsWorkspace({
         : Promise.resolve({ items: [], nextOffset: null }),
     ])
       .then(async ([sessionPage, storyPage]) => {
-        const attendancePages = character === null || !canManage
+        const attendancePages = character === null
           ? []
           : await Promise.all(sessionPage.items.map((session) => gateway.sessionAttendances(selected.chronicleId, session.id)))
         if (live) setContext({ sessions: sessionPage.items, stories: storyPage.items, attendances: attendancePages.flat() })
@@ -371,17 +384,49 @@ export function ChronicleParticipantsWorkspace({
               </section>
 
               <section className="participant-card participant-card--character">
-                <div className="participant-card__heading"><h3>Personaje asociado</h3>{selected.userId === authenticatedUserId ? <button className="participant-inline-button" type="button" onClick={openCharacterAssociation}>{character ? 'Cambiar asociación' : 'Asociar personaje'}</button> : null}</div>
+                <div className="participant-card__heading">
+                  <h3>{isDesktopLayout ? 'Personaje' : 'Personaje asociado'}</h3>
+                  {selected.userId === authenticatedUserId ? (
+                    <button
+                      className="participant-inline-button participant-association-toggle"
+                      type="button"
+                      aria-expanded={isDesktopLayout ? associationOpen : undefined}
+                      aria-controls={isDesktopLayout ? 'participant-association-management' : undefined}
+                      onClick={() => {
+                        if (isDesktopLayout) setAssociationOpen((open) => !open)
+                        else openCharacterAssociation()
+                      }}
+                    >
+                      {isDesktopLayout
+                        ? associationOpen ? 'Cerrar gestión' : 'Gestionar asociación'
+                        : character ? 'Cambiar asociación' : 'Asociar personaje'}
+                    </button>
+                  ) : null}
+                </div>
                 {character ? (
-                  <div className="associated-character">
-                    <ParticipantCharacterPortrait chronicleId={chronicleId} character={character} />
-                    <div><strong>{character.name || 'Personaje sin nombre'}</strong><span>{character.concept ?? 'Sin concepto definido'}</span><small>{character.status}</small></div>
-                  </div>
+                  <>
+                    <div className="associated-character">
+                      <ParticipantCharacterPortrait chronicleId={chronicleId} character={character} />
+                      <div><strong>{character.name || 'Personaje sin nombre'}</strong><span>{character.concept ?? 'Sin concepto definido'}</span></div>
+                    </div>
+                    <dl className="participant-character-facts">
+                      <div><dt>Estado</dt><dd>{character.status}</dd></div>
+                      <div><dt>PX disponibles</dt><dd>{experienceError ? '—' : experience?.available ?? '…'}</dd></div>
+                    </dl>
+                  </>
                 ) : <p>Sin personaje asociado a esta crónica.</p>}
                 {canManage && character ? (
                   <button className="participant-secondary-button" type="button" onClick={() => { setCorrectionOpen(false); setOpenedCharacterId(character.characterId) }}>Abrir ficha</button>
                 ) : null}
-                {selected.userId === authenticatedUserId ? characterAssociation : null}
+                {selected.userId === authenticatedUserId ? (
+                  <div
+                    id="participant-association-management"
+                    className="participant-association-management"
+                    hidden={isDesktopLayout && !associationOpen}
+                  >
+                    {characterAssociation}
+                  </div>
+                ) : null}
               </section>
             </div>
 
@@ -427,7 +472,7 @@ export function ChronicleParticipantsWorkspace({
               </div>
             </section>
 
-            <section className="participant-card participant-card--stories">
+            <section className={`participant-card participant-card--stories${involvedStories.length === 0 ? ' is-empty' : ''}`}>
               <div className="participant-card__heading"><h3>Historias implicadas</h3><span className="participant-count">{involvedStories.length}</span></div>
               <div className="involved-story-grid">
                 {involvedStories.slice(0, 3).map((story) => <article key={story.id}><span className="story-seal" aria-hidden="true">▣</span><div><strong>{story.title}</strong><small>{story.status === 'active' ? 'En juego' : story.status}</small></div><b>{story.progress.percentage}%</b></article>)}

@@ -65,6 +65,9 @@ export function ChronicleMapPage() {
   // CHRONICLE_MAP_TEMPORARY_LAYER_FILTERS_V1 — preferencia local de vista, nunca modifica los datos guardados.
   const [visibleMapLayers, setVisibleMapLayers] = useState<Record<MapLayer, boolean>>({ LOCATION: true, REFUGE: true, LANDMARK: true, DANGER: true, AREAS: true })
   const [mapLayerPanelOpen, setMapLayerPanelOpen] = useState(false)
+  const [mapTreeCollapsed, setMapTreeCollapsed] = useState(false)
+  const [inspectorPosition, setInspectorPosition] = useState<{ x: number; y: number } | null>(null)
+  const inspectorDragRef = useRef<{ pointerId: number; startX: number; startY: number; left: number; top: number } | null>(null)
   const [resourcePreview, setResourcePreview] = useState<NotebookResourcePreview | null>(null)
   const [resourcePreviewLoading, setResourcePreviewLoading] = useState(false)
   const [resourcePreviewError, setResourcePreviewError] = useState('')
@@ -73,6 +76,16 @@ export function ChronicleMapPage() {
 
   const maps = workspace?.maps ?? []
   const activeMap = maps.find(map => map.id === selectedMapId) ?? maps[0] ?? null
+
+  useEffect(() => {
+    const mobile = window.matchMedia('(max-width: 900px)')
+    const resetDesktopOnlyState = () => {
+      if (mobile.matches) { setMapTreeCollapsed(false); setInspectorPosition(null) }
+    }
+    resetDesktopOnlyState()
+    mobile.addEventListener('change', resetDesktopOnlyState)
+    return () => mobile.removeEventListener('change', resetDesktopOnlyState)
+  }, [])
 
   useEffect(() => {
     void (async () => {
@@ -202,7 +215,34 @@ export function ChronicleMapPage() {
 
   function resetAreaStyle() { setAreaColor('#bd3e57'); setAreaFillColor('#bd3e57'); setAreaLabelColor('#fff3ed'); setAreaLabelSize('medium'); setAreaLabelVertical('top'); setAreaLabelHorizontal('left') }
 
-  function closeInteraction() { setClick(null); setInteraction(null); setAreaPreview(null); setAreaStart(null); setDrawingArea(false); setEditingMarkerId(null); setEditingAreaId(null) }
+  function beginInspectorDrag(event: PointerEvent<HTMLDivElement>) {
+    if (window.matchMedia('(max-width: 900px)').matches || event.button !== 0) return
+    const panel = event.currentTarget.closest('.chronicle-map-inspector')
+    if (!(panel instanceof HTMLElement)) return
+    const rect = panel.getBoundingClientRect()
+    inspectorDragRef.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, left: rect.left, top: rect.top }
+    event.currentTarget.setPointerCapture(event.pointerId)
+    event.preventDefault()
+  }
+
+  function moveInspectorDrag(event: PointerEvent<HTMLDivElement>) {
+    const drag = inspectorDragRef.current
+    if (!drag || drag.pointerId !== event.pointerId) return
+    const panel = event.currentTarget.closest('.chronicle-map-inspector')
+    if (!(panel instanceof HTMLElement)) return
+    const rect = panel.getBoundingClientRect()
+    const x = Math.min(Math.max(12, drag.left + event.clientX - drag.startX), Math.max(12, window.innerWidth - rect.width - 12))
+    const y = Math.min(Math.max(12, drag.top + event.clientY - drag.startY), Math.max(12, window.innerHeight - rect.height - 12))
+    setInspectorPosition({ x, y })
+  }
+
+  function endInspectorDrag(event: PointerEvent<HTMLDivElement>) {
+    if (inspectorDragRef.current?.pointerId !== event.pointerId) return
+    inspectorDragRef.current = null
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+  }
+
+  function closeInteraction() { setClick(null); setInteraction(null); setAreaPreview(null); setAreaStart(null); setDrawingArea(false); setEditingMarkerId(null); setEditingAreaId(null); setInspectorPosition(null) }
 
   function beginNewArea() { setEditingAreaId(null); setAreaPreview(null); setAreaStart(null); setClick(null); setInteraction(null); setInteractionTitle(''); setInteractionDescription(''); resetAreaStyle(); setDrawingArea(true); setMessage('Arrastra sobre el mapa para delimitar una zona.') }
 
@@ -214,13 +254,13 @@ export function ChronicleMapPage() {
   }
 
   function openMarker(marker: ChronicleMapSnapshot['markers'][number]) {
-    setSelectedMarkerId(marker.id); setSelectedAreaId('')
+    setSelectedMarkerId(marker.id); setSelectedAreaId(''); setInspectorPosition(null)
     if (!editing || !workspace?.canManage) return
     setEditingMarkerId(marker.id); setClick({ x: marker.x, y: marker.y }); setInteraction('marker'); setInteractionTitle(marker.label || marker.resource?.name || marker.location?.name || ''); setInteractionDescription(marker.description || ''); setInteractionKind(marker.kind); setInteractionResourceId(marker.resourceId || ''); setInteractionSize(marker.size || 'large')
   }
 
   function openArea(area: ChronicleMapSnapshot['areas'][number]) {
-    setSelectedAreaId(area.id); setSelectedMarkerId('')
+    setSelectedAreaId(area.id); setSelectedMarkerId(''); setInspectorPosition(null)
     if (!editing || !workspace?.canManage) return
     const shape = area.geometry as Partial<AreaRectangle>
     if (shape.type !== 'RECT') return
@@ -345,8 +385,8 @@ export function ChronicleMapPage() {
     {loading ? <p className="chronicle-map-page__status">Cargando cartografía…</p> : null}
     {!loading && !chronicleId && chronicles.length === 0 && !message ? <section className="chronicle-map-empty"><h2>El mapa aparecerá cuando formes parte de una crónica</h2><p>Cuando el Narrador te invite, aquí encontrarás los mapas de la historia.</p></section> : null}
     {!loading && workspace && !maps.length ? <section className="chronicle-map-empty"><h2>Aún no hay mapas</h2><p>El narrador puede subir una ciudad, provincia o cualquier otro mapa y añadir después mapas superiores o submapas.</p>{workspace.canManage ? <button type="button" className="chronicle-map-button chronicle-map-button--primary" onClick={() => setCreating(true)}>Crear el primer mapa</button> : null}</section> : null}
-    {activeMap ? <section className="chronicle-map-workspace">
-      <aside className="chronicle-map-tree"><h2>Mapas de la crónica</h2><p>Selecciona una escala para trabajar con ella.</p>{renderTree(null)}</aside>
+    {activeMap ? <section className={'chronicle-map-workspace' + (mapTreeCollapsed ? ' is-tree-collapsed' : '')}>
+      <aside className={'chronicle-map-tree' + (mapTreeCollapsed ? ' is-collapsed' : '')}><div className="chronicle-map-tree__heading">{mapTreeCollapsed ? <span className="chronicle-map-tree__collapsed-label" aria-hidden="true">Mapas</span> : <div><h2>Mapas de la crónica</h2><p>Selecciona una escala para trabajar con ella.</p></div>}<button type="button" className="chronicle-map-tree__toggle" aria-expanded={!mapTreeCollapsed} aria-label={mapTreeCollapsed ? 'Mostrar lista de mapas' : 'Plegar lista de mapas'} title={mapTreeCollapsed ? 'Mostrar mapas' : 'Plegar mapas'} onClick={() => setMapTreeCollapsed(value => !value)}>{mapTreeCollapsed ? '»' : '«'}</button></div>{!mapTreeCollapsed ? renderTree(null) : null}</aside>
       <section className="chronicle-map-detail">
         <header className="chronicle-map-detail__header"><div><small>{activeMap.status === 'archived' ? 'MAPA ARCHIVADO' : 'MAPA ACTIVO'}</small><h2>{activeMap.name}</h2><p>{activeMap.description || 'Sin descripción.'}</p></div>{workspace?.canManage ? <div className="chronicle-map-detail__tools"><button type="button" className={'chronicle-map-button' + (editing ? ' chronicle-map-button--primary' : '')} onClick={enterOrLeaveEditing}>{editing ? 'Salir de edición' : 'Editar mapa'}</button>{editing ? <><button type="button" className="chronicle-map-button" onClick={beginNewArea}>＋ Dibujar zona</button><label className="chronicle-map-upload">Subir o reemplazar imagen<input type="file" accept="image/png,image/jpeg,image/webp" onChange={event => { const file = event.currentTarget.files?.[0]; if (file) void uploadMap(file); event.currentTarget.value = '' }} /></label></> : null}</div> : null}</header>
         {workspace?.canManage ? <div className="chronicle-map-detail__parent"><label>Mapa superior<select value={parentDraft} onChange={event => setParentDraft(event.target.value)}><option value="">Sin mapa superior</option>{maps.filter(map => map.id !== activeMap.id && map.status === 'active').map(map => <option key={map.id} value={map.id}>{map.name}</option>)}</select></label><button type="button" className="chronicle-map-button" onClick={() => void saveParent()}>Guardar jerarquía</button></div> : null}
@@ -358,8 +398,8 @@ export function ChronicleMapPage() {
             <button type="button" className="chronicle-map-layer-panel__all" onClick={() => { setVisibleMapLayers({ LOCATION: true, REFUGE: true, LANDMARK: true, DANGER: true, AREAS: true }); setSelectedAreaId(''); setSelectedMarkerId('') }}>Mostrar todo</button>
           </fieldset> : null}
         </div><span>VISTA</span><button type="button" onClick={() => setZoom(current => Math.max(.75, Number((current - .25).toFixed(2))))} aria-label="Alejar">−</button><strong>{Math.round(zoom * 100)}%</strong><button type="button" onClick={() => setZoom(current => Math.min(2.5, Number((current + .25).toFixed(2))))} aria-label="Acercar">＋</button><button type="button" onClick={() => setZoom(1)}>Restablecer</button></div>
-        {selectedMarkerId ? (() => { const marker = activeMap.markers.find(item => item.id === selectedMarkerId); return marker ? <aside className="chronicle-map-inspector"><div><small>PUNTO DEL MAPA</small><h3>{marker.label || marker.resource?.name || marker.location?.name || 'Ubicación sin nombre'}</h3><p>{marker.description || marker.resource?.summary || marker.location?.category || 'Sin información adicional.'}</p><span>{marker.kind} · {Math.round(marker.x * 100)}% / {Math.round(marker.y * 100)}%</span></div><div>{marker.resource || marker.location ? <button type="button" className="chronicle-map-button" onClick={() => void openLinkedResource(marker)}>Abrir recurso</button> : null}{editing ? <><button type="button" className="chronicle-map-button" onClick={() => openMarker(marker)}>Modificar</button><button type="button" className="chronicle-map-button chronicle-map-button--danger" onClick={() => void removeMarker(marker.id)}>Eliminar</button></> : <span className="chronicle-map-inspector__hint">Activa «Editar mapa» para modificarlo.</span>}<button type="button" className="chronicle-map-button" onClick={() => setSelectedMarkerId('')}>Cerrar</button></div></aside> : null })() : null}
-        {selectedAreaId ? (() => { const area = activeMap.areas.find(item => item.id === selectedAreaId); return area ? <aside className="chronicle-map-inspector"><div><small>ZONA DEL MAPA</small><h3>{area.name}</h3><p>Zona delimitada en la cartografía.</p></div><div>{editing ? <><button type="button" className="chronicle-map-button" onClick={() => openArea(area)}>Modificar</button><button type="button" className="chronicle-map-button chronicle-map-button--danger" onClick={() => void removeArea(area.id)}>Eliminar</button></> : <span className="chronicle-map-inspector__hint">Activa «Editar mapa» para modificarla.</span>}<button type="button" className="chronicle-map-button" onClick={() => setSelectedAreaId('')}>Cerrar</button></div></aside> : null })() : null}
+        {selectedMarkerId ? (() => { const marker = activeMap.markers.find(item => item.id === selectedMarkerId); return marker ? <aside className="chronicle-map-inspector" style={inspectorPosition ? { left: `${inspectorPosition.x}px`, top: `${inspectorPosition.y}px`, right: "auto", bottom: "auto" } : undefined}><div className="chronicle-map-inspector__drag-handle" title="Arrastra para mover la ficha" onPointerDown={beginInspectorDrag} onPointerMove={moveInspectorDrag} onPointerUp={endInspectorDrag} onPointerCancel={endInspectorDrag}><small>PUNTO DEL MAPA</small><h3>{marker.label || marker.resource?.name || marker.location?.name || 'Ubicación sin nombre'}</h3><p>{marker.description || marker.resource?.summary || marker.location?.category || 'Sin información adicional.'}</p><span>{marker.kind} · {Math.round(marker.x * 100)}% / {Math.round(marker.y * 100)}%</span></div><div>{marker.resource || marker.location ? <button type="button" className="chronicle-map-button" onClick={() => void openLinkedResource(marker)}>Abrir recurso</button> : null}{editing ? <><button type="button" className="chronicle-map-button" onClick={() => openMarker(marker)}>Modificar</button><button type="button" className="chronicle-map-button chronicle-map-button--danger" onClick={() => void removeMarker(marker.id)}>Eliminar</button></> : <span className="chronicle-map-inspector__hint">Activa «Editar mapa» para modificarlo.</span>}<button type="button" className="chronicle-map-button" onClick={() => setSelectedMarkerId('')}>Cerrar</button></div></aside> : null })() : null}
+        {selectedAreaId ? (() => { const area = activeMap.areas.find(item => item.id === selectedAreaId); return area ? <aside className="chronicle-map-inspector" style={inspectorPosition ? { left: `${inspectorPosition.x}px`, top: `${inspectorPosition.y}px`, right: "auto", bottom: "auto" } : undefined}><div className="chronicle-map-inspector__drag-handle" title="Arrastra para mover la ficha" onPointerDown={beginInspectorDrag} onPointerMove={moveInspectorDrag} onPointerUp={endInspectorDrag} onPointerCancel={endInspectorDrag}><small>ZONA DEL MAPA</small><h3>{area.name}</h3><p>Zona delimitada en la cartografía.</p></div><div>{editing ? <><button type="button" className="chronicle-map-button" onClick={() => openArea(area)}>Modificar</button><button type="button" className="chronicle-map-button chronicle-map-button--danger" onClick={() => void removeArea(area.id)}>Eliminar</button></> : <span className="chronicle-map-inspector__hint">Activa «Editar mapa» para modificarla.</span>}<button type="button" className="chronicle-map-button" onClick={() => setSelectedAreaId('')}>Cerrar</button></div></aside> : null })() : null}
         {!workspace?.canManage ? <p className="chronicle-map-hint">Pulsa sobre el mapa para solicitar una ubicación. Pulsa un marcador o una zona para consultar su información.</p> : editing ? <p className="chronicle-map-hint">Pulsa sobre el mapa para colocar un punto o utiliza “Dibujar zona”. Pulsa un elemento para editarlo.</p> : <p className="chronicle-map-hint">Modo consulta. Pulsa un marcador o una zona para ver sus detalles; activa “Editar mapa” para realizar cambios.</p>}
         {workspace?.canManage && requests.length ? <section className="chronicle-map-requests"><header><small>SOLICITUDES DE JUGADORES</small><h3>Ubicaciones pendientes</h3></header>{requests.map(request => <article key={request.id} className="chronicle-map-request"><div><strong>{request.title}</strong><p>{request.description || 'Sin explicación adicional.'}</p><small>{request.requester?.displayName || 'Jugador'} · {request.status}</small></div>{request.status === 'pending' ? <div><button type="button" className="chronicle-map-button chronicle-map-button--primary" onClick={() => void review(request, 'APPROVED')}>Aprobar</button><button type="button" className="chronicle-map-button" onClick={() => void review(request, 'REJECTED')}>Rechazar</button></div> : null}</article>)}</section> : null}
       </section>

@@ -14,6 +14,8 @@ import type { ChronicleStoryApiSnapshot } from '../types/chronicle-story-api.typ
 import { ChronicleContextExport } from './ChronicleContextExport.tsx'
 import { ChronicleNarratorExport } from './ChronicleNarratorExport.tsx'
 import './chronicle-summary-workspace.css'
+import './chronicle-summary-activity-formatting.css'
+import './chronicle-summary-activity-mobile.css'
 import './chronicle-summary-progress-containment.css'
 import './chronicle-summary-mobile.css'
 
@@ -99,6 +101,7 @@ export function ChronicleSummaryWorkspace({
 }: Props) {
   const [data, setData] = useState<Snapshot | null>(null)
   const [error, setError] = useState(false)
+  const [expandedActivityIds, setExpandedActivityIds] = useState<ReadonlySet<string>>(() => new Set())
   const [premiseExpanded, setPremiseExpanded] = useState(false)
   const premiseText = chronicle.description ?? 'Añade una premisa para fijar el tono y el conflicto de esta crónica.'
 
@@ -239,14 +242,41 @@ export function ChronicleSummaryWorkspace({
                 <span className="summary-timeline-dot" aria-hidden="true" />
                 <div>
                   <strong>{item.title}</strong>
-                  <small>{item.description}</small>
+                  <small
+                    id={`summary-activity-${item.id}-description`}
+                    className={
+                      'summary-activity-description' +
+                      (item.description.length > 220 ? ' summary-activity-description--collapsible' : '') +
+                      (expandedActivityIds.has(item.id) ? ' summary-activity-description--expanded' : '')
+                    }
+                  >
+                    {item.description}
+                  </small>
                   <time>{item.kind} · {dateLabel(item.at)}</time>
+                  {item.description.length > 220 ? (
+                    <button
+                      type="button"
+                      className="summary-activity-toggle"
+                      aria-expanded={expandedActivityIds.has(item.id)}
+                      aria-controls={`summary-activity-${item.id}-description`}
+                      onClick={() => setExpandedActivityIds((current) => {
+                        const next = new Set(current)
+                        if (next.has(item.id)) next.delete(item.id)
+                        else next.add(item.id)
+                        return next
+                      })}
+                    >
+                      {expandedActivityIds.has(item.id) ? 'Mostrar menos' : 'Leer resumen completo'}
+                    </button>
+                  ) : null}
                 </div>
               </li>
             ))}
             {recent.length === 0 ? <li className="summary-empty">Sin actividad registrada.</li> : null}
           </ul>
-          <button className="summary-link-button" type="button" onClick={() => onNavigate('timeline')}>Ver toda la actividad <span>›</span></button>
+          {canManage ? (
+            <button className="summary-link-button" type="button" onClick={() => onNavigate('timeline')}>Ver toda la actividad <span>›</span></button>
+          ) : null}
         </section>
       </aside>
 
@@ -324,7 +354,9 @@ export function ChronicleSummaryWorkspace({
         <section className={'summary-card summary-card--events' + (events.length === 0 ? ' summary-card--events-empty' : '')}>
           <div className="summary-card__heading">
               <span className="summary-eyebrow">&Uacute;ltimos sucesos</span>
-            <button className="summary-inline-button" type="button" aria-label="Ver todos los sucesos" onClick={() => onNavigate('timeline')}><span className="summary-inline-button__full">Ver todos los sucesos</span><span className="summary-inline-button__mobile">Ver cronología</span><span aria-hidden="true">›</span></button>
+            {canManage ? (
+              <button className="summary-inline-button" type="button" aria-label="Ver todos los sucesos" onClick={() => onNavigate('timeline')}><span className="summary-inline-button__full">Ver todos los sucesos</span><span className="summary-inline-button__mobile">Ver cronología</span><span aria-hidden="true">›</span></button>
+            ) : null}
           </div>
           <ul className="summary-event-list">
             {events.slice(0, 4).map((event) => (

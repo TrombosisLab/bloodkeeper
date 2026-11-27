@@ -495,3 +495,224 @@ body:has(.dashboard) .dashboard {
     background: linear-gradient(100deg, rgba(48, 37, 23, .22), #191416 64%);
   }
 }
+
+/* DASHBOARD_DESKTOP_HOME_V1 — jerarquía y acentos solo para escritorio. */
+@media (min-width: 1151px) {
+  .dashboard {
+    display: grid;
+    grid-template-columns: minmax(0, 1.02fr) minmax(0, .98fr);
+    grid-template-areas:
+      "chronicles chronicles"
+      "context context"
+      "character chronicle"
+      "ambition now"
+      "previous previous"
+      "pending pending";
+    align-items: stretch;
+    column-gap: 14px;
+    row-gap: 12px;
+  }
+
+  .dashboard > .dashboard-section {
+    grid-area: chronicles;
+    margin-bottom: 0;
+  }
+
+  .dashboard > .dashboard-context-bar {
+    grid-area: context;
+    margin-bottom: 0;
+  }
+
+  .dashboard > .dashboard-primary-grid,
+  .dashboard > .dashboard-secondary-grid {
+    display: contents;
+  }
+
+  .dashboard .dashboard-character-panel {
+    grid-area: character;
+    border-color: rgba(91, 166, 158, .52);
+    background: linear-gradient(135deg, rgba(24, 45, 44, .42), var(--dash-panel) 74%);
+  }
+
+  .dashboard .dashboard-character-panel .dashboard__eyebrow {
+    color: #82bdb6;
+  }
+
+  .dashboard .dashboard-character-panel .dashboard-status {
+    border: 1px solid rgba(91, 166, 158, .38);
+    background: rgba(38, 102, 94, .24);
+    color: #9bd2c5;
+  }
+
+  .dashboard .dashboard-chronicle-panel {
+    grid-area: chronicle;
+    border-color: rgba(190, 143, 72, .48);
+    background: linear-gradient(135deg, rgba(48, 37, 23, .34), var(--dash-panel) 76%);
+  }
+
+  .dashboard .dashboard-chronicle-panel .dashboard__eyebrow,
+  .dashboard .dashboard-chronicle-panel .dashboard-facts dt {
+    color: #c9a66c;
+  }
+
+  .dashboard .dashboard-ambition {
+    grid-area: ambition;
+    margin-top: 0;
+    border-top: 2px solid rgba(91, 166, 158, .55);
+    background: linear-gradient(135deg, rgba(24, 45, 44, .24), var(--dash-panel-deep) 82%);
+  }
+
+  .dashboard .dashboard-ambition .dashboard-icon {
+    border-color: rgba(91, 166, 158, .4);
+    color: #82bdb6;
+  }
+
+  .dashboard .dashboard-now {
+    grid-area: now;
+    margin-top: 0;
+    border-top: 2px solid rgba(190, 143, 72, .55);
+    background: linear-gradient(135deg, rgba(48, 37, 23, .24), var(--dash-panel-deep) 82%);
+  }
+
+  .dashboard .dashboard-now .dashboard-icon {
+    border-color: rgba(190, 143, 72, .4);
+    color: #d2ad70;
+  }
+
+  .dashboard > .dashboard-previous {
+    grid-area: previous;
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-items: center;
+    gap: 16px;
+    min-height: 0;
+    margin-top: 0;
+    padding: 10px 14px;
+    border: 1px solid rgba(190, 143, 72, .3);
+    border-left: 3px solid #c9a66c;
+    border-radius: 8px;
+    background: rgba(48, 37, 23, .18);
+  }
+
+  .dashboard > .dashboard-previous .dashboard__eyebrow {
+    color: #c9a66c;
+    white-space: nowrap;
+  }
+
+  .dashboard > .dashboard-previous p {
+    font-size: 13px;
+  }
+
+  .dashboard > .dashboard-pending {
+    grid-area: pending;
+    grid-template-columns: 115px minmax(0, 1fr);
+    min-height: 0;
+    margin-top: 0;
+    padding: 8px 14px;
+  }
+
+  .dashboard > .dashboard-pending p {
+    padding: 0 12px;
+  }
+
+  .dashboard > .dashboard-pending strong {
+    font-size: 19px;
+  }
+}
+
+/* DASHBOARD_DESKTOP_CHRONICLE_CARDS_V2_BEGIN — revertir eliminando este bloque. */
+@media (min-width: 1151px) {
+  .dashboard .dashboard-chronicle-cards--desktop > .dashboard-chronicle-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 176px;
+    overflow: hidden;
+    isolation: isolate;
+    padding: 0;
+    background: #151416;
+  }
+
+  .dashboard .dashboard-chronicle-cards--desktop > .dashboard-chronicle-card.is-selected {
+    border: 2px solid var(--dash-accent);
+    background: #191416;
+  }
+
+  .dashboard .dashboard-chronicle-cards--desktop .dashboard-chronicle-card__image {
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    min-height: 0;
+    padding: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #34232a, #111416 78%);
+    font-size: 0;
+  }
+
+  .dashboard .dashboard-chronicle-cards--desktop .dashboard-chronicle-card__image > span {
+    display: none;
+  }
+
+  .dashboard .dashboard-chronicle-cards--desktop .dashboard-chronicle-card__image img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: .45;
+  }
+
+  .dashboard .dashboard-chronicle-cards--desktop .dashboard-chronicle-card__image::after {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(90deg, rgba(13, 12, 13, .97) 0%, rgba(13, 12, 13, .84) 46%, rgba(13, 12, 13, .56) 100%);
+    content: '';
+  }
+
+  .dashboard .dashboard-chronicle-cards--desktop .dashboard-chronicle-card__body {
+    z-index: 1;
+    grid-column: 1;
+    grid-row: 1;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 5px;
+    min-width: 0;
+    padding: 16px 42px 15px 16px;
+  }
+
+  .dashboard .dashboard-chronicle-cards--desktop .dashboard-chronicle-card__body strong {
+    display: -webkit-box;
+    overflow: hidden;
+    max-width: 100%;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow-wrap: anywhere;
+    font-size: 18px;
+    line-height: 1.18;
+  }
+
+  .dashboard .dashboard-chronicle-cards--desktop .dashboard-chronicle-card__body em,
+  .dashboard .dashboard-chronicle-cards--desktop .dashboard-chronicle-card__meta {
+    overflow: hidden;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dashboard .dashboard-chronicle-cards--desktop .dashboard-chronicle-card__arrow {
+    position: absolute;
+    z-index: 2;
+    top: 10px;
+    right: 13px;
+    align-self: auto;
+    padding: 0;
+    color: #e58b98;
+  }
+
+  .dashboard .dashboard-chronicle-cards--desktop .dashboard-badge {
+    margin-top: 3px;
+    background: rgba(10, 12, 12, .68);
+  }
+}
+/* DASHBOARD_DESKTOP_CHRONICLE_CARDS_V2_END */

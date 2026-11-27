@@ -71,6 +71,21 @@ function characterPhaseLabel(
   return 'Vampiro establecido'
 }
 
+
+/* CHARACTER_POSTER_CLASS_V1_BEGIN — clases cromáticas por etapa. */
+function characterCardClass(
+  character: CharacterDraftApiSnapshot,
+): string {
+  const phase = character.nature === 'human'
+    ? 'human'
+    : character.creation.creationMode === 'sessionZero'
+      ? 'transition'
+      : 'established'
+
+  return `character-list-card character-list-card--${phase}`
+}
+/* CHARACTER_POSTER_CLASS_V1_END */
+
 function errorMessage(
   error: unknown,
 ): string {
@@ -259,7 +274,7 @@ export function CharacterList({
               (character) => (
                 <li
                   key={character.characterId}
-                  className="character-list-card"
+                  className={characterCardClass(character)}
                 >
                   <CharacterListPortrait characterId={character.characterId} />
 
